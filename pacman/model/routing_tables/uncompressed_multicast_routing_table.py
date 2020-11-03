@@ -45,8 +45,6 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
 
         #  dict of multicast routing entries. (key) -> entry
         "_entries_by_key"
-
-
     ]
 
     def __init__(self, x, y, multicast_routing_entries=None):
@@ -131,7 +129,7 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
     @property
     @overrides(AbsractMulticastRoutingTable.number_of_entries)
     def number_of_entries(self):
-        """ The number of multi-cast routing entries there are in the\
+        """ The number of multicast routing entries there are in the\
             multicast routing table
 
         :rtype: int
@@ -141,7 +139,7 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
     @property
     @overrides(AbsractMulticastRoutingTable.number_of_defaultable_entries)
     def number_of_defaultable_entries(self):
-        """ The number of multi-cast routing entries that are set to be\
+        """ The number of multicast routing entries that are set to be\
             defaultable within this multicast routing table
 
         :rtype: int
@@ -149,15 +147,13 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
         return self._number_of_defaulted_routing_entries
 
     def get_entry_by_routing_entry_key(self, routing_entry_key):
-        """  Get the routing entry associated with the specified key \
-            or None if the routing table does not match the key
+        """ Get the routing entry associated with the specified key \
+            or ``None`` if the routing table does not match the key
 
-        :param routing_entry_key: the routing key to be searched
-        :type routing_entry_key: int
-        :return the routing entry associated with the routing key_combo or\
-            None if no such entry exists
-        :rtype:\
-            :py:class:`spinn_machine.MulticastRoutingEntry`
+        :param int routing_entry_key: the routing key to be searched
+        :return: the routing entry associated with the routing key_combo or
+            ``None`` if no such entry exists
+        :rtype: ~spinn_machine.MulticastRoutingEntry or None
         """
         if routing_entry_key in self._entries_by_key:
             return self._entries_by_key[routing_entry_key]
@@ -166,13 +162,13 @@ class UnCompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
     def get_multicast_routing_entry_by_routing_entry_key(
             self, routing_entry_key, mask):
         """ Get the routing entry associated with the specified key_combo-mask\
-            combination or None if the routing table does not match the\
+            combination or ``None`` if the routing table does not match the\
             key_combo
 
         :param int routing_entry_key: the routing key to be searched
         :param int mask: the routing mask to be searched
-        :return: the routing entry associated with the routing key_combo or\
-            None if no such entry exists
+        :return: the routing entry associated with the routing key_combo or
+            ``None`` if no such entry exists
         :rtype: ~spinn_machine.MulticastRoutingEntry or None
         """
         if (routing_entry_key & mask) != routing_entry_key:
