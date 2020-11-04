@@ -47,7 +47,7 @@ class MultiRegionSDRAM(VariableSDRAM):
         """ Adds the cost for the specified region
 
         :param region: Key to identify the region
-        :type region: int or String or enum
+        :type region: int or str or enum
         :param fixed_sdram: The fixed cost for this region.
         :type fixed_sdram: int or numpy.integer
         :param per_timestep_sdram: The variable cost for this region is any
@@ -74,7 +74,7 @@ class MultiRegionSDRAM(VariableSDRAM):
         *not* combined, but kept separate.
 
         :param region: Key to identify the summary region
-        :type region: int or String or enum
+        :type region: int or str or enum
         :param AbstractSDRAM other: Another SDRAM model to make combine by
             nesting
         """
