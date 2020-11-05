@@ -60,9 +60,12 @@ jobs:
       run: python setup.py install
       working-directory: SpiNNMachine
 
-    - name: Install
+    - name: Setup
       run: |
         python setup.py develop
+
+    - name: Install
+      run: |
         pip install -r requirements-test.txt
 
     - name: Test with pytest and coverage
