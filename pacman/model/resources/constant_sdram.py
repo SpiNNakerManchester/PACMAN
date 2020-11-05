@@ -32,7 +32,7 @@ class ConstantSDRAM(AbstractSDRAM):
     def __init__(self, sdram):
         """
         :param sdram: The amount of SDRAM in bytes
-        :type sdram: int or numpy.integer
+        :type sdram: int or ~numpy.int64
         """
         self._sdram = int(sdram)
 

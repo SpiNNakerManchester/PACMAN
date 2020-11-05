@@ -58,8 +58,8 @@ class ApplicationEdge(AbstractEdge):
         :param label: The name of the edge.
         :type label: str or None
         :param machine_edge_type:
-            The type of machine edges made from this app edge. If `None`,
-            standard `MachineEdge`s will be made.
+            The type of machine edges made from this app edge. If ``None``,
+            standard machine edges will be made.
         :type machine_edge_type: type(MachineEdge)
         """
         self._label = label
@@ -82,7 +82,7 @@ class ApplicationEdge(AbstractEdge):
             machine-level embodiment of this application edge.
 
         If you are thinking about overriding this, you probably ought to
-        override :py:meth:`~_create_machine_edge` instead; this is a wrapper
+        override :py:meth:`~._create_machine_edge` instead; this is a wrapper
         round that method that handles application-edge level bookkeeping.
 
         :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
@@ -137,16 +137,16 @@ class ApplicationEdge(AbstractEdge):
     @property
     def machine_edges(self):
         """ The machine
+
         :rtype: iterable(MachineEdge)
         """
         return self.__machine_edges
 
     def remember_associated_machine_edge(self, machine_edge):
-        """
-        Adds the Machine Edge to the iterable returned by machine_edges
+        """ Adds the Machine Edge to the iterable returned by machine_edges
 
         :param MachineEdge machine_edge: A pointer to a machine_edge.
-            This edge may not be fully initialized
+            This edge may not be fully initialised
         """
         self.__machine_edges.add(machine_edge)
 
