@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [2.7, 3.6, 3.7, 3.8]
 
     steps:
     - name: Set up Python ${{ matrix.python-version }}
@@ -60,13 +60,13 @@ jobs:
       run: python setup.py install
       working-directory: SpiNNMachine
 
+    - name: Install requirements-test
+      run: |
+        pip install -r requirements-test.txt
+
     - name: Setup
       run: |
         python setup.py develop
-
-    - name: Install
-      run: |
-        pip install -r requirements-test.txt
 
     - name: Test with pytest and coverage
       if: matrix.python-version == 3.6
