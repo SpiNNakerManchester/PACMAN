@@ -83,6 +83,11 @@ jobs:
         # run flake8
         flake8 pacman unittests
 
+    - name: Lint with pylint
+      # Note that there's special conditioning of the return code of pylint
+      run: |
+        pylint --output-format=colorized --disable=R,C pacman || exit $(($? & 35))
+
     - name: Run rat copyright enforcement
       if: matrix.python-version == 3.6
       run: |
