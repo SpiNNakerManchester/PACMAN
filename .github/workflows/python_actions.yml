@@ -60,13 +60,18 @@ jobs:
       run: python setup.py install
       working-directory: SpiNNMachine
 
-    - name: Install requirements-test
+    - name: Preinstall requirements (2.7 only)
+      if: matrix.python-version == 2.7
       run: |
         pip install -r requirements-test.txt
 
     - name: Setup
       run: |
         python setup.py develop
+
+    - name: Install requirements-test
+      run: |
+        pip install -r requirements-test.txt
 
     - name: Test with pytest and coverage
       if: matrix.python-version == 3.6
