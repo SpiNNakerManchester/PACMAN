@@ -14,12 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty, \
-    abstractmethod
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractproperty, abstractmethod)
 
 
 @add_metaclass(AbstractBase)
-class AbsractMulticastRoutingTable(object):
+class AbstractMulticastRoutingTable(object):
 
     @abstractproperty
     def x(self):

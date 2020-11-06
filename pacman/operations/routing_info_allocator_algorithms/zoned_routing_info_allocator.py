@@ -35,41 +35,46 @@ class ZonedRoutingInfoAllocator(object):
     """ A routing key allocator that uses fixed zones that are the same for
         all vertices.  This will hopefully make the keys more compressible.
 
-        Keys will have the format:
-              <--- 32 bits --->
-        Key:  | AP | M | X |
-        Mask: |11111111111|   | (i.e. 1s covering AP and M fields)
+        Keys will have the format::
 
-        A: the index of the application vertex
-        P: the index of the name of outgoing edge partition of the vertex.
-        M: the index of the machine vertex of the application vertex
-        X: space for the maximum number of keys required by any outgoing edge
-           partition
+                  <--- 32 bits --->
+            Key:  | A | P | M | X |
+            Mask: |11111111111|   | (i.e. 1s covering A, P and M fields)
 
-        The A and P are combined into a single index so that applications with
-        multiple partitions use multiple entries
+        Field ``A``:
+            The index of the application vertex.
+        Field ``P``:
+            The index of the name of outgoing edge partition of the vertex.
+        Field ``M``:
+            The index of the machine vertex of the application vertex.
+        Field ``X``:
+            Space for the maximum number of keys required by any outgoing edge
+            partition.
+
+        The ``A`` and ``P`` are combined into a single index (``AP``) so that
+        applications with multiple partitions use multiple entries
         while ones with only 1 use just one.
 
-        The split between the AP bit and other parts is always fixed
+        The split between the ``AP`` bit and other parts is always fixed
         This also means that all machine vertices of the same
         application vertex and partition will have a shared key.
 
-        The split between the M and X may vary depending on how the allocator
-        is called.
+        The split between the ``M`` and ``X`` may vary depending on how the
+        allocator is called.
 
         In "global" mode the widths of the fields are pre determined and fixed
         such that every key will have every field in the same place in the key,
         and the mask is the same for every vertex.
-         The global approach is particularly sensitive to the one large and
-         many small vertices limit.
+        The global approach is particularly sensitive to the one large and
+        many small vertices limit.
 
-        In "flexible" mode the size of the M and X will change for each
+        In "flexible" mode the size of the ``M`` and ``X`` will change for each
         application/partition. Every vertex for a application/partition pair
         but different pairs may have different masks.
         This should result in less gaps between the machine vertexes.
-        Even in none Flexible mode if the sizes are too big to keep M and X the
-        same size they will be allowed to change for those vertexes will a
-        very high number of atoms.
+        Even in none Flexible mode if the sizes are too big to keep ``M`` and
+        ``X`` the same size they will be allowed to change for those vertexes
+        will a very high number of atoms.
 
     :param MachineGraph machine_graph:
         The machine graph to allocate the routing info for
@@ -115,7 +120,7 @@ class ZonedRoutingInfoAllocator(object):
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             A map between the edges and the number of keys required by the
             edges
-        :param bool flexible: Dettermines if flexible can be use.
+        :param bool flexible: Determines if flexible can be use.
             If False global settings will be attempted
         :raise PacmanRouteInfoAllocationException:
         """
@@ -147,7 +152,7 @@ class ZonedRoutingInfoAllocator(object):
         """
         Looks for FixedKeyAmdMask Constraints and keeps track of these.
 
-        See __ add_fixed
+        See :py:meth:`__add_fixed`
         """
         multicast_partitions = self.__machine_graph.multicast_partitions
         for app_id in multicast_partitions:
@@ -165,9 +170,9 @@ class ZonedRoutingInfoAllocator(object):
 
     def __add_fixed(self, partition, constraint):
         """
-        Pre computes and caches FixedKeyAmdMask for easier use later
+        Precomputes and caches FixedKeyAndMask for easier use later
 
-        Saves a map of parition to the constraintit records theese in a dict by
+        Saves a map of partition to the constraint records these in a dict by
         Partition so they can be found easier in future passes.
 
         Saves a list of the keys and their n_keys so these zones can be blocked
@@ -186,10 +191,11 @@ class ZonedRoutingInfoAllocator(object):
         """
         Computes the size for the zones.
 
-        Note: Even Parititions with FicedKeysAndMasks a included here.
-        This does waste a little space.
-        However makes this and the allocate code slightly simpler
-        It also keeps the "AP" zone working for these partitions too
+        .. note::
+            Even Partitions with FixedKeysAndMasks a included here.
+            This does waste a little space.
+            However makes this and the allocate code slightly simpler
+            It also keeps the ``AP`` zone working for these partitions too
 
         :raises PacmanRouteInfoAllocationException:
         """
@@ -261,7 +267,7 @@ class ZonedRoutingInfoAllocator(object):
 
     def __set_fixed_used(self):
         """
-        Block the use of AP indexes that would clash with fixed keys
+        Block the use of ``AP`` indexes that would clash with fixed keys
         """
         self.__fixed_used = set()
         bucket_size = 2 ** self.__n_bits_atoms_and_mac
@@ -338,7 +344,7 @@ class ZonedRoutingInfoAllocator(object):
 
 def flexible_allocate(machine_graph, n_keys_map):
     """
-    Allocated with fixed bits for the Application/Paritition index but
+    Allocated with fixed bits for the Application/Partition index but
     with the size of the atom and machine bit changing
 
     :param MachineGraph machine_graph:
