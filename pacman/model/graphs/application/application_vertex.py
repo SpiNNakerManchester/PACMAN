@@ -27,7 +27,7 @@ from spinn_utilities.overrides import overrides
 
 @add_metaclass(AbstractBase)
 class ApplicationVertex(AbstractVertex):
-    """ A vertex that can be broken down into a number of smaller vertices
+    """ A vertex that can be broken down into a number of smaller vertices\
         based on the resources that the vertex requires.
     """
 
@@ -52,7 +52,7 @@ class ApplicationVertex(AbstractVertex):
             placed on a core, used in partitioning.
         :param splitter: The splitter object needed for this vertex.
             Leave as None to delegate the choice of splitter to the selector.
-        :type splitter None or AbstractSplitterCommon
+        :type splitter: None or AbstractSplitterCommon
         :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
@@ -111,7 +111,7 @@ class ApplicationVertex(AbstractVertex):
         This method will be called by MachineVertex.app_vertex
         No other place should call it.
 
-        :param machine_vertex: A pointer to a machine_vertex.
+        :param MachineVertex machine_vertex: A pointer to a machine_vertex.
             This vertex may not be fully initialized but will have a slice
         :raises PacmanValueError: If the slice of the machine_vertex is too big
         """
