@@ -20,7 +20,6 @@ from pacman.exceptions import (
 
 class AbstractDependentSplitter(AbstractSplitterCommon):
     """ splitter that defines it needs to be run after another splitter.
-
     """
 
     __slots__ = [
@@ -36,14 +35,20 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
         Creates a splitter that must be done after the other unless None.
 
         :param other_splitter:
-        :type other_splitter: AbstractSplitterCommon or None
-        :param splitter_name:
+        :type other_splitter:
+            ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
+            or None
+        :param str splitter_name:
         """
         AbstractSplitterCommon.__init__(self, splitter_name)
         self._other_splitter = other_splitter
 
     @property
     def other_splitter(self):
+        """
+        :rtype:
+            ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
+        """
         return self._other_splitter
 
     def check_circular(self, upstream):
@@ -56,7 +61,7 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
     @other_splitter.setter
     def other_splitter(self, new_value):
         """
-        Supports the delayed setting ot the other to depend on
+        Supports the delayed setting of the other to depend on
 
         :param new_value: other splitter
         :raise PacmanAlreadyExistsException:
