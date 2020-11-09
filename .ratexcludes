@@ -1,1 +1,3 @@
 **/*.json
+**/SpiNNUtils/**
+**/SpiNNMachine/**
