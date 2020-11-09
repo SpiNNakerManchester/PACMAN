@@ -27,9 +27,10 @@ class CPUCyclesPerTickResource(object):
 
     def __init__(self, cycles):
         """
-        :param int cycles: The number of CPU clock cycles
+        :param cycles: The number of CPU clock cycles
+        :type cycles: int or numpy.integer
         """
-        self._cycles = cycles
+        self._cycles = int(cycles)
 
     def get_value(self):
         """

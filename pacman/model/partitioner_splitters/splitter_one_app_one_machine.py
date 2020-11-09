@@ -20,7 +20,8 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.model.graphs.machine.abstract import AbstractOneAppOneMachineVertex
+from pacman.model.graphs.application.abstract import (
+    AbstractOneAppOneMachineVertex)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -67,13 +68,13 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
     def get_in_coming_slices(self):
         return [self._governed_app_vertex.machine_vertex.vertex_slice], True
 
-    @overrides(AbstractSplitterCommon.get_pre_vertices)
-    def get_pre_vertices(self, edge, outgoing_edge_partition):
+    @overrides(AbstractSplitterCommon.get_out_going_vertices)
+    def get_out_going_vertices(self, edge, outgoing_edge_partition):
         return {self._governed_app_vertex.machine_vertex: [MachineEdge]}
 
-    @overrides(AbstractSplitterCommon.get_post_vertices)
-    def get_post_vertices(self, edge, outgoing_edge_partition,
-                          src_machine_vertex):
+    @overrides(AbstractSplitterCommon.get_in_coming_vertices)
+    def get_in_coming_vertices(
+            self, edge, outgoing_edge_partition, src_machine_vertex):
         return {self._governed_app_vertex.machine_vertex: [MachineEdge]}
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
