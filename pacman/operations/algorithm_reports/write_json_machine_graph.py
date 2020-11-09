@@ -54,7 +54,7 @@ class WriteJsonMachineGraph(object):
         :param str json_folder:
             The folder to which the json are being written
 
-            ..warning::
+            .. warning::
                 Will overwrite existing file in this folder!
 
         :param ~spinn_utilities.progress_bar.ProgressBar progress:
