@@ -14,13 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.constraints.partitioner_constraints import \
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint, \
-    AbstractPartitionerConstraint, SameAtomsAsVertexConstraint
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterSlice)
-from pacman.utilities import utility_calls
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 
@@ -72,12 +68,3 @@ class SplitterSliceLegacy(AbstractSplitterSlice):
     def get_resources_used_by_atoms(self, vertex_slice):
         return self._governed_app_vertex.get_resources_used_by_atoms(
             vertex_slice)
-
-    @overrides(AbstractSplitterSlice.check_supported_constraints)
-    def check_supported_constraints(self):
-        utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=[self._governed_app_vertex],
-            supported_constraints=[
-                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-                SameAtomsAsVertexConstraint],
-            abstract_constraint_type=AbstractPartitionerConstraint)
