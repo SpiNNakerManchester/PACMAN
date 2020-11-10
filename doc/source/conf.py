@@ -57,7 +57,7 @@ root_package = "pacman"
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
-    'numpy': ("https://docs.scipy.org/doc/numpy/", None),
+    'numpy': ("https://numpy.org/doc/stable/", None),
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None)}
 
@@ -75,7 +75,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PACMAN'
-copyright = u'2014-2019'
+copyright = u'2014-2020'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

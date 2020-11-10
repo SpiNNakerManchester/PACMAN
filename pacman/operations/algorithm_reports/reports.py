@@ -112,7 +112,8 @@ def router_summary_report(
     """ Generates a text file of routing summaries
 
     :param str report_folder: The report folder to store this value.
-    :param MulticastRoutingTables routing_tables: The original routing tables.
+    :param MulticastRoutingTables routing_tables:
+        The original routing tables.
     :param str hostname: The machine's hostname to which the placer worked on.
     :param ~spinn_machine.Machine machine: The python machine object.
     :rtype: RouterSummary
@@ -129,7 +130,8 @@ def router_compressed_summary_report(
     """ Generates a text file of routing summaries
 
     :param str report_folder: The report folder to store this value.
-    :param MulticastRoutingTables routing_tables: The original routing tables.
+    :param MulticastRoutingTables routing_tables:
+        The in-operation routing tables.
     :param str hostname: The machine's hostname to which the placer worked on.
     :param ~spinn_machine.Machine machine: The python machine object.
     :rtype: RouterSummary
@@ -738,7 +740,7 @@ def format_route(entry):
 
 def generate_routing_table(routing_table, top_level_folder):
     """
-    :param ~spinn_machine.MulticastRoutingTable routing_table:
+    :param AbstractMulticastRoutingTable routing_table:
     :param str top_level_folder:
     """
     file_name = "routing_table_{}_{}.rpt".format(
@@ -789,9 +791,9 @@ def generate_comparison_router_report(
         routing tables
 
     :param str report_folder: the folder to store the resulting report
-    :param ~spinn_machine.MulticastRoutingTables routing_tables:
+    :param MulticastRoutingTables routing_tables:
         the original routing tables
-    :param ~spinn_machine.MulticastRoutingTables compressed_routing_tables:
+    :param MulticastRoutingTables compressed_routing_tables:
         the compressed routing tables
     :rtype: None
     """

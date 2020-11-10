@@ -48,7 +48,7 @@ def get_vertices_on_same_chip(vertex, graph):
     """ Get the vertices that must be on the same chip as the given vertex
 
     :param AbstractVertex vertex: The vertex to search with
-    :param AbstractGraph graph: The graph containing the vertex
+    :param Graph graph: The graph containing the vertex
     :rtype: set(AbstractVertex)
     """
     # Virtual vertices can't be forced on different chips
@@ -70,7 +70,7 @@ def get_same_chip_vertex_groups(graph):
     """ Get a dictionary of vertex to list of vertices that must be placed on\
        the same chip
 
-    :param AbstractGraph graph: The graph containing the vertices
+    :param Graph graph: The graph containing the vertices
     :rtype: dict(AbstractVertex, set(AbstractVertex))
     """
     groups = create_vertices_groups(graph.vertices, functools.partial(
