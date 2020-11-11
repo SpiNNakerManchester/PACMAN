@@ -12,14 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from .abstract_machine_edge_partition import AbstractMachineEdgePartition
 from .constant_sdram_machine_partition import ConstantSDRAMMachinePartition
 from .destination_segmented_sdram_machine_partition import (
     DestinationSegmentedSDRAMMachinePartition)
 from .source_segmented_sdram_machine_partition import (
     SourceSegmentedSDRAMMachinePartition)
-from .machine_edge_partition import MachineEdgePartition
 
 __all__ = [
-    "ConstantSDRAMMachinePartition",
-    "DestinationSegmentedSDRAMMachinePartition", "MachineEdgePartition",
+    "AbstractMachineEdgePartition", "ConstantSDRAMMachinePartition",
+    "DestinationSegmentedSDRAMMachinePartition",
     "SourceSegmentedSDRAMMachinePartition"]

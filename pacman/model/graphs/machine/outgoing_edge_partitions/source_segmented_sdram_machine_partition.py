@@ -12,27 +12,41 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.abstract_sdram_multiple_partition import \
-    AbstractSDRAMMultiplePartition
+from pacman.model.graphs.abstract_sdram_multiple_partition import (
+    AbstractSDRAMMultiplePartition)
+from pacman.model.graphs.machine.outgoing_edge_partitions import (
+    AbstractMachineEdgePartition)
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import SDRAMMachineEdge
 
 
-class SourceSegmentedSDRAMMachinePartition(AbstractSDRAMMultiplePartition):
+class SourceSegmentedSDRAMMachinePartition(
+        AbstractMachineEdgePartition, AbstractSDRAMMultiplePartition):
 
     __slots__ = [
         "_sdram_base_address",
+        "_traffic_type",
     ]
 
     def __init__(self, identifier, label, pre_vertices):
-        AbstractSDRAMMultiplePartition.__init__(
-            self, pre_vertices, identifier,
+        super(SourceSegmentedSDRAMMachinePartition, self).__init__(
+            pre_vertices, identifier,
             allowed_edge_types=SDRAMMachineEdge, constraints=None,
-            label=label, traffic_weight=1, traffic_type=EdgeTrafficType.SDRAM,
+            label=label, traffic_weight=1,
             class_name="ConstantSdramMachinePartition")
+        self._traffic_type = EdgeTrafficType.SDRAM
         self._sdram_base_address = None
+
+    @property
+    @overrides(AbstractMachineEdgePartition.traffic_type)
+    def traffic_type(self):
+        """ The traffic type of all the edges in this edge partition.
+
+        :rtype: EdgeTrafficType
+        """
+        return self._traffic_type
 
     def total_sdram_requirements(self):
         total = 0
@@ -47,6 +61,7 @@ class SourceSegmentedSDRAMMachinePartition(AbstractSDRAMMultiplePartition):
     @overrides(AbstractSDRAMMultiplePartition.add_edge)
     def add_edge(self, edge):
         # add
+        AbstractMachineEdgePartition.check_edge(self, edge)
         AbstractSDRAMMultiplePartition.add_edge(self, edge)
 
         # check

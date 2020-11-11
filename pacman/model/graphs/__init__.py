@@ -21,8 +21,6 @@ from .abstract_spinnaker_link import AbstractSpiNNakerLink
 from .abstract_edge_partition import AbstractEdgePartition
 from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
-from .abstract_application_outgoing_partition import (
-    AbstractApplicationOutgoingPartition)
 from .outgoing_edge_partition import OutgoingEdgePartition
 from .graph import Graph
 from .abstract_supports_sdram_edges import AbstractSupportsSDRAMEdges
@@ -34,7 +32,7 @@ from .abstract_sdram_multiple_partition import AbstractSDRAMMultiplePartition
 from .abstract_sdram_partition import AbstractSDRAMPartition
 
 __all__ = [
-    "AbstractApplicationOutgoingPartition", "AbstractCostedMultiplePartition",
+    "AbstractCostedMultiplePartition",
     "AbstractCostedSinglePartition", "AbstractEdge",
     "AbstractEdgePartition", "AbstractFPGA", "AbstractMultiplePartition",
     "AbstractSDRAMMultiplePartition", "AbstractSDRAMPartition",

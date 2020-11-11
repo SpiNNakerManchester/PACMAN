@@ -12,6 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.model.graphs.machine.outgoing_edge_partitions.\
+    abstract_machine_edge_partition import AbstractMachineEdgePartition
 from pacman.model.graphs.abstract_sdram_single_partition import \
     AbstractSDRAMSinglePartition
 from spinn_utilities.overrides import overrides
@@ -20,19 +22,31 @@ from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import SDRAMMachineEdge
 
 
-class ConstantSDRAMMachinePartition(AbstractSDRAMSinglePartition):
+class ConstantSDRAMMachinePartition(
+        AbstractSDRAMSinglePartition, AbstractMachineEdgePartition):
 
     __slots__ = [
-        "_sdram_base_address"
+        "_sdram_base_address",
+        "_traffic_type"
     ]
 
     def __init__(self, identifier, pre_vertex, label):
-        AbstractSDRAMSinglePartition.__init__(
-            self, pre_vertex, identifier, allowed_edge_types=SDRAMMachineEdge,
+        super(ConstantSDRAMMachinePartition, self).__init__(
+            pre_vertex, identifier, allowed_edge_types=SDRAMMachineEdge,
             constraints=None, label=label, traffic_weight=1,
-            traffic_type=EdgeTrafficType.SDRAM,
             class_name="ConstantSdramMachinePartition")
         self._sdram_base_address = None
+        self._traffic_type = EdgeTrafficType.SDRAM
+
+    @property
+    @overrides(AbstractMachineEdgePartition.traffic_type)
+    def traffic_type(self):
+        return self._traffic_type
+
+    @overrides(AbstractSDRAMSinglePartition.add_edge)
+    def add_edge(self, edge):
+        AbstractMachineEdgePartition.check_edge(self, edge)
+        AbstractSDRAMSinglePartition.add_edge(self, edge)
 
     @overrides(AbstractSDRAMSinglePartition.total_sdram_requirements)
     def total_sdram_requirements(self):

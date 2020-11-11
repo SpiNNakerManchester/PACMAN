@@ -31,9 +31,6 @@ class ApplicationEdge(AbstractEdge):
         # The edge at the end of the vertex
         "_post_vertex",
 
-        # The type of traffic on the edge
-        "_traffic_type",
-
         # Machine edge type
         "_machine_edge_type",
 
@@ -45,16 +42,13 @@ class ApplicationEdge(AbstractEdge):
     ]
 
     def __init__(
-            self, pre_vertex, post_vertex,
-            traffic_type=EdgeTrafficType.MULTICAST, label=None,
+            self, pre_vertex, post_vertex, label=None,
             machine_edge_type=MachineEdge):
         """
         :param ApplicationVertex pre_vertex:
             The application vertex at the start of the edge.
         :param ApplicationVertex post_vertex:
             The application vertex at the end of the edge.
-        :param EdgeTrafficType traffic_type:
-            The type of the traffic on the edge.
         :param label: The name of the edge.
         :type label: str or None
         :param machine_edge_type:
@@ -65,7 +59,6 @@ class ApplicationEdge(AbstractEdge):
         self._label = label
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
-        self._traffic_type = traffic_type
         if not issubclass(machine_edge_type, MachineEdge):
             raise ValueError(
                 "machine_edge_type must be a kind of machine edge")
@@ -86,11 +79,6 @@ class ApplicationEdge(AbstractEdge):
     @overrides(AbstractEdge.post_vertex)
     def post_vertex(self):
         return self._post_vertex
-
-    @property
-    @overrides(AbstractEdge.traffic_type)
-    def traffic_type(self):
-        return self._traffic_type
 
     @property
     def machine_edges(self):

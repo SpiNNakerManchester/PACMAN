@@ -28,10 +28,10 @@ class AbstractCostedMultiplePartition(AbstractMultiplePartition):
 
     def __init__(
             self, pre_vertices, identifier, allowed_edge_types, constraints,
-            label, traffic_weight, class_name, traffic_type):
+            label, traffic_weight, class_name):
         super(AbstractCostedMultiplePartition, self).__init__(
             pre_vertices, identifier, allowed_edge_types, constraints,
-            label, traffic_weight, class_name, traffic_type)
+            label, traffic_weight, class_name)
         self._allocated = False
 
     @property

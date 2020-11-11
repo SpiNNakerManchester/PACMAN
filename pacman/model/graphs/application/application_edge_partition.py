@@ -14,17 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs import (
-    AbstractEdgePartition, AbstractSingleSourcePartition,
-    AbstractApplicationOutgoingPartition)
+    AbstractEdgePartition, AbstractSingleSourcePartition)
 from .application_edge import ApplicationEdge
-from pacman.model.graphs.machine.outgoing_edge_partitions import (
-    MachineEdgePartition)
 
 
-class ApplicationEdgePartition(
-        AbstractSingleSourcePartition, AbstractApplicationOutgoingPartition):
+class ApplicationEdgePartition(AbstractSingleSourcePartition):
     """ A simple implementation of an application edge partition that will\
         communicate using SpiNNaker multicast packets. They have the same \
         source(s) and semantics and so can share a single key.
@@ -34,7 +29,7 @@ class ApplicationEdgePartition(
 
     def __init__(
             self, identifier, pre_vertex, constraints=None, label=None,
-            traffic_weight=1, traffic_type=EdgeTrafficType.MULTICAST):
+            traffic_weight=1):
         """
         :param str identifier: The identifier of the partition
         :param ApplicationVertex pre_vertex: The source of this partition
@@ -48,16 +43,7 @@ class ApplicationEdgePartition(
             pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=ApplicationEdge, constraints=constraints,
             label=label, traffic_weight=traffic_weight,
-            traffic_type=traffic_type,
             class_name="ApplicationEdgePartition")
-
-    @overrides(AbstractApplicationOutgoingPartition.
-               convert_to_machine_outgoing_partition)
-    def convert_to_machine_outgoing_partition(self, machine_pre_vertex):
-        return MachineEdgePartition(
-            identifier=self.identifier, pre_vertex=machine_pre_vertex,
-            constraints=self.constraints, label=self.label,
-            traffic_weight=self.traffic_weight)
 
     @overrides(AbstractEdgePartition.clone_for_graph_move)
     def clone_for_graph_move(self):
@@ -65,5 +51,5 @@ class ApplicationEdgePartition(
         :rtype: ApplicationEdgePartition
         """
         return ApplicationEdgePartition(
-            self._identifier, self._pre_vertex, self._constraints, self._label,
-            self._traffic_weight)
+            self._identifier, self._pre_vertex, self._constraints,
+            self._label, self._traffic_weight)

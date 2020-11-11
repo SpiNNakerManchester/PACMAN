@@ -33,8 +33,6 @@ class AbstractEdgePartition(ConstrainedObject):
         "_identifier",
         # The edges in the partition
         "_edges",
-        # The traffic type of all the edges
-        "_traffic_type",
         # The type of edges to accept
         "_allowed_edge_types",
         # The weight of traffic going down this partition
@@ -47,9 +45,7 @@ class AbstractEdgePartition(ConstrainedObject):
 
     def __init__(
             self, identifier, allowed_edge_types, constraints=None,
-            label=None, traffic_weight=1,
-            traffic_type=EdgeTrafficType.MULTICAST,
-            class_name="AbstractEdgePartition"):
+            label=None, traffic_weight=1, class_name="AbstractEdgePartition"):
         """
         :param str identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed
@@ -65,11 +61,6 @@ class AbstractEdgePartition(ConstrainedObject):
         self._identifier = identifier
         self._edges = OrderedSet()
         self._allowed_edge_types = allowed_edge_types
-        self._traffic_type = traffic_type
-        if not isinstance(traffic_type, EdgeTrafficType):
-            raise PacmanInvalidParameterException(
-                "traffic_type", traffic_type,
-                "crazy traffic type; must be of EdgeTrafficType")
         self._traffic_weight = traffic_weight
         self._class_name = class_name
 
@@ -94,14 +85,6 @@ class AbstractEdgePartition(ConstrainedObject):
                 "edge", str(edge.__class__),
                 "Edges of this graph must be one of the following types:"
                 " {}".format(self._allowed_edge_types))
-
-        # Check for an incompatible traffic type
-        if edge.traffic_type != self._traffic_type:
-            raise PacmanConfigurationException(
-                "A partition can only contain edges with the same "
-                "traffic_type; trying to add a {} edge to a partition of "
-                "type {}".format(edge.traffic_type, self._traffic_type))
-
         self._edges.add(edge)
 
     @property
@@ -127,14 +110,6 @@ class AbstractEdgePartition(ConstrainedObject):
         :rtype: int
         """
         return len(self._edges)
-
-    @property
-    def traffic_type(self):
-        """ The traffic type of all the edges in this edge partition.
-
-        :rtype: EdgeTrafficType
-        """
-        return self._traffic_type
 
     @property
     def traffic_weight(self):

@@ -18,11 +18,12 @@ from .machine_edge import MachineEdge
 from spinn_utilities.overrides import overrides
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from pacman.model.graphs.machine.outgoing_edge_partitions.\
-    machine_edge_partition import MachineEdgePartition
+    abstract_machine_edge_partition import AbstractMachineEdgePartition
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs.graph import Graph
-from pacman.model.graphs import AbstractEdgePartition
 from pacman.model.graphs.common import EdgeTrafficType
+from .outgoing_edge_partitions.single_source_machine_edge_partition import (
+    SingleSourceMachineEdgePartition)
 
 
 class MachineGraph(Graph):
@@ -56,8 +57,8 @@ class MachineGraph(Graph):
         :type application_graph: ApplicationGraph or None
         """
         super(MachineGraph, self).__init__(
-            MachineVertex, MachineEdge, AbstractEdgePartition, label,
-            MachineEdgePartition)
+            MachineVertex, MachineEdge, AbstractMachineEdgePartition, label,
+            SingleSourceMachineEdgePartition)
         if application_graph:
             application_graph.forget_machine_graph()
             # Check the first vertex added
@@ -108,9 +109,10 @@ class MachineGraph(Graph):
                     self._application_level_used = False
                 else:
                     raise PacmanInvalidParameterException(
-                        "vertex", vertex,
+                        "vertex", str(vertex),
                         self.MISSING_APP_VERTEX_ERROR_MESSAGE)
         else:
             if vertex.app_vertex:
                 raise PacmanInvalidParameterException(
-                    "vertex", vertex, self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
+                    "vertex", str(vertex),
+                    self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)

@@ -28,10 +28,10 @@ class AbstractCostedSinglePartition(AbstractSingleSourcePartition):
 
     def __init__(
             self, pre_vertex, identifier, allowed_edge_types, constraints,
-            label, traffic_weight, class_name, traffic_type):
+            label, traffic_weight, class_name):
         super(AbstractCostedSinglePartition, self).__init__(
             pre_vertex, identifier, allowed_edge_types, constraints,
-            label, traffic_weight, class_name, traffic_type)
+            label, traffic_weight, class_name)
         self._allocated = False
 
     @property
