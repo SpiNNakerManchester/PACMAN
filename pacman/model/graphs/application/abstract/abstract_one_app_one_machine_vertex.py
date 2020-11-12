@@ -27,8 +27,8 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
     def __init__(self, machine_vertex, label, constraints):
         """
         :param str label: The optional name of the vertex.
-        :param iterable(AbstractConstraint) constraints: \
-            The optional initial constraints of the vertex.
+        :param constraints: The optional initial constraints of the vertex.
+        :type constraints: iterable(AbstractConstraint)
         :raise PacmanInvalidParameterException: \
             If one of the constraints is not valid
         """
