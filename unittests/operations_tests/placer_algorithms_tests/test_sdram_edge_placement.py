@@ -16,8 +16,7 @@
 from spinn_machine import virtual_machine
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, SDRAMMachineEdge)
-from pacman.model.graphs.machine.outgoing_edge_partitions import (
-    ConstantSDRAMMachinePartition)
+from pacman.model.graphs.machine import ConstantSDRAMMachinePartition
 from pacman.model.resources import ResourceContainer
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.executor.pacman_algorithm_executor import PACMANAlgorithmExecutor

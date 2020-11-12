@@ -18,8 +18,7 @@ from pacman.exceptions import PacmanException
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex,
     MachineEdge, SDRAMMachineEdge)
-from pacman.model.graphs.machine.outgoing_edge_partitions import (
-    ConstantSDRAMMachinePartition)
+from pacman.model.graphs.machine import ConstantSDRAMMachinePartition
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.operations.placer_algorithms import SpreaderPlacer
