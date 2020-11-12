@@ -37,7 +37,7 @@ class MultipleSourceMachineEdgePartition(
             traffic_weight=1):
         """
         :param pre_vertices: the pre vertices
-        :type pre_vertices: iterable (MachineVertex)
+        :type pre_vertices: iterable(MachineVertex)
         :param str identifier: The identifier of the partition
         :param list(AbstractConstraint) constraints: Any initial constraints
         :param str label: An optional label of the partition
