@@ -69,5 +69,5 @@ class SingleSourceMachineEdgePartition(
         :rtype: SingleSourceMachineEdgePartition
         """
         return SingleSourceMachineEdgePartition(
-            self._identifier, self._constraints, self._label,
-            self._traffic_weight)
+            self._pre_vertex, self._identifier, self._constraints,
+            self._label, self._traffic_weight)
