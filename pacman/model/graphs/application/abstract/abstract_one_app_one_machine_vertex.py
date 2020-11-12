@@ -21,19 +21,23 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
     """ An Application Vertex that has a fixed Singleton Machine Vertex
     """
     __slots__ = [
-        # A pointer to the machine vertex that must be set by the sub class
+        # A pointer to the machine vertex set at init time
         "_machine_vertex"]
 
-    def __init__(self, machine_vertex, label, constraints):
+    def __init__(self, machine_vertex, label, constraints, n_atoms=1):
         """
+        Creates an Application Vertex which has exactly one predefined \
+        machine Vertex
+
+        :param machine_vertex: MachineVertex
         :param str label: The optional name of the vertex.
-        :param constraints: The optional initial constraints of the vertex.
-        :type constraints: iterable(AbstractConstraint)
-        :raise PacmanInvalidParameterException: \
+        :param iterable(AbstractConstraint) constraints:
+            The optional initial constraints of the vertex.
+        :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
         super(AbstractOneAppOneMachineVertex, self).__init__(
-            label, constraints, 1)
+            label, constraints, n_atoms)
         self._machine_vertex = machine_vertex
 
     @overrides(ApplicationVertex.remember_machine_vertex)
@@ -44,6 +48,11 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
 
     @property
     def machine_vertex(self):
+        """
+        Provides access to the machine vertex at all times
+
+        :rtype:  MachineVertex
+        """
         return self._machine_vertex
 
     @property
