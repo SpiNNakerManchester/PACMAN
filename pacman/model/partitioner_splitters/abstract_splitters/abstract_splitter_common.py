@@ -146,7 +146,7 @@ class AbstractSplitterCommon(object):
 
         :param app_vertex: the app vertex to govern
         :rtype: None
-        :raises PacmanConfigurationException if the app vertex has already\
+        :raises PacmanConfigurationException: if the app vertex has already \
             been set.
         """
         if self._governed_app_vertex == app_vertex:
