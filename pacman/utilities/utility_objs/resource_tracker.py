@@ -789,13 +789,12 @@ class ResourceTracker(object):
             resources.sdram.get_total_sdram(self._plan_n_timesteps)
 
     def allocate_sdram(self, chip_x, chip_y, sdram_value):
-        """ Allocates sdram value directly to a chip
+        """ Allocates SDRAM value directly to a chip
 
-        :param sdram_value: the number fo bytes to allocate
-        :param chip_x: machine chip x coord.
-        :param chip_y: machine chip y coord.
-        :rtype: None
-        :raises   when the sdram cant be allocated
+        :param int chip_x: machine chip x coord.
+        :param int chip_y: machine chip y coord.
+        :param int sdram_value: the number of bytes to allocate
+        :raises PacmanException: when the SDRAM can't be allocated
         """
         if self._sdram_tracker[chip_x, chip_y] - sdram_value < 0:
             raise PacmanException(self.ALLOCATION_SDRAM_ERROR.format(

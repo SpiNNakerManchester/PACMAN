@@ -52,7 +52,8 @@ class ApplicationVertex(AbstractVertex):
             placed on a core, used in partitioning.
         :param splitter: The splitter object needed for this vertex.
             Leave as None to delegate the choice of splitter to the selector.
-        :type splitter: None or AbstractSplitterCommon
+        :type splitter: None or
+            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
@@ -78,7 +79,7 @@ class ApplicationVertex(AbstractVertex):
     @property
     def splitter(self):
         """
-        :rtype: ~pacman.model.partitioner_interfaces.AbstractSplitterCommon
+        :rtype: ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         """
         return self._splitter
 

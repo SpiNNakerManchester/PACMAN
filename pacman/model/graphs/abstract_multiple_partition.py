@@ -49,7 +49,7 @@ class AbstractMultiplePartition(AbstractEdgePartition):
         # safety checks
         if edge.pre_vertex not in self._pre_vertices.keys():
             raise Exception(
-                "th edge {} is not allowed in this outgoing partition".format(
+                "the edge {} is not allowed in this outgoing partition".format(
                     edge))
 
         # update

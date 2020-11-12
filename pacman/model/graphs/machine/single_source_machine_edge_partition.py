@@ -51,17 +51,11 @@ class SingleSourceMachineEdgePartition(
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge):
-        """ Add an edge to the edge partition.
-
-        :param AbstractEdge edge: the edge to add
-        :raises PacmanInvalidParameterException:
-            If the edge does not belong in this edge partition
-        """
         AbstractMachineEdgePartition.check_edge(self, edge)
         AbstractSingleSourcePartition.add_edge(self, edge)
 
     @property
-    @overrides(AbstractMachineEdgePartition.traffic_type)
+    @overrides(AbstractMachineEdgePartition.traffic_type, extend_doc=False)
     def traffic_type(self):
         """ The traffic type of all the edges in this edge partition.
 

@@ -30,6 +30,12 @@ class SourceSegmentedSDRAMMachinePartition(
     ]
 
     def __init__(self, identifier, label, pre_vertices):
+        """
+        :param str identifier: The identifier of the partition
+        :param str label: A label of the partition
+        :param iterable(AbstractVertex) pre_vertices:
+            The vertices that an edge in this partition may originate at
+        """
         super(SourceSegmentedSDRAMMachinePartition, self).__init__(
             pre_vertices, identifier,
             allowed_edge_types=SDRAMMachineEdge, constraints=None,
@@ -39,7 +45,7 @@ class SourceSegmentedSDRAMMachinePartition(
         self._sdram_base_address = None
 
     @property
-    @overrides(AbstractMachineEdgePartition.traffic_type)
+    @overrides(AbstractMachineEdgePartition.traffic_type, extend_doc=False)
     def traffic_type(self):
         """ The traffic type of all the edges in this edge partition.
 
@@ -48,13 +54,16 @@ class SourceSegmentedSDRAMMachinePartition(
         return self._traffic_type
 
     def total_sdram_requirements(self):
-        total = 0
-        for edge in self.edges:
-            total += edge.sdram_size
-        return total
+        """
+        :rtype: int
+        """
+        return sum(edge.sdram_size for edge in self.edges)
 
     @property
     def sdram_base_address(self):
+        """
+        :rtype: int
+        """
         return self._sdram_base_address
 
     @overrides(AbstractSDRAMMultiplePartition.add_edge)
