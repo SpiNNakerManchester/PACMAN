@@ -141,7 +141,7 @@ class AbstractSplitterCommon(object):
         return self._governed_app_vertex
 
     def set_governed_app_vertex(self, app_vertex):
-        """ sets a app vertex to be governed by this splitter object.
+        """ sets a app vertex to be governed by this splitter object.\
         Once set it cant be reset
 
         :param app_vertex: the app vertex to govern
