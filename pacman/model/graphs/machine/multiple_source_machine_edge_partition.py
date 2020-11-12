@@ -21,7 +21,7 @@ from pacman.model.graphs import (
 from pacman.model.graphs.machine.machine_edge import MachineEdge
 
 
-class MultipleMachineEdgePartition(
+class MultipleSourceMachineEdgePartition(
         AbstractMachineEdgePartition, AbstractMultiplePartition):
     """ A simple implementation of a machine edge partition that will \
         communicate with SpiNNaker multicast packets. They have a common set \
@@ -36,14 +36,15 @@ class MultipleMachineEdgePartition(
             self, pre_vertices, identifier, constraints=None, label=None,
             traffic_weight=1):
         """
-        :param iterable of MachineVertex pre_vertices: the pre verts
+        :param pre_vertices: the pre vertices
+        :type pre_vertices: iterable (MachineVertex)
         :param str identifier: The identifier of the partition
         :param list(AbstractConstraint) constraints: Any initial constraints
         :param str label: An optional label of the partition
         :param int traffic_weight:
             The weight of traffic going down this partition
         """
-        super(MultipleMachineEdgePartition, self).__init__(
+        super(MultipleSourceMachineEdgePartition, self).__init__(
             pre_vertices=pre_vertices, identifier=identifier,
             allowed_edge_types=MachineEdge, constraints=constraints,
             label=label, traffic_weight=traffic_weight,
@@ -74,8 +75,8 @@ class MultipleMachineEdgePartition(
     @overrides(AbstractEdgePartition.clone_for_graph_move)
     def clone_for_graph_move(self):
         """
-        :rtype: MultipleMachineEdgePartition
+        :rtype: MultipleSourceMachineEdgePartition
         """
-        return MultipleMachineEdgePartition(
+        return MultipleSourceMachineEdgePartition(
             self._pre_vertices, self._identifier, self._constraints,
             self._label, self._traffic_weight)
