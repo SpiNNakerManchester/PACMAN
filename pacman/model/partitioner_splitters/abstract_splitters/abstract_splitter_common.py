@@ -189,6 +189,7 @@ class AbstractSplitterCommon(object):
     def get_out_going_slices(self):
         """ allows a application vertex to control the set of slices for \
         outgoing application edges
+
         :return: list of Slices and bool of estimate or not
         :rtype: tuple(list(Slice), bool
         """
@@ -197,6 +198,7 @@ class AbstractSplitterCommon(object):
     def get_in_coming_slices(self):
         """ allows a application vertex to control the set of slices for \
         incoming application edges
+
         :return: the slices incoming to this vertex, bool if estimate or exact
         :rtype: tuple(list(Slice), bool
         """
@@ -204,6 +206,7 @@ class AbstractSplitterCommon(object):
     @abstractmethod
     def get_pre_vertices(self, edge, outgoing_edge_partition):
         """ gets pre vertices and their acceptable edge types
+
         :param ApplicationEdge edge: app edge
         :param OutgoingEdgePartition outgoing_edge_partition: \
             outgoing edge partition
@@ -215,6 +218,7 @@ class AbstractSplitterCommon(object):
     def get_post_vertices(self, edge, outgoing_edge_partition,
                           src_machine_vertex):
         """ gets incoming vertices and their acceptable edge types
+
         :param ApplicationEdge edge: app edge
         :param OutgoingEdgePartition outgoing_edge_partition: \
             outgoing edge partition
