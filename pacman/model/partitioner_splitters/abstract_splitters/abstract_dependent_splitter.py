@@ -17,8 +17,7 @@ from .abstract_splitter_common import AbstractSplitterCommon
 
 
 class AbstractDependentSplitter(AbstractSplitterCommon):
-    """ splitter that works on slices from another splitter.
-
+    """ splitter that defines it needs to be run after another splitter.
     """
 
     __slots__ = [
@@ -26,9 +25,22 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
     ]
 
     def __init__(self, other_splitter, splitter_name):
+        """
+        Creates a splitter that must be done after the other unless None.
+
+        :param other_splitter:
+        :type other_splitter:
+            ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
+            or None
+        :param str splitter_name:
+        """
         AbstractSplitterCommon.__init__(self, splitter_name)
         self._other_splitter = other_splitter
 
     @property
     def other_splitter(self):
+        """
+        :rtype:
+            ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
+        """
         return self._other_splitter
