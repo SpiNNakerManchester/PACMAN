@@ -14,11 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+
+from pacman.model.graphs.machine.outgoing_edge_partitions.\
+    single_source_machine_edge_partition import (
+        SingleSourceMachineEdgePartition)
 from pacman.model.resources import ResourceContainer
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException)
-from pacman.model.graphs.machine.outgoing_edge_partitions import (
-    MachineEdgePartition)
 from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo,
     DictBasedMachinePartitionNKeysMap)
@@ -30,7 +32,7 @@ class TestRoutingInfo(unittest.TestCase):
 
     def test_routing_info(self):
         pre_vertex = SimpleMachineVertex(resources=ResourceContainer())
-        partition = MachineEdgePartition("Test", pre_vertex)
+        partition = SingleSourceMachineEdgePartition(pre_vertex, "Test")
         post_vertex = SimpleMachineVertex(resources=ResourceContainer())
         edge = MachineEdge(pre_vertex, post_vertex)
         key = 12345
@@ -71,7 +73,7 @@ class TestRoutingInfo(unittest.TestCase):
 
         assert next(iter(routing_info)) == partition_info
 
-        partition2 = MachineEdgePartition("Test", pre_vertex)
+        partition2 = SingleSourceMachineEdgePartition(pre_vertex, "Test")
         partition2.add_edge(MachineEdge(pre_vertex, post_vertex))
 
         with self.assertRaises(PacmanAlreadyExistsException):
@@ -79,7 +81,7 @@ class TestRoutingInfo(unittest.TestCase):
                 [BaseKeyAndMask(key, FULL_MASK)], partition2))
         assert partition != partition2
 
-        partition3 = MachineEdgePartition("Test2", pre_vertex)
+        partition3 = SingleSourceMachineEdgePartition(pre_vertex, "Test2")
         partition3.add_edge(MachineEdge(pre_vertex, post_vertex))
         routing_info.add_partition_info(PartitionRoutingInfo(
             [BaseKeyAndMask(key, FULL_MASK)], partition3))
@@ -90,7 +92,7 @@ class TestRoutingInfo(unittest.TestCase):
         assert routing_info.get_routing_info_from_partition(
             partition3).get_keys().tolist() == [key]
 
-        partition3 = MachineEdgePartition("Test3", pre_vertex)
+        partition3 = SingleSourceMachineEdgePartition(pre_vertex, "Test3")
         partition3.add_edge(MachineEdge(pre_vertex, post_vertex))
         routing_info.add_partition_info(PartitionRoutingInfo(
             [BaseKeyAndMask(key, FULL_MASK),
@@ -116,8 +118,8 @@ class TestRoutingInfo(unittest.TestCase):
 
     def test_dict_based_machine_partition_n_keys_map(self):
         pmap = DictBasedMachinePartitionNKeysMap()
-        p1 = MachineEdgePartition("foo", None)
-        p2 = MachineEdgePartition("bar", None)
+        p1 = SingleSourceMachineEdgePartition(None, "foo")
+        p2 = SingleSourceMachineEdgePartition(None, "bar")
         pmap.set_n_keys_for_partition(p1, 1)
         pmap.set_n_keys_for_partition(p2, 2)
         assert pmap.n_keys_for_partition(p1) == 1

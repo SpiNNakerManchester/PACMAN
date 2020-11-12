@@ -47,7 +47,7 @@ class MultipleMachineEdgePartition(
             pre_vertices=pre_vertices, identifier=identifier,
             allowed_edge_types=MachineEdge, constraints=constraints,
             label=label, traffic_weight=traffic_weight,
-            class_name="MachineEdgePartition")
+            class_name="MultipleMachineEdgePartition")
         self._traffic_type = EdgeTrafficType.MULTICAST
 
     @overrides(AbstractMultiplePartition.add_edge)

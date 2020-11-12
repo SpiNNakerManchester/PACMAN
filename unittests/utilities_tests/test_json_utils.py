@@ -23,6 +23,9 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
     FixedVertexAtomsConstraint)
+from pacman.model.graphs.machine.outgoing_edge_partitions.\
+    single_source_machine_edge_partition import (
+        SingleSourceMachineEdgePartition)
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
     ResourceContainer)
@@ -36,8 +39,6 @@ from pacman.utilities.json_utils import (
     vertex_to_json, vertex_from_json)
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
-from pacman.model.graphs.machine.outgoing_edge_partitions import (
-    MachineEdgePartition)
 
 MACHINE_GRAPH_FILENAME = "machine_graph.json"
 
@@ -243,9 +244,9 @@ class TestJsonUtils(unittest.TestCase):
                 vertices[5], vertices[(i + 1) % 10]))
         graph = MachineGraph("foo")
         graph.add_vertices(vertices)
-        graph.add_outgoing_edge_partition(MachineEdgePartition(
+        graph.add_outgoing_edge_partition(SingleSourceMachineEdgePartition(
             identifier="bar", pre_vertex=vertices[0]))
-        graph.add_outgoing_edge_partition(MachineEdgePartition(
+        graph.add_outgoing_edge_partition(SingleSourceMachineEdgePartition(
             identifier="bar", pre_vertex=vertices[5]))
         graph.add_edges(edges, "bar")
         self.graph_there_and_back(graph)
