@@ -82,8 +82,8 @@ class AbstractSplitterCommon(object):
         """ builds map of machine vertex to edge type
 
         :param edge_types: the type of edges to add to the dict.
-
         :return: dict of vertex as key, edge types as list in value
+        :rtype: dict(MachineVertex,EdgeType)
         """
         result = OrderedDict()
         for vertex in self._governed_app_vertex.machine_vertices:
@@ -93,9 +93,8 @@ class AbstractSplitterCommon(object):
     def set_max_atoms_per_core(self, max_atoms_per_core, is_fixed_atoms):
         """ sets max atoms per core for this splitter object
 
-        :param max_atoms_per_core: max atoms per core for this splitter.
-        :param is_fixed_atoms: is this a hard constraint or soft.
-        :rtype: None
+        :param int max_atoms_per_core: max atoms per core for this splitter.
+        :param bool is_fixed_atoms: is this a hard constraint or soft.
         :raises PacmanConfigurationException:
             If the new setting clash with a previous setting
         """
@@ -141,13 +140,12 @@ class AbstractSplitterCommon(object):
         return self._governed_app_vertex
 
     def set_governed_app_vertex(self, app_vertex):
-        """ sets a app vertex to be governed by this splitter object.\
-        Once set it cant be reset
+        """ sets a app vertex to be governed by this splitter object. \
+            Once set it can't be reset
 
-        :param app_vertex: the app vertex to govern
-        :rtype: None
-        :raises PacmanConfigurationException: if the app vertex has already \
-            been set.
+        :param ApplicationVertex app_vertex: the app vertex to govern
+        :raises PacmanConfigurationException:
+            if the app vertex has already been set.
         """
         if self._governed_app_vertex == app_vertex:
             return
@@ -172,7 +170,8 @@ class AbstractSplitterCommon(object):
 
         :param ResourceTracker resource_tracker: machine resources
         :param MachineGraph machine_graph: machine graph
-        :return: bool true if successful, false otherwise
+        :return: true if successful, false otherwise
+        :rtype: bool
         """
         return self.create_machine_vertices(resource_tracker, machine_graph)
 
@@ -182,25 +181,52 @@ class AbstractSplitterCommon(object):
 
         :param resource_tracker:
         :param machine_graph:
-        :return: bool true if successful, false otherwise
+        :return: true if successful, false otherwise
+        :rtype: bool
         """
 
     @abstractmethod
     def get_out_going_slices(self):
-        """ allows a application vertex to control the set of slices for \
-        outgoing application edges
+        """ A best effort prediction of the slices of the output vertices.
+
+        If this method is called after create_machine_vertices the splitter
+        should return the actual slices of the output vertices.
+        The second value returned is then always True
+
+        If this method is called before create_machine_vertices the splitter
+        will have to make an estimate unless the actual slices it will use are
+        already known. The second value returned is True if and only if the
+        slices will not be changed.
+
+        The output vertices are the ones that will serve as source vertices
+        for external edges.  If more than one set of vertices match this
+        description the splitter should use the ones used by the most general
+        edge type/ down stream splitter.
 
         :return: list of Slices and bool of estimate or not
-        :rtype: tuple(list(Slice), bool
+        :rtype: tuple(list(Slice), bool)
         """
 
     @abstractmethod
     def get_in_coming_slices(self):
-        """ allows a application vertex to control the set of slices for \
-        incoming application edges
+        """ A best effort prediction of the slices of the input vertices.
+
+        If this method is called after create_machine_vertices the splitter
+        should return the actual slices of the input vertices.
+        The second value returned is then always True
+
+        If this method is called before create_machine_vertices the splitter
+        will have to make an estimate unless the actual slices it will use are
+        already known. The second value returned is True if and only if the
+        slices will not be changed.
+
+        The output vertices are the ones that will serve as source vertices
+        for external edges.  If more than one set of vertices match this
+        description the splitter should use the ones used by the most general
+        edge type/ down stream splitter.
 
         :return: the slices incoming to this vertex, bool if estimate or exact
-        :rtype: tuple(list(Slice), bool
+        :rtype: tuple(list(Slice), bool)
         """
 
     @abstractmethod
@@ -208,10 +234,11 @@ class AbstractSplitterCommon(object):
         """ gets pre vertices and their acceptable edge types
 
         :param ApplicationEdge edge: app edge
-        :param OutgoingEdgePartition outgoing_edge_partition: \
+        :param OutgoingEdgePartition outgoing_edge_partition:
             outgoing edge partition
         :return: dict of keys being machine vertices and values are a list
-        of acceptable edge types.
+            of acceptable edge types.
+        :rtype: dict(MachineVertex,list(class))
         """
 
     @abstractmethod
@@ -220,11 +247,12 @@ class AbstractSplitterCommon(object):
         """ gets incoming vertices and their acceptable edge types
 
         :param ApplicationEdge edge: app edge
-        :param OutgoingEdgePartition outgoing_edge_partition: \
+        :param OutgoingEdgePartition outgoing_edge_partition:
             outgoing edge partition
         :param MachineVertex src_machine_vertex: the src machine vertex
         :return: dict of keys being machine vertices and values are a list
-        of acceptable edge types.
+            of acceptable edge types.
+        :rtype: dict(MachineVertex,list(class))
         """
 
     @abstractmethod
@@ -233,7 +261,7 @@ class AbstractSplitterCommon(object):
 
         :param variable_to_record: the variable to get machine verts for.
         :return: list of machine vertices
-        :rtype iterable of <MachineVertex>
+        :rtype: iterable of <MachineVertex>
         """
 
     @abstractmethod
