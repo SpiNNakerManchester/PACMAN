@@ -18,8 +18,13 @@ from .destination_segmented_sdram_machine_partition import (
     DestinationSegmentedSDRAMMachinePartition)
 from .source_segmented_sdram_machine_partition import (
     SourceSegmentedSDRAMMachinePartition)
+from .single_source_machine_edge_partition import (
+    SingleSourceMachineEdgePartition)
+from .multiple_source_machine_edge_partition import (
+    MultipleMachineEdgePartition)
 
 __all__ = [
     "AbstractMachineEdgePartition", "ConstantSDRAMMachinePartition",
     "DestinationSegmentedSDRAMMachinePartition",
+    "MultipleMachineEdgePartition", "SingleSourceMachineEdgePartition",
     "SourceSegmentedSDRAMMachinePartition"]
