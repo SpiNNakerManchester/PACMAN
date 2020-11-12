@@ -12,12 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.abstract_sdram_single_partition import \
-    AbstractSDRAMSinglePartition
-from pacman.model.graphs.machine.outgoing_edge_partitions import \
-    AbstractMachineEdgePartition
-from pacman.model.graphs.machine.outgoing_edge_partitions.single_source_machine_edge_partition import \
-    SingleSourceMachineEdgePartition
+from pacman.model.graphs.abstract_sdram_single_partition import (
+    AbstractSDRAMSinglePartition)
+from pacman.model.graphs.machine.outgoing_edge_partitions import (
+    AbstractMachineEdgePartition)
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import EdgeTrafficType

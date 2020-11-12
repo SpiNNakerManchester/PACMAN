@@ -124,7 +124,7 @@ class TestMachineGraphModel(unittest.TestCase):
         graph = MachineGraph("foo")
         graph.add_vertices(vertices)
         graph.add_outgoing_edge_partition(
-            SingleSourceMachineEdgePartition( vertices[0], "bar"))
+            SingleSourceMachineEdgePartition(vertices[0], "bar"))
         with self.assertRaises(PacmanAlreadyExistsException):
             graph.add_edges(edges, "bar")
 

@@ -15,9 +15,8 @@
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ordered_set import OrderedSet
-from pacman.exceptions import (
-    PacmanInvalidParameterException, PacmanConfigurationException)
-from pacman.model.graphs.common import ConstrainedObject, EdgeTrafficType
+from pacman.exceptions import PacmanInvalidParameterException
+from pacman.model.graphs.common import ConstrainedObject
 
 _REPR_TEMPLATE = "{}(identifier={}, edges={}, constraints={}, label={})"
 
