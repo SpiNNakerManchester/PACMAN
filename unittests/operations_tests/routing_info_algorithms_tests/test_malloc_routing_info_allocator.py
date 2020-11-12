@@ -20,8 +20,7 @@ from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint, ShareKeyConstraint)
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, MachineEdge)
-from pacman.model.graphs.machine.outgoing_edge_partitions.\
-    single_source_machine_edge_partition import (
+from pacman.model.graphs.machine.single_source_machine_edge_partition import (
         SingleSourceMachineEdgePartition)
 from pacman.model.resources import ResourceContainer
 from pacman.operations.routing_info_allocator_algorithms\

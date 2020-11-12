@@ -16,8 +16,7 @@
 import unittest
 from collections import deque
 
-from pacman.model.graphs.machine.outgoing_edge_partitions.\
-    single_source_machine_edge_partition import (
+from pacman.model.graphs.machine.single_source_machine_edge_partition import (
         SingleSourceMachineEdgePartition)
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (

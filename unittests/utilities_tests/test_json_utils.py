@@ -23,8 +23,7 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
     FixedVertexAtomsConstraint)
-from pacman.model.graphs.machine.outgoing_edge_partitions.\
-    single_source_machine_edge_partition import (
+from pacman.model.graphs.machine.single_source_machine_edge_partition import (
         SingleSourceMachineEdgePartition)
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,

@@ -12,8 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.machine.outgoing_edge_partitions.\
-    abstract_machine_edge_partition import AbstractMachineEdgePartition
+from pacman.model.graphs.machine.abstract_machine_edge_partition import AbstractMachineEdgePartition
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs import (

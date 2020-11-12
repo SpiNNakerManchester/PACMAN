@@ -17,12 +17,11 @@ from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
 from spinn_utilities.overrides import overrides
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
-from pacman.model.graphs.machine.outgoing_edge_partitions.\
-    abstract_machine_edge_partition import AbstractMachineEdgePartition
+from pacman.model.graphs.machine.abstract_machine_edge_partition import AbstractMachineEdgePartition
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs.graph import Graph
 from pacman.model.graphs.common import EdgeTrafficType
-from .outgoing_edge_partitions.single_source_machine_edge_partition import (
+from pacman.model.graphs.machine.single_source_machine_edge_partition import (
     SingleSourceMachineEdgePartition)
 
 

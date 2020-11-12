@@ -19,8 +19,7 @@ from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
-from pacman.model.graphs.machine.outgoing_edge_partitions.\
-    single_source_machine_edge_partition import (
+from pacman.model.graphs.machine.single_source_machine_edge_partition import (
         SingleSourceMachineEdgePartition)
 from uinit_test_objects import SimpleTestVertex
 
