@@ -96,13 +96,13 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
     def get_in_coming_slices(self):
         return [self._vertex_slice], True
 
-    @overrides(AbstractSplitterCommon.get_pre_vertices)
-    def get_pre_vertices(self, edge, outgoing_edge_partition):
+    @overrides(AbstractSplitterCommon.get_out_going_vertices)
+    def get_out_going_vertices(self, edge, outgoing_edge_partition):
         return {self._machine_vertex: [MachineEdge]}
 
-    @overrides(AbstractSplitterCommon.get_post_vertices)
-    def get_post_vertices(self, edge, outgoing_edge_partition,
-                          src_machine_vertex):
+    @overrides(AbstractSplitterCommon.get_in_coming_vertices)
+    def get_in_coming_vertices(self, edge, outgoing_edge_partition,
+                               src_machine_vertex):
         return {self._machine_vertex: [MachineEdge]}
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)

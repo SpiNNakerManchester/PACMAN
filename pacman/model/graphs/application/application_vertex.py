@@ -88,7 +88,9 @@ class ApplicationVertex(AbstractVertex):
     def splitter(self, new_value):
         """ sets the splitter object. Does not allow repeated settings.
 
-        :param SplitterObjectCommon new_value: the new splitter object
+        :param new_value: the new splitter object
+        :type new_value:
+            ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
         :rtype: None
         """
         if self._splitter == new_value:

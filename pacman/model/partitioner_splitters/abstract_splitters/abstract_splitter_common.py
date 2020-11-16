@@ -230,7 +230,7 @@ class AbstractSplitterCommon(object):
         """
 
     @abstractmethod
-    def get_pre_vertices(self, edge, outgoing_edge_partition):
+    def get_out_going_vertices(self, edge, outgoing_edge_partition):
         """ gets pre vertices and their acceptable edge types
 
         :param ApplicationEdge edge: app edge
@@ -242,8 +242,8 @@ class AbstractSplitterCommon(object):
         """
 
     @abstractmethod
-    def get_post_vertices(self, edge, outgoing_edge_partition,
-                          src_machine_vertex):
+    def get_in_coming_vertices(self, edge, outgoing_edge_partition,
+                               src_machine_vertex):
         """ gets incoming vertices and their acceptable edge types
 
         :param ApplicationEdge edge: app edge

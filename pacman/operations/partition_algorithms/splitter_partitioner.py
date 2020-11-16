@@ -12,10 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from collections import OrderedDict
 
-from pacman.exceptions import (
-    PacmanConfigurationException, PacmanPartitionException)
+from collections import OrderedDict
+from pacman.exceptions import (PacmanConfigurationException)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 from pacman.model.graphs import AbstractCostedMultiplePartition, \
@@ -26,8 +25,6 @@ from pacman.model.partitioner_interfaces import (
     AbstractSplitterPartitioner, AbstractSlicesConnect)
 from pacman.model.partitioner_splitters.abstract_splitters\
     .abstract_dependent_splitter import AbstractDependentSplitter
-from pacman.utilities.algorithm_utilities. \
-    partition_algorithm_utilities import get_same_size_vertex_groups
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints)
 from pacman.utilities.constants import SARK_PER_MALLOC_SDRAM_USAGE
@@ -104,7 +101,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                 app_graph, machine, plan_n_time_steps,
                 pre_allocated_resources))
 
-        self.__set_same_max_atoms_to_splitters(app_graph)
+        self.__set_max_atoms_to_splitters(app_graph)
 
         # Partition one vertex at a time
         for vertex in progress.over(vertices):
@@ -117,8 +114,26 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         # return the accepted things
         return machine_graph, resource_tracker.chips_used
 
-    @staticmethod
-    def order_vertices_for_dependent_splitters(vertices):
+    def __make_dependent_after(self, vertices, dependent_vertices, dependent):
+        """ orders the vertices so that dependants are split after the
+        things they depend upon.
+
+        :param vertices: machine vertices
+        :param dependent_vertices: list of dependent vertices
+        :param dependent: the vertex that's dependent on things.
+        :rtype: None
+        """
+        if dependent in dependent_vertices:
+            other_app_vertex = dependent_vertices[dependent]
+            # check the other is not also dependent
+            self.__make_dependent_after(
+                vertices, dependent_vertices, other_app_vertex)
+            old_index = vertices.index(dependent)
+            other_index = vertices.index(other_app_vertex)
+            if old_index < other_index:
+                vertices.insert(other_index + 1, vertices.pop(old_index))
+
+    def order_vertices_for_dependent_splitters(self, vertices):
         """ orders the list so that dependent splitters are next to their other
         splitter in terms of vertex ordering.
 
@@ -128,69 +143,36 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         :rtype: iterable of ApplicationVertex
         """
         dependent_vertices = OrderedDict()
+        other_vertices = set()
         for vertex in vertices:
             if isinstance(vertex.splitter, AbstractDependentSplitter):
-                other_app_vertex = (
-                    vertex.splitter.other_splitter.governed_app_vertex)
-                dependent_vertices[other_app_vertex] = vertex
+                other_splitter = vertex.splitter.other_splitter
+                if other_splitter:
+                    other_app_vertex = other_splitter.governed_app_vertex
+                    other_vertices.add(other_app_vertex)
+                    dependent_vertices[vertex] = other_app_vertex
 
-        for main_vertex in dependent_vertices.keys():
-            old_index_of_dependent = (
-                vertices.index(dependent_vertices[main_vertex]))
-            next_to_index = vertices.index(main_vertex) + 1
-            vertices.insert(next_to_index,
-                            vertices.pop(old_index_of_dependent))
-        return vertices
+        for vertex in dependent_vertices:
+            # As we do the whole dependency chain only start at the bottom
+            if vertex not in other_vertices:
+                self.__make_dependent_after(
+                    vertices, dependent_vertices, vertex)
 
-    def __set_same_max_atoms_to_splitters(self, app_graph):
+    def __set_max_atoms_to_splitters(self, app_graph):
         """ get the constraints sorted out.
 
         :param ApplicationGraph app_graph: the app graph
         :rtype: None
         """
-        # Group vertices that are supposed to be the same size
-        vertex_groups = get_same_size_vertex_groups(app_graph.vertices)
         for vertex in app_graph.vertices:
-            partition_together_vertices = list(vertex_groups[vertex])
-
-            # locate max atoms per core and fixed atoms per core
-            possible_max_atoms = list()
-            fixed_n_atoms = None
-            for other_vertex in partition_together_vertices:
-                possible_max_atoms.append(
-                    other_vertex.get_max_atoms_per_core())
-                max_atom_constraints = utils.locate_constraints_of_type(
-                    other_vertex.constraints, MaxVertexAtomsConstraint)
-                for constraint in max_atom_constraints:
-                    possible_max_atoms.append(constraint.size)
-                n_atom_constraints = utils.locate_constraints_of_type(
-                    other_vertex.constraints, FixedVertexAtomsConstraint)
-                for constraint in n_atom_constraints:
-                    if (fixed_n_atoms is not None and
-                            constraint.size != fixed_n_atoms):
-                        raise PacmanPartitionException(
-                            self.__ERROR_MESSAGE_CONFLICT_FIXED_ATOM.format(
-                                fixed_n_atoms, constraint.size))
-                    fixed_n_atoms = constraint.size
-
-            max_atoms_per_core = int(min(possible_max_atoms))
-            if (fixed_n_atoms is not None and
-                    max_atoms_per_core < fixed_n_atoms):
-                raise PacmanPartitionException(
-                    self.__ERROR_MESSAGE_CONFLICT_MAX_ATOMS.format(
-                        max_atoms_per_core, fixed_n_atoms))
-            if fixed_n_atoms is not None:
-                max_atoms_per_core = fixed_n_atoms
-                if vertex.n_atoms % fixed_n_atoms != 0:
-                    raise PacmanPartitionException(
-                        self.__ERROR_MESSAGE_FAILED_DIVISION.format(
-                            vertex.n_atoms, fixed_n_atoms))
-
-            for other_vertex in partition_together_vertices:
-                other_vertex.splitter.set_max_atoms_per_core(
-                    max_atoms_per_core, fixed_n_atoms is not None)
-            vertex.splitter.set_max_atoms_per_core(
-                max_atoms_per_core, fixed_n_atoms is not None)
+            for constraint in utils.locate_constraints_of_type(
+                    vertex.constraints, MaxVertexAtomsConstraint):
+                vertex.splitter.set_max_atoms_per_core(
+                    constraint.size, False)
+            for constraint in utils.locate_constraints_of_type(
+                    vertex.constraints, FixedVertexAtomsConstraint):
+                vertex.splitter.set_max_atoms_per_core(
+                    constraint.size, True)
 
     def __setup_objects(
             self, app_graph, machine, plan_n_time_steps,
@@ -218,7 +200,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         vertices = sort_vertices_by_known_constraints(app_graph.vertices)
 
         # Group vertices that are supposed to be the same size
-        vertices = self.order_vertices_for_dependent_splitters(vertices)
+        self.order_vertices_for_dependent_splitters(vertices)
 
         # Set up the progress
         progress = ProgressBar(
@@ -272,13 +254,14 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             # go through each edge
             for app_edge in app_outgoing_edge_partition.edges:
                 src_vertices_edge_type_map = (
-                    app_edge.pre_vertex.splitter.get_pre_vertices(
+                    app_edge.pre_vertex.splitter.get_out_going_vertices(
                         app_edge, app_outgoing_edge_partition))
 
                 # go through each pre vertices
                 for src_machine_vertex in src_vertices_edge_type_map:
+                    splitter = app_edge.post_vertex.splitter
                     dest_vertices_edge_type_map = (
-                        app_edge.post_vertex.splitter.get_post_vertices(
+                        splitter.get_in_coming_vertices(
                             app_edge, app_outgoing_edge_partition,
                             src_machine_vertex))
 
@@ -347,20 +330,6 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
             app_outgoing_edge_partition, resource_tracker):
-        """ overridable method for creating the machine edges
-
-        :param MachineVertex src_machine_vertex: \
-            src machine vertex of the edge.
-        :param MachineVertex dest_machine_vertex: \
-            dest machine vertex of the edge.
-        :param MachineEdge common_edge_type: the edge type to build.
-        :param ApplicationEdge app_edge: the app edge to associate the\
-            machine edge with.
-        :param MachineGraph machine_graph: machine graph
-        :param Resource resource_tracker: res tracker.
-        :param OutgoingEdgePartition app_outgoing_edge_partition: partition.
-        :rtype: None
-        """
 
         if (isinstance(app_edge, AbstractSlicesConnect) and not
                 app_edge.could_connect(
