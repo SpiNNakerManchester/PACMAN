@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from six import add_metaclass
-from pacman.model.graphs.abstract_costed_multiple_partition import (
-    AbstractCostedMultiplePartition)
+from pacman.model.graphs.abstract_multiple_partition import (
+    AbstractMultiplePartition)
 from pacman.model.graphs.abstract_sdram_partition import (
     AbstractSDRAMPartition)
 from spinn_utilities.abstract_base import AbstractBase
@@ -23,7 +23,7 @@ from spinn_utilities.abstract_base import AbstractBase
 
 @add_metaclass(AbstractBase)
 class AbstractSDRAMMultiplePartition(
-        AbstractCostedMultiplePartition, AbstractSDRAMPartition):
+        AbstractMultiplePartition, AbstractSDRAMPartition):
 
     __slots__ = []
 

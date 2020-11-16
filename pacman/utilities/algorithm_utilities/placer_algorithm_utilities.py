@@ -144,19 +144,13 @@ def create_requirement_collections(vertices, machine_graph):
     for vertex in vertices:
         required_resources.append([
             vertex.resources_required, vertex.constraints])
-        costed_partitions = (
-            machine_graph.get_costed_edge_partitions_starting_at_vertex(
+        to_add_partitions.update(
+            machine_graph.get_sdram_edge_partitions_starting_at_vertex(
                 vertex))
-        to_add_partitions.update(costed_partitions)
 
     total_sdram = 0
     for partition in to_add_partitions:
-        if isinstance(partition, AbstractSDRAMPartition):
-            total_sdram += partition.total_sdram_requirements()
-        else:
-            raise PacmanConfigurationException(
-                "Currently the only costed partition type supported is "
-                "AbstractSDRAMPartition")
+        total_sdram += partition.total_sdram_requirements()
     required_resources[-1][0].extend(
         ResourceContainer(sdram=ConstantSDRAM(total_sdram)))
 

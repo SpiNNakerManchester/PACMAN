@@ -18,8 +18,7 @@ from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
-from .abstract_costed_multiple_partition import AbstractCostedMultiplePartition
-from .abstract_costed_single_partition import AbstractCostedSinglePartition
+from .abstract_sdram_partition import AbstractSdramPartition
 from .abstract_edge_partition import AbstractEdgePartition
 from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
@@ -56,7 +55,7 @@ class Graph(ConstrainedObject):
         # the outgoing partitions by edge
         "_outgoing_edge_partition_by_edge",
         # The sdram outgoing edge partitions by pre-vertex
-        "_outgoing_costed_edge_partitions_by_pre_vertex",
+        "_outgoing_sdram_edge_partitions_by_pre_vertex",
         # The label of the graph
         "_label",
         # map between labels and vertex
@@ -96,7 +95,7 @@ class Graph(ConstrainedObject):
         self._incoming_edges_by_partition_name = DefaultOrderedDict(list)
         self._outgoing_edge_partitions_by_pre_vertex = \
             DefaultOrderedDict(OrderedSet)
-        self._outgoing_costed_edge_partitions_by_pre_vertex = \
+        self._outgoing_sdram_edge_partitions_by_pre_vertex = \
             DefaultOrderedDict(OrderedSet)
         self._outgoing_edge_partition_by_edge = OrderedDict()
         self._label = label
@@ -265,10 +264,9 @@ class Graph(ConstrainedObject):
                     str(AbstractEdgePartition.__class__),
                     str(pre_vertex, edge_partition.identifier))
 
-        if (isinstance(edge_partition, AbstractCostedSinglePartition) or
-                isinstance(edge_partition, AbstractCostedMultiplePartition)):
+        if (isinstance(edge_partition, AbstractSdramPartition)):
             for pre_vertex in pre_vertices:
-                self._outgoing_costed_edge_partitions_by_pre_vertex[
+                self._outgoing_sdram_edge_partitions_by_pre_vertex[
                     pre_vertex].add(edge_partition)
         else:
             for pre_vertex in pre_vertices:
@@ -380,15 +378,14 @@ class Graph(ConstrainedObject):
         """
         return self._outgoing_edge_partitions_by_pre_vertex[vertex]
 
-    def get_costed_edge_partitions_starting_at_vertex(self, vertex):
-        """ Get all the costed edge partitions that start at the given vertex.
+    def get_sdram_edge_partitions_starting_at_vertex(self, vertex):
+        """ Get all the sdram edge partitions that start at the given vertex.
 
         :param AbstractVertex vertex:
-            The vertex at which the costed edge partitions to find starts
-        :rtype: iterable(AbstractCostedSinglePartition or
-                         AbstractCostedMultiplePartition)
+            The vertex at which the sdram edge partitions to find starts
+        :rtype: iterable(AbstractSDRAMPartition)
         """
-        return self._outgoing_costed_edge_partitions_by_pre_vertex[vertex]
+        return self._outgoing_sdram_edge_partitions_by_pre_vertex[vertex]
 
     def get_outgoing_edge_partition_starting_at_vertex(
             self, vertex, outgoing_edge_partition_name):
