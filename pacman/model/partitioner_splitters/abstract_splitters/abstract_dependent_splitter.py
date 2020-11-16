@@ -45,7 +45,9 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
 
     @property
     def other_splitter(self):
-        """ the other splitter
+        """
+        the other splitter
+
         :rtype:
             ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
         """
