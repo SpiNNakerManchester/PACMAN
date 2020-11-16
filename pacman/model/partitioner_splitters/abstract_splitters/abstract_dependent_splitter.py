@@ -36,7 +36,7 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
 
         :param other_splitter: the other splitter to depend upon
         :type other_splitter: \
-            ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon \
+            ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
             or None
         :param str splitter_name:
         """
