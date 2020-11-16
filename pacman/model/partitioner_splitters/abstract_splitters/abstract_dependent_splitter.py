@@ -14,6 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_splitter_common import AbstractSplitterCommon
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanPartitionException)
 
 
 class AbstractDependentSplitter(AbstractSplitterCommon):
@@ -23,6 +25,10 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
     __slots__ = [
         "_other_splitter"
     ]
+
+    CIRCULAR_ERROR_MESSAGE = (
+        "Circular dependency found when setting splitter {} to be "
+        "dependent on splitter {}")
 
     def __init__(self, other_splitter, splitter_name):
         """
@@ -44,3 +50,30 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
             ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
         """
         return self._other_splitter
+
+    def check_circular(self, upstream):
+        if upstream == self:
+            return True
+        if not isinstance(upstream,  AbstractDependentSplitter):
+            return False
+        return self.check_circular(upstream.other_splitter)
+
+    @other_splitter.setter
+    def other_splitter(self, new_value):
+        """
+        Supports the delayed setting of the other to depend on
+
+        :param new_value: other splitter
+        :raise PacmanAlreadyExistsException:
+            If there is already a different other set
+        :raise PacmanPartitionException:
+            If a circular dependency is detected
+        """
+        if (self._other_splitter is not None and
+                self._other_splitter != new_value):
+            raise PacmanAlreadyExistsException(
+                "other_splitter", self._other_splitter)
+        if self.check_circular(new_value):
+            raise PacmanPartitionException(
+                self.CIRCULAR_ERROR_MESSAGE.format(self, new_value))
+        self._other_splitter = new_value
