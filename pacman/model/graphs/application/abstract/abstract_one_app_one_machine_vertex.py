@@ -26,8 +26,8 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
 
     def __init__(self, machine_vertex, label, constraints, n_atoms=1):
         """
-        Creates an Applicatio Vertex which has exactly one predefined machine \
-        Vertex
+        Creates an Application Vertex which has exactly one predefined \
+        machine Vertex
 
         :param machine_vertex: MachineVertex
         :param str label: The optional name of the vertex.

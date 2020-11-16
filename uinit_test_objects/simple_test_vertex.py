@@ -15,8 +15,8 @@
 
 """ test vertex used in many unit tests
 """
-from pacman.model.partitioner_interfaces.legacy_partitioner_api import \
-    LegacyPartitionerAPI
+from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
+    LegacyPartitionerAPI)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import SimpleMachineVertex
@@ -49,34 +49,31 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
         """
         return ResourceContainer(
             sdram=ConstantSDRAM(
-                self.get_sdram_usage_for_atoms(vertex_slice, None)),
+                self.get_sdram_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(
-                self.get_cpu_usage_for_atoms(vertex_slice, None)),
+                self.get_cpu_usage_for_atoms(vertex_slice)),
             dtcm=DTCMResource(
-                self.get_dtcm_usage_for_atoms(vertex_slice, None)))
+                self.get_dtcm_usage_for_atoms(vertex_slice)))
 
-    def get_cpu_usage_for_atoms(self, vertex_slice, graph):
+    def get_cpu_usage_for_atoms(self, vertex_slice):
         """
 
         :param vertex_slice: the atoms being considered
-        :param graph: the graph
         :return: the amount of cpu (in cycles this model will use)
         """
         return 1 * vertex_slice.n_atoms
 
-    def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
+    def get_dtcm_usage_for_atoms(self, vertex_slice):
         """
 
         :param vertex_slice: the atoms being considered
-        :param graph: the graph
         :return: the amount of dtcm (in bytes this model will use)
         """
         return 1 * vertex_slice.n_atoms
 
-    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
+    def get_sdram_usage_for_atoms(self, vertex_slice):
         """
         :param vertex_slice: the atoms being considered
-        :param graph: the graph
         :return: the amount of sdram (in bytes this model will use)
         """
         if self._fixed_sdram_value is None:
