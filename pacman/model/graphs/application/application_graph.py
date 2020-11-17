@@ -35,7 +35,7 @@ class ApplicationGraph(Graph):
         :type label: str or None
         """
         super(ApplicationGraph, self).__init__(
-            ApplicationVertex, ApplicationEdge, AbstractEdgePartition, label)
+            ApplicationVertex, ApplicationEdge, label)
 
     def forget_machine_graph(self):
         """ Forget the whole mapping from this graph to an application graph.

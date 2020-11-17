@@ -17,14 +17,13 @@ from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
 from spinn_utilities.overrides import overrides
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
-from pacman.model.graphs.machine.abstract_machine_edge_partition import (
-    AbstractMachineEdgePartition)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
-from pacman.model.graphs.graph import (
+from pacman.model.graphs import (
     AbstractMultiplePartition, AbstractSingleSourcePartition, Graph)
 from pacman.model.graphs.common import EdgeTrafficType
-from pacman.model.graphs.machine.single_source_machine_edge_partition import (
+from pacman.model.graphs.machine import (
+    AbstractMachineEdgePartition, AbstractSDRAMPartition,
     SingleSourceMachineEdgePartition)
 
 
@@ -58,8 +57,7 @@ class MachineGraph(Graph):
             it is derived from one at all.
         :type application_graph: ApplicationGraph or None
         """
-        super(MachineGraph, self).__init__(
-            MachineVertex, MachineEdge, AbstractMachineEdgePartition, label)
+        super(MachineGraph, self).__init__(MachineVertex, MachineEdge, label)
         if application_graph:
             application_graph.forget_machine_graph()
             # Check the first vertex added
@@ -153,7 +151,6 @@ class MachineGraph(Graph):
                 raise PacmanAlreadyExistsException(
                     str(AbstractMachineEdgePartition.__class__),
                     str(pre_vertex, edge_partition.identifier))
-        from pacman.model.graphs.machine import AbstractSDRAMPartition
         if (isinstance(edge_partition, AbstractSDRAMPartition)):
             for pre_vertex in pre_vertices:
                 self._outgoing_sdram_edge_partitions_by_pre_vertex[

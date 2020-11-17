@@ -21,7 +21,6 @@ from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from .abstract_edge_partition import AbstractEdgePartition
-from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
 from .abstract_edge import AbstractEdge
 from .abstract_vertex import AbstractVertex
@@ -38,8 +37,6 @@ class Graph(ConstrainedObject):
         "_allowed_vertex_types",
         # The classes of edges that are allowed in this graph
         "_allowed_edge_types",
-        # The vertices of the graph
-        "_allowed_partition_types",
         # The vertices of the graph
         "_vertices",
         # The outgoing edge partitions of the graph by name
@@ -63,8 +60,7 @@ class Graph(ConstrainedObject):
         # count of vertex which had a None or already used label
         "_unlabelled_vertex_count"]
 
-    def __init__(self, allowed_vertex_types, allowed_edge_types,
-                 allowed_partition_types, label):
+    def __init__(self, allowed_vertex_types, allowed_edge_types, label):
         """
         :param allowed_vertex_types:
             A single or tuple of types of vertex to be allowed in the graph
@@ -72,17 +68,12 @@ class Graph(ConstrainedObject):
         :param allowed_edge_types:
             A single or tuple of types of edges to be allowed in the graph
         :type allowed_edge_types: type or tuple(type, ...)
-        :param allowed_partition_types:
-            A single or tuple of types of partitions to be allowed in the
-            graph
-        :type allowed_partition_types: type or tuple(type, ...)
         :param label: The label on the graph, or None
         :type label: str or None
         """
         super(Graph, self).__init__(None)
         self._allowed_vertex_types = allowed_vertex_types
         self._allowed_edge_types = allowed_edge_types
-        self._allowed_partition_types = allowed_partition_types
         self._vertices = []
         self._vertex_by_label = dict()
         self._unlabelled_vertex_count = 0
