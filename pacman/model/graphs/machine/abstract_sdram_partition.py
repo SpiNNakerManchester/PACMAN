@@ -14,10 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from six import add_metaclass
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
+from pacman.model.graphs.machine import AbstractMachineEdgePartition
 
 
 @add_metaclass(AbstractBase)
-class AbstractSDRAMPartition(object):
+class AbstractSDRAMPartition(AbstractMachineEdgePartition):
 
     @abstractmethod
     def total_sdram_requirements(self):

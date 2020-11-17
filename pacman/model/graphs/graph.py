@@ -18,7 +18,6 @@ from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
-from .abstract_sdram_partition import AbstractSdramPartition
 from .abstract_edge_partition import AbstractEdgePartition
 from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
@@ -263,8 +262,8 @@ class Graph(ConstrainedObject):
                 raise PacmanAlreadyExistsException(
                     str(AbstractEdgePartition.__class__),
                     str(pre_vertex, edge_partition.identifier))
-
-        if (isinstance(edge_partition, AbstractSdramPartition)):
+        from pacman.model.graphs.machine import AbstractSDRAMPartition
+        if (isinstance(edge_partition, AbstractSDRAMPartition)):
             for pre_vertex in pre_vertices:
                 self._outgoing_sdram_edge_partitions_by_pre_vertex[
                     pre_vertex].add(edge_partition)

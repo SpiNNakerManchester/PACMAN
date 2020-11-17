@@ -17,9 +17,8 @@ from collections import OrderedDict
 from pacman.exceptions import (PacmanConfigurationException)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
-from pacman.model.graphs import AbstractSDRAMMultiplePartition, \
-    AbstractSDRAMSinglePartition, AbstractSDRAMPartition
-from pacman.model.graphs.machine import MachineGraph
+from pacman.model.graphs import AbstractMultiplePartition
+from pacman.model.graphs.machine import MachineGraph, AbstractSDRAMPartition
 from pacman.model.partitioner_interfaces import (
     AbstractSplitterPartitioner, AbstractSlicesConnect)
 from pacman.model.partitioner_splitters.abstract_splitters\
@@ -303,11 +302,10 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                 chip_x = None
                 chip_y = None
                 if isinstance(
-                        machine_partition, AbstractSDRAMMultiplePartition):
+                        machine_partition, AbstractMultiplePartition):
                     (chip_x, chip_y) = resource_tracker.chip_of(
                         list(machine_partition.pre_vertices)[0])
-                elif isinstance(
-                        machine_partition, AbstractSDRAMSinglePartition):
+                else:
                     (chip_x, chip_y) = resource_tracker.chip_of(
                         machine_partition.pre_vertex)
                 resource_tracker.allocate_sdram(chip_x, chip_y, sdram_cost)

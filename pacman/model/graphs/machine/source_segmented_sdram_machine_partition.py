@@ -12,17 +12,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.abstract_sdram_multiple_partition import (
-    AbstractSDRAMMultiplePartition)
 from pacman.model.graphs.machine import AbstractMachineEdgePartition
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs import AbstractMultiplePartition
 from pacman.model.graphs.common import EdgeTrafficType
-from pacman.model.graphs.machine import SDRAMMachineEdge
+from pacman.model.graphs.machine import (
+    AbstractSDRAMPartition, SDRAMMachineEdge)
 
 
 class SourceSegmentedSDRAMMachinePartition(
-        AbstractMachineEdgePartition, AbstractSDRAMMultiplePartition):
+        AbstractMultiplePartition, AbstractSDRAMPartition):
 
     __slots__ = [
         "_sdram_base_address",
@@ -66,11 +66,11 @@ class SourceSegmentedSDRAMMachinePartition(
         """
         return self._sdram_base_address
 
-    @overrides(AbstractSDRAMMultiplePartition.add_edge)
+    @overrides(AbstractMultiplePartition.add_edge)
     def add_edge(self, edge):
         # add
         AbstractMachineEdgePartition.check_edge(self, edge)
-        AbstractSDRAMMultiplePartition.add_edge(self, edge)
+        AbstractMultiplePartition.add_edge(self, edge)
 
         # check
         if len(self._destinations.keys()) != 1:
@@ -93,7 +93,7 @@ class SourceSegmentedSDRAMMachinePartition(
             edge.sdram_base_address = new_value
             new_value += edge.sdram_size
 
-    @overrides(AbstractSDRAMMultiplePartition.get_sdram_base_address_for)
+    @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
     def get_sdram_base_address_for(self, vertex):
         if vertex in self._pre_vertices:
             for edge in self._edges:
@@ -102,7 +102,7 @@ class SourceSegmentedSDRAMMachinePartition(
         else:
             return self._sdram_base_address
 
-    @overrides(AbstractSDRAMMultiplePartition.get_sdram_size_of_region_for)
+    @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
     def get_sdram_size_of_region_for(self, vertex):
         if vertex in self._pre_vertices:
             for edge in self._edges:
@@ -111,7 +111,7 @@ class SourceSegmentedSDRAMMachinePartition(
         else:
             return self.total_sdram_requirements()
 
-    @overrides(AbstractSDRAMMultiplePartition.clone_for_graph_move)
+    @overrides(AbstractMultiplePartition.clone_for_graph_move)
     def clone_for_graph_move(self):
         """
         :rtype: SourceSegmentedSDRAMMachinePartition

@@ -12,10 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.machine.abstract_machine_edge_partition import (
-    AbstractMachineEdgePartition)
+from pacman.model.graphs.machine import AbstractSDRAMPartition
 from pacman.model.graphs.abstract_sdram_single_partition import (
-    AbstractSDRAMSinglePartition)
+    AbstractSingleSourcePartition)
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import SDRAMEdgeSizeException
 from pacman.model.graphs.common import EdgeTrafficType
@@ -23,7 +22,7 @@ from pacman.model.graphs.machine import SDRAMMachineEdge
 
 
 class ConstantSDRAMMachinePartition(
-        AbstractSDRAMSinglePartition, AbstractMachineEdgePartition):
+        AbstractSingleSourcePartition, AbstractSDRAMPartition):
 
     __slots__ = [
         "_sdram_base_address",
@@ -39,16 +38,16 @@ class ConstantSDRAMMachinePartition(
         self._traffic_type = EdgeTrafficType.SDRAM
 
     @property
-    @overrides(AbstractMachineEdgePartition.traffic_type)
+    @overrides(AbstractSDRAMPartition.traffic_type)
     def traffic_type(self):
         return self._traffic_type
 
-    @overrides(AbstractSDRAMSinglePartition.add_edge)
+    @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge):
-        AbstractMachineEdgePartition.check_edge(self, edge)
-        AbstractSDRAMSinglePartition.add_edge(self, edge)
+        AbstractSDRAMPartition.check_edge(self, edge)
+        AbstractSingleSourcePartition.add_edge(self, edge)
 
-    @overrides(AbstractSDRAMSinglePartition.total_sdram_requirements)
+    @overrides(AbstractSDRAMPartition.total_sdram_requirements)
     def total_sdram_requirements(self):
         if len(self.edges) == 0:
             return 0
@@ -71,17 +70,17 @@ class ConstantSDRAMMachinePartition(
         for edge in self.edges:
             edge.sdram_base_address = self._sdram_base_address
 
-    @overrides(AbstractSDRAMSinglePartition.get_sdram_base_address_for)
+    @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
     def get_sdram_base_address_for(self, vertex):
         return self._sdram_base_address
 
-    @overrides(AbstractSDRAMSinglePartition.get_sdram_size_of_region_for)
+    @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
     def get_sdram_size_of_region_for(self, vertex):
         if len(self._edges) == 0:
             return 0
         return self._edges.peek().sdram_size
 
-    @overrides(AbstractSDRAMSinglePartition.clone_for_graph_move)
+    @overrides(AbstractSingleSourcePartition.clone_for_graph_move)
     def clone_for_graph_move(self):
         """
         :rtype: ConstantSDRAMMachinePartition
