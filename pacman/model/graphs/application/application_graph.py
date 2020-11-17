@@ -20,7 +20,6 @@ from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from pacman.model.graphs.graph import Graph
-from pacman.model.graphs import AbstractEdgePartition
 
 
 class ApplicationGraph(Graph):

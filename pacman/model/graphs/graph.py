@@ -21,7 +21,6 @@ from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from .abstract_edge_partition import AbstractEdgePartition
-from .abstract_single_source_partition import AbstractSingleSourcePartition
 from .abstract_edge import AbstractEdge
 from .abstract_vertex import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
