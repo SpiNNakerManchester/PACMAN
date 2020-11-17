@@ -133,8 +133,8 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                 vertices.insert(other_index + 1, vertices.pop(old_index))
 
     def order_vertices_for_dependent_splitters(self, vertices):
-        """ orders the list so that dependent splitters are next to their other
-        splitter in terms of vertex ordering.
+        """ orders the list so that dependent splitters are next to their \
+        other splitter in terms of vertex ordering.
 
         :param vertices: the list of application vertices
         :type vertices: iterable of ApplicationVertex
@@ -157,7 +157,8 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                 self.__make_dependent_after(
                     vertices, dependent_vertices, vertex)
 
-    def __set_max_atoms_to_splitters(self, app_graph):
+    @staticmethod
+    def __set_max_atoms_to_splitters(app_graph):
         """ get the constraints sorted out.
 
         :param ApplicationGraph app_graph: the app graph
@@ -184,7 +185,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         :param int plan_n_time_steps: the number of time steps to run for.
         :param pre_allocated_resources: pre allocated res from other systems.
         :type PreAllocatedResourceContainer or None
-        :return:
+        :return: tuple with (machine graph, res tracker, verts, progress bar)
         """
         # Load the vertices and create the machine_graph to fill
         machine_graph = MachineGraph(

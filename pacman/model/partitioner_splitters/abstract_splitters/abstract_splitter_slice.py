@@ -33,8 +33,8 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
     __slots__ = ["_called"]
 
     NOT_SUITABLE_VERTEX_ERROR = (
-        "The vertex {} cannot be supported by the {} as"
-        " the vertex does not support the required API of "
+        "The vertex {} cannot be supported by the {} as "
+        "the vertex does not support the required API of "
         "LegacyPartitionerAPI. Please inherit from the class in "
         "pacman.model.partitioner_interfaces.legacy_partitioner_api and try "
         "again.")
@@ -306,9 +306,9 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
 
             if not isinstance(self._governed_app_vertex, AbstractVirtual):
                 # Re-allocate the existing resources
-                (x, y, p, ip_tags, reverse_ip_tags) = \
+                (x, y, p, ip_tags, reverse_ip_tags) = (
                     resource_tracker.allocate_constrained_resources(
-                        new_resources, self._governed_app_vertex.constraints)
+                        new_resources, self._governed_app_vertex.constraints))
             new_used_placements.append(
                 (x, y, p, new_resources, ip_tags, reverse_ip_tags))
         return new_used_placements

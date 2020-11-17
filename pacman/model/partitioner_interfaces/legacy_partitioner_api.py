@@ -48,9 +48,9 @@ class LegacyPartitionerAPI(object):
             The resources used by the machine vertex.
         :param label: human readable label for the machine vertex
         :type label: str or None
-        :param iterable(~pacman.model.constraints.AbstractConstraint) \
-                constraints:
-            Constraints to be passed on to the machine vertex.
+        :param constraints: Constraints to be passed on to the machine vertex.
+        :type constraints: \
+            iterable(~pacman.model.constraints.AbstractConstraint)
         """
 
     @abstractproperty
@@ -62,9 +62,9 @@ class LegacyPartitionerAPI(object):
         """
 
     @staticmethod
-    def abstractmethods():
+    def abstract_methods():
         """
-        Exposes the asbtract methods and properties defined in this class
+        Exposes the abstract methods and properties defined in this class
         :rtype list(str)
         """
         return LegacyPartitionerAPI.__abstractmethods__
