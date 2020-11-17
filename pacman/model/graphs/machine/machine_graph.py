@@ -57,8 +57,7 @@ class MachineGraph(Graph):
         :type application_graph: ApplicationGraph or None
         """
         super(MachineGraph, self).__init__(
-            MachineVertex, MachineEdge, AbstractMachineEdgePartition, label,
-            SingleSourceMachineEdgePartition)
+            MachineVertex, MachineEdge, AbstractMachineEdgePartition, label)
         if application_graph:
             application_graph.forget_machine_graph()
             # Check the first vertex added
@@ -116,3 +115,8 @@ class MachineGraph(Graph):
                 raise PacmanInvalidParameterException(
                     "vertex", str(vertex),
                     self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
+
+    @overrides(Graph.new_edge_partition)
+    def new_edge_partition(self, name, pre_vertex):
+        return SingleSourceMachineEdgePartition(
+            identifier=name, pre_vertex=pre_vertex)

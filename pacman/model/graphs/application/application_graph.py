@@ -16,6 +16,7 @@
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from .application_edge_partition import ApplicationEdgePartition
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs.graph import Graph
 from pacman.model.graphs import AbstractEdgePartition
 
@@ -32,8 +33,7 @@ class ApplicationGraph(Graph):
         :type label: str or None
         """
         super(ApplicationGraph, self).__init__(
-            ApplicationVertex, ApplicationEdge, AbstractEdgePartition, label,
-            ApplicationEdgePartition)
+            ApplicationVertex, ApplicationEdge, AbstractEdgePartition, label)
 
     def forget_machine_graph(self):
         """ Forget the whole mapping from this graph to an application graph.
@@ -49,3 +49,7 @@ class ApplicationGraph(Graph):
         """
         for e in self.edges:
             e.forget_machine_edges()
+
+    @overrides(Graph.new_edge_partition)
+    def new_edge_partition(self, name, pre_vertex):
+        return ApplicationEdgePartition(identifier=name, pre_vertex=pre_vertex)

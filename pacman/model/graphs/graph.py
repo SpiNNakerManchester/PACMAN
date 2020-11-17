@@ -14,6 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
+from six import add_metaclass
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
@@ -26,6 +28,7 @@ from .abstract_vertex import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
 
 
+@add_metaclass(AbstractBase)
 class Graph(ConstrainedObject):
     """ A graph that specifies the allowed types of the vertices and edges.
     """
@@ -37,8 +40,6 @@ class Graph(ConstrainedObject):
         "_allowed_edge_types",
         # The vertices of the graph
         "_allowed_partition_types",
-        # the default partition type
-        "_default_partition_type",
         # The vertices of the graph
         "_vertices",
         # The outgoing edge partitions of the graph by name
@@ -63,7 +64,7 @@ class Graph(ConstrainedObject):
         "_unlabelled_vertex_count"]
 
     def __init__(self, allowed_vertex_types, allowed_edge_types,
-                 allowed_partition_types, label, default_partition_type):
+                 allowed_partition_types, label):
         """
         :param allowed_vertex_types:
             A single or tuple of types of vertex to be allowed in the graph
@@ -77,14 +78,11 @@ class Graph(ConstrainedObject):
         :type allowed_partition_types: type or tuple(type, ...)
         :param label: The label on the graph, or None
         :type label: str or None
-        :param type default_partition_type:
-            The type of partition that is made by default
         """
         super(Graph, self).__init__(None)
         self._allowed_vertex_types = allowed_vertex_types
         self._allowed_edge_types = allowed_edge_types
         self._allowed_partition_types = allowed_partition_types
-        self._default_partition_type = default_partition_type
         self._vertices = []
         self._vertex_by_label = dict()
         self._unlabelled_vertex_count = 0
@@ -180,7 +178,7 @@ class Graph(ConstrainedObject):
         key = (edge.pre_vertex, outgoing_edge_partition_name)
         partition = self._outgoing_edge_partitions_by_name.get(key, None)
         if partition is None:
-            partition = self._new_edge_partition(
+            partition = self.new_edge_partition(
                 outgoing_edge_partition_name, edge.pre_vertex)
             self._outgoing_edge_partitions_by_pre_vertex[edge.pre_vertex].add(
                 partition)
@@ -196,7 +194,8 @@ class Graph(ConstrainedObject):
             raise PacmanAlreadyExistsException("edge", edge)
         self._outgoing_edge_partition_by_edge[edge] = partition
 
-    def _new_edge_partition(self, name, pre_vertex):
+    @abstractmethod
+    def new_edge_partition(self, name, pre_vertex):
         """ How we create a new :py:class:`AbstractSingleSourcePartition` in \
             the first place. Uses the first/only element in the allowed \
             partition types argument to the graph's constructor.
@@ -210,8 +209,6 @@ class Graph(ConstrainedObject):
         :return: the new edge partition
         :rtype: AbstractSingleSourcePartition
         """
-        return self._default_partition_type(
-            identifier=name, pre_vertex=pre_vertex)
 
     def add_edges(self, edges, outgoing_edge_partition_name):
         """ Add a collection of edges to the graph.
