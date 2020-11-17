@@ -19,8 +19,10 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from pacman.model.graphs.machine.abstract_machine_edge_partition import (
     AbstractMachineEdgePartition)
-from pacman.exceptions import PacmanInvalidParameterException
-from pacman.model.graphs.graph import Graph
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanInvalidParameterException)
+from pacman.model.graphs.graph import (
+    AbstractMultiplePartition, AbstractSingleSourcePartition, Graph)
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine.single_source_machine_edge_partition import (
     SingleSourceMachineEdgePartition)
@@ -115,6 +117,55 @@ class MachineGraph(Graph):
                 raise PacmanInvalidParameterException(
                     "vertex", str(vertex),
                     self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
+
+    @overrides(Graph.add_outgoing_edge_partition)
+    def add_outgoing_edge_partition(self, edge_partition):
+        """ Add an edge partition to the graph.
+
+        :param AbstractEdgePartition edge_partition:
+            The edge partition to add
+        :raises PacmanAlreadyExistsException:
+            If a partition already exists with the same pre_vertex and
+            identifier
+        """
+        # verify that this partition is suitable for this graph
+        if not isinstance(edge_partition, AbstractMachineEdgePartition):
+            raise PacmanInvalidParameterException(
+                "outgoing_edge_partition", str(edge_partition.__class__),
+                "Partitions of this graph must be an "
+                "AbstractMachineEdgePartition")
+
+        # check if its a single pre or multiple pre
+        if isinstance(edge_partition, AbstractSingleSourcePartition):
+            pre_vertices = [edge_partition.pre_vertex]
+        elif isinstance(edge_partition, AbstractMultiplePartition):
+            pre_vertices = edge_partition.pre_vertices
+        else:
+            raise PacmanInvalidParameterException(
+                "outgoing_edge_partition", str(edge_partition.__class__),
+                "The graph does not know how to handle outgoing partitions "
+                "that are not of types [single source, multiple]")
+
+        for pre_vertex in pre_vertices:
+            # check this partition doesn't already exist
+            if ((pre_vertex, edge_partition.identifier) in
+                    self._outgoing_edge_partitions_by_name):
+                raise PacmanAlreadyExistsException(
+                    str(AbstractMachineEdgePartition.__class__),
+                    str(pre_vertex, edge_partition.identifier))
+        from pacman.model.graphs.machine import AbstractSDRAMPartition
+        if (isinstance(edge_partition, AbstractSDRAMPartition)):
+            for pre_vertex in pre_vertices:
+                self._outgoing_sdram_edge_partitions_by_pre_vertex[
+                    pre_vertex].add(edge_partition)
+        else:
+            for pre_vertex in pre_vertices:
+                self._outgoing_edge_partitions_by_pre_vertex[pre_vertex].add(
+                    edge_partition)
+
+        for pre_vertex in pre_vertices:
+            self._outgoing_edge_partitions_by_name[
+                pre_vertex, edge_partition.identifier] = edge_partition
 
     @overrides(Graph.new_edge_partition)
     def new_edge_partition(self, name, pre_vertex):

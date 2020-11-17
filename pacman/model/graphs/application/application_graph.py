@@ -17,6 +17,8 @@ from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from .application_edge_partition import ApplicationEdgePartition
 from spinn_utilities.overrides import overrides
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from pacman.model.graphs.graph import Graph
 from pacman.model.graphs import AbstractEdgePartition
 
@@ -53,3 +55,31 @@ class ApplicationGraph(Graph):
     @overrides(Graph.new_edge_partition)
     def new_edge_partition(self, name, pre_vertex):
         return ApplicationEdgePartition(identifier=name, pre_vertex=pre_vertex)
+
+    @overrides(Graph.add_outgoing_edge_partition)
+    def add_outgoing_edge_partition(self, edge_partition):
+        """ Add an existing outgoing edge partition to the graph. Note that \
+            the edge partition probably needs to have at least one edge \
+            before this will work.
+        :param OutgoingEdgePartition edge_partition:
+            The outgoing edge partition to add
+        :raises PacmanAlreadyExistsException:
+            If a partition already exists with the same pre_vertex and
+            identifier
+        """
+        # verify that this partition is suitable for this graph
+        if not isinstance(edge_partition, ApplicationEdgePartition):
+            raise PacmanInvalidParameterException(
+                "outgoing_edge_partition", edge_partition.__class__,
+                "Partitions of this graph must be an ApplicationEdgePartition")
+
+        # check this partition doesn't already exist
+        key = (edge_partition.pre_vertex,
+               edge_partition.identifier)
+        if key in self._outgoing_edge_partitions_by_name:
+            raise PacmanAlreadyExistsException(
+                str(self._allowed_partition_types), key)
+
+        self._outgoing_edge_partitions_by_pre_vertex[
+            edge_partition.pre_vertex].add(edge_partition)
+        self._outgoing_edge_partitions_by_name[key] = edge_partition
