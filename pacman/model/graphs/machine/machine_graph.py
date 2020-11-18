@@ -19,8 +19,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
-from pacman.model.graphs import (
-    AbstractMultiplePartition, AbstractSingleSourcePartition, Graph)
+from pacman.model.graphs import Graph
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
     AbstractMachineEdgePartition, AbstractSDRAMPartition,
