@@ -16,8 +16,7 @@
 import unittest
 from collections import deque
 
-from pacman.model.graphs.machine.single_source_machine_edge_partition import (
-        SingleSourceMachineEdgePartition)
+from pacman.model.graphs.machine import MulticastEdgePartition
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
@@ -46,8 +45,7 @@ class MyTestCase(unittest.TestCase):
 
         for vertex in vertices:
             graph.add_outgoing_edge_partition(
-                SingleSourceMachineEdgePartition(
-                    identifier="Test", pre_vertex=vertex))
+                MulticastEdgePartition(identifier="Test", pre_vertex=vertex))
             for vertex_to in vertices:
                 graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 

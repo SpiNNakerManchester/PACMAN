@@ -52,8 +52,9 @@ class ApplicationGraph(Graph):
             e.forget_machine_edges()
 
     @overrides(Graph.new_edge_partition)
-    def new_edge_partition(self, name, pre_vertex):
-        return ApplicationEdgePartition(identifier=name, pre_vertex=pre_vertex)
+    def new_edge_partition(self, name, edge):
+        return ApplicationEdgePartition(
+            identifier=name, pre_vertex=edge.pre_vertex)
 
     @overrides(Graph.add_outgoing_edge_partition)
     def add_outgoing_edge_partition(self, edge_partition):

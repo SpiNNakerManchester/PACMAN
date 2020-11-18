@@ -169,7 +169,7 @@ class Graph(ConstrainedObject):
         partition = self._outgoing_edge_partitions_by_name.get(key, None)
         if partition is None:
             partition = self.new_edge_partition(
-                outgoing_edge_partition_name, edge.pre_vertex)
+                outgoing_edge_partition_name, edge)
             self._outgoing_edge_partitions_by_pre_vertex[edge.pre_vertex].add(
                 partition)
             self._outgoing_edge_partitions_by_name[key] = partition
@@ -185,7 +185,7 @@ class Graph(ConstrainedObject):
         self._outgoing_edge_partition_by_edge[edge] = partition
 
     @abstractmethod
-    def new_edge_partition(self, name, pre_vertex):
+    def new_edge_partition(self, name, edge):
         """ How we create a new :py:class:`AbstractSingleSourcePartition` in \
             the first place. Uses the first/only element in the allowed \
             partition types argument to the graph's constructor.
@@ -194,8 +194,8 @@ class Graph(ConstrainedObject):
         Can be overridden if different arguments should be passed.
 
         :param str name: The identifier of the partition
-        :param AbstractVertex pre_vertex:
-            The starting vertex for the partition
+        :param AbstractEdge edge:
+            An edge for the partition
         :return: the new edge partition
         :rtype: AbstractSingleSourcePartition
         """

@@ -23,7 +23,7 @@ from pacman.model.graphs import Graph
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
     AbstractMachineEdgePartition, AbstractSDRAMPartition,
-    SingleSourceMachineEdgePartition)
+    FixedRouteEdgePartition, MulticastEdgePartition)
 
 
 class MachineGraph(Graph):
@@ -153,6 +153,15 @@ class MachineGraph(Graph):
                 pre_vertex, edge_partition.identifier] = edge_partition
 
     @overrides(Graph.new_edge_partition)
-    def new_edge_partition(self, name, pre_vertex):
-        return SingleSourceMachineEdgePartition(
-            identifier=name, pre_vertex=pre_vertex)
+    def new_edge_partition(self, name, edge):
+        if edge.traffic_type == EdgeTrafficType.FIXED_ROUTE:
+            return FixedRouteEdgePartition(
+                identifier=name, pre_vertex=edge.pre_vertex)
+        elif edge.traffic_type == EdgeTrafficType.MULTICAST:
+            return MulticastEdgePartition(
+                identifier=name, pre_vertex=edge.pre_vertex)
+        else:
+            raise PacmanInvalidParameterException(
+                "edge", edge,
+                "Unable to add an Edge with traffic type {} unless you frist "
+                "add a paritition for it".format(edge.traffic_type ))

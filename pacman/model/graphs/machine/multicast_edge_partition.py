@@ -21,20 +21,18 @@ from pacman.model.graphs import (
 from pacman.model.graphs.machine.machine_edge import MachineEdge
 
 
-class SingleSourceMachineEdgePartition(
+class MulticastEdgePartition(
         AbstractMachineEdgePartition, AbstractSingleSourcePartition):
     """ A simple implementation of a machine edge partition that will \
         communicate with SpiNNaker multicast packets. They have a common set \
         of sources with the same semantics and so can share a single key.
     """
 
-    __slots__ = (
-        "_traffic_type"
-    )
+    __slots__ = ()
 
     def __init__(
             self, pre_vertex, identifier, constraints=None, label=None,
-            traffic_weight=1, traffic_type=EdgeTrafficType.MULTICAST):
+            traffic_weight=1):
         """
         :param str identifier: The identifier of the partition
         :param list(AbstractConstraint) constraints: Any initial constraints
@@ -42,12 +40,11 @@ class SingleSourceMachineEdgePartition(
         :param int traffic_weight:
             The weight of traffic going down this partition
         """
-        super(SingleSourceMachineEdgePartition, self).__init__(
+        super(MulticastEdgePartition, self).__init__(
             pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=MachineEdge, constraints=constraints,
             label=label, traffic_weight=traffic_weight,
             class_name="SingleSourceMachineEdgePartition")
-        self._traffic_type = traffic_type
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge):
@@ -61,13 +58,13 @@ class SingleSourceMachineEdgePartition(
 
         :rtype: EdgeTrafficType
         """
-        return self._traffic_type
+        return EdgeTrafficType.MULTICAST
 
     @overrides(AbstractEdgePartition.clone_for_graph_move)
     def clone_for_graph_move(self):
         """
-        :rtype: SingleSourceMachineEdgePartition
+        :rtype: MulticastEdgePartition
         """
-        return SingleSourceMachineEdgePartition(
+        return MulticastEdgePartition(
             self._pre_vertex, self._identifier, self._constraints,
             self._label, self._traffic_weight)

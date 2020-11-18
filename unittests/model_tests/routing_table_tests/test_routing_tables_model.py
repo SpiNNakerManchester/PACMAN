@@ -15,8 +15,7 @@
 
 import unittest
 
-from pacman.model.graphs.machine.single_source_machine_edge_partition import (
-        SingleSourceMachineEdgePartition)
+from pacman.model.graphs.machine import MulticastEdgePartition
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
@@ -187,7 +186,7 @@ class TestRoutingTable(unittest.TestCase):
 
     def test_multicast_routing_table_by_partition(self):
         mrt = MulticastRoutingTableByPartition()
-        partition = SingleSourceMachineEdgePartition(None, "foo")
+        partition = MulticastEdgePartition(None, "foo")
         entry = MulticastRoutingTableByPartitionEntry(range(4), range(2))
         mrt.add_path_entry(entry, 0, 0, partition)
         entry = MulticastRoutingTableByPartitionEntry(
