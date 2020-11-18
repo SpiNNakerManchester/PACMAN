@@ -190,7 +190,7 @@ class Graph(ConstrainedObject):
             the first place. Uses the first/only element in the allowed \
             partition types argument to the graph's constructor.
 
-        Called from :py:method:`~add_edge`.
+        Called from :py:meth:`~add_edge`.
         Can be overridden if different arguments should be passed.
 
         :param str name: The identifier of the partition
