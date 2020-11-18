@@ -56,8 +56,8 @@ class ApplicationGraph(Graph):
         return ApplicationEdgePartition(
             identifier=name, pre_vertex=edge.pre_vertex)
 
-    @overrides(Graph.add_outgoing_edge_partition)
-    def add_outgoing_edge_partition(self, edge_partition):
+    @overrides(Graph.add_edge_partition)
+    def add_edge_partition(self, edge_partition):
         """ Add an existing outgoing edge partition to the graph. Note that \
             the edge partition probably needs to have at least one edge \
             before this will work.
@@ -84,3 +84,17 @@ class ApplicationGraph(Graph):
         self._outgoing_edge_partitions_by_pre_vertex[
             edge_partition.pre_vertex].add(edge_partition)
         self._outgoing_edge_partitions_by_name[key] = edge_partition
+
+    @property
+    @overrides(Graph.outgoing_edge_partitions)
+    def outgoing_edge_partitions(self):
+        # This is based on the assumption that an Application partition is
+        # always SingleSourced
+        return self._outgoing_edge_partitions_by_name.values()
+
+    @property
+    @overrides(Graph.n_outgoing_edge_partitions)
+    def n_outgoing_edge_partitions(self):
+        # This is based on the assumption that an Application partition is
+        # always SingleSourced
+        return len(self._outgoing_edge_partitions_by_name)

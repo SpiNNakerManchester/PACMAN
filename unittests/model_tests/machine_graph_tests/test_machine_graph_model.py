@@ -56,9 +56,9 @@ class TestMachineGraphModel(unittest.TestCase):
                 vertices[5], vertices[(i + 1) % 10]))
         graph = MachineGraph("foo")
         graph.add_vertices(vertices)
-        graph.add_outgoing_edge_partition(
+        graph.add_edge_partition(
             MulticastEdgePartition(vertices[0], "bar"))
-        graph.add_outgoing_edge_partition(
+        graph.add_edge_partition(
             MulticastEdgePartition(vertices[5], "bar"))
         graph.add_edges(edges, "bar")
         outgoing = set(graph.get_edges_starting_at_vertex(vertices[0]))
@@ -102,9 +102,9 @@ class TestMachineGraphModel(unittest.TestCase):
         graph = MachineGraph("foo")
         with self.assertRaises(PacmanAlreadyExistsException):
             graph.add_vertices(vertices)
-        graph.add_outgoing_edge_partition(
+        graph.add_edge_partition(
             MulticastEdgePartition(vertices[0], "bar"))
-        graph.add_outgoing_edge_partition(
+        graph.add_edge_partition(
             MulticastEdgePartition(vertices[1], "bar"))
         graph.add_edges(edges, "bar")
 
@@ -121,7 +121,7 @@ class TestMachineGraphModel(unittest.TestCase):
         edges.append(edge)
         graph = MachineGraph("foo")
         graph.add_vertices(vertices)
-        graph.add_outgoing_edge_partition(
+        graph.add_edge_partition(
             MulticastEdgePartition(vertices[0], "bar"))
         with self.assertRaises(PacmanAlreadyExistsException):
             graph.add_edges(edges, "bar")
@@ -175,9 +175,9 @@ class TestMachineGraphModel(unittest.TestCase):
         with self.assertRaises(PacmanInvalidParameterException):
             graph = MachineGraph("foo")
             graph.add_vertices(vertices)
-            graph.add_outgoing_edge_partition(
+            graph.add_edge_partition(
                 MulticastEdgePartition(vertices[0], "ba"))
-            graph.add_outgoing_edge_partition(
+            graph.add_edge_partition(
                 MulticastEdgePartition(vertex_extra, "bar"))
             graph.add_edges(edges, "bar")
 
@@ -195,7 +195,7 @@ class TestMachineGraphModel(unittest.TestCase):
         with self.assertRaises(PacmanInvalidParameterException):
             graph = MachineGraph("foo")
             graph.add_vertices(vertices)
-            graph.add_outgoing_edge_partition(
+            graph.add_edge_partition(
                 MulticastEdgePartition(vertices[0], "bar"))
             graph.add_edges(edges, "bar")
 

@@ -15,7 +15,8 @@
 
 from collections import OrderedDict
 from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
@@ -38,15 +39,16 @@ class Graph(ConstrainedObject):
         "_allowed_edge_types",
         # The vertices of the graph
         "_vertices",
-        # The outgoing edge partitions of the graph by name
+        # The outgoing edge partitions of the graph by
+        # (edge.pre_vertex, outgoing_edge_partition_name)
         "_outgoing_edge_partitions_by_name",
         # The outgoing edges by pre-vertex
         "_outgoing_edges",
         # The incoming edges by post-vertex
         "_incoming_edges",
-        # map between incoming edges and their associated partitions
+        # map between incoming edges and edge.post_vertex, edge_partition_name
         "_incoming_edges_by_partition_name",
-        # The outgoing edge partitions by pre-vertex
+        # The sets of edge partitions by pre-vertex
         "_outgoing_edge_partitions_by_pre_vertex",
         # the outgoing partitions by edge
         "_outgoing_edge_partition_by_edge",
@@ -165,14 +167,12 @@ class Graph(ConstrainedObject):
                 "post-vertex must be known in graph")
 
         # Add the edge to the partition
-        key = (edge.pre_vertex, outgoing_edge_partition_name)
-        partition = self._outgoing_edge_partitions_by_name.get(key, None)
+        partition = self.get_outgoing_edge_partition_starting_at_vertex(
+            edge.pre_vertex, outgoing_edge_partition_name)
         if partition is None:
             partition = self.new_edge_partition(
                 outgoing_edge_partition_name, edge)
-            self._outgoing_edge_partitions_by_pre_vertex[edge.pre_vertex].add(
-                partition)
-            self._outgoing_edge_partitions_by_name[key] = partition
+            self.add_edge_partition(partition)
         partition.add_edge(edge)
 
         # Add the edge to the indices
@@ -216,7 +216,7 @@ class Graph(ConstrainedObject):
             self.add_edge(e, outgoing_edge_partition_name)
 
     @abstractmethod
-    def add_outgoing_edge_partition(self, edge_partition):
+    def add_edge_partition(self, edge_partition):
         """ Add an edge partition to the graph.
 
         :param AbstractEdgePartition edge_partition:
@@ -253,28 +253,22 @@ class Graph(ConstrainedObject):
         """
         return [
             edge
-            for partition in self._outgoing_edge_partitions_by_name.values()
+            for partition in self.outgoing_edge_partitions
             for edge in partition.edges]
 
-    @property
+    @abstractproperty
     def outgoing_edge_partitions(self):
         """ The edge partitions in the graph.
 
         :rtype: iterable(AbstractEdgePartition)
         """
-        seen = set()
-        for element in self._outgoing_edge_partitions_by_name.values():
-            if element not in seen:
-                yield element
-                seen.add(element)
 
-    @property
+    @abstractproperty
     def n_outgoing_edge_partitions(self):
         """ The number of outgoing edge partitions in the graph.
 
         :rtype: int
         """
-        return len(self._outgoing_edge_partitions_by_name)
 
     def get_outgoing_partition_for_edge(self, edge):
         """ Gets the partition this edge is associated with.

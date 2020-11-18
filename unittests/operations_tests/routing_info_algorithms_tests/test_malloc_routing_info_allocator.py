@@ -130,11 +130,11 @@ class MyTestCase(unittest.TestCase):
         e3 = MachineEdge(v2, v3, label="e3")
         e4 = MachineEdge(v1, v4, label="e4")
 
-        machine_graph.add_outgoing_edge_partition(
+        machine_graph.add_edge_partition(
             MulticastEdgePartition(identifier="part1", pre_vertex=v1))
-        machine_graph.add_outgoing_edge_partition(
+        machine_graph.add_edge_partition(
             MulticastEdgePartition(identifier="part2", pre_vertex=v2))
-        machine_graph.add_outgoing_edge_partition(
+        machine_graph.add_edge_partition(
             MulticastEdgePartition(identifier="part2", pre_vertex=v1))
 
         machine_graph.add_edge(e1, "part1")
@@ -151,7 +151,7 @@ class MyTestCase(unittest.TestCase):
         machine_graph, n_keys_map, v1, v2, _v3, v4, e1, e2, e3, e4 = (
             self._integration_setup())
         e5 = MachineEdge(v4, v2, label="e1")
-        machine_graph.add_outgoing_edge_partition(
+        machine_graph.add_edge_partition(
             MulticastEdgePartition(identifier="part3", pre_vertex=v4))
 
         machine_graph.add_edge(e5, "part3")

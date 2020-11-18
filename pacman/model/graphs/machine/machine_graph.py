@@ -15,6 +15,7 @@
 
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
+from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from pacman.exceptions import (
@@ -31,12 +32,14 @@ class MachineGraph(Graph):
     """
 
     __slots__ = [
-        # A double dictionary of MULTICAST edges by their
-        # application id and then their (partition name)
-        "_multicast_partitions",
         # Flags to say the application level is used so all machine vertices
         # will have an application vertex
         "_application_level_used",
+        # Ordered set of partitions
+        "_edge_partitions",
+        # A double dictionary of MULTICAST edges by their
+        # application id and then their (partition name)
+        "_multicast_partitions",
     ]
 
     MISSING_APP_VERTEX_ERROR_MESSAGE = (
@@ -66,6 +69,7 @@ class MachineGraph(Graph):
             self._application_level_used = False
         self._multicast_partitions = DefaultOrderedDict(
             lambda: DefaultOrderedDict(set))
+        self._edge_partitions = OrderedSet()
 
     @overrides(Graph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
@@ -115,8 +119,8 @@ class MachineGraph(Graph):
                     "vertex", str(vertex),
                     self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
 
-    @overrides(Graph.add_outgoing_edge_partition)
-    def add_outgoing_edge_partition(self, edge_partition):
+    @overrides(Graph.add_edge_partition)
+    def add_edge_partition(self, edge_partition):
         """ Add an edge partition to the graph.
 
         :param AbstractEdgePartition edge_partition:
@@ -151,6 +155,7 @@ class MachineGraph(Graph):
         for pre_vertex in edge_partition.pre_vertices:
             self._outgoing_edge_partitions_by_name[
                 pre_vertex, edge_partition.identifier] = edge_partition
+        self._edge_partitions.add(edge_partition)
 
     @overrides(Graph.new_edge_partition)
     def new_edge_partition(self, name, edge):
@@ -165,3 +170,13 @@ class MachineGraph(Graph):
                 "edge", edge,
                 "Unable to add an Edge with traffic type {} unless you frist "
                 "add a paritition for it".format(edge.traffic_type ))
+
+    @property
+    @overrides(Graph.outgoing_edge_partitions)
+    def outgoing_edge_partitions(self):
+        return self._edge_partitions
+
+    @property
+    @overrides(Graph.n_outgoing_edge_partitions)
+    def n_outgoing_edge_partitions(self):
+        return len(self._edge_partitions)
