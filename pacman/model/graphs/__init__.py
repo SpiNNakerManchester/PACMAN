@@ -23,13 +23,9 @@ from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
 from .graph import Graph
 from .abstract_supports_sdram_edges import AbstractSupportsSDRAMEdges
-from .abstract_sdram_single_partition import AbstractSDRAMSinglePartition
-from .abstract_sdram_multiple_partition import AbstractSDRAMMultiplePartition
-from .abstract_sdram_partition import AbstractSDRAMPartition
 
 __all__ = [
     "AbstractEdge", "AbstractEdgePartition", "AbstractFPGA",
-    "AbstractMultiplePartition", "AbstractSDRAMMultiplePartition",
-    "AbstractSDRAMPartition", "AbstractSDRAMSinglePartition",
-    "AbstractSingleSourcePartition", "AbstractSpiNNakerLink",
-    "AbstractSupportsSDRAMEdges", "AbstractVertex", "AbstractVirtual", "Graph"]
+    "AbstractMultiplePartition", "AbstractSingleSourcePartition",
+    "AbstractSpiNNakerLink", "AbstractSupportsSDRAMEdges", "AbstractVertex",
+    "AbstractVirtual", "Graph"]

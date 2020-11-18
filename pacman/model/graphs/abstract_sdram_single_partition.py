@@ -16,8 +16,7 @@
 from six import add_metaclass
 from pacman.model.graphs.abstract_single_source_partition import (
     AbstractSingleSourcePartition)
-from pacman.model.graphs.abstract_sdram_partition import (
-    AbstractSDRAMPartition)
+from pacman.model.graphs.machine import (AbstractSDRAMPartition)
 from spinn_utilities.abstract_base import AbstractBase
 
 
