@@ -331,7 +331,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
         """ Find the max ratio between the resources.
 
         :param ResourceContainer required: the resources used by the vertex
-        :param ResourceContainer available:
+        :param ResourceContainer available: \
             the max resources available from the machine
         :param int plan_n_time_steps: number of time steps to plan for
         :return: the largest ratio of resources
@@ -385,9 +385,10 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
         """
 
     def _estimate_slices(self):
-        """ estimates the slices for when not already been split.
+        """ Estimates the slices for when the governed_app_vertex has not\
+            already been split.
 
-        :return: the slices of this vertex, bool if estimate or exact
+        :return: The slices of this vertex, bool if estimate or exact
         :rtype: tuple(list(Slice), bool
 
         """
