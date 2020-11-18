@@ -77,7 +77,7 @@ class ApplicationGraph(Graph):
                edge_partition.identifier)
         if key in self._outgoing_edge_partitions_by_name:
             raise PacmanAlreadyExistsException(
-                str(self._allowed_partition_types), key)
+                str(ApplicationEdgePartition), key)
 
         self._outgoing_edge_partitions_by_pre_vertex[
             edge_partition.pre_vertex].add(edge_partition)
