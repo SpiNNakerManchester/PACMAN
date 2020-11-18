@@ -678,12 +678,11 @@ def _write_vertex_virtual_keys(
     """
     f.write("Vertex: {}\n".format(vertex))
     for partition in progress.over(
-            graph.get_outgoing_edge_partitions_starting_at_vertex(vertex),
+            graph.get_multicast_edge_partitions_starting_at_vertex(vertex),
             False):
-        if partition.traffic_type == EdgeTrafficType.MULTICAST:
-            rinfo = routing_infos.get_routing_info_from_partition(partition)
-            f.write("    Partition: {}, Routing Info: {}\n".format(
-                partition.identifier, rinfo.keys_and_masks))
+        rinfo = routing_infos.get_routing_info_from_partition(partition)
+        f.write("    Partition: {}, Routing Info: {}\n".format(
+            partition.identifier, rinfo.keys_and_masks))
 
 
 def router_report_from_router_tables(report_folder, routing_tables):

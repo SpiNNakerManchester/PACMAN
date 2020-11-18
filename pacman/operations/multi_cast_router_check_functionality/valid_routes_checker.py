@@ -67,7 +67,7 @@ def validate_routes(machine_graph, placements, routing_infos,
 
         # gather keys and masks per partition
         partitions = machine_graph.\
-            get_outgoing_edge_partitions_starting_at_vertex(placement.vertex)
+            get_multicast_edge_partitions_starting_at_vertex(placement.vertex)
 
         n_atoms = placement.vertex.vertex_slice.n_atoms
 

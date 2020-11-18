@@ -16,6 +16,8 @@
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from .application_edge_partition import ApplicationEdgePartition
+from spinn_utilities.default_ordered_dict import DefaultOrderedDict
+from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
@@ -26,7 +28,10 @@ class ApplicationGraph(Graph):
     """ An application-level abstraction of a graph.
     """
 
-    __slots__ = []
+    __slots__ = [
+        # The sets of edge partitions by pre-vertex
+        "_outgoing_edge_partitions_by_pre_vertex",
+    ]
 
     def __init__(self, label):
         """
@@ -35,6 +40,8 @@ class ApplicationGraph(Graph):
         """
         super(ApplicationGraph, self).__init__(
             ApplicationVertex, ApplicationEdge, label)
+        self._outgoing_edge_partitions_by_pre_vertex = \
+            DefaultOrderedDict(OrderedSet)
 
     def forget_machine_graph(self):
         """ Forget the whole mapping from this graph to an application graph.
@@ -98,3 +105,12 @@ class ApplicationGraph(Graph):
         # This is based on the assumption that an Application partition is
         # always SingleSourced
         return len(self._outgoing_edge_partitions_by_name)
+
+    def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
+        """ Get all the edge partitions that start at the given vertex.
+
+        :param AbstractVertex vertex:
+            The vertex at which the edge partitions to find starts
+        :rtype: iterable(AbstractEdgePartition)
+        """
+        return self._outgoing_edge_partitions_by_pre_vertex[vertex]

@@ -40,6 +40,12 @@ class MachineGraph(Graph):
         # A double dictionary of MULTICAST edges by their
         # application id and then their (partition name)
         "_multicast_partitions",
+        # The sets of multicast edge partitions by pre-vertex
+        "_multicast_edge_partitions_by_pre_vertex",
+        # The sets of fixed_point edge partitions by pre-vertex
+        "_fixed_route_edge_partitions_by_pre_vertex",
+        # The sdram outgoing edge partitions by pre-vertex
+        "_sdram_edge_partitions_by_pre_vertex",
     ]
 
     MISSING_APP_VERTEX_ERROR_MESSAGE = (
@@ -70,6 +76,12 @@ class MachineGraph(Graph):
         self._multicast_partitions = DefaultOrderedDict(
             lambda: DefaultOrderedDict(set))
         self._edge_partitions = OrderedSet()
+        self._fixed_route_edge_partitions_by_pre_vertex = \
+            DefaultOrderedDict(OrderedSet)
+        self._multicast_edge_partitions_by_pre_vertex = \
+            DefaultOrderedDict(OrderedSet)
+        self._sdram_edge_partitions_by_pre_vertex = \
+            DefaultOrderedDict(OrderedSet)
 
     @overrides(Graph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
@@ -136,26 +148,27 @@ class MachineGraph(Graph):
                 "Partitions of this graph must be an "
                 "AbstractMachineEdgePartition")
 
-        for pre_vertex in edge_partition.pre_vertices:
-            # check this partition doesn't already exist
-            if ((pre_vertex, edge_partition.identifier) in
-                    self._outgoing_edge_partitions_by_name):
-                raise PacmanAlreadyExistsException(
-                    str(AbstractMachineEdgePartition.__class__),
-                    str(pre_vertex, edge_partition.identifier))
+        # check this partition doesn't already exist
+        if edge_partition in self._edge_partitions:
+            raise PacmanAlreadyExistsException(
+                str(AbstractMachineEdgePartition), edge_partition)
+        else:
+            self._edge_partitions.add(edge_partition)
+
+        if (isinstance(edge_partition, MulticastEdgePartition)):
+            for pre_vertex in edge_partition.pre_vertices:
+                self._multicast_edge_partitions_by_pre_vertex[
+                    pre_vertex].add(edge_partition)
+        elif (isinstance(edge_partition, FixedRouteEdgePartition)):
+            for pre_vertex in edge_partition.pre_vertices:
+                self._fixed_route_edge_partitions_by_pre_vertex[
+                    pre_vertex].add(edge_partition)
         if (isinstance(edge_partition, AbstractSDRAMPartition)):
             for pre_vertex in edge_partition.pre_vertices:
                 self._outgoing_sdram_edge_partitions_by_pre_vertex[
                     pre_vertex].add(edge_partition)
         else:
-            for pre_vertex in edge_partition.pre_vertices:
-                self._outgoing_edge_partitions_by_pre_vertex[pre_vertex].add(
-                    edge_partition)
-
-        for pre_vertex in edge_partition.pre_vertices:
-            self._outgoing_edge_partitions_by_name[
-                pre_vertex, edge_partition.identifier] = edge_partition
-        self._edge_partitions.add(edge_partition)
+            raise NotImplementedError("Unexpected edge type")
 
     @overrides(Graph.new_edge_partition)
     def new_edge_partition(self, name, edge):
@@ -180,3 +193,28 @@ class MachineGraph(Graph):
     @overrides(Graph.n_outgoing_edge_partitions)
     def n_outgoing_edge_partitions(self):
         return len(self._edge_partitions)
+
+    def get_multicast_edge_partitions_starting_at_vertex(self, vertex):
+        """ Get only the muticast edge partitions that start at the vertex.
+
+         :param AbstractVertex vertex:
+             The vertex at which the edge partitions to find starts
+         :rtype: iterable(MulticastEdgePartition)
+         """
+        return self._multicast_edge_partitions_by_pre_vertex[vertex]
+
+    @overrides(Graph.get_outgoing_edge_partitions_starting_at_vertex)
+    def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
+        if vertex in self._multicast_edge_partitions_by_pre_vertex:
+            for partition in \
+                    self._multicast_edge_partitions_by_pre_vertex[vertex]:
+                yield partition
+        if vertex in self._fixed_route_edge_partitions_by_pre_vertex:
+            for partition in \
+                    self._fixed_route_edge_partitions_by_pre_vertex[vertex]:
+                yield partition
+        if vertex in self._sdram_edge_partitions_by_pre_vertex:
+            for partition in \
+                    self._sdram_edge_partitions_by_pre_vertex[vertex]:
+                yield partition
+

@@ -48,12 +48,8 @@ class Graph(ConstrainedObject):
         "_incoming_edges",
         # map between incoming edges and edge.post_vertex, edge_partition_name
         "_incoming_edges_by_partition_name",
-        # The sets of edge partitions by pre-vertex
-        "_outgoing_edge_partitions_by_pre_vertex",
         # the outgoing partitions by edge
         "_outgoing_edge_partition_by_edge",
-        # The sdram outgoing edge partitions by pre-vertex
-        "_outgoing_sdram_edge_partitions_by_pre_vertex",
         # The label of the graph
         "_label",
         # map between labels and vertex
@@ -82,8 +78,6 @@ class Graph(ConstrainedObject):
         self._outgoing_edges = DefaultOrderedDict(OrderedSet)
         self._incoming_edges = DefaultOrderedDict(OrderedSet)
         self._incoming_edges_by_partition_name = DefaultOrderedDict(list)
-        self._outgoing_edge_partitions_by_pre_vertex = \
-            DefaultOrderedDict(OrderedSet)
         self._outgoing_sdram_edge_partitions_by_pre_vertex = \
             DefaultOrderedDict(OrderedSet)
         self._outgoing_edge_partition_by_edge = OrderedDict()
@@ -319,7 +313,6 @@ class Graph(ConstrainedObject):
             The vertex at which the edge partitions to find starts
         :rtype: iterable(AbstractEdgePartition)
         """
-        return self._outgoing_edge_partitions_by_pre_vertex[vertex]
 
     def get_sdram_edge_partitions_starting_at_vertex(self, vertex):
         """ Get all the sdram edge partitions that start at the given vertex.

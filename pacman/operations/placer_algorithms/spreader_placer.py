@@ -196,13 +196,11 @@ class SpreaderPlacer(OneToOnePlacer):
 
         # handle outgoing
         out_going_partitions = \
-            machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
+            machine_graph.get_multicast_edge_partitions_starting_at_vertex(
                 vertex)
         for partition in out_going_partitions:
-            edge = list(partition.edges)[0]
-            if edge.traffic_type == EdgeTrafficType.MULTICAST:
-                total_incoming_keys += \
-                    n_keys_map.n_keys_for_partition(partition)
+            total_incoming_keys += \
+                n_keys_map.n_keys_for_partition(partition)
         return total_incoming_keys
 
     @staticmethod

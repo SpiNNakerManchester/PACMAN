@@ -32,7 +32,7 @@ from pacman.utilities.utility_calls import (
     get_key_ranges)
 from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
 from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
-    import (check_types_of_edge_constraint, get_edge_groups)
+    import (check_types_of_edge_constraint, get_mulitcast_edge_groups)
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from .utils import get_possible_masks
 
@@ -80,8 +80,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Get the edges grouped by those that require the same key
         (fixed_keys, _shared_keys, fixed_masks, fixed_fields, continuous,
-         noncontinuous) = \
-            get_edge_groups(machine_graph, EdgeTrafficType.MULTICAST)
+         noncontinuous) = get_mulitcast_edge_groups(machine_graph)
 
         # Even non-continuous keys will be continuous
         continuous.extend(noncontinuous)
