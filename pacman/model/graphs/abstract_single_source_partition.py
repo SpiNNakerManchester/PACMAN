@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractEdgePartition
 
@@ -55,3 +56,8 @@ class AbstractSingleSourcePartition(AbstractEdgePartition):
         :rtype: AbstractVertex
         """
         return self._pre_vertex
+
+    @property
+    @overrides(AbstractEdgePartition.pre_vertices)
+    def pre_vertices(self):
+        yield self.pre_vertex

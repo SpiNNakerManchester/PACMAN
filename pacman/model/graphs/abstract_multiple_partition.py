@@ -16,6 +16,7 @@
 from collections import OrderedDict
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
+from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractEdgePartition
 
@@ -58,5 +59,6 @@ class AbstractMultiplePartition(AbstractEdgePartition):
         AbstractEdgePartition.add_edge(self, edge)
 
     @property
+    @overrides(AbstractEdgePartition.pre_vertices)
     def pre_vertices(self):
         return self._pre_vertices.keys()

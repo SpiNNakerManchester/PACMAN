@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs.common import ConstrainedObject
@@ -147,4 +148,15 @@ class AbstractEdgePartition(ConstrainedObject):
             graph.
 
         :return: The copied edge partition.
+        """
+
+    @abstractproperty
+    def pre_vertices(self):
+        """
+        Proivdes the vertice(s) associated with this partition
+
+        Note: Most edge prtitions will be AbstractSingleSourcePartition and
+            therefor provide the pre_vertex method.
+
+        :rtype: iter(AbstractVertex)
         """
