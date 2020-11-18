@@ -60,6 +60,7 @@ class ApplicationGraph(Graph):
         """ Add an existing outgoing edge partition to the graph. Note that \
             the edge partition probably needs to have at least one edge \
             before this will work.
+
         :param OutgoingEdgePartition edge_partition:
             The outgoing edge partition to add
         :raises PacmanAlreadyExistsException:
