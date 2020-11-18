@@ -30,7 +30,7 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
 
     NOT_SUITABLE_VERTEX_ERROR = (
         "The vertex {} cannot be supported by the {} as "
-        "the vertex does implement AbstractOneAppOneMachineVertex")
+        "the vertex does not implement AbstractOneAppOneMachineVertex")
 
     __slots__ = []
 

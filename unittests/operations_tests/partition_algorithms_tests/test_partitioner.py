@@ -34,7 +34,7 @@ from pacman.model.resources import PreAllocatedResourceContainer
 from uinit_test_objects import NewPartitionerConstraint, SimpleTestVertex
 
 
-class TestPartitionAndPlacePartitioner(unittest.TestCase):
+class TestPartitioner(unittest.TestCase):
     """
     test for partition-and-place partitioning algorithm
     """
