@@ -32,10 +32,10 @@ class ApplicationVertex(AbstractVertex):
     """
 
     __slots__ = [
-        # list of machine verts associated with this app vertex
+        # List of machine verts associated with this app vertex
         "_machine_vertices",
 
-        # the splitter object associated with this app vertex
+        # The splitter object associated with this app vertex
         "_splitter"]
 
     SETTING_SPLITTER_ERROR_MSG = (
@@ -86,9 +86,9 @@ class ApplicationVertex(AbstractVertex):
 
     @splitter.setter
     def splitter(self, new_value):
-        """ sets the splitter object. Does not allow repeated settings.
+        """ Sets the splitter object. Does not allow repeated settings.
 
-        :param new_value: the new splitter object
+        :param new_value: The new splitter object
         :type new_value:
             ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
         :rtype: None
