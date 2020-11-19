@@ -195,7 +195,7 @@ class Graph(ConstrainedObject):
         else:
             cls = self._allowed_partition_types
         # NOTE: In master there is only one partition class
-        # in SDRAM PR this function has been completley changed
+        # in SDRAM PR this function has been completely changed
         return cls(name, self._allowed_edge_types, graph_code=id(self))
 
     def add_edges(self, edges, outgoing_edge_partition_name):

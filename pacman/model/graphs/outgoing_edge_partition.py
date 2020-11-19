@@ -58,7 +58,7 @@ class OutgoingEdgePartition(ConstrainedObject):
         :type label: str or None
         :param int traffic_weight:
             The weight of traffic going down this partition
-        :param graph_code: Code of the graph creating this parition
+        :param graph_code: Code of the graph creating this partition
             or None if created outside of a graph
         """
         super(OutgoingEdgePartition, self).__init__(constraints)
