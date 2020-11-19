@@ -23,7 +23,6 @@ from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, FixedKeyFieldConstraint,
     FixedMaskConstraint, FixedKeyAndMaskConstraint,
     ContiguousKeyRangeContraint)
-from pacman.model.graphs.common import EdgeTrafficType
 from .key_field_generator import KeyFieldGenerator
 from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo)

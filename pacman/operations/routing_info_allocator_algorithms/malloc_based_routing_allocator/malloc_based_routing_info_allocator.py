@@ -16,7 +16,6 @@
 import logging
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
-from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, ShareKeyConstraint, FixedMaskConstraint,
     FixedKeyAndMaskConstraint, ContiguousKeyRangeContraint)

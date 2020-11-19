@@ -36,7 +36,7 @@ __all__ = [
     "AbstractMachineEdgePartition", "AbstractSDRAMPartition",
     "ConstantSDRAMMachinePartition",
     "DestinationSegmentedSDRAMMachinePartition", "FixedRouteEdgePartition",
-    "MachineEdge","MachineFPGAVertex", "MachineGraph",
+    "MachineEdge", "MachineFPGAVertex", "MachineGraph",
     "MachineSpiNNakerLinkVertex", "MachineVertex", "MulticastEdgePartition",
     "MultipleSourceMachineEdgePartition", "SDRAMMachineEdge",
     "SimpleMachineVertex", "SourceSegmentedSDRAMMachinePartition"]

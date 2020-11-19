@@ -147,8 +147,7 @@ class MachineGraph(Graph):
         else:
             self._edge_partitions.add(edge_partition)
         for pre_vertex in edge_partition.pre_vertices:
-            key = (pre_vertex,
-               edge_partition.identifier)
+            key = (pre_vertex, edge_partition.identifier)
             self._outgoing_edge_partitions_by_name[key] = edge_partition
             if (isinstance(edge_partition, MulticastEdgePartition)):
                 self._multicast_edge_partitions_by_pre_vertex[
@@ -177,7 +176,7 @@ class MachineGraph(Graph):
             raise PacmanInvalidParameterException(
                 "edge", edge,
                 "Unable to add an Edge with traffic type {} unless you first "
-                "add a paritition for it".format(edge.traffic_type ))
+                "add a paritition for it".format(edge.traffic_type))
 
     @property
     @overrides(Graph.outgoing_edge_partitions)
@@ -212,4 +211,3 @@ class MachineGraph(Graph):
             for partition in \
                     self._sdram_edge_partitions_by_pre_vertex[vertex]:
                 yield partition
-
