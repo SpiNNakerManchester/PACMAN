@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.model.graphs.machine import AbstractSDRAMPartition
-from pacman.model.graphs.abstract_sdram_single_partition import (
-    AbstractSingleSourcePartition)
+from pacman.model.graphs import AbstractSingleSourcePartition
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import SDRAMEdgeSizeException
 from pacman.model.graphs.common import EdgeTrafficType
