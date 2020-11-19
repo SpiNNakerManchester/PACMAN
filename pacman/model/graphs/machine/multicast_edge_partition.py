@@ -39,6 +39,8 @@ class MulticastEdgePartition(
         :param str label: An optional label of the partition
         :param int traffic_weight:
             The weight of traffic going down this partition
+        :param graph_code: Code of the graph creating this partition
+            or None if created outside of a graph
         """
         super(MulticastEdgePartition, self).__init__(
             pre_vertex=pre_vertex, identifier=identifier,
@@ -47,9 +49,9 @@ class MulticastEdgePartition(
             class_name="SingleSourceMachineEdgePartition")
 
     @overrides(AbstractSingleSourcePartition.add_edge)
-    def add_edge(self, edge):
+    def add_edge(self, edge, graph_code):
         AbstractMachineEdgePartition.check_edge(self, edge)
-        AbstractSingleSourcePartition.add_edge(self, edge)
+        AbstractSingleSourcePartition.add_edge(self, edge, graph_code)
 
     @property
     @overrides(AbstractMachineEdgePartition.traffic_type, extend_doc=False)

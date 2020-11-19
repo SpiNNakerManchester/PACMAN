@@ -42,9 +42,9 @@ class ConstantSDRAMMachinePartition(
         return self._traffic_type
 
     @overrides(AbstractSingleSourcePartition.add_edge)
-    def add_edge(self, edge):
+    def add_edge(self, edge, graph_code):
         AbstractSDRAMPartition.check_edge(self, edge)
-        AbstractSingleSourcePartition.add_edge(self, edge)
+        AbstractSingleSourcePartition.add_edge(self, edge, graph_code)
 
     @overrides(AbstractSDRAMPartition.total_sdram_requirements)
     def total_sdram_requirements(self):

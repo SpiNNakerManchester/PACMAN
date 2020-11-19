@@ -144,8 +144,10 @@ class MachineGraph(Graph):
         if edge_partition in self._edge_partitions:
             raise PacmanAlreadyExistsException(
                 str(AbstractMachineEdgePartition), edge_partition)
-        else:
-            self._edge_partitions.add(edge_partition)
+
+        self._edge_partitions.add(edge_partition)
+        edge_partition.register_graph_code(id(self))
+
         for pre_vertex in edge_partition.pre_vertices:
             key = (pre_vertex, edge_partition.identifier)
             self._outgoing_edge_partitions_by_name[key] = edge_partition

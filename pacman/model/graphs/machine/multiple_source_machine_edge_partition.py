@@ -52,7 +52,7 @@ class MultipleSourceMachineEdgePartition(
         self._traffic_type = EdgeTrafficType.MULTICAST
 
     @overrides(AbstractMultiplePartition.add_edge)
-    def add_edge(self, edge):
+    def add_edge(self, edge, graph_code):
         """ Add an edge to the edge partition.
 
         :param AbstractEdge edge: the edge to add
@@ -61,7 +61,7 @@ class MultipleSourceMachineEdgePartition(
         """
         # Check for an incompatible traffic type
         AbstractMachineEdgePartition.check_edge(self, edge)
-        AbstractMultiplePartition.add_edge(self, edge)
+        AbstractMultiplePartition.add_edge(self, edge, graph_code)
 
     @property
     @overrides(AbstractMachineEdgePartition.traffic_type, extend_doc=False)

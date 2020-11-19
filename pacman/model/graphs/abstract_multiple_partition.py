@@ -46,7 +46,8 @@ class AbstractMultiplePartition(AbstractEdgePartition):
             raise PacmanConfigurationException(
                 "there were clones in your list of acceptable pre vertices")
 
-    def add_edge(self, edge):
+    @overrides(AbstractEdgePartition.add_edge)
+    def add_edge(self, edge, graph_code):
         # safety checks
         if edge.pre_vertex not in self._pre_vertices.keys():
             raise Exception(
@@ -56,7 +57,7 @@ class AbstractMultiplePartition(AbstractEdgePartition):
         # update
         self._pre_vertices[edge.pre_vertex].add(edge)
         self._destinations[edge.post_vertex].add(edge)
-        AbstractEdgePartition.add_edge(self, edge)
+        AbstractEdgePartition.add_edge(self, edge, graph_code)
 
     @property
     @overrides(AbstractEdgePartition.pre_vertices)

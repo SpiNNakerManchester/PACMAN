@@ -235,21 +235,9 @@ class TestMachineGraphModel(unittest.TestCase):
         graph.add_edge(edge1, "spikes")
         self.assertIn(edge1, part1.edges)
 
-        # Add edge to partition first
-        part2 = MulticastEdgePartition(mach3, "spikes")
-        edge2 = MachineEdge(mach3, mach4)
-        edge3 = MachineEdge(mach3, mach2)
-        part2.add_edge(edge2)
-        part2.add_edge(edge3)
-        graph.add_edge_partition(part2)
-        self.assertIn(edge2, graph.edges)
-        self.assertEqual(3, len(list(graph.edges)))
-        self.assertEqual(2, len(list(part2.edges)))
-
         # check clear error it you add the edge again
         with self.assertRaises(PacmanAlreadyExistsException):
-            graph.add_edge(edge2, "spikes")
-
+            graph.add_edge(edge1, "spikes")
 
 if __name__ == '__main__':
     unittest.main()

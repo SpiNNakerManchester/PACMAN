@@ -28,14 +28,15 @@ class AbstractSingleSourcePartition(AbstractEdgePartition):
 
     def __init__(
             self, pre_vertex, identifier, allowed_edge_types, constraints,
-            label, traffic_weight, class_name):
+            label, traffic_weight, class_name, graph_code=None):
         super(AbstractSingleSourcePartition, self).__init__(
             identifier=identifier, allowed_edge_types=allowed_edge_types,
             constraints=constraints, label=label,
             traffic_weight=traffic_weight, class_name=class_name)
         self._pre_vertex = pre_vertex
 
-    def add_edge(self, edge):
+    @overrides(AbstractEdgePartition.add_edge)
+    def add_edge(self, edge, graph_code):
         """ Add an edge to the edge partition.
 
         :param AbstractEdge edge: the edge to add
@@ -46,7 +47,7 @@ class AbstractSingleSourcePartition(AbstractEdgePartition):
         if edge.pre_vertex != self._pre_vertex:
             raise PacmanConfigurationException(
                 "A partition can only contain edges with the same pre_vertex")
-        super(AbstractSingleSourcePartition, self).add_edge(edge)
+        super(AbstractSingleSourcePartition, self).add_edge(edge, graph_code)
 
     @property
     def pre_vertex(self):

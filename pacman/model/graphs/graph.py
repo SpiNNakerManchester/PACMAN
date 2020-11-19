@@ -150,7 +150,7 @@ class Graph(ConstrainedObject):
                 outgoing_edge_partition_name, edge)
             self.add_edge_partition(partition)
         self._register_edge(edge, partition)
-        partition.add_edge(edge)
+        partition.add_edge(edge, id(self))
 
     def _register_edge(self, edge, partition):
         """ Add an edge to the graph.
