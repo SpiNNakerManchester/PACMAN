@@ -78,7 +78,7 @@ class OutgoingEdgePartition(ConstrainedObject):
         if self._graph_code is not None:
             raise PacmanConfigurationException(
                 "illegal attempt to add this partition to a second graph")
-        self._graph_code =  graph_code
+        self._graph_code = graph_code
 
     @property
     def label(self):
