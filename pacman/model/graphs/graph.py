@@ -78,8 +78,6 @@ class Graph(ConstrainedObject):
         self._outgoing_edges = DefaultOrderedDict(OrderedSet)
         self._incoming_edges = DefaultOrderedDict(OrderedSet)
         self._incoming_edges_by_partition_name = DefaultOrderedDict(list)
-        self._outgoing_sdram_edge_partitions_by_pre_vertex = \
-            DefaultOrderedDict(OrderedSet)
         self._outgoing_edge_partition_by_edge = OrderedDict()
         self._label = label
 
@@ -321,7 +319,7 @@ class Graph(ConstrainedObject):
             The vertex at which the sdram edge partitions to find starts
         :rtype: iterable(AbstractSDRAMPartition)
         """
-        return self._outgoing_sdram_edge_partitions_by_pre_vertex[vertex]
+        return self._sdram_edge_partitions_by_pre_vertex[vertex]
 
     def get_outgoing_edge_partition_starting_at_vertex(
             self, vertex, outgoing_edge_partition_name):

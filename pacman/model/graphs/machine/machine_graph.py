@@ -154,21 +154,22 @@ class MachineGraph(Graph):
                 str(AbstractMachineEdgePartition), edge_partition)
         else:
             self._edge_partitions.add(edge_partition)
-
-        if (isinstance(edge_partition, MulticastEdgePartition)):
-            for pre_vertex in edge_partition.pre_vertices:
+        for pre_vertex in edge_partition.pre_vertices:
+            key = (pre_vertex,
+               edge_partition.identifier)
+            self._outgoing_edge_partitions_by_name[key] = edge_partition
+            if (isinstance(edge_partition, MulticastEdgePartition)):
                 self._multicast_edge_partitions_by_pre_vertex[
                     pre_vertex].add(edge_partition)
-        elif (isinstance(edge_partition, FixedRouteEdgePartition)):
-            for pre_vertex in edge_partition.pre_vertices:
+            elif (isinstance(edge_partition, FixedRouteEdgePartition)):
                 self._fixed_route_edge_partitions_by_pre_vertex[
                     pre_vertex].add(edge_partition)
-        if (isinstance(edge_partition, AbstractSDRAMPartition)):
-            for pre_vertex in edge_partition.pre_vertices:
-                self._outgoing_sdram_edge_partitions_by_pre_vertex[
+            elif (isinstance(edge_partition, AbstractSDRAMPartition)):
+                self._sdram_edge_partitions_by_pre_vertex[
                     pre_vertex].add(edge_partition)
-        else:
-            raise NotImplementedError("Unexpected edge type")
+            else:
+                raise NotImplementedError(
+                    "Unexpected edge_partition: {}".format(edge_partition))
 
     @overrides(Graph.new_edge_partition)
     def new_edge_partition(self, name, edge):
@@ -181,7 +182,7 @@ class MachineGraph(Graph):
         else:
             raise PacmanInvalidParameterException(
                 "edge", edge,
-                "Unable to add an Edge with traffic type {} unless you frist "
+                "Unable to add an Edge with traffic type {} unless you first "
                 "add a paritition for it".format(edge.traffic_type ))
 
     @property
