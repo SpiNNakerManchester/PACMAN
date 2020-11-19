@@ -319,6 +319,7 @@ class Graph(ConstrainedObject):
             return []
         return self._incoming_edges_by_partition_name[key]
 
+    @abstractmethod
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
         """ Get all the edge partitions that start at the given vertex.
 
@@ -326,15 +327,6 @@ class Graph(ConstrainedObject):
             The vertex at which the edge partitions to find starts
         :rtype: iterable(AbstractEdgePartition)
         """
-
-    def get_sdram_edge_partitions_starting_at_vertex(self, vertex):
-        """ Get all the sdram edge partitions that start at the given vertex.
-
-        :param AbstractVertex vertex:
-            The vertex at which the sdram edge partitions to find starts
-        :rtype: iterable(AbstractSDRAMPartition)
-        """
-        return self._sdram_edge_partitions_by_pre_vertex[vertex]
 
     def get_outgoing_edge_partition_starting_at_vertex(
             self, vertex, outgoing_edge_partition_name):

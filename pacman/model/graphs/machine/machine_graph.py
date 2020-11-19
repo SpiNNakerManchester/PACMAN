@@ -197,6 +197,15 @@ class MachineGraph(Graph):
          """
         return self._multicast_edge_partitions_by_pre_vertex[vertex]
 
+    def get_sdram_edge_partitions_starting_at_vertex(self, vertex):
+        """ Get all the sdram edge partitions that start at the given vertex.
+
+        :param AbstractVertex vertex:
+            The vertex at which the sdram edge partitions to find starts
+        :rtype: iterable(AbstractSDRAMPartition)
+        """
+        return self._sdram_edge_partitions_by_pre_vertex[vertex]
+
     @overrides(Graph.get_outgoing_edge_partitions_starting_at_vertex)
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
         if vertex in self._multicast_edge_partitions_by_pre_vertex:
