@@ -28,14 +28,17 @@ from pacman.utilities.constants import FULL_MASK
 class TestRoutingInfo(unittest.TestCase):
 
     def test_routing_info(self):
-        partition = OutgoingEdgePartition("Test", MachineEdge)
+        # mock to avoid having to create a graph for this test
+        graph_code = 123
+        partition = OutgoingEdgePartition(
+            "Test", MachineEdge, graph_code=graph_code)
         pre_vertex = SimpleMachineVertex(resources=ResourceContainer())
         post_vertex = SimpleMachineVertex(resources=ResourceContainer())
         edge = MachineEdge(pre_vertex, post_vertex)
         key = 12345
         partition_info = PartitionRoutingInfo(
             [BaseKeyAndMask(key, FULL_MASK)], partition)
-        partition.add_edge(edge)
+        partition.add_edge(edge, graph_code)
         routing_info = RoutingInfo([partition_info])
 
         with self.assertRaises(PacmanAlreadyExistsException):
@@ -70,16 +73,18 @@ class TestRoutingInfo(unittest.TestCase):
 
         assert next(iter(routing_info)) == partition_info
 
-        partition2 = OutgoingEdgePartition("Test", MachineEdge)
-        partition2.add_edge(MachineEdge(pre_vertex, post_vertex))
+        partition2 = OutgoingEdgePartition(
+            "Test", MachineEdge, graph_code=graph_code)
+        partition2.add_edge(MachineEdge(pre_vertex, post_vertex), graph_code)
 
         with self.assertRaises(PacmanAlreadyExistsException):
             routing_info.add_partition_info(PartitionRoutingInfo(
                 [BaseKeyAndMask(key, FULL_MASK)], partition2))
         assert partition != partition2
 
-        partition3 = OutgoingEdgePartition("Test2", MachineEdge)
-        partition3.add_edge(MachineEdge(pre_vertex, post_vertex))
+        partition3 = OutgoingEdgePartition(
+            "Test3", MachineEdge, graph_code=graph_code)
+        partition3.add_edge(MachineEdge(pre_vertex, post_vertex), graph_code)
         routing_info.add_partition_info(PartitionRoutingInfo(
             [BaseKeyAndMask(key, FULL_MASK)], partition3))
 
@@ -89,14 +94,15 @@ class TestRoutingInfo(unittest.TestCase):
         assert routing_info.get_routing_info_from_partition(
             partition3).get_keys().tolist() == [key]
 
-        partition3 = OutgoingEdgePartition("Test3", MachineEdge)
-        partition3.add_edge(MachineEdge(pre_vertex, post_vertex))
+        partition4 = OutgoingEdgePartition(
+            "Test4", MachineEdge, graph_code=graph_code)
+        partition4.add_edge(MachineEdge(pre_vertex, post_vertex), graph_code)
         routing_info.add_partition_info(PartitionRoutingInfo(
             [BaseKeyAndMask(key, FULL_MASK),
-             BaseKeyAndMask(key * 2, FULL_MASK)], partition3))
+             BaseKeyAndMask(key * 2, FULL_MASK)], partition4))
 
         assert routing_info.get_routing_info_from_partition(
-            partition3).get_keys().tolist() == [key, key * 2]
+            partition4).get_keys().tolist() == [key, key * 2]
 
     def test_base_key_and_mask(self):
         with self.assertRaises(PacmanConfigurationException):
