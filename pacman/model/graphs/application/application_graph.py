@@ -65,16 +65,6 @@ class ApplicationGraph(Graph):
 
     @overrides(Graph.add_edge_partition)
     def add_edge_partition(self, edge_partition):
-        """ Add an existing outgoing edge partition to the graph. Note that \
-            the edge partition probably needs to have at least one edge \
-            before this will work.
-
-        :param OutgoingEdgePartition edge_partition:
-            The outgoing edge partition to add
-        :raises PacmanAlreadyExistsException:
-            If a partition already exists with the same pre_vertex and
-            identifier
-        """
         # verify that this partition is suitable for this graph
         if not isinstance(edge_partition, ApplicationEdgePartition):
             raise PacmanInvalidParameterException(
@@ -91,6 +81,8 @@ class ApplicationGraph(Graph):
         self._outgoing_edge_partitions_by_pre_vertex[
             edge_partition.pre_vertex].add(edge_partition)
         self._outgoing_edge_partitions_by_name[key] = edge_partition
+        for edge in edge_partition.edges:
+            self._register_edge(edge, edge_partition)
 
     @property
     @overrides(Graph.outgoing_edge_partitions)

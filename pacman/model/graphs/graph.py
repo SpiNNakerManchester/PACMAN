@@ -131,10 +131,32 @@ class Graph(ConstrainedObject):
             self.add_vertex(v)
 
     def add_edge(self, edge, outgoing_edge_partition_name):
-        """ Add an edge to the graph.
+        """ Add an edge to the graph and its partition
 
         :param AbstractEdge edge: The edge to add
         :param str outgoing_edge_partition_name:
+            The name of the edge partition to add the edge to; each edge
+            partition is the partition of edges that start at the same vertex
+        :raises PacmanInvalidParameterException:
+            If the edge is not of a valid type or if edges have already been
+            added to this partition that start at a different vertex to this
+            one
+        """
+        # Add the edge to the partition
+        partition = self.get_outgoing_edge_partition_starting_at_vertex(
+            edge.pre_vertex, outgoing_edge_partition_name)
+        if partition is None:
+            partition = self.new_edge_partition(
+                outgoing_edge_partition_name, edge)
+            self.add_edge_partition(partition)
+        self._register_edge(edge, partition)
+        partition.add_edge(edge)
+
+    def _register_edge(self, edge, partition):
+        """ Add an edge to the graph.
+
+        :param AbstractEdge edge: The edge to add
+        :param AbstractEdgePartition partition:
             The name of the edge partition to add the edge to; each edge
             partition is the partition of edges that start at the same vertex
         :raises PacmanInvalidParameterException:
@@ -158,19 +180,10 @@ class Graph(ConstrainedObject):
                 "edge", str(edge.post_vertex),
                 "post-vertex must be known in graph")
 
-        # Add the edge to the partition
-        partition = self.get_outgoing_edge_partition_starting_at_vertex(
-            edge.pre_vertex, outgoing_edge_partition_name)
-        if partition is None:
-            partition = self.new_edge_partition(
-                outgoing_edge_partition_name, edge)
-            self.add_edge_partition(partition)
-        partition.add_edge(edge)
-
         # Add the edge to the indices
         self._outgoing_edges[edge.pre_vertex].add(edge)
         self._incoming_edges_by_partition_name[
-            edge.post_vertex, outgoing_edge_partition_name].append(edge)
+            edge.post_vertex, partition.identifier].append(edge)
         self._incoming_edges[edge.post_vertex].add(edge)
         if edge in self._outgoing_edge_partition_by_edge:
             raise PacmanAlreadyExistsException("edge", edge)
@@ -210,6 +223,8 @@ class Graph(ConstrainedObject):
     @abstractmethod
     def add_edge_partition(self, edge_partition):
         """ Add an edge partition to the graph.
+
+        Will also add any edges already in the partition as well
 
         :param AbstractEdgePartition edge_partition:
             The edge partition to add

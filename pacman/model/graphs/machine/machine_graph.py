@@ -133,14 +133,6 @@ class MachineGraph(Graph):
 
     @overrides(Graph.add_edge_partition)
     def add_edge_partition(self, edge_partition):
-        """ Add an edge partition to the graph.
-
-        :param AbstractEdgePartition edge_partition:
-            The edge partition to add
-        :raises PacmanAlreadyExistsException:
-            If a partition already exists with the same pre_vertex and
-            identifier
-        """
         # verify that this partition is suitable for this graph
         if not isinstance(edge_partition, AbstractMachineEdgePartition):
             raise PacmanInvalidParameterException(
@@ -170,6 +162,8 @@ class MachineGraph(Graph):
             else:
                 raise NotImplementedError(
                     "Unexpected edge_partition: {}".format(edge_partition))
+        for edge in edge_partition.edges:
+            self._register_edge(edge, edge_partition)
 
     @overrides(Graph.new_edge_partition)
     def new_edge_partition(self, name, edge):

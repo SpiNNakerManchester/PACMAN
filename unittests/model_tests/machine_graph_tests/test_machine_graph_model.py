@@ -16,10 +16,10 @@
 import unittest
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.machine import (
-    MachineEdge, MachineGraph, SimpleMachineVertex)
+    MachineEdge, MachineGraph, MulticastEdgePartition,
+    SimpleMachineVertex)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
-from pacman.model.graphs.machine import MulticastEdgePartition
 from uinit_test_objects import SimpleTestVertex
 
 
@@ -219,6 +219,36 @@ class TestMachineGraphModel(unittest.TestCase):
         self.assertIn(mach2, app1.machine_vertices)
         self.assertIn(mach3, app1.machine_vertices)
         self.assertIn(mach4, app2.machine_vertices)
+
+    def test_add_edge_partition(self):
+        graph = MachineGraph("foo")
+        mach1 = SimpleMachineVertex("mach1")
+        mach2 = SimpleMachineVertex("mach2")
+        mach3 = SimpleMachineVertex("mach3")
+        mach4 = SimpleMachineVertex("mach4")
+        graph.add_vertices([mach1, mach2, mach3, mach4])
+
+        # Add partition then edge
+        part1 = MulticastEdgePartition(mach1, "spikes")
+        graph.add_edge_partition(part1)
+        edge1 = MachineEdge(mach1, mach2)
+        graph.add_edge(edge1, "spikes")
+        self.assertIn(edge1, part1.edges)
+
+        # Add edge to partition first
+        part2 = MulticastEdgePartition(mach3, "spikes")
+        edge2 = MachineEdge(mach3, mach4)
+        edge3 = MachineEdge(mach3, mach2)
+        part2.add_edge(edge2)
+        part2.add_edge(edge3)
+        graph.add_edge_partition(part2)
+        self.assertIn(edge2, graph.edges)
+        self.assertEqual(3, len(list(graph.edges)))
+        self.assertEqual(2, len(list(part2.edges)))
+
+        # check clear error it you add the edge again
+        with self.assertRaises(PacmanAlreadyExistsException):
+            graph.add_edge(edge2, "spikes")
 
 
 if __name__ == '__main__':
