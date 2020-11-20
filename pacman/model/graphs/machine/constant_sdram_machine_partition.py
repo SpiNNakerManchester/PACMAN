@@ -15,7 +15,9 @@
 from pacman.model.graphs.machine import AbstractSDRAMPartition
 from pacman.model.graphs import AbstractSingleSourcePartition
 from spinn_utilities.overrides import overrides
-from pacman.exceptions import SDRAMEdgeSizeException
+from pacman.exceptions import (
+    PacmanConfigurationException, PartitionMissingEdgesException,
+    SDRAMEdgeSizeException)
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import SDRAMMachineEdge
 
@@ -25,6 +27,8 @@ class ConstantSDRAMMachinePartition(
 
     __slots__ = [
         "_sdram_base_address",
+        # The sdram size of every edge or None if no edge added
+        "_sdram_size",
     ]
 
     def __init__(self, identifier, pre_vertex, label):
@@ -41,28 +45,34 @@ class ConstantSDRAMMachinePartition(
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge, graph_code):
-        AbstractSDRAMPartition.check_edge(self, edge)
-        AbstractSingleSourcePartition.add_edge(self, edge, graph_code)
+        if self._sdram_size is None:
+            self._sdram_size = edge.sdram_size
+        elif self._sdram_size != edge.sdram_size:
+            raise SDRAMEdgeSizeException(
+                "The edges within the constant sdram partition {} have "
+                "inconsistent memory size requests. ")
+        if self._sdram_base_address is None:
+            AbstractSingleSourcePartition.add_edge(self, edge, graph_code)
+        else:
+            raise PacmanConfigurationException(
+                "Illegal attempt to add an edge after sdram_base_address set")
 
     @overrides(AbstractSDRAMPartition.total_sdram_requirements)
     def total_sdram_requirements(self):
-        if len(self.edges) == 0:
-            return 0
-
-        expected_size = self.edges.peek().sdram_size
-        for edge in self.edges:
-            if edge.sdram_size != expected_size:
-                raise SDRAMEdgeSizeException(
-                    "The edges within the constant sdram partition {} have "
-                    "inconsistent memory size requests. ")
-        return expected_size
+        if self._sdram_size is None:
+            raise PartitionMissingEdgesException("This partition has no edges")
+        return self._sdram_size
 
     @property
     def sdram_base_address(self):
+        if self._sdram_size is None:
+            raise PartitionMissingEdgesException("This partition has no edges")
         return self._sdram_base_address
 
     @sdram_base_address.setter
     def sdram_base_address(self, new_value):
+        if len(self.edges) == 0:
+            raise PartitionMissingEdgesException("This partition has no edges")
         self._sdram_base_address = new_value
         for edge in self.edges:
             edge.sdram_base_address = self._sdram_base_address

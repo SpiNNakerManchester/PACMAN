@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.exceptions import PacmanConfigurationException
+from pacman.exceptions import (
+    PacmanConfigurationException,  PartitionMissingEdgesException)
 from pacman.model.graphs import AbstractSingleSourcePartition
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
@@ -51,12 +52,18 @@ class DestinationSegmentedSDRAMMachinePartition(
 
     @sdram_base_address.setter
     def sdram_base_address(self, new_value):
+        if len(self.edges) == 0:
+            raise PartitionMissingEdgesException("This partition has no edges")
         self._sdram_base_address = new_value
         for edge in self.edges:
             edge.sdram_base_address = new_value + edge.sdram_size
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge, graph_code):
+        if self._sdram_base_address is not None:
+            raise PacmanConfigurationException(
+                "Illegal attempt to add an edge after sdram_base_address set")
+
         AbstractSDRAMPartition.check_edge(self, edge)
 
         # safety check

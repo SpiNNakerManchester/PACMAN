@@ -213,6 +213,11 @@ class SDRAMEdgeSizeException(PacmanException):
     inconsistent size requests
     """
 
+class PartitionMissingEdgesException(PacmanException):
+    """
+    Raise when after partitioning a partition does h=not have the edges it \
+    expects
+    """
 
 class MinimisationFailedError(PacmanException):
     """ Raised when a routing table could not be minimised to reach a
@@ -252,3 +257,4 @@ class MinimisationFailedError(PacmanException):
             text += " Best managed was {} entries.".format(self.final_length)
 
         return text
+

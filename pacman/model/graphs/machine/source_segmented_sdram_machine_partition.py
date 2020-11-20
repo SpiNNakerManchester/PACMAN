@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.model.graphs.machine import AbstractMachineEdgePartition
 from spinn_utilities.overrides import overrides
-from pacman.exceptions import PacmanConfigurationException
+from pacman.exceptions import (
+    PacmanConfigurationException, PartitionMissingEdgesException)
 from pacman.model.graphs import AbstractMultiplePartition
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
@@ -62,10 +63,6 @@ class SourceSegmentedSDRAMMachinePartition(
 
     @overrides(AbstractMultiplePartition.add_edge)
     def add_edge(self, edge, graph_code):
-        # add
-        AbstractMachineEdgePartition.check_edge(self, edge)
-        AbstractMultiplePartition.add_edge(self, edge, graph_code)
-
         # check
         if len(self._destinations.keys()) != 1:
             raise PacmanConfigurationException(
@@ -76,16 +73,27 @@ class SourceSegmentedSDRAMMachinePartition(
                 "The multiple source partition only supports 1 edge from a "
                 "given pre vertex.")
 
+        if self._sdram_base_address is not None:
+            raise PacmanConfigurationException(
+                "Illegal attempt to add an edge after sdram_base_address set")
+
+        # add
+        AbstractMachineEdgePartition.check_edge(self, edge)
+        AbstractMultiplePartition.add_edge(self, edge, graph_code)
+
     @sdram_base_address.setter
     def sdram_base_address(self, new_value):
         self._sdram_base_address = new_value
 
         for pre_vertex in self._pre_vertices.keys():
-
-            # allocate for the pre_vertex
-            edge = self._pre_vertices[pre_vertex].peek()
-            edge.sdram_base_address = new_value
-            new_value += edge.sdram_size
+            try:
+                # allocate for the pre_vertex
+                edge = self._pre_vertices[pre_vertex].peek()
+                edge.sdram_base_address = new_value
+                new_value += edge.sdram_size
+            except KeyError:
+                raise PartitionMissingEdgesException(
+                    "This partition has no edge from {}".format(pre_vertex))
 
     @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
     def get_sdram_base_address_for(self, vertex):
