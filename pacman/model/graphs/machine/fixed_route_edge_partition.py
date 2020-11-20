@@ -44,8 +44,7 @@ class FixedRouteEdgePartition(
             pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=MachineEdge, constraints=constraints,
             label=label, traffic_weight=traffic_weight,
-            class_name="SingleSourceMachineEdgePartition",
-            graph_code=graph_code)
+            class_name="SingleSourceMachineEdgePartition")
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge, graph_code):

@@ -239,5 +239,6 @@ class TestMachineGraphModel(unittest.TestCase):
         with self.assertRaises(PacmanAlreadyExistsException):
             graph.add_edge(edge1, "spikes")
 
+
 if __name__ == '__main__':
     unittest.main()
