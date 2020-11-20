@@ -48,7 +48,7 @@ class TestSameChipConstraint(unittest.TestCase):
         sdram_edges = list()
         for vertex in same_vertices:
             graph.add_vertex(vertex)
-            graph.add_edge_partition(
+            graph.add_outgoing_edge_partition(
                 ConstantSDRAMMachinePartition(
                     identifier="Test", pre_vertex=vertex, label="bacon"))
             for _i in range(0, random.randint(1, 5)):

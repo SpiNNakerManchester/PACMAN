@@ -170,7 +170,7 @@ def test_sdram_links():
         last_vertex = vertex
 
     for vertex in machine_graph.vertices:
-        machine_graph.add_edge_partition(
+        machine_graph.add_outgoing_edge_partition(
             ConstantSDRAMMachinePartition(
                 identifier="SDRAM", pre_vertex=vertex, label="bacon"))
         edge = SDRAMMachineEdge(vertex, last_vertex, "bacon", app_edge=None)

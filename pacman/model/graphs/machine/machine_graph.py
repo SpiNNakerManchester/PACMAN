@@ -131,8 +131,8 @@ class MachineGraph(Graph):
                     "vertex", str(vertex),
                     self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
 
-    @overrides(Graph.add_edge_partition)
-    def add_edge_partition(self, edge_partition):
+    @overrides(Graph.add_outgoing_edge_partition)
+    def add_outgoing_edge_partition(self, edge_partition):
         # verify that this partition is suitable for this graph
         if not isinstance(edge_partition, AbstractMachineEdgePartition):
             raise PacmanInvalidParameterException(

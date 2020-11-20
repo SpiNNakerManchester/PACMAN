@@ -148,7 +148,7 @@ class Graph(ConstrainedObject):
         if partition is None:
             partition = self.new_edge_partition(
                 outgoing_edge_partition_name, edge)
-            self.add_edge_partition(partition)
+            self.add_outgoing_edge_partition(partition)
         self._register_edge(edge, partition)
         partition.add_edge(edge, id(self))
 
@@ -221,7 +221,7 @@ class Graph(ConstrainedObject):
             self.add_edge(e, outgoing_edge_partition_name)
 
     @abstractmethod
-    def add_edge_partition(self, edge_partition):
+    def add_outgoing_edge_partition(self, edge_partition):
         """ Add an edge partition to the graph.
 
         Will also add any edges already in the partition as well

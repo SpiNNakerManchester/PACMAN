@@ -63,8 +63,8 @@ class ApplicationGraph(Graph):
         return ApplicationEdgePartition(
             identifier=name, pre_vertex=edge.pre_vertex)
 
-    @overrides(Graph.add_edge_partition)
-    def add_edge_partition(self, edge_partition):
+    @overrides(Graph.add_outgoing_edge_partition)
+    def add_outgoing_edge_partition(self, edge_partition):
         # verify that this partition is suitable for this graph
         if not isinstance(edge_partition, ApplicationEdgePartition):
             raise PacmanInvalidParameterException(
