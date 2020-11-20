@@ -24,8 +24,6 @@ from .abstract_sdram_partition import AbstractSDRAMPartition
 from .constant_sdram_machine_partition import ConstantSDRAMMachinePartition
 from .destination_segmented_sdram_machine_partition import (
     DestinationSegmentedSDRAMMachinePartition)
-from .multiple_source_machine_edge_partition import (
-    MultipleSourceMachineEdgePartition)
 from .fixed_route_edge_partition import FixedRouteEdgePartition
 from .multicast_edge_partition import MulticastEdgePartition
 from .source_segmented_sdram_machine_partition import (
@@ -38,5 +36,5 @@ __all__ = [
     "DestinationSegmentedSDRAMMachinePartition", "FixedRouteEdgePartition",
     "MachineEdge", "MachineFPGAVertex", "MachineGraph",
     "MachineSpiNNakerLinkVertex", "MachineVertex", "MulticastEdgePartition",
-    "MultipleSourceMachineEdgePartition", "SDRAMMachineEdge",
-    "SimpleMachineVertex", "SourceSegmentedSDRAMMachinePartition"]
+    "SDRAMMachineEdge", "SimpleMachineVertex",
+    "SourceSegmentedSDRAMMachinePartition"]
