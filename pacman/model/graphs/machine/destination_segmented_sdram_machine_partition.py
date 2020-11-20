@@ -26,7 +26,6 @@ class DestinationSegmentedSDRAMMachinePartition(
 
     __slots__ = [
         "_sdram_base_address",
-        "_traffic_type"
     ]
 
     def __init__(self, identifier, pre_vertex, label):
@@ -36,12 +35,11 @@ class DestinationSegmentedSDRAMMachinePartition(
             label=label, traffic_weight=1,
             class_name="ConstantSdramMachinePartition")
         self._sdram_base_address = None
-        self._traffic_type = EdgeTrafficType.SDRAM
 
     @property
     @overrides(AbstractSDRAMPartition.traffic_type)
     def traffic_type(self):
-        return self._traffic_type
+        return EdgeTrafficType.SDRAM
 
     @overrides(AbstractSDRAMPartition.total_sdram_requirements)
     def total_sdram_requirements(self):

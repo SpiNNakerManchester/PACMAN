@@ -39,9 +39,11 @@ class AbstractMachineEdgePartition(object):
 
     @abstractproperty
     def traffic_type(self):
-        """ The traffic type of all the edges in this edge partition.\
+        """ The traffic type of all the edges in this edge partition.
+
         NOTE: the reason for a abstract property which all machine outgoing\
         partitions is purely due the need for multiple slots and pythons \
         lack of support for this.
+
         :rtype: EdgeTrafficType
         """

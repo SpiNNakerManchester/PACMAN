@@ -54,12 +54,8 @@ class MulticastEdgePartition(
         AbstractSingleSourcePartition.add_edge(self, edge, graph_code)
 
     @property
-    @overrides(AbstractMachineEdgePartition.traffic_type, extend_doc=False)
+    @overrides(AbstractMachineEdgePartition.traffic_type)
     def traffic_type(self):
-        """ The traffic type of all the edges in this edge partition.
-
-        :rtype: EdgeTrafficType
-        """
         return EdgeTrafficType.MULTICAST
 
     @overrides(AbstractEdgePartition.clone_without_edges)

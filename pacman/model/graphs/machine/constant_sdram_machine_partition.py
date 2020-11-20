@@ -25,7 +25,6 @@ class ConstantSDRAMMachinePartition(
 
     __slots__ = [
         "_sdram_base_address",
-        "_traffic_type"
     ]
 
     def __init__(self, identifier, pre_vertex, label):
@@ -34,12 +33,11 @@ class ConstantSDRAMMachinePartition(
             constraints=None, label=label, traffic_weight=1,
             class_name="ConstantSdramMachinePartition")
         self._sdram_base_address = None
-        self._traffic_type = EdgeTrafficType.SDRAM
 
     @property
     @overrides(AbstractSDRAMPartition.traffic_type)
     def traffic_type(self):
-        return self._traffic_type
+        return EdgeTrafficType.SDRAM
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge, graph_code):
