@@ -62,8 +62,8 @@ class MulticastEdgePartition(
         """
         return EdgeTrafficType.MULTICAST
 
-    @overrides(AbstractEdgePartition.clone_for_graph_move)
-    def clone_for_graph_move(self):
+    @overrides(AbstractEdgePartition.clone_without_edges)
+    def clone_without_edges(self):
         """
         :rtype: MulticastEdgePartition
         """

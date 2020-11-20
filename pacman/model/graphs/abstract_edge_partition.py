@@ -169,11 +169,13 @@ class AbstractEdgePartition(ConstrainedObject):
         return edge in self._edges
 
     @abstractmethod
-    def clone_for_graph_move(self):
-        """ Make a copy of this edge partition for insertion into another \
-            graph.
+    def clone_without_edges(self):
+        """ Make a copy of this edge partition without any of the edges in it
 
-        :return: The copied edge partition.
+        This follows the design pattern that only the graph adds edges to
+        partitions already added to the graph
+
+        :return: The copied edge partition but excluding edges
         """
 
     @abstractproperty

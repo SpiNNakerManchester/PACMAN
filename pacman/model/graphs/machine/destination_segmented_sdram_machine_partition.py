@@ -89,8 +89,8 @@ class DestinationSegmentedSDRAMMachinePartition(
                 return edge.sdram_size
         return None
 
-    @overrides(AbstractSingleSourcePartition.clone_for_graph_move)
-    def clone_for_graph_move(self):
+    @overrides(AbstractSingleSourcePartition.clone_without_edges)
+    def clone_without_edges(self):
         """
         :rtype: DestinationSegmentedSDRAMMachinePartition
         """

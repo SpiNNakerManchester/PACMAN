@@ -79,8 +79,8 @@ class ConstantSDRAMMachinePartition(
             return 0
         return self._edges.peek().sdram_size
 
-    @overrides(AbstractSingleSourcePartition.clone_for_graph_move)
-    def clone_for_graph_move(self):
+    @overrides(AbstractSingleSourcePartition.clone_without_edges)
+    def clone_without_edges(self):
         """
         :rtype: ConstantSDRAMMachinePartition
         """

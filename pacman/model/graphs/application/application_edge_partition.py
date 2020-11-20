@@ -45,8 +45,8 @@ class ApplicationEdgePartition(AbstractSingleSourcePartition):
             label=label, traffic_weight=traffic_weight,
             class_name="ApplicationEdgePartition")
 
-    @overrides(AbstractEdgePartition.clone_for_graph_move)
-    def clone_for_graph_move(self):
+    @overrides(AbstractEdgePartition.clone_without_edges)
+    def clone_without_edges(self):
         """
         :rtype: ApplicationEdgePartition
         """

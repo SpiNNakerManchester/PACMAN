@@ -111,8 +111,8 @@ class SourceSegmentedSDRAMMachinePartition(
         else:
             return self.total_sdram_requirements()
 
-    @overrides(AbstractMultiplePartition.clone_for_graph_move)
-    def clone_for_graph_move(self):
+    @overrides(AbstractMultiplePartition.clone_without_edges)
+    def clone_without_edges(self):
         """
         :rtype: SourceSegmentedSDRAMMachinePartition
         """

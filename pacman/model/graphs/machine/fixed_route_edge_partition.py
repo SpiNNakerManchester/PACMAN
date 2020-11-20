@@ -61,8 +61,8 @@ class FixedRouteEdgePartition(
         """
         return EdgeTrafficType.FIXED_ROUTE
 
-    @overrides(AbstractEdgePartition.clone_for_graph_move)
-    def clone_for_graph_move(self):
+    @overrides(AbstractEdgePartition.clone_without_edges)
+    def clone_without_edges(self):
         """
         :rtype: FixedRouteEdgePartition
         """

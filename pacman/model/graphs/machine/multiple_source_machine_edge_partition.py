@@ -72,8 +72,8 @@ class MultipleSourceMachineEdgePartition(
         """
         return self._traffic_type
 
-    @overrides(AbstractEdgePartition.clone_for_graph_move)
-    def clone_for_graph_move(self):
+    @overrides(AbstractEdgePartition.clone_without_edges)
+    def clone_without_edges(self):
         """
         :rtype: MultipleSourceMachineEdgePartition
         """
