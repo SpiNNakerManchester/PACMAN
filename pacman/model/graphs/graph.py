@@ -133,10 +133,15 @@ class Graph(ConstrainedObject):
     def add_edge(self, edge, outgoing_edge_partition_name):
         """ Add an edge to the graph and its partition
 
+        If required and possible will create a new partition in the graph
+
+        Returns the partition the edge was added to
+
         :param AbstractEdge edge: The edge to add
         :param str outgoing_edge_partition_name:
             The name of the edge partition to add the edge to; each edge
             partition is the partition of edges that start at the same vertex
+        :rtype AbstractEdgePartition
         :raises PacmanInvalidParameterException:
             If the edge is not of a valid type or if edges have already been
             added to this partition that start at a different vertex to this
@@ -151,6 +156,7 @@ class Graph(ConstrainedObject):
             self.add_outgoing_edge_partition(partition)
         self._register_edge(edge, partition)
         partition.add_edge(edge, id(self))
+        return partition
 
     def _register_edge(self, edge, partition):
         """ Add an edge to the graph.

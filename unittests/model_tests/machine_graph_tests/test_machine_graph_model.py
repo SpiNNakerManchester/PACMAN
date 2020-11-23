@@ -15,9 +15,10 @@
 
 import unittest
 from pacman.model.graphs.application import ApplicationGraph
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
-    MachineEdge, MachineGraph, MulticastEdgePartition,
-    SimpleMachineVertex)
+    ConstantSDRAMMachinePartition, MachineEdge, MachineGraph,
+    MulticastEdgePartition, SDRAMMachineEdge, SimpleMachineVertex)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from uinit_test_objects import SimpleTestVertex
@@ -220,7 +221,7 @@ class TestMachineGraphModel(unittest.TestCase):
         self.assertIn(mach3, app1.machine_vertices)
         self.assertIn(mach4, app2.machine_vertices)
 
-    def test_add_edge_partition(self):
+    def test_at_vertexc_methods(self):
         graph = MachineGraph("foo")
         mach1 = SimpleMachineVertex("mach1")
         mach2 = SimpleMachineVertex("mach2")
@@ -229,15 +230,67 @@ class TestMachineGraphModel(unittest.TestCase):
         graph.add_vertices([mach1, mach2, mach3, mach4])
 
         # Add partition then edge
-        part1 = MulticastEdgePartition(mach1, "spikes")
-        graph.add_outgoing_edge_partition(part1)
-        edge1 = MachineEdge(mach1, mach2)
-        graph.add_edge(edge1, "spikes")
-        self.assertIn(edge1, part1.edges)
-
+        part_m_1 = MulticastEdgePartition(mach1, "spikes")
+        graph.add_outgoing_edge_partition(part_m_1)
+        edge_m_11 = MachineEdge(mach1, mach2,
+                            traffic_type=EdgeTrafficType.MULTICAST)
+        graph.add_edge(edge_m_11, "spikes")
         # check clear error it you add the edge again
         with self.assertRaises(PacmanAlreadyExistsException):
-            graph.add_edge(edge1, "spikes")
+            graph.add_edge(edge_m_11, "spikes")
+        self.assertIn(edge_m_11, part_m_1.edges)
+        edge_m_12 = MachineEdge(mach1, mach3,
+                            traffic_type=EdgeTrafficType.MULTICAST)
+        graph.add_edge(edge_m_12, "spikes")
+        edge_m_21 = MachineEdge(mach3, mach4,
+                            traffic_type=EdgeTrafficType.MULTICAST)
+        graph.add_edge(edge_m_21, "spikes")
+        part_m_2 = graph.get_outgoing_partition_for_edge(edge_m_21)
+
+        edge_f_1 = MachineEdge(mach1, mach3,
+                            traffic_type=EdgeTrafficType.FIXED_ROUTE)
+        graph.add_edge(edge_f_1, "Control")
+        part_f = graph.get_outgoing_partition_for_edge(edge_f_1)
+
+        part_s_1 = ConstantSDRAMMachinePartition("ram", mach1, "ram1")
+        graph.add_outgoing_edge_partition(part_s_1)
+        edge_s_11 = SDRAMMachineEdge(mach1, mach2, "s1")
+        graph.add_edge(edge_s_11, "ram")
+        edge_s_12 = SDRAMMachineEdge(mach1, mach3, "s2")
+        graph.add_edge(edge_s_12, "ram")
+
+        starting_at_mach1 = list(
+            graph.get_outgoing_edge_partitions_starting_at_vertex(mach1))
+        self.assertIn(part_m_1, starting_at_mach1 )
+        self.assertIn(part_f, starting_at_mach1 )
+        self.assertIn(part_s_1, starting_at_mach1 )
+        self.assertEqual(3, len(starting_at_mach1))
+
+        starting_at_mach3 = list(
+            graph.get_outgoing_edge_partitions_starting_at_vertex(mach3))
+        self.assertIn(part_m_2, starting_at_mach3)
+        self.assertEqual(1, len(starting_at_mach3))
+
+        starting_at_mach4 = list(
+            graph.get_outgoing_edge_partitions_starting_at_vertex(mach4))
+        self.assertEqual(0, len(starting_at_mach4))
+
+        ending_at_mach2 = list(
+            graph.get_edge_partitions_ending_at_vertex(mach2))
+        self.assertIn(part_m_1, ending_at_mach2)
+        self.assertIn(part_s_1, ending_at_mach2)
+        self.assertEqual(2, len(ending_at_mach2))
+
+        ending_at_mach3 = list(
+            graph.get_edge_partitions_ending_at_vertex(mach3))
+        self.assertIn(part_m_1, ending_at_mach3)
+        self.assertIn(part_f, ending_at_mach3)
+        self.assertIn(part_s_1, ending_at_mach3)
+        self.assertEqual(3, len(ending_at_mach3))
+
+        ending_at_mach1 = list(
+            graph.get_edge_partitions_ending_at_vertex(mach1))
+        self.assertEqual(0, len(ending_at_mach1))
 
 
 if __name__ == '__main__':

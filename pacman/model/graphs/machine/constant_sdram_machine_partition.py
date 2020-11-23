@@ -36,6 +36,7 @@ class ConstantSDRAMMachinePartition(
             pre_vertex, identifier, allowed_edge_types=SDRAMMachineEdge,
             constraints=None, label=label, traffic_weight=1,
             class_name="ConstantSdramMachinePartition")
+        self._sdram_size = None
         self._sdram_base_address = None
 
     @property
