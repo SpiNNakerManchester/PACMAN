@@ -393,6 +393,7 @@ os.chdir("../..")
 
 options = [
     '-o', output_dir, root_package,
+    # A list of excluded files (not all!) by pattern
     "pacman/executor/a*/[a-z]*.py",
     "pacman/executor/*reader.py",
     "pacman/executor/[b-z]*.py",
@@ -406,9 +407,21 @@ options = [
     "pacman/model/resources/[a-z]*.py",
     "pacman/model/routing_*/[a-z]*.py",
     "pacman/model/tags/[a-z]*.py",
+    "pacman/operations/algorithm_reports/[a-qs-z]*.py",
+    "pacman/operations/algorithm_reports/ro*.py",
+    "pacman/operations/chip_id_allocator_algorithms/[a-z]*.py",
+    "pacman/operations/fixed_route_router/[a-z]*.py",
+    "pacman/operations/multi_cast_router_check_functionality/[a-z]*.py",
+    "pacman/operations/partition_algorithms/[a-z]*.py",
+    "pacman/operations/placer_algorithms/[a-z]*.py",
+    "pacman/operations/rigged_algorithms/[a-z]*.py",
+    "pacman/operations/router_algorithms/[bn]*.py",
     "pacman/operations/router_compressors/[a-ep-z]*.py",
     "pacman/operations/router_compressors/malloc*.py",
     "pacman/operations/router_compressors/m*/[a-z]*.py",
+    "pacman/operations/routing_info_allocator_algorithms/[a-z]*.py",
+    "pacman/operations/routing_table_generators/[a-z]*.py",
+    "pacman/operations/tag_allocator_algorithms/[a-z]*.py",
     "pacman/utilities/utility_objs/[a-z]*.py",
     ]
 try:
