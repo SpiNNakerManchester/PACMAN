@@ -13,15 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 import sys
 from six import add_metaclass
-from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.abstract_base import (
     abstractmethod, abstractproperty, AbstractBase)
+from spinn_utilities.ordered_set import OrderedSet
+from spinn_utilities.log import FormatAdapter
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs import AbstractVertex
-from pacman.exceptions import PacmanValueError, PacmanAlreadyExistsException
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanInvalidParameterException,
+    PacmanValueError)
+
+logger = FormatAdapter(logging.getLogger(__file__))
 
 
 @add_metaclass(AbstractBase)
@@ -117,6 +123,28 @@ class ApplicationVertex(AbstractVertex):
 
         :rtype: int
         """
+
+    def round_n_atoms(self, n_atoms, label="n_atoms"):
+        """
+        Utility function to allow supoer classes to make sure n_atom is an int
+
+        :param n_atoms: Value convertable to int to be used for n_atoms
+        :type n_atoms: int or float or numpy.
+        :return:
+        """
+        if isinstance(n_atoms, int):
+            return n_atoms
+        # Allow a float which has a near int value
+        temp = int(round(n_atoms))
+        if abs(temp - n_atoms) < 0.001:
+            if temp != n_atoms:
+                logger.warning(
+                    "Size of the {} rounded from {} to {}. "
+                    "Please use int values for n_atoms",
+                    label, n_atoms, temp)
+            return temp
+        raise PacmanInvalidParameterException(
+            label, n_atoms, "int value expected for {}".format(label))
 
     @property
     def machine_vertices(self):
