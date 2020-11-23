@@ -57,6 +57,8 @@ root_package = "pacman"
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
     'numpy': ("https://numpy.org/doc/stable/", None),
+    'jsonschema': (
+        'https://python-jsonschema.readthedocs.io/en/stable/', None),
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None)}
 
@@ -391,7 +393,7 @@ for f in os.listdir("."):
 output_dir = os.path.abspath(".")
 os.chdir("../..")
 
-options = [
+arguments = [
     '-o', output_dir, root_package,
     # A list of excluded files (not all!) by pattern
     "pacman/executor/a*/[a-z]*.py",
@@ -423,12 +425,13 @@ options = [
     "pacman/operations/routing_table_generators/[a-z]*.py",
     "pacman/operations/tag_allocator_algorithms/[a-z]*.py",
     "pacman/utilities/utility_objs/[a-z]*.py",
+    "pacman/utilities/vertex_sorter.py",
     ]
 try:
     # Old style API; Python 2.7
     from sphinx import apidoc
-    options = [None] + options
+    arguments = [None] + arguments
 except ImportError:
     # New style API; Python 3.6 onwards
     from sphinx.ext import apidoc
-apidoc.main(options)
+apidoc.main(arguments)
