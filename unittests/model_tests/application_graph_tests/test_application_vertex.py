@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import numpy
 import unittest
+from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs.application import ApplicationGraph
@@ -161,3 +163,14 @@ class TestApplicationGraphModel(unittest.TestCase):
         self.assertIn(sub2, vert.machine_vertices)
         self.assertIn(Slice(0, 7), vert.vertex_slices)
         self.assertIn(Slice(7, 11), vert.vertex_slices)
+
+    def test_round_n_atoms(self):
+        # .1 is not exact in floating point
+        near = .1 + .1 + .1 + .1 + .1 + .1 + .1 + .1 + .1 + .1
+        self.assertNotEqual(1, near)
+        vert = SimpleTestVertex(near)
+        self.assertEqual(1, vert.n_atoms)
+        with self.assertRaises(PacmanInvalidParameterException):
+            SimpleTestVertex(1.5)
+        vert = SimpleTestVertex(numpy.int64(23))
+        self.assertTrue(isinstance(vert.n_atoms, int))
