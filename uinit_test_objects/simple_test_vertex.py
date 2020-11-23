@@ -36,7 +36,7 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
             label=label, max_atoms_per_core=max_atoms_per_core,
             constraints=constraints)
         self._model_based_max_atoms_per_core = max_atoms_per_core
-        self._n_atoms = n_atoms
+        self._n_atoms = self.round_n_atoms(n_atoms, "test_param")
         self._fixed_sdram_value = fixed_sdram_value
 
     @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
