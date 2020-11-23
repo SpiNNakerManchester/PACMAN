@@ -186,13 +186,11 @@ class SpreaderPlacer(OneToOnePlacer):
         # sent every time step. but this is obviously not valid often
         # handle incoming
         total_incoming_keys = 0
-        for incoming_edge in machine_graph.get_edges_ending_at_vertex(vertex):
-            if incoming_edge.traffic_type == EdgeTrafficType.MULTICAST:
-                incoming_partition = \
-                    machine_graph.get_outgoing_partition_for_edge(
-                        incoming_edge)
-                total_incoming_keys += n_keys_map.n_keys_for_partition(
-                    incoming_partition)
+        for incoming_partition in \
+                machine_graph.get_multicast_edge_partitions_ending_at_vertex(
+                    vertex):
+            total_incoming_keys += n_keys_map.n_keys_for_partition(
+                incoming_partition)
 
         # handle outgoing
         out_going_partitions = \
