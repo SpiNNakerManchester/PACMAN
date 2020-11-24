@@ -37,13 +37,6 @@ class AbstractSingleSourcePartition(AbstractEdgePartition):
 
     @overrides(AbstractEdgePartition.add_edge)
     def add_edge(self, edge, graph_code):
-        """ Add an edge to the edge partition.
-
-        :param AbstractEdge edge: the edge to add
-        :raises PacmanInvalidParameterException:
-            If the starting vertex of the edge does not match that of the
-            edges already in the partition
-        """
         if edge.pre_vertex != self._pre_vertex:
             raise PacmanConfigurationException(
                 "A partition can only contain edges with the same pre_vertex")
