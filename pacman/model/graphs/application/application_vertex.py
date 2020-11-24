@@ -23,7 +23,8 @@ from spinn_utilities.log import FormatAdapter
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanInvalidParameterException)
+    PacmanAlreadyExistsException, PacmanConfigurationException,
+    PacmanInvalidParameterException)
 from pacman.model.graphs import AbstractVertex
 
 logger = FormatAdapter(logging.getLogger(__file__))
