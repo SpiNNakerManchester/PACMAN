@@ -260,6 +260,8 @@ class Graph(ConstrainedObject):
 
     @property
     def edges(self):
+        # pylint: disable=not-an-iterable
+        # https://github.com/PyCQA/pylint/issues/3105
         """ The edges in the graph
 
         :rtype: iterable(AbstractEdge)
@@ -268,6 +270,7 @@ class Graph(ConstrainedObject):
             edge
             for partition in self.outgoing_edge_partitions
             for edge in partition.edges]
+
 
     @abstractproperty
     def outgoing_edge_partitions(self):
