@@ -271,7 +271,6 @@ class Graph(ConstrainedObject):
             for partition in self.outgoing_edge_partitions
             for edge in partition.edges]
 
-
     @abstractproperty
     def outgoing_edge_partitions(self):
         """ The edge partitions in the graph.
