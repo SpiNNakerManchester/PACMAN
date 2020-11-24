@@ -141,7 +141,7 @@ class Graph(ConstrainedObject):
         :param str outgoing_edge_partition_name:
             The name of the edge partition to add the edge to; each edge
             partition is the partition of edges that start at the same vertex
-        :rtype AbstractEdgePartition
+        :rtype: AbstractEdgePartition
         :raises PacmanInvalidParameterException:
             If the edge is not of a valid type or if edges have already been
             added to this partition that start at a different vertex to this
