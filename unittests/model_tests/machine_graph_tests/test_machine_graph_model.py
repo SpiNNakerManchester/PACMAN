@@ -232,23 +232,23 @@ class TestMachineGraphModel(unittest.TestCase):
         # Add partition then edge
         part_m_1 = MulticastEdgePartition(mach1, "spikes")
         graph.add_outgoing_edge_partition(part_m_1)
-        edge_m_11 = MachineEdge(mach1, mach2,
-                            traffic_type=EdgeTrafficType.MULTICAST)
+        edge_m_11 = MachineEdge(
+            mach1, mach2, traffic_type=EdgeTrafficType.MULTICAST)
         graph.add_edge(edge_m_11, "spikes")
         # check clear error it you add the edge again
         with self.assertRaises(PacmanAlreadyExistsException):
             graph.add_edge(edge_m_11, "spikes")
         self.assertIn(edge_m_11, part_m_1.edges)
-        edge_m_12 = MachineEdge(mach1, mach3,
-                            traffic_type=EdgeTrafficType.MULTICAST)
+        edge_m_12 = MachineEdge(
+            mach1, mach3, traffic_type=EdgeTrafficType.MULTICAST)
         graph.add_edge(edge_m_12, "spikes")
-        edge_m_21 = MachineEdge(mach3, mach4,
-                            traffic_type=EdgeTrafficType.MULTICAST)
+        edge_m_21 = MachineEdge(
+            mach3, mach4, traffic_type=EdgeTrafficType.MULTICAST)
         graph.add_edge(edge_m_21, "spikes")
         part_m_2 = graph.get_outgoing_partition_for_edge(edge_m_21)
 
-        edge_f_1 = MachineEdge(mach1, mach3,
-                            traffic_type=EdgeTrafficType.FIXED_ROUTE)
+        edge_f_1 = MachineEdge(
+            mach1, mach3, traffic_type=EdgeTrafficType.FIXED_ROUTE)
         graph.add_edge(edge_f_1, "Control")
         part_f = graph.get_outgoing_partition_for_edge(edge_f_1)
 
@@ -261,9 +261,9 @@ class TestMachineGraphModel(unittest.TestCase):
 
         starting_at_mach1 = list(
             graph.get_outgoing_edge_partitions_starting_at_vertex(mach1))
-        self.assertIn(part_m_1, starting_at_mach1 )
-        self.assertIn(part_f, starting_at_mach1 )
-        self.assertIn(part_s_1, starting_at_mach1 )
+        self.assertIn(part_m_1, starting_at_mach1)
+        self.assertIn(part_f, starting_at_mach1)
+        self.assertIn(part_s_1, starting_at_mach1)
         self.assertEqual(3, len(starting_at_mach1))
 
         starting_at_mach3 = list(

@@ -18,7 +18,6 @@ try:
 except ImportError:
     from collections import defaultdict
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import OneToOnePlacer
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (

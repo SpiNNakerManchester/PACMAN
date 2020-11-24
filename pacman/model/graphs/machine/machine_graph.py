@@ -231,7 +231,7 @@ class MachineGraph(Graph):
             The vertex at which the edge partitions to find starts
         :rtype: iterable(MulticastEdgePartition)
         """
-        return self._multicast_edge_partitions_by_pre_vertex.get(vertex,[])
+        return self._multicast_edge_partitions_by_pre_vertex.get(vertex, [])
 
     def get_sdram_edge_partitions_starting_at_vertex(self, vertex):
         """ Get all the sdram edge partitions that start at the given vertex.
@@ -244,8 +244,8 @@ class MachineGraph(Graph):
 
     @overrides(Graph.get_outgoing_edge_partitions_starting_at_vertex)
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
-        for partition in \
-                self.get_fixed_route_edge_partitions_starting_at_vertex(vertex):
+        for partition in self.\
+                get_fixed_route_edge_partitions_starting_at_vertex(vertex):
             yield partition
         for partition in \
                 self.get_multicast_edge_partitions_starting_at_vertex(vertex):
