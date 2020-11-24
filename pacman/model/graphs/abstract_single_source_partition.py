@@ -28,7 +28,7 @@ class AbstractSingleSourcePartition(AbstractEdgePartition):
 
     def __init__(
             self, pre_vertex, identifier, allowed_edge_types, constraints,
-            label, traffic_weight, class_name, graph_code=None):
+            label, traffic_weight, class_name):
         super(AbstractSingleSourcePartition, self).__init__(
             identifier=identifier, allowed_edge_types=allowed_edge_types,
             constraints=constraints, label=label,
