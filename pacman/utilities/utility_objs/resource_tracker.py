@@ -1028,18 +1028,18 @@ class ResourceTracker(object):
             self._listen_port_reverse_ip_tag[board_address, tag] = port
 
     def allocate_constrained_resources(
-            self, resources, constraints, vertices=None, chips=None):
+            self, resources, constraints, chips=None, vertices=None):
         """ Attempts to use the given resources of the machine, constrained\
             by the given placement constraints.
 
         :param ResourceContainer resources: The resources to be allocated
         :param list(AbstractConstraint) constraints:
             The constraints to consider
-        :param vertices: the vertices related to these resources.
         :param iterable(tuple(int,int)) chips:
             The optional list of (x, y) tuples of chip coordinates of chips
             that can be used. Note that any chips passed in previously will
             be ignored
+        :param vertices: the vertices related to these resources.
         :return:
             The x and y coordinates of the used chip, the processor_id,
             and the IP tag and reverse IP tag allocation tuples
