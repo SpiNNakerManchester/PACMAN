@@ -111,3 +111,19 @@ class MachineGraph(Graph):
             if vertex.app_vertex:
                 raise PacmanInvalidParameterException(
                     "vertex", vertex, self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
+
+    @overrides(Graph.clone)
+    def clone(self):
+        """
+        :rtype: MachineGraph
+        """
+        new_graph = MachineGraph(label=self.label, application_graph=None)
+        for vertex in self.vertices:
+            new_graph.add_vertex(vertex)
+        for outgoing_partition in \
+                self.outgoing_edge_partitions:
+            new_outgoing_partition = outgoing_partition.clone_without_edges()
+            new_graph.add_outgoing_edge_partition(new_outgoing_partition)
+            for edge in outgoing_partition.edges:
+                new_graph.add_edge(edge, outgoing_partition.identifier)
+        return new_graph

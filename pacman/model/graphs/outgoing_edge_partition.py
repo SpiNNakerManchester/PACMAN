@@ -212,6 +212,8 @@ class OutgoingEdgePartition(ConstrainedObject):
 
         :rtype: OutgoingEdgePartition
         """
-        return OutgoingEdgePartition(
-            self.identifier, self.allowed_edge_types, self.constraints,
+        second = OutgoingEdgePartition(
+            self.identifier, self._allowed_edge_types, self.constraints,
             self.label, self.traffic_weight)
+        second._pre_vertex = self._pre_vertex
+        return second

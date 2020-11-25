@@ -81,6 +81,20 @@ class TestMachineGraphModel(unittest.TestCase):
         for edge in edges_from_graph:
             self.assertIn(edge, edges)
 
+        second = graph.clone()
+        self.assertEqual(graph.n_vertices, second.n_vertices)
+        vertices_from_graph = list(second.vertices)
+        for vert in vertices_from_graph:
+            self.assertIn(vert, vertices)
+        for vert in vertices:
+            self.assertEqual(vert, graph.vertex_by_label(vert.label))
+        self.assertEqual(
+            graph.n_outgoing_edge_partitions, second.n_outgoing_edge_partitions)
+        edges_from_graph = list(second.edges)
+        for edge in edges_from_graph:
+            self.assertIn(edge, edges)
+        self.assertEqual(len(edges_from_graph), len(edges))
+
     def test_add_duplicate_vertex(self):
         """
         testing that adding the same machine vertex twice will cause an
