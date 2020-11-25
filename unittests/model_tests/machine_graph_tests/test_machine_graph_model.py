@@ -88,8 +88,7 @@ class TestMachineGraphModel(unittest.TestCase):
             self.assertIn(vert, vertices)
         for vert in vertices:
             self.assertEqual(vert, graph.vertex_by_label(vert.label))
-        self.assertEqual(
-            graph.n_outgoing_edge_partitions, second.n_outgoing_edge_partitions)
+        self.assertEqual(graph.n_outgoing_edge_partitions, second.n_outgoing_edge_partitions)
         edges_from_graph = list(second.edges)
         for edge in edges_from_graph:
             self.assertIn(edge, edges)
