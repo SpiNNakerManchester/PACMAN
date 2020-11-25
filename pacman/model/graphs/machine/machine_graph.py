@@ -82,18 +82,18 @@ class MachineGraph(Graph):
         self._multicast_partitions = DefaultOrderedDict(
             lambda: DefaultOrderedDict(set))
         self._edge_partitions = OrderedSet()
-        self._fixed_route_edge_partitions_by_pre_vertex = \
-            DefaultOrderedDict(OrderedSet)
-        self._multicast_edge_partitions_by_pre_vertex = \
-            DefaultOrderedDict(OrderedSet)
-        self._sdram_edge_partitions_by_pre_vertex = \
-            DefaultOrderedDict(OrderedSet)
-        self._fixed_route_edge_partitions_by_post_vertex = \
-            DefaultOrderedDict(OrderedSet)
-        self._multicast_edge_partitions_by_post_vertex = \
-            DefaultOrderedDict(OrderedSet)
-        self._sdram_edge_partitions_by_post_vertex = \
-            DefaultOrderedDict(OrderedSet)
+        self._fixed_route_edge_partitions_by_pre_vertex = (
+            DefaultOrderedDict(OrderedSet))
+        self._multicast_edge_partitions_by_pre_vertex = (
+            DefaultOrderedDict(OrderedSet))
+        self._sdram_edge_partitions_by_pre_vertex = (
+            DefaultOrderedDict(OrderedSet))
+        self._fixed_route_edge_partitions_by_post_vertex = (
+            DefaultOrderedDict(OrderedSet))
+        self._multicast_edge_partitions_by_post_vertex = (
+            DefaultOrderedDict(OrderedSet))
+        self._sdram_edge_partitions_by_post_vertex = (
+            DefaultOrderedDict(OrderedSet))
 
     @overrides(Graph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
@@ -110,10 +110,10 @@ class MachineGraph(Graph):
             by_partition.add(edge.pre_vertex)
             self._multicast_edge_partitions_by_post_vertex[
                 edge.post_vertex].add(edge_partition)
-        elif (isinstance(edge_partition, FixedRouteEdgePartition)):
+        elif isinstance(edge_partition, FixedRouteEdgePartition):
             self._fixed_route_edge_partitions_by_post_vertex[
                 edge.post_vertex].add(edge_partition)
-        elif (isinstance(edge_partition, AbstractSDRAMPartition)):
+        elif isinstance(edge_partition, AbstractSDRAMPartition):
             self._sdram_edge_partitions_by_post_vertex[
                 edge.post_vertex].add(edge_partition)
         else:
@@ -176,13 +176,13 @@ class MachineGraph(Graph):
         for pre_vertex in edge_partition.pre_vertices:
             key = (pre_vertex, edge_partition.identifier)
             self._outgoing_edge_partitions_by_name[key] = edge_partition
-            if (isinstance(edge_partition, MulticastEdgePartition)):
+            if isinstance(edge_partition, MulticastEdgePartition):
                 self._multicast_edge_partitions_by_pre_vertex[
                     pre_vertex].add(edge_partition)
-            elif (isinstance(edge_partition, FixedRouteEdgePartition)):
+            elif isinstance(edge_partition, FixedRouteEdgePartition):
                 self._fixed_route_edge_partitions_by_pre_vertex[
                     pre_vertex].add(edge_partition)
-            elif (isinstance(edge_partition, AbstractSDRAMPartition)):
+            elif isinstance(edge_partition, AbstractSDRAMPartition):
                 self._sdram_edge_partitions_by_pre_vertex[
                     pre_vertex].add(edge_partition)
             else:
@@ -203,7 +203,7 @@ class MachineGraph(Graph):
             raise PacmanInvalidParameterException(
                 "edge", edge,
                 "Unable to add an Edge with traffic type {} unless you first "
-                "add a paritition for it".format(edge.traffic_type))
+                "add a partition for it".format(edge.traffic_type))
 
     @property
     @overrides(Graph.outgoing_edge_partitions)
@@ -218,16 +218,16 @@ class MachineGraph(Graph):
     def get_fixed_route_edge_partitions_starting_at_vertex(self, vertex):
         """ Get only the fixed_route edge partitions that start at the vertex.
 
-        :param AbstractVertex vertex:
+        :param AbstractVertex vertex:\
              The vertex at which the edge partitions to find starts
         :rtype: iterable(FixedRouteEdgePartition)
         """
         return self._fixed_route_edge_partitions_by_pre_vertex.get(vertex, [])
 
     def get_multicast_edge_partitions_starting_at_vertex(self, vertex):
-        """ Get only the muticast edge partitions that start at the vertex.
+        """ Get only the multicast edge partitions that start at the vertex.
 
-        :param AbstractVertex vertex:
+        :param AbstractVertex vertex:\
             The vertex at which the edge partitions to find starts
         :rtype: iterable(MulticastEdgePartition)
         """
@@ -236,7 +236,7 @@ class MachineGraph(Graph):
     def get_sdram_edge_partitions_starting_at_vertex(self, vertex):
         """ Get all the sdram edge partitions that start at the given vertex.
 
-        :param AbstractVertex vertex:
+        :param AbstractVertex vertex:\
             The vertex at which the sdram edge partitions to find starts
         :rtype: iterable(AbstractSDRAMPartition)
         """
@@ -257,16 +257,16 @@ class MachineGraph(Graph):
     def get_fixed_route_edge_partitions_ending_at_vertex(self, vertex):
         """ Get only the fixed_route edge partitions that end at the vertex.
 
-        :param AbstractVertex vertex:
+        :param AbstractVertex vertex:\
             The vertex at which the edge partitions to find starts
         :rtype: iterable(FixedRouteEdgePartition)
         """
         return self._fixed_route_edge_partitions_by_post_vertex.get(vertex, [])
 
     def get_multicast_edge_partitions_ending_at_vertex(self, vertex):
-        """ Get only the muticast edge partitions that end at the vertex.
+        """ Get only the multicast edge partitions that end at the vertex.
 
-        :param AbstractVertex vertex:
+        :param AbstractVertex vertex:\
             The vertex at which the edge partitions to find starts
         :rtype: iterable(MulticastEdgePartition)
         """
@@ -275,7 +275,7 @@ class MachineGraph(Graph):
     def get_sdram_edge_partitions_ending_at_vertex(self, vertex):
         """ Get all the sdram edge partitions that end at the given vertex.
 
-        :param AbstractVertex vertex:
+        :param AbstractVertex vertex:\
             The vertex at which the sdram edge partitions to find starts
         :rtype: iterable(AbstractSDRAMPartition)
         """
@@ -284,7 +284,7 @@ class MachineGraph(Graph):
     def get_edge_partitions_ending_at_vertex(self, vertex):
         """ Get all the edge partitions that end at the given vertex.
 
-        :param AbstractVertex vertex:
+        :param AbstractVertex vertex:\
             The vertex at which the sdram edge partitions to find starts
         :rtype: iterable(AbstractPartition)
         """

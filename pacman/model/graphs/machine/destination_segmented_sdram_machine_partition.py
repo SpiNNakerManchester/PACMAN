@@ -26,6 +26,7 @@ class DestinationSegmentedSDRAMMachinePartition(
         AbstractSingleSourcePartition, AbstractSDRAMPartition):
 
     __slots__ = [
+        # The sdram base address for this partition.
         "_sdram_base_address",
     ]
 
@@ -53,7 +54,8 @@ class DestinationSegmentedSDRAMMachinePartition(
     @sdram_base_address.setter
     def sdram_base_address(self, new_value):
         if len(self.edges) == 0:
-            raise PartitionMissingEdgesException("This partition has no edges")
+            raise PartitionMissingEdgesException(
+                "Partition {} has no edges".format(self))
         self._sdram_base_address = new_value
         for edge in self.edges:
             edge.sdram_base_address = new_value + edge.sdram_size

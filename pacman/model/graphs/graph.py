@@ -205,8 +205,7 @@ class Graph(ConstrainedObject):
         Can be overridden if different arguments should be passed.
 
         :param str name: The identifier of the partition
-        :param AbstractEdge edge:
-            An edge for the partition
+        :param AbstractEdge edge: An edge for the partition
         :return: the new edge partition
         :rtype: AbstractSingleSourcePartition
         """
@@ -232,8 +231,7 @@ class Graph(ConstrainedObject):
 
         Will also add any edges already in the partition as well
 
-        :param AbstractEdgePartition edge_partition:
-            The edge partition to add
+        :param AbstractEdgePartition edge_partition: The edge partition to add
         :raises PacmanAlreadyExistsException:
             If a partition already exists with the same pre_vertex and
             identifier
@@ -296,7 +294,7 @@ class Graph(ConstrainedObject):
     def get_edges_starting_at_vertex(self, vertex):
         """ Get all the edges that start at the given vertex.
 
-        :param AbstractVertex vertex:
+        :param AbstractVertex vertex:\
             The vertex at which the edges to get start
         :rtype: iterable(AbstractEdge)
         """
@@ -305,7 +303,7 @@ class Graph(ConstrainedObject):
     def get_edges_ending_at_vertex(self, vertex):
         """ Get all the edges that end at the given vertex.
 
-        :param AbstractVertex vertex:
+        :param AbstractVertex vertex:\
             The vertex at which the edges to get end
         :rtype: iterable(AbstractEdge)
         """
@@ -315,7 +313,7 @@ class Graph(ConstrainedObject):
 
     def get_edges_ending_at_vertex_with_partition_name(
             self, vertex, partition_name):
-        """ Get all the edges that end at the given vertex, and reside in the
+        """ Get all the edges that end at the given vertex, and reside in the\
             correct partition ID.
 
         :param AbstractVertex vertex: The vertex at which the edges to get end
@@ -331,7 +329,7 @@ class Graph(ConstrainedObject):
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
         """ Get all the edge partitions that start at the given vertex.
 
-        :param AbstractVertex vertex:
+        :param AbstractVertex vertex:\
             The vertex at which the edge partitions to find starts
         :rtype: iterable(AbstractEdgePartition)
         """
@@ -341,9 +339,9 @@ class Graph(ConstrainedObject):
         """ Get the given outgoing edge partition that starts at the
             given vertex, or `None` if no such edge partition exists.
 
-        :param AbstractVertex vertex:
+        :param AbstractVertex vertex:\
             The vertex at the start of the edges in the partition
-        :param str outgoing_edge_partition_name:
+        :param str outgoing_edge_partition_name:\
             The name of the edge partition
         :return: the named edge partition, or None if no such partition exists
         :rtype: AbstractEdgePartition or None

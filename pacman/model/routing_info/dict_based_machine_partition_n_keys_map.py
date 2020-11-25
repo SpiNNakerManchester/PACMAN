@@ -38,7 +38,7 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
         """ Set the number of keys required by a machine outgoing edge\
             partition
 
-        :param AbstractSingleSourcePartition partition:
+        :param AbstractSingleSourcePartition partition:\
             The partition to set the number of keys for
         :param int n_keys: The number of keys required by the edge
         """

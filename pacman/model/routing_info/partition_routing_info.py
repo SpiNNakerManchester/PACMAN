@@ -31,9 +31,9 @@ class PartitionRoutingInfo(object):
 
     def __init__(self, keys_and_masks, partition):
         """
-        :param iterable(BaseKeyAndMask) keys_and_masks:
+        :param iterable(BaseKeyAndMask) keys_and_masks:\
             The keys allocated to the machine partition
-        :param AbstractSingleSourcePartition partition:
+        :param AbstractSingleSourcePartition partition:\
             The partition to set the number of keys for
         """
         self._keys_and_masks = keys_and_masks

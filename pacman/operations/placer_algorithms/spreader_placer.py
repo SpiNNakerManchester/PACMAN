@@ -37,7 +37,7 @@ class SpreaderPlacer(OneToOnePlacer):
 
     :param MachineGraph machine_graph: the machine graph
     :param ~spinn_machine.Machine machine: the SpiNNaker machine
-    :param AbstractMachinePartitionNKeysMap n_keys_map:
+    :param AbstractMachinePartitionNKeysMap n_keys_map:\
         the n keys from partition map
     :param int plan_n_timesteps: number of timesteps to plan for
     :return: placements.
@@ -175,7 +175,7 @@ class SpreaderPlacer(OneToOnePlacer):
 
         :param MachineVertex vertex: the vertex the get the cost of
         :param MachineGraph machine_graph: the machine graph
-        :param AbstractMachinePartitionNKeysMap n_keys_map:
+        :param AbstractMachinePartitionNKeysMap n_keys_map:\
             the map of outgoing partition and n keys down it.
         :return: total keys to come into this vertex.
         :rtype: int

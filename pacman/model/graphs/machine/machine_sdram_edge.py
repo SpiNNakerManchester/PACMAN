@@ -22,9 +22,10 @@ from pacman.model.graphs.machine import MachineEdge
 class SDRAMMachineEdge(MachineEdge):
 
     __slots__ = [
+        # The sdram size of this edge.
         "_sdram_size",
+        # The sdram base address for this edge
         "_sdram_base_address"
-
     ]
 
     NO_SUPPORT_MESSAGE = (
@@ -68,8 +69,8 @@ class SDRAMMachineEdge(MachineEdge):
 
         :return: tuple of pre and post sdram costs.
         :rtype: tuple(int, int)
-        :rtype SDRAMEdgeSizeException: if either vertex does not support \
-            SDRAM edges
+        :rtype SDRAMEdgeSizeException: \
+            if either vertex does not support SDRAM edges.
         """
 
         if isinstance(self.pre_vertex, AbstractSupportsSDRAMEdges):

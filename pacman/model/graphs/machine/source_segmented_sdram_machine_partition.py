@@ -70,7 +70,7 @@ class SourceSegmentedSDRAMMachinePartition(
                 "vertex")
         if len(self._pre_vertices[edge.pre_vertex]) != 1:
             raise PacmanConfigurationException(
-                "The multiple source partition only supports 1 edge from a "
+                "The MultiSourcePartition only supports 1 edge from a "
                 "given pre vertex.")
 
         if self._sdram_base_address is not None:

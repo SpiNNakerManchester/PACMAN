@@ -296,12 +296,10 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         """
         for machine_partition in machine_graph.\
                 outgoing_edge_partitions:
-            if (isinstance(machine_partition, AbstractSDRAMPartition)):
+            if isinstance(machine_partition, AbstractSDRAMPartition):
                 sdram_cost = (
                     machine_partition.total_sdram_requirements())
                 sdram_cost += SARK_PER_MALLOC_SDRAM_USAGE
-                chip_x = None
-                chip_y = None
                 if isinstance(
                         machine_partition, AbstractMultiplePartition):
                     (chip_x, chip_y) = resource_tracker.chip_of(

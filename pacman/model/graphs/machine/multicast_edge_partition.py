@@ -34,13 +34,12 @@ class MulticastEdgePartition(
             self, pre_vertex, identifier, constraints=None, label=None,
             traffic_weight=1):
         """
+        :param pre_vertex: the pre vertex of this partition.
         :param str identifier: The identifier of the partition
         :param list(AbstractConstraint) constraints: Any initial constraints
         :param str label: An optional label of the partition
-        :param int traffic_weight:
+        :param int traffic_weight:\
             The weight of traffic going down this partition
-        :param graph_code: Code of the graph creating this partition
-            or None if created outside of a graph
         """
         super(MulticastEdgePartition, self).__init__(
             pre_vertex=pre_vertex, identifier=identifier,

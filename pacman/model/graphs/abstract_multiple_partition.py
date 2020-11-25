@@ -24,7 +24,10 @@ from pacman.model.graphs import AbstractEdgePartition
 class AbstractMultiplePartition(AbstractEdgePartition):
 
     __slots__ = [
-        "_pre_vertices", "_destinations"
+        # the vertices which send through this partition.
+        "_pre_vertices",
+        # the destinations of this outgoing partition.
+        "_destinations"
     ]
 
     def __init__(

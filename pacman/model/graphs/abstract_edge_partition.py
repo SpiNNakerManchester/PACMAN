@@ -110,7 +110,8 @@ class AbstractEdgePartition(ConstrainedObject):
         """
         if self._graph_code is not None:
             raise PacmanConfigurationException(
-                "illegal attempt to add this partition to a second graph")
+                "illegal attempt to add partition {} to a second "
+                "graph".format(self))
         self._graph_code = graph_code
 
     @property
@@ -181,10 +182,10 @@ class AbstractEdgePartition(ConstrainedObject):
     @abstractproperty
     def pre_vertices(self):
         """
-        Proivdes the vertice(s) associated with this partition
+        Provides the vertices associated with this partition
 
-        Note: Most edge prtitions will be AbstractSingleSourcePartition and
-            therefor provide the pre_vertex method.
+        Note: Most edge partitions will be AbstractSingleSourcePartition and
+            therefore provide the pre_vertex method.
 
         :rtype: iter(AbstractVertex)
         """

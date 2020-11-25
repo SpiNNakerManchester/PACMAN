@@ -35,7 +35,7 @@ class MulticastRoutingTableByPartition(object):
         :param MulticastRoutingTableByPartitionEntry entry: the entry to add
         :param int router_x: the x coord of the router
         :param int router_y: the y coord of the router
-        :param AbstractSingleSourcePartition partition:
+        :param AbstractSingleSourcePartition partition:\
             the partition containing the machine edge
         """
 
@@ -63,7 +63,7 @@ class MulticastRoutingTableByPartition(object):
         :param int router_x: the x coord of the router
         :param int router_y: the y coord of the router
         :return: all router_path_entries for the router.
-        :rtype: dict(AbstractSingleSourcePartition,
+        :rtype: dict(AbstractSingleSourcePartition,\
             MulticastRoutingTableByPartitionEntry)
         """
         key = (router_x, router_y)

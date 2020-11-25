@@ -26,10 +26,13 @@ class ConstantSDRAMMachinePartition(
         AbstractSingleSourcePartition, AbstractSDRAMPartition):
 
     __slots__ = [
+        # The sdram base address for this partition.
         "_sdram_base_address",
-        # The sdram size of every edge or None if no edge added
+        # The sdram size of every edge or None if no edge added.
         "_sdram_size",
     ]
+
+    MISSING_EDGE_ERROR_MESSAGE = "Partition {} has no edges"
 
     def __init__(self, identifier, pre_vertex, label):
         super(ConstantSDRAMMachinePartition, self).__init__(
@@ -61,19 +64,22 @@ class ConstantSDRAMMachinePartition(
     @overrides(AbstractSDRAMPartition.total_sdram_requirements)
     def total_sdram_requirements(self):
         if self._sdram_size is None:
-            raise PartitionMissingEdgesException("This partition has no edges")
+            raise PartitionMissingEdgesException(
+                self.MISSING_EDGE_ERROR_MESSAGE.format(self))
         return self._sdram_size
 
     @property
     def sdram_base_address(self):
         if self._sdram_size is None:
-            raise PartitionMissingEdgesException("This partition has no edges")
+            raise PartitionMissingEdgesException(
+                self.MISSING_EDGE_ERROR_MESSAGE.format(self))
         return self._sdram_base_address
 
     @sdram_base_address.setter
     def sdram_base_address(self, new_value):
         if len(self.edges) == 0:
-            raise PartitionMissingEdgesException("This partition has no edges")
+            raise PartitionMissingEdgesException(
+                self.MISSING_EDGE_ERROR_MESSAGE.format(self))
         self._sdram_base_address = new_value
         for edge in self.edges:
             edge.sdram_base_address = self._sdram_base_address
