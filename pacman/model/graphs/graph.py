@@ -357,13 +357,3 @@ class Graph(ConstrainedObject):
         """
         return self._outgoing_edge_partitions_by_name.get(
             (vertex, outgoing_edge_partition_name), None)
-
-    @abstractmethod
-    def clone(self):
-        """
-        Makes as shallow as possible copy of the graph.
-
-        Vertices and edges are copied over. Partition will be new objects.
-
-        :return: A shallow copy of this graph
-        """

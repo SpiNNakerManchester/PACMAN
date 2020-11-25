@@ -15,7 +15,6 @@
 
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
-from spinn_utilities.overrides import overrides
 from pacman.model.graphs.graph import Graph
 from pacman.model.graphs import OutgoingEdgePartition
 
@@ -49,9 +48,13 @@ class ApplicationGraph(Graph):
         for e in self.edges:
             e.forget_machine_edges()
 
-    @overrides(Graph.clone)
     def clone(self):
         """
+        Makes as shallow as possible copy of the graph.
+
+        Vertices and edges are copied over. Partition will be new objects.
+
+        :return: A shallow copy of this graph
         :rtype: ApplicationGraph
         """
         new_graph = ApplicationGraph(label=self.label)

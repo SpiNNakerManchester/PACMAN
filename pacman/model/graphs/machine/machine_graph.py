@@ -112,12 +112,18 @@ class MachineGraph(Graph):
                 raise PacmanInvalidParameterException(
                     "vertex", vertex, self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
 
-    @overrides(Graph.clone)
-    def clone(self):
+    def clone(self, application_graph=None):
         """
+        Makes as shallow as possible copy of the graph.
+
+        Vertices and edges are copied over. Partition will be new objects.
+
+        :param application_graph: The application graph with which the clone
+            should be associated
+        :return: A shallow copy of this graph
         :rtype: MachineGraph
         """
-        new_graph = MachineGraph(label=self.label, application_graph=None)
+        new_graph = MachineGraph(self.label, application_graph)
         for vertex in self.vertices:
             new_graph.add_vertex(vertex)
         for outgoing_partition in \
