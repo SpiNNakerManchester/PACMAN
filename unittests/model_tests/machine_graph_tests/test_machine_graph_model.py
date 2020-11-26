@@ -18,7 +18,8 @@ from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanInvalidParameterException)
+    PacmanAlreadyExistsException, PacmanConfigurationException,
+    PacmanInvalidParameterException)
 from uinit_test_objects import SimpleTestVertex
 
 
@@ -81,7 +82,7 @@ class TestMachineGraphModel(unittest.TestCase):
         for edge in edges_from_graph:
             self.assertIn(edge, edges)
 
-        second = graph.clone()
+        second = graph.clone(False)
         self.assertEqual(graph.n_vertices, second.n_vertices)
         vertices_from_graph = list(second.vertices)
         for vert in vertices_from_graph:
@@ -94,6 +95,26 @@ class TestMachineGraphModel(unittest.TestCase):
         for edge in edges_from_graph:
             self.assertIn(edge, edges)
         self.assertEqual(len(edges_from_graph), len(edges))
+
+        third = graph.clone(True)
+        self.assertEqual(graph.n_vertices, third.n_vertices)
+        vertices_from_graph = list(third.vertices)
+        for vert in vertices_from_graph:
+            self.assertIn(vert, vertices)
+        for vert in vertices:
+            self.assertEqual(vert, graph.vertex_by_label(vert.label))
+        self.assertEqual(graph.n_outgoing_edge_partitions,
+                         third.n_outgoing_edge_partitions)
+        edges_from_graph = list(third.edges)
+        for edge in edges_from_graph:
+            self.assertIn(edge, edges)
+        self.assertEqual(len(edges_from_graph), len(edges))
+        with self.assertRaises(PacmanConfigurationException):
+            third.add_edge("mock", "mock")
+        with self.assertRaises(PacmanConfigurationException):
+            third.add_vertex("mock")
+        with self.assertRaises(PacmanConfigurationException):
+            third.add_outgoing_edge_partition("mock")
 
     def test_add_duplicate_vertex(self):
         """
