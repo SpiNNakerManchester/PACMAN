@@ -63,8 +63,13 @@ class SourceSegmentedSDRAMMachinePartition(
 
     @overrides(AbstractMultiplePartition.add_edge)
     def add_edge(self, edge, graph_code):
+        # add
+        AbstractMachineEdgePartition.check_edge(self, edge)
+        AbstractMultiplePartition.add_edge(self, edge, graph_code)
+
         # check
         if len(self._destinations.keys()) != 1:
+            print(len(self._destinations.keys()))
             raise PacmanConfigurationException(
                 "The MultiSourcePartition can only support 1 destination "
                 "vertex")
@@ -76,10 +81,6 @@ class SourceSegmentedSDRAMMachinePartition(
         if self._sdram_base_address is not None:
             raise PacmanConfigurationException(
                 "Illegal attempt to add an edge after sdram_base_address set")
-
-        # add
-        AbstractMachineEdgePartition.check_edge(self, edge)
-        AbstractMultiplePartition.add_edge(self, edge, graph_code)
 
     @sdram_base_address.setter
     def sdram_base_address(self, new_value):
