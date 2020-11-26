@@ -146,7 +146,6 @@ class _FrozenMachineGraph(MachineGraph):
     """
     # This is declared in the same file due to the circular dependency
 
-
     __slots__ = ["__frozen"]
 
     def __init__(self, label):
@@ -180,6 +179,7 @@ class _FrozenMachineGraph(MachineGraph):
     def add_outgoing_edge_partition(self, outgoing_edge_partition):
         if self.__frozen:
             raise PacmanConfigurationException(
-                "Please add partitions via simulator not directly to this graph")
+                "Please add partitions via simulator not directly to this "
+                "graph")
         super(_FrozenMachineGraph, self).add_outgoing_edge_partition(
             outgoing_edge_partition)
