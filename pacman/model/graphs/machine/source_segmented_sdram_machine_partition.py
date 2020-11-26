@@ -69,7 +69,6 @@ class SourceSegmentedSDRAMMachinePartition(
 
         # check
         if len(self._destinations.keys()) != 1:
-            print(len(self._destinations.keys()))
             raise PacmanConfigurationException(
                 "The MultiSourcePartition can only support 1 destination "
                 "vertex")
