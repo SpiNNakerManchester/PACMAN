@@ -13,12 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.routing_tables.abstract_multicast_routing_table import \
-    AbsractMulticastRoutingTable
+from pacman.model.routing_tables import AbstractMulticastRoutingTable
 from spinn_utilities.overrides import overrides
 
 
-class CompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
+class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     """ Represents a compressed routing table for a chip.
     """
 
@@ -78,31 +77,31 @@ class CompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
             self._number_of_defaulted_routing_entries += 1
 
     @property
-    @overrides(AbsractMulticastRoutingTable.x)
+    @overrides(AbstractMulticastRoutingTable.x)
     def x(self):
         return self._x
 
     @property
-    @overrides(AbsractMulticastRoutingTable.y)
+    @overrides(AbstractMulticastRoutingTable.y)
     def y(self):
         return self._y
 
     @property
-    @overrides(AbsractMulticastRoutingTable.multicast_routing_entries)
+    @overrides(AbstractMulticastRoutingTable.multicast_routing_entries)
     def multicast_routing_entries(self):
         return self._multicast_routing_entries
 
     @property
-    @overrides(AbsractMulticastRoutingTable.number_of_entries)
+    @overrides(AbstractMulticastRoutingTable.number_of_entries)
     def number_of_entries(self):
         return len(self._multicast_routing_entries)
 
     @property
-    @overrides(AbsractMulticastRoutingTable.number_of_defaultable_entries)
+    @overrides(AbstractMulticastRoutingTable.number_of_defaultable_entries)
     def number_of_defaultable_entries(self):
         return self._number_of_defaulted_routing_entries
 
-    @overrides(AbsractMulticastRoutingTable.__eq__)
+    @overrides(AbstractMulticastRoutingTable.__eq__)
     def __eq__(self, other):
         if not isinstance(other, CompressedMulticastRoutingTable):
             return False
@@ -111,17 +110,17 @@ class CompressedMulticastRoutingTable(AbsractMulticastRoutingTable):
         return self._multicast_routing_entries == \
             other.multicast_routing_entries
 
-    @overrides(AbsractMulticastRoutingTable.__ne__)
+    @overrides(AbstractMulticastRoutingTable.__ne__)
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    @overrides(AbsractMulticastRoutingTable.__repr__)
+    @overrides(AbstractMulticastRoutingTable.__repr__)
     def __repr__(self):
         entry_string = ""
         for entry in self._multicast_routing_entries:
             entry_string += "{}\n".format(entry)
         return "{}:{}\n\n{}".format(self._x, self._y, entry_string)
 
-    @overrides(AbsractMulticastRoutingTable.__hash__)
+    @overrides(AbstractMulticastRoutingTable.__hash__)
     def __hash__(self):
         return id(self)

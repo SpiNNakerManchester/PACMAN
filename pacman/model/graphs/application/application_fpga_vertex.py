@@ -42,7 +42,7 @@ class ApplicationFPGAVertex(ApplicationVertex, AbstractFPGA):
             label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
 
-        self._n_atoms = n_atoms
+        self._n_atoms = self.round_n_atoms(n_atoms)
         self._fpga_id = fpga_id
         self._fpga_link_id = fpga_link_id
         self._board_address = board_address
