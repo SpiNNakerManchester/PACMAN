@@ -40,14 +40,9 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
-    """ A Routing Info Allocation Allocator algorithm that keeps track of
-        free keys and attempts to allocate them as requested, but that also
+    """ A Routing Info Allocation Allocator algorithm that keeps track of\
+        free keys and attempts to allocate them as requested, but that also\
         looks at routing tables in an attempt to make things more compressible
-
-    :param MachineGraph machine_graph:
-    :param AbstractMachinePartitionNKeysMap n_keys_map:
-    :param MulticastRoutingTableByPartition routing_tables:
-    :rtype: RoutingInfo
     """
 
     __slots__ = []

@@ -31,7 +31,8 @@ def validate(json_obj, schema_filename):
         The name of the file containing the schema (e.g., "routes.json")
     :rtype: None
     :raises IOError: If the schema file doesn't exist.
-    :raises ValidationError: If the JSON object isn't valid.
+    :raises ~jsonschema.exceptions.ValidationError:
+        If the JSON object isn't valid.
     """
     schema_file = os.path.join(os.path.dirname(__file__), schema_filename)
     with open(schema_file, "r") as f:

@@ -13,6 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+This is a package of algorithms that originated in Rig.
+
+Converted to PACMAN by Sara Summerton.
+"""
+
 from .hilbert_placer import HilbertPlacer
 from .hilbert_state import HilbertState
 from .isomorph_check import IsomorphicChecker

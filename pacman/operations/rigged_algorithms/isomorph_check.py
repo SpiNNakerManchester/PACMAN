@@ -25,8 +25,8 @@ class IsomorphicChecker(object):
     """ A short algorithm to check if there is an isomorphism of the placement\
         of vertices by two separate placement algorithms. One of the\
         algorithms must output to memory placements_copy in its method and\
-        <param_type>MemoryPlacements2</param_type> in\
-        algorithms_metadata.xml.
+        ``<param_type>MemoryPlacements2</param_type>`` in\
+        ``algorithms_metadata.xml``.
     """
 
     def __call__(self, report_folder, placements, placements_copy):

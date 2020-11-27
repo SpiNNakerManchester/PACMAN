@@ -58,12 +58,25 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         self._virtual_chips = dict()
 
     def __call__(self, machine, graph=None):
+        """
+        :param ~spinn_machine.Machine machine:
+        :param graph:
+        :type graph: Graph or None
+        :rtype: ~spinn_machine.Machine
+        :raises PacmanConfigurationException:
+            If a virtual chip is in an impossible position.
+        """
         if graph is not None:
             self.allocate_chip_ids(machine, graph)
         return machine
 
     def allocate_chip_ids(self, machine, graph):
         """ Go through the chips (real and virtual) and allocate keys for each
+
+        :param ~spinn_machine.Machine machine:
+        :param Graph graph:
+        :raises PacmanConfigurationException:
+            If a virtual chip is in an impossible position.
         """
         progress = ProgressBar(
             graph.n_vertices + machine.n_chips,

@@ -24,19 +24,15 @@ ROUTING_TABLES_FILENAME = "routing_tables.json"
 
 class WriteJsonRoutingTables(object):
     """ Converter from MulticastRoutingTables to JSON.
-
-    :param MulticastRoutingTables router_tables:
-        Routing Tables to convert
-    :param str json_folder: the folder to which the JSON are being written
-    :return: the name of the generated file
-    :rtype: str
     """
 
     def __call__(self, router_tables, json_folder):
         """ Runs the code to write the machine in Java readable JSON.
 
         :param MulticastRoutingTables router_tables:
-        :param str json_folder:
+            Routing Tables to convert
+        :param str json_folder: the folder to which the JSON are being written
+        :return: the name of the generated file
         :rtype: str
         """
         # Steps are tojson, validate and writefile

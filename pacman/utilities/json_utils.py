@@ -12,6 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+Miscellaneous minor functions for converting between JSON and Python objects.
+"""
+
 from collections import OrderedDict
 import json
 import gzip
@@ -38,7 +42,9 @@ def json_to_object(json_object):
     Makes sure this is a JSON object reading in a file if required
 
     :param json_object: Either a JSON Object or a string pointing to a file
+    :type json_object: dict or list or str
     :return: a JSON object
+    :rtype: dict or list
     """
     if isinstance(json_object, str):
         if json_object.endswith(".gz"):
@@ -59,15 +65,18 @@ _SIZE_CONSTRAINTS = (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)
 def constraint_to_json(constraint):
     """ Converts a constraint to JSON.
 
-    Note: Vertexes are represented by just their label.
+    .. note::
 
-    Note: If an unexpected constraint is received, the str() and repr() values
-    are saved
+        Vertexes are represented by just their label.
 
-    If an Exception occurs, that is caught and added to the JSON object.
+        If an unexpected constraint is received, the str() and repr() values
+        are saved
 
-    :param constraint: The constraint to describe
+        If an Exception occurs, that is caught and added to the JSON object.
+
+    :param AbstractConstraint constraint: The constraint to describe
     :return: A dict describing the constraint
+    :rtype: dict
     """
     json_dict = OrderedDict()
     try:
