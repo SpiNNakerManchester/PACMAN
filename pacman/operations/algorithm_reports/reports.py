@@ -688,7 +688,7 @@ def _write_vertex_virtual_keys(
 def router_report_from_router_tables(report_folder, routing_tables):
     """
     :param str report_folder: the report folder to store this value
-    :param ~spinn_machine.MulticastRoutingTables routing_tables:
+    :param MulticastRoutingTables routing_tables:
         the original routing tables
     :rtype: None
     """
@@ -706,7 +706,7 @@ def router_report_from_router_tables(report_folder, routing_tables):
 def router_report_from_compressed_router_tables(report_folder, routing_tables):
     """
     :param str report_folder: the report folder to store this value
-    :param ~spinn_machine.MulticastRoutingTables routing_tables:
+    :param MulticastRoutingTables routing_tables:
         the compressed routing tables
     :rtype: None
     """

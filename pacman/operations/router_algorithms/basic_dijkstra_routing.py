@@ -409,7 +409,7 @@ class BasicDijkstraRouting(object):
         :param MachineGraph graph:
         :return: x, y, previous_entry, made_an_entry
         :rtype: tuple(int, int, MulticastRoutingTableByPartitionEntry, bool)
-        :raise PacmanRoutingException: \
+        :raise PacmanRoutingException:
             when the bandwidth of a router is beyond expected parameters
         """
 
