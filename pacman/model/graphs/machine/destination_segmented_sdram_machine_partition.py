@@ -58,7 +58,8 @@ class DestinationSegmentedSDRAMMachinePartition(
                 "Partition {} has no edges".format(self))
         self._sdram_base_address = new_value
         for edge in self.edges:
-            edge.sdram_base_address = new_value + edge.sdram_size
+            edge.sdram_base_address = new_value
+            new_value += edge.sdram_size
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge, graph_code):
