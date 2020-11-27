@@ -28,15 +28,16 @@ logger = logging.getLogger(__name__)
 class HilbertPlacer(object):
     """ A simple placing algorithm using the Hilbert space-filling curve,\
         translated from RIG.
-
-    :param MachineGraph machine_graph: The machine_graph to place
-    :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
-    :param int plan_n_timesteps: number of timesteps to plan for
-    :return: Placements of vertices on the machine
-    :rtype: Placements
     """
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
+        """
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :return: Placements of vertices on the machine
+        :rtype: Placements
+        """
         # check that the algorithm can handle the constraints
         self._check_constraints(
             machine_graph.vertices,

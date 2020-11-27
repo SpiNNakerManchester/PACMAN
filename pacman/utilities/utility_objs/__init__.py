@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .field import Field
+from .field import Field, SUPPORTED_TAGS
 from .resource_tracker import ResourceTracker
 
-__all__ = ["Field", "ResourceTracker"]
+__all__ = ["Field", "ResourceTracker", "SUPPORTED_TAGS"]

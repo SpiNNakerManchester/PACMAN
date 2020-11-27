@@ -37,11 +37,6 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     """ A Routing Info Allocation Allocator algorithm that keeps track of\
         free keys and attempts to allocate them as requested.
-
-    :param MachineGraph machine_graph:
-    :param AbstractMachinePartitionNKeysMap n_keys_map:
-    :rtype: RoutingInfo
-    :raises PacmanRouteInfoAllocationException:
     """
 
     __slots__ = ["_n_keys_map"]
