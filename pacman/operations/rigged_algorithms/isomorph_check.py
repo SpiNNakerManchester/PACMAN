@@ -66,7 +66,7 @@ class IsomorphicChecker(object):
             two placement algorithms.
 
         :param Placements placements: Placements of vertices on the machine
-        :param Placements placements_copy: \
+        :param Placements placements_copy:
             memory copy of placements of vertices on the machine
         :return: True if the placements are the same
         :rtype: tuple(bool, set(MachineVertex), set(MachineVertex))

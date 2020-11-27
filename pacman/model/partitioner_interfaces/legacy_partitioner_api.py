@@ -20,9 +20,8 @@ from spinn_utilities.abstract_base import (
 
 @add_metaclass(AbstractBase)
 class LegacyPartitionerAPI(object):
-    """ api used by the vertices which dont have their own splitters but use
-    what master did before the self partitioning stuff came to be.
-
+    """ API used by the vertices which dont have their own splitters but use\
+        what master did before the self partitioning stuff came to be.
     """
 
     @abstractmethod
@@ -49,7 +48,7 @@ class LegacyPartitionerAPI(object):
         :param label: human readable label for the machine vertex
         :type label: str or None
         :param constraints: Constraints to be passed on to the machine vertex.
-        :type constraints: \
+        :type constraints:
             iterable(~pacman.model.constraints.AbstractConstraint)
         """
 
@@ -63,8 +62,8 @@ class LegacyPartitionerAPI(object):
 
     @staticmethod
     def abstract_methods():
-        """
-        Exposes the abstract methods and properties defined in this class
+        """ Exposes the abstract methods and properties defined in this class.
+
         :rtype list(str)
         """
         return LegacyPartitionerAPI.__abstractmethods__

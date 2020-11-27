@@ -38,18 +38,16 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
 
     def __init__(self, x, y, multicast_routing_entries=None):
         """
-        :param x: \
+        :param int x:
             The x-coordinate of the chip for which this is the routing table
-        :type x: int
-        :param y: \
+        :param int y:
             The y-coordinate of the chip for which this is the routing tables
-        :type y: int
-        :param multicast_routing_entries: \
+        :param multicast_routing_entries:
             The routing entries to add to the table
-        :type multicast_routing_entries: \
-            iterable(:py:class:`spinn_machine.MulticastRoutingEntry`)
-        :raise pacman.exceptions.PacmanAlreadyExistsException: If any two\
-            routing entries contain the same key-mask combination
+        :type multicast_routing_entries:
+            iterable(~spinn_machine.MulticastRoutingEntry)
+        :raise pacman.exceptions.PacmanAlreadyExistsException:
+            If any two routing entries contain the same key-mask combination
         """
         self._x = x
         self._y = y
@@ -64,10 +62,9 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         """ Adds a routing entry to this table
 
         :param multicast_routing_entry: The route to add
-        :type multicast_routing_entry:\
-            :py:class:`spinn_machine.MulticastRoutingEntry`
-        :rtype: None
-        :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing\
+        :type multicast_routing_entry:
+            ~spinn_machine.MulticastRoutingEntry
+        :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing
             entry with the same key-mask combination already exists
         """
         self._multicast_routing_entries.append(multicast_routing_entry)

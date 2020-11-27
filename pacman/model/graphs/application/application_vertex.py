@@ -55,10 +55,10 @@ class ApplicationVertex(AbstractVertex):
             The optional initial constraints of the vertex.
         :param int max_atoms_per_core: The max number of atoms that can be
             placed on a core, used in partitioning.
-        :param splitter: The splitter object needed for this vertex. \
+        :param splitter: The splitter object needed for this vertex.
             Leave as None to delegate the choice of splitter to the selector.
         :type splitter: None or
-            ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
+            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
         :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
@@ -85,7 +85,7 @@ class ApplicationVertex(AbstractVertex):
     def splitter(self):
         """
         :rtype:
-            ~pacman.model.partitioner_interfaces.abstract_splitters.AbstractSplitterCommon
+            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
         """
         return self._splitter
 
@@ -95,7 +95,7 @@ class ApplicationVertex(AbstractVertex):
 
         :param new_value: The new splitter object
         :type new_value:
-            ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
+            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
         :rtype: None
         """
         if self._splitter == new_value:

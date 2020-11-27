@@ -31,12 +31,11 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
         "dependent on splitter {}")
 
     def __init__(self, other_splitter, splitter_name):
-        """
-        Creates a splitter that must be done after the other unless None.
+        """ Creates a splitter that must be done after the other unless None.
 
         :param other_splitter: the other splitter to depend upon
-        :type other_splitter: \
-            ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
+        :type other_splitter:
+            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
             or None
         :param str splitter_name:
         """
@@ -45,11 +44,10 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
 
     @property
     def other_splitter(self):
-        """
-        the other splitter
+        """ the other splitter
 
         :rtype:
-            ~pacman.model.partitioner_interfaces.abstract_splitters.SplitterObjectCommon
+            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
         """
         return self._other_splitter
 
@@ -62,13 +60,12 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
 
     @other_splitter.setter
     def other_splitter(self, new_value):
-        """
-        Supports the delayed setting of the other to depend on
+        """ Supports the delayed setting of the other to depend on
 
         :param new_value: other splitter
-        :raise PacmanAlreadyExistsException: \
+        :raise PacmanAlreadyExistsException:
             If there is already a different other set
-        :raise PacmanPartitionException: \
+        :raise PacmanPartitionException:
             If a circular dependency is detected
         """
         if (self._other_splitter is not None and

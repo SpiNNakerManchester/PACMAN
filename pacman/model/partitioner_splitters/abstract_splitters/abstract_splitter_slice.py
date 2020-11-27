@@ -331,12 +331,11 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
         """ Find the max ratio between the resources.
 
         :param ResourceContainer required: the resources used by the vertex
-        :param ResourceContainer available: \
+        :param ResourceContainer available:
             the max resources available from the machine
         :param int plan_n_time_steps: number of time steps to plan for
         :return: the largest ratio of resources
         :rtype: float
-        :raise None: this method does not raise any known exceptions
         """
         cpu_ratio = cls._ratio(
             required.cpu_cycles.get_value(),
@@ -371,7 +370,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
         :param ResourceTracker resources: resources
         :param str label: human readable label for machine vertex.
         :param remaining_constraints: none partitioner constraints.
-        :type remaining_constraints: iterable [Constraint]
+        :type remaining_constraints: iterable(AbstractConstraint)
         :return: machine vertex
         :rtype: MachineVertex
         """
