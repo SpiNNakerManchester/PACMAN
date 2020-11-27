@@ -34,22 +34,22 @@ class SharedEntry(object):
         ]
 
     def __init__(self, entry):
+        """
+        :param MulticastRoutingTableByPartitionEntry entry:
+        """
         self.link_ids = entry.link_ids
         self.processor_ids = entry.processor_ids
         self.defaultable = entry.defaultable
 
     def still_defaultable(self, entry):
+        """
+        :param MulticastRoutingTableByPartitionEntry entry:
+        """
         self.defaultable = self.defaultable & entry.defaultable
 
 
 class ZonedRoutingTableGenerator(object):
     """ An algorithm that can produce routing tables in zones
-
-    :param RoutingInfo routing_infos:
-    :param MulticastRoutingTableByPartition routing_table_by_partitions:
-    :param ~spinn_machine.Machine machine:
-    :param dict(ApplicationVertex,BaseKeyAndMask) info_by_app_vertex:
-    :rtype: MulticastRoutingTables
     """
 
     __slots__ = []

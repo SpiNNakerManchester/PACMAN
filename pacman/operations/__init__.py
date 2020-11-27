@@ -13,6 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+The algorithms in the subpackages are generally :py:obj:`callable`.
+"""
+
 import os
 
 algorithms_metdata_file = os.path.join(

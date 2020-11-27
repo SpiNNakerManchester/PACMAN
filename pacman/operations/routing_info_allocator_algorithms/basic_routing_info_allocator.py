@@ -36,16 +36,6 @@ class BasicRoutingInfoAllocator(object):
         required by each edge must be 2048 or less, and that all edges coming\
         out of a vertex will be given the same key/mask assignment.
 
-    :param MachineGraph machine_graph:
-        The machine graph to allocate the routing info for
-    :param Placements placements: The placements of the vertices
-    :param AbstractMachinePartitionNKeysMap n_keys_map:
-        A map between the edges and the number of keys required by the
-        edges
-    :return: The routing information
-    :rtype: PartitionRoutingInfo
-    :raise PacmanRouteInfoAllocationException:
-        If something goes wrong with the allocation
     """
 
     __slots__ = []

@@ -28,8 +28,7 @@ def locate_constraints_of_type(constraints, constraint_type):
         The type of constraints to return
     :return: The constraints of constraint_type that are found in the
         constraints given
-    :rtype: iterable(AbstractConstraint`)
-    :raises None: no known exceptions
+    :rtype: iterable(AbstractConstraint)
     """
     return [c for c in constraints if isinstance(c, constraint_type)]
 
@@ -77,8 +76,6 @@ def check_algorithm_can_support_constraints(
         The constraints supported
     :param type(AbstractConstraint) abstract_constraint_type:
         The overall abstract c type supported
-    :return: Nothing is returned
-    :rtype: None
     :raise PacmanInvalidParameterException:
         When the algorithm cannot support the constraints demanded of it
     """

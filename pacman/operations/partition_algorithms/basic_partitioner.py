@@ -32,15 +32,6 @@ logger = logging.getLogger(__name__)
 class BasicPartitioner(object):
     """ An basic algorithm that can partition an application graph based\
         on the number of atoms in the vertices.
-
-    :param ApplicationGraph graph: The application_graph to partition
-    :param ~spinn_machine.Machine machine:
-        The machine with respect to which to partition the application graph
-    :param int plan_n_timesteps: number of timesteps to plan for
-    :return: A machine graph
-    :rtype: MachineGraph
-    :raise PacmanPartitionException:
-        If something goes wrong with the partitioning
     """
 
     __slots__ = []
@@ -54,11 +45,15 @@ class BasicPartitioner(object):
     # inherited from AbstractPartitionAlgorithm
     def __call__(self, graph, machine, plan_n_timesteps):
         """
-        :param ApplicationGraph graph:
+        :param ApplicationGraph graph: The application_graph to partition
         :param ~spinn_machine.Machine machine:
-        :param int plan_n_timesteps:
+            The machine with respect to which to partition the application
+            graph
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :return: A machine graph
         :rtype: MachineGraph
         :raise PacmanPartitionException:
+            If something goes wrong with the partitioning
         """
         ResourceTracker.check_constraints(graph.vertices)
         utility_calls.check_algorithm_can_support_constraints(

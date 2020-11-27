@@ -38,18 +38,14 @@ class ConnectiveBasedPlacer(RadialPlacer):
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
         """
-        :param machine_graph: The machine_graph to place
-        :type machine_graph:\
-            :py:class:`pacman.model.graphs.machine.MachineGraph`
-        :param machine:\
-            The machine with respect to which to partition the application\
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param ~spinn_machine.Machine machine:
+            The machine with respect to which to partition the application
             graph
-        :type machine: :py:class:`spinn_machine.Machine`
-        :param plan_n_timesteps: number of timesteps to plan for
-        :type  plan_n_timesteps: int
+        :param int plan_n_timesteps: number of timesteps to plan for
         :return: A set of placements
-        :rtype: :py:class:`pacman.model.placements.Placements`
-        :raise pacman.exceptions.PacmanPlaceException: \
+        :rtype: ~pacman.model.placements.Placements
+        :raise PacmanPlaceException:
             If something goes wrong with the placement
         """
         # check that the algorithm can handle the constraints

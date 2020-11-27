@@ -39,20 +39,6 @@ logger = logging.getLogger(__name__)
 class PartitionAndPlacePartitioner(object):
     """ A partitioner that tries to ensure that SDRAM is not overloaded by\
         keeping track of the SDRAM usage on the various chips
-
-    :param ApplicationGraph graph: The application_graph to partition
-    :param ~spinn_machine.Machine machine:
-        The machine with respect to which to partition the application
-        graph
-    :param int plan_n_timesteps: number of timesteps to plan for
-    :param preallocated_resources:
-    :type preallocated_resources: PreAllocatedResourceContainer or None
-    :return:
-        A machine_graph of partitioned vertices and partitioned edges,
-        and the number of chips needed to satisfy this partitioning.
-    :rtype: tuple(MachineGraph, int)
-    :raise PacmanPartitionException:
-        If something goes wrong with the partitioning
     """
 
     __slots__ = []
@@ -62,13 +48,19 @@ class PartitionAndPlacePartitioner(object):
             self, graph, machine, plan_n_timesteps,
             preallocated_resources=None):
         """
-        :param ApplicationGraph graph:
+        :param ApplicationGraph graph: The application_graph to partition
         :param ~spinn_machine.Machine machine:
-        :param int plan_n_timesteps:
+            The machine with respect to which to partition the application
+            graph
+        :param int plan_n_timesteps: number of timesteps to plan for
         :param preallocated_resources:
         :type preallocated_resources: PreAllocatedResourceContainer or None
+        :return:
+            A machine_graph of partitioned vertices and partitioned edges,
+            and the number of chips needed to satisfy this partitioning.
         :rtype: tuple(MachineGraph, int)
         :raise PacmanPartitionException:
+            If something goes wrong with the partitioning
         """
         ResourceTracker.check_constraints(graph.vertices)
         utils.check_algorithm_can_support_constraints(

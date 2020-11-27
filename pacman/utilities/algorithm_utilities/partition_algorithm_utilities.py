@@ -29,8 +29,9 @@ from pacman.model.constraints.partitioner_constraints import (
 def determine_max_atoms_for_vertex(vertex):
     """  returns the max atom constraint after assessing them all.
 
-    :param vertex: the vertex to find max atoms of
+    :param ApplicationVertex vertex: the vertex to find max atoms of
     :return: the max number of atoms per core
+    :rtype: int
     """
     possible_max_atoms = list()
     n_atoms = None
