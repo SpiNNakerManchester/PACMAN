@@ -367,4 +367,3 @@ class _FrozenMachineGraph(MachineGraph):
                 "graph")
         super(_FrozenMachineGraph, self).add_outgoing_edge_partition(
             edge_partition)
-
