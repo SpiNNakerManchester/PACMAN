@@ -27,7 +27,7 @@ from .abstract_splitter_common import AbstractSplitterCommon
 
 @add_metaclass(AbstractBase)
 class AbstractSplitterSlice(AbstractSplitterCommon):
-    """ contains default logic for splitting by slice
+    """ Contains default logic for splitting by slice.
     """
 
     __slots__ = ["_called"]
@@ -87,6 +87,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
 
         :param ResourceTracker resource_tracker: res tracker.
         :return: map of slices to resources. for easier usage later.
+        :rtype: dict(Slice, ResourceContainer)
         """
         slice_resource_map = dict()
         n_atoms_placed = 0
@@ -110,7 +111,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
         return slice_resource_map
 
     def _scale_down_resources(self, lo_atom, hi_atom, resource_tracker):
-        """ Reduce the number of atoms on a core so that it fits within the
+        """ Reduce the number of atoms on a core so that it fits within the\
             resources available.
 
         :param int lo_atom: the number of atoms already partitioned
@@ -118,8 +119,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
         :param ResourceTracker resource_tracker: Tracker of used resources
         :return: the list of placements made by this method and the new amount
             of atoms partitioned
-        :rtype: tuple(iterable(tuple(ApplicationVertex, ResourceContainer)),
-            int)
+        :rtype: tuple(list(ResourceContainer), int)
         :raise PacmanPartitionException: when the vertex cannot be partitioned
         """
 
@@ -366,21 +366,25 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
             self, vertex_slice, resources, label, remaining_constraints):
         """ creates a machine vertex
 
-        :param Slice vertex_slice: vertex slice
-        :param ResourceTracker resources: resources
+        :param ~pacman.model.graphs.common.Slice vertex_slice: vertex slice
+        :param ~pacman.utilities.utility_objs.ResourceTracker resources:
+            resources
         :param str label: human readable label for machine vertex.
         :param remaining_constraints: none partitioner constraints.
-        :type remaining_constraints: iterable(AbstractConstraint)
+        :type remaining_constraints:
+            iterable(~pacman.model.constraints.AbstractConstraint)
         :return: machine vertex
-        :rtype: MachineVertex
+        :rtype: ~pacman.model.graphs.machine.MachineVertex
         """
 
     @abstractmethod
     def get_resources_used_by_atoms(self, vertex_slice):
         """ gets the resources of a slice of atoms from a given app vertex.
 
-        :param vertex_slice: the slice to find the resources of.
-        :return: ResourceContainer.
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice to find the resources of.
+        :return: Resource container.
+        :rtype: ~pacman.model.resources.ResourceContainer
         """
 
     def _estimate_slices(self):
@@ -388,7 +392,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
             already been split.
 
         :return: The slices of this vertex, bool if estimate or exact
-        :rtype: tuple(list(Slice), bool
+        :rtype: tuple(list(~pacman.model.graphs.common.Slice), bool
 
         """
         if self._governed_app_vertex.n_atoms < self._max_atoms_per_core:
