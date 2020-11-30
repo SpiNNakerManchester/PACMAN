@@ -33,22 +33,8 @@ from pacman.utilities import utility_calls as utils
 
 
 class SplitterPartitioner(AbstractSplitterPartitioner):
-    """ partitioner which hands the partitioning work to app vertices
-    splitter objects.
-
-    :param ApplicationGraph app_graph: The application_graph to partition
-    :param ~spinn_machine.Machine machine:
-        The machine with respect to which to partition the application
-        graph
-    :param int or None plan_n_time_steps: number of time steps to plan for
-    :param pre_allocated_resources:
-    :type pre_allocated_resources: PreAllocatedResourceContainer or None
-    :return:
-        A machine_graph of partitioned vertices and partitioned edges,
-        and the number of chips needed to satisfy this partitioning.
-    :rtype: tuple(MachineGraph, int)
-    :raise PacmanPartitionException:
-        If something goes wrong with the partitioning
+    """ Partitioner which hands the partitioning work to application vertices'\
+        splitter objects.
     """
 
     MACHINE_EDGE_LABEL = "machine_edge_for_{}"
@@ -79,15 +65,22 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             self, app_graph, machine, plan_n_time_steps,
             pre_allocated_resources=None):
         """
-        :param ApplicationGraph app_graph: app graph
-        :param ~spinn_machine.Machine machine: machine rep
-        :param int or None plan_n_time_steps: \
-            the number of time steps to run for
-        :param pre_allocated_resources: res needed to be pre allocated before\
-            making new machine vertices.
+        :param ApplicationGraph app_graph: The application_graph to partition
+        :param ~spinn_machine.Machine machine:
+            The machine with respect to which to partition the application
+            graph
+        :param plan_n_time_steps:
+            the number of time steps to plan to run for
+        :type plan_n_time_steps: int or None
+        :param pre_allocated_resources:
+            res needed to be preallocated before making new machine vertices
         :type pre_allocated_resources: PreAllocatedResourceContainer or None
+        :return:
+            A machine_graph of partitioned vertices and partitioned edges,
+            and the number of chips needed to satisfy this partitioning.
         :rtype: tuple(MachineGraph, int)
         :raise PacmanPartitionException:
+            If something goes wrong with the partitioning
         """
 
         # check resource tracker can handle constraints
@@ -113,13 +106,14 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         return machine_graph, resource_tracker.chips_used
 
     def __make_dependent_after(self, vertices, dependent_vertices, dependent):
-        """ orders the vertices so that dependants are split after the
-        things they depend upon.
+        """ orders the vertices so that dependents are split after the\
+            things they depend upon.
 
-        :param vertices: machine vertices
-        :param dependent_vertices: list of dependent vertices
-        :param dependent: the vertex that's dependent on things.
-        :rtype: None
+        :param list(MachineVertex) vertices: machine vertices
+        :param list(ApplicationVertex) dependent_vertices:
+            list of dependent vertices
+        :param ApplicationVertex dependent:
+            the vertex that's dependent on things.
         """
         if dependent in dependent_vertices:
             other_app_vertex = dependent_vertices[dependent]
@@ -133,12 +127,12 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
 
     def order_vertices_for_dependent_splitters(self, vertices):
         """ orders the list so that dependent splitters are next to their \
-        other splitter in terms of vertex ordering.
+            other splitter in terms of vertex ordering.
 
-        :param vertices: the list of application vertices
-        :type vertices: iterable of ApplicationVertex
+        :param iterable(ApplicationVertex) vertices:
+            the list of application vertices
         :return: vertices in list with new ordering
-        :rtype: iterable of ApplicationVertex
+        :rtype: iterable(ApplicationVertex)
         """
         dependent_vertices = OrderedDict()
         other_vertices = set()
@@ -161,7 +155,6 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         """ get the constraints sorted out.
 
         :param ApplicationGraph app_graph: the app graph
-        :rtype: None
         """
         for vertex in app_graph.vertices:
             for constraint in utils.locate_constraints_of_type(
@@ -177,14 +170,16 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             self, app_graph, machine, plan_n_time_steps,
             pre_allocated_resources):
         """ sets up the machine_graph, resource_tracker, vertices, \
-        progress bar.
+            progress bar.
 
         :param ApplicationGraph app_graph: app graph
         :param ~spinn_machine.Machine machine: machine
         :param int plan_n_time_steps: the number of time steps to run for.
         :param pre_allocated_resources: pre allocated res from other systems.
         :type PreAllocatedResourceContainer or None
-        :return: tuple with (machine graph, res tracker, verts, progress bar)
+        :return: (machine graph, res tracker, verts, progress bar)
+        :rtype: tuple(MachineGraph, ResourceTracker, list(ApplicationVertex),
+            ~.ProgressBar)
         """
         # Load the vertices and create the machine_graph to fill
         machine_graph = MachineGraph(
@@ -210,14 +205,14 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
     def __locate_common_edge_type(
             self, pre_edge_types, post_edge_types, src_machine_vertex,
             dest_machine_vertex):
-        """ searches the sets of edge types and finds the common one. if more
-        than one common, is biased towards the destination common and the
-        order of the list.
+        """ searches the sets of edge types and finds the common one. if more\
+            than one common, is biased towards the destination common and the\
+            order of the list.
 
-        :param pre_edge_types: the edge types the pre vertex can support for \
-        transmission
-        :param post_edge_types: the edge types the post vertex can support \
-        for reception.
+        :param pre_edge_types:
+            the edge types the pre vertex can support for transmission
+        :param post_edge_types:
+            the edge types the post vertex can support for reception.
         :param MachineVertex src_machine_vertex: used for error message
         :param MachineVertex dest_machine_vertex: used for error message
         :return: MachineEdge class
@@ -239,7 +234,6 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         :param ApplicationGraph app_graph: app graph
         :param MachineGraph machine_graph: machine graph
         :param ResourceTracker resource_tracker: resource tracker
-        :rtype: None
         """
 
         # process edges

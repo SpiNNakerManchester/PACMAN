@@ -20,7 +20,8 @@ from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanInvalidParameterException)
+    PacmanAlreadyExistsException, PacmanConfigurationException,
+    PacmanInvalidParameterException)
 from pacman.model.graphs.graph import Graph
 
 
@@ -108,3 +109,74 @@ class ApplicationGraph(Graph):
         :rtype: iterable(AbstractEdgePartition)
         """
         return self._outgoing_edge_partitions_by_pre_vertex[vertex]
+
+    def clone(self, frozen=False):
+        """
+        Makes as shallow as possible copy of the graph.
+
+        Vertices and edges are copied over. Partition will be new objects.
+
+        :return: A shallow copy of this graph
+        :rtype: ApplicationGraph
+        """
+        if frozen:
+            new_graph = _FrozenApplicationGraph(label=self.label)
+        else:
+            new_graph = ApplicationGraph(label=self.label)
+        for vertex in self.vertices:
+            new_graph.add_vertex(vertex)
+        for outgoing_partition in \
+                self.outgoing_edge_partitions:
+            for edge in outgoing_partition.edges:
+                new_graph.add_edge(edge, outgoing_partition.identifier)
+        if frozen:
+            new_graph.freeze()
+        return new_graph
+
+
+class _FrozenApplicationGraph(ApplicationGraph):
+    """ A frozen application-level abstraction of a graph.
+    """
+    # This is declared in the same file due to the circular dependency
+
+    __slots__ = ["__frozen"]
+
+    def __init__(self, label):
+        """
+        :param label: The label on the graph, or None
+        :type label: str or None
+        """
+        super(_FrozenApplicationGraph, self).__init__(label)
+        self.__frozen = False
+
+    def freeze(self):
+        """
+        blocks any farther attempt to add to this graph
+
+        :return:
+        """
+        self.__frozen = True
+
+    @overrides(ApplicationGraph.add_edge)
+    def add_edge(self, edge, outgoing_edge_partition_name):
+        if self.__frozen:
+            raise PacmanConfigurationException(
+                "Please add edges via simulator not directly to this graph")
+        super(_FrozenApplicationGraph, self).add_edge(
+            edge, outgoing_edge_partition_name)
+
+    @overrides(ApplicationGraph.add_vertex)
+    def add_vertex(self, vertex):
+        if self.__frozen:
+            raise PacmanConfigurationException(
+                "Please add vertices via simulator not directly to this graph")
+        super(_FrozenApplicationGraph, self).add_vertex(vertex)
+
+    @overrides(ApplicationGraph.add_outgoing_edge_partition)
+    def add_outgoing_edge_partition(self, edge_partition):
+        if self.__frozen:
+            raise PacmanConfigurationException(
+                "Please add partitions via simulator not directly to this "
+                "graph")
+        super(_FrozenApplicationGraph, self).add_outgoing_edge_partition(
+            edge_partition)
