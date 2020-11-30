@@ -404,6 +404,7 @@ arguments = [
     "pacman/model/decorators/*",
     "pacman/model/graphs/*/[a-z]*.py",
     "pacman/model/graphs/application/*/[a-z]*.py",
+    "pacman/model/graphs/application/abstract/[a-z]*.py",
     "pacman/model/graphs/abstract_*.py",
     "pacman/model/graphs/[go]*.py",
     "pacman/model/placements/[a-z]*.py",
