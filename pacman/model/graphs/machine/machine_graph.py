@@ -17,7 +17,8 @@ from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.overrides import overrides
-from pacman.exceptions import PacmanInvalidParameterException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.model.graphs import OutgoingEdgePartition
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.graph import Graph
@@ -110,3 +111,74 @@ class MachineGraph(Graph):
         elif vertex.app_vertex:
             raise PacmanInvalidParameterException(
                 "vertex", vertex, self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
+
+    def clone(self, frozen=False):
+        """
+        Makes as shallow as possible copy of the graph.
+
+        Vertices and edges are copied over. Partition will be new objects.
+
+        :param application_graph: The application graph with which the clone
+            should be associated
+        :return: A shallow copy of this graph
+        :rtype: MachineGraph
+        """
+        if frozen:
+            new_graph = _FrozenMachineGraph(self.label)
+        else:
+            new_graph = MachineGraph(self.label)
+        for vertex in self.vertices:
+            new_graph.add_vertex(vertex)
+        for outgoing_partition in \
+                self.outgoing_edge_partitions:
+            new_outgoing_partition = outgoing_partition.clone_without_edges()
+            new_graph.add_outgoing_edge_partition(new_outgoing_partition)
+            for edge in outgoing_partition.edges:
+                new_graph.add_edge(edge, outgoing_partition.identifier)
+        if frozen:
+            new_graph.freeze()
+        return new_graph
+
+
+class _FrozenMachineGraph(MachineGraph):
+    """ A frozen graph whose vertices can fit on the chips of a machine.
+    """
+    # This is declared in the same file due to the circular dependency
+
+    __slots__ = ["__frozen"]
+
+    def __init__(self, label):
+        super(_FrozenMachineGraph, self).__init__(label)
+        self.__frozen = False
+
+    def freeze(self):
+        """
+        blocks any farther attempt to add to this graph
+
+        :return:
+        """
+        self.__frozen = True
+
+    @overrides(MachineGraph.add_edge)
+    def add_edge(self, edge, outgoing_edge_partition_name):
+        if self.__frozen:
+            raise PacmanConfigurationException(
+                "Please add edges via simulator not directly to this graph")
+        super(_FrozenMachineGraph, self).add_edge(
+            edge, outgoing_edge_partition_name)
+
+    @overrides(MachineGraph.add_vertex)
+    def add_vertex(self, vertex):
+        if self.__frozen:
+            raise PacmanConfigurationException(
+                "Please add vertices via simulator not directly to this graph")
+        super(_FrozenMachineGraph, self).add_vertex(vertex)
+
+    @overrides(MachineGraph.add_outgoing_edge_partition)
+    def add_outgoing_edge_partition(self, outgoing_edge_partition):
+        if self.__frozen:
+            raise PacmanConfigurationException(
+                "Please add partitions via simulator not directly to this "
+                "graph")
+        super(_FrozenMachineGraph, self).add_outgoing_edge_partition(
+            outgoing_edge_partition)

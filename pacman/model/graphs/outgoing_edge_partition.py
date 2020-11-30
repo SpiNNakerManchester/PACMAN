@@ -205,3 +205,15 @@ class OutgoingEdgePartition(ConstrainedObject):
         :rtype: bool
         """
         return edge in self._edges
+
+    def clone_without_edges(self):
+        """ Make a copy of this edge partition for insertion into another \
+            graph.
+
+        :rtype: OutgoingEdgePartition
+        """
+        second = OutgoingEdgePartition(
+            self.identifier, self._allowed_edge_types, self.constraints,
+            self.label, self.traffic_weight)
+        second._pre_vertex = self._pre_vertex
+        return second
