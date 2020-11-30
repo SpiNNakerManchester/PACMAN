@@ -31,7 +31,6 @@
 import os
 import inspect
 import six
-from sphinx import apidoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -58,6 +57,8 @@ root_package = "pacman"
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
     'numpy': ("https://numpy.org/doc/stable/", None),
+    'jsonschema': (
+        'https://python-jsonschema.readthedocs.io/en/stable/', None),
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None)}
 
@@ -376,32 +377,62 @@ def setup(app):
     app.connect('autodoc-skip-member', maybe_skip)
 
 
+# We want to document __call__ when encountered
+autodoc_default_options = {
+    "members": True,
+    "special-members": "__call__"
+}
+
 # Do the rst generation
 for f in os.listdir("."):
     if (os.path.isfile(f) and f.endswith(
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
-base = "../../" + root_package
-apidoc.main([None, '-o', ".", base,
-             base + "/executor/a*/[a-z]*.py",
-             base + "/executor/*reader.py",
-             base + "/executor/[b-z]*.py",
-             base + "/model/*_constraints/[a-z]*.py",
-             base + "/model/constraints/abstract_constraint.py",
-             base + "/model/decorators/*",
-             base + "/model/graphs/application/abstract/[a-z]*.py",
-             base + "/model/graphs/application/ap*.py",
-             base + "/model/graphs/[b-z]*/[a-z]*.py",
-             base + "/model/graphs/abstract_*.py",
-             base + "/model/graphs/[go]*.py",
-             base + "/model/partitioner_splitters/s*.py",
-             base + "/model/partitioner_splitters/abstract/a*.py",
-             base + "/model/placements/[a-z]*.py",
-             base + "/model/resources/[a-z]*.py",
-             base + "/model/routing_*/[a-z]*.py",
-             base + "/model/tags/[a-z]*.py",
-             base + "/operations/router_compressors/[a-ep-z]*.py",
-             base + "/operations/router_compressors/malloc*.py",
-             base + "/operations/router_compressors/m*/[a-z]*.py",
-             base + "/utilities/utility_objs/[a-z]*.py",
-             ])
+
+# UGH!
+output_dir = os.path.abspath(".")
+os.chdir("../..")
+
+arguments = [
+    '-o', output_dir, root_package,
+    # A list of excluded files (not all!) by pattern
+    "pacman/executor/a*/[a-z]*.py",
+    "pacman/executor/*reader.py",
+    "pacman/executor/[b-z]*.py",
+    "pacman/model/*_constraints/[a-z]*.py",
+    "pacman/model/constraints/abstract_constraint.py",
+    "pacman/model/decorators/*",
+    "pacman/model/graphs/*/[a-z]*.py",
+    "pacman/model/graphs/abstract_*.py",
+    "pacman/model/graphs/[go]*.py",
+    "pacman/model/placements/[a-z]*.py",
+    "pacman/model/resources/[a-z]*.py",
+    "pacman/model/routing_*/[a-z]*.py",
+    "pacman/model/tags/[a-z]*.py",
+    "pacman/operations/algorithm_reports/[a-qs-z]*.py",
+    "pacman/operations/algorithm_reports/ro*.py",
+    "pacman/operations/chip_id_allocator_algorithms/[a-z]*.py",
+    "pacman/operations/fixed_route_router/[a-z]*.py",
+    "pacman/operations/multi_cast_router_check_functionality/[a-z]*.py",
+    "pacman/operations/partition_algorithms/[a-z]*.py",
+    "pacman/operations/placer_algorithms/[a-z]*.py",
+    "pacman/operations/rigged_algorithms/[a-z]*.py",
+    "pacman/operations/router_algorithms/[bn]*.py",
+    "pacman/operations/router_compressors/[a-ep-z]*.py",
+    "pacman/operations/router_compressors/malloc*.py",
+    "pacman/operations/router_compressors/m*/[a-z]*.py",
+    "pacman/operations/routing_info_allocator_algorithms/[a-ln-z]*.py",
+    "pacman/operations/routing_info_allocator_algorithms/m*/[a-z]*.py",
+    "pacman/operations/routing_table_generators/[a-z]*.py",
+    "pacman/operations/tag_allocator_algorithms/[a-z]*.py",
+    "pacman/utilities/utility_objs/[a-z]*.py",
+    "pacman/utilities/vertex_sorter.py",
+    ]
+try:
+    # Old style API; Python 2.7
+    from sphinx import apidoc
+    arguments = [None] + arguments
+except ImportError:
+    # New style API; Python 3.6 onwards
+    from sphinx.ext import apidoc
+apidoc.main(arguments)

@@ -300,6 +300,7 @@ class ResourceTracker(object):
             Additional placement constraints supported by the algorithm doing\
             this check
         :raises PacmanInvalidParameterException:
+            If the constraints cannot be satisfied.
         """
 
         # These placement constraints are supported by the resource tracker
@@ -490,6 +491,7 @@ class ResourceTracker(object):
         :param int chip_x: x coord of the chip in question
         :param int chip_y: y coord of the chip in question
         :return: the SDRAM remaining
+        :rtype: int
         """
         chip = self._machine.get_chip_at(chip_x, chip_y)
         return self._sdram_available(chip)
@@ -499,6 +501,7 @@ class ResourceTracker(object):
 
         :param ~spinn_machine.Chip chip: The chip to check the resources of
         :return: The processor ID selected as the best on this chip
+        :rtype: int
         """
 
         # TODO: Check for the best core; currently assumes all are the same
@@ -1133,9 +1136,9 @@ class ResourceTracker(object):
         :type processor_ids: list(int or None)
         :param str board_address:
             the board address to allocate resources of a chip
-        :param list(list(IptagResource)) group_ip_tags:
+        :param list(list(IPtagResource)) group_ip_tags:
             list of lists of IP tag resources
-        :param list(list(ReverseIptagResource)) group_reverse_ip_tags:
+        :param list(list(ReverseIPtagResource)) group_reverse_ip_tags:
             list of lists of reverse IP tag resources
         :return: An iterable of tuples of the x and y coordinates of the used
             chip, the processor_id, and the IP tag and reverse IP tag
@@ -1229,7 +1232,7 @@ class ResourceTracker(object):
         :param int processor_id: The specific processor to use on any chip.
         :param str board_address:
             The board address to allocate resources of a chip
-        :param iterable(IptagResource) ip_tags: iterable of IP tag resources
+        :param iterable(IPtagResource) ip_tags: iterable of IP tag resources
         :param iterable(ReverseIPtagResource) reverse_ip_tags:
             iterable of reverse IP tag resources
         :return: The x and y coordinates of the used chip, the processor_id,
@@ -1408,7 +1411,7 @@ class ResourceTracker(object):
         """ Get the maximum resources available
 
         :param area_code: A set of valid (x, y) coordinates to choose from
-        :type area_code: iterabke(tuple(int,int)) or None
+        :type area_code: iterable(tuple(int,int)) or None
         :return: a resource which shows max resources available
         :rtype: ResourceContainer
         """

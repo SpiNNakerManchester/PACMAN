@@ -31,19 +31,20 @@ logger = logging.getLogger(__name__)
 class RadialPlacer(object):
     """ A placement algorithm that can place a machine graph onto a\
         machine choosing chips radiating in a circle from the boot chip
-
-    :param MachineGraph machine_graph: The machine_graph to place
-    :param ~spinn_machine.Machine machine:
-        The machine with respect to which to partition the application\
-        graph
-    :param int plan_n_timesteps: number of timesteps to plan for
-    :return: A set of placements
-    :rtype: Placements
-    :raise PacmanPlaceException:
-        If something goes wrong with the placement
     """
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
+        """
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param ~spinn_machine.Machine machine:
+            The machine with respect to which to partition the application
+            graph
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :return: A set of placements
+        :rtype: Placements
+        :raise PacmanPlaceException:
+            If something goes wrong with the placement
+        """
         # check that the algorithm can handle the constraints
         self._check_constraints(machine_graph.vertices)
 

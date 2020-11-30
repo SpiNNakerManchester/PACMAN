@@ -56,16 +56,6 @@ class BasicDijkstraRouting(object):
     """ An routing algorithm that can find routes for edges between vertices\
         in a machine graph that have been placed on a machine by the use of a\
         Dijkstra shortest path algorithm.
-
-    :param Placements placements: The placements of the edges
-    :param ~spinn_machine.Machine machine:
-        The machine through which the routes are to be found
-    :param MachineGraph machine_graph: the machine_graph object
-    :param bool use_progress_bar: whether to show a progress bar
-    :return: The discovered routes
-    :rtype: MulticastRoutingTables
-    :raise PacmanRoutingException:
-        If something goes wrong with the routing
     """
 
     __slots__ = [

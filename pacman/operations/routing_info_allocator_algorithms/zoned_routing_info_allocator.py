@@ -32,7 +32,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class ZonedRoutingInfoAllocator(object):
-    """ A routing key allocator that uses fixed zones that are the same for
+    """ A routing key allocator that uses fixed zones that are the same for\
         all vertices.  This will hopefully make the keys more compressible.
 
         Keys will have the format::
@@ -62,7 +62,7 @@ class ZonedRoutingInfoAllocator(object):
         The split between the ``M`` and ``X`` may vary depending on how the
         allocator is called.
 
-        In "global" mode the widths of the fields are pre determined and fixed
+        In "global" mode the widths of the fields are predetermined and fixed
         such that every key will have every field in the same place in the key,
         and the mask is the same for every vertex.
         The global approach is particularly sensitive to the one large and
@@ -75,17 +75,6 @@ class ZonedRoutingInfoAllocator(object):
         Even in none Flexible mode if the sizes are too big to keep ``M`` and
         ``X`` the same size they will be allowed to change for those vertexes
         will a very high number of atoms.
-
-    :param MachineGraph machine_graph:
-        The machine graph to allocate the routing info for
-    :param AbstractMachinePartitionNKeysMap n_keys_map:
-        A map between the edges and the number of keys required by the
-        edges
-    :param bool flexible: Use flexible mode
-    :return: The routing information
-    :rtype: RoutingInfo
-    :raise PacmanRouteInfoAllocationException:
-        If something goes wrong with the allocation
     """
 
     __slots__ = [
@@ -121,8 +110,11 @@ class ZonedRoutingInfoAllocator(object):
             A map between the edges and the number of keys required by the
             edges
         :param bool flexible: Determines if flexible can be use.
-            If False global settings will be attempted
+            If False, global settings will be attempted
+        :return: The routing information
+        :rtype: RoutingInfo
         :raise PacmanRouteInfoAllocationException:
+            If something goes wrong with the allocation
         """
         # check that this algorithm supports the constraints put onto the
         # partitions

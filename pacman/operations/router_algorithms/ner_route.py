@@ -683,11 +683,11 @@ class NerRouteTrafficAware(object):
     __slots__ = []
 
     def __call__(self, machine_graph, machine, placements):
-        """ traffic aware ner router
+        """ traffic-aware ner router
 
-        :param machine_graph: the machine graph
-        :param machine: spinnaker machine
-        :param placements:  pacman.model.placements.placements.py
+        :param MachineGraph machine_graph: the machine graph
+        :param ~spinn_machine.Machine machine: spinnaker machine
+        :param Placements placements: the placements
         :return: a routing table by partition
         :rtype: MulticastRoutingTableByPartition
         """
