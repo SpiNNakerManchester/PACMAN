@@ -46,9 +46,9 @@ class AbstractSplitterPartitioner(object):
             The app edge this machine edge is to be associated with.
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             Machine graph to add edge to.
-        :param ~pacman.model.graphs.OutgoingEdgePartition \
-                app_outgoing_edge_partition:
-            Partition
+        :param app_outgoing_edge_partition: Partition
+        :type app_outgoing_edge_partition:
+            ~pacman.model.graphs.OutgoingEdgePartition
         :param ~pacman.utilities.utility_objs.ResourceTracker resource_tracker:
             The resource tracker.
         """

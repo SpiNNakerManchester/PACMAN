@@ -42,9 +42,8 @@ class AbstractSplitterCommon(object):
     ]
 
     SETTING_SPLITTER_ERROR_MSG = (
-        "The app vertex {} is already governed by this "
-        "{}. And so cannot govern app vertex {}."
-        " Please fix and try again.")
+        "The app vertex {} is already governed by this {}. "
+        "And so cannot govern app vertex {}. Please fix and try again.")
 
     STR_MESSAGE = "{} governing app vertex {}"
 
@@ -58,11 +57,14 @@ class AbstractSplitterCommon(object):
 
     FIXED_ABOVE_MAX = (
         "Illegal attempt to set fixed atoms per core to {} "
-        "as that is abve a previously set max atoms of {}")
+        "as that is above a previously set max atoms of {}")
 
     DEFAULT_SPLITTER_NAME = "AbstractSplitterCommon"
 
     def __init__(self, splitter_name=None):
+        """
+        :param str splitter_name:
+        """
         if splitter_name is None:
             splitter_name = self.DEFAULT_SPLITTER_NAME
         self._splitter_name = splitter_name
@@ -136,10 +138,13 @@ class AbstractSplitterCommon(object):
 
     @property
     def governed_app_vertex(self):
+        """
+        :rtype: ApplicationVertex
+        """
         return self._governed_app_vertex
 
     def set_governed_app_vertex(self, app_vertex):
-        """ sets a app vertex to be governed by this splitter object. \
+        """ Sets a app vertex to be governed by this splitter object. \
             Once set it can't be reset
 
         :param ApplicationVertex app_vertex: the app vertex to govern
@@ -158,6 +163,12 @@ class AbstractSplitterCommon(object):
         app_vertex.splitter = self
 
     def check_supported_constraints(self):
+        """
+        :raise PacmanInvalidParameterException:
+            When partitioner constraints other than
+            :py:class:`MaxVertexAtomsConstraint` and
+            :py:class:`FixedVertexAtomsConstraint` are used.
+        """
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=[self._governed_app_vertex],
             supported_constraints=[
@@ -167,8 +178,10 @@ class AbstractSplitterCommon(object):
     def split(self, resource_tracker, machine_graph):
         """ executes splitting
 
-        :param ResourceTracker resource_tracker: machine resources
-        :param MachineGraph machine_graph: machine graph
+        :param ~pacman.utilities.utility_objs.ResourceTracker resource_tracker:
+            machine resources
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            machine graph
         :return: true if successful, false otherwise
         :rtype: bool
         """
@@ -178,8 +191,10 @@ class AbstractSplitterCommon(object):
     def create_machine_vertices(self, resource_tracker, machine_graph):
         """ method for specific splitter objects to use.
 
-        :param resource_tracker:
-        :param machine_graph:
+        :param ~pacman.utilities.utility_objs.ResourceTracker resource_tracker:
+            machine resources
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            machine graph
         :return: true if successful, false otherwise
         :rtype: bool
         """
@@ -203,7 +218,7 @@ class AbstractSplitterCommon(object):
         edge type/down-stream splitter.
 
         :return: list of Slices and bool of estimate or not
-        :rtype: tuple(list(Slice), bool)
+        :rtype: tuple(list(~pacman.model.graphs.common.Slice), bool)
         """
 
     @abstractmethod
@@ -225,7 +240,7 @@ class AbstractSplitterCommon(object):
         edge type/ down stream splitter.
 
         :return: the slices incoming to this vertex, bool if estimate or exact
-        :rtype: tuple(list(Slice), bool)
+        :rtype: tuple(list(~pacman.model.graphs.common.Slice), bool)
         """
 
     @abstractmethod
@@ -237,12 +252,13 @@ class AbstractSplitterCommon(object):
         description the splitter should use the ones used by the most general
         edge type/ down stream splitter.
 
-        :param ApplicationEdge edge: app edge
-        :param OutgoingEdgePartition outgoing_edge_partition:
-            outgoing edge partition
+        :param ~pacman.model.graphs.application.ApplicationEdge edge: app edge
+        :param outgoing_edge_partition: outgoing edge partition
+        :type outgoing_edge_partition:
+            ~pacman.model.graphs.OutgoingEdgePartition
         :return: dict of keys being machine vertices and values are a list
             of acceptable edge types.
-        :rtype: dict(MachineVertex,list(class))
+        :rtype: dict(~pacman.model.graphs.machine.MachineVertex,list(class))
         """
 
     @abstractmethod
@@ -255,13 +271,15 @@ class AbstractSplitterCommon(object):
         description the splitter should use the ones used by the most general
         edge type/ down stream splitter.
 
-        :param ApplicationEdge edge: app edge
-        :param OutgoingEdgePartition outgoing_edge_partition:
-            outgoing edge partition
-        :param MachineVertex src_machine_vertex: the src machine vertex
+        :param ~pacman.model.graphs.application.ApplicationEdge edge: app edge
+        :param outgoing_edge_partition: outgoing edge partition
+        :type outgoing_edge_partition:
+            ~pacman.model.graphs.OutgoingEdgePartition
+        :param ~pacman.model.graphs.machine.MachineVertex src_machine_vertex:
+            the src machine vertex
         :return: dict of keys being machine vertices and values are a list
             of acceptable edge types.
-        :rtype: dict(MachineVertex,list(class))
+        :rtype: dict(~pacman.model.graphs.machine.MachineVertex,list(class))
         """
 
     @abstractmethod
@@ -270,12 +288,10 @@ class AbstractSplitterCommon(object):
 
         :param str variable_to_record: the variable to get machine verts for.
         :return: list of machine vertices
-        :rtype: iterable(MachineVertex)
+        :rtype: iterable(~pacman.model.graphs.machine.MachineVertex)
         """
 
     @abstractmethod
     def reset_called(self):
-        """ reset the splitter as if it has not operated a splitting yet.
-
-        :rtype: None
+        """ reset the splitter to be as if it has not operated a splitting yet.
         """

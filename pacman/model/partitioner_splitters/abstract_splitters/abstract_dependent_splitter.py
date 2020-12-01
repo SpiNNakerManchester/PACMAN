@@ -35,7 +35,7 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
 
         :param other_splitter: the other splitter to depend upon
         :type other_splitter:
-            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
+            ~pacman.model.partitioner_interfaces.AbstractSplitterCommon
             or None
         :param str splitter_name:
         """
@@ -47,14 +47,15 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
         """ the other splitter
 
         :rtype:
-            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
+            ~pacman.model.partitioner_interfaces.AbstractSplitterCommon
+            or None
         """
         return self._other_splitter
 
     def check_circular(self, upstream):
         if upstream == self:
             return True
-        if not isinstance(upstream,  AbstractDependentSplitter):
+        if not isinstance(upstream, AbstractDependentSplitter):
             return False
         return self.check_circular(upstream.other_splitter)
 
@@ -63,6 +64,7 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
         """ Supports the delayed setting of the other to depend on
 
         :param new_value: other splitter
+        :type new_value: AbstractSplitterCommon or None
         :raise PacmanAlreadyExistsException:
             If there is already a different other set
         :raise PacmanPartitionException:
