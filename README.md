@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/SpiNNakerManchester/PACMAN.svg?branch=master)](https://travis-ci.org/SpiNNakerManchester/PACMAN)
+[![CI Check](https://github.com/SpiNNakerManchester/PACMAN/workflows/Python%20Actions/badge.svg?branch=master)](https://github.com/SpiNNakerManchester/PACMAN/actions?query=workflow%3A%22Python+Actions%22+branch%3Amaster)
 [![Documentation Status](https://readthedocs.org/projects/pacman/badge/?version=latest)](https://pacman.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/PACMAN/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/PACMAN?branch=master)
 
