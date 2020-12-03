@@ -34,14 +34,6 @@ import sys
 class SpreaderPlacer(OneToOnePlacer):
     """ Places vertices on as many chips as available with a effort to\
         reduce the number of packets being received by the router in total.
-
-    :param MachineGraph machine_graph: the machine graph
-    :param ~spinn_machine.Machine machine: the SpiNNaker machine
-    :param AbstractMachinePartitionNKeysMap n_keys_map:
-        the n keys from partition map
-    :param int plan_n_timesteps: number of timesteps to plan for
-    :return: placements.
-    :rtype: Placements
     """
 
     # number of cycles over the machine graph (
@@ -62,6 +54,15 @@ class SpreaderPlacer(OneToOnePlacer):
         OneToOnePlacer.__init__(self)
 
     def __call__(self, machine_graph, machine, n_keys_map, plan_n_timesteps):
+        """
+        :param MachineGraph machine_graph: the machine graph
+        :param ~spinn_machine.Machine machine: the SpiNNaker machine
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+            the n keys from partition map
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :return: placements.
+        :rtype: Placements
+        """
         # create progress bar
         progress_bar = ProgressBar(
             (machine_graph.n_vertices * self.ITERATIONS) + self.STEPS,

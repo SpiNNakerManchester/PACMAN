@@ -27,9 +27,6 @@ _LOWER_16_BITS = 0xFFFF
 class BasicRouteMerger(object):
     """ Merges routing tables entries via different masks and an\
         exploration process
-
-    :param MulticastRoutingTables router_tables:
-    :rtype: MulticastRoutingTables
     """
 
     __slots__ = []

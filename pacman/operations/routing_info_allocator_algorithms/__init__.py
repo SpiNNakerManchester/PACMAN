@@ -16,8 +16,6 @@
 from .basic_routing_info_allocator import BasicRoutingInfoAllocator
 from .destination_based_key_allocator import (
     DestinationBasedRoutingInfoAllocator)
-from .global_zoned_routing_info_allocator import (
-    GlobalZonedRoutingInfoAllocator)
 from .zoned_routing_info_allocator import ZonedRoutingInfoAllocator
 from .malloc_based_routing_allocator.malloc_based_routing_info_allocator \
     import (
@@ -29,6 +27,5 @@ from .malloc_based_routing_allocator.\
 __all__ = ['BasicRoutingInfoAllocator',
            'CompressibleMallocBasedRoutingInfoAllocator',
            'DestinationBasedRoutingInfoAllocator',
-           'GlobalZonedRoutingInfoAllocator',
            'MallocBasedRoutingInfoAllocator',
            'ZonedRoutingInfoAllocator']

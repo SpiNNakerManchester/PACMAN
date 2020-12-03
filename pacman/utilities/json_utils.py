@@ -12,6 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+Miscellaneous minor functions for converting between JSON and Python objects.
+"""
+
 from collections import OrderedDict
 import json
 import gzip
@@ -30,8 +34,7 @@ from pacman.model.resources import (
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
-from pacman.model.placements.placements import Placements
-from pacman.model.placements.placement import Placement
+from pacman.model.placements import Placement, Placements
 
 
 def json_to_object(json_object):
@@ -39,7 +42,7 @@ def json_to_object(json_object):
     Makes sure this is a JSON object reading in a file if required
 
     :param json_object: Either a JSON Object or a string pointing to a file
-    :type json_object: str or dict or list
+    :type json_object: dict or list or str
     :return: a JSON object or an array (list) of JSON objects
     :rtype: dict or list
     """
@@ -69,7 +72,7 @@ def constraint_to_json(constraint):
         If an unexpected constraint is received, the str() and repr() values
         are saved
 
-    If an Exception occurs, that is caught and added to the JSON object.
+        If an Exception occurs, that is caught and added to the JSON object.
 
     :param AbstractConstraint constraint: The constraint to describe
     :return: A dict describing the constraint
@@ -98,7 +101,7 @@ def constraint_to_json(constraint):
                     constraint.key_list_function)
         elif isinstance(constraint, FixedMaskConstraint):
             json_dict["mask"] = constraint.mask
-        elif isinstance(constraint, "ContiguousKeyRangeContraint"):
+        elif isinstance(constraint, "ContiguousKeyRangeConstraint"):
             # No extra parameters
             pass
         else:
@@ -371,6 +374,7 @@ def graph_to_json(graph):
     :param MachineGraph graph:
     :rtype: dict
     """
+    #  TODO Application vertex info needed for ZonedRoutingInfoAllocator
     json_dict = OrderedDict()
     try:
         if graph.label is not None:

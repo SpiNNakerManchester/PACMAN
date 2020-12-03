@@ -114,6 +114,8 @@ class AbstractCompressor(object):
     def compress_table(self, router_table):
         """
         :param UnCompressedMulticastRoutingTable router_table:
+            Original routing table for a single chip
+        :return: Raw compressed routing table entries for the same chip
         :rtype: list(Entry)
         """
 

@@ -14,8 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.operations.router_compressors import (AbstractCompressor, Entry)
-from pacman.operations.router_compressors.mundys_router_compressor import (
-    ordered_covering as rigs_compressor)
+from .ordered_covering import minimise
 
 
 class MundyRouterCompressor(AbstractCompressor):
@@ -29,7 +28,7 @@ class MundyRouterCompressor(AbstractCompressor):
 
     def compress_table(self, router_table):
         """
-        :param AbstractMulticastRoutingTable router_table:
+        :param UnCompressedMulticastRoutingTable router_table:
         :rtype: list(~pacman.operations.router_compressors.Entry)
         """
         # convert to rig inspired format
@@ -40,8 +39,7 @@ class MundyRouterCompressor(AbstractCompressor):
             # Add the new entry
             entries.append(Entry.from_MulticastRoutingEntry(router_entry))
 
-        compressed_router_table_entries = \
-            rigs_compressor.minimise(entries, self._target_length)
-
         # compress the router entries
+        compressed_router_table_entries = minimise(
+            entries, self._target_length)
         return compressed_router_table_entries

@@ -43,7 +43,7 @@ class Entry(object):
     @staticmethod
     def from_MulticastRoutingEntry(mre):
         """
-        :param MulticastRoutingEntry mre:
+        :param ~spinn_machine.MulticastRoutingEntry mre:
         :rtype: Entry
         """
         # Yes I know using _params is ugly but this is for speed
@@ -53,7 +53,7 @@ class Entry(object):
 
     def to_MulticastRoutingEntry(self):
         """
-        :rtype: MulticastRoutingEntry
+        :rtype: ~spinn_machine.MulticastRoutingEntry
         """
         return MulticastRoutingEntry(
             self.key, self.mask, defaultable=self.defaultable,

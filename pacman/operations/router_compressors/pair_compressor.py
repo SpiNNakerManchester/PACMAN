@@ -22,8 +22,8 @@ class PairCompressor(AbstractCompressor):
     """ Routing Table compressor based on brute force. \
     Finds mergable pairs to replace.
 
-    This algorithm assumes unordered routing tables and returns \
-    a possibly ordered routing tables. If unordered it can be used \
+    This algorithm assumes unordered routing tables and returns
+    a possibly ordered routing tables. If unordered it can be used
     as a precompressor for another that makes use of order.
 
     In the simplest format the algorithm is:
@@ -82,21 +82,21 @@ class PairCompressor(AbstractCompressor):
 
     A farther optimisation is to uses order.
     The entries are sorted by route frequency from low to high.
-    The results are considered ordered so previous routes are not \
+    The results are considered ordered so previous routes are not
     considered.
 
-    The advantage is this allows all the entries from the most frequent \
-    route to be merged into a single entry. And the second most \
+    The advantage is this allows all the entries from the most frequent
+    route to be merged into a single entry. And the second most
     frequent only has to consider the most frequent routes.
 
-    Step 1 requires the counting of the frequency of routes and the \
+    Step 1 requires the counting of the frequency of routes and the
     sorting the routes based on this frequency.
-    The current tie break between routes with the same frequency is \
+    The current tie break between routes with the same frequency is
     the route but this is arbitrary at the algorithm level.
-    This code does not use a dictionary to keep the code the same as \
+    This code does not use a dictionary to keep the code the same as
     the C.
 
-    Step 2 is change in that the previous entries \
+    Step 2 is change in that the previous entries
     (0 to _previous_pointer(-1)) are not considered for clash checking
     """
 
@@ -314,11 +314,15 @@ class PairCompressor(AbstractCompressor):
 
     @overrides(AbstractCompressor.compress_table)
     def compress_table(self, router_table):
-        """
-        Compresses all the entries for a single table.
+        """ Compresses all the entries for a single table.
 
         Compressed the entries for this unordered table
         returning a new table with possibly fewer entries but still unordered
+
+        :param UnCompressedMulticastRoutingTable router_table:
+            Original Routing table for a single chip
+        :return: Compressed routing table for the same chip
+        :rtype: list(Entry)
         """
 
         # Split the entries into buckets based on spinnaker_route

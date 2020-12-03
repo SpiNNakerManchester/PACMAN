@@ -40,4 +40,3 @@ class AbstractMachinePartitionNKeysMap(object):
 
         :rtype: iterable(~pacman.model.graphs.OutgoingEdgePartition)
         """
-        pass

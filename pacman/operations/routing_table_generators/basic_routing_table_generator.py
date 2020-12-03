@@ -21,11 +21,6 @@ from pacman.model.routing_tables import (
 
 class BasicRoutingTableGenerator(object):
     """ An basic algorithm that can produce routing tables
-
-    :param RoutingInfo routing_infos:
-    :param MulticastRoutingTableByPartition routing_table_by_partitions:
-    :param ~spinn_machine.Machine machine:
-    :rtype: MulticastRoutingTables
     """
 
     __slots__ = []

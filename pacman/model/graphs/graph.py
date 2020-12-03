@@ -168,7 +168,7 @@ class Graph(ConstrainedObject):
             self._outgoing_edge_partitions_by_pre_vertex[edge.pre_vertex].add(
                 partition)
             self._outgoing_edge_partitions_by_name[key] = partition
-        partition.add_edge(edge)
+        partition.add_edge(edge, id(self))
 
         # Add the edge to the indices
         self._outgoing_edges[edge.pre_vertex].add(edge)
@@ -194,7 +194,9 @@ class Graph(ConstrainedObject):
             cls = self._allowed_partition_types[0]
         else:
             cls = self._allowed_partition_types
-        return cls(name, self._allowed_edge_types)
+        # NOTE: In master there is only one partition class
+        # in SDRAM PR this function has been completely changed
+        return cls(name, self._allowed_edge_types, graph_code=id(self))
 
     def add_edges(self, edges, outgoing_edge_partition_name):
         """ Add a collection of edges to the graph.
@@ -230,6 +232,7 @@ class Graph(ConstrainedObject):
                 "Partitions of this graph must be one of the following types:"
                 " {}".format(self._allowed_partition_types))
 
+        outgoing_edge_partition.register_graph_code(id(self))
         # check this partition doesn't already exist
         key = (outgoing_edge_partition.pre_vertex,
                outgoing_edge_partition.identifier)

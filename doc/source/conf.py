@@ -31,7 +31,6 @@
 import os
 import inspect
 import six
-from sphinx import apidoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -58,7 +57,8 @@ root_package = "pacman"
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
     'numpy': ("https://numpy.org/doc/stable/", None),
-    'jsonschema': ("https://python-jsonschema.readthedocs.io/en/stable/", None),
+    'jsonschema': (
+        'https://python-jsonschema.readthedocs.io/en/stable/', None),
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None)}
 
@@ -76,7 +76,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PACMAN'
-copyright = u'2014-2019'
+copyright = u'2014-2020'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -377,40 +377,57 @@ def setup(app):
     app.connect('autodoc-skip-member', maybe_skip)
 
 
+# We want to document __call__ when encountered
+autodoc_default_options = {
+    "members": True,
+    "special-members": "__call__"
+}
+
 # Do the rst generation
 for f in os.listdir("."):
     if (os.path.isfile(f) and f.endswith(
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
-base = "../../" + root_package
-apidoc.main([None, '-o', ".", base,
-             base + "/executor/a*/[a-z]*.py",
-             base + "/executor/*reader.py",
-             base + "/executor/[b-z]*.py",
-             base + "/model/*_constraints/[a-z]*.py",
-             base + "/model/constraints/abstract_constraint.py",
-             base + "/model/decorators/*",
-             base + "/model/graphs/*/[a-z]*.py",
-             base + "/model/graphs/abstract_*.py",
-             base + "/model/graphs/[go]*.py",
-             base + "/model/placements/[a-z]*.py",
-             base + "/model/resources/[a-z]*.py",
-             base + "/model/routing_*/[a-z]*.py",
-             base + "/model/tags/[a-z]*.py",
-             base + "/operations/chip_id_allocator_algorithms/[a-z]*.py",
-             base + "/operations/fixed_route_router/[a-z]*.py",
-             base + "/operations/multi_cast_router_check_functionality/[a-z]*.py",
-             base + "/operations/partition_algorithms/[a-z]*.py",
-             base + "/operations/placer_algorithms/[a-z]*.py",
-             base + "/operations/rigged_algorithms/[a-z]*.py",
-             base + "/operations/router_algorithms/[b]*.py",
-             base + "/operations/router_compressors/[a-ep-z]*.py",
-             base + "/operations/router_compressors/malloc*.py",
-             base + "/operations/router_compressors/mu*/[r-z]*.py",
-             base + "/operations/routing_info_allocator_algorithms/[bdgz]*.py",
-             base + "/operations/routing_info_allocator_algorithms/m*/[a-z]*.py",
-             base + "/operations/routing_table_generators/[a-z]*.py",
-             base + "/operations/tag_allocator_algorithms/[a-z]*.py",
-             base + "/utilities/utility_objs/[a-z]*.py",
-             base + "/utilities/vertex_sorter.py",
-             ])
+
+
+def filtered_files(base, excludes=None):
+    if not excludes:
+        excludes = []
+    for root, _dirs, files in os.walk(base):
+        for filename in files:
+            if filename.endswith(".py") and not filename.startswith("_"):
+                full = root + "/" + filename
+                if full not in excludes:
+                    yield full
+
+
+# UGH!
+output_dir = os.path.abspath(".")
+os.chdir("../..")
+
+# We only document __init__.py files... except for these special cases.
+# Use the unix full pathname from the root of the checked out repo
+explicit_wanted_files = [
+    "pacman/exceptions.py",
+    "pacman/operations/algorithm_reports/reports.py",
+    "pacman/operations/router_algorithms/routing_tree.py",
+    "pacman/utilities/constants.py",
+    "pacman/utilities/utility_calls.py",
+    "pacman/utilities/json_utils.py",
+    "pacman/utilities/algorithm_utilities/element_allocator_algorithm.py",
+    "pacman/utilities/algorithm_utilities/machine_algorithm_utilities.py",
+    "pacman/utilities/algorithm_utilities/routing_info_allocator_utilities.py",
+    "pacman/utilities/algorithm_utilities/placer_algorithm_utilities.py",
+    "pacman/utilities/algorithm_utilities/partition_algorithm_utilities.py",
+    "pacman/model/partitioner_interfaces/abstract_slices_connect.py",
+    ]
+arguments = ['-o', output_dir, root_package]
+arguments.extend(filtered_files(root_package, explicit_wanted_files))
+try:
+    # Old style API; Python 2.7
+    from sphinx import apidoc
+    arguments = [None] + arguments
+except ImportError:
+    # New style API; Python 3.6 onwards
+    from sphinx.ext import apidoc
+apidoc.main(arguments)

@@ -54,12 +54,6 @@ class SharedEntry(object):
 
 class ZonedRoutingTableGenerator(object):
     """ An algorithm that can produce routing tables in zones
-
-    :param RoutingInfo routing_infos:
-    :param MulticastRoutingTableByPartition routing_table_by_partitions:
-    :param ~spinn_machine.Machine machine:
-    :param dict(ApplicationVertex,BaseKeyAndMask) info_by_app_vertex:
-    :rtype: MulticastRoutingTables
     """
 
     __slots__ = []

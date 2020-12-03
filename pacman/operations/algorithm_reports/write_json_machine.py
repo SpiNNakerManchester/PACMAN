@@ -28,22 +28,19 @@ class WriteJsonMachine(object):
     .. note::
         This is no longer the rig machine format!
 
-    :param ~spinn_machine.Machine machine: Machine to convert
-    :param str json_folder:
-        The folder to which the JSON are being written.
-
-        .. warning::
-             The files in this folder will be overwritten!
-
-    :return: the name of the generated file
-    :rtype: str
     """
 
     def __call__(self, machine, json_folder):
         """ Runs the code to write the machine in readable JSON.
 
-        :param ~spinn_machine.Machine machine:
+        :param ~spinn_machine.Machine machine: Machine to convert
         :param str json_folder:
+            The folder to which JSON files are being written.
+
+            .. warning::
+                 The files in this folder will be overwritten!
+
+        :return: the name of the generated file
         :rtype: str
         """
         # Steps are tojson, validate and writefile

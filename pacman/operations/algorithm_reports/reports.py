@@ -108,7 +108,8 @@ def router_summary_report(
     """ Generates a text file of routing summaries
 
     :param str report_folder: The report folder to store this value.
-    :param MulticastRoutingTables routing_tables: The original routing tables.
+    :param MulticastRoutingTables routing_tables:
+        The original routing tables.
     :param str hostname: The machine's hostname to which the placer worked on.
     :param ~spinn_machine.Machine machine: The python machine object.
     :rtype: RouterSummary
@@ -125,7 +126,8 @@ def router_compressed_summary_report(
     """ Generates a text file of routing summaries
 
     :param str report_folder: The report folder to store this value.
-    :param MulticastRoutingTables routing_tables: The original routing tables.
+    :param MulticastRoutingTables routing_tables:
+        The in-operation routing tables.
     :param str hostname: The machine's hostname to which the placer worked on.
     :param ~spinn_machine.Machine machine: The python machine object.
     :rtype: RouterSummary
