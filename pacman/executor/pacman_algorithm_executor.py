@@ -516,17 +516,18 @@ class PACMANAlgorithmExecutor(object):
         """
         left_over_inputs = "            {}: [".format(algorithm.algorithm_id)
         separator = ""
-        for algorithm_inputs, extra in (
-                (algorithm.required_inputs, ""),
-                (algorithm.optional_inputs, " (optional)")):
+        for algorithm_inputs, extra, required in (
+                (algorithm.required_inputs, "", True),
+                (algorithm.optional_inputs, " (optional)", False)):
             for an_input in algorithm_inputs:
                 unfound_types = [
                     param_type for param_type in an_input.param_types
                     if param_type not in inputs and
-                    param_type not in fake_inputs]
+                    (required or param_type not in fake_inputs)]
                 found_types = [
                     param_type for param_type in an_input.param_types
-                    if param_type in inputs or param_type in fake_inputs]
+                    if param_type in inputs or
+                    (not required and param_type in fake_inputs)]
                 if unfound_types:
                     left_over_inputs += "{}'{}'{}".format(
                         separator, unfound_types, extra)
@@ -534,11 +535,15 @@ class PACMANAlgorithmExecutor(object):
                         left_over_inputs += " (but found '{}')".format(
                             found_types)
                     separator = ", "
-            for a_token in algorithm.required_input_tokens:
+        for algorithm_tokens, extra, required in (
+                (algorithm.required_input_tokens, "", True),
+                (algorithm.optional_input_tokens, " (optional)", False)):
+            for a_token in algorithm_tokens:
                 if (not tokens.is_token_complete(a_token) and
-                        not fake_tokens.is_token_complete(a_token)):
-                    left_over_inputs += "{}'{}'".format(
-                        separator, a_token)
+                        (required or
+                         not fake_tokens.is_token_complete(a_token))):
+                    left_over_inputs += "{}'{}'{}".format(
+                        separator, a_token, extra)
                     separator = ", "
         left_over_inputs += "]\n"
         return left_over_inputs
