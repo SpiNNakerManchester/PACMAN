@@ -56,7 +56,7 @@ class SpecificChipSDRAMResource(object):
 
     def get_value(self):
         """
-        :return: The chip for which it is required, and the amount of SDRAM\
+        :return: The chip for which it is required, and the amount of SDRAM
             required thereon, in bytes.
         :rtype: tuple(~spinn_machine.Chip, AbstractSDRAM)
         """

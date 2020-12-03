@@ -112,9 +112,9 @@ class BaseKeyAndMask(object):
         :param int offset:
             Optional offset into the array at which to start placing keys
         :param int n_keys:
-            Optional limit on the number of keys returned. If less than this\
+            Optional limit on the number of keys returned. If less than this
             number of keys are available, only the keys available will be added
-        :return: A tuple of an array of keys and the number of keys added to\
+        :return: A tuple of an array of keys and the number of keys added to
             the array
         :rtype: tuple(~numpy.ndarray(int), int)
         """

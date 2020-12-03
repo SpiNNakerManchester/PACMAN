@@ -82,7 +82,7 @@ class MachineGraph(Graph):
     @property
     def multicast_partitions(self):
         """
-        Returns a double dictionary of  app id then
+        Returns a double dictionary of app id then
         outgoing_edge_partition_name to a set of machine_vertex that act as
         pre vertices for these multicast edges
 
@@ -91,7 +91,7 @@ class MachineGraph(Graph):
         If the (machine) edge.pre_vertex has no app vertex then the app_id will
         be the machine vertex which will then form its own group of 1
 
-        :rtype dict(Vertex, dict(str, set(MachineVertex))
+        :rtype: dict(ApplicationVertex, dict(str, set(MachineVertex))
         """
         return self._multicast_partitions
 
@@ -108,10 +108,9 @@ class MachineGraph(Graph):
                     raise PacmanInvalidParameterException(
                         "vertex", vertex,
                         self.MISSING_APP_VERTEX_ERROR_MESSAGE)
-        else:
-            if vertex.app_vertex:
-                raise PacmanInvalidParameterException(
-                    "vertex", vertex, self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
+        elif vertex.app_vertex:
+            raise PacmanInvalidParameterException(
+                "vertex", vertex, self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
 
     def clone(self, frozen=False):
         """

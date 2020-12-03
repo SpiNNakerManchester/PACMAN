@@ -38,7 +38,7 @@ class RoutingInfo(object):
         """
         :param partition_info_items: The partition information items to add
         :type partition_info_items: iterable(PartitionRoutingInfo) or None
-        :raise PacmanAlreadyExistsException: If there are \
+        :raise PacmanAlreadyExistsException: If there are
             two partition information objects with the same partition
         """
 

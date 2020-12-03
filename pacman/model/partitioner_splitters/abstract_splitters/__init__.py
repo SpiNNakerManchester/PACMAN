@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020 The University of Manchester
+# Copyright (c) 2020-2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,10 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .legacy_partitioner_api import LegacyPartitionerAPI
-from .abstract_slices_connect import AbstractSlicesConnect
-from .abstract_splitter_partitioner import AbstractSplitterPartitioner
+from .abstract_dependent_splitter import AbstractDependentSplitter
+from .abstract_splitter_common import AbstractSplitterCommon
+from .abstract_splitter_slice import AbstractSplitterSlice
 
-__all__ = [
-    "AbstractSlicesConnect", "AbstractSplitterPartitioner",
-    "LegacyPartitionerAPI"]
+__all__ = ["AbstractDependentSplitter",  "AbstractSplitterCommon",
+           "AbstractSplitterSlice"]

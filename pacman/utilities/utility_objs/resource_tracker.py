@@ -110,10 +110,10 @@ class ResourceTracker(object):
         :param ~spinn_machine.Machine machine:
             The machine to track the usage of
         :param int plan_n_timesteps: number of timesteps to plan for
-        :param chips: If specified, this list of chips will be used instead\
-            of the list from the machine. Note that the order will be\
-            maintained, so this can be used either to reduce the set of chips\
-            used, or to re-order the chips. Note also that on deallocation,\
+        :param chips: If specified, this list of chips will be used instead
+            of the list from the machine. Note that the order will be
+            maintained, so this can be used either to reduce the set of chips
+            used, or to re-order the chips. Note also that on deallocation,
             the order is no longer guaranteed.
         :type chips: iterable(tuple(int, int)) or None
         :param preallocated_resources:
@@ -211,6 +211,10 @@ class ResourceTracker(object):
         else:
             for x, y in chips:
                 self._chips_available.add((x, y))
+
+    @property
+    def plan_n_time_steps(self):
+        return self._plan_n_timesteps
 
     def _convert_preallocated_resources(self, preallocated_resources):
         """ Allocates preallocated SDRAM and specific cores to the trackers.\
@@ -374,7 +378,7 @@ class ResourceTracker(object):
     def _get_usable_chips(self, chips, board_address):
         """ Get all chips that are available on a board given the constraints
 
-        :param chips: iterable of tuples of (x, y) coordinates of chips to \
+        :param chips: iterable of tuples of (x, y) coordinates of chips to
             look though for usable chips, or None to use all available chips
         :type chips: iterable(tuple(int, int))
         :param board_address: the board address to check for usable chips on
@@ -427,10 +431,9 @@ class ResourceTracker(object):
         Check to see if any of the candidates chip have already been used.
         If not this may indicate the Chip was not there. Possibly a dead chip.
 
-        :param chips: iterable of tuples of (x, y) coordinates of chips to \
+        :param chips: iterable of tuples of (x, y) coordinates of chips to
             look though for usable chips, or None to use all available chips
         :type chips: iterable(tuple(int, int))
-        :rtype: None
         :raises PacmanCanNotFindChipException:
         """
         for chip in chips:
