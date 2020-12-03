@@ -88,6 +88,24 @@ class _TokenState(object):
     def incomplete_parts(self):
         return self._incomplete_parts
 
+    def __or__(self, other):
+        """
+        Create a new object which is an or merge of the two
+
+        If a part is completed in either it will be completed
+        If a part is incomplete in either and not completed in the second is
+        will be incomplete
+
+        :param _Token_state other:
+        :rtype:  _TokenState
+        """
+        result = _TokenState()
+        result._complete_parts = self._complete_parts | other._complete_parts
+        result._incomplete_parts = \
+            (self._incomplete_parts | other._incomplete_parts)
+        result._incomplete_parts.difference_update(result._complete_parts)
+        return result
+
 
 class TokenStates(object):
     """ Keeps track of multiple token state objects to determine if they\
@@ -161,3 +179,30 @@ class TokenStates(object):
             return False
 
         return self._tokens[token.name].is_tracking_token_part(token.part)
+
+    def __or__(self, other):
+        """
+        Create a new object which is an or merge of the two
+
+        If a token or part is completed in either it will be completed
+        If a part is incomplete in either and not completed in the second is
+        will be incomplete
+
+        :param other:
+        :return:
+        """
+        result = TokenStates()
+        # Copy in all the tokens
+        for name in self._tokens:
+            if name in other._tokens:
+                # Both so union
+                result._tokens[name] = (
+                        self._tokens[name] | other._tokens[name])
+            else:
+                # only self
+                result._tokens[name] = self._tokens[name]
+        for name in other._tokens:
+            # Add the ones not already unioned from other
+            if not name in self._tokens:
+                result._tokens[name] = other._tokens[name]
+        return result
