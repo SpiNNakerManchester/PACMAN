@@ -47,7 +47,7 @@ class FixedKeyFieldConstraint(AbstractKeyAllocatorConstraint):
         """ Any fields in the mask, i.e., ranges of the mask that have\
             further limitations
 
-        :return: Iterable of fields, ordered by mask with the highest bit\
+        :return: Iterable of fields, ordered by mask with the highest bit
             range first
         :rtype: list(Field)
         """

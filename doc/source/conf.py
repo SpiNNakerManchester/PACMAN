@@ -389,45 +389,40 @@ for f in os.listdir("."):
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
 
+
+def filtered_files(base, excludes=None):
+    if not excludes:
+        excludes = []
+    for root, _dirs, files in os.walk(base):
+        for filename in files:
+            if filename.endswith(".py") and not filename.startswith("_"):
+                full = root + "/" + filename
+                if full not in excludes:
+                    yield full
+
+
 # UGH!
 output_dir = os.path.abspath(".")
 os.chdir("../..")
 
-arguments = [
-    '-o', output_dir, root_package,
-    # A list of excluded files (not all!) by pattern
-    "pacman/executor/a*/[a-z]*.py",
-    "pacman/executor/*reader.py",
-    "pacman/executor/[b-z]*.py",
-    "pacman/model/*_constraints/[a-z]*.py",
-    "pacman/model/constraints/abstract_constraint.py",
-    "pacman/model/decorators/*",
-    "pacman/model/graphs/*/[a-z]*.py",
-    "pacman/model/graphs/abstract_*.py",
-    "pacman/model/graphs/[go]*.py",
-    "pacman/model/placements/[a-z]*.py",
-    "pacman/model/resources/[a-z]*.py",
-    "pacman/model/routing_*/[a-z]*.py",
-    "pacman/model/tags/[a-z]*.py",
-    "pacman/operations/algorithm_reports/[a-qs-z]*.py",
-    "pacman/operations/algorithm_reports/ro*.py",
-    "pacman/operations/chip_id_allocator_algorithms/[a-z]*.py",
-    "pacman/operations/fixed_route_router/[a-z]*.py",
-    "pacman/operations/multi_cast_router_check_functionality/[a-z]*.py",
-    "pacman/operations/partition_algorithms/[a-z]*.py",
-    "pacman/operations/placer_algorithms/[a-z]*.py",
-    "pacman/operations/rigged_algorithms/[a-z]*.py",
-    "pacman/operations/router_algorithms/[bn]*.py",
-    "pacman/operations/router_compressors/[a-ep-z]*.py",
-    "pacman/operations/router_compressors/malloc*.py",
-    "pacman/operations/router_compressors/m*/[a-z]*.py",
-    "pacman/operations/routing_info_allocator_algorithms/[a-ln-z]*.py",
-    "pacman/operations/routing_info_allocator_algorithms/m*/[a-z]*.py",
-    "pacman/operations/routing_table_generators/[a-z]*.py",
-    "pacman/operations/tag_allocator_algorithms/[a-z]*.py",
-    "pacman/utilities/utility_objs/[a-z]*.py",
-    "pacman/utilities/vertex_sorter.py",
+# We only document __init__.py files... except for these special cases.
+# Use the unix full pathname from the root of the checked out repo
+explicit_wanted_files = [
+    "pacman/exceptions.py",
+    "pacman/operations/algorithm_reports/reports.py",
+    "pacman/operations/router_algorithms/routing_tree.py",
+    "pacman/utilities/constants.py",
+    "pacman/utilities/utility_calls.py",
+    "pacman/utilities/json_utils.py",
+    "pacman/utilities/algorithm_utilities/element_allocator_algorithm.py",
+    "pacman/utilities/algorithm_utilities/machine_algorithm_utilities.py",
+    "pacman/utilities/algorithm_utilities/routing_info_allocator_utilities.py",
+    "pacman/utilities/algorithm_utilities/placer_algorithm_utilities.py",
+    "pacman/utilities/algorithm_utilities/partition_algorithm_utilities.py",
+    "pacman/model/partitioner_interfaces/abstract_slices_connect.py",
     ]
+arguments = ['-o', output_dir, root_package]
+arguments.extend(filtered_files(root_package, explicit_wanted_files))
 try:
     # Old style API; Python 2.7
     from sphinx import apidoc

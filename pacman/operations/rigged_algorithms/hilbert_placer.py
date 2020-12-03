@@ -111,7 +111,7 @@ class HilbertPlacer(object):
             tracks the usage of resources of a machine
         :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
         :param Placements placements: Placements of vertices on the machine
-        :param vertices_on_same_chip: a dictionary where keys are a vertex \
+        :param vertices_on_same_chip: a dictionary where keys are a vertex
             and values are a list of vertices
         :type vertices_on_same_chip: dict(MachineVertex,list(MachineVertex))
         :return vertices: an iterable of vertices to be placed
@@ -148,7 +148,7 @@ class HilbertPlacer(object):
 
         :param int level: Number of levels of recursion to use in generating
             the curve. The resulting curve will be `(2**level)-1` wide/tall.
-        :param int angle: `1` if this is the 'positive' \
+        :param int angle: `1` if this is the 'positive'
             expansion of the grammar and `-1` for the 'negative' expansion.
         :param state: The current state of the system in a Hilbert curve.
         :type state:
