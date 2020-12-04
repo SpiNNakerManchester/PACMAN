@@ -419,7 +419,6 @@ explicit_wanted_files = [
     "pacman/utilities/algorithm_utilities/routing_info_allocator_utilities.py",
     "pacman/utilities/algorithm_utilities/placer_algorithm_utilities.py",
     "pacman/utilities/algorithm_utilities/partition_algorithm_utilities.py",
-    "pacman/model/partitioner_interfaces/abstract_slices_connect.py",
     ]
 arguments = ['-o', output_dir, root_package]
 arguments.extend(filtered_files(root_package, explicit_wanted_files))

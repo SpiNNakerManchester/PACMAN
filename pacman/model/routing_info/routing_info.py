@@ -84,7 +84,7 @@ class RoutingInfo(object):
 
         :param OutgoingEdgePartition partition:
             The partition to get the first key of
-        :return: The routing key, or None if the partition does not exist
+        :return: The routing key, or ``None`` if the partition does not exist
         :rtype: int or None
         """
         if partition in self._info_by_partition:

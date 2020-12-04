@@ -134,8 +134,8 @@ class PACMANAlgorithmExecutor(object):
             True if algorithms that have been detected outside of the packages
             argument specified above should be used
         :param str provenance_path:
-            Path to file to append full provenance data to
-            If None no provenance is written
+            Path to file to append full provenance data to.
+            If ``None``, no provenance is written
         :raises PacmanConfigurationException:
             if the configuration cannot be compiled into an execution plan
         """

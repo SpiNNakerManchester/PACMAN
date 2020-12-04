@@ -36,7 +36,7 @@ class MachineVertex(AbstractVertex):
             The optional initial constraints of the vertex
         :param app_vertex:
             The application vertex that caused this machine vertex to be
-            created. If `None`, there is no such application vertex.
+            created. If ``None``, there is no such application vertex.
         :type app_vertex: ApplicationVertex or None
         :param vertex_slice:
             The slice of the application vertex that this machine vertex
@@ -46,7 +46,7 @@ class MachineVertex(AbstractVertex):
             If one of the constraints is not valid
         :raises PacmanValueError: If the slice of the machine_vertex is too big
         :raise AttributeError:
-            If a not None app_vertex is not an ApplicationVertex
+            If a non-``None`` app_vertex is not an ApplicationVertex
         """
         if label is None:
             label = str(type(self))
@@ -61,7 +61,7 @@ class MachineVertex(AbstractVertex):
     @property
     def app_vertex(self):
         """ The application vertex that caused this machine vertex to be\
-            created. If None, there is no such application vertex.
+            created. If ``None``, there is no such application vertex.
 
         :rtype: ApplicationVertex or None
         """

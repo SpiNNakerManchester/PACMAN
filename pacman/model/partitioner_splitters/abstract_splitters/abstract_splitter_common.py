@@ -41,39 +41,39 @@ class AbstractSplitterCommon(object):
         "_is_fixed_atoms_per_core"
     ]
 
-    SETTING_SPLITTER_ERROR_MSG = (
+    _SETTING_SPLITTER_ERROR_MSG = (
         "The app vertex {} is already governed by this {}. "
         "And so cannot govern app vertex {}. Please fix and try again.")
 
-    STR_MESSAGE = "{} governing app vertex {}"
+    _STR_MESSAGE = "{} governing app vertex {}"
 
-    FIX_ATOMS_RESET = (
+    _FIX_ATOMS_RESET = (
         "Illegal attempt to set fixed atoms per core to {} "
         "as it was already set to {}")
 
-    MAX_BELOW_FIXED = (
+    _MAX_BELOW_FIXED = (
         "Illegal attempt to set max atoms per core to {} "
         "as that is lower than the previously set fixed of {}")
 
-    FIXED_ABOVE_MAX = (
+    _FIXED_ABOVE_MAX = (
         "Illegal attempt to set fixed atoms per core to {} "
         "as that is above a previously set max atoms of {}")
 
-    DEFAULT_SPLITTER_NAME = "AbstractSplitterCommon"
+    _DEFAULT_SPLITTER_NAME = "AbstractSplitterCommon"
 
     def __init__(self, splitter_name=None):
         """
         :param str splitter_name:
         """
         if splitter_name is None:
-            splitter_name = self.DEFAULT_SPLITTER_NAME
+            splitter_name = self._DEFAULT_SPLITTER_NAME
         self._splitter_name = splitter_name
         self._max_atoms_per_core = sys.maxsize
         self._is_fixed_atoms_per_core = False
         self._governed_app_vertex = None
 
     def __str__(self):
-        return self.STR_MESSAGE.format(
+        return self._STR_MESSAGE.format(
             self._splitter_name, self._governed_app_vertex)
 
     def __repr__(self):
@@ -105,7 +105,7 @@ class AbstractSplitterCommon(object):
                 # as new also fixed they must be the same
                 if max_atoms_per_core != self._max_atoms_per_core:
                     raise PacmanConfigurationException(
-                        self.FIX_ATOMS_RESET.format(
+                        self._FIX_ATOMS_RESET.format(
                             max_atoms_per_core, self._max_atoms_per_core))
                 else:
                     return  # No change
@@ -113,7 +113,7 @@ class AbstractSplitterCommon(object):
                 # as new a max make sure it is not lower than current fixed
                 if max_atoms_per_core < self._max_atoms_per_core:
                     raise PacmanConfigurationException(
-                        self.MAX_BELOW_FIXED.format(
+                        self._MAX_BELOW_FIXED.format(
                             max_atoms_per_core, self._max_atoms_per_core))
                 else:
                     return  # OK to ignore the max above the fixed
@@ -123,7 +123,7 @@ class AbstractSplitterCommon(object):
                 # As new is fixed max sure it is not higher than max
                 if max_atoms_per_core > self._max_atoms_per_core:
                     raise PacmanConfigurationException(
-                        self.FIXED_ABOVE_MAX.format(
+                        self._FIXED_ABOVE_MAX.format(
                             max_atoms_per_core, self._max_atoms_per_core))
                 else:  # Set the new fixed
                     self._max_atoms_per_core = max_atoms_per_core
@@ -155,7 +155,7 @@ class AbstractSplitterCommon(object):
             return
         if self._governed_app_vertex is not None:
             raise PacmanConfigurationException(
-                self.SETTING_SPLITTER_ERROR_MSG.format(
+                self._SETTING_SPLITTER_ERROR_MSG.format(
                     self._governed_app_vertex, self._splitter_name,
                     app_vertex))
         self._governed_app_vertex = app_vertex
@@ -203,14 +203,14 @@ class AbstractSplitterCommon(object):
     def get_out_going_slices(self):
         """ A best effort prediction of the slices of the output vertices.
 
-        If this method is called after create_machine_vertices the splitter
-        should return the actual slices of the output vertices.
+        If this method is called after :py:meth:`create_machine_vertices` the
+        splitter should return the actual slices of the output vertices.
         The second value returned is then always ``True``
 
-        If this method is called before create_machine_vertices the splitter
-        will have to make an estimate unless the actual slices it will use are
-        already known. The second value returned is ``True`` if and only if
-        the slices will not be changed.
+        If this method is called before :py:meth:`create_machine_vertices` the
+        splitter will have to make an estimate unless the actual slices it will
+        use are already known. The second value returned is ``True`` if and
+        only if the slices will not be changed.
 
         The output vertices are the ones that will serve as source vertices
         for external edges.  If more than one set of vertices match this
@@ -225,14 +225,14 @@ class AbstractSplitterCommon(object):
     def get_in_coming_slices(self):
         """ A best effort prediction of the slices of the input vertices.
 
-        If this method is called after create_machine_vertices the splitter
-        should return the actual slices of the input vertices.
+        If this method is called after :py:meth:`create_machine_vertices`
+        the splitter should return the actual slices of the input vertices.
         The second value returned is then always ``True``
 
-        If this method is called before create_machine_vertices the splitter
-        will have to make an estimate unless the actual slices it will use are
-        already known. The second value returned is ``True`` if and only if
-        the slices will not be changed.
+        If this method is called before :py:meth:`create_machine_vertices`
+        the splitter will have to make an estimate unless the actual slices
+        it will use are already known. The second value returned is ``True``
+        if and only if the slices will not be changed.
 
         The output vertices are the ones that will serve as source vertices
         for external edges.  If more than one set of vertices match this

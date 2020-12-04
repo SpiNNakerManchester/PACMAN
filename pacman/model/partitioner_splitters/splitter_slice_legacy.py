@@ -27,23 +27,23 @@ class SplitterSliceLegacy(AbstractSplitterSlice):
 
     __slots__ = []
 
-    NOT_API_WARNING = (
+    _NOT_API_WARNING = (
         "Your vertex is deprecated. Please add a Splitter or "
         "inherit from the class in "
         "pacman.model.partitioner_interfaces.legacy_partitioner_api")
 
-    NOT_SUITABLE_VERTEX_ERROR = (
+    _NOT_SUITABLE_VERTEX_ERROR = (
         "The vertex {} cannot be supported by the {} as"
         " the vertex does not support the required method {} of "
         "LegacyPartitionerAPI. Please inherit from the class in "
         "pacman.model.partitioner_interfaces.legacy_partitioner_api and try "
         "again.")
 
-    SPLITTER_NAME = "SplitterSliceLegacy"
+    _SPLITTER_NAME = "SplitterSliceLegacy"
 
     def __init__(self, splitter_name=None):
         if splitter_name is None:
-            splitter_name = self.SPLITTER_NAME
+            splitter_name = self._SPLITTER_NAME
         AbstractSplitterSlice.__init__(self, splitter_name)
 
     @overrides(AbstractSplitterSlice.set_governed_app_vertex)
@@ -54,10 +54,10 @@ class SplitterSliceLegacy(AbstractSplitterSlice):
                 check = getattr(app_vertex, abstractmethod, None)
                 if not check:
                     raise PacmanConfigurationException(
-                        self.NOT_SUITABLE_VERTEX_ERROR.format(
+                        self._NOT_SUITABLE_VERTEX_ERROR.format(
                             app_vertex.label, self._splitter_name,
                             abstractmethod))
-                logger.warning(self.NOT_API_WARNING)
+                logger.warning(self._NOT_API_WARNING)
 
     @overrides(AbstractSplitterSlice.create_machine_vertex)
     def create_machine_vertex(

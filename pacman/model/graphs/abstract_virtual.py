@@ -31,7 +31,7 @@ class AbstractVirtual(object):
     @abstractproperty
     def board_address(self):
         """ The IP address of the board to which the device is connected,\
-            or `None` for the boot board.
+            or ``None`` for the boot board.
 
         :rtype: str
         """

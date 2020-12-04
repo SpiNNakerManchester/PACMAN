@@ -57,7 +57,7 @@ class MachineEdge(AbstractEdge):
             The optional weight of traffic expected to travel down this edge
             relative to other edges. (default is 1)
         :param app_edge: The application edge from which this was created.
-            If `None`, this edge is part of a pure machine graph.
+            If ``None``, this edge is part of a pure machine graph.
         :type app_edge: ApplicationEdge or None
         """
         self._label = label

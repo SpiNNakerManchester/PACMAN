@@ -229,8 +229,8 @@ def do_injection(objects_to_inject, objects_to_inject_into=None):
         The objects to be injected as a dict of type name -> object of type
     :type objects_to_inject: dict(str, ...)
     :param objects_to_inject_into:
-        The objects whose classes :py:func:`support_injection`, or None to use
-        all instances that have been created
+        The objects whose classes :py:func:`support_injection`, or ``None`` to
+        use all instances that have been created
     :type objects_to_inject_into: list or None
     """
     if objects_to_inject is None:

@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class SpecificBoardTagResource(object):
+class SpecificBoardIPtagResource(object):
     """ A resource that allocates a tag on a specific board before the class\
         needing it has been built.
     """
@@ -50,15 +50,16 @@ class SpecificBoardTagResource(object):
             with
         :param str ip_address:
             The IP address of the host that will receive data from this tag
-        :param port: The port that will
+        :param port: The port that data from this tag will be sent to, or
+            ``None`` if the port is to be assigned elsewhere
         :type port: int or None
         :param bool strip_sdp: Whether the tag requires that SDP headers are
             stripped before transmission of data
-        :param tag: A fixed tag ID to assign, or None if any tag is OK
+        :param tag: A fixed tag ID to assign, or ``None`` if any tag is OK
         :type tag: int or None
-        :param str traffic_identifier: The traffic to be sent using this tag;
-            traffic with the same traffic_identifier can be sent using
-            the same tag
+        :param str traffic_identifier:
+            The traffic to be sent using this tag; traffic with the same
+            traffic_identifier can be sent using the same tag
         """
         # pylint: disable=too-many-arguments
         self._board = board
@@ -102,7 +103,7 @@ class SpecificBoardTagResource(object):
 
     @property
     def tag(self):
-        """ The tag required, or None if any tag is OK.
+        """ The tag required, or ``None`` if any tag is OK.
 
         :rtype: int or None
         """

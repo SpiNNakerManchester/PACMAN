@@ -202,7 +202,7 @@ class KeyFieldGenerator(object):
 
     @property
     def next_key(self):
-        """ The next key, or `None` if there are no further keys.
+        """ The next key, or ``None`` if there are no further keys.
 
         :rtype: int or None
         """

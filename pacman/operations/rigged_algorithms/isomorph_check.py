@@ -36,7 +36,6 @@ class IsomorphicChecker(object):
             the folder to which the reports are being written
         :param Placements placements:
         :param Placements placements_copy:
-        :return: None
         """
 
         file_name = os.path.join(report_folder, _REPORT_FILENAME)

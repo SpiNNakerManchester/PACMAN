@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class ReverseIPtagResource(object):
+class SpecificBoardReverseIPtagResource(object):
     """ Represents the ability to talk to a specific board of a SpiNNaker\
         machine by sending UDP packets to it during execution.
     """
@@ -41,12 +41,11 @@ class ReverseIPtagResource(object):
         :param str board:
             A board IP address which is where this reverse IP tag is to be
             placed
-        :param port: The target port of the tag or None to assign elsewhere
+        :param port: The target port of the tag or ``None`` to assign elsewhere
         :type port: int or None
-        :param int port: The UDP port to listen to on the board for this tag
         :param int sdp_port: The SDP port number to be used when constructing
             SDP packets from the received UDP packets for this tag.
-        :param tag: A fixed tag ID to assign, or None if any tag is OK
+        :param tag: A fixed tag ID to assign, or ``None`` if any tag is OK
         :type tag: int or None
         """
         self._port = port
@@ -56,7 +55,7 @@ class ReverseIPtagResource(object):
 
     @property
     def port(self):
-        """ The port of the tag
+        """ The port of the tag, or ``None`` if it is not yet assigned.
 
         :rtype: int
         """
@@ -73,9 +72,9 @@ class ReverseIPtagResource(object):
 
     @property
     def tag(self):
-        """ The tag required, or None if any tag is OK
+        """ The tag required, or ``None`` if any tag is OK
 
-        :rtype: int
+        :rtype: int or None
         """
         return self._tag
 

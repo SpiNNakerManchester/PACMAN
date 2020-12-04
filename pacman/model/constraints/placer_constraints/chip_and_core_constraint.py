@@ -67,7 +67,7 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
     @property
     def p(self):
         """ The processor ID on chip (:py:attr:`x`, :py:attr:`y`) that this\
-            vertex is placed on within the SpiNNaker machine, or `None` if\
+            vertex is placed on within the SpiNNaker machine, or ``None`` if\
             that is not constrained.
 
         :rtype: int or None

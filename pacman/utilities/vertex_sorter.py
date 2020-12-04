@@ -41,11 +41,11 @@ class ConstraintOrder(object):
         """
         :param type constraint_class: The class of the constraint
         :param int relative_order:
-            The order of the constraint relative to other constraints to be\
+            The order of the constraint relative to other constraints to be
             sorted
         :param required_optional_properties:
-            Properties of the constraint instances that must not be None for\
-            the constraint to match this ordering
+            Properties of the constraint instances that must not be ``None``
+            for the constraint to match this ordering
         :type required_optional_properties: list(str) or None
         """
         self._constraint_class = constraint_class

@@ -65,26 +65,26 @@ class RoutingTree(object):
     @property
     def children(self):
         """
-        A :py:class:`iterable` of the next steps in the route represented by a\
+        A :py:class:`iterable` of the next steps in the route represented by a
         (route, object) tuple.
 
         .. note::
 
-            Up until Rig 1.5.1, this structure used :py:class:`set`\\ s to \
-            store children. This was changed to :py:class:`list`\\ s since \
-            sets incur a large memory overhead and in practice the set-like \
+            Up until Rig 1.5.1, this structure used :py:class:`set`\\ s to
+            store children. This was changed to :py:class:`list`\\ s since
+            sets incur a large memory overhead and in practice the set-like
             behaviour of the list of children is not useful.
 
-        The object indicates the intended destination of this step in the \
+        The object indicates the intended destination of this step in the
         route. It may be one of:
 
-        * :py:class:`RoutingTree` \
-          representing the continuation of the routing tree after following a \
+        * :py:class:`RoutingTree`
+          representing the continuation of the routing tree after following a
           given link.
-        * A vertex (i.e. some other Python object) when the route terminates \
-          at the supplied vertex. Note that the direction may be None and so \
-          additional logic may be required to determine what core to target to\
-          reach the vertex.
+        * A vertex (i.e. some other Python object) when the route terminates
+          at the supplied vertex. Note that the direction may be ``None`` and
+          so additional logic may be required to determine what core to target
+          to reach the vertex.
 
         :rtype: iterable(RoutingTree or MachineVertex)
         """
@@ -106,9 +106,9 @@ class RoutingTree(object):
         self._children.remove(child)
 
     def __iter__(self):
-        """Iterate over this node and then all its children, recursively and in
-        no specific order. This iterator iterates over the child *objects*
-        (i.e. not the route part of the child tuple).
+        """ Iterate over this node and then all its children, recursively and\
+            in no specific order. This iterator iterates over the child \
+            *objects* (i.e. not the route part of the child tuple).
         """
         yield self
 
@@ -126,12 +126,12 @@ class RoutingTree(object):
             "child" if len(self._children) == 1 else "children")
 
     def traverse(self):
-        """ Traverse the tree yielding the direction taken to a node, the
-        coordinates of that node and the directions leading from the Node.
+        """ Traverse the tree yielding the direction taken to a node, the\
+            coordinates of that node and the directions leading from the Node.
 
-        :return: (direction, (x, y), set(route)) \
-            Direction taken to reach a Node in the tree, the (x, y) coordinate\
-            of that Node and routes leading to children of the Node.
+        :return:
+            Direction taken to reach a Node in the tree, the (x, y) coordinate
+            of that Node, and set of routes leading to children of the Node.
         :rtype: iterable(tuple(int, tuple(int,int), set(int)))
         """
         # A queue of (direction, node) to visit. The direction is the Links

@@ -59,7 +59,7 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
             The module containing the python code to execute
         :param str python_class: The class of the algorithm
         :param python_method:
-            The method of the algorithm, or None if the class is callable
+            The method of the algorithm, or ``None`` if the class is callable
         :type python_method: str or None
         """
         # pylint: disable=too-many-arguments

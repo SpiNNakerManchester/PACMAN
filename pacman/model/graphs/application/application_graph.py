@@ -29,7 +29,7 @@ class ApplicationGraph(Graph):
 
     def __init__(self, label):
         """
-        :param label: The label on the graph, or None
+        :param label: The label on the graph, or ``None``
         :type label: str or None
         """
         super(ApplicationGraph, self).__init__(
@@ -83,7 +83,7 @@ class _FrozenApplicationGraph(ApplicationGraph):
 
     def __init__(self, label):
         """
-        :param label: The label on the graph, or None
+        :param label: The label on the graph, or ``None``
         :type label: str or None
         """
         super(_FrozenApplicationGraph, self).__init__(label)

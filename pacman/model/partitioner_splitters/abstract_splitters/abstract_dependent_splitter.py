@@ -26,16 +26,17 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
         "_other_splitter"
     ]
 
-    CIRCULAR_ERROR_MESSAGE = (
+    _CIRCULAR_ERROR_MESSAGE = (
         "Circular dependency found when setting splitter {} to be "
         "dependent on splitter {}")
 
     def __init__(self, other_splitter, splitter_name):
-        """ Creates a splitter that must be done after the other unless None.
+        """ Creates a splitter that must be done after the other unless \
+            ``None``.
 
         :param other_splitter: the other splitter to depend upon
         :type other_splitter:
-            ~pacman.model.partitioner_interfaces.AbstractSplitterCommon
+            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
             or None
         :param str splitter_name:
         """
@@ -46,13 +47,15 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
     def other_splitter(self):
         """ the other splitter
 
-        :rtype:
-            ~pacman.model.partitioner_interfaces.AbstractSplitterCommon
-            or None
+        :rtype: AbstractSplitterCommon or None
         """
         return self._other_splitter
 
     def check_circular(self, upstream):
+        """
+        :param AbstractSplitterCommon upstream:
+        :rtype: bool
+        """
         if upstream == self:
             return True
         if not isinstance(upstream, AbstractDependentSplitter):
@@ -76,5 +79,5 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
                 "other_splitter", self._other_splitter)
         if self.check_circular(new_value):
             raise PacmanPartitionException(
-                self.CIRCULAR_ERROR_MESSAGE.format(self, new_value))
+                self._CIRCULAR_ERROR_MESSAGE.format(self, new_value))
         self._other_splitter = new_value

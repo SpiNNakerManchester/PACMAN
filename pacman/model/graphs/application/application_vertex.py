@@ -43,7 +43,7 @@ class ApplicationVertex(AbstractVertex):
         # The splitter object associated with this app vertex
         "_splitter"]
 
-    SETTING_SPLITTER_ERROR_MSG = (
+    _SETTING_SPLITTER_ERROR_MSG = (
         "The splitter object on {} has already been set, it cannot be "
         "reset. Please fix and try again. ")
 
@@ -56,7 +56,8 @@ class ApplicationVertex(AbstractVertex):
         :param int max_atoms_per_core: The max number of atoms that can be
             placed on a core, used in partitioning.
         :param splitter: The splitter object needed for this vertex.
-            Leave as None to delegate the choice of splitter to the selector.
+            Leave as ``None`` to delegate the choice of splitter to the
+            selector.
         :type splitter: None or
             ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
         :raise PacmanInvalidParameterException:
@@ -104,7 +105,7 @@ class ApplicationVertex(AbstractVertex):
             return
         if self._splitter is not None:
             raise PacmanConfigurationException(
-                self.SETTING_SPLITTER_ERROR_MSG.format(self._label))
+                self._SETTING_SPLITTER_ERROR_MSG.format(self._label))
         self._splitter = new_value
         self._splitter.set_governed_app_vertex(self)
         self._splitter.check_supported_constraints()

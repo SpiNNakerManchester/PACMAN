@@ -52,7 +52,7 @@ class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
 
             * An iterable of keys and masks
             * A machine edge
-            * Number of keys to generate (may be `None`)
+            * Number of keys to generate (may be ``None``)
         :type key_list_function: callable(iterable(tuple(
             BaseKeyAndMask, MachineEdge, int)), iterable(int)) or None
         """
@@ -79,9 +79,9 @@ class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
         """ A function to call to generate the keys
 
         :return:
-            A python function, or `None` if the default function can be used
+            A python function, or ``None`` if the default function can be used
         :rtype: callable(iterable(tuple(BaseKeyAndMask, MachineEdge, int)),
-            iterable(int))
+            iterable(int)) or None
         """
         return self._key_list_function
 

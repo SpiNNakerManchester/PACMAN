@@ -66,7 +66,7 @@ class Graph(ConstrainedObject):
             A single or tuple of types of partitions to be allowed in the
             graph
         :type allowed_partition_types: type or tuple(type, ...)
-        :param label: The label on the graph, or None
+        :param label: The label on the graph, or ``None``
         :type label: str or None
         """
         super(Graph, self).__init__(None)
@@ -344,7 +344,7 @@ class Graph(ConstrainedObject):
     def get_outgoing_edge_partition_starting_at_vertex(
             self, vertex, outgoing_edge_partition_name):
         """ Get the given outgoing edge partition that starts at the\
-            given vertex, or `None` if no such edge partition exists.
+            given vertex, or ``None`` if no such edge partition exists.
 
         :param AbstractVertex vertex:
             The vertex at the start of the edges in the partition

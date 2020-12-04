@@ -247,7 +247,7 @@ def get_fixed_mask(same_key_group):
 
     :param iterable(MachineEdge) same_key_group:
         Set of edges that are to be assigned the same keys and masks
-    :return: The fixed mask if found, or None
+    :return: The fixed mask if found, or ``None``
     :rtype: tuple(int or None, iterable(Field) or None)
     :raise PacmanValueError: If two edges conflict in their requirements
     """

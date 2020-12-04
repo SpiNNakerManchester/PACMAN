@@ -27,7 +27,7 @@ class Token(object):
     def __init__(self, name, part=None):
         """
         :param str name: The name of the token
-        :param part: The part of the token, or None if no part
+        :param part: The part of the token, or ``None`` if no part
         :type part: str or None
         """
         self._name = name

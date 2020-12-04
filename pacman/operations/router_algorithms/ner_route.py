@@ -51,8 +51,10 @@ def _convert_a_route(
     :param MulticastRoutingTableByPartition routing_tables:
         spinnaker format routing tables
     :param OutgoingEdgePartition partition: Partition this route applies to
-    :param int or None incoming_processor: processor this link came from
-    :param int or None incoming_link: link this link came from
+    :param incoming_processor: processor this link came from
+    :type incoming_processor: int or None
+    :param incoming_link: link this link came from
+    :type incoming_link: int or None
     :param RoutingTree partition_route: algorithm specific format of the route
     """
     x, y = partition_route.chip

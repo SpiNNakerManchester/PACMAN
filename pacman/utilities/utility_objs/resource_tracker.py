@@ -341,7 +341,7 @@ class ResourceTracker(object):
             restricting the allowed chips
         :type chips: iterable(tuple(int, int)) or None
         :return: tuple of a chip x and y coordinates, and processor ID, any of
-            which might be None
+            which might be ``None``
         :rtype: tuple(int or None, int or None, int or None)
         """
         x = None
@@ -379,7 +379,8 @@ class ResourceTracker(object):
         """ Get all chips that are available on a board given the constraints
 
         :param chips: iterable of tuples of (x, y) coordinates of chips to
-            look though for usable chips, or None to use all available chips
+            look though for usable chips, or ``None`` to use all available
+            chips.
         :type chips: iterable(tuple(int, int))
         :param board_address: the board address to check for usable chips on
         :type board_address: str or None
@@ -432,7 +433,8 @@ class ResourceTracker(object):
         If not this may indicate the Chip was not there. Possibly a dead chip.
 
         :param chips: iterable of tuples of (x, y) coordinates of chips to
-            look though for usable chips, or None to use all available chips
+            look though for usable chips, or ``None`` to use all available
+            chips
         :type chips: iterable(tuple(int, int))
         :raises PacmanCanNotFindChipException:
         """
@@ -572,12 +574,13 @@ class ResourceTracker(object):
         :param tag_id: the tag ID to locate
         :type tag_id: int or None
         :param str ip_address: The IP address of the tag
-        :param port: The port of the tag or None if not assigned
+        :param port: The port of the tag or ``None`` if not assigned
         :type port: int or None
         :param bool strip_sdp: True if the tag is to strip SDP header
         :param str traffic_identifier:
             The identifier of the traffic to pass over this tag
-        :return: A board address, tag ID, and port or None, None, None if none
+        :return:
+            A board address, tag ID, and port, or ``None, None, None`` if none
         :rtype: tuple of (str, int, (int or None)) or (None, None, None)
         """
 
@@ -785,7 +788,8 @@ class ResourceTracker(object):
         :param ~spinn_machine.Chip chip: The chip to allocate the resources of
         :param tuple(int,int) key: The (x, y) coordinates of the chip
         :param processor_id:
-            The ID of the processor to allocate, or None to pick automatically
+            The ID of the processor to allocate, or ``None`` to pick
+            automatically
         :type processor_id: int or None
         :rtype: int
         """

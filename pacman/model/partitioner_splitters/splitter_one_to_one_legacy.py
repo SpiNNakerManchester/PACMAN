@@ -28,12 +28,12 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class SplitterOneToOneLegacy(AbstractSplitterCommon):
 
-    NOT_API_WARNING = (
+    _NOT_API_WARNING = (
         "Your vertex is deprecated. Please add a Splitter or "
         "inherit from the class in "
         "pacman.model.partitioner_interfaces.legacy_partitioner_api")
 
-    NOT_SUITABLE_VERTEX_ERROR = (
+    _NOT_SUITABLE_VERTEX_ERROR = (
         "The vertex {} cannot be supported by the {} as"
         " the vertex does not support the required method {} of "
         "LegacyPartitionerAPI. Please inherit from the class in "
@@ -53,7 +53,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         self._resources_required = None
 
     def __str__(self):
-        return self.STR_MESSAGE.format(self._governed_app_vertex)
+        return self._STR_MESSAGE.format(self._governed_app_vertex)
 
     def __repr__(self):
         return self.__str__()
@@ -75,10 +75,10 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
                 check = getattr(app_vertex, abstractmethod, None)
                 if not check:
                     raise PacmanConfigurationException(
-                        self.NOT_SUITABLE_VERTEX_ERROR.format(
+                        self._NOT_SUITABLE_VERTEX_ERROR.format(
                             app_vertex.label, self._splitter_name,
                             abstractmethod))
-                logger.warning(self.NOT_API_WARNING)
+                logger.warning(self._NOT_API_WARNING)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):

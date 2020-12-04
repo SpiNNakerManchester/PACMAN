@@ -58,8 +58,8 @@ class OutgoingEdgePartition(ConstrainedObject):
         :type label: str or None
         :param int traffic_weight:
             The weight of traffic going down this partition
-        :param graph_code: Code of the graph creating this partition
-            or None if created outside of a graph
+        :param int graph_code: Code of the graph creating this partition
+            or ``None`` if created outside of a graph
         """
         super(OutgoingEdgePartition, self).__init__(constraints)
         self._label = label
@@ -74,6 +74,8 @@ class OutgoingEdgePartition(ConstrainedObject):
     def register_graph_code(self, graph_code):
         """
         Allows the graph to register its code when the partition is added
+
+        :param int graph_code:
         """
         if self._graph_code is not None:
             raise PacmanConfigurationException(

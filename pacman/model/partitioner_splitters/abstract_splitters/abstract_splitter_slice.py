@@ -32,24 +32,24 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
 
     __slots__ = ["_called"]
 
-    NOT_SUITABLE_VERTEX_ERROR = (
+    _NOT_SUITABLE_VERTEX_ERROR = (
         "The vertex {} cannot be supported by the {} as "
         "the vertex does not support the required API of "
         "LegacyPartitionerAPI. Please inherit from the class in "
         "pacman.model.partitioner_interfaces.legacy_partitioner_api and try "
         "again.")
 
-    NO_MORE_RESOURCE_AVAILABLE_ERROR = (
+    _NO_MORE_RESOURCE_AVAILABLE_ERROR = (
         "No more of vertex '{}' would fit on the board:\n"
         "    Allocated so far: {} atoms\n"
         "    Request for SDRAM: {}\n"
         "    Largest SDRAM space: {}")
 
-    FAIL_TO_ALLOCATE_RESOURCES = (
+    _FAIL_TO_ALLOCATE_RESOURCES = (
         "Unable to allocate requested resources available to vertex "
         "'{}':\n{}")
 
-    MACHINE_LABEL = "{}:{}:{}"
+    _MACHINE_LABEL = "{}:{}:{}"
 
     def __init__(self, splitter_name):
         super(AbstractSplitterSlice, self).__init__(splitter_name)
@@ -152,7 +152,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
 
             if self._is_fixed_atoms_per_core and ratio > 1.0:
                 raise PacmanPartitionException(
-                    self.NO_MORE_RESOURCE_AVAILABLE_ERROR.format(
+                    self._NO_MORE_RESOURCE_AVAILABLE_ERROR.format(
                         self._governed_app_vertex, lo_atom - 1,
                         used_resources.sdram.get_total_sdram(
                             resource_tracker.plan_n_timesteps),
@@ -181,7 +181,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
             # If we couldn't partition, raise an exception
             if hi_atom < lo_atom:
                 raise PacmanPartitionException(
-                    self.NO_MORE_RESOURCE_AVAILABLE_ERROR.format(
+                    self._NO_MORE_RESOURCE_AVAILABLE_ERROR.format(
                         self._governed_app_vertex, lo_atom - 1,
                         used_resources.sdram.get_total_sdram(
                             resource_tracker.plan_n_time_steps),
@@ -210,7 +210,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
                         used_resources, self._governed_app_vertex.constraints)
             except PacmanValueError as e:
                 raise_from(PacmanValueError(
-                    self.FAIL_TO_ALLOCATE_RESOURCES.format(
+                    self._FAIL_TO_ALLOCATE_RESOURCES.format(
                         self._governed_app_vertex, e)), e)
 
         used_placements.append(
@@ -353,7 +353,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
         for vertex_slice in slices_resources_map:
             machine_vertex = self.create_machine_vertex(
                 vertex_slice, slices_resources_map[vertex_slice],
-                self.MACHINE_LABEL.format(
+                self._MACHINE_LABEL.format(
                     self._governed_app_vertex.label, vertex_slice.lo_atom,
                     vertex_slice.hi_atom),
                 get_remaining_constraints(self._governed_app_vertex))

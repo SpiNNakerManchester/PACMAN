@@ -28,7 +28,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class SplitterOneAppOneMachine(AbstractSplitterCommon):
 
-    NOT_SUITABLE_VERTEX_ERROR = (
+    _NOT_SUITABLE_VERTEX_ERROR = (
         "The vertex {} cannot be supported by the {} as "
         "the vertex does not implement AbstractOneAppOneMachineVertex")
 
@@ -46,7 +46,7 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
     def set_governed_app_vertex(self, app_vertex):
         if not isinstance(app_vertex, AbstractOneAppOneMachineVertex):
             raise PacmanConfigurationException(
-                self.NOT_SUITABLE_VERTEX_ERROR.format(
+                self._NOT_SUITABLE_VERTEX_ERROR.format(
                     app_vertex.label, self._splitter_name))
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
 
