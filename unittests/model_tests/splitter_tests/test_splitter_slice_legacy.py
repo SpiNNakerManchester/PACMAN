@@ -16,12 +16,11 @@
 import unittest
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.partitioner_interfaces import  LegacyPartitionerAPI
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 
 
 class MockLegacyApi(ApplicationVertex, LegacyPartitionerAPI):
-
     def __init__(self, label):
         super(MockLegacyApi, self).__init__(
             label=label, constraints=None,  max_atoms_per_core=None)
@@ -39,7 +38,6 @@ class MockLegacyApi(ApplicationVertex, LegacyPartitionerAPI):
 
 
 class MockLegacy(ApplicationVertex):
-
     def __init__(self, label):
         super(MockLegacy, self).__init__(
             label=label, constraints=None,  max_atoms_per_core=None)
@@ -57,7 +55,6 @@ class MockLegacy(ApplicationVertex):
 
 
 class MockNotLegacy(ApplicationVertex):
-
     def __init__(self, label):
         super(MockNotLegacy, self).__init__(
             label=label, constraints=None,  max_atoms_per_core=None)
@@ -67,13 +64,14 @@ class MockNotLegacy(ApplicationVertex):
 
 
 class TestSplitterSliceLegacy(unittest.TestCase):
-
     def test_api(self):
         splitter = SplitterSliceLegacy("foo")
         a = str(splitter)
+        self.assertIsNotNone(a)
         v1 = MockLegacyApi("v1")
         splitter.set_governed_app_vertex(v1)
         a = str(splitter)
+        self.assertIsNotNone(a)
         splitter.set_governed_app_vertex(v1)
         v2 = MockLegacyApi("v1")
         with self.assertRaises(PacmanConfigurationException):
@@ -171,4 +169,3 @@ class TestSplitterSliceLegacy(unittest.TestCase):
         splitter.set_max_atoms_per_core(100, True)
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_max_atoms_per_core(50, True)
-
