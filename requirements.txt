@@ -15,9 +15,9 @@
 
 six
 enum34
-# numpy 1.20 only supported in Python 3.7 onwards
-# numpy 1.21 only supported in Python 3.8 onwards
-numpy >= 1.12, <= 1.19
+numpy >= 1.12, <= 1.19; python_version <= '3.6'
+numpy >= 1.12, <= 1.20; python_version <= '3.7'
+numpy; python_version >= '3.8'
 future
 lxml
 jsonschema
