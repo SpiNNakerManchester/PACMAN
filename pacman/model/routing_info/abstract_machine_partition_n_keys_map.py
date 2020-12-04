@@ -37,4 +37,3 @@ class AbstractMachinePartitionNKeysMap(object):
     @abstractmethod
     def __iter__(self):
         """ Returns an iterator over the mapped partitions"""
-        pass

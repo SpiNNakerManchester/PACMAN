@@ -22,30 +22,31 @@ from .utils import intersect
 from pacman.exceptions import MinimisationFailedError
 
 
-def minimise(table, target_length, check_for_aliases=True):
+def remove_default_routes(table, target_length, check_for_aliases=True):
     """
     Remove from the routing table any entries which could be replaced by
     default routing.
 
-    :param RoutingTableEntry routing_table: Routing entries to be merged.
+    :param list(Entry) table: Routing entries to be merged.
     :param target_length:
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
-        possible. If None then the table will be made as small as possible.
+        possible. If ``None`` then the table will be made as small as possible.
     :type target_length: int or None
     :param bool check_for_aliases:
-        If True (the default), default-route candidates are checked for aliased
-        entries before suggesting a route may be default routed. This check is
-        required to ensure correctness in the general case but has a runtime
-        complexity of O(N^2) in the worst case for N-entry tables.
+        If ``True`` (the default), default-route candidates are checked for
+        aliased entries before suggesting a route may be default routed. This
+        check is required to ensure correctness in the general case but has a
+        runtime complexity of O(N\\ :sup:`2`) in the worst case for N-entry
+        tables.
 
-        If False, the alias-check is skipped resulting in O(N) runtime. This
-        option should only be used if the supplied table is guaranteed not to
-        contain any aliased entries.
-    :rtype: list(RoutingTableEntry)
-    :raises MinimisationFailedError: \
-        If the smallest table that can be produced is larger than \
-        `target_length`.
+        If ``False``, the alias-check is skipped resulting in O(N) runtime.
+        This option should only be used if the supplied table is guaranteed not
+        to contain any aliased entries.
+    :rtype: list(Entry)
+    :raises MinimisationFailedError:
+        If the smallest table that can be produced is larger than
+        ``target_length``.
     """
     # If alias checking is required, see if we can cheaply prove that no
     # aliases exist in the table to skip this costly check.

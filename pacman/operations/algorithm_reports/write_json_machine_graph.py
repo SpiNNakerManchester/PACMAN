@@ -60,16 +60,16 @@ class NumpyEncoder(json.JSONEncoder):
 class WriteJsonMachineGraph(object):
     """ Converter (:py:obj:`callable`) from :py:class:`MulticastRoutingTables`
         to JSON.
-
-    :param MachineGraph machine_graph: The machine_graph to place
-    :param str json_folder:
-        The folder to which the reports are being written
-    :return: The name of the actual file that was written
-    :rtype: str
     """
 
     def __call__(self, machine_graph, json_folder):
         """ Runs the code to write the machine in Java readable JSON.
+
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param str json_folder:
+            The folder to which the reports are being written
+        :return: The name of the actual file that was written
+        :rtype: str
         """
         # Steps are tojson, validate and writefile
         progress = ProgressBar(3, "Converting to JSON MachineGraph")
@@ -83,7 +83,7 @@ class WriteJsonMachineGraph(object):
 
         :param MachineGraph machine_graph: The machine_graph to place
         :param str json_folder:
-            The folder to which the json are being written
+            The folder to which the JSON are being written
 
             .. warning::
                 Will overwrite existing file in this folder!

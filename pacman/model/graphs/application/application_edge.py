@@ -77,48 +77,6 @@ class ApplicationEdge(AbstractEdge):
     def label(self):
         return self._label
 
-    def create_machine_edge(self, pre_vertex, post_vertex, label):
-        """ Create a machine edge between two machine vertices that is a \
-            machine-level embodiment of this application edge.
-
-        If you are thinking about overriding this, you probably ought to
-        override :py:meth:`~._create_machine_edge` instead; this is a wrapper
-        round that method that handles application-edge level bookkeeping.
-
-        :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
-            The machine vertex at the start of the edge.
-        :param ~pacman.model.graphs.machine.MachineVertex post_vertex:
-            The machine vertex at the end of the edge.
-        :param label: label of the edge
-        :type label: str or None
-        :return: The created machine edge
-        :rtype: ~pacman.model.graphs.machine.MachineEdge
-        """
-        m_edge = self._create_machine_edge(pre_vertex, post_vertex, label)
-        self.remember_associated_machine_edge(m_edge)
-        return m_edge
-
-    def _create_machine_edge(self, pre_vertex, post_vertex, label):
-        """ Create a machine edge between two machine vertices that is a \
-            machine-level embodiment of this application edge.
-
-        This method is intended to be easy to override if alternate arguments
-        are to be passed to the relevant machine edge constructor. It should
-        only ever be called from :py:meth:`~create_machine_edge`.
-
-        :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
-            The machine vertex at the start of the edge.
-        :param ~pacman.model.graphs.machine.MachineVertex post_vertex:
-            The machine vertex at the end of the edge.
-        :param label: label of the edge
-        :type label: str or None
-        :return: The created machine edge
-        :rtype: ~pacman.model.graphs.machine.MachineEdge
-        """
-        return self._machine_edge_type(
-            pre_vertex, post_vertex, self._traffic_type, label=label,
-            app_edge=self)
-
     @property
     @overrides(AbstractEdge.pre_vertex)
     def pre_vertex(self):

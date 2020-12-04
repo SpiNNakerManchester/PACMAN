@@ -12,6 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+Miscellaneous minor functions for converting between JSON and Python objects.
+"""
+
 from collections import OrderedDict
 import json
 import gzip
@@ -30,7 +34,6 @@ from pacman.model.resources import (
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
-from pacman.model.placements.placements import Placements
 from pacman.model.placements.placement import Placement
 
 
@@ -39,7 +42,9 @@ def json_to_object(json_object):
     Makes sure this is a JSON object reading in a file if required
 
     :param json_object: Either a JSON Object or a string pointing to a file
+    :type json_object: dict or list or str
     :return: a JSON object
+    :rtype: dict or list
     """
     if isinstance(json_object, str):
         if json_object.endswith(".gz"):
@@ -60,15 +65,18 @@ _SIZE_CONSTRAINTS = (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)
 def constraint_to_json(constraint):
     """ Converts a constraint to JSON.
 
-    Note: Vertexes are represented by just their label.
+    .. note::
 
-    Note: If an unexpected constraint is received, the str() and repr() values
-    are saved
+        Vertexes are represented by just their label.
 
-    If an Exception occurs, that is caught and added to the JSON object.
+        If an unexpected constraint is received, the str() and repr() values
+        are saved
 
-    :param constraint: The constraint to describe
+        If an Exception occurs, that is caught and added to the JSON object.
+
+    :param AbstractConstraint constraint: The constraint to describe
     :return: A dict describing the constraint
+    :rtype: dict
     """
     json_dict = OrderedDict()
     try:
@@ -93,7 +101,7 @@ def constraint_to_json(constraint):
                     constraint.key_list_function)
         elif isinstance(constraint, FixedMaskConstraint):
             json_dict["mask"] = constraint.mask
-        elif isinstance(constraint, "ContiguousKeyRangeContraint"):
+        elif isinstance(constraint, "ContiguousKeyRangeConstraint"):
             # No extra parameters
             pass
         else:
@@ -364,14 +372,6 @@ def placement_from_json(json_dict, graph=None):
     vertex = vertex_lookup(json_dict["vertex_label"], graph)
     return Placement(
         vertex, int(json_dict["x"]), int(json_dict["y"]), int(json_dict["p"]))
-
-
-def placements_from_json(json_list, graph=None):
-    json_list = json_to_object(json_list)
-    placements = Placements()
-    for json_placement in json_list:
-        placements.add_placement(placement_from_json(json_placement))
-    return placements
 
 
 def partition_to_n_keys_map_to_json(partition_to_n_keys_map):

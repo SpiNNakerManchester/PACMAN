@@ -23,16 +23,6 @@ from pacman.exceptions import (
 class FixedRouteRouter(object):
     """ Computes the fixed routes used to direct data out traffic to the
         board-local gatherer processors.
-
-    :param ~spinn_machine.Machine machine: SpiNNMachine object
-    :param Placements placements: placements object
-    :param destination_class: the destination class to route packets to
-    :type destination_class: type or tuple(type,...)
-    :return: router tables for fixed route paths
-    :rtype: dict(tuple(int,int), ~spinn_machine.FixedRouteEntry)
-    :raises PacmanConfigurationException: if no placement processor found
-    :raises PacmanRoutingException:
-    :raises PacmanAlreadyExistsException:
     """
 
     __slots__ = [

@@ -45,20 +45,22 @@ def _conflict(x, y, post_x, post_y):
 class OneToOnePlacer(RadialPlacer):
     """ Placer that puts vertices which are directly connected to only its\
         destination on the same chip
-
-    :param MachineGraph machine_graph: The machine_graph to place
-    :param ~spinn_machine.Machine machine:
-        The machine with respect to which to partition the application graph
-    :param int plan_n_timesteps: number of timesteps to plan for
-    :return: A set of placements
-    :rtype: Placements
-    :raise PacmanPlaceException:
-        If something goes wrong with the placement
     """
 
     __slots__ = []
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
+        """
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param ~spinn_machine.Machine machine:
+            The machine with respect to which to partition the application
+            graph
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :return: A set of placements
+        :rtype: Placements
+        :raise PacmanPlaceException:
+            If something goes wrong with the placement
+        """
         # Iterate over vertices and generate placements
         # +3 covers check_constraints, get_same_chip_vertex_groups and
         #    create_vertices_groups
