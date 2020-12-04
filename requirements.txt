@@ -15,7 +15,9 @@
 
 six
 enum34
-numpy >= 1.12, < 1.9999
+# numpy 1.20 only supported in Python 3.7 onwards
+# numpy 1.21 only supported in Python 3.8 onwards
+numpy >= 1.12, <= 1.19
 future
 lxml
 jsonschema

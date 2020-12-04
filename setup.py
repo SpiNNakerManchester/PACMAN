@@ -78,7 +78,7 @@ setup(
         'six',
         'enum34',
         'future',
-        'numpy',
+        'numpy >=1.12, <= 1.19',
         'lxml',
         'jsonschema',
         'sortedcollections'],
