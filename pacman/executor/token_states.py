@@ -203,6 +203,6 @@ class TokenStates(object):
                 result._tokens[name] = self._tokens[name]
         for name in other._tokens:
             # Add the ones not already unioned from other
-            if not name in self._tokens:
+            if name not in self._tokens:
                 result._tokens[name] = other._tokens[name]
         return result
