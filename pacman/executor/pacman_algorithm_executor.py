@@ -406,6 +406,12 @@ class PACMANAlgorithmExecutor(object):
             if suitable_algorithm:
                 return suitable_algorithm, algorithms
 
+        for (algorithms, check_outputs, force_required) in order:
+            suitable_algorithm = self.__find_algorithm_in_list(
+                algorithms, input_types, generated_outputs,
+                token_states, fake_inputs, fake_tokens,
+                check_outputs, force_required)
+
         # Failed to find an algorithm to run!
         algorithms_to_find_names = [
             alg.algorithm_id for alg in algorithms_to_find]
@@ -433,13 +439,13 @@ class PACMANAlgorithmExecutor(object):
         # create complete token string
         completed_tokens_string = ""
         for token in token_states.get_completed_tokens():
-            completed_tokens_string += "{}, ".format(token.name)
+            completed_tokens_string += "{}:{}, ".format(token.name, token.part)
 
         # create fake token string
         fake_token_string = ""
         for token in fake_tokens.get_completed_tokens():
             fake_token_string += (
-                "{},{} ".format(token.name, token.part))
+                "{}:{}, ".format(token.name, token.part))
 
         # tokens to find string
         token_to_find_string = ""
@@ -447,7 +453,7 @@ class PACMANAlgorithmExecutor(object):
             token = token_states.get_token(token_name)
             for incomplete_part in token.incomplete_parts:
                 token_to_find_string += (
-                    "{}:{}".format(token_name, incomplete_part))
+                    "{}:{}, ".format(token_name, incomplete_part))
 
         raise PacmanConfigurationException(
             "Unable to deduce a future algorithm to use.\n"
@@ -515,17 +521,19 @@ class PACMANAlgorithmExecutor(object):
         """
         left_over_inputs = "            {}: [".format(algorithm.algorithm_id)
         separator = ""
-        for algorithm_inputs, extra in (
-                (algorithm.required_inputs, ""),
-                (algorithm.optional_inputs, " (optional)")):
+        all_inputs = inputs | fake_inputs
+        all_tokens = tokens | fake_tokens
+        for algorithm_inputs, extra, the_inputs, the_tokens in (
+                (algorithm.required_inputs, "", inputs, tokens),
+                (algorithm.optional_inputs, " (optional)", all_inputs,
+                 all_tokens)):
             for an_input in algorithm_inputs:
                 unfound_types = [
                     param_type for param_type in an_input.param_types
-                    if param_type not in inputs and
-                    param_type not in fake_inputs]
+                    if param_type not in the_inputs]
                 found_types = [
                     param_type for param_type in an_input.param_types
-                    if param_type in inputs or param_type in fake_inputs]
+                    if param_type in the_inputs]
                 if unfound_types:
                     left_over_inputs += "{}'{}'{}".format(
                         separator, unfound_types, extra)
@@ -534,8 +542,7 @@ class PACMANAlgorithmExecutor(object):
                             found_types)
                     separator = ", "
             for a_token in algorithm.required_input_tokens:
-                if (not tokens.is_token_complete(a_token) and
-                        not fake_tokens.is_token_complete(a_token)):
+                if (not the_tokens.is_token_complete(a_token)):
                     left_over_inputs += "{}'{}'".format(
                         separator, a_token)
                     separator = ", "

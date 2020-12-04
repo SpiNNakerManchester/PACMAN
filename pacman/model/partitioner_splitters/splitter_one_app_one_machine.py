@@ -34,23 +34,21 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
 
     __slots__ = []
 
-    def __init__(self):
-        AbstractSplitterCommon.__init__(
-            self, splitter_name=type(self).__name__)
-
-    def __str__(self):
-        return self.STR_MESSAGE.format(self._governed_app_vertex)
+    def __init__(self, splitter_name=None):
+        if splitter_name is None:
+            splitter_name = type(self).__name__
+        AbstractSplitterCommon.__init__(self, splitter_name)
 
     def __repr__(self):
         return self.__str__()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
-        AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, AbstractOneAppOneMachineVertex):
             raise PacmanConfigurationException(
                 self.NOT_SUITABLE_VERTEX_ERROR.format(
                     app_vertex.label, self._splitter_name))
+        AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
