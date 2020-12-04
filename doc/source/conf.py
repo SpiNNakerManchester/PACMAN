@@ -56,7 +56,7 @@ root_package = "pacman"
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
-    'numpy': ("https://numpy.org/doc/stable/", None),
+    'numpy': ("https://numpy.org/doc/1.19/", None),
     'jsonschema': (
         'https://python-jsonschema.readthedocs.io/en/stable/', None),
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
