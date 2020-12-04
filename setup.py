@@ -79,7 +79,7 @@ setup(
         'enum34',
         'future',
         "numpy >= 1.12, <= 1.19; python_version <= '3.6'",
-        "numpy >= 1.12, <= 1.20; python_version <= '3.7'",
+        "numpy >= 1.12, <= 1.20; python_version == '3.7'",
         "numpy; python_version >= '3.8'",
         'lxml',
         'jsonschema',
