@@ -12,17 +12,3 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-six
-enum34
-numpy == 1.16; python_version == '2.7'
-numpy == 1.18; python_version == '3.5'
-numpy == 1.19; python_version == '3.6'
-numpy >= 1.19, <= 1.20; python_version == '3.7'
-numpy; python_version >= '3.8'
-future
-lxml
-jsonschema
-sortedcollections
-SpiNNUtilities >= 1!5.1.1, < 1!6.0.0
-SpiNNMachine >= 1!5.1.1, < 1!6.0.0
