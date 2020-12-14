@@ -1,0 +1,61 @@
+# Copyright (c) 2020 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+name: Publish
+on:
+  push:
+    branches: [ master ]
+env:
+  DEPLOY_DIR: doc/source/_build/html
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Checkout SupportScripts
+      uses: actions/checkout@v2
+      with:
+        repository: SpiNNakerManchester/SupportScripts
+        path: support
+        ref: actions
+    - name: Install pip, etc
+      uses: ./support/actions/python-tools
+      with:
+        coverage: false
+    - name: Checkout SpiNNaker Dependencies
+      uses: ./support/actions/checkout-spinn-deps
+      with:
+        repositories: SpiNNUtils SpiNNMachine
+        install: true
+    - name: Install Python code
+      uses: ./support/actions/run-setup
+    - name: Build Python documentation
+      uses: ./support/actions/sphinx
+      with:
+        directory: doc/source
+    - name: Prepare for Deploy
+      run: touch .nojekyll
+      working-directory: ${{ env.DEPLOY_DIR }}
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages
+        folder: ${{ env.DEPLOY_DIR }}
