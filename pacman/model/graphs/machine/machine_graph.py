@@ -61,7 +61,7 @@ class MachineGraph(Graph):
 
     UNEXPECTED_APP_VERTEX_ERROR_MESSAGE = (
         "The vertex has an app_vertex, "
-        "which is not allowed when others not have app_vertices.")
+        "which is not allowed when other vertices not have app_vertices.")
 
     def __init__(self, label, application_graph=None):
         """
