@@ -108,9 +108,9 @@ class ResourceTracker(object):
     ]
 
     ALLOCATION_SDRAM_ERROR = (
-        "allocating of {} SDRAM on chip {}:{} has failed as there is "
-        "only {} SDRAM available on the chip at this time. Please fix and "
-        "try again")
+        "Allocating of {} bytes of SDRAM on chip {}:{} has failed as there "
+        "are only {} bytes of SDRAM available on the chip at this time. "
+        "Please fix and try again")
 
     def __init__(self, machine, plan_n_timesteps, chips=None,
                  preallocated_resources=None):
