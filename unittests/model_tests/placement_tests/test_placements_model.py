@@ -73,8 +73,6 @@ class TestPlacements(unittest.TestCase):
 
         pls = Placements(pl)
         for i in range(4):
-            vertex = pls.get_vertex_on_processor(0, 0, i)
-            self.assertEqual(pls.get_vertex_on_processor(0, 0, i), subv[i])
             self.assertEqual(
                 pls.get_placement_on_processor(0, 0, i).vertex, subv[i])
 
