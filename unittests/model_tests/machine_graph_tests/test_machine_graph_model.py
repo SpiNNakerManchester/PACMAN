@@ -256,7 +256,7 @@ class TestMachineGraphModel(unittest.TestCase):
         self.assertIn(mach3, app1.machine_vertices)
         self.assertIn(mach4, app2.machine_vertices)
 
-    def test_at_vertexc_methods(self):
+    def test_at_vertex_methods(self):
         graph = MachineGraph("foo")
         mach1 = SimpleMachineVertex("mach1")
         mach2 = SimpleMachineVertex("mach2")
