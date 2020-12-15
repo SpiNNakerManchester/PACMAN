@@ -19,12 +19,13 @@ based on https://github.com/project-rig/
 
 from abc import abstractmethod
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import MinimisationFailedError
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class AbstractCompressor(object):

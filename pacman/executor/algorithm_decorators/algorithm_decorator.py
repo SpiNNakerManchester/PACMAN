@@ -25,6 +25,7 @@ import pkgutil
 import sys
 from threading import RLock
 from six import iteritems
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanConfigurationException
 from pacman.executor.algorithm_classes import (
@@ -41,7 +42,7 @@ _algorithms = dict()
 # A lock of the algorithms
 _algorithm_lock = RLock()
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class AllOf(object):

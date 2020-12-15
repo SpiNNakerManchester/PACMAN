@@ -15,6 +15,7 @@
 
 from collections import deque
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint, SameChipAsConstraint)
@@ -24,7 +25,7 @@ from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class RadialPlacer(object):
