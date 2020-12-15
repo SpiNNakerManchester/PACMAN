@@ -18,6 +18,8 @@ from .application_fpga_vertex import ApplicationFPGAVertex
 from .application_graph import ApplicationGraph
 from .application_spinnaker_link_vertex import ApplicationSpiNNakerLinkVertex
 from .application_vertex import ApplicationVertex
+from .application_edge_partition import ApplicationEdgePartition
 
-__all__ = ["ApplicationEdge", "ApplicationFPGAVertex", "ApplicationGraph",
-           "ApplicationVertex", "ApplicationSpiNNakerLinkVertex"]
+__all__ = ["ApplicationEdge", "ApplicationEdgePartition",
+           "ApplicationFPGAVertex", "ApplicationGraph",
+           "ApplicationSpiNNakerLinkVertex", "ApplicationVertex"]

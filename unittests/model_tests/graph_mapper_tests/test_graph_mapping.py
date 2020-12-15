@@ -17,7 +17,11 @@
 tests for graph mapping
 """
 import unittest
-from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex
+
+from pacman.model.graphs.application import ApplicationGraph
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex, \
+    MachineGraph
 from uinit_test_objects import SimpleTestEdge, SimpleTestVertex
 
 
@@ -46,6 +50,51 @@ class TestGraphMapping(unittest.TestCase):
         self.assertIn(sube, edges_from_edge)
         self.assertIn(edges[0], edges_from_edge)
         self.assertNotIn(edges[1], edges_from_edge)
+
+    def test_get_vertices_from_vertex(self):
+        """
+        test getting the vertex from a graph mapper via the vertex
+        """
+        vertices = list()
+        app_graph = ApplicationGraph("bacon")
+        vert = SimpleTestVertex(10, "Some testing vertex")
+        app_graph.add_vertex(vert)
+        vertices.append(SimpleMachineVertex(None, ""))
+        vertices.append(SimpleMachineVertex(None, ""))
+        mac_graph = MachineGraph("cooked bacon", application_graph=app_graph)
+        vertex1 = SimpleMachineVertex(
+            None, "", vertex_slice=Slice(0, 1), app_vertex=vert)
+        vertex2 = SimpleMachineVertex(
+            None, "", vertex_slice=Slice(2, 3), app_vertex=vert)
+        mac_graph.add_vertex(vertex1)
+        mac_graph.add_vertex(vertex2)
+
+        returned_vertices = vert.machine_vertices
+
+        self.assertIn(vertex1, returned_vertices)
+        self.assertIn(vertex2, returned_vertices)
+        for v in vertices:
+            self.assertNotIn(v, returned_vertices)
+
+    def test_get_vertex_from_vertex(self):
+        """
+        test that the graph mapper can retrieve a vertex from a given vertex
+        """
+        app_graph = ApplicationGraph("bacon")
+        vert = SimpleTestVertex(10, "Some testing vertex")
+        app_graph.add_vertex(vert)
+        vertex1 = SimpleMachineVertex(None, "", app_vertex=vert,
+                                      vertex_slice=Slice(0, 1))
+        vertex2 = SimpleMachineVertex(None, "", app_vertex=vert,
+                                      vertex_slice=Slice(2, 3))
+        machine_graph = MachineGraph(
+            application_graph=app_graph, label="cooked_bacon")
+        machine_graph.add_vertex(vertex1)
+        machine_graph.add_vertex(vertex2)
+
+        self.assertEqual(vert, vertex1.app_vertex)
+        self.assertEqual(vert, vertex2.app_vertex)
+        self.assertEqual([vertex1, vertex2], list(vert.machine_vertices))
 
     def test_get_edge_from_machine_edge(self):
         """

@@ -25,7 +25,7 @@ from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     create_vertices_groups, get_same_chip_vertex_groups,
-    get_vertices_on_same_chip)
+    get_vertices_on_same_chip, create_requirement_collections)
 from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint,
     RadialPlacementFromChipConstraint)
@@ -193,8 +193,8 @@ class OneToOnePlacer(RadialPlacer):
                     vertex.constraints, ChipAndCoreConstraint):
                 self._allocate_same_chip_as_group(
                     vertex, placements, resource_tracker,
-                    same_chip_vertex_groups,
-                    all_vertices_placed, progress)
+                    same_chip_vertex_groups, all_vertices_placed, progress,
+                    machine_graph)
 
         for grouped_vertices in one_to_one_groups:
             # Get unallocated vertices and placements of allocated vertices
@@ -212,7 +212,7 @@ class OneToOnePlacer(RadialPlacer):
                 # Try to allocate all vertices to the same chip
                 self._allocate_one_to_one_group(
                     resource_tracker, unallocated, progress, placements, chips,
-                    all_vertices_placed)
+                    all_vertices_placed, machine_graph)
             # if too big or failed go on to other groups first
 
         # check all have been allocated if not do so now.
@@ -221,7 +221,7 @@ class OneToOnePlacer(RadialPlacer):
                 self._allocate_same_chip_as_group(
                     vertex, placements, resource_tracker,
                     same_chip_vertex_groups, all_vertices_placed,
-                    progress)
+                    progress, machine_graph)
 
         progress.end()
         return placements
@@ -229,7 +229,7 @@ class OneToOnePlacer(RadialPlacer):
     @staticmethod
     def _allocate_one_to_one_group(
             resource_tracker, vertices, progress, placements, chips,
-            all_vertices_placed):
+            all_vertices_placed, machine_graph):
         """
         :param ResourceTracker resource_tracker:
         :param list(MachineVertex) vertices:
@@ -237,12 +237,13 @@ class OneToOnePlacer(RadialPlacer):
         :param Placements placements:
         :param chips:
         :type chips: iterable(tuple(int, int)) or None
+        :param MachineGraph machine_graph: machine graph
         :param set(MachineVertex) all_vertices_placed:
         :rtype: bool
         """
         try:
             allocs = resource_tracker.allocate_constrained_group_resources(
-                [(v.resources_required, v.constraints) for v in vertices],
+                create_requirement_collections(vertices, machine_graph),
                 chips)
 
             # allocate cores to vertices
@@ -258,18 +259,22 @@ class OneToOnePlacer(RadialPlacer):
     @staticmethod
     def _allocate_same_chip_as_group(
             vertex, placements, tracker, same_chip_vertex_groups,
-            all_vertices_placed, progress):
+            all_vertices_placed, progress, machine_graph):
         """
         :param MachineVertex vertex:
         :param Placements placements:
         :param ResourceTracker tracker:
         :param dict(MachineVertex,set(MachineVertex)) same_chip_vertex_groups:
         :param ~spinn_utilities.progress_bar.ProgressBar progress:
+        :param MachineGraph machine_graph:
         """
         if vertex not in all_vertices_placed:
+            # get vert's
             vertices = same_chip_vertex_groups[vertex]
-            resources = tracker.allocate_constrained_group_resources([
-                (v.resources_required, v.constraints) for v in vertices])
+
+            resources = tracker.allocate_constrained_group_resources(
+                create_requirement_collections(vertices, machine_graph))
+
             for (x, y, p, _, _), v in progress.over(
                     zip(resources, vertices), False):
                 placements.add_placement(Placement(v, x, y, p))
