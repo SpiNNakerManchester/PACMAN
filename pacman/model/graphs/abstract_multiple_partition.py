@@ -47,14 +47,14 @@ class AbstractMultiplePartition(AbstractEdgePartition):
         # handle clones
         if len(self._pre_vertices.keys()) != len(pre_vertices):
             raise PacmanConfigurationException(
-                "there were clones in your list of acceptable pre vertices")
+                "There were clones in your list of acceptable pre vertices")
 
     @overrides(AbstractEdgePartition.add_edge)
     def add_edge(self, edge, graph_code):
         # safety checks
         if edge.pre_vertex not in self._pre_vertices.keys():
             raise Exception(
-                "the edge {} is not allowed in this outgoing partition".format(
+                "The edge {} is not allowed in this outgoing partition".format(
                     edge))
 
         # update

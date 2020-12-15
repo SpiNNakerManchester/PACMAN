@@ -179,12 +179,12 @@ class Graph(ConstrainedObject):
 
         if edge.pre_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
-                "edge", str(edge.pre_vertex),
-                "pre-vertex must be known in graph")
+                "Edge", str(edge.pre_vertex),
+                "Pre-vertex must be known in graph")
         if edge.post_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
-                "edge", str(edge.post_vertex),
-                "post-vertex must be known in graph")
+                "Edge", str(edge.post_vertex),
+                "Post-vertex must be known in graph")
 
         # Add the edge to the indices
         self._outgoing_edges[edge.pre_vertex].add(edge)
