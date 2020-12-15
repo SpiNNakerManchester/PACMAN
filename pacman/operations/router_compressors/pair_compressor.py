@@ -321,7 +321,11 @@ class PairCompressor(AbstractCompressor):
         """ Compresses all the entries for a single table.
 
         Compressed the entries for this unordered table
-        returning a new table with possibly fewer entries but still unordered
+        returning a new table with possibly fewer entries
+
+        The resulting table may be ordered or unordered depending on the
+        value of ordered passed into the init method.
+        Ordered tables may be shorted than unordered ones.
 
         :param UnCompressedMulticastRoutingTable router_table:
             Original Routing table for a single chip
