@@ -15,6 +15,8 @@
 
 import unittest
 from collections import deque
+
+from pacman.model.graphs.machine import MulticastEdgePartition
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
@@ -41,6 +43,9 @@ class TestBasicDijkstraRouting(unittest.TestCase):
                     vertices.append(vertex)
 
         for vertex in vertices:
+            graph.add_outgoing_edge_partition(
+                MulticastEdgePartition(
+                    identifier="Test", pre_vertex=vertex))
             for vertex_to in vertices:
                 if vertex != vertex_to:
                     graph.add_edge(MachineEdge(vertex, vertex_to), "Test")

@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from pacman.exceptions import PacmanNotExistException
 from spinn_utilities.overrides import overrides
 from .abstract_machine_partition_n_keys_map import (
     AbstractMachinePartitionNKeysMap)
@@ -22,6 +22,9 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
     """ A python dict-based implementation of the\
         :py:class:`AbstractMachinePartitionNKeysMap`
     """
+
+    NOT_EXIST_ERROR_MESSAGE = (
+        "Partition {} does not exist in the mapping to n keys")
 
     __slots__ = [
         # A mapping of [partition] -> number of keys to use via this partition
@@ -35,7 +38,7 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
         """ Set the number of keys required by a machine outgoing edge\
             partition
 
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:\
             The partition to set the number of keys for
         :param int n_keys: The number of keys required by the edge
         """
@@ -43,8 +46,10 @@ class DictBasedMachinePartitionNKeysMap(AbstractMachinePartitionNKeysMap):
 
     @overrides(AbstractMachinePartitionNKeysMap.n_keys_for_partition)
     def n_keys_for_partition(self, partition):
-        if partition in self._n_keys_map:
-            return self._n_keys_map[partition]
+        if partition not in self._n_keys_map:
+            raise PacmanNotExistException(
+                self.NOT_EXIST_ERROR_MESSAGE.format(partition))
+        return self._n_keys_map[partition]
 
     @overrides(AbstractMachinePartitionNKeysMap.__iter__)
     def __iter__(self):

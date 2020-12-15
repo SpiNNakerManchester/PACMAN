@@ -15,6 +15,8 @@
 
 import functools
 from collections import OrderedDict
+
+from pacman.model.resources import ResourceContainer, ConstantSDRAM
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
@@ -131,3 +133,23 @@ def create_vertices_groups(vertices, same_group_as_function):
                 add_set(groups, same_chip_as_vertices)
             done.update(same_chip_as_vertices)
     return groups
+
+
+def create_requirement_collections(vertices, machine_graph):
+    # get sdram edge costs as required
+    required_resources = list()
+    to_add_partitions = set()
+    for vertex in vertices:
+        required_resources.append([
+            vertex.resources_required, vertex.constraints])
+        to_add_partitions.update(
+            machine_graph.get_sdram_edge_partitions_starting_at_vertex(
+                vertex))
+
+    total_sdram = 0
+    for partition in to_add_partitions:
+        total_sdram += partition.total_sdram_requirements()
+    required_resources[-1][0].extend(
+        ResourceContainer(sdram=ConstantSDRAM(total_sdram)))
+
+    return required_resources

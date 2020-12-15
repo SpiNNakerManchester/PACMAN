@@ -17,13 +17,15 @@ from collections import OrderedDict
 from pacman.exceptions import (PacmanConfigurationException)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
-from pacman.model.graphs.machine import MachineGraph
+from pacman.model.graphs import AbstractMultiplePartition
+from pacman.model.graphs.machine import MachineGraph, AbstractSDRAMPartition
 from pacman.model.partitioner_interfaces import (
     AbstractSplitterPartitioner, AbstractSlicesConnect)
 from pacman.model.partitioner_splitters.abstract_splitters\
     .abstract_dependent_splitter import AbstractDependentSplitter
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints)
+from pacman.utilities.constants import SARK_PER_MALLOC_SDRAM_USAGE
 from pacman.utilities.utility_objs import ResourceTracker
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
@@ -273,6 +275,33 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                             src_machine_vertex, dest_machine_vertex,
                             common_edge_type, app_edge, machine_graph,
                             app_outgoing_edge_partition, resource_tracker)
+
+        self.__process_sdram_partitions(machine_graph, resource_tracker)
+
+    @staticmethod
+    def __process_sdram_partitions(machine_graph, resource_tracker):
+        """ process the sdram partitions
+
+        :param machine_graph: machine graph
+        :param resource_tracker: resource tracker.
+        :rtype: None
+        :raises PacmanException when outgoing partition requirements is\
+            too much.
+        """
+        for machine_partition in machine_graph.\
+                outgoing_edge_partitions:
+            if isinstance(machine_partition, AbstractSDRAMPartition):
+                sdram_cost = (
+                    machine_partition.total_sdram_requirements())
+                sdram_cost += SARK_PER_MALLOC_SDRAM_USAGE
+                if isinstance(
+                        machine_partition, AbstractMultiplePartition):
+                    (chip_x, chip_y) = resource_tracker.chip_of(
+                        list(machine_partition.pre_vertices)[0])
+                else:
+                    (chip_x, chip_y) = resource_tracker.chip_of(
+                        machine_partition.pre_vertex)
+                resource_tracker.allocate_sdram(chip_x, chip_y, sdram_cost)
 
     @overrides(AbstractSplitterPartitioner.create_machine_edge)
     def create_machine_edge(

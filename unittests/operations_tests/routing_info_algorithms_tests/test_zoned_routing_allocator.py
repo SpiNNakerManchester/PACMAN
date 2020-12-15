@@ -168,13 +168,13 @@ def check_fixed(p, key):
 
 
 def check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask):
+        app_graph, m_graph, routing_info, app_mask):
     # Check the key for each application vertex/ parition pair is the same
     # The bits that should be the same are all but the bottom 12
     mapped_base = dict()
     for app_vertex in app_graph.vertices:
         for m_vertex in app_vertex.machine_vertices:
-            for p in mac_graph.get_outgoing_edge_partitions_starting_at_vertex(
+            for p in m_graph.get_multicast_edge_partitions_starting_at_vertex(
                     m_vertex):
                 key = routing_info.get_first_key_from_partition(p)
                 if check_fixed(p, key):

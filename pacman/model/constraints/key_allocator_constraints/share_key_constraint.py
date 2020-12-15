@@ -32,7 +32,7 @@ class ShareKeyConstraint(AbstractKeyAllocatorConstraint):
 
     def __init__(self, other_partitions):
         """
-        :param list(OutgoingEdgePartition) other_partitions:
+        :param list(AbstractSingleSourcePartition) other_partitions:
             the other edges which keys are shared with.
         """
         self._other_partitions = other_partitions
@@ -41,6 +41,6 @@ class ShareKeyConstraint(AbstractKeyAllocatorConstraint):
     def other_partitions(self):
         """ the other edges which keys are shared with
 
-        :rtype: list(OutgoingEdgePartition)
+        :rtype: list(AbstractSingleSourcePartition)
         """
         return self._other_partitions

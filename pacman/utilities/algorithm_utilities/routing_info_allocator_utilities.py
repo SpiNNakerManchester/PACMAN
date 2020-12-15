@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.model.graphs.common import EdgeTrafficType
 
 from collections import OrderedDict
 from six import itervalues
@@ -35,7 +36,7 @@ class ConstraintGroup(list):
 
     def __init__(self, values):
         """
-        :param iterable(OutgoingEdgePartition) values:
+        :param iterable(AbstractSingleSourcePartition) values:
         """
         super(ConstraintGroup, self).__init__(values)
         self._constraint = None
@@ -66,13 +67,12 @@ _ALL_FIXED_TYPES = (
     FixedKeyAndMaskConstraint, FixedMaskConstraint, FixedKeyFieldConstraint)
 
 
-def get_edge_groups(machine_graph, traffic_type):
-    """ Utility method to get groups of edges using any\
+def get_mulitcast_edge_groups(machine_graph):
+    """ Utility method to get groups of multicast edges using any\
         :py:class:`KeyAllocatorSameKeyConstraint` constraints.  Note that no\
         checking is done here about conflicts related to other constraints.
 
     :param MachineGraph machine_graph: the machine graph
-    :param EdgeTrafficType traffic_type: the traffic type to group
     :return: (fixed key groups, shared key groups, fixed mask groups,
         fixed field groups, continuous groups, noncontinuous groups)
     :rtype: tuple(list(ConstraintGroup), list(ConstraintGroup),
@@ -86,28 +86,25 @@ def get_edge_groups(machine_graph, traffic_type):
     # process each partition one by one in a bubble sort kinda way
     for vertex in machine_graph.vertices:
         for partition in machine_graph.\
-                get_outgoing_edge_partitions_starting_at_vertex(vertex):
+                get_multicast_edge_partitions_starting_at_vertex(vertex):
 
-            # only process partitions of the correct traffic type
-            if partition.traffic_type == traffic_type:
+            # Get a set of partitions that should be grouped together
+            shared_key_constraints = locate_constraints_of_type(
+                partition.constraints, ShareKeyConstraint)
+            partitions_to_group = [partition]
+            for constraint in shared_key_constraints:
+                partitions_to_group.extend(constraint.other_partitions)
 
-                # Get a set of partitions that should be grouped together
-                shared_key_constraints = locate_constraints_of_type(
-                    partition.constraints, ShareKeyConstraint)
-                partitions_to_group = [partition]
-                for constraint in shared_key_constraints:
-                    partitions_to_group.extend(constraint.other_partitions)
+            # Get a set of groups that should be grouped
+            groups_to_group = [
+                partition_groups.get(part_to_group, [part_to_group])
+                for part_to_group in partitions_to_group]
 
-                # Get a set of groups that should be grouped
-                groups_to_group = [
-                    partition_groups.get(part_to_group, [part_to_group])
-                    for part_to_group in partitions_to_group]
-
-                # Group the groups
-                new_group = ConstraintGroup(
-                    part for group in groups_to_group for part in group)
-                partition_groups.update(
-                    {part: new_group for part in new_group})
+            # Group the groups
+            new_group = ConstraintGroup(
+                part for group in groups_to_group for part in group)
+            partition_groups.update(
+                {part: new_group for part in new_group})
 
     # Keep track of groups
     fixed_key_groups = list()
@@ -172,6 +169,8 @@ def check_types_of_edge_constraint(machine_graph):
     :raises PacmanConfigurationException: if a problem is found
     """
     for partition in machine_graph.outgoing_edge_partitions:
+        if partition.traffic_type != EdgeTrafficType.MULTICAST:
+            continue
         fixed_key = locate_constraints_of_type(
             partition.constraints, FixedKeyAndMaskConstraint)
         fixed_mask = locate_constraints_of_type(
@@ -215,7 +214,7 @@ def _check_masks_are_correct(partition):
     """ Check that the masks between a fixed mask constraint and a fixed_field\
         constraint. Raises error if not.
 
-    :param OutgoingEdgePartition partition:
+    :param AbstractSingleSourcePartition partition:
         the outgoing_edge_partition to search for these constraints
     :raise PacmanInvalidParameterException: if the masks are incompatible
     """

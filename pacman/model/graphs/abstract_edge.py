@@ -44,10 +44,3 @@ class AbstractEdge(object):
 
         :rtype: AbstractVertex
         """
-
-    @abstractproperty
-    def traffic_type(self):
-        """ The traffic type of the edge
-
-        :rtype: EdgeTrafficType
-        """

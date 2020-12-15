@@ -14,10 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.exceptions import PacmanException
-from pacman.model.graphs.common import EdgeTrafficType
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
-    MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge)
+    MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge,
+    SDRAMMachineEdge)
+from pacman.model.graphs.machine import ConstantSDRAMMachinePartition
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.operations.chip_id_allocator_algorithms import (
@@ -149,13 +150,15 @@ def test_sdram_links():
     for x in range(20):
         vertex = SimpleMachineVertex(
             resources=ResourceContainer(),
-            label="Vertex_{}".format(x))
+            label="Vertex_{}".format(x), sdram_cost=20)
         machine_graph.add_vertex(vertex)
         last_vertex = vertex
 
     for vertex in machine_graph.vertices:
-        edge = MachineEdge(vertex, last_vertex,
-                           traffic_type=EdgeTrafficType.SDRAM)
+        machine_graph.add_outgoing_edge_partition(
+            ConstantSDRAMMachinePartition(
+                identifier="SDRAM", pre_vertex=vertex, label="bacon"))
+        edge = SDRAMMachineEdge(vertex, last_vertex, "bacon", app_edge=None)
         machine_graph.add_edge(edge, "SDRAM")
 
     # Do placements

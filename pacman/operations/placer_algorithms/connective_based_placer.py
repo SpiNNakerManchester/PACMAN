@@ -73,7 +73,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
         for vertex in progress.over(constrained, False):
             self._place_vertex(
                 vertex, resource_tracker, machine, placements,
-                vertices_on_same_chip)
+                vertices_on_same_chip, machine_graph)
 
         while unconstrained:
             # Place the subgraph with the overall most connected vertex
@@ -105,7 +105,7 @@ class ConnectiveBasedPlacer(RadialPlacer):
             # Place the vertex
             self._place_vertex(
                 vertex, resource_tracker, machine, placements,
-                vertices_on_same_chip)
+                vertices_on_same_chip, machine_graph)
             progress.update()
 
             # Remove from collections of unplaced_vertices to work on

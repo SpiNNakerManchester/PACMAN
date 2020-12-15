@@ -21,6 +21,11 @@ FULL_MASK = 0xFFFFFFFF  # DEFAULT MASK FOR EVERYTHING
 
 CORES_PER_VIRTUAL_CHIP = 128
 
+BYTES_PER_WORD = 4
+
+#: The number of bytes used by SARK per memory allocation
+SARK_PER_MALLOC_SDRAM_USAGE = 2 * BYTES_PER_WORD
+
 EDGES = Enum(
     value="EDGES",
     names=[("EAST", 0),
