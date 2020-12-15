@@ -110,7 +110,7 @@ class AbstractEdgePartition(ConstrainedObject):
         """
         if self._graph_code is not None:
             raise PacmanConfigurationException(
-                "illegal attempt to add partition {} to a second "
+                "Illegal attempt to add partition {} to a second "
                 "graph".format(self))
         self._graph_code = graph_code
 
