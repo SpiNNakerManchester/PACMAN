@@ -40,7 +40,6 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
-        ref: actions
 
     - name: Install pip, etc
       uses: ./support/actions/python-tools
@@ -65,10 +64,8 @@ jobs:
         cover-packages: pacman
         coveralls-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
-    - name: Lint with flake8
-      run: flake8 pacman pacman_integration_tests unittests uinit_test_objects
-
     - name: Lint with pylint
+      # This would be version-independent... except pylint finds different things in different Python versions
       uses: ./support/actions/pylint
       with:
         package: pacman
@@ -90,7 +87,6 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
-        ref: actions
 
     - name: Install pip, etc
       uses: ./support/actions/python-tools
@@ -101,6 +97,9 @@ jobs:
         install: true
     - name: Setup
       uses: ./support/actions/run-setup
+
+    - name: Lint with flake8
+      run: flake8 pacman pacman_integration_tests unittests uinit_test_objects
 
     - name: Run rat copyright enforcement
       uses: ./support/actions/check-copyrights
