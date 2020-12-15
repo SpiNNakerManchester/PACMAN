@@ -23,7 +23,6 @@ from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, FixedKeyFieldConstraint,
     FixedMaskConstraint, FixedKeyAndMaskConstraint,
     ContiguousKeyRangeContraint)
-from pacman.model.graphs.common import EdgeTrafficType
 from .key_field_generator import KeyFieldGenerator
 from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo)
@@ -32,7 +31,7 @@ from pacman.utilities.utility_calls import (
     get_key_ranges)
 from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
 from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
-    import (check_types_of_edge_constraint, get_edge_groups)
+    import (check_types_of_edge_constraint, get_mulitcast_edge_groups)
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from .utils import get_possible_masks
 
@@ -75,8 +74,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Get the edges grouped by those that require the same key
         (fixed_keys, _shared_keys, fixed_masks, fixed_fields, continuous,
-         noncontinuous) = \
-            get_edge_groups(machine_graph, EdgeTrafficType.MULTICAST)
+         noncontinuous) = get_mulitcast_edge_groups(machine_graph)
 
         # Even non-continuous keys will be continuous
         continuous.extend(noncontinuous)
@@ -205,7 +203,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         """
         :param iterable(BaseKeyAndMask) keys_and_masks:
         :param RoutingInfo routing_infos:
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
         """
         # Allocate the routing information
         partition_info = PartitionRoutingInfo(keys_and_masks, partition)

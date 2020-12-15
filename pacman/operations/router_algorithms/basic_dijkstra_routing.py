@@ -354,7 +354,7 @@ class BasicDijkstraRouting(object):
         routing_entry_route_links = None
 
         # build the multicast entry
-        partitions = graph.get_outgoing_edge_partitions_starting_at_vertex(
+        partitions = graph.get_multicast_edge_partitions_starting_at_vertex(
             edge.pre_vertex)
 
         prev_entry = None
@@ -429,7 +429,7 @@ class BasicDijkstraRouting(object):
         if (neighbours_lowest_cost is not None and
                 self._close_enough(neighbours_lowest_cost, chip_sought_cost)):
             # build the multicast entry
-            partns = graph.get_outgoing_edge_partitions_starting_at_vertex(
+            partns = graph.get_multicast_edge_partitions_starting_at_vertex(
                     edge.pre_vertex)
             entry = None
             for partition in partns:

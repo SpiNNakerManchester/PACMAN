@@ -20,7 +20,8 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint, SameChipAsConstraint)
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
-    get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
+    get_same_chip_vertex_groups, sort_vertices_by_known_constraints,
+    create_requirement_collections)
 from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
@@ -62,7 +63,7 @@ class RadialPlacer(object):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
                     vertex, resource_tracker, machine, placements,
-                    vertices_on_same_chip)
+                    vertices_on_same_chip, machine_graph)
                 all_vertices_placed.update(vertices_placed)
         return placements
 
@@ -78,7 +79,7 @@ class RadialPlacer(object):
 
     def _place_vertex(
             self, vertex, resource_tracker, machine, placements,
-            vertices_on_same_chip):
+            vertices_on_same_chip, machine_graph):
         """
         :param MachineVertex vertex:
         :param ResourceTracker resource_tracker:
@@ -86,6 +87,7 @@ class RadialPlacer(object):
         :param Placements placements:
         :param vertices_on_same_chip:
         :type vertices_on_same_chip: dict(MachineVertex, set(MachineVertex))
+        :param MachineGraph machine_graph:
         :rtype: set(MachineVertex)
         """
         vertices = vertices_on_same_chip[vertex]
@@ -101,16 +103,15 @@ class RadialPlacer(object):
 
         if len(vertices) > 1:
             assigned_values = \
-                resource_tracker.allocate_constrained_group_resources([
-                    (vert.resources_required, vert.constraints)
-                    for vert in vertices
-                ], chips)
+                resource_tracker.allocate_constrained_group_resources(
+                    create_requirement_collections(vertices, machine_graph),
+                    chips=chips)
             for (x, y, p, _, _), vert in zip(assigned_values, vertices):
                 placement = Placement(vert, x, y, p)
                 placements.add_placement(placement)
         else:
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
-                vertex.resources_required, vertex.constraints, chips)
+                vertex.resources_required, vertex.constraints, chips=chips)
             placement = Placement(vertex, x, y, p)
             placements.add_placement(placement)
 

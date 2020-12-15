@@ -20,11 +20,11 @@ from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint, ShareKeyConstraint)
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, MachineEdge)
+from pacman.model.graphs.machine import MulticastEdgePartition
 from pacman.model.resources import ResourceContainer
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator.malloc_based_routing_info_allocator\
-    import (
-        MallocBasedRoutingInfoAllocator)
+    import MallocBasedRoutingInfoAllocator
 from pacman.model.routing_info import (
     BaseKeyAndMask, DictBasedMachinePartitionNKeysMap)
 
@@ -130,6 +130,13 @@ class MyTestCase(unittest.TestCase):
         e3 = MachineEdge(v2, v3, label="e3")
         e4 = MachineEdge(v1, v4, label="e4")
 
+        machine_graph.add_outgoing_edge_partition(
+            MulticastEdgePartition(identifier="part1", pre_vertex=v1))
+        machine_graph.add_outgoing_edge_partition(
+            MulticastEdgePartition(identifier="part2", pre_vertex=v2))
+        machine_graph.add_outgoing_edge_partition(
+            MulticastEdgePartition(identifier="part2", pre_vertex=v1))
+
         machine_graph.add_edge(e1, "part1")
         machine_graph.add_edge(e2, "part1")
         machine_graph.add_edge(e3, "part2")
@@ -141,9 +148,12 @@ class MyTestCase(unittest.TestCase):
         return machine_graph, n_keys_map, v1, v2, v3, v4, e1, e2, e3, e4
 
     def test_share_key_with_2_nests(self):
-        machine_graph, n_keys_map, v1, v2, _v3, v4, e1, e2, e3, e4 = \
-            self._integration_setup()
+        machine_graph, n_keys_map, v1, v2, _v3, v4, e1, e2, e3, e4 = (
+            self._integration_setup())
         e5 = MachineEdge(v4, v2, label="e1")
+        machine_graph.add_outgoing_edge_partition(
+            MulticastEdgePartition(identifier="part3", pre_vertex=v4))
+
         machine_graph.add_edge(e5, "part3")
         partition2 = machine_graph.\
             get_outgoing_edge_partition_starting_at_vertex(v4, "part3")
