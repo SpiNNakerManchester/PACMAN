@@ -126,8 +126,9 @@ class AbstractEdgePartition(ConstrainedObject):
     def edges(self):
         """ The edges in this edge partition.
 
-        NOTE: the order the edges were added will come out in the same order.
-        IF not, please talk to the software team.
+        NOTE: The order in which the edges are added is preserved for
+        when they are requested later. IF not, please talk to the software
+        team.
 
         :rtype: iterable(AbstractEdge)
         """
