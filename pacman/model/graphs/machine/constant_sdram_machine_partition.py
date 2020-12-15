@@ -54,7 +54,7 @@ class ConstantSDRAMMachinePartition(
         elif self._sdram_size != edge.sdram_size:
             raise SDRAMEdgeSizeException(
                 "The edges within the constant sdram partition {} have "
-                "inconsistent memory size requests. ")
+                "inconsistent memory size requests.".format(self))
         if self._sdram_base_address is None:
             AbstractSingleSourcePartition.add_edge(self, edge, graph_code)
         else:
