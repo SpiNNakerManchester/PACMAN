@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2020-2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,28 +12,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 
 @add_metaclass(AbstractBase)
-class AbstractMachinePartitionNKeysMap(object):
-    """ A map that provides the number of keys required by each partition
-    """
+class AbstractSupportsSDRAMEdges(object):
 
     __slots__ = []
 
     @abstractmethod
-    def n_keys_for_partition(self, partition):
-        """ The number of keys required by the given partition
+    def sdram_requirement(self, sdram_machine_edge):
+        """ supports asking a machine vertex for the sdram requirement it
+        needs
 
-        :param ~pacman.model.graphs.AbstractSingleSourcePartition partition:\
-            The partition to set the number of keys for
-        :return: The number of keys required by the partition
-        :rtype: int
+        :param sdram_machine_edge: The sdram edge in question
+        :return: the size in bytes this sdram needs.
+        :rtype: int (most likely a multiple of 4)
         """
-
-    @abstractmethod
-    def __iter__(self):
-        """ Returns an iterator over the mapped partitions"""

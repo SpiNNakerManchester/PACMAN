@@ -35,7 +35,6 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import MachineHasDisconnectedSubRegion
 from pacman.model.graphs import (
     AbstractFPGA, AbstractVirtual, AbstractSpiNNakerLink)
-from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from .routing_tree import RoutingTree
@@ -50,7 +49,8 @@ def _convert_a_route(
 
     :param MulticastRoutingTableByPartition routing_tables:
         spinnaker format routing tables
-    :param OutgoingEdgePartition partition: Partition this route applies to
+    :param AbstractSingleSourcePartition partition: \
+        Partition this route applies to
     :param int or None incoming_processor: processor this link came from
     :param int or None incoming_link: link this link came from
     :param RoutingTree partition_route: algorithm specific format of the route
@@ -639,19 +639,18 @@ def _ner_route(machine_graph, machine, placements, vector_to_nodes):
     for source_vertex in progress_bar.over(machine_graph.vertices):
         # handle the vertex edges
         for partition in machine_graph.\
-                get_outgoing_edge_partitions_starting_at_vertex(
+                get_multicast_edge_partitions_starting_at_vertex(
                     source_vertex):
-            if partition.traffic_type == EdgeTrafficType.MULTICAST:
-                post_vertexes = list(
-                    e.post_vertex for e in partition.edges)
-                routing_tree = _do_route(
-                    source_vertex, post_vertexes, machine, placements,
-                    vector_to_nodes)
-                incoming_processor = placements.get_placement_of_vertex(
-                    partition.pre_vertex).p
-                _convert_a_route(
-                    routing_tables, partition, incoming_processor, None,
-                    routing_tree)
+            post_vertexes = list(
+                e.post_vertex for e in partition.edges)
+            routing_tree = _do_route(
+                source_vertex, post_vertexes, machine, placements,
+                vector_to_nodes)
+            incoming_processor = placements.get_placement_of_vertex(
+                partition.pre_vertex).p
+            _convert_a_route(
+                routing_tables, partition, incoming_processor, None,
+                routing_tree)
 
     progress_bar.end()
 
