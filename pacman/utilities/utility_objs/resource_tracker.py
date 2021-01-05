@@ -100,11 +100,7 @@ class ResourceTracker(object):
         "_real_chips_with_n_cores_available",
 
         # the number of virtual chips with the n cores currently available
-        "_virtual_chips_with_n_cores_available",
-
-        # tracker of vertex to chip location
-        '_vertex_to_chip_map',
-
+        "_virtual_chips_with_n_cores_available"
     ]
 
     ALLOCATION_SDRAM_ERROR = (
@@ -139,9 +135,6 @@ class ResourceTracker(object):
         # indexed by the (x, y) tuple of coordinates of the chip
         # Note that entries are only added when a core is first used
         self._core_tracker = dict()
-
-        # map between vertex to chip it was allocated
-        self._vertex_to_chip_map = dict()
 
         # The machine object
         self._machine = machine
@@ -1058,8 +1051,7 @@ class ResourceTracker(object):
             chips = [(x, y)]
 
         return self.allocate_resources(
-            resources, chips, p, board_address, ip_tags, reverse_ip_tags,
-            vertices=vertices)
+            resources, chips, p, board_address, ip_tags, reverse_ip_tags)
 
     def allocate_constrained_group_resources(
             self, resource_and_constraint_list, chips=None):
@@ -1148,15 +1140,20 @@ class ResourceTracker(object):
             If there aren't chips available that can take the allocation.
         """
 
-        usable_chips = chips
-        for ip_tags, reverse_ip_tags in zip(
-                group_ip_tags, group_reverse_ip_tags):
-            usable_chips = self._get_usable_chips(usable_chips, board_address)
+        usable_chips = self._get_usable_chips(chips, board_address)
 
         total_sdram = 0
         for resources in group_resources:
             total_sdram += resources.sdram.get_total_sdram(
                 self._plan_n_timesteps)
+
+        # Make arrays to make the next bit work
+        if not group_ip_tags:
+            group_ip_tags = [None for _ in group_resources]
+        if not group_reverse_ip_tags:
+            group_reverse_ip_tags = [None for _ in group_resources]
+        if not processor_ids:
+            processor_ids = [None for _ in group_resources]
 
         # Find the first usable chip which fits all the group resources
         tried_chips = list()
@@ -1218,8 +1215,7 @@ class ResourceTracker(object):
 
     def allocate_resources(
             self, resources, chips=None, processor_id=None,
-            board_address=None, ip_tags=None, reverse_ip_tags=None,
-            vertices=None):
+            board_address=None, ip_tags=None, reverse_ip_tags=None):
         """ Attempts to use the given resources of the machine.  Can be given
         specific place to use the resources, or else it will allocate them on
         the first place that the resources fit.
@@ -1257,9 +1253,6 @@ class ResourceTracker(object):
                     chip, board_address, ip_tags)
                 reverse_ip_tags_allocated = self._allocate_reverse_ip_tags(
                     chip, board_address, reverse_ip_tags)
-                if vertices is not None:
-                    for vertex in vertices:
-                        self._vertex_to_chip_map[vertex] = (chip.x, chip.y)
                 return (chip.x, chip.y, processor_id, ip_tags_allocated,
                         reverse_ip_tags_allocated)
 
@@ -1433,7 +1426,7 @@ class ResourceTracker(object):
         return ResourceContainer()
 
     def unallocate_resources(self, chip_x, chip_y, processor_id, resources,
-                             ip_tags, reverse_ip_tags, vertices=None):
+                             ip_tags, reverse_ip_tags):
         """ Undo the allocation of resources
 
         :param int chip_x: the x coord of the chip allocated
@@ -1444,19 +1437,12 @@ class ResourceTracker(object):
         :type ip_tags: iterable(tuple(str, int)) or None
         :param reverse_ip_tags: the details of the reverse IP tags allocated
         :type reverse_ip_tags: iterable(tuple(str, int)) or None
-        :param vertices: list of vertices associated with the resources.
-        :type vertices: iterable of <AbstractVertex>
         :rtype: None
         """
 
         self._chips_available.add((chip_x, chip_y))
         self._sdram_tracker[chip_x, chip_y] += \
             resources.sdram.get_total_sdram(self._plan_n_timesteps)
-
-        # clear vertex chip tracker
-        if vertices is not None:
-            for vertex in vertices:
-                del self._vertex_to_chip_map[vertex]
 
         # update number tracker
         if self._machine.get_chip_at(chip_x, chip_y).virtual:
@@ -1529,12 +1515,3 @@ class ResourceTracker(object):
         :rtype: int
         """
         return len(self._chips_used)
-
-    def chip_of(self, vertex):
-        """ returns the chip a vertex is associated with
-
-        :param vertex: vertex to find chip of.
-        :rtype: tuple of (int, int) or None.
-        :return: tuple of chip x and chip y values, or None.
-        """
-        return self._vertex_to_chip_map.get(vertex, None)
