@@ -1269,7 +1269,7 @@ class ResourceTracker(object):
                     "Processor id {} is not available on any of the chips"
                     "".format(processor_id))
         tried_chips = self._get_usable_chips(chips, board_address)
-        resources = self._available_resources(tried_chips)
+        left_resources = self._available_resources(tried_chips)
         all_chips = self._get_usable_chips(None, None)
         all_resources = self._available_resources(all_chips)
         raise PacmanValueError(
@@ -1286,7 +1286,7 @@ class ResourceTracker(object):
                 resources.cpu_cycles.get_value(), resources.dtcm.get_value(),
                 resources.sdram.fixed, resources.sdram.per_timestep,
                 resources.iptags, resources.reverse_iptags,
-                self._plan_n_timesteps, resources, all_resources))
+                self._plan_n_timesteps, left_resources, all_resources))
 
     def _available_resources(self, usable_chips):
         """ Describe how much of the various resource types are available.
