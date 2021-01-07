@@ -16,13 +16,14 @@
 import logging
 import sys
 from six.moves import zip
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar, DummyProgressBar
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 infinity = float("inf")
 
 
