@@ -17,6 +17,7 @@ from pacman.model.graphs.common import EdgeTrafficType
 from collections import OrderedDict
 from six import itervalues
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyFieldConstraint,
@@ -27,7 +28,7 @@ from pacman.exceptions import (
     PacmanValueError, PacmanConfigurationException,
     PacmanInvalidParameterException, PacmanRouteInfoAllocationException)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class ConstraintGroup(list):
