@@ -85,7 +85,8 @@ setup(
         "numpy; python_version >= '3.8'",
         'lxml',
         'jsonschema',
-        'sortedcollections'],
+        "sortedcollections < 2; python_version == '2.7'",
+        "sortedcollections; python_version >= '3.6'"],
     maintainer="SpiNNakerTeam",
     maintainer_email="spinnakerusers@googlegroups.com"
 )
