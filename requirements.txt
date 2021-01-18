@@ -23,8 +23,7 @@ numpy; python_version >= '3.8'
 future
 lxml
 jsonschema
-# pathlib is needed by sortedcollections and python2.7 neeeds help finding it
-pathlib
-sortedcollections
+sortedcollections <  2.0.1; python_version == '2.7'
+sortedcollections; python_version > '2.7'
 SpiNNUtilities >= 1!5.1.1, < 1!6.0.0
 SpiNNMachine >= 1!5.1.1, < 1!6.0.0
