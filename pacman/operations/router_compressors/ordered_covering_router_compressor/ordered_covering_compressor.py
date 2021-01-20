@@ -13,19 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+from spinn_utilities.log import FormatAdapter
 from pacman.operations.router_compressors import (AbstractCompressor, Entry)
-from pacman.operations.router_compressors.mundys_router_compressor import (
-    minimise)
+from .ordered_covering import minimise
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class MundyRouterCompressor(AbstractCompressor):
+class OrderedCoveringCompressor(AbstractCompressor):
     """ Compressor from rig that has been tied into the main tool chain stack.
     """
 
     __slots__ = []
 
     def __init__(self):
-        super(MundyRouterCompressor, self).__init__(True)
+        super(OrderedCoveringCompressor, self).__init__(True)
 
     def compress_table(self, router_table):
         """
@@ -44,3 +47,15 @@ class MundyRouterCompressor(AbstractCompressor):
         compressed_router_table_entries = minimise(
             entries, self._target_length)
         return compressed_router_table_entries
+
+
+class MundyRouterCompressor(OrderedCoveringCompressor):
+    """ DEPRECATED use OrderedCoveringCompressor """
+    def __new__(cls, *args, **kwargs):
+        logger.warning(
+            "MundyRouterCompressor algorithm name is deprecated. "
+            "Please use OrderedCoveringCompressor instead. "
+            "Remove loading_algorithms from your cfg to use defaults")
+        return super(MundyRouterCompressor, cls).__new__(
+            cls, *args, **kwargs)
+
