@@ -43,7 +43,7 @@ class CheckedUnorderedPairCompressor(UnorderedPairCompressor):
         """
         if target_length is None:
             # Stop when enought
-            self._target_length = self.MAX_SUPPORTED_LENGTH
+            self._target_length = 0
         else:
             self._target_length = target_length
         # create progress bar
