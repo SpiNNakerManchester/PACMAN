@@ -58,4 +58,3 @@ class MundyRouterCompressor(OrderedCoveringCompressor):
             "Remove loading_algorithms from your cfg to use defaults")
         return super(MundyRouterCompressor, cls).__new__(
             cls, *args, **kwargs)
-
