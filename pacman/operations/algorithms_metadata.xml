@@ -532,9 +532,9 @@
             <param_type>MemoryCompressedRoutingTables</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="UnorderedCompressor">
-        <python_module>pacman.operations.router_compressors.checked_unordered_compressor</python_module>
-        <python_class>CheckedUnorderedCompressor</python_class>
+    <algorithm name="PairUnorderedCompressor">
+        <python_module>pacman.operations.router_compressors.checked_unordered_pair_compressor</python_module>
+        <python_class>CheckedUnorderedPairCompressor</python_class>
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
