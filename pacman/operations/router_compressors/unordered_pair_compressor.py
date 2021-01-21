@@ -20,7 +20,7 @@ class UnorderedPairCompressor(PairCompressor):
     """
     A version of the pair compressor that does not consider order or length
 
-    The resulting entires are unordered,
+    The resulting entries are unordered,
     which allows the use of a second follow on compressor.
 
     The results are not checked for length so the reults may be too big to be

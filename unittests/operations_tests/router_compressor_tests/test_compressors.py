@@ -21,8 +21,8 @@ from pacman.operations.router_compressors.routing_compression_checker import (
     compare_tables)
 from pacman.operations.router_compressors.pair_compressor import (
     PairCompressor)
-from pacman.operations.router_compressors.unordered_pair_compressor \
-    import UnorderedPairCompressor
+from pacman.operations.router_compressors.unordered_pair_compressor import (
+    UnorderedPairCompressor)
 from pacman.operations.router_compressors.checked_unordered_pair_compressor \
     import CheckedUnorderedPairCompressor
 from pacman.operations.router_compressors.ordered_covering_router_compressor \
