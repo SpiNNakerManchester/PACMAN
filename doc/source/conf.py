@@ -27,10 +27,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-# import sys
 import os
 import inspect
-import six
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -366,7 +364,7 @@ autoclass_content = 'both'
 def maybe_skip(app, what, name, obj, skip, options):  # @UnusedVariable
     # pylint: disable=unused-argument
     if what == "module":
-        if isinstance(obj, six.class_types):
+        if isinstance(obj, type):
             obj = inspect.getmodule(obj)
         if inspect.ismodule(obj) and not obj.__name__.startswith(root_package):
             skip = True

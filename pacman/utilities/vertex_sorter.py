@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from six import itervalues
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 
 
@@ -99,7 +98,7 @@ class VertexSorter(object):
 
         # Sort each list of constraint by the number of optional properties,
         # largest first
-        for constraints in itervalues(self._constraints):
+        for constraints in self._constraints.values():
             constraints.sort(key=len, reverse=True)
 
     def sort(self, vertices):

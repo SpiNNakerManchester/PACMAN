@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import itervalues
 from pacman.exceptions import PacmanAlreadyExistsException
 
 
@@ -152,4 +151,4 @@ class RoutingInfo(object):
 
         :return: a iterator of partition routing information
         """
-        return itervalues(self._info_by_partition)
+        return iter(self._info_by_partition.values())

@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from six import raise_from, add_metaclass
+from six import add_metaclass
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -209,9 +209,9 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
                     resource_tracker.allocate_constrained_resources(
                         used_resources, self._governed_app_vertex.constraints)
             except PacmanValueError as e:
-                raise_from(PacmanValueError(
+                raise PacmanValueError(
                     self.FAIL_TO_ALLOCATE_RESOURCES.format(
-                        self._governed_app_vertex, e)), e)
+                        self._governed_app_vertex, e)) from e
 
         used_placements.append(
             (x, y, p, used_resources, ip_tags, reverse_ip_tags))

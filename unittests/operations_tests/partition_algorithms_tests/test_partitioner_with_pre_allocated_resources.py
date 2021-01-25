@@ -13,12 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import six
-import sys
-
+from spinn_machine import virtual_machine
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.operations.partition_algorithms import SplitterPartitioner
-from spinn_machine import virtual_machine
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanValueError,
     PacmanPartitionException)
@@ -146,9 +143,6 @@ class TestPartitionerWithPreAllocatedResources(object):
             raise Exception("should have blown up here")
         except PacmanPartitionException:
             pass
-        except Exception:
-            exc_info = sys.exc_info()
-            six.reraise(*exc_info)
 
     def test_1_chip_no_pre_allocated_too_much_sdram(self):
         machine = virtual_machine(width=8, height=8)
