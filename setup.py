@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from distutils.core import setup
 from collections import defaultdict
 import os
 
@@ -75,7 +72,6 @@ setup(
         'SpiNNUtilities >= 1!5.1.1, < 1!6.0.0',
         'SpiNNMachine >= 1!5.1.1, < 1!6.0.0',
         'six',
-        'future',
         "numpy > 1.13, < 1.20; python_version == '3.6'",
         "numpy > 1.13, < 1.21; python_version == '3.7'",
         "numpy; python_version >= '3.8'",

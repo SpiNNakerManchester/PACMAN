@@ -15,7 +15,6 @@
 
 import hashlib
 import numpy
-from past.builtins import xrange
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanValueError)
 
@@ -218,7 +217,7 @@ def get_key_ranges(key, mask):
         yield key, n_keys
         return
     unwrapped_key = expand_to_bit_array(key)
-    for value in xrange(n_sets):
+    for value in range(n_sets):
         generated_key = numpy.copy(unwrapped_key)
         generated_key[remaining_zeros] = \
             expand_to_bit_array(value)[-len(remaining_zeros):]
