@@ -280,13 +280,15 @@ def test_flexible_allocator_no_fixed():
 def test_fixed_only():
     app_graph, mac_graph, n_keys_map = create_graphs_only_fixed()
     flexible_allocate(mac_graph, n_keys_map)
-    global_allocate(mac_graph, n_keys_map)
+    routing_info = global_allocate(mac_graph, n_keys_map)
+    assert len(list(routing_info)) == 2
 
 
 def test_no_edge():
     app_graph, mac_graph, n_keys_map = create_graphs_no_edge()
     flexible_allocate(mac_graph, n_keys_map)
-    global_allocate(mac_graph, n_keys_map)
+    routing_info = global_allocate(mac_graph, n_keys_map)
+    assert len(list(routing_info)) == 0
 
 
 def test_flexible_allocator_with_fixed():
