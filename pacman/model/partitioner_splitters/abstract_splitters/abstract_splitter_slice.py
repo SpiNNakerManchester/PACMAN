@@ -12,21 +12,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from six import add_metaclass
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.machine import MachineEdge
 from pacman.utilities.algorithm_utilities.\
-    partition_algorithm_utilities import get_remaining_constraints
+    partition_algorithm_utilities import (
+        get_remaining_constraints)
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
 from pacman.model.graphs import AbstractVirtual
 from pacman.model.graphs.common import Slice
 from .abstract_splitter_common import AbstractSplitterCommon
 
 
-@add_metaclass(AbstractBase)
-class AbstractSplitterSlice(AbstractSplitterCommon):
+class AbstractSplitterSlice(AbstractSplitterCommon, metaclass=AbstractBase):
     """ Contains default logic for splitting by slice.
     """
 

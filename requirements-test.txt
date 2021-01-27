@@ -18,6 +18,6 @@ coverage >= 4.4, < 5.0
 flake8
 # pytest will be brought in by pytest-cov
 pytest-cov
-sphinx >= 2; python_version >= '3.6'
+sphinx >= 2
 pylint
 testfixtures

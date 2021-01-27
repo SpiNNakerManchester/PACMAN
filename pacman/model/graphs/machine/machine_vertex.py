@@ -13,14 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
 
 
-@add_metaclass(AbstractBase)
-class MachineVertex(AbstractVertex):
+class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     """ A machine graph vertex.
     """
 

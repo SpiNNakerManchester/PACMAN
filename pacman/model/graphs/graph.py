@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
@@ -27,8 +26,7 @@ from .abstract_vertex import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
 
 
-@add_metaclass(AbstractBase)
-class Graph(ConstrainedObject):
+class Graph(ConstrainedObject, metaclass=AbstractBase):
     """ A graph that specifies the allowed types of the vertices and edges.
     """
 

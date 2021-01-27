@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.ordered_set import OrderedSet
@@ -23,8 +22,7 @@ from pacman.model.graphs.common import ConstrainedObject
 _REPR_TEMPLATE = "{}(identifier={}, edges={}, constraints={}, label={})"
 
 
-@add_metaclass(AbstractBase)
-class AbstractEdgePartition(ConstrainedObject):
+class AbstractEdgePartition(ConstrainedObject, metaclass=AbstractBase):
     """ A collection of edges which start at a single vertex which have the
         same semantics and so can share a single key.
     """

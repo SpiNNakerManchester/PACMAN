@@ -12,12 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(AbstractBase)
-class AbstractSplitterPartitioner(object):
+class AbstractSplitterPartitioner(object, metaclass=AbstractBase):
     """ Splitter API to allow other Partitioner's to add more stuff to the\
         edge creation process.
 

@@ -15,7 +15,6 @@
 
 import logging
 import sys
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
@@ -26,12 +25,10 @@ from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanInvalidParameterException)
 from pacman.model.graphs import AbstractVertex
-
 logger = FormatAdapter(logging.getLogger(__file__))
 
 
-@add_metaclass(AbstractBase)
-class ApplicationVertex(AbstractVertex):
+class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
     """ A vertex that can be broken down into a number of smaller vertices\
         based on the resources that the vertex requires.
     """

@@ -12,19 +12,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from six import add_metaclass
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 
-@add_metaclass(AbstractBase)
-class AbstractSupportsSDRAMEdges(object):
+class AbstractSupportsSDRAMEdges(object, metaclass=AbstractBase):
 
     __slots__ = []
 
     @abstractmethod
     def sdram_requirement(self, sdram_machine_edge):
-        """ supports asking a machine vertex for the sdram requirement it
-        needs
+        """ Asks a machine vertex for the sdram requirement it needs.
 
         :param sdram_machine_edge: The sdram edge in question
         :return: the size in bytes this sdram needs.

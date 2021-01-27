@@ -12,15 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractEdgePartition
 
 
-@add_metaclass(AbstractBase)
-class AbstractSingleSourcePartition(AbstractEdgePartition):
+class AbstractSingleSourcePartition(
+        AbstractEdgePartition, metaclass=AbstractBase):
     __slots__ = [
         # The vertex at the start of all the edges
         "_pre_vertex"

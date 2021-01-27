@@ -12,13 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(AbstractBase)
-class AbstractSlicesConnect(object):
+class AbstractSlicesConnect(object, metaclass=AbstractBase):
     """ An object that can check if a pre slice and a post slice could
         connect.
 
