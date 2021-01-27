@@ -112,6 +112,64 @@ def create_graphs1(with_fixed):
     return app_graph, mac_graph, n_keys_map
 
 
+def create_graphs_only_fixed():
+    app_graph = ApplicationGraph("Test")
+    # An output vertex to aim things at (to make keys required)
+    out_app_vertex = SimpleAppVertex()
+    app_graph.add_vertex(out_app_vertex)
+    # Create 5 application vertices (3 bits)
+    app_vertex = SimpleAppVertex()
+    app_graph.add_vertex(app_vertex)
+
+    mac_graph = MachineGraph("Test", app_graph)
+    n_keys_map = DictBasedMachinePartitionNKeysMap()
+
+    # An output vertex to aim things at (to make keys required)
+    out_mac_vertex = SimpleMacVertex(app_vertex=out_app_vertex)
+    mac_graph.add_vertex(out_mac_vertex)
+
+    mac_vertex = SimpleMacVertex(app_vertex=app_vertex)
+    mac_graph.add_vertex(mac_vertex)
+    for mac_edge_index in range(2):
+        mac_edge = MachineEdge(mac_vertex, out_mac_vertex)
+        part_name = "Part{}".format(mac_edge_index)
+        mac_graph.add_edge(mac_edge, part_name)
+        p = mac_graph.get_outgoing_edge_partition_starting_at_vertex(
+            mac_vertex, part_name)
+        if (mac_edge_index == 0):
+            p.add_constraint(FixedKeyAndMaskConstraint(
+                [BaseKeyAndMask(0x4c00000, 0xFFFFFFFE)]))
+        if (mac_edge_index == 1):
+            p.add_constraint(FixedKeyAndMaskConstraint(
+                [BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)]))
+        n_keys_map.set_n_keys_for_partition(
+                p, (mac_edge_index * 4) + 1)
+
+    return app_graph, mac_graph, n_keys_map
+
+
+def create_graphs_no_edge():
+    app_graph = ApplicationGraph("Test")
+    # An output vertex to aim things at (to make keys required)
+    out_app_vertex = SimpleAppVertex()
+    app_graph.add_vertex(out_app_vertex)
+    # Create 5 application vertices (3 bits)
+    app_vertex = SimpleAppVertex()
+    app_graph.add_vertex(app_vertex)
+
+    mac_graph = MachineGraph("Test", app_graph)
+    n_keys_map = DictBasedMachinePartitionNKeysMap()
+
+    # An output vertex to aim things at (to make keys required)
+    out_mac_vertex = SimpleMacVertex(app_vertex=out_app_vertex)
+    mac_graph.add_vertex(out_mac_vertex)
+
+    mac_vertex = SimpleMacVertex(app_vertex=app_vertex)
+    mac_graph.add_vertex(mac_vertex)
+
+    return app_graph, mac_graph, n_keys_map
+
+
 def create_app_less():
     app_graph = ApplicationGraph("Test")
 
@@ -217,6 +275,20 @@ def test_flexible_allocator_no_fixed():
     app_mask = 0xFFFFF800
     check_keys_for_application_partition_pairs(
         app_graph, mac_graph, routing_info, app_mask)
+
+
+def test_fixed_only():
+    app_graph, mac_graph, n_keys_map = create_graphs_only_fixed()
+    flexible_allocate(mac_graph, n_keys_map)
+    routing_info = global_allocate(mac_graph, n_keys_map)
+    assert len(list(routing_info)) == 2
+
+
+def test_no_edge():
+    app_graph, mac_graph, n_keys_map = create_graphs_no_edge()
+    flexible_allocate(mac_graph, n_keys_map)
+    routing_info = global_allocate(mac_graph, n_keys_map)
+    assert len(list(routing_info)) == 0
 
 
 def test_flexible_allocator_with_fixed():
