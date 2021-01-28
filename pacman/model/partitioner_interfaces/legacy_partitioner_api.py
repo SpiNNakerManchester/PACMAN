@@ -21,6 +21,7 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
     """ API used by the vertices which dont have their own splitters but use\
         what master did before the self partitioning stuff came to be.
     """
+    __slots__ = []
 
     @abstractmethod
     def get_resources_used_by_atoms(self, vertex_slice):
@@ -48,6 +49,8 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
         :param constraints: Constraints to be passed on to the machine vertex.
         :type constraints:
             iterable(~pacman.model.constraints.AbstractConstraint)
+        :return: The created machine vertex
+        :rtype: ~pacman.model.graphs.machine.MachineVertex
         """
 
     @abstractproperty
@@ -59,9 +62,9 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
         """
 
     @staticmethod
-    def abstract_methods():
+    def _abstract_methods():
         """ Exposes the abstract methods and properties defined in this class.
 
-        :rtype list(str)
+        :rtype frozenset(str)
         """
         return LegacyPartitionerAPI.__abstractmethods__

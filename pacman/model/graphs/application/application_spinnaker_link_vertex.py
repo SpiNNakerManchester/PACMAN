@@ -14,9 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint)
 from .application_vertex import ApplicationVertex
