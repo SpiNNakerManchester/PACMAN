@@ -99,6 +99,24 @@ class Placements(object):
         except KeyError as e:
             raise_from(PacmanProcessorNotOccupiedError(placement_id), e)
 
+    def get_placement_on_processor(self, x, y, p):
+        """ Return the placement on a specific processor or raises an exception
+            if the processor has not been allocated
+
+        :param int x: the x coordinate of the chip
+        :param int y: the y coordinate of the chip
+        :param int p: the processor on the chip
+        :return: the placement on the given processor
+        :rtype: Placement
+        :raise PacmanProcessorNotOccupiedError:
+            If the processor is not occupied
+        """
+        placement_id = (x, y, p)
+        try:
+            return self._placements[placement_id]
+        except KeyError as e:
+            raise_from(PacmanProcessorNotOccupiedError(placement_id), e)
+
     def get_placement_of_vertex(self, vertex):
         """ Return the placement information for a vertex
 

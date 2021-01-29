@@ -66,7 +66,7 @@ def validate_routes(machine_graph, placements, routing_infos,
 
         # gather keys and masks per partition
         partitions = machine_graph.\
-            get_outgoing_edge_partitions_starting_at_vertex(placement.vertex)
+            get_multicast_edge_partitions_starting_at_vertex(placement.vertex)
 
         n_atoms = placement.vertex.vertex_slice.n_atoms
 
@@ -105,7 +105,7 @@ def validate_routes(machine_graph, placements, routing_infos,
 
 def _check_if_partition_has_continuous_keys(partition):
     """
-    :param OutgoingEdgePartition partition:
+    :param AbstractSingleSourcePartition partition:
     :rtype: bool
     """
     continuous_constraints = locate_constraints_of_type(

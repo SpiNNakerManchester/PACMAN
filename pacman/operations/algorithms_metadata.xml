@@ -46,22 +46,6 @@
             <param_type>MemoryFixedRoutes</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="BasicSplitterSelector">
-        <python_module>pacman.operations.partition_algorithms.splitter_selector</python_module>
-        <python_class>SplitterSelector</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>app_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>app_graph</param_name>
-        </required_inputs>
-         <outputs>
-            <token>SplitterObjectsAllocated</token>
-        </outputs>
-    </algorithm>
     <algorithm name="SplitterPartitioner">
         <python_module>pacman.operations.partition_algorithms.splitter_partitioner</python_module>
         <python_class>SplitterPartitioner</python_class>
@@ -499,8 +483,33 @@
             <token part="UnCompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
     </algorithm>
+    <algorithm name="OrderedCoveringCompressor">
+        <python_module>pacman.operations.router_compressors.ordered_covering_router_compressor.ordered_covering_compressor</python_module>
+        <python_class>OrderedCoveringCompressor</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+            <parameter>
+                <param_name>target_length</param_name>
+                <param_type>CompressionTargetSize</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>router_tables</param_name>
+        </required_inputs>
+        <optional_inputs>
+            <token>RoutingTablesPreCompressed</token>
+            <param_name>target_length</param_name>
+        </optional_inputs>
+        <outputs>
+            <param_type>MemoryCompressedRoutingTables</param_type>
+        </outputs>
+    </algorithm>
     <algorithm name="MundyRouterCompressor">
-        <python_module>pacman.operations.router_compressors.mundys_router_compressor.routing_table_condenser</python_module>
+        <!-- DEPRECATED Use OrderedCoveringRouterCompressor !-->
+        <python_module>pacman.operations.router_compressors.ordered_covering_router_compressor.ordered_covering_compressor</python_module>
         <python_class>MundyRouterCompressor</python_class>
         <input_definitions>
             <parameter>
@@ -523,9 +532,9 @@
             <param_type>MemoryCompressedRoutingTables</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="UnorderedCompressor">
-        <python_module>pacman.operations.router_compressors.checked_unordered_compressor</python_module>
-        <python_class>CheckedUnorderedCompressor</python_class>
+    <algorithm name="PairUnorderedCompressor">
+        <python_module>pacman.operations.router_compressors.checked_unordered_pair_compressor</python_module>
+        <python_class>CheckedUnorderedPairCompressor</python_class>
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>

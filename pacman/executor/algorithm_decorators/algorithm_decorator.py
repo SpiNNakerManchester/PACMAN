@@ -25,6 +25,7 @@ import pkgutil
 import sys
 from threading import RLock
 from six import iteritems
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanConfigurationException
 from pacman.executor.algorithm_classes import (
@@ -41,7 +42,7 @@ _algorithms = dict()
 # A lock of the algorithms
 _algorithm_lock = RLock()
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class AllOf(object):
@@ -369,8 +370,8 @@ def scan_packages(packages, recursive=True):
                     __import__(package_name)
                     package = sys.modules[package_name]
                 except Exception as ex:  # pragma: no cover
-                    logger.warning("Failed to import %s : %s",
-                                   package_name, str(ex))
+                    logger.warning("Failed to import package {}: {}".format(
+                        package_name, str(ex)))
                     continue
             pkg_path = os.path.dirname(package.__file__)
 
@@ -385,8 +386,8 @@ def scan_packages(packages, recursive=True):
                     try:
                         __import__(module)
                     except Exception as ex:  # pragma: no cover
-                        logger.warning("Failed to import %s : %s",
-                                       module, str(ex))
+                        logger.warning("Failed to import module {}: {}".format(
+                            module, str(ex)))
                         continue
 
         new_algorithms = _algorithms

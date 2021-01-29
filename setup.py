@@ -78,12 +78,15 @@ setup(
         'six',
         'enum34',
         'future',
-        "numpy >= 1.12, <= 1.19; python_version <= '3.6'",
-        "numpy >= 1.12, <= 1.20; python_version == '3.7'",
+        "numpy > 1.13, < 1.17; python_version == '2.7'",
+        "numpy > 1.13, < 1.19; python_version == '3.5'",
+        "numpy > 1.13, < 1.20; python_version == '3.6'",
+        "numpy > 1.13, < 1.21; python_version == '3.7'",
         "numpy; python_version >= '3.8'",
         'lxml',
         'jsonschema',
-        'sortedcollections'],
+        "sortedcollections < 2; python_version == '2.7'",
+        "sortedcollections; python_version >= '3.6'"],
     maintainer="SpiNNakerTeam",
     maintainer_email="spinnakerusers@googlegroups.com"
 )

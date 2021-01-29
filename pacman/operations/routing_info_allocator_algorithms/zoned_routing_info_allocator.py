@@ -169,7 +169,7 @@ class ZonedRoutingInfoAllocator(object):
 
         Saves a list of the keys and their n_keys so these zones can be blocked
 
-        :param pacman.model.graphs.OutgoingEdgePartition partition:
+        :param pacman.model.graphs.AbstractEdgePartition partition:
         :param FixedKeyAndMaskConstraint constraint:
         """
         self.__fixed_partitions[partition] = constraint.keys_and_masks
@@ -331,6 +331,8 @@ class ZonedRoutingInfoAllocator(object):
         :param int size:
         :rtype: int
         """
+        if size == 0:
+            return 0
         return int(math.ceil(math.log(size, 2)))
 
 

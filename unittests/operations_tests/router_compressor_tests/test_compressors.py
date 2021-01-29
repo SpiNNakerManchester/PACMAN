@@ -21,10 +21,12 @@ from pacman.operations.router_compressors.routing_compression_checker import (
     compare_tables)
 from pacman.operations.router_compressors.pair_compressor import (
     PairCompressor)
-from pacman.operations.router_compressors.unordered_compressor import (
-    UnorderedCompressor)
-from pacman.operations.router_compressors.mundys_router_compressor.\
-    routing_table_condenser import (MundyRouterCompressor)
+from pacman.operations.router_compressors.unordered_pair_compressor import (
+    UnorderedPairCompressor)
+from pacman.operations.router_compressors.checked_unordered_pair_compressor \
+    import CheckedUnorderedPairCompressor
+from pacman.operations.router_compressors.ordered_covering_router_compressor \
+    import OrderedCoveringCompressor
 
 
 class MyTestCase(unittest.TestCase):
@@ -62,13 +64,18 @@ class MyTestCase(unittest.TestCase):
         compressed_tables = compressor(self.original_tables)
         self.check_compression(compressed_tables)
 
-    def test_unordered_compressor(self):
-        compressor = UnorderedCompressor()
+    def test_checked_unordered_pair_compressor(self):
+        compressor = CheckedUnorderedPairCompressor()
         compressed_tables = compressor(self.original_tables)
         self.check_compression(compressed_tables)
 
-    def test_mundy_compressor(self):
-        compressor = MundyRouterCompressor()
+    def test_unordered_pair_compressor(self):
+        compressor = UnorderedPairCompressor()
+        compressed_tables = compressor(self.original_tables)
+        self.check_compression(compressed_tables)
+
+    def test_ordered_covering_compressor(self):
+        compressor = OrderedCoveringCompressor()
         compressed_tables = compressor(self.original_tables)
         self.check_compression(compressed_tables)
 
