@@ -333,9 +333,9 @@ class SpreaderPlacer(OneToOnePlacer):
                 # order chips so that shared chip is first, and the rest are
                 # nearby it in order. or if not all same, just least first
                 if all_matched:
-                    chips = self._generate_radial_chips(
+                    chips = list(self._generate_radial_chips(
                         machine, resource_tracker=None, start_chip_x=x,
-                        start_chip_y=y)
+                        start_chip_y=y))
 
             # allocate verts.
             for one_to_one_vertex in unallocated:

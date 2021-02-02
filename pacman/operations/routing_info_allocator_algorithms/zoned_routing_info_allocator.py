@@ -330,6 +330,8 @@ class ZonedRoutingInfoAllocator(object):
         :param int size:
         :rtype: int
         """
+        if size == 0:
+            return 0
         return int(math.ceil(math.log(size, 2)))
 
 
