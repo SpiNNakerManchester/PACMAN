@@ -1317,11 +1317,11 @@ class ResourceTracker(object):
             eth_x, eth_y = self._ethernet_chips[board_address]
             board_resources = dict()
             if board_address in self._tags_by_board:
-                board_resources["n_tags"] = \
-                    len(self._tags_by_board[board_address])
+                board_resources["n_tags"] = (
+                    len(self._tags_by_board[board_address]))
             else:
-                board_resources["n_tags"] = \
-                    len(self._machine.get_chip_at(eth_x, eth_y).tag_ids)
+                board_resources["n_tags"] = (
+                    len(self._machine.get_chip_at(eth_x, eth_y).tag_ids))
             chips = list()
             for chip in self._machine.get_chips_by_ethernet(eth_x, eth_y):
                 chip_resources = resources_for_chips.get((chip.x, chip.y))
