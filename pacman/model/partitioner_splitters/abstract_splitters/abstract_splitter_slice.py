@@ -395,26 +395,12 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
         :rtype: tuple(list(~pacman.model.graphs.common.Slice), bool
 
         """
-        if self._governed_app_vertex.n_atoms < self._max_atoms_per_core:
-            return (
-                [Slice(0, self._governed_app_vertex.n_atoms)],
-                self._is_fixed_atoms_per_core)
-        else:
-            slices = list()
-            n_atoms_placed = 0
-            n_atoms = self._governed_app_vertex.n_atoms
-            while n_atoms_placed < n_atoms:
-                if n_atoms_placed + self._max_atoms_per_core > n_atoms:
-                    slices.append(Slice(
-                        n_atoms_placed,
-                        n_atoms_placed + (n_atoms - n_atoms_placed)))
-                    n_atoms_placed = n_atoms
-                else:
-                    slices.append(Slice(
-                        n_atoms_placed,
-                        n_atoms_placed + self._max_atoms_per_core))
-                n_atoms_placed += self._max_atoms_per_core
-            return slices, self._is_fixed_atoms_per_core
+        n_atoms = self._governed_app_vertex.n_atoms
+        per_core = self._max_atoms_per_core
+        return (
+            [Slice(lo, min(lo + per_core - 1, n_atoms))
+             for lo in range(0, n_atoms, per_core)],
+            self._is_fixed_atoms_per_core)
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):
