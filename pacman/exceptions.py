@@ -31,7 +31,7 @@ class PacmanInvalidParameterException(PacmanException):
         :param str value: The value of the parameter
         :param str problem: The problem with the value of the parameter
         """
-        super(PacmanInvalidParameterException, self).__init__(problem)
+        super().__init__(problem)
         self.parameter = parameter
         self.value = value
 
@@ -46,8 +46,7 @@ class PacmanAlreadyExistsException(PacmanException):
         :param str item_type: The type of the item that already exists
         :param str item_id: The ID of the item which is in conflict
         """
-        super(PacmanAlreadyExistsException, self).__init__(
-            "{}({}) already exists".format(item_type, item_id))
+        super().__init__("{}({}) already exists".format(item_type, item_id))
         self.item_type = item_type
         self.item_id = item_id
 

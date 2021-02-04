@@ -56,5 +56,4 @@ class MundyRouterCompressor(OrderedCoveringCompressor):
             "MundyRouterCompressor algorithm name is deprecated. "
             "Please use OrderedCoveringCompressor instead. "
             "Remove algorithms from your cfg to use defaults")
-        return super(MundyRouterCompressor, cls).__new__(
-            cls, *args, **kwargs)
+        return super().__new__(cls, *args, **kwargs)
