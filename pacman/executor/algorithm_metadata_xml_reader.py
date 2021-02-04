@@ -39,7 +39,7 @@ class _XmlConfigurationException(PacmanConfigurationException):
             msg = "Error in algorithm {} specification starting on " \
                 "line {} of {}: {}".format(
                     algorithm_name, element.sourceline, path, problem)
-        super(_XmlConfigurationException, self).__init__(msg)
+        super().__init__(msg)
 
 
 class AlgorithmMetadataXmlReader(object):

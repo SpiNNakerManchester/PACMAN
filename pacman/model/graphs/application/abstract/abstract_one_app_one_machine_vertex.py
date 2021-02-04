@@ -36,14 +36,12 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
         :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
-        super(AbstractOneAppOneMachineVertex, self).__init__(
-            label, constraints, n_atoms)
+        super().__init__(label, constraints, n_atoms)
         self._machine_vertex = machine_vertex
 
     @overrides(ApplicationVertex.remember_machine_vertex)
     def remember_machine_vertex(self, machine_vertex):
-        super(AbstractOneAppOneMachineVertex, self).\
-            remember_machine_vertex(machine_vertex)
+        super().remember_machine_vertex(machine_vertex)
         assert (machine_vertex == self._machine_vertex)
 
     @property

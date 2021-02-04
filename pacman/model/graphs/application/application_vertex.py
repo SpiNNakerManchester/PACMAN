@@ -61,15 +61,14 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """
         # Need to set to None temporarily as add_constraint checks splitter
         self._splitter = None
-        super(ApplicationVertex, self).__init__(label, constraints)
+        super().__init__(label, constraints)
         self._machine_vertices = OrderedSet()
 
         # Use setter as there is extra work to do
         self.splitter = splitter
 
         # add a constraint for max partitioning
-        self.add_constraint(
-            MaxVertexAtomsConstraint(max_atoms_per_core))
+        self.add_constraint(MaxVertexAtomsConstraint(max_atoms_per_core))
 
     def __str__(self):
         return self.label
@@ -106,7 +105,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     @overrides(AbstractVertex.add_constraint)
     def add_constraint(self, constraint):
-        AbstractVertex.add_constraint(self, constraint)
+        super().add_constraint(constraint)
         if self._splitter is not None:
             self._splitter.check_supported_constraints()
 
@@ -138,9 +137,9 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     def round_n_atoms(self, n_atoms, label="n_atoms"):
         """
-        Utility function to allow supoer classes to make sure n_atom is an int
+        Utility function to allow suoer-classes to make sure n_atom is an int
 
-        :param n_atoms: Value convertable to int to be used for n_atoms
+        :param n_atoms: Value convertible to int to be used for n_atoms
         :type n_atoms: int or float or numpy.
         :return:
         """
@@ -160,7 +159,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     @property
     def machine_vertices(self):
-        """ The machine vertices that this application vertex maps to.
+        """ The machine vertices that this application vertex maps to.\
             Will be the same length as :py:meth:`vertex_slices`.
 
         :rtype: iterable(MachineVertex)
@@ -169,7 +168,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     @property
     def vertex_slices(self):
-        """ The slices of this vertex that each machine vertex manages.
+        """ The slices of this vertex that each machine vertex manages.\
             Will be the same length as :py:meth:`machine_vertices`.
 
         :rtype: iterable(Slice)

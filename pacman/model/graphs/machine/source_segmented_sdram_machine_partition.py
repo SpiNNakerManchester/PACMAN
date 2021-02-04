@@ -36,7 +36,7 @@ class SourceSegmentedSDRAMMachinePartition(
         :param iterable(AbstractVertex) pre_vertices:
             The vertices that an edge in this partition may originate at
         """
-        super(SourceSegmentedSDRAMMachinePartition, self).__init__(
+        super().__init__(
             pre_vertices, identifier,
             allowed_edge_types=SDRAMMachineEdge, constraints=None,
             label=label, traffic_weight=1,
@@ -64,8 +64,8 @@ class SourceSegmentedSDRAMMachinePartition(
     @overrides(AbstractMultiplePartition.add_edge)
     def add_edge(self, edge, graph_code):
         # add
-        AbstractMachineEdgePartition.check_edge(self, edge)
-        AbstractMultiplePartition.add_edge(self, edge, graph_code)
+        super().check_edge(edge)
+        super().add_edge(edge, graph_code)
 
         # check
         if len(self._destinations.keys()) != 1:
@@ -91,9 +91,10 @@ class SourceSegmentedSDRAMMachinePartition(
                 edge = self._pre_vertices[pre_vertex].peek()
                 edge.sdram_base_address = new_value
                 new_value += edge.sdram_size
-            except KeyError:
+            except KeyError as e:
                 raise PartitionMissingEdgesException(
-                    "This partition has no edge from {}".format(pre_vertex))
+                    "This partition has no edge from {}".format(
+                        pre_vertex)) from e
 
     @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
     def get_sdram_base_address_for(self, vertex):

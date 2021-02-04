@@ -46,8 +46,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     __slots__ = []
 
     def __init__(self):
-        super(CompressibleMallocBasedRoutingInfoAllocator, self).__init__(
-            0, 2 ** 32)
+        super().__init__(0, 2 ** 32)
 
     def __call__(self, machine_graph, n_keys_map, routing_tables):
         """

@@ -51,7 +51,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon, metaclass=AbstractBase):
     MACHINE_LABEL = "{}:{}:{}"
 
     def __init__(self, splitter_name):
-        super(AbstractSplitterSlice, self).__init__(splitter_name)
+        super().__init__(splitter_name)
         self._called = False
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)

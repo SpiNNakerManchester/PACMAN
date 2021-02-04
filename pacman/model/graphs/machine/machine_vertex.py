@@ -48,7 +48,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """
         if label is None:
             label = str(type(self))
-        super(MachineVertex, self).__init__(label, constraints)
+        super().__init__(label, constraints)
         self._added_to_graph = False
         self._app_vertex = app_vertex
         self._index = None

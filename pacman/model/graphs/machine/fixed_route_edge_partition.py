@@ -40,7 +40,7 @@ class FixedRouteEdgePartition(
         :param int traffic_weight:
             The weight of traffic going down this partition
         """
-        super(FixedRouteEdgePartition, self).__init__(
+        super().__init__(
             pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=MachineEdge, constraints=constraints,
             label=label, traffic_weight=traffic_weight,
@@ -48,8 +48,8 @@ class FixedRouteEdgePartition(
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge, graph_code):
-        AbstractMachineEdgePartition.check_edge(self, edge)
-        AbstractSingleSourcePartition.add_edge(self, edge, graph_code)
+        super().check_edge(edge)
+        super().add_edge(edge, graph_code)
 
     @property
     @overrides(AbstractMachineEdgePartition.traffic_type)

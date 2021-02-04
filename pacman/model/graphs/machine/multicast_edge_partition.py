@@ -38,10 +38,10 @@ class MulticastEdgePartition(
         :param str identifier: The identifier of the partition
         :param list(AbstractConstraint) constraints: Any initial constraints
         :param str label: An optional label of the partition
-        :param int traffic_weight:\
+        :param int traffic_weight:
             The weight of traffic going down this partition
         """
-        super(MulticastEdgePartition, self).__init__(
+        super().__init__(
             pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=MachineEdge, constraints=constraints,
             label=label, traffic_weight=traffic_weight,
@@ -49,8 +49,8 @@ class MulticastEdgePartition(
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge, graph_code):
-        AbstractMachineEdgePartition.check_edge(self, edge)
-        AbstractSingleSourcePartition.add_edge(self, edge, graph_code)
+        super().check_edge(edge)
+        super().add_edge(edge, graph_code)
 
     @property
     @overrides(AbstractMachineEdgePartition.traffic_type)

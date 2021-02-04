@@ -38,7 +38,7 @@ class ConstraintGroup(list):
         """
         :param iterable(AbstractSingleSourcePartition) values:
         """
-        super(ConstraintGroup, self).__init__(values)
+        super().__init__(values)
         self._constraint = None
         self._n_keys = None
 

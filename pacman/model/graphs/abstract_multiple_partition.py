@@ -33,8 +33,8 @@ class AbstractMultiplePartition(AbstractEdgePartition):
     def __init__(
             self, pre_vertices, identifier, allowed_edge_types, constraints,
             label, traffic_weight, class_name):
-        AbstractEdgePartition.__init__(
-            self, identifier=identifier,
+        super().__init__(
+            identifier=identifier,
             allowed_edge_types=allowed_edge_types, constraints=constraints,
             label=label, traffic_weight=traffic_weight, class_name=class_name)
         self._pre_vertices = OrderedDict()
@@ -60,7 +60,7 @@ class AbstractMultiplePartition(AbstractEdgePartition):
         # update
         self._pre_vertices[edge.pre_vertex].add(edge)
         self._destinations[edge.post_vertex].add(edge)
-        AbstractEdgePartition.add_edge(self, edge, graph_code)
+        super().add_edge(edge, graph_code)
 
     @property
     @overrides(AbstractEdgePartition.pre_vertices)

@@ -28,7 +28,7 @@ class OrderedCoveringCompressor(AbstractCompressor):
     __slots__ = []
 
     def __init__(self):
-        super(OrderedCoveringCompressor, self).__init__(True)
+        super().__init__(True)
 
     def compress_table(self, router_table):
         """

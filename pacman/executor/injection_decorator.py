@@ -168,7 +168,7 @@ class _DictFacade(dict):
         """
         :param dicts: An iterable of dict objects to be used
         """
-        super(_DictFacade, self).__init__()
+        super().__init__()
         self._dicts = dicts
 
     def get(self, key, default=None):

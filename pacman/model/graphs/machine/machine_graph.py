@@ -72,7 +72,7 @@ class MachineGraph(Graph):
             it is derived from one at all.
         :type application_graph: ApplicationGraph or None
         """
-        super(MachineGraph, self).__init__(MachineVertex, MachineEdge, label)
+        super().__init__(MachineVertex, MachineEdge, label)
         if application_graph:
             application_graph.forget_machine_graph()
             # Check the first vertex added
@@ -98,7 +98,7 @@ class MachineGraph(Graph):
 
     @overrides(Graph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
-        edge_partition = super(MachineGraph, self).add_edge(
+        edge_partition = super().add_edge(
             edge, outgoing_edge_partition_name)
         if (isinstance(edge_partition, MulticastEdgePartition)):
             if edge.pre_vertex.app_vertex:
@@ -140,7 +140,7 @@ class MachineGraph(Graph):
 
     @overrides(Graph.add_vertex)
     def add_vertex(self, vertex):
-        super(MachineGraph, self).add_vertex(vertex)
+        super().add_vertex(vertex)
         if self._application_level_used:
             try:
                 vertex.app_vertex.remember_machine_vertex(vertex)
@@ -333,7 +333,7 @@ class _FrozenMachineGraph(MachineGraph):
     __slots__ = ["__frozen"]
 
     def __init__(self, label):
-        super(_FrozenMachineGraph, self).__init__(label)
+        super().__init__(label)
         self.__frozen = False
 
     def freeze(self):
@@ -349,15 +349,14 @@ class _FrozenMachineGraph(MachineGraph):
         if self.__frozen:
             raise PacmanConfigurationException(
                 "Please add edges via simulator not directly to this graph")
-        super(_FrozenMachineGraph, self).add_edge(
-            edge, outgoing_edge_partition_name)
+        super().add_edge(edge, outgoing_edge_partition_name)
 
     @overrides(MachineGraph.add_vertex)
     def add_vertex(self, vertex):
         if self.__frozen:
             raise PacmanConfigurationException(
                 "Please add vertices via simulator not directly to this graph")
-        super(_FrozenMachineGraph, self).add_vertex(vertex)
+        super().add_vertex(vertex)
 
     @overrides(MachineGraph.add_outgoing_edge_partition)
     def add_outgoing_edge_partition(self, edge_partition):
@@ -365,5 +364,4 @@ class _FrozenMachineGraph(MachineGraph):
             raise PacmanConfigurationException(
                 "Please add partitions via simulator not directly to this "
                 "graph")
-        super(_FrozenMachineGraph, self).add_outgoing_edge_partition(
-            edge_partition)
+        super().add_outgoing_edge_partition(edge_partition)

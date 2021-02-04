@@ -39,8 +39,7 @@ class ApplicationGraph(Graph):
         :param label: The label on the graph, or None
         :type label: str or None
         """
-        super(ApplicationGraph, self).__init__(
-            ApplicationVertex, ApplicationEdge, label)
+        super().__init__(ApplicationVertex, ApplicationEdge, label)
         self._outgoing_edge_partitions_by_pre_vertex = \
             DefaultOrderedDict(OrderedSet)
 
@@ -125,8 +124,7 @@ class ApplicationGraph(Graph):
             new_graph = ApplicationGraph(label=self.label)
         for vertex in self.vertices:
             new_graph.add_vertex(vertex)
-        for outgoing_partition in \
-                self.outgoing_edge_partitions:
+        for outgoing_partition in self.outgoing_edge_partitions:
             for edge in outgoing_partition.edges:
                 new_graph.add_edge(edge, outgoing_partition.identifier)
         if frozen:
@@ -146,7 +144,7 @@ class _FrozenApplicationGraph(ApplicationGraph):
         :param label: The label on the graph, or None
         :type label: str or None
         """
-        super(_FrozenApplicationGraph, self).__init__(label)
+        super().__init__(label)
         self.__frozen = False
 
     def freeze(self):
@@ -162,15 +160,14 @@ class _FrozenApplicationGraph(ApplicationGraph):
         if self.__frozen:
             raise PacmanConfigurationException(
                 "Please add edges via simulator not directly to this graph")
-        super(_FrozenApplicationGraph, self).add_edge(
-            edge, outgoing_edge_partition_name)
+        super().add_edge(edge, outgoing_edge_partition_name)
 
     @overrides(ApplicationGraph.add_vertex)
     def add_vertex(self, vertex):
         if self.__frozen:
             raise PacmanConfigurationException(
                 "Please add vertices via simulator not directly to this graph")
-        super(_FrozenApplicationGraph, self).add_vertex(vertex)
+        super().add_vertex(vertex)
 
     @overrides(ApplicationGraph.add_outgoing_edge_partition)
     def add_outgoing_edge_partition(self, edge_partition):
@@ -178,5 +175,4 @@ class _FrozenApplicationGraph(ApplicationGraph):
             raise PacmanConfigurationException(
                 "Please add partitions via simulator not directly to this "
                 "graph")
-        super(_FrozenApplicationGraph, self).add_outgoing_edge_partition(
-            edge_partition)
+        super().add_outgoing_edge_partition(edge_partition)

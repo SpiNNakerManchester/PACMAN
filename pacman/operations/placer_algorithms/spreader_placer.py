@@ -55,9 +55,6 @@ class SpreaderPlacer(OneToOnePlacer):
     # 4. chip and core)
     STEPS = 4
 
-    def __init__(self):
-        OneToOnePlacer.__init__(self)
-
     def __call__(self, machine_graph, machine, n_keys_map, plan_n_timesteps):
         """
         :param MachineGraph machine_graph: the machine graph

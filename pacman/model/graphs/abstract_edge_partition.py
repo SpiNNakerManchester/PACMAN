@@ -57,7 +57,7 @@ class AbstractEdgePartition(ConstrainedObject, metaclass=AbstractBase):
         :param int traffic_weight:
             The weight of traffic going down this partition
         """
-        ConstrainedObject.__init__(self, constraints)
+        super().__init__(constraints)
         self._label = label
         self._identifier = identifier
         self._edges = OrderedSet()

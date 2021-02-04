@@ -23,8 +23,8 @@ class UnorderedPairCompressor(PairCompressor):
     The resulting entries are unordered,
     which allows the use of a second follow on compressor.
 
-    The results are not checked for length so the reults may be too big to be
+    The results are not checked for length so the results may be too big to be
     used unless compressed again.
     """
     def __init__(self):
-        super(UnorderedPairCompressor, self).__init__(False)
+        super().__init__(False)

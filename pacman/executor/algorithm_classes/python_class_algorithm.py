@@ -63,7 +63,7 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
         :type python_method: str or None
         """
         # pylint: disable=too-many-arguments
-        super(PythonClassAlgorithm, self).__init__(
+        super().__init__(
             algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
             generated_output_tokens, python_module)

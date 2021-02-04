@@ -66,7 +66,7 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         :param label: The label on the graph, or None
         :type label: str or None
         """
-        super(Graph, self).__init__(None)
+        super().__init__(None)
         self._allowed_vertex_types = allowed_vertex_types
         self._allowed_edge_types = allowed_edge_types
         self._vertices = []
@@ -292,7 +292,7 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
     def get_edges_starting_at_vertex(self, vertex):
         """ Get all the edges that start at the given vertex.
 
-        :param AbstractVertex vertex:\
+        :param AbstractVertex vertex:
             The vertex at which the edges to get start
         :rtype: iterable(AbstractEdge)
         """
@@ -301,7 +301,7 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
     def get_edges_ending_at_vertex(self, vertex):
         """ Get all the edges that end at the given vertex.
 
-        :param AbstractVertex vertex:\
+        :param AbstractVertex vertex:
             The vertex at which the edges to get end
         :rtype: iterable(AbstractEdge)
         """
@@ -327,7 +327,7 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
         """ Get all the edge partitions that start at the given vertex.
 
-        :param AbstractVertex vertex:\
+        :param AbstractVertex vertex:
             The vertex at which the edge partitions to find starts
         :rtype: iterable(AbstractEdgePartition)
         """
@@ -337,9 +337,9 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         """ Get the given outgoing edge partition that starts at the
             given vertex, or `None` if no such edge partition exists.
 
-        :param AbstractVertex vertex:\
+        :param AbstractVertex vertex:
             The vertex at the start of the edges in the partition
-        :param str outgoing_edge_partition_name:\
+        :param str outgoing_edge_partition_name:
             The name of the edge partition
         :return: the named edge partition, or None if no such partition exists
         :rtype: AbstractEdgePartition or None

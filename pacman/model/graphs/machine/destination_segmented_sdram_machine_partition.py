@@ -31,7 +31,7 @@ class DestinationSegmentedSDRAMMachinePartition(
     ]
 
     def __init__(self, identifier, pre_vertex, label):
-        super(DestinationSegmentedSDRAMMachinePartition, self).__init__(
+        super().__init__(
             pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=SDRAMMachineEdge, constraints=None,
             label=label, traffic_weight=1,
@@ -67,7 +67,7 @@ class DestinationSegmentedSDRAMMachinePartition(
             raise PacmanConfigurationException(
                 "Illegal attempt to add an edge after sdram_base_address set")
 
-        AbstractSDRAMPartition.check_edge(self, edge)
+        super().check_edge(edge)
 
         # safety check
         if self._pre_vertex != edge.pre_vertex:
@@ -76,8 +76,7 @@ class DestinationSegmentedSDRAMMachinePartition(
                 "1 pre-vertex")
 
         # add
-        super(DestinationSegmentedSDRAMMachinePartition, self).add_edge(
-            edge, graph_code)
+        super().add_edge(edge, graph_code)
 
     @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
     def get_sdram_base_address_for(self, vertex):
