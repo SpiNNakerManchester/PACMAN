@@ -31,9 +31,10 @@ class ConstantSDRAM(AbstractSDRAM):
 
     def __init__(self, sdram):
         """
-        :param int sdram: The amount of SDRAM in bytes
+        :param sdram: The amount of SDRAM in bytes
+        :type sdram: int or ~numpy.int64
         """
-        self._sdram = sdram
+        self._sdram = int(sdram)
 
     @overrides(AbstractSDRAM.get_total_sdram)
     def get_total_sdram(self, n_timesteps):  # @UnusedVariable

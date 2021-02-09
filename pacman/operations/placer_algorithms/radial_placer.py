@@ -15,34 +15,37 @@
 
 from collections import deque
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint, SameChipAsConstraint)
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
-    get_same_chip_vertex_groups, sort_vertices_by_known_constraints)
+    get_same_chip_vertex_groups, sort_vertices_by_known_constraints,
+    create_requirement_collections)
 from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class RadialPlacer(object):
     """ A placement algorithm that can place a machine graph onto a\
         machine choosing chips radiating in a circle from the boot chip
-
-    :param MachineGraph machine_graph: The machine_graph to place
-    :param ~spinn_machine.Machine machine:
-        The machine with respect to which to partition the application\
-        graph
-    :param int plan_n_timesteps: number of timesteps to plan for
-    :return: A set of placements
-    :rtype: Placements
-    :raise PacmanPlaceException:
-        If something goes wrong with the placement
     """
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
+        """
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param ~spinn_machine.Machine machine:
+            The machine with respect to which to partition the application
+            graph
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :return: A set of placements
+        :rtype: Placements
+        :raise PacmanPlaceException:
+            If something goes wrong with the placement
+        """
         # check that the algorithm can handle the constraints
         self._check_constraints(machine_graph.vertices)
 
@@ -60,7 +63,7 @@ class RadialPlacer(object):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
                     vertex, resource_tracker, machine, placements,
-                    vertices_on_same_chip)
+                    vertices_on_same_chip, machine_graph)
                 all_vertices_placed.update(vertices_placed)
         return placements
 
@@ -76,7 +79,7 @@ class RadialPlacer(object):
 
     def _place_vertex(
             self, vertex, resource_tracker, machine, placements,
-            vertices_on_same_chip):
+            vertices_on_same_chip, machine_graph):
         """
         :param MachineVertex vertex:
         :param ResourceTracker resource_tracker:
@@ -84,6 +87,7 @@ class RadialPlacer(object):
         :param Placements placements:
         :param vertices_on_same_chip:
         :type vertices_on_same_chip: dict(MachineVertex, set(MachineVertex))
+        :param MachineGraph machine_graph:
         :rtype: set(MachineVertex)
         """
         vertices = vertices_on_same_chip[vertex]
@@ -99,16 +103,15 @@ class RadialPlacer(object):
 
         if len(vertices) > 1:
             assigned_values = \
-                resource_tracker.allocate_constrained_group_resources([
-                    (vert.resources_required, vert.constraints)
-                    for vert in vertices
-                ], chips)
+                resource_tracker.allocate_constrained_group_resources(
+                    create_requirement_collections(vertices, machine_graph),
+                    chips=chips)
             for (x, y, p, _, _), vert in zip(assigned_values, vertices):
                 placement = Placement(vert, x, y, p)
                 placements.add_placement(placement)
         else:
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
-                vertex.resources_required, vertex.constraints, chips)
+                vertex.resources_required, vertex.constraints, chips=chips)
             placement = Placement(vertex, x, y, p)
             placements.add_placement(placement)
 

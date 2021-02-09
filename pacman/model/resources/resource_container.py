@@ -62,7 +62,7 @@ class ResourceContainer(object):
         :param iptags: the IP tags required
         :type iptags: None or list(IPtagResource)
         :param reverse_iptags: the reverse IP tags required
-        :type reverse_iptags: None or \
+        :type reverse_iptags: None or
             list(SpecificBoardReverseIPtagResource)
         """
         # pylint: disable=too-many-arguments

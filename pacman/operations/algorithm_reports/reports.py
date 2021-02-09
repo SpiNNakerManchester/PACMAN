@@ -112,7 +112,8 @@ def router_summary_report(
     """ Generates a text file of routing summaries
 
     :param str report_folder: The report folder to store this value.
-    :param MulticastRoutingTables routing_tables: The original routing tables.
+    :param MulticastRoutingTables routing_tables:
+        The original routing tables.
     :param str hostname: The machine's hostname to which the placer worked on.
     :param ~spinn_machine.Machine machine: The python machine object.
     :rtype: RouterSummary
@@ -129,7 +130,8 @@ def router_compressed_summary_report(
     """ Generates a text file of routing summaries
 
     :param str report_folder: The report folder to store this value.
-    :param MulticastRoutingTables routing_tables: The original routing tables.
+    :param MulticastRoutingTables routing_tables:
+        The in-operation routing tables.
     :param str hostname: The machine's hostname to which the placer worked on.
     :param ~spinn_machine.Machine machine: The python machine object.
     :rtype: RouterSummary
@@ -245,7 +247,7 @@ def _write_one_router_partition_report(f, partition, machine, placements,
                                        routing_infos, routing_tables):
     """
     :param ~io.FileIO f:
-    :param OutgoingEdgePartition partition:
+    :param AbstractSingleSourcePartition partition:
     :param ~spinn_machine.Machine machine:
     :param Placements placements:
     :param RoutingInfo routing_infos:
@@ -676,18 +678,17 @@ def _write_vertex_virtual_keys(
     """
     f.write("Vertex: {}\n".format(vertex))
     for partition in progress.over(
-            graph.get_outgoing_edge_partitions_starting_at_vertex(vertex),
+            graph.get_multicast_edge_partitions_starting_at_vertex(vertex),
             False):
-        if partition.traffic_type == EdgeTrafficType.MULTICAST:
-            rinfo = routing_infos.get_routing_info_from_partition(partition)
-            f.write("    Partition: {}, Routing Info: {}\n".format(
-                partition.identifier, rinfo.keys_and_masks))
+        rinfo = routing_infos.get_routing_info_from_partition(partition)
+        f.write("    Partition: {}, Routing Info: {}\n".format(
+            partition.identifier, rinfo.keys_and_masks))
 
 
 def router_report_from_router_tables(report_folder, routing_tables):
     """
     :param str report_folder: the report folder to store this value
-    :param ~spinn_machine.MulticastRoutingTables routing_tables:
+    :param MulticastRoutingTables routing_tables:
         the original routing tables
     :rtype: None
     """
@@ -705,7 +706,7 @@ def router_report_from_router_tables(report_folder, routing_tables):
 def router_report_from_compressed_router_tables(report_folder, routing_tables):
     """
     :param str report_folder: the report folder to store this value
-    :param ~spinn_machine.MulticastRoutingTables routing_tables:
+    :param MulticastRoutingTables routing_tables:
         the compressed routing tables
     :rtype: None
     """
@@ -738,7 +739,7 @@ def format_route(entry):
 
 def generate_routing_table(routing_table, top_level_folder):
     """
-    :param ~spinn_machine.MulticastRoutingTable routing_table:
+    :param AbstractMulticastRoutingTable routing_table:
     :param str top_level_folder:
     """
     file_name = "routing_table_{}_{}.rpt".format(
@@ -789,9 +790,9 @@ def generate_comparison_router_report(
         routing tables
 
     :param str report_folder: the folder to store the resulting report
-    :param ~spinn_machine.MulticastRoutingTables routing_tables:
+    :param MulticastRoutingTables routing_tables:
         the original routing tables
-    :param ~spinn_machine.MulticastRoutingTables compressed_routing_tables:
+    :param MulticastRoutingTables compressed_routing_tables:
         the compressed routing tables
     :rtype: None
     """

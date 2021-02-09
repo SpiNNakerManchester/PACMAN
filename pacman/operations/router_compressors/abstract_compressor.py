@@ -19,12 +19,13 @@ based on https://github.com/project-rig/
 
 from abc import abstractmethod
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import MinimisationFailedError
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class AbstractCompressor(object):
@@ -67,7 +68,7 @@ class AbstractCompressor(object):
         the same keys).
 
         For example, the key-mask pairs ``00XX`` and ``001X`` both match the
-        keys``0010`` and ``0011`` (i.e., they do intersect)::
+        keys ``0010`` and ``0011`` (i.e., they do intersect)::
 
             >>> intersect(0b0000, 0b1100, 0b0010, 0b1110)
             True
@@ -113,8 +114,10 @@ class AbstractCompressor(object):
     @abstractmethod
     def compress_table(self, router_table):
         """
-        :param MulticastRoutingTable router_table:
-        :rtype: MulticastRoutingTable
+        :param UnCompressedMulticastRoutingTable router_table:
+            Original routing table for a single chip
+        :return: Raw compressed routing table entries for the same chip
+        :rtype: list(Entry)
         """
 
     def compress_tables(self, router_tables, progress):

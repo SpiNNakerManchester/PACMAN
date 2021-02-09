@@ -26,12 +26,6 @@ class RandomPlacer(object):
     """
     This placer chooses chips on a machine on which to place vertices at
     random, and tracks those which have already been used.
-
-    :param MachineGraph machine_graph: The machine_graph to place
-    :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
-    :param int plan_n_timesteps: number of timesteps to plan for
-    :return placements: Placements of vertices on the machine
-    :rtype: Placements
     """
 
     #: THRESHOLD is an arbitrary number of times the generator is allowed to
@@ -42,6 +36,12 @@ class RandomPlacer(object):
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
         """ Place each vertex in a machine graph on a core in the machine.
+
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :return placements: Placements of vertices on the machine
+        :rtype: Placements
         """
 
         # check that the algorithm can handle the constraints

@@ -15,6 +15,7 @@
 
 import hashlib
 import numpy
+from past.builtins import xrange
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanValueError)
 
@@ -27,8 +28,7 @@ def locate_constraints_of_type(constraints, constraint_type):
         The type of constraints to return
     :return: The constraints of constraint_type that are found in the
         constraints given
-    :rtype: iterable(AbstractConstraint`)
-    :raises None: no known exceptions
+    :rtype: iterable(AbstractConstraint)
     """
     return [c for c in constraints if isinstance(c, constraint_type)]
 
@@ -76,8 +76,6 @@ def check_algorithm_can_support_constraints(
         The constraints supported
     :param type(AbstractConstraint) abstract_constraint_type:
         The overall abstract c type supported
-    :return: Nothing is returned
-    :rtype: None
     :raise PacmanInvalidParameterException:
         When the algorithm cannot support the constraints demanded of it
     """
@@ -186,3 +184,42 @@ def ident(object):  # @ReservedAssignment pylint: disable=redefined-builtin
     :rtype: str
     """
     return str(id(object))
+
+
+def get_key_ranges(key, mask):
+    """ Get a generator of base_key, n_keys pairs that represent ranges
+        allowed by the mask.
+
+    :param int key: The base key
+    :param int mask: The mask
+    :rtype: iterable(tuple(int,int))
+    """
+    unwrapped_mask = expand_to_bit_array(mask)
+    first_zeros = list()
+    remaining_zeros = list()
+    pos = len(unwrapped_mask) - 1
+
+    # Keep the indices of the first set of zeros
+    while pos >= 0 and unwrapped_mask[pos] == 0:
+        first_zeros.append(pos)
+        pos -= 1
+
+    # Find all the remaining zeros
+    while pos >= 0:
+        if unwrapped_mask[pos] == 0:
+            remaining_zeros.append(pos)
+        pos -= 1
+
+    # Loop over 2^len(remaining_zeros) to produce the base key,
+    # with n_keys being 2^len(first_zeros)
+    n_sets = 2 ** len(remaining_zeros)
+    n_keys = 2 ** len(first_zeros)
+    if not remaining_zeros:
+        yield key, n_keys
+        return
+    unwrapped_key = expand_to_bit_array(key)
+    for value in xrange(n_sets):
+        generated_key = numpy.copy(unwrapped_key)
+        generated_key[remaining_zeros] = \
+            expand_to_bit_array(value)[-len(remaining_zeros):]
+        yield compress_from_bit_array(generated_key), n_keys

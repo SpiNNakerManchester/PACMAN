@@ -27,9 +27,10 @@ class DTCMResource(object):
 
     def __init__(self, dtcm):
         """
-        :param int dtcm: The amount of DTCM in bytes
+        :param dtcm: The amount of DTCM in bytes
+        :type dtcm: int or numpy.integer
         """
-        self._dtcm = dtcm
+        self._dtcm = int(dtcm)
 
     def get_value(self):
         """

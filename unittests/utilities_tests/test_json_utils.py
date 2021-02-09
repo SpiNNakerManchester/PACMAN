@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
-
 import json
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
@@ -24,10 +23,12 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
     FixedVertexAtomsConstraint)
+from pacman.model.graphs.machine import MulticastEdgePartition
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
     ResourceContainer)
 from pacman.model.routing_info import BaseKeyAndMask
+from pacman.utilities import file_format_schemas
 from pacman.utilities.json_utils import (
     constraint_to_json, constraint_from_json,
     edge_to_json, edge_from_json,
@@ -36,6 +37,8 @@ from pacman.utilities.json_utils import (
     vertex_to_json, vertex_from_json)
 from pacman.model.graphs.machine import (
     MachineEdge, MachineGraph, SimpleMachineVertex)
+
+MACHINE_GRAPH_FILENAME = "machine_graph.json"
 
 
 class TestJsonUtils(unittest.TestCase):
@@ -108,6 +111,7 @@ class TestJsonUtils(unittest.TestCase):
     def graph_there_and_back(self, there):
         j_object = graph_to_json(there)
         print(j_object)
+        file_format_schemas.validate(j_object, MACHINE_GRAPH_FILENAME)
         back = graph_from_json(j_object)
         self.assertEqual(there.n_vertices, back.n_vertices)
         for vertex in there.vertices:
@@ -138,9 +142,10 @@ class TestJsonUtils(unittest.TestCase):
         self.constraint_there_and_back(c1)
 
     def test_same_atoms_as_vertex_constraint(self):
-        v1 = SimpleMachineVertex(None, "v1")
-        c1 = SameAtomsAsVertexConstraint(v1)
-        self.constraint_there_and_back(c1)
+        with self.assertRaises(NotImplementedError):
+            v1 = SimpleMachineVertex(None, "v1")
+            c1 = SameAtomsAsVertexConstraint(v1)
+            self.constraint_there_and_back(c1)
 
     def test_max_vertex_atoms_constraint(self):
         c1 = MaxVertexAtomsConstraint(5)
@@ -227,9 +232,13 @@ class TestJsonUtils(unittest.TestCase):
         vertices = list()
         edges = list()
         for i in range(10):
-            vertices.append(SimpleMachineVertex(None, "V{}".format(i)))
-        vertices[1].add_constraint(SameAtomsAsVertexConstraint(vertices[4]))
-        vertices[4].add_constraint(SameAtomsAsVertexConstraint(vertices[1]))
+            vertices.append(
+                SimpleMachineVertex(ResourceContainer(), "V{}".format(i)))
+        with self.assertRaises(NotImplementedError):
+            vertices[1].add_constraint(SameAtomsAsVertexConstraint(
+                vertices[4]))
+            vertices[4].add_constraint(SameAtomsAsVertexConstraint(
+                vertices[1]))
         for i in range(5):
             edges.append(MachineEdge(vertices[0], vertices[(i + 1)]))
         for i in range(5, 10):
@@ -237,5 +246,9 @@ class TestJsonUtils(unittest.TestCase):
                 vertices[5], vertices[(i + 1) % 10]))
         graph = MachineGraph("foo")
         graph.add_vertices(vertices)
+        graph.add_outgoing_edge_partition(MulticastEdgePartition(
+            identifier="bar", pre_vertex=vertices[0]))
+        graph.add_outgoing_edge_partition(MulticastEdgePartition(
+            identifier="bar", pre_vertex=vertices[5]))
         graph.add_edges(edges, "bar")
         self.graph_there_and_back(graph)

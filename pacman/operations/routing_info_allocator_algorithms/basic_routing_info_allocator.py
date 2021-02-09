@@ -36,16 +36,6 @@ class BasicRoutingInfoAllocator(object):
         required by each edge must be 2048 or less, and that all edges coming\
         out of a vertex will be given the same key/mask assignment.
 
-    :param MachineGraph machine_graph:
-        The machine graph to allocate the routing info for
-    :param Placements placements: The placements of the vertices
-    :param AbstractMachinePartitionNKeysMap n_keys_map:
-        A map between the edges and the number of keys required by the
-        edges
-    :return: The routing information
-    :rtype: PartitionRoutingInfo
-    :raise PacmanRouteInfoAllocationException:
-        If something goes wrong with the allocation
     """
 
     __slots__ = []
@@ -77,7 +67,7 @@ class BasicRoutingInfoAllocator(object):
         routing_infos = RoutingInfo()
         for vertex in progress.over(machine_graph.vertices):
             for partition in machine_graph.\
-                    get_outgoing_edge_partitions_starting_at_vertex(vertex):
+                    get_multicast_edge_partitions_starting_at_vertex(vertex):
                 routing_infos.add_partition_info(
                     self._allocate_key_for_partition(
                         partition, vertex, placements, n_keys_map))
@@ -86,7 +76,7 @@ class BasicRoutingInfoAllocator(object):
     def _allocate_key_for_partition(
             self, partition, vertex, placements, n_keys_map):
         """
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
         :param MachineVertex vertex:
         :param Placements placements:
         :param AbstractMachinePartitionNKeysMap n_keys_map:

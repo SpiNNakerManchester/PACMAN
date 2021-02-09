@@ -15,15 +15,24 @@
 
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
+from .application_edge_partition import ApplicationEdgePartition
+from spinn_utilities.default_ordered_dict import DefaultOrderedDict
+from spinn_utilities.ordered_set import OrderedSet
+from spinn_utilities.overrides import overrides
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanConfigurationException,
+    PacmanInvalidParameterException)
 from pacman.model.graphs.graph import Graph
-from pacman.model.graphs import OutgoingEdgePartition
 
 
 class ApplicationGraph(Graph):
     """ An application-level abstraction of a graph.
     """
 
-    __slots__ = []
+    __slots__ = [
+        # The sets of edge partitions by pre-vertex
+        "_outgoing_edge_partitions_by_pre_vertex",
+    ]
 
     def __init__(self, label):
         """
@@ -31,7 +40,9 @@ class ApplicationGraph(Graph):
         :type label: str or None
         """
         super(ApplicationGraph, self).__init__(
-            ApplicationVertex, ApplicationEdge, OutgoingEdgePartition, label)
+            ApplicationVertex, ApplicationEdge, label)
+        self._outgoing_edge_partitions_by_pre_vertex = \
+            DefaultOrderedDict(OrderedSet)
 
     def forget_machine_graph(self):
         """ Forget the whole mapping from this graph to an application graph.
@@ -47,3 +58,125 @@ class ApplicationGraph(Graph):
         """
         for e in self.edges:
             e.forget_machine_edges()
+
+    @overrides(Graph.new_edge_partition)
+    def new_edge_partition(self, name, edge):
+        return ApplicationEdgePartition(
+            identifier=name, pre_vertex=edge.pre_vertex)
+
+    @overrides(Graph.add_outgoing_edge_partition)
+    def add_outgoing_edge_partition(self, edge_partition):
+        # verify that this partition is suitable for this graph
+        if not isinstance(edge_partition, ApplicationEdgePartition):
+            raise PacmanInvalidParameterException(
+                "outgoing_edge_partition", edge_partition.__class__,
+                "Partitions of this graph must be an ApplicationEdgePartition")
+
+        # check this partition doesn't already exist
+        key = (edge_partition.pre_vertex,
+               edge_partition.identifier)
+        if key in self._outgoing_edge_partitions_by_name:
+            raise PacmanAlreadyExistsException(
+                str(ApplicationEdgePartition), key)
+
+        edge_partition.register_graph_code(id(self))
+
+        self._outgoing_edge_partitions_by_pre_vertex[
+            edge_partition.pre_vertex].add(edge_partition)
+        self._outgoing_edge_partitions_by_name[key] = edge_partition
+        for edge in edge_partition.edges:
+            self._register_edge(edge, edge_partition)
+
+    @property
+    @overrides(Graph.outgoing_edge_partitions)
+    def outgoing_edge_partitions(self):
+        # This is based on the assumption that an Application partition is
+        # always SingleSourced
+        return self._outgoing_edge_partitions_by_name.values()
+
+    @property
+    @overrides(Graph.n_outgoing_edge_partitions)
+    def n_outgoing_edge_partitions(self):
+        # This is based on the assumption that an Application partition is
+        # always SingleSourced
+        return len(self._outgoing_edge_partitions_by_name)
+
+    def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
+        """ Get all the edge partitions that start at the given vertex.
+
+        :param AbstractVertex vertex:
+            The vertex at which the edge partitions to find starts
+        :rtype: iterable(AbstractEdgePartition)
+        """
+        return self._outgoing_edge_partitions_by_pre_vertex[vertex]
+
+    def clone(self, frozen=False):
+        """
+        Makes as shallow as possible copy of the graph.
+
+        Vertices and edges are copied over. Partition will be new objects.
+
+        :return: A shallow copy of this graph
+        :rtype: ApplicationGraph
+        """
+        if frozen:
+            new_graph = _FrozenApplicationGraph(label=self.label)
+        else:
+            new_graph = ApplicationGraph(label=self.label)
+        for vertex in self.vertices:
+            new_graph.add_vertex(vertex)
+        for outgoing_partition in \
+                self.outgoing_edge_partitions:
+            for edge in outgoing_partition.edges:
+                new_graph.add_edge(edge, outgoing_partition.identifier)
+        if frozen:
+            new_graph.freeze()
+        return new_graph
+
+
+class _FrozenApplicationGraph(ApplicationGraph):
+    """ A frozen application-level abstraction of a graph.
+    """
+    # This is declared in the same file due to the circular dependency
+
+    __slots__ = ["__frozen"]
+
+    def __init__(self, label):
+        """
+        :param label: The label on the graph, or None
+        :type label: str or None
+        """
+        super(_FrozenApplicationGraph, self).__init__(label)
+        self.__frozen = False
+
+    def freeze(self):
+        """
+        blocks any farther attempt to add to this graph
+
+        :return:
+        """
+        self.__frozen = True
+
+    @overrides(ApplicationGraph.add_edge)
+    def add_edge(self, edge, outgoing_edge_partition_name):
+        if self.__frozen:
+            raise PacmanConfigurationException(
+                "Please add edges via simulator not directly to this graph")
+        super(_FrozenApplicationGraph, self).add_edge(
+            edge, outgoing_edge_partition_name)
+
+    @overrides(ApplicationGraph.add_vertex)
+    def add_vertex(self, vertex):
+        if self.__frozen:
+            raise PacmanConfigurationException(
+                "Please add vertices via simulator not directly to this graph")
+        super(_FrozenApplicationGraph, self).add_vertex(vertex)
+
+    @overrides(ApplicationGraph.add_outgoing_edge_partition)
+    def add_outgoing_edge_partition(self, edge_partition):
+        if self.__frozen:
+            raise PacmanConfigurationException(
+                "Please add partitions via simulator not directly to this "
+                "graph")
+        super(_FrozenApplicationGraph, self).add_outgoing_edge_partition(
+            edge_partition)

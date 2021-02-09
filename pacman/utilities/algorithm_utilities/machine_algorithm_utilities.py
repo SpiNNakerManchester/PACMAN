@@ -25,7 +25,7 @@ def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
     :param ~spinn_machine.link_data_objects.AbstractLinkData link_data:
         Describes the link from the real machine.
     :param int virtual_chip_x: Virtual chip coordinate
-    :param int virtual_chip_x: Virtual chip coordinate
+    :param int virtual_chip_y: Virtual chip coordinate
     """
 
     # If the chip already exists, return the data

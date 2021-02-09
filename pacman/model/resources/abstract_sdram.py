@@ -90,12 +90,12 @@ class AbstractSDRAM(object):
 
     @abstractmethod
     def report(self, timesteps, indent="", preamble="", target=None):
-        """ Writes a description of this SDRAM to the target
+        """ Writes a description of this SDRAM to the target.
 
-        :param int timesteps:  Number of timesteps to do total cost for
+        :param int timesteps: Number of timesteps to do total cost for
         :param str indent: Text at the start of this and all children
         :param str preamble:
             Additional text at the start but not in children
-        :param target: Where to write the output. None is standard output
-        :type target: str or None
+        :param target: Where to write the output.``None`` is standard print.
+        :type target: str or None or file
         """

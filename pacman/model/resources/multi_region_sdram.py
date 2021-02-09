@@ -22,14 +22,14 @@ from .variable_sdram import VariableSDRAM
 class MultiRegionSDRAM(VariableSDRAM):
     """ A resource for SDRAM that comes in regions.
 
-        .. note::
+        .. note:
             Adding or Subtracting two :py:class:`MultiRegionSDRAM` objects will
             be assumed to be an operation over multiple cores/placements so
             these functions return a :py:class:`VariableSDRAM` object without
             the regions data.
 
-            To add extra SDRAM costs for the *same* core/placement use the
-            methods :py:meth:`add_cost`, :py:meth:`merge`, or :py:meth:`nest`.
+            To add extra SDRAM costs for the same core/placement use the
+            methods :py:meth:`add_cost` and :py:meth:`merge`, or :py:meth:`nest`.
     """
 
     __slots__ = [
@@ -54,16 +54,18 @@ class MultiRegionSDRAM(VariableSDRAM):
 
         :param region: Key to identify the region
         :type region: int or str or enum
-        :param int fixed_sdram: The fixed cost for this region.
-        :param int per_timestep_sdram: The variable cost for this region is any
+        :param fixed_sdram: The fixed cost for this region.
+        :type fixed_sdram: int or numpy.integer
+        :param per_timestep_sdram: The variable cost for this region is any.
+        :type per_timestep_sdram: int or numpy.integer
         """
         self._fixed_sdram = self._fixed_sdram + fixed_sdram
         self._per_timestep_sdram = \
             self._per_timestep_sdram + per_timestep_sdram
         if per_timestep_sdram:
-            sdram = VariableSDRAM(fixed_sdram, per_timestep_sdram)
+            sdram = VariableSDRAM(int(fixed_sdram), int(per_timestep_sdram))
         else:
-            sdram = ConstantSDRAM(fixed_sdram)
+            sdram = ConstantSDRAM(int(fixed_sdram))
         if region in self.__regions:
             self.__regions[region] += sdram
         else:

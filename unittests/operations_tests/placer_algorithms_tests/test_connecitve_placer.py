@@ -62,7 +62,6 @@ class TestConnectivePlacer(unittest.TestCase):
         self.mach_graph.add_edge(edge3, "packet")
         edge4 = MachineEdge(self.vertex3, self.vertex1)
         self.edges.append(edge4)
-        self.mach_graph.add_edge(edge1, "bacon")
 
         self.plan_n_timesteps = 100
 

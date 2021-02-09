@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import (
@@ -21,7 +22,7 @@ from pacman.model.graphs import (
 from pacman.utilities.algorithm_utilities import (
     machine_algorithm_utilities, ElementAllocatorAlgorithm)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 _LOWER_16_BITS = 0xFFFF
 
 
@@ -58,12 +59,25 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         self._virtual_chips = dict()
 
     def __call__(self, machine, graph=None):
+        """
+        :param ~spinn_machine.Machine machine:
+        :param graph:
+        :type graph: Graph or None
+        :rtype: ~spinn_machine.Machine
+        :raises PacmanConfigurationException:
+            If a virtual chip is in an impossible position.
+        """
         if graph is not None:
             self.allocate_chip_ids(machine, graph)
         return machine
 
     def allocate_chip_ids(self, machine, graph):
         """ Go through the chips (real and virtual) and allocate keys for each
+
+        :param ~spinn_machine.Machine machine:
+        :param Graph graph:
+        :raises PacmanConfigurationException:
+            If a virtual chip is in an impossible position.
         """
         progress = ProgressBar(
             graph.n_vertices + machine.n_chips,

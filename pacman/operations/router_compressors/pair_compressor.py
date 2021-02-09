@@ -318,13 +318,16 @@ class PairCompressor(AbstractCompressor):
         self._routes_count += 1
 
     def compress_table(self, router_table):
-        """
-        Compresses all the entries for a single table.
+        """ Compresses all the entries for a single table.
 
         Compressed the entries for this unordered table
-        returning a new table with possibly fewer entries but still unordered
+        returning a new table with possibly fewer entries
 
-        :param MulticastRoutingTable router_table:
+        The resulting table may be ordered or unordered depending on the
+        value of ordered passed into the init method.
+        Ordered tables may be shorted than unordered ones.
+
+        :param UnCompressedMulticastRoutingTable router_table:
             Original Routing table for a single chip
         :return: Compressed routing table for the same chip
         :rtype: list(Entry)

@@ -20,6 +20,9 @@ class EdgeTrafficType(IntEnum):
     """ Indicates the traffic type of an Edge in a graph
     """
 
+    #: Edge communicates using multicast packets
     MULTICAST = 1
+    #: Edge communicates using fixed route packets
     FIXED_ROUTE = 2
+    #: Edge communicates using shared memory
     SDRAM = 3

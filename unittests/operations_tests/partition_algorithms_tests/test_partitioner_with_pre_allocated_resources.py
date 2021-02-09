@@ -15,6 +15,9 @@
 
 import six
 import sys
+
+from pacman.model.partitioner_splitters import SplitterSliceLegacy
+from pacman.operations.partition_algorithms import SplitterPartitioner
 from spinn_machine import virtual_machine
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanValueError,
@@ -25,7 +28,6 @@ from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.resources import (
     CoreResource, ConstantSDRAM, SpecificCoreResource,
     SpecificChipSDRAMResource, PreAllocatedResourceContainer)
-from pacman.operations.partition_algorithms import PartitionAndPlacePartitioner
 from uinit_test_objects import SimpleTestVertex
 
 
@@ -37,13 +39,15 @@ class TestPartitionerWithPreAllocatedResources(object):
     def test_1_chip_over_pre_allocated(self):
         machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
-        partitioner = PartitionAndPlacePartitioner()
+        partitioner = SplitterPartitioner()
 
         # add graph vertices which reside on 0,0
         for _ in range(0, 13):
-            graph.add_vertex(SimpleTestVertex(
+            vertex = SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0)],
-                n_atoms=1))
+                n_atoms=1)
+            vertex.splitter = SplitterSliceLegacy()
+            graph.add_vertex(vertex)
 
         # add pre-allocated resources for cores on 0,0
         core_pre = CoreResource(chip=machine.get_chip_at(0, 0), n_cores=5)
@@ -52,8 +56,8 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, plan_n_timesteps=None,
-                        preallocated_resources=pre_allocated_res)
+            partitioner(graph, machine, plan_n_time_steps=None,
+                        pre_allocated_resources=pre_allocated_res)
             raise Exception("should have blown up here")
         except PacmanInvalidParameterException:
             pass
@@ -61,13 +65,15 @@ class TestPartitionerWithPreAllocatedResources(object):
     def test_1_chip_under_pre_allocated(self):
         machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
-        partitioner = PartitionAndPlacePartitioner()
+        partitioner = SplitterPartitioner()
 
         # add graph vertices which reside on 0,0
         for _ in range(0, 13):
-            graph.add_vertex(SimpleTestVertex(
+            vertex = SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0)],
-                n_atoms=1))
+                n_atoms=1)
+            vertex.splitter = SplitterSliceLegacy()
+            graph.add_vertex(vertex)
 
         # add pre-allocated resources for cores on 0,0
         core_pre = CoreResource(chip=machine.get_chip_at(0, 0), n_cores=4)
@@ -76,21 +82,23 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, plan_n_timesteps=None,
-                        preallocated_resources=pre_allocated_res)
+            partitioner(graph, machine, plan_n_time_steps=None,
+                        pre_allocated_resources=pre_allocated_res)
         except Exception:
             raise Exception("should have blown up here")
 
     def test_1_chip_pre_allocated_same_core(self):
         machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
-        partitioner = PartitionAndPlacePartitioner()
+        partitioner = SplitterPartitioner()
 
         # add graph vertices which reside on 0,0
         for p in range(0, 13):
-            graph.add_vertex(SimpleTestVertex(
+            vertex = SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0, p=p)],
-                n_atoms=1))
+                n_atoms=1)
+            vertex.splitter = SplitterSliceLegacy()
+            graph.add_vertex(vertex)
 
         # add pre-allocated resources for cores on 0,0
         core_pre = SpecificCoreResource(
@@ -100,8 +108,8 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, plan_n_timesteps=None,
-                        preallocated_resources=pre_allocated_res)
+            partitioner(graph, machine, plan_n_time_steps=None,
+                        pre_allocated_resources=pre_allocated_res)
             raise Exception("should have blown up here")
         except PacmanValueError:
             pass
@@ -111,16 +119,18 @@ class TestPartitionerWithPreAllocatedResources(object):
     def test_1_chip_pre_allocated_too_much_sdram(self):
         machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
-        partitioner = PartitionAndPlacePartitioner()
+        partitioner = SplitterPartitioner()
 
         eight_meg = 8 * 1024 * 1024
 
         # add graph vertices which reside on 0,0
         for _ in range(0, 13):
-            graph.add_vertex(SimpleTestVertex(
+            vertex = SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1,
-                fixed_sdram_value=eight_meg))
+                fixed_sdram_value=eight_meg)
+            vertex.splitter = SplitterSliceLegacy()
+            graph.add_vertex(vertex)
 
         # add pre-allocated resources for cores on 0,0
         twenty_meg = ConstantSDRAM(20 * 1024 * 1024)
@@ -131,8 +141,8 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, plan_n_timesteps=None,
-                        preallocated_resources=pre_allocated_res)
+            partitioner(graph, machine, plan_n_time_steps=None,
+                        pre_allocated_resources=pre_allocated_res)
             raise Exception("should have blown up here")
         except PacmanPartitionException:
             pass
@@ -143,23 +153,26 @@ class TestPartitionerWithPreAllocatedResources(object):
     def test_1_chip_no_pre_allocated_too_much_sdram(self):
         machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
-        partitioner = PartitionAndPlacePartitioner()
+        partitioner = SplitterPartitioner()
 
         eight_meg = 8 * 1024 * 1024
 
         # add graph vertices which reside on 0,0
         for _ in range(0, 13):
-            graph.add_vertex(SimpleTestVertex(
+            vertex = SimpleTestVertex(
                 constraints=[ChipAndCoreConstraint(x=0, y=0)],
                 n_atoms=1,
-                fixed_sdram_value=eight_meg))
+                fixed_sdram_value=eight_meg)
+            vertex.splitter = SplitterSliceLegacy()
+            graph.add_vertex(vertex)
 
         # add pre-allocated resources for cores on 0,0
         pre_allocated_res = PreAllocatedResourceContainer()
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, pre_allocated_res)
+            partitioner(graph, machine, plan_n_time_steps=None,
+                        pre_allocated_resources=pre_allocated_res)
         except Exception:
             raise Exception("should have blown up here")
 

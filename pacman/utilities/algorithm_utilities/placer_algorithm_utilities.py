@@ -15,6 +15,8 @@
 
 import functools
 from collections import OrderedDict
+
+from pacman.model.resources import ResourceContainer, ConstantSDRAM
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
@@ -44,7 +46,7 @@ def get_vertices_on_same_chip(vertex, graph):
     """ Get the vertices that must be on the same chip as the given vertex
 
     :param AbstractVertex vertex: The vertex to search with
-    :param AbstractGraph graph: The graph containing the vertex
+    :param Graph graph: The graph containing the vertex
     :rtype: set(AbstractVertex)
     """
     # Virtual vertices can't be forced on different chips
@@ -66,7 +68,7 @@ def get_same_chip_vertex_groups(graph):
     """ Get a dictionary of vertex to list of vertices that must be placed on\
        the same chip
 
-    :param AbstractGraph graph: The graph containing the vertices
+    :param Graph graph: The graph containing the vertices
     :rtype: dict(AbstractVertex, set(AbstractVertex))
     """
     groups = create_vertices_groups(graph.vertices, functools.partial(
@@ -131,3 +133,35 @@ def create_vertices_groups(vertices, same_group_as_function):
                 add_set(groups, same_chip_as_vertices)
             done.update(same_chip_as_vertices)
     return groups
+
+
+def create_requirement_collections(vertices, machine_graph):
+    """ Get a collection of requirements that includes SDRAM edge resources
+    """
+
+    # Get all but the last requirements, keeping the SDRAM edge requirements
+    required_resources = list()
+    to_add_partitions = set()
+    last_resources = None
+    last_constraints = None
+    for vertex in vertices:
+        if last_resources is not None:
+            required_resources.append([
+                last_resources, last_constraints])
+        last_resources = vertex.resources_required
+        last_constraints = vertex.constraints
+        to_add_partitions.update(
+            machine_graph.get_sdram_edge_partitions_starting_at_vertex(
+                vertex))
+
+    # Add up all the SDRAM edge requirements
+    total_sdram = 0
+    for partition in to_add_partitions:
+        total_sdram += partition.total_sdram_requirements()
+
+    # Add the SDRAM requirements to the final requirements
+    resources = ResourceContainer(sdram=ConstantSDRAM(total_sdram))
+    resources.extend(last_resources)
+    required_resources.append([resources, last_constraints])
+
+    return required_resources
