@@ -17,6 +17,8 @@ from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 
 
+# Can't use this decorator: circular import problem
+# @require_subclass(ApplicationVertex)
 class LegacyPartitionerAPI(object, metaclass=AbstractBase):
     """ API used by the vertices which dont have their own splitters but use\
         what master did before the self partitioning stuff came to be.
@@ -25,12 +27,13 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_resources_used_by_atoms(self, vertex_slice):
-        """ Get the separate resource requirements for a range of atoms
+        """ Get the separate resource requirements for a range of atoms.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the low value of atoms to calculate resources from
-        :return: a Resource container that contains a
-            CPUCyclesPerTickResource, DTCMResource and SDRAMResource
+        :return: a resource container that contains a
+            :py:class:`CPUCyclesPerTickResource`, :py:class:`DTCMResource`
+            and :py:class:`SDRAMResource`
         :rtype: ~pacman.model.resources.ResourceContainer
         """
 
@@ -38,7 +41,7 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        """ Create a machine vertex from this application vertex
+        """ Create a machine vertex from this application vertex.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of atoms that the machine vertex will cover.

@@ -19,8 +19,8 @@ class AbstractSplitterPartitioner(object, metaclass=AbstractBase):
     """ Splitter API to allow other Partitioner's to add more stuff to the\
         edge creation process.
 
-    This makes sure that the methods super class expect to be there are not
-    removed.
+    This makes sure that the methods the superclass expects to be there are
+    not removed.
     """
 
     @abstractmethod
@@ -28,8 +28,7 @@ class AbstractSplitterPartitioner(object, metaclass=AbstractBase):
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
             app_outgoing_edge_partition, resource_tracker):
-        """ Creates the machine edge (if needed) and adding it\
-            to the graph
+        """ Create the machine edge (if needed) and add it to the graph.
 
         Some implementations of this method are able to detect that the
         requested edge is not actually needed so never create or add it.

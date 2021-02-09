@@ -216,6 +216,9 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         :param MachineVertex src_machine_vertex: used for error message
         :param MachineVertex dest_machine_vertex: used for error message
         :return: MachineEdge class
+        :rtype: type
+        :raises PacmanConfigurationException:
+            If we can't find a workable class
         """
         for post_edge_type in post_edge_types:
             if post_edge_type in pre_edge_types:
@@ -235,7 +238,6 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         :param MachineGraph machine_graph: machine graph
         :param ResourceTracker resource_tracker: resource tracker
         """
-
         # process edges
         progress = ProgressBar(
             app_graph.n_outgoing_edge_partitions, self.__PROGRESS_BAR_EDGES)
@@ -282,20 +284,16 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
     def __process_sdram_partitions(machine_graph, resource_tracker):
         """ process the sdram partitions
 
-        :param machine_graph: machine graph
-        :param resource_tracker: resource tracker.
-        :rtype: None
-        :raises PacmanException when outgoing partition requirements is\
-            too much.
+        :param MachineGraph machine_graph: machine graph
+        :param ResourceTracker resource_tracker: resource tracker.
+        :raises PacmanException:
+            when outgoing partition requirements is too much.
         """
-        for machine_partition in machine_graph.\
-                outgoing_edge_partitions:
+        for machine_partition in machine_graph.outgoing_edge_partitions:
             if isinstance(machine_partition, AbstractSDRAMPartition):
-                sdram_cost = (
-                    machine_partition.total_sdram_requirements())
+                sdram_cost = machine_partition.total_sdram_requirements()
                 sdram_cost += SARK_PER_MALLOC_SDRAM_USAGE
-                if isinstance(
-                        machine_partition, AbstractMultiplePartition):
+                if isinstance(machine_partition, AbstractMultiplePartition):
                     (chip_x, chip_y) = resource_tracker.chip_of(
                         list(machine_partition.pre_vertices)[0])
                 else:

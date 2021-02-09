@@ -15,6 +15,8 @@
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 
+# Can't use this decorator: circular import problem
+# @require_subclass(MachineVertex)
 class AbstractSupportsSDRAMEdges(object, metaclass=AbstractBase):
 
     __slots__ = []

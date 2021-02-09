@@ -13,15 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.require_subclass import require_subclass
+from pacman.model.graphs.application import ApplicationEdge
 
 
+@require_subclass(ApplicationEdge)
 class AbstractSlicesConnect(object, metaclass=AbstractBase):
-    """ An object that can check if a pre slice and a post slice could
+    """ An object that can check if a pre-slice and a post-slice could\
         connect.
 
-        Typically used to determine if a Machine Edge should be created by
-        checking that at least one of the indexes in the source slice could
-        connect to at least one of the indexes in the destination slice.
+    Typically used to determine if a Machine Edge should be created by
+    checking that at least one of the indexes in the source slice could
+    connect to at least one of the indexes in the destination slice.
     """
 
     __slots__ = ()
@@ -29,8 +32,8 @@ class AbstractSlicesConnect(object, metaclass=AbstractBase):
     @abstractmethod
     def could_connect(self, pre_slice, post_slice):
         """ Determine if there is a chance that one of the indexes in the\
-            pre slice could connect to at least one of the indexes in the\
-            post slice.
+            pre-slice could connect to at least one of the indexes in the\
+            post-slice.
 
         .. note::
             This method should never return a false negative,
