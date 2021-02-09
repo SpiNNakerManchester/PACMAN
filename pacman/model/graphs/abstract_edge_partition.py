@@ -23,8 +23,9 @@ _REPR_TEMPLATE = "{}(identifier={}, edges={}, constraints={}, label={})"
 
 
 class AbstractEdgePartition(ConstrainedObject, metaclass=AbstractBase):
-    """ A collection of edges which start at a single vertex which have the
-        same semantics and so can share a single key.
+    """ A collection of edges which start at a single vertex which have the\
+        same semantics and so can share a single key or block of SDRAM\
+        (depending on edge type).
     """
 
     __slots__ = [
@@ -77,9 +78,11 @@ class AbstractEdgePartition(ConstrainedObject, metaclass=AbstractBase):
     def add_edge(self, edge, graph_code):
         """ Add an edge to the edge partition.
 
-        Note: This method should only be called by the add_edge method of the\
-            graph that owns the partition. Calling it from anywhere else even
-            with the correct graph_code will lead to unsupported inconsistency
+        .. note::
+            This method should only be called by the ``add_edge`` method of
+            the graph that owns the partition. Calling it from anywhere else,
+            even with the correct graph_code, will lead to unsupported
+            inconsistency.
 
         :param AbstractEdge edge: the edge to add
         :param int graph_code:
@@ -124,9 +127,9 @@ class AbstractEdgePartition(ConstrainedObject, metaclass=AbstractBase):
     def edges(self):
         """ The edges in this edge partition.
 
-        NOTE: The order in which the edges are added is preserved for
-        when they are requested later. IF not, please talk to the software
-        team.
+        .. note::
+            The order in which the edges are added is preserved for when they
+            are requested later. If not, please talk to the software team.
 
         :rtype: iterable(AbstractEdge)
         """
@@ -186,8 +189,10 @@ class AbstractEdgePartition(ConstrainedObject, metaclass=AbstractBase):
         """
         Provides the vertices associated with this partition
 
-        Note: Most edge partitions will be AbstractSingleSourcePartition and
-            therefore provide the pre_vertex method.
+        .. note::
+            Most edge partitions will be
+            :py:class:`AbstractSingleSourcePartition`
+            and therefore provide the ``pre_vertex`` method.
 
         :rtype: iter(AbstractVertex)
         """

@@ -12,16 +12,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from collections import defaultdict
+from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import MinimisationFailedError
-
 from .abstract_compressor import AbstractCompressor
 from .entry import Entry
+from spinn_utilities.overrides import overrides
+logger = FormatAdapter(logging.getLogger(__file__))
 
 
 class ClashCompressor(AbstractCompressor):
-
     __slots__ = [
         "_all_entries",
         "_max_clashes"
@@ -107,22 +108,23 @@ class ClashCompressor(AbstractCompressor):
                 results.extend(compressed)
 
             if len(top_entries) + len(results) < self._target_length:
-                print("success!", len(top_entries) + len(results),
-                      len(top_entries), len(results))
+                logger.info("success! {} {} {}",
+                            len(top_entries) + len(results),
+                            len(top_entries), len(results))
                 answer = top_entries + results
-                print("Good Results ", len(answer))
+                logger.info("Good Results {}", len(answer))
                 return answer
 
             clashers = []
             for entry in results:
                 if entry.clashes > 0:
                     clashers.append(entry)
-            print(len(top_entries) + len(results), len(top_entries),
-                  len(results), len(clashers))
+            logger.info("{} ({},{},{})", len(top_entries) + len(results),
+                        len(top_entries), len(results), len(clashers))
 
             if len(clashers) == 0:
                 answer = top_entries + results
-                print("Best Results ", len(answer))
+                logger.info("Best Results {}", len(answer))
                 if len(answer) > self.MAX_SUPPORTED_LENGTH:
                     raise MinimisationFailedError("No clashers left")
                 return answer
@@ -130,20 +132,17 @@ class ClashCompressor(AbstractCompressor):
             clashers = sorted(clashers, key=lambda x: x.clashes, reverse=True)
             top_entries.extend(clashers[0:1])
 
+    @overrides(AbstractCompressor.compress_table)
     def compress_table(self, router_table):
-        """
-        :param MulticastRoutingTable router_table:
-        :rtype: list(~.Entry)
-        """
         # Split the entries into buckets based on spinnaker_route
 
         self._max_clashes = 1
 
         try:
-            results = self.compress_ignore_clashers(router_table, [])
-            return results
-        except Exception as ex:  # pylint: disable=broad-except
-            print(ex)
+            return self.compress_ignore_clashers(router_table, [])
+        except Exception:  # pylint: disable=broad-except
+            logger.exception("failed to compress table at {}:{}",
+                             router_table.x, router_table.y)
             self._problems += "(x:{},y:{})={} ".format(
-                router_table.x, router_table.y, len(results))
+                router_table.x, router_table.y, router_table.number_of_entries)
         return []

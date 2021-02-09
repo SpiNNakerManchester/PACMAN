@@ -144,13 +144,13 @@ class MachineGraph(Graph):
         if self._application_level_used:
             try:
                 vertex.app_vertex.remember_machine_vertex(vertex)
-            except AttributeError:
+            except AttributeError as e:
                 if self.n_vertices == 1:
                     self._application_level_used = False
                 else:
                     raise PacmanInvalidParameterException(
                         "vertex", str(vertex),
-                        self.MISSING_APP_VERTEX_ERROR_MESSAGE)
+                        self.MISSING_APP_VERTEX_ERROR_MESSAGE) from e
         elif vertex.app_vertex:
             raise PacmanInvalidParameterException(
                 "vertex", vertex, self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
@@ -217,7 +217,7 @@ class MachineGraph(Graph):
     def get_fixed_route_edge_partitions_starting_at_vertex(self, vertex):
         """ Get only the fixed_route edge partitions that start at the vertex.
 
-        :param AbstractVertex vertex:\
+        :param MachineVertex vertex:
              The vertex at which the edge partitions to find starts
         :rtype: iterable(FixedRouteEdgePartition)
         """
@@ -226,16 +226,16 @@ class MachineGraph(Graph):
     def get_multicast_edge_partitions_starting_at_vertex(self, vertex):
         """ Get only the multicast edge partitions that start at the vertex.
 
-        :param AbstractVertex vertex:\
+        :param MachineVertex vertex:
             The vertex at which the edge partitions to find starts
         :rtype: iterable(MulticastEdgePartition)
         """
         return self._multicast_edge_partitions_by_pre_vertex.get(vertex, [])
 
     def get_sdram_edge_partitions_starting_at_vertex(self, vertex):
-        """ Get all the sdram edge partitions that start at the given vertex.
+        """ Get all the SDRAM edge partitions that start at the given vertex.
 
-        :param AbstractVertex vertex:\
+        :param MachineVertex vertex:
             The vertex at which the sdram edge partitions to find starts
         :rtype: iterable(AbstractSDRAMPartition)
         """
@@ -256,7 +256,7 @@ class MachineGraph(Graph):
     def get_fixed_route_edge_partitions_ending_at_vertex(self, vertex):
         """ Get only the fixed_route edge partitions that end at the vertex.
 
-        :param AbstractVertex vertex:\
+        :param MachineVertex vertex:
             The vertex at which the edge partitions to find starts
         :rtype: iterable(FixedRouteEdgePartition)
         """
@@ -265,7 +265,7 @@ class MachineGraph(Graph):
     def get_multicast_edge_partitions_ending_at_vertex(self, vertex):
         """ Get only the multicast edge partitions that end at the vertex.
 
-        :param AbstractVertex vertex:\
+        :param MachineVertex vertex:
             The vertex at which the edge partitions to find starts
         :rtype: iterable(MulticastEdgePartition)
         """
@@ -274,8 +274,8 @@ class MachineGraph(Graph):
     def get_sdram_edge_partitions_ending_at_vertex(self, vertex):
         """ Get all the sdram edge partitions that end at the given vertex.
 
-        :param AbstractVertex vertex:\
-            The vertex at which the sdram edge partitions to find starts
+        :param MachineVertex vertex:
+            The vertex at which the SDRAM edge partitions to find starts
         :rtype: iterable(AbstractSDRAMPartition)
         """
         return self._sdram_edge_partitions_by_post_vertex.get(vertex, [])
@@ -283,8 +283,8 @@ class MachineGraph(Graph):
     def get_edge_partitions_ending_at_vertex(self, vertex):
         """ Get all the edge partitions that end at the given vertex.
 
-        :param AbstractVertex vertex:\
-            The vertex at which the sdram edge partitions to find starts
+        :param MachineVertex vertex:
+            The vertex at which the SDRAM edge partitions to find starts
         :rtype: iterable(AbstractPartition)
         """
         for partition in \
@@ -303,8 +303,7 @@ class MachineGraph(Graph):
 
         Vertices and edges are copied over. Partition will be new objects.
 
-        :param application_graph: The application graph with which the clone
-            should be associated
+        :param bool frozen: Whether the copy should be unmodifiable
         :return: A shallow copy of this graph
         :rtype: MachineGraph
         """

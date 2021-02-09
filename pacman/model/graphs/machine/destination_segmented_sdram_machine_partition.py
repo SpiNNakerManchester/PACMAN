@@ -24,7 +24,9 @@ from pacman.model.graphs.machine import (
 
 class DestinationSegmentedSDRAMMachinePartition(
         AbstractSingleSourcePartition, AbstractSDRAMPartition):
-
+    """ An SDRAM partition that gives each edge its own slice of memory from a\
+        contiguous block. The edges all have the same source vertex.
+    """
     __slots__ = [
         # The sdram base address for this partition.
         "_sdram_base_address",
@@ -35,7 +37,7 @@ class DestinationSegmentedSDRAMMachinePartition(
             pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=SDRAMMachineEdge, constraints=None,
             label=label, traffic_weight=1,
-            class_name="ConstantSdramMachinePartition")
+            class_name="DestinationSegmentedSDRAMMachinePartition")
         self._sdram_base_address = None
 
     @property

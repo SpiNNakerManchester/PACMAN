@@ -22,7 +22,8 @@ from pacman.model.graphs import AbstractEdgePartition
 
 
 class AbstractMultiplePartition(AbstractEdgePartition):
-
+    """ An edge partition that has multiple source vertices.
+    """
     __slots__ = [
         # the vertices which send through this partition.
         "_pre_vertices",

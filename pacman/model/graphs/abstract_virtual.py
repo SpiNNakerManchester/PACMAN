@@ -24,23 +24,23 @@ class AbstractVirtual(object):
         allowing a graph to formally participate in I/O.
 
     .. note::
-        Everything that is an instance of AbstractVirtual is also an instance
-        of :py:class:`AbstractVertex`.
+        Everything that is an instance of ``AbstractVirtual`` is also an
+        instance of :py:class:`AbstractVertex`.
     """
 
     __slots__ = ()
 
     @abstractproperty
     def board_address(self):
-        """ The IP address of the board to which the device is connected,
-            or None for the boot board.
+        """ The IP address of the board to which the device is connected,\
+            or ``None`` for the boot board.
 
         :rtype: str
         """
 
     @abstractmethod
     def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
-        """ Set the details of the virtual chip that has been added to the
+        """ Set the details of the virtual chip that has been added to the\
             machine for this vertex.
 
         :param int virtual_chip_x: The x-coordinate of the added chip
@@ -49,7 +49,7 @@ class AbstractVirtual(object):
 
     @abstractproperty
     def virtual_chip_x(self):
-        """ The x-coordinate of the virtual chip where this vertex is to be
+        """ The x-coordinate of the virtual chip where this vertex is to be\
             placed.
 
         :rtype: int
@@ -57,7 +57,7 @@ class AbstractVirtual(object):
 
     @abstractproperty
     def virtual_chip_y(self):
-        """ The y-coordinate of the virtual chip where this vertex is to be
+        """ The y-coordinate of the virtual chip where this vertex is to be\
             placed.
 
         :rtype: int

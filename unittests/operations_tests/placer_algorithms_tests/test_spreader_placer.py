@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import pytest
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.exceptions import PacmanException
 from pacman.model.graphs.machine import (
@@ -179,9 +179,6 @@ def test_sdram_links():
 
     # Do placements
     machine = virtual_machine(width=8, height=8)
-    try:
+    with pytest.raises(PacmanException):
         SpreaderPlacer()(machine_graph, machine, n_keys_map,
                          plan_n_timesteps=1000)
-        raise Exception("should blow up here")
-    except PacmanException:
-        pass

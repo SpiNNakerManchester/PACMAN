@@ -18,6 +18,8 @@ from pacman.model.graphs.machine import AbstractMachineEdgePartition
 
 class AbstractSDRAMPartition(
         AbstractMachineEdgePartition, metaclass=AbstractBase):
+    """ An edge partition that contains SDRAM edges.
+    """
 
     @abstractmethod
     def total_sdram_requirements(self):

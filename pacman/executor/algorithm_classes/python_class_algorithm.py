@@ -87,14 +87,14 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
             method = getattr(instance, self._python_method)
         try:
             return method(**inputs)
-        except Exception:
+        except Exception as e:
             method = "__call__"
             if self._python_method is not None:
                 method = self._python_method
             logger.error("Error when calling {}.{}.{} with inputs {}",
                          self._python_module, self._python_class, method,
                          inputs.keys())
-            raise
+            raise e
 
     def __repr__(self):
         return (

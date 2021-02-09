@@ -73,11 +73,11 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
         # Run the algorithm and get the results
         try:
             return function(**inputs)
-        except Exception:
+        except Exception as e:
             logger.error("Error when calling {}.{} with inputs {}",
                          self._python_module, self._python_function,
                          inputs.keys())
-            raise
+            raise e
 
     def __repr__(self):
         return (

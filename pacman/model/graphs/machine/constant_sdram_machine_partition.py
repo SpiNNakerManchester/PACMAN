@@ -24,6 +24,9 @@ from pacman.model.graphs.machine import SDRAMMachineEdge
 
 class ConstantSDRAMMachinePartition(
         AbstractSingleSourcePartition, AbstractSDRAMPartition):
+    """ An SDRAM partition that uses a fixed amount of memory. The edges in\
+        the partition must agree on how much memory is required.
+    """
 
     __slots__ = [
         # The sdram base address for this partition.
@@ -38,7 +41,7 @@ class ConstantSDRAMMachinePartition(
         super().__init__(
             pre_vertex, identifier, allowed_edge_types=SDRAMMachineEdge,
             constraints=None, label=label, traffic_weight=1,
-            class_name="ConstantSdramMachinePartition")
+            class_name="ConstantSDRAMMachinePartition")
         self._sdram_size = None
         self._sdram_base_address = None
 

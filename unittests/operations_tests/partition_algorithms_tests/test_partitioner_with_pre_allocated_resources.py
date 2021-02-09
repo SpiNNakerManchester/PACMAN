@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import pytest
 from spinn_machine import virtual_machine
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.operations.partition_algorithms import SplitterPartitioner
@@ -52,12 +53,9 @@ class TestPartitionerWithPreAllocatedResources(object):
             core_resources=[core_pre])
 
         # run partitioner that should go boom
-        try:
+        with pytest.raises(PacmanInvalidParameterException):
             partitioner(graph, machine, plan_n_time_steps=None,
                         pre_allocated_resources=pre_allocated_res)
-            raise Exception("should have blown up here")
-        except PacmanInvalidParameterException:
-            pass
 
     def test_1_chip_under_pre_allocated(self):
         machine = virtual_machine(width=8, height=8)
@@ -81,8 +79,8 @@ class TestPartitionerWithPreAllocatedResources(object):
         try:
             partitioner(graph, machine, plan_n_time_steps=None,
                         pre_allocated_resources=pre_allocated_res)
-        except Exception:
-            raise Exception("should have blown up here")
+        except Exception as e:
+            raise Exception("should have blown up here") from e
 
     def test_1_chip_pre_allocated_same_core(self):
         machine = virtual_machine(width=8, height=8)
@@ -104,14 +102,9 @@ class TestPartitionerWithPreAllocatedResources(object):
             specific_core_resources=[core_pre])
 
         # run partitioner that should go boom
-        try:
+        with pytest.raises(PacmanValueError):
             partitioner(graph, machine, plan_n_time_steps=None,
                         pre_allocated_resources=pre_allocated_res)
-            raise Exception("should have blown up here")
-        except PacmanValueError:
-            pass
-        except Exception:
-            raise Exception("should have blown up here")
 
     def test_1_chip_pre_allocated_too_much_sdram(self):
         machine = virtual_machine(width=8, height=8)
@@ -137,12 +130,9 @@ class TestPartitionerWithPreAllocatedResources(object):
             specific_sdram_usage=[core_pre])
 
         # run partitioner that should go boom
-        try:
+        with pytest.raises(PacmanPartitionException):
             partitioner(graph, machine, plan_n_time_steps=None,
                         pre_allocated_resources=pre_allocated_res)
-            raise Exception("should have blown up here")
-        except PacmanPartitionException:
-            pass
 
     def test_1_chip_no_pre_allocated_too_much_sdram(self):
         machine = virtual_machine(width=8, height=8)
@@ -167,8 +157,8 @@ class TestPartitionerWithPreAllocatedResources(object):
         try:
             partitioner(graph, machine, plan_n_time_steps=None,
                         pre_allocated_resources=pre_allocated_res)
-        except Exception:
-            raise Exception("should have blown up here")
+        except Exception as e:
+            raise Exception("should have blown up here") from e
 
 
 if __name__ == "__main__":

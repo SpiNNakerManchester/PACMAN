@@ -18,6 +18,8 @@ from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 # Can't use this decorator: circular import problem
 # @require_subclass(MachineVertex)
 class AbstractSupportsSDRAMEdges(object, metaclass=AbstractBase):
+    """ Marks a machine vertex that can have SDRAM edges attached to it.
+    """
 
     __slots__ = []
 
@@ -25,7 +27,7 @@ class AbstractSupportsSDRAMEdges(object, metaclass=AbstractBase):
     def sdram_requirement(self, sdram_machine_edge):
         """ Asks a machine vertex for the sdram requirement it needs.
 
-        :param sdram_machine_edge: The sdram edge in question
-        :return: the size in bytes this sdram needs.
+        :param sdram_machine_edge: The SDRAM edge in question
+        :return: the size in bytes this vertex needs for the SDRAM edge
         :rtype: int (most likely a multiple of 4)
         """
