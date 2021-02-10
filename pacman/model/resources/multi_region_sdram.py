@@ -29,7 +29,8 @@ class MultiRegionSDRAM(VariableSDRAM):
             the regions data.
 
             To add extra SDRAM costs for the same core/placement use the
-            methods :py:meth:`add_cost` and :py:meth:`merge`, or :py:meth:`nest`.
+            methods :py:meth:`add_cost` and :py:meth:`merge`, or 
+            :py:meth:`nest`.
     """
 
     __slots__ = [
