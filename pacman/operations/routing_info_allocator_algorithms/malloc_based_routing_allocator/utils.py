@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from functools import reduce
 import itertools
-from six.moves import reduce, xrange
 
 
 def get_possible_masks(n_keys, mask_width=32, contiguous_keys=True):
@@ -36,7 +36,7 @@ def get_possible_masks(n_keys, mask_width=32, contiguous_keys=True):
     # Get all possible places where the zero bits could be put; this is an
     # ideal way to do it too, as it gives us the one with the bits at the
     # bottom (the old generation algorithm) first.
-    places_for_zeroes = itertools.combinations(xrange(mask_width), n_zeros)
+    places_for_zeroes = itertools.combinations(range(mask_width), n_zeros)
 
     # If the keys are all contiguous, you can only have one possible mask,
     # which is the first one

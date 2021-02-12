@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.ordered_set import OrderedSet
@@ -23,10 +22,10 @@ from pacman.model.graphs.common import ConstrainedObject
 _REPR_TEMPLATE = "{}(identifier={}, edges={}, constraints={}, label={})"
 
 
-@add_metaclass(AbstractBase)
-class AbstractEdgePartition(ConstrainedObject):
-    """ A collection of edges which start at a single vertex which have the
-        same semantics and so can share a single key.
+class AbstractEdgePartition(ConstrainedObject, metaclass=AbstractBase):
+    """ A collection of edges which start at a single vertex which have the\
+        same semantics and so can share a single key or block of SDRAM\
+        (depending on edge type).
     """
 
     __slots__ = [
@@ -59,7 +58,7 @@ class AbstractEdgePartition(ConstrainedObject):
         :param int traffic_weight:
             The weight of traffic going down this partition
         """
-        ConstrainedObject.__init__(self, constraints)
+        super().__init__(constraints)
         self._label = label
         self._identifier = identifier
         self._edges = OrderedSet()
@@ -79,9 +78,11 @@ class AbstractEdgePartition(ConstrainedObject):
     def add_edge(self, edge, graph_code):
         """ Add an edge to the edge partition.
 
-        Note: This method should only be called by the add_edge method of the\
-            graph that owns the partition. Calling it from anywhere else even
-            with the correct graph_code will lead to unsupported inconsistency
+        .. note::
+            This method should only be called by the ``add_edge`` method of
+            the graph that owns the partition. Calling it from anywhere else,
+            even with the correct graph_code, will lead to unsupported
+            inconsistency.
 
         :param AbstractEdge edge: the edge to add
         :param int graph_code:
@@ -126,9 +127,9 @@ class AbstractEdgePartition(ConstrainedObject):
     def edges(self):
         """ The edges in this edge partition.
 
-        NOTE: The order in which the edges are added is preserved for
-        when they are requested later. IF not, please talk to the software
-        team.
+        .. note::
+            The order in which the edges are added is preserved for when they
+            are requested later. If not, please talk to the software team.
 
         :rtype: iterable(AbstractEdge)
         """
@@ -188,8 +189,10 @@ class AbstractEdgePartition(ConstrainedObject):
         """
         Provides the vertices associated with this partition
 
-        Note: Most edge partitions will be AbstractSingleSourcePartition and
-            therefore provide the pre_vertex method.
+        .. note::
+            Most edge partitions will be
+            :py:class:`AbstractSingleSourcePartition`
+            and therefore provide the ``pre_vertex`` method.
 
         :rtype: iter(AbstractVertex)
         """

@@ -24,7 +24,7 @@ class SimpleMachineVertex(MachineVertex, AbstractSupportsSDRAMEdges):
 
     def __init__(self, resources, label=None, constraints=None,
                  app_vertex=None, vertex_slice=None, sdram_cost=0):
-        super(SimpleMachineVertex, self).__init__(
+        super().__init__(
             label=label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
         self._resources = resources

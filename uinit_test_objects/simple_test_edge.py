@@ -22,5 +22,4 @@ class SimpleTestEdge(ApplicationEdge):
     """
 
     def __init__(self, pre_vertex, post_vertex, label=None):
-        super(SimpleTestEdge, self).__init__(
-            pre_vertex, post_vertex, label=label)
+        super().__init__(pre_vertex, post_vertex, label=label)

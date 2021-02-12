@@ -13,14 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
 
 
-@add_metaclass(AbstractBase)
-class MachineVertex(AbstractVertex):
+class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     """ A machine graph vertex.
     """
 
@@ -50,7 +48,7 @@ class MachineVertex(AbstractVertex):
         """
         if label is None:
             label = str(type(self))
-        super(MachineVertex, self).__init__(label, constraints)
+        super().__init__(label, constraints)
         self._added_to_graph = False
         self._app_vertex = app_vertex
         self._index = None

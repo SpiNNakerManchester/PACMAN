@@ -12,13 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from six import add_metaclass
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 from pacman.model.graphs.machine import AbstractMachineEdgePartition
 
 
-@add_metaclass(AbstractBase)
-class AbstractSDRAMPartition(AbstractMachineEdgePartition):
+class AbstractSDRAMPartition(
+        AbstractMachineEdgePartition, metaclass=AbstractBase):
+    """ An edge partition that contains SDRAM edges.
+    """
 
     @abstractmethod
     def total_sdram_requirements(self):

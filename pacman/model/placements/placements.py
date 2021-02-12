@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-from six import iterkeys, itervalues, raise_from
 from pacman.exceptions import (
     PacmanAlreadyPlacedError, PacmanNotPlacedError,
     PacmanProcessorAlreadyOccupiedError, PacmanProcessorNotOccupiedError)
@@ -97,7 +96,7 @@ class Placements(object):
         try:
             return self._placements[placement_id].vertex
         except KeyError as e:
-            raise_from(PacmanProcessorNotOccupiedError(placement_id), e)
+            raise PacmanProcessorNotOccupiedError(placement_id) from e
 
     def get_placement_on_processor(self, x, y, p):
         """ Return the placement on a specific processor or raises an exception
@@ -115,7 +114,7 @@ class Placements(object):
         try:
             return self._placements[placement_id]
         except KeyError as e:
-            raise_from(PacmanProcessorNotOccupiedError(placement_id), e)
+            raise PacmanProcessorNotOccupiedError(placement_id) from e
 
     def get_placement_of_vertex(self, vertex):
         """ Return the placement information for a vertex
@@ -128,7 +127,7 @@ class Placements(object):
         try:
             return self._machine_vertices[vertex]
         except KeyError as e:
-            raise_from(PacmanNotPlacedError(vertex), e)
+            raise PacmanNotPlacedError(vertex) from e
 
     def get_placed_processors(self):
         """ Return an iterable of processors with assigned vertices.
@@ -136,7 +135,7 @@ class Placements(object):
         :return: Iterable of (x, y, p) tuples
         :rtype: iterable(tuple(int, int, int))
         """
-        return iterkeys(self._placements)
+        return iter(self._placements.keys())
 
     def is_processor_occupied(self, x, y, p):
         """ Determine if a processor has a vertex on it
@@ -155,7 +154,7 @@ class Placements(object):
         :return: iterable of placements
         :rtype: iterable(Placement)
         """
-        return itervalues(self._placements)
+        return iter(self._placements.values())
 
     def __repr__(self):
         output = ""

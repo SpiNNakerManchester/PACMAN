@@ -12,10 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.common import EdgeTrafficType
 
 from collections import OrderedDict
-from six import itervalues
 import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
@@ -23,6 +21,7 @@ from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyFieldConstraint,
     ContiguousKeyRangeContraint, FixedMaskConstraint,
     FixedKeyAndMaskConstraint, ShareKeyConstraint)
+from pacman.model.graphs.common import EdgeTrafficType
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.exceptions import (
     PacmanValueError, PacmanConfigurationException,
@@ -39,7 +38,7 @@ class ConstraintGroup(list):
         """
         :param iterable(AbstractSingleSourcePartition) values:
         """
-        super(ConstraintGroup, self).__init__(values)
+        super().__init__(values)
         self._constraint = None
         self._n_keys = None
 
@@ -119,7 +118,7 @@ def get_mulitcast_edge_groups(machine_graph):
         FixedMaskConstraint: fixed_mask_groups,
         FixedKeyFieldConstraint: fixed_field_groups,
     }
-    groups = OrderedSet(itervalues(partition_groups))
+    groups = OrderedSet(partition_groups.values())
     for group in groups:
 
         # Get all expected constraints in the group

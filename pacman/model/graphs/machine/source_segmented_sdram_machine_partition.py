@@ -24,7 +24,9 @@ from pacman.model.graphs.machine import (
 
 class SourceSegmentedSDRAMMachinePartition(
         AbstractMultiplePartition, AbstractSDRAMPartition):
-
+    """ An SDRAM partition that gives each edge its own slice of memory from a\
+        contiguous block. The edges all have the same destination vertex.
+    """
     __slots__ = [
         "_sdram_base_address",
     ]
@@ -36,11 +38,11 @@ class SourceSegmentedSDRAMMachinePartition(
         :param iterable(AbstractVertex) pre_vertices:
             The vertices that an edge in this partition may originate at
         """
-        super(SourceSegmentedSDRAMMachinePartition, self).__init__(
+        super().__init__(
             pre_vertices, identifier,
             allowed_edge_types=SDRAMMachineEdge, constraints=None,
             label=label, traffic_weight=1,
-            class_name="ConstantSdramMachinePartition")
+            class_name="SourceSegmentedSDRAMMachinePartition")
         self._sdram_base_address = None
 
     @property
@@ -64,18 +66,18 @@ class SourceSegmentedSDRAMMachinePartition(
     @overrides(AbstractMultiplePartition.add_edge)
     def add_edge(self, edge, graph_code):
         # add
-        AbstractMachineEdgePartition.check_edge(self, edge)
-        AbstractMultiplePartition.add_edge(self, edge, graph_code)
+        super().check_edge(edge)
+        super().add_edge(edge, graph_code)
 
         # check
         if len(self._destinations.keys()) != 1:
             raise PacmanConfigurationException(
-                "The MultiSourcePartition can only support 1 destination "
-                "vertex")
+                "The {} can only support 1 destination vertex".format(
+                    self._class_name))
         if len(self._pre_vertices[edge.pre_vertex]) != 1:
             raise PacmanConfigurationException(
-                "The MultiSourcePartition only supports 1 edge from a "
-                "given pre vertex.")
+                "The {} only supports 1 edge from a given pre vertex.".format(
+                    self._class_name))
 
         if self._sdram_base_address is not None:
             raise PacmanConfigurationException(
@@ -91,9 +93,10 @@ class SourceSegmentedSDRAMMachinePartition(
                 edge = self._pre_vertices[pre_vertex].peek()
                 edge.sdram_base_address = new_value
                 new_value += edge.sdram_size
-            except KeyError:
+            except KeyError as e:
                 raise PartitionMissingEdgesException(
-                    "This partition has no edge from {}".format(pre_vertex))
+                    "This partition has no edge from {}".format(
+                        pre_vertex)) from e
 
     @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
     def get_sdram_base_address_for(self, vertex):

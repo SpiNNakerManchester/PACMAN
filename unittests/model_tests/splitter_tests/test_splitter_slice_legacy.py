@@ -22,7 +22,7 @@ from pacman.model.partitioner_splitters import SplitterSliceLegacy
 
 class MockLegacyApi(ApplicationVertex, LegacyPartitionerAPI):
     def __init__(self, label):
-        super(MockLegacyApi, self).__init__(
+        super().__init__(
             label=label, constraints=None,  max_atoms_per_core=None)
 
     def get_resources_used_by_atoms(self, vertex_slice):
@@ -39,7 +39,7 @@ class MockLegacyApi(ApplicationVertex, LegacyPartitionerAPI):
 
 class MockLegacy(ApplicationVertex):
     def __init__(self, label):
-        super(MockLegacy, self).__init__(
+        super().__init__(
             label=label, constraints=None,  max_atoms_per_core=None)
 
     def get_resources_used_by_atoms(self, vertex_slice):
@@ -56,7 +56,7 @@ class MockLegacy(ApplicationVertex):
 
 class MockNotLegacy(ApplicationVertex):
     def __init__(self, label):
-        super(MockNotLegacy, self).__init__(
+        super().__init__(
             label=label, constraints=None,  max_atoms_per_core=None)
 
     def n_atoms(self):

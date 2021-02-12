@@ -15,7 +15,6 @@
 
 import logging
 import sys
-from six.moves import zip
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar, DummyProgressBar
 from pacman.exceptions import PacmanRoutingException

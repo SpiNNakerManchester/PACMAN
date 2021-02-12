@@ -32,7 +32,7 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
 
     def __init__(self, n_atoms, label="testVertex", max_atoms_per_core=256,
                  constraints=None, fixed_sdram_value=None):
-        super(SimpleTestVertex, self).__init__(
+        super().__init__(
             label=label, max_atoms_per_core=max_atoms_per_core,
             constraints=constraints)
         self._model_based_max_atoms_per_core = max_atoms_per_core

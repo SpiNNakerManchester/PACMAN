@@ -52,7 +52,7 @@ class AbstractPythonAlgorithm(AbstractAlgorithm):
             The module containing the python code to execute
         """
         # pylint: disable=too-many-arguments
-        super(AbstractPythonAlgorithm, self).__init__(
+        super().__init__(
             algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
             generated_output_tokens)

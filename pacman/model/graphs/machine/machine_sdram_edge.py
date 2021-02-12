@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.exceptions import SDRAMEdgeSizeException
-from pacman.model.graphs.abstract_supports_sdram_edges import \
-    AbstractSupportsSDRAMEdges
+from pacman.model.graphs.abstract_supports_sdram_edges import (
+    AbstractSupportsSDRAMEdges)
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import MachineEdge
 
@@ -40,8 +40,8 @@ class SDRAMMachineEdge(MachineEdge):
         "handle this case. Please fix and try again.")
 
     def __init__(self, pre_vertex, post_vertex, label, app_edge=None):
-        MachineEdge.__init__(
-            self, pre_vertex, post_vertex, traffic_type=EdgeTrafficType.SDRAM,
+        super().__init__(
+            pre_vertex, post_vertex, traffic_type=EdgeTrafficType.SDRAM,
             label=label, traffic_weight=1, app_edge=app_edge)
 
         (pre_vertex_sdram, post_vertex_sdram) = self.__get_vertex_sdrams()
@@ -69,7 +69,7 @@ class SDRAMMachineEdge(MachineEdge):
 
         :return: tuple of pre and post sdram costs.
         :rtype: tuple(int, int)
-        :rtype SDRAMEdgeSizeException: \
+        :rtype SDRAMEdgeSizeException:
             if either vertex does not support SDRAM edges.
         """
 

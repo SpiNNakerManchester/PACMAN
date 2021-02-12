@@ -14,14 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
-try:
-    from inspect import getfullargspec
-except ImportError:
-    # Python 2.7 hack
-    from inspect import getargspec as getfullargspec
+from inspect import getfullargspec
 from functools import wraps
-from six import iteritems, itervalues
-# pylint: disable=deprecated-method
 _instances = list()
 _methods = defaultdict(dict)
 _injectables = None
@@ -41,7 +35,7 @@ def supports_injection(injectable_class):
     def new_init(self, *args, **kwargs):
         # pylint: disable=protected-access
         orig_init(self, *args, **kwargs)
-        for method in itervalues(injectable_class.__dict__):
+        for method in injectable_class.__dict__.values():
             if hasattr(method, "_type_to_inject"):
                 _methods[injectable_class][method._type_to_inject] = method
         _instances.append(self)
@@ -129,7 +123,7 @@ def inject_items(types):
                 raise InjectionException(
                     "No injectable objects have been provided")
             new_args = dict(kwargs)
-            for arg, arg_type in iteritems(types):
+            for arg, arg_type in types.items():
                 if arg_type not in _injectables:
                     raise InjectionException(
                         "Cannot find object of type {} to inject into"
@@ -174,7 +168,7 @@ class _DictFacade(dict):
         """
         :param dicts: An iterable of dict objects to be used
         """
-        super(_DictFacade, self).__init__()
+        super().__init__()
         self._dicts = dicts
 
     def get(self, key, default=None):
@@ -244,7 +238,7 @@ def do_injection(objects_to_inject, objects_to_inject_into=None):
             cls_methods = _methods.get(cls, {})
             methods.update(cls_methods)
         if methods is not None:
-            for object_type, object_to_inject in iteritems(objects_to_inject):
+            for object_type, object_to_inject in objects_to_inject.items():
                 method = methods.get(object_type, None)
                 if method is not None:
                     method(obj, object_to_inject)

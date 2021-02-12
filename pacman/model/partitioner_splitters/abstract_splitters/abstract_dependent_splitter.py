@@ -39,7 +39,7 @@ class AbstractDependentSplitter(AbstractSplitterCommon):
             or None
         :param str splitter_name:
         """
-        AbstractSplitterCommon.__init__(self, splitter_name)
+        super().__init__(splitter_name)
         self._other_splitter = other_splitter
 
     @property
