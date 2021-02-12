@@ -21,11 +21,6 @@ from .entry import Entry
 
 
 class ClashCompressor(AbstractCompressor):
-    """
-    This was an attempt to extend the Pair compressor to look for entries which caused lot of clashes and put them at the top of the routing table.
-
-    Last time tried to proved to be very slow with no or very minro differences.
-    """
 
     __slots__ = [
         "_all_entries",
