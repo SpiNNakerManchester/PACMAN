@@ -67,7 +67,7 @@ class BasicRoutingInfoAllocator(object):
         routing_infos = RoutingInfo()
         for vertex in progress.over(machine_graph.vertices):
             for partition in machine_graph.\
-                    get_outgoing_edge_partitions_starting_at_vertex(vertex):
+                    get_multicast_edge_partitions_starting_at_vertex(vertex):
                 routing_infos.add_partition_info(
                     self._allocate_key_for_partition(
                         partition, vertex, placements, n_keys_map))
@@ -76,7 +76,7 @@ class BasicRoutingInfoAllocator(object):
     def _allocate_key_for_partition(
             self, partition, vertex, placements, n_keys_map):
         """
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
         :param MachineVertex vertex:
         :param Placements placements:
         :param AbstractMachinePartitionNKeysMap n_keys_map:

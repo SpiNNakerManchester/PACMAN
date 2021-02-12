@@ -21,12 +21,11 @@ name: Python Actions
 on: [push]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: [2.7, 3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
     - name: Set up Python ${{ matrix.python-version }}
@@ -42,75 +41,72 @@ jobs:
         repository: SpiNNakerManchester/SupportScripts
         path: support
 
+    - name: Install pip, etc
+      uses: ./support/actions/python-tools
+
     - name: Checkout Spinnaker Dependencies
-      run: |
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNUtils.git
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNMachine.git
-
-    - name: Install -pip
-      run: |
-        python -m pip install --upgrade pip
-        pip install 'pylint<2.5' python-coveralls 'coverage>=4.4,<5.0'
-
-    - name: Install SpiNNUtils
-      run: python setup.py install
-      working-directory: SpiNNUtils
-
-    - name: Install SpiNNMachine
-      run: python setup.py install
-      working-directory: SpiNNMachine
-
-    - name: Preinstall requirements (2.7 only)
-      if: matrix.python-version == 2.7
-      run: |
-        pip install -r requirements-test.txt
+      uses: ./support/actions/checkout-spinn-deps
+      with:
+        repositories: SpiNNUtils SpiNNMachine
+        install: true
 
     - name: Setup
-      run: |
-        python setup.py develop
-
-    - name: Install requirements-test
-      run: |
-        pip install -r requirements-test.txt
-
-    - name: Test with pytest and coverage
-      if: matrix.python-version == 3.6
-      run: |
-        pytest unittests --cov pacman
+      uses: ./support/actions/run-setup
 
     - name: Test with pytest
-      if: matrix.python-version != 3.6
-      run: |
-        pytest unittests
-
-    - name: Lint with flake8
-      run: |
-        # run flake8
-        flake8 pacman unittests
+      uses: ./support/actions/pytest
+      with:
+        tests: unittests
+        coverage: ${{ matrix.python-version == 3.6 }}
+        cover-packages: pacman
+        coveralls-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
     - name: Lint with pylint
-      # Note that there's special conditioning of the return code of pylint
-      run: |
-        pylint --output-format=colorized --disable=R,C pacman || exit $(($? & 35))
+      # This would be version-independent... except pylint finds different things in different Python versions
+      uses: ./support/actions/pylint
+      with:
+        package: pacman
+
+  validate:
+    # These actions are only run on 3.6 as they are basically version-independent
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Checkout SupportScripts
+      uses: actions/checkout@v2
+      with:
+        repository: SpiNNakerManchester/SupportScripts
+        path: support
+
+    - name: Install pip, etc
+      uses: ./support/actions/python-tools
+    - name: Checkout Spinnaker Dependencies
+      uses: ./support/actions/checkout-spinn-deps
+      with:
+        repositories: SpiNNUtils SpiNNMachine
+        install: true
+    - name: Setup
+      uses: ./support/actions/run-setup
+
+    - name: Lint with flake8
+      run: flake8 pacman pacman_integration_tests unittests uinit_test_objects
 
     - name: Run rat copyright enforcement
-      if: matrix.python-version == 3.6
-      run: |
-        support/rat.sh download
-        support/rat.sh run
+      uses: ./support/actions/check-copyrights
+
+    - name: Validate all XML
+      uses: ./support/actions/validate-xml
+      with:
+        base-path: pacman
 
     - name: Build documentation with sphinx
-      if: matrix.python-version == 3.6
-      run: |
-        cd doc/source
-        sphinx-build -W -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
-        sphinx-build -W -T -b json -d _build/doctrees-json -D language=en . _build/json
-        sphinx-build -W -T -b singlehtml -d _build/doctrees-readthedocssinglehtmllocalmedia -D language=en . _build/localmedia
-
-    - name: Run coveralls and report coverage
-      if: matrix.python-version == 3.6
-      env:
-        COVERALLS_SERVICE_NAME: 'GitHub CI'
-        COVERALLS_REPO_TOKEN : ${{ secrets.COVERALLS_REPO_TOKEN }}
-        NODE_COVERALLS_DEBUG: 1
-      run: coveralls
+      uses: ./support/actions/sphinx
+      with:
+        directory: doc/source

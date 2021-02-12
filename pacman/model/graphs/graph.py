@@ -14,14 +14,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
+from .abstract_edge_partition import AbstractEdgePartition
+from .abstract_edge import AbstractEdge
+from .abstract_vertex import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
 
 
-class Graph(ConstrainedObject):
+class Graph(ConstrainedObject, metaclass=AbstractBase):
     """ A graph that specifies the allowed types of the vertices and edges.
     """
 
@@ -31,19 +36,16 @@ class Graph(ConstrainedObject):
         # The classes of edges that are allowed in this graph
         "_allowed_edge_types",
         # The vertices of the graph
-        "_allowed_partition_types",
-        # The vertices of the graph
         "_vertices",
-        # The outgoing edge partitions of the graph by name
+        # The outgoing edge partitions of the graph by
+        # (edge.pre_vertex, outgoing_edge_partition_name)
         "_outgoing_edge_partitions_by_name",
         # The outgoing edges by pre-vertex
         "_outgoing_edges",
         # The incoming edges by post-vertex
         "_incoming_edges",
-        # map between incoming edges and their associated partitions
+        # map between incoming edges and edge.post_vertex, edge_partition_name
         "_incoming_edges_by_partition_name",
-        # The outgoing edge partitions by pre-vertex
-        "_outgoing_edge_partitions_by_pre_vertex",
         # the outgoing partitions by edge
         "_outgoing_edge_partition_by_edge",
         # The label of the graph
@@ -53,8 +55,7 @@ class Graph(ConstrainedObject):
         # count of vertex which had a None or already used label
         "_unlabelled_vertex_count"]
 
-    def __init__(self, allowed_vertex_types, allowed_edge_types,
-                 allowed_partition_types, label):
+    def __init__(self, allowed_vertex_types, allowed_edge_types, label):
         """
         :param allowed_vertex_types:
             A single or tuple of types of vertex to be allowed in the graph
@@ -62,17 +63,12 @@ class Graph(ConstrainedObject):
         :param allowed_edge_types:
             A single or tuple of types of edges to be allowed in the graph
         :type allowed_edge_types: type or tuple(type, ...)
-        :param allowed_partition_types:
-            A single or tuple of types of partitions to be allowed in the
-            graph
-        :type allowed_partition_types: type or tuple(type, ...)
         :param label: The label on the graph, or None
         :type label: str or None
         """
-        super(Graph, self).__init__(None)
+        super().__init__(None)
         self._allowed_vertex_types = allowed_vertex_types
         self._allowed_edge_types = allowed_edge_types
-        self._allowed_partition_types = allowed_partition_types
         self._vertices = []
         self._vertex_by_label = dict()
         self._unlabelled_vertex_count = 0
@@ -80,8 +76,6 @@ class Graph(ConstrainedObject):
         self._outgoing_edges = DefaultOrderedDict(OrderedSet)
         self._incoming_edges = DefaultOrderedDict(OrderedSet)
         self._incoming_edges_by_partition_name = DefaultOrderedDict(list)
-        self._outgoing_edge_partitions_by_pre_vertex = \
-            DefaultOrderedDict(OrderedSet)
         self._outgoing_edge_partition_by_edge = OrderedDict()
         self._label = label
 
@@ -108,7 +102,7 @@ class Graph(ConstrainedObject):
         """
         if not isinstance(vertex, self._allowed_vertex_types):
             raise PacmanInvalidParameterException(
-                "vertex", vertex.__class__,
+                "vertex", str(vertex.__class__),
                 "Vertices of this graph must be one of the following types:"
                 " {}".format(self._allowed_vertex_types))
         if not vertex.label:
@@ -135,10 +129,38 @@ class Graph(ConstrainedObject):
             self.add_vertex(v)
 
     def add_edge(self, edge, outgoing_edge_partition_name):
-        """ Add an edge to the graph.
+        """ Add an edge to the graph and its partition
+
+        If required and possible will create a new partition in the graph
+
+        Returns the partition the edge was added to
 
         :param AbstractEdge edge: The edge to add
         :param str outgoing_edge_partition_name:
+            The name of the edge partition to add the edge to; each edge
+            partition is the partition of edges that start at the same vertex
+        :rtype: AbstractEdgePartition
+        :raises PacmanInvalidParameterException:
+            If the edge is not of a valid type or if edges have already been
+            added to this partition that start at a different vertex to this
+            one
+        """
+        # Add the edge to the partition
+        partition = self.get_outgoing_edge_partition_starting_at_vertex(
+            edge.pre_vertex, outgoing_edge_partition_name)
+        if partition is None:
+            partition = self.new_edge_partition(
+                outgoing_edge_partition_name, edge)
+            self.add_outgoing_edge_partition(partition)
+        self._register_edge(edge, partition)
+        partition.add_edge(edge, id(self))
+        return partition
+
+    def _register_edge(self, edge, partition):
+        """ Add an edge to the graph.
+
+        :param AbstractEdge edge: The edge to add
+        :param AbstractEdgePartition partition:
             The name of the edge partition to add the edge to; each edge
             partition is the partition of edges that start at the same vertex
         :raises PacmanInvalidParameterException:
@@ -155,48 +177,36 @@ class Graph(ConstrainedObject):
 
         if edge.pre_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
-                "edge", edge.pre_vertex, "pre-vertex must be known in graph")
+                "Edge", str(edge.pre_vertex),
+                "Pre-vertex must be known in graph")
         if edge.post_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
-                "edge", edge.post_vertex, "post-vertex must be known in graph")
-
-        # Add the edge to the partition
-        key = (edge.pre_vertex, outgoing_edge_partition_name)
-        partition = self._outgoing_edge_partitions_by_name.get(key, None)
-        if partition is None:
-            partition = self._new_edge_partition(outgoing_edge_partition_name)
-            self._outgoing_edge_partitions_by_pre_vertex[edge.pre_vertex].add(
-                partition)
-            self._outgoing_edge_partitions_by_name[key] = partition
-        partition.add_edge(edge, id(self))
+                "Edge", str(edge.post_vertex),
+                "Post-vertex must be known in graph")
 
         # Add the edge to the indices
         self._outgoing_edges[edge.pre_vertex].add(edge)
         self._incoming_edges_by_partition_name[
-            (edge.post_vertex, outgoing_edge_partition_name)].append(edge)
+            edge.post_vertex, partition.identifier].append(edge)
         self._incoming_edges[edge.post_vertex].add(edge)
         if edge in self._outgoing_edge_partition_by_edge:
             raise PacmanAlreadyExistsException("edge", edge)
         self._outgoing_edge_partition_by_edge[edge] = partition
 
-    def _new_edge_partition(self, name):
-        """ How we create a new :py:class:`~.OutgoingEdgePartition` in the \
-            first place. Uses the first/only element in the allowed partition\
-            types argument to the graph's constructor.
+    @abstractmethod
+    def new_edge_partition(self, name, edge):
+        """ How we create a new :py:class:`AbstractSingleSourcePartition` in \
+            the first place. Uses the first/only element in the allowed \
+            partition types argument to the graph's constructor.
 
-        Called from :py:method:`~add_edge`.
+        Called from :py:meth:`~add_edge`.
         Can be overridden if different arguments should be passed.
 
+        :param str name: The identifier of the partition
+        :param AbstractEdge edge: An edge for the partition
         :return: the new edge partition
-        :rtype: ~.OutgoingEdgePartition
+        :rtype: AbstractSingleSourcePartition
         """
-        if isinstance(self._allowed_partition_types, (tuple, list)):
-            cls = self._allowed_partition_types[0]
-        else:
-            cls = self._allowed_partition_types
-        # NOTE: In master there is only one partition class
-        # in SDRAM PR this function has been completely changed
-        return cls(name, self._allowed_edge_types, graph_code=id(self))
 
     def add_edges(self, edges, outgoing_edge_partition_name):
         """ Add a collection of edges to the graph.
@@ -213,36 +223,17 @@ class Graph(ConstrainedObject):
         for e in edges:
             self.add_edge(e, outgoing_edge_partition_name)
 
-    def add_outgoing_edge_partition(self, outgoing_edge_partition):
-        """ Add an existing outgoing edge partition to the graph. Note that \
-            the edge partition probably needs to have at least one edge \
-            before this will work.
+    @abstractmethod
+    def add_outgoing_edge_partition(self, edge_partition):
+        """ Add an edge partition to the graph.
 
-        :param OutgoingEdgePartition outgoing_edge_partition:
-            The outgoing edge partition to add
+        Will also add any edges already in the partition as well
+
+        :param AbstractEdgePartition edge_partition: The edge partition to add
         :raises PacmanAlreadyExistsException:
             If a partition already exists with the same pre_vertex and
             identifier
         """
-        # verify that this partition is suitable for this graph
-        if not isinstance(outgoing_edge_partition,
-                          self._allowed_partition_types):
-            raise PacmanInvalidParameterException(
-                "outgoing_edge_partition", outgoing_edge_partition.__class__,
-                "Partitions of this graph must be one of the following types:"
-                " {}".format(self._allowed_partition_types))
-
-        outgoing_edge_partition.register_graph_code(id(self))
-        # check this partition doesn't already exist
-        key = (outgoing_edge_partition.pre_vertex,
-               outgoing_edge_partition.identifier)
-        if key in self._outgoing_edge_partitions_by_name:
-            raise PacmanAlreadyExistsException(
-                str(self._allowed_partition_types), key)
-
-        self._outgoing_edge_partitions_by_pre_vertex[
-            outgoing_edge_partition.pre_vertex].add(outgoing_edge_partition)
-        self._outgoing_edge_partitions_by_name[key] = outgoing_edge_partition
 
     @property
     def vertices(self):
@@ -265,36 +256,36 @@ class Graph(ConstrainedObject):
 
     @property
     def edges(self):
+        # pylint: disable=not-an-iterable
+        # https://github.com/PyCQA/pylint/issues/3105
         """ The edges in the graph
 
         :rtype: iterable(AbstractEdge)
         """
         return [
             edge
-            for partition in self._outgoing_edge_partitions_by_name.values()
+            for partition in self.outgoing_edge_partitions
             for edge in partition.edges]
 
-    @property
+    @abstractproperty
     def outgoing_edge_partitions(self):
-        """ The outgoing edge partitions in the graph.
+        """ The edge partitions in the graph.
 
-        :rtype: iterable(OutgoingEdgePartition)
+        :rtype: iterable(AbstractEdgePartition)
         """
-        return self._outgoing_edge_partitions_by_name.values()
 
-    @property
+    @abstractproperty
     def n_outgoing_edge_partitions(self):
         """ The number of outgoing edge partitions in the graph.
 
         :rtype: int
         """
-        return len(self._outgoing_edge_partitions_by_name)
 
     def get_outgoing_partition_for_edge(self, edge):
-        """ Gets the outgoing partition this edge is associated with.
+        """ Gets the partition this edge is associated with.
 
         :param AbstractEdge edge: the edge to find associated partition
-        :rtype: OutgoingEdgePartition
+        :rtype: AbstractEdgePartition
         """
         return self._outgoing_edge_partition_by_edge[edge]
 
@@ -332,14 +323,14 @@ class Graph(ConstrainedObject):
             return []
         return self._incoming_edges_by_partition_name[key]
 
+    @abstractmethod
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
         """ Get all the edge partitions that start at the given vertex.
 
         :param AbstractVertex vertex:
             The vertex at which the edge partitions to find starts
-        :rtype: iterable(OutgoingEdgePartition)
+        :rtype: iterable(AbstractEdgePartition)
         """
-        return self._outgoing_edge_partitions_by_pre_vertex[vertex]
 
     def get_outgoing_edge_partition_starting_at_vertex(
             self, vertex, outgoing_edge_partition_name):
@@ -350,7 +341,24 @@ class Graph(ConstrainedObject):
             The vertex at the start of the edges in the partition
         :param str outgoing_edge_partition_name:
             The name of the edge partition
-        :rtype: pacman.model.graphs.OutgoingEdgePartition, or None
+        :return: the named edge partition, or None if no such partition exists
+        :rtype: AbstractEdgePartition or None
         """
         return self._outgoing_edge_partitions_by_name.get(
             (vertex, outgoing_edge_partition_name), None)
+
+    def __contains__(self, value):
+        """ Determines if a value is an object that is in the graph.
+
+        :param value: The object to see if it is in the graph
+        :type value: AbstractVertex or AbstractEdge or AbstractEdgePartition
+        :return: True if the value is in the graph, False otherwise
+        :rtype: bool
+        """
+        if isinstance(value, AbstractEdgePartition):
+            return value in self._outgoing_edge_partitions_by_name.values()
+        elif isinstance(value, AbstractEdge):
+            return value in self._outgoing_edge_partition_by_edge
+        elif isinstance(value, AbstractVertex):
+            return value in self._vertices
+        return False

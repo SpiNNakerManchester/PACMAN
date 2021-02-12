@@ -63,7 +63,7 @@ class Slice(collections.namedtuple('Slice', 'lo_atom hi_atom n_atoms')):
 
         # Create the Slice object as a `namedtuple` with these pre-computed
         # values filled in.
-        return super(cls, Slice).__new__(cls, lo_atom, hi_atom, n_atoms)
+        return super().__new__(cls, lo_atom, hi_atom, n_atoms)
 
     @property
     def as_slice(self):

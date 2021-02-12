@@ -15,7 +15,6 @@
 
 import logging
 import sys
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
@@ -26,12 +25,10 @@ from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanInvalidParameterException)
 from pacman.model.graphs import AbstractVertex
-
 logger = FormatAdapter(logging.getLogger(__file__))
 
 
-@add_metaclass(AbstractBase)
-class ApplicationVertex(AbstractVertex):
+class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
     """ A vertex that can be broken down into a number of smaller vertices\
         based on the resources that the vertex requires.
     """
@@ -64,15 +61,14 @@ class ApplicationVertex(AbstractVertex):
         """
         # Need to set to None temporarily as add_constraint checks splitter
         self._splitter = None
-        super(ApplicationVertex, self).__init__(label, constraints)
+        super().__init__(label, constraints)
         self._machine_vertices = OrderedSet()
 
         # Use setter as there is extra work to do
         self.splitter = splitter
 
         # add a constraint for max partitioning
-        self.add_constraint(
-            MaxVertexAtomsConstraint(max_atoms_per_core))
+        self.add_constraint(MaxVertexAtomsConstraint(max_atoms_per_core))
 
     def __str__(self):
         return self.label
@@ -111,7 +107,7 @@ class ApplicationVertex(AbstractVertex):
 
     @overrides(AbstractVertex.add_constraint)
     def add_constraint(self, constraint):
-        AbstractVertex.add_constraint(self, constraint)
+        super().add_constraint(constraint)
         if self._splitter is not None:
             self._splitter.check_supported_constraints()
 
@@ -144,9 +140,9 @@ class ApplicationVertex(AbstractVertex):
 
     def round_n_atoms(self, n_atoms, label="n_atoms"):
         """
-        Utility function to allow supoer classes to make sure n_atom is an int
+        Utility function to allow suoer-classes to make sure n_atom is an int
 
-        :param n_atoms: Value convertable to int to be used for n_atoms
+        :param n_atoms: Value convertible to int to be used for n_atoms
         :type n_atoms: int or float or numpy.
         :return:
         """

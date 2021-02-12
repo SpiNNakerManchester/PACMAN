@@ -12,21 +12,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from six import raise_from, add_metaclass
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.machine import MachineEdge
 from pacman.utilities.algorithm_utilities.\
-    partition_algorithm_utilities import get_remaining_constraints
+    partition_algorithm_utilities import (
+        get_remaining_constraints)
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
 from pacman.model.graphs import AbstractVirtual
 from pacman.model.graphs.common import Slice
 from .abstract_splitter_common import AbstractSplitterCommon
 
 
-@add_metaclass(AbstractBase)
-class AbstractSplitterSlice(AbstractSplitterCommon):
+class AbstractSplitterSlice(AbstractSplitterCommon, metaclass=AbstractBase):
     """ Contains default logic for splitting by slice.
     """
 
@@ -52,7 +51,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
     MACHINE_LABEL = "{}:{}:{}"
 
     def __init__(self, splitter_name):
-        super(AbstractSplitterSlice, self).__init__(splitter_name)
+        super().__init__(splitter_name)
         self._called = False
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
@@ -209,9 +208,9 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
                     resource_tracker.allocate_constrained_resources(
                         used_resources, self._governed_app_vertex.constraints)
             except PacmanValueError as e:
-                raise_from(PacmanValueError(
+                raise PacmanValueError(
                     self.FAIL_TO_ALLOCATE_RESOURCES.format(
-                        self._governed_app_vertex, e)), e)
+                        self._governed_app_vertex, e)) from e
 
         used_placements.append(
             (x, y, p, used_resources, ip_tags, reverse_ip_tags))
@@ -395,26 +394,12 @@ class AbstractSplitterSlice(AbstractSplitterCommon):
         :rtype: tuple(list(~pacman.model.graphs.common.Slice), bool
 
         """
-        if self._governed_app_vertex.n_atoms < self._max_atoms_per_core:
-            return (
-                [Slice(0, self._governed_app_vertex.n_atoms)],
-                self._is_fixed_atoms_per_core)
-        else:
-            slices = list()
-            n_atoms_placed = 0
-            n_atoms = self._governed_app_vertex.n_atoms
-            while n_atoms_placed < n_atoms:
-                if n_atoms_placed + self._max_atoms_per_core > n_atoms:
-                    slices.append(Slice(
-                        n_atoms_placed,
-                        n_atoms_placed + (n_atoms - n_atoms_placed)))
-                    n_atoms_placed = n_atoms
-                else:
-                    slices.append(Slice(
-                        n_atoms_placed,
-                        n_atoms_placed + self._max_atoms_per_core))
-                n_atoms_placed += self._max_atoms_per_core
-            return slices, self._is_fixed_atoms_per_core
+        n_atoms = self._governed_app_vertex.n_atoms
+        per_core = self._max_atoms_per_core
+        return (
+            [Slice(lo, min(lo + per_core - 1, n_atoms))
+             for lo in range(0, n_atoms, per_core)],
+            self._is_fixed_atoms_per_core)
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):

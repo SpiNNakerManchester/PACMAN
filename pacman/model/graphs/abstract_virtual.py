@@ -14,16 +14,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import abstractmethod, abstractproperty
+from spinn_utilities.require_subclass import require_subclass
+from pacman.model.graphs.abstract_vertex import AbstractVertex
 
 
+@require_subclass(AbstractVertex)
 class AbstractVirtual(object):
-    """ An Object (most likely a vertex) which exists outside of the machine,\
+    """ A vertex which exists outside of the machine, \
         allowing a graph to formally participate in I/O.
 
-        .. note::
-            It is expected that everything that is an instance of
-            AbstractVirtual is also an instance of :py:class:`AbstractVertex`.
-            This is not enforced to avoid diamond inheritance.
+    .. note::
+        Everything that is an instance of ``AbstractVirtual`` is also an
+        instance of :py:class:`AbstractVertex`.
     """
 
     __slots__ = ()
@@ -31,7 +33,7 @@ class AbstractVirtual(object):
     @abstractproperty
     def board_address(self):
         """ The IP address of the board to which the device is connected,\
-            or `None` for the boot board.
+            or ``None`` for the boot board.
 
         :rtype: str
         """

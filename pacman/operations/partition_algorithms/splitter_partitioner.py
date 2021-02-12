@@ -214,6 +214,9 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         :param MachineVertex src_machine_vertex: used for error message
         :param MachineVertex dest_machine_vertex: used for error message
         :return: MachineEdge class
+        :rtype: type
+        :raises PacmanConfigurationException:
+            If we can't find a workable class
         """
         for post_edge_type in post_edge_types:
             if post_edge_type in pre_edge_types:
@@ -233,7 +236,6 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         :param MachineGraph machine_graph: machine graph
         :param ResourceTracker resource_tracker: resource tracker
         """
-
         # process edges
         progress = ProgressBar(
             app_graph.n_outgoing_edge_partitions, self.__PROGRESS_BAR_EDGES)

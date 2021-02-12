@@ -44,13 +44,13 @@ class SplitterSliceLegacy(AbstractSplitterSlice):
     def __init__(self, splitter_name=None):
         if splitter_name is None:
             splitter_name = self.SPLITTER_NAME
-        AbstractSplitterSlice.__init__(self, splitter_name)
+        super().__init__(splitter_name)
 
     @overrides(AbstractSplitterSlice.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
-        AbstractSplitterSlice.set_governed_app_vertex(self, app_vertex)
+        super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, LegacyPartitionerAPI):
-            for abstractmethod in LegacyPartitionerAPI.abstract_methods():
+            for abstractmethod in LegacyPartitionerAPI._abstract_methods():
                 check = getattr(app_vertex, abstractmethod, None)
                 if not check:
                     raise PacmanConfigurationException(

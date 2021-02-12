@@ -16,7 +16,6 @@
 import logging
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
-from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, ShareKeyConstraint, FixedMaskConstraint,
     FixedKeyAndMaskConstraint, ContiguousKeyRangeContraint)
@@ -27,7 +26,7 @@ from pacman.utilities.utility_calls import (
     check_algorithm_can_support_constraints, get_key_ranges)
 from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
 from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
-    import (check_types_of_edge_constraint, get_edge_groups)
+    import (check_types_of_edge_constraint, get_mulitcast_edge_groups)
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from .utils import get_possible_masks
 
@@ -42,7 +41,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     __slots__ = ["_n_keys_map"]
 
     def __init__(self):
-        super(MallocBasedRoutingInfoAllocator, self).__init__(0, 2 ** 32)
+        super().__init__(0, 2 ** 32)
         self._n_keys_map = None
 
     def __call__(self, machine_graph, n_keys_map):
@@ -71,8 +70,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Get the edges grouped by those that require the same key
         (fixed_keys, shared_keys, fixed_masks, fixed_fields, continuous,
-         noncontinuous) = get_edge_groups(
-             machine_graph, EdgeTrafficType.MULTICAST)
+         noncontinuous) = get_mulitcast_edge_groups(machine_graph)
 
         # Go through the groups and allocate keys
         progress = ProgressBar(

@@ -146,14 +146,14 @@ Implementation API
 """
 from .ordered_covering import get_generality, minimise, ordered_covering
 from .remove_default_routes import remove_default_routes
-from .routing_table_condenser import MundyRouterCompressor
+from .ordered_covering_compressor import OrderedCoveringCompressor
 from .utils import intersect
 
 __all__ = (
     "get_generality",
     "intersect",
     "minimise",
-    "MundyRouterCompressor",
     "ordered_covering",
+    "OrderedCoveringCompressor",
     "remove_default_routes"
     )

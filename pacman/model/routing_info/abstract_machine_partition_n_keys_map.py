@@ -13,12 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(AbstractBase)
-class AbstractMachinePartitionNKeysMap(object):
+class AbstractMachinePartitionNKeysMap(object, metaclass=AbstractBase):
     """ A map that provides the number of keys required by each partition.
     """
 
@@ -28,7 +26,7 @@ class AbstractMachinePartitionNKeysMap(object):
     def n_keys_for_partition(self, partition):
         """ The number of keys required by the given partition
 
-        :param ~pacman.model.graphs.OutgoingEdgePartition partition:
+        :param ~pacman.model.graphs.AbstractSingleSourcePartition partition:\
             The partition to set the number of keys for
         :return: The number of keys required by the partition
         :rtype: int

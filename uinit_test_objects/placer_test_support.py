@@ -34,7 +34,7 @@ def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
 
 class Vertex(ApplicationVertex):
     def __init__(self, n_atoms, label):
-        super(Vertex, self).__init__(label=label, max_atoms_per_core=256)
+        super().__init__(label=label, max_atoms_per_core=256)
         self._n_atoms = n_atoms
         self._model_based_max_atoms_per_core = 256
 
@@ -63,7 +63,7 @@ class Vertex(ApplicationVertex):
 class MachineVertex(SimpleMachineVertex):
     def __init__(self, lo_atom, hi_atom, resources_required, label=None,
                  constraints=None):
-        super(MachineVertex, self).__init__(
+        super().__init__(
             resources_required, label=label, constraints=constraints,
             vertex_slice=Slice(lo_atom, hi_atom))
         self.lo_atom = lo_atom

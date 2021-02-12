@@ -99,7 +99,6 @@ class MachineEdge(AbstractEdge):
         return self._post_vertex
 
     @property
-    @overrides(AbstractEdge.traffic_type)
     def traffic_type(self):
         return self._traffic_type
 

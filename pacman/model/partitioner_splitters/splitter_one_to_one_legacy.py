@@ -46,8 +46,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         "_resources_required"]
 
     def __init__(self):
-        AbstractSplitterCommon.__init__(
-            self, splitter_name=type(self).__name__)
+        super().__init__(type(self).__name__)
         self._machine_vertex = None
         self._vertex_slice = None
         self._resources_required = None
@@ -60,7 +59,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
-        AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
+        super().set_governed_app_vertex(app_vertex)
         self._vertex_slice = Slice(0, self._governed_app_vertex.n_atoms - 1)
         self._resources_required = (
             self._governed_app_vertex.get_resources_used_by_atoms(
@@ -71,7 +70,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
                 resources_required=self._resources_required, label=None,
                 constraints=None))
         if not isinstance(app_vertex, LegacyPartitionerAPI):
-            for abstractmethod in LegacyPartitionerAPI.abstract_methods():
+            for abstractmethod in LegacyPartitionerAPI._abstract_methods():
                 check = getattr(app_vertex, abstractmethod, None)
                 if not check:
                     raise PacmanConfigurationException(
@@ -83,7 +82,8 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
         resource_tracker.allocate_constrained_resources(
-            self._resources_required, self._governed_app_vertex.constraints)
+            self._resources_required, self._governed_app_vertex.constraints,
+            vertices=[self._machine_vertex])
         machine_graph.add_vertex(self._machine_vertex)
         return self._machine_vertex
 

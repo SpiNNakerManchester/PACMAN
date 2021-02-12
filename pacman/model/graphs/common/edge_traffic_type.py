@@ -27,5 +27,5 @@ class EdgeTrafficType(IntEnum):
     #: Vertices must usually be on the same board; number of destinations is
     #: strictly constrained.
     FIXED_ROUTE = 2
-    #: Traffic is via a region of SDRAM. Vertices must be on same chip.
+    #: Traffic is via a shared region of SDRAM. Vertices must be on same chip.
     SDRAM = 3

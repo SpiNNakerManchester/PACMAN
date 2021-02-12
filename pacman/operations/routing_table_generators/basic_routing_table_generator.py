@@ -48,7 +48,8 @@ class BasicRoutingTableGenerator(object):
         :param ~spinn_machine.Chip chip:
         :param partitions_in_table:
         :type partitions_in_table:
-            dict(OutgoingEdgePartition, MulticastRoutingTableByPartitionEntry)
+            dict(AbstractSingleSourcePartition,
+            MulticastRoutingTableByPartitionEntry)
         :param RoutingInfo routing_infos:
         :rtype: UnCompressedMulticastRoutingTable
         """

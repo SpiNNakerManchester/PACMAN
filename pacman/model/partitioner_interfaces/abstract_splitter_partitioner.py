@@ -12,17 +12,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(AbstractBase)
-class AbstractSplitterPartitioner(object):
+class AbstractSplitterPartitioner(object, metaclass=AbstractBase):
     """ Splitter API to allow other Partitioner's to add more stuff to the\
         edge creation process.
 
-    This makes sure that the methods super class expect to be there are not
-    removed.
+    This makes sure that the methods the superclass expects to be there are
+    not removed.
     """
 
     @abstractmethod
@@ -30,8 +28,7 @@ class AbstractSplitterPartitioner(object):
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
             app_outgoing_edge_partition, resource_tracker):
-        """ Creates the machine edge (if needed) and adding it\
-            to the graph
+        """ Create the machine edge (if needed) and add it to the graph.
 
         Some implementations of this method are able to detect that the
         requested edge is not actually needed so never create or add it.

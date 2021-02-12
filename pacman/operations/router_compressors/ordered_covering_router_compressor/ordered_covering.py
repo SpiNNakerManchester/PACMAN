@@ -13,19 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.timer import Timer
-from pacman.exceptions import MinimisationFailedError
-from pacman.utilities.constants import FULL_MASK
 from pacman.operations.router_compressors import Entry
+from pacman.exceptions import MinimisationFailedError
 from .remove_default_routes import remove_default_routes
+from pacman.utilities.constants import FULL_MASK
 from .utils import intersect
+from spinn_utilities.timer import Timer
 
 
 def minimise(
         routing_table, target_length, use_timer_cut_off=False,
         time_to_run_for_before_raising_exception=None):
-    """ Reduce the size of a routing table by merging together entries where\
-        possible and by removing any remaining default routes.
+    """Reduce the size of a routing table by merging together entries where \
+    possible and by removing any remaining default routes.
 
     .. warning::
 
@@ -53,7 +53,7 @@ def minimise(
         The time to run for in seconds before raising an exception
     :type time_to_run_for_before_raising_exception: int or None
     :return: The compressed table entries
-    :rtype: list(~pacman.operations.router_compressors.Entry)
+    :rtype: list(Entry)
     :raises MinimisationFailedError:
         If the smallest table that can be produced is larger than
         ``target_length``.
@@ -68,8 +68,8 @@ def minimise(
 def ordered_covering(
         routing_table, target_length, aliases=None, no_raise=False,
         use_timer_cut_off=False, time_to_run_for=None):
-    """ Reduce the size of a routing table by merging together entries where\
-        possible.
+    """Reduce the size of a routing table by merging together entries where
+    possible.
 
     .. warning::
 
@@ -105,9 +105,8 @@ def ordered_covering(
         be minimised to be smaller than `target_length` and `target_length` is
         not None. If True then a table will be returned regardless of the size
         of the final table.
-    :return: new routing table entries, and a new aliases dictionary.
-    :rtype: tuple(list(~pacman.operations.router_compressors.Entry),
-        dict(tuple(int,int), set(tuple(int,int))))
+    :return: new routing table, A new aliases dictionary.
+    :rtype: tuple(list(Entry), dict(tuple(int,int), set(tuple(int,int))))
     :raises MinimisationFailedError:
         If the smallest table that can be produced is larger than
         ``target_length``.
@@ -179,7 +178,7 @@ def _get_best_merge(routing_table, aliases):
     Inspect all possible merges for the routing table and return the merge
     which would combine the greatest number of entries.
 
-    :param list(Entry) routing_table: Routing entries to be merged.
+    :param Entry routing_table: Routing entries to be merged.
     :param aliases:
         Dictionary of which keys and masks in the routing table are
         combinations of other (now removed) keys and masks; this allows us to
@@ -220,7 +219,7 @@ def _get_best_merge(routing_table, aliases):
 def _get_all_merges(routing_table):
     """ Get possible sets of entries to merge.
 
-    :param list(Entry) routing_table: Routing entries to be merged.
+    :param Entry routing_table: Routing entries to be merged.
     :rtype: iterable(_Merge)
     """
     # Memorise entries that have been considered as part of a merge
@@ -251,7 +250,7 @@ def _get_insertion_index(routing_table, generality):
     """ Determine the index in the routing table where a new entry should be
         inserted.
 
-    :param list(Entry) routing_table: Routing entries to be merged.
+    :param Entry routing_table: Routing entries to be merged.
     :param int generality:
     """
     # We insert before blocks of equivalent generality, so decrement the given
@@ -290,7 +289,7 @@ class _Merge(object):
 
     _slots__ = [
         # Reference to the routing table against which the merge is defined.
-        # list(Entry)
+        # list(RoutingTableEntry)
         "routing_table",
         # Indices of entries in the routing table which are included in this
         #    merge.
@@ -315,7 +314,7 @@ class _Merge(object):
 
     def __init__(self, routing_table, entries=tuple()):
         """
-        :param list(~pacman.operations.router_compressors.Entry) routing_table:
+        :param list(RoutingTableEntry) routing_table:
         :param set(int) entries:
         """
         # Generate the new key, mask and sources
@@ -363,7 +362,7 @@ class _Merge(object):
             method to update an already minimised table.
         :type aliases: dict(tuple(int, int), set(tuple(int, int))
         :return:
-            New routing table, and a new aliases dictionary.
+            new routing table, new aliases dictionary
         :rtype: tuple(list(RoutingTableEntry),
             dict(tuple(int,int), set(tuple(int,int))))
         """
@@ -410,8 +409,8 @@ class _Merge(object):
 
 
 def _refine_merge(merge, aliases, min_goodness):
-    """ Remove entries from a merge to generate a valid merge which may be\
-        applied to the routing table.
+    """ Remove entries from a merge to generate a valid merge which may be
+    applied to the routing table.
 
     :param _Merge merge: Initial merge to refine.
     :param aliases:

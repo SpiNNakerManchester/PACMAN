@@ -15,6 +15,8 @@
 
 import functools
 from collections import OrderedDict
+
+from pacman.model.resources import ResourceContainer, ConstantSDRAM
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
@@ -131,3 +133,35 @@ def create_vertices_groups(vertices, same_group_as_function):
                 add_set(groups, same_chip_as_vertices)
             done.update(same_chip_as_vertices)
     return groups
+
+
+def create_requirement_collections(vertices, machine_graph):
+    """ Get a collection of requirements that includes SDRAM edge resources
+    """
+
+    # Get all but the last requirements, keeping the SDRAM edge requirements
+    required_resources = list()
+    to_add_partitions = set()
+    last_resources = None
+    last_constraints = None
+    for vertex in vertices:
+        if last_resources is not None:
+            required_resources.append([
+                last_resources, last_constraints])
+        last_resources = vertex.resources_required
+        last_constraints = vertex.constraints
+        to_add_partitions.update(
+            machine_graph.get_sdram_edge_partitions_starting_at_vertex(
+                vertex))
+
+    # Add up all the SDRAM edge requirements
+    total_sdram = 0
+    for partition in to_add_partitions:
+        total_sdram += partition.total_sdram_requirements()
+
+    # Add the SDRAM requirements to the final requirements
+    resources = ResourceContainer(sdram=ConstantSDRAM(total_sdram))
+    resources.extend(last_resources)
+    required_resources.append([resources, last_constraints])
+
+    return required_resources

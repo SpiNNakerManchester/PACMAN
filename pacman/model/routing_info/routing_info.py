@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import itervalues
 from pacman.exceptions import PacmanAlreadyExistsException
 
 
@@ -26,7 +25,7 @@ class RoutingInfo(object):
         # Partition information indexed by partition
         "_info_by_partition",
 
-        # Partition information indexed by edge pre vertex and partition ID
+        # Partition information indexed by edge pre vertex and partition ID\
         # name
         "_info_by_prevertex",
 
@@ -82,7 +81,7 @@ class RoutingInfo(object):
     def get_first_key_from_partition(self, partition):
         """ Get the first key associated with a particular partition
 
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
             The partition to get the first key of
         :return: The routing key, or None if the partition does not exist
         :rtype: int or None
@@ -95,7 +94,7 @@ class RoutingInfo(object):
     def get_routing_info_from_partition(self, partition):
         """ Get the routing information for a given partition.
 
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
             The partition to obtain routing information about.
         :return: the partition_routing_info for the partition, if any exists
         :rtype: PartitionRoutingInfo or None
@@ -149,4 +148,4 @@ class RoutingInfo(object):
         :return: a iterator of partition routing information
         :rtype: iterator(PartitionRoutingInfo)
         """
-        return itervalues(self._info_by_partition)
+        return iter(self._info_by_partition.values())

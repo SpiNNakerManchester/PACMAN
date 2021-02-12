@@ -16,10 +16,7 @@
 """ A collection of methods which support partitioning algorithms.
 """
 
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.utilities import utility_calls as utils
 from pacman.exceptions import PacmanPartitionException

@@ -18,17 +18,16 @@ based on
 https://github.com/project-rig/rig/blob/master/rig/routing_table/remove_default_routes.py
 """
 
-from pacman.exceptions import MinimisationFailedError
 from .utils import intersect
+from pacman.exceptions import MinimisationFailedError
 
 
 def remove_default_routes(table, target_length, check_for_aliases=True):
     """
-    Remove from the routing table any entries which could be replaced by \
+    Remove from the routing table any entries which could be replaced by
     default routing.
 
-    :param list(~pacman.operations.router_compressors.Entry) table:
-        Routing entries to be merged.
+    :param list(Entry) table: Routing entries to be merged.
     :param target_length:
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
@@ -44,7 +43,7 @@ def remove_default_routes(table, target_length, check_for_aliases=True):
         If ``False``, the alias-check is skipped resulting in O(N) runtime.
         This option should only be used if the supplied table is guaranteed not
         to contain any aliased entries.
-    :rtype: list(~pacman.operations.router_compressors.Entry)
+    :rtype: list(Entry)
     :raises MinimisationFailedError:
         If the smallest table that can be produced is larger than
         ``target_length``.

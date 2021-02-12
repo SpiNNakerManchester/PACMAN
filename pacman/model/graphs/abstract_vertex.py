@@ -37,7 +37,7 @@ class AbstractVertex(ConstrainedObject):
             If one of the constraints is not valid
         """
 
-        super(AbstractVertex, self).__init__(constraints)
+        super().__init__(constraints)
         self._label = label
         self.__added_to_graph = False
 

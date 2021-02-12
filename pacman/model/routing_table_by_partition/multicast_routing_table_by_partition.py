@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-from six import iterkeys
 
 _EMPTY_RESULT = OrderedDict()
 
@@ -37,7 +36,7 @@ class MulticastRoutingTableByPartition(object):
         :param MulticastRoutingTableByPartitionEntry entry: the entry to add
         :param int router_x: the x-coordinate of the router
         :param int router_y: the y-coordinate of the router
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
             the partition containing the machine edge
         """
 
@@ -57,7 +56,7 @@ class MulticastRoutingTableByPartition(object):
 
         :rtype: iterable(tuple(int, int))
         """
-        return iterkeys(self._router_to_entries_map)
+        return iter(self._router_to_entries_map.keys())
 
     def get_entries_for_router(self, router_x, router_y):
         """ Get the set of multicast path entries assigned to this router.
@@ -65,7 +64,7 @@ class MulticastRoutingTableByPartition(object):
         :param int router_x: the x-coordinate of the router
         :param int router_y: the y-coordinate of the router
         :return: all router_path_entries for the router.
-        :rtype: dict(OutgoingEdgePartition,
+        :rtype: dict(AbstractSingleSourcePartition,
             MulticastRoutingTableByPartitionEntry)
         """
         return self._router_to_entries_map.get(
@@ -74,7 +73,7 @@ class MulticastRoutingTableByPartition(object):
     def get_entry_on_coords_for_edge(self, partition, router_x, router_y):
         """ Get an entry from a specific coordinate
 
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
         :param int router_x: the x-coordinate of the router
         :param int router_y: the y-coordinate of the router
         :rtype: MulticastRoutingTableByPartitionEntry or None

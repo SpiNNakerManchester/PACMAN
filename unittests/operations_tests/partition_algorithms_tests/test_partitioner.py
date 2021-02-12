@@ -16,9 +16,7 @@
 """
 test for partitioning
 """
-from __future__ import division
 import unittest
-
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.operations.partition_algorithms import SplitterPartitioner
 from spinn_machine import (

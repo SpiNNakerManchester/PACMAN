@@ -14,9 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint)
 from .application_vertex import ApplicationVertex
@@ -41,7 +40,7 @@ class ApplicationSpiNNakerLinkVertex(
     def __init__(
             self, n_atoms, spinnaker_link_id, board_address=None, label=None,
             constraints=None, max_atoms_per_core=sys.maxsize):
-        super(ApplicationSpiNNakerLinkVertex, self).__init__(
+        super().__init__(
             label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
         self._n_atoms = self.round_n_atoms(n_atoms)
