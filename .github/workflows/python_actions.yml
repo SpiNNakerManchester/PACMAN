@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
     - name: Set up Python ${{ matrix.python-version }}
@@ -57,7 +57,7 @@ jobs:
       uses: ./support/actions/pytest
       with:
         tests: unittests
-        coverage: ${{ matrix.python-version == 3.6 }}
+        coverage: ${{ matrix.python-version == 3.8 }}
         cover-packages: pacman
         coveralls-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
@@ -68,14 +68,14 @@ jobs:
         package: pacman
 
   validate:
-    # These actions are only run on 3.6 as they are basically version-independent
+    # These actions are only run on 3.8 as they are basically version-independent
     runs-on: ubuntu-20.04
 
     steps:
-    - name: Set up Python 3.6
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: 3.6
+        python-version: ${{ matrix.python-version }}
 
     - name: Checkout
       uses: actions/checkout@v2
@@ -99,14 +99,17 @@ jobs:
       run: flake8 pacman pacman_integration_tests unittests uinit_test_objects
 
     - name: Run rat copyright enforcement
+      if: matrix.python-version == 3.8
       uses: ./support/actions/check-copyrights
 
     - name: Validate all XML
+      if: matrix.python-version == 3.8
       uses: ./support/actions/validate-xml
       with:
         base-path: pacman
 
     - name: Build documentation with sphinx
+      if: matrix.python-version == 3.8
       uses: ./support/actions/sphinx
       with:
         directory: doc/source
