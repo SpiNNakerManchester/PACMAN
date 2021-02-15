@@ -25,7 +25,9 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
+    env:
+      BASE_PKG: pacman
 
     steps:
     - name: Set up Python ${{ matrix.python-version }}
@@ -57,56 +59,31 @@ jobs:
       uses: ./support/actions/pytest
       with:
         tests: unittests
-        coverage: ${{ matrix.python-version == 3.6 }}
-        cover-packages: pacman
+        coverage: ${{ matrix.python-version == 3.8 }}
+        cover-packages: ${{ env.BASE_PKG }}
         coveralls-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
+    - name: Lint with flake8
+      run: flake8 $BASE_PKG unittests
+
     - name: Lint with pylint
-      # This would be version-independent... except pylint finds different things in different Python versions
       uses: ./support/actions/pylint
       with:
-        package: pacman
-
-  validate:
-    # These actions are only run on 3.6 as they are basically version-independent
-    runs-on: ubuntu-20.04
-
-    steps:
-    - name: Set up Python 3.6
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.6
-
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Checkout SupportScripts
-      uses: actions/checkout@v2
-      with:
-        repository: SpiNNakerManchester/SupportScripts
-        path: support
-
-    - name: Install pip, etc
-      uses: ./support/actions/python-tools
-    - name: Checkout Spinnaker Dependencies
-      uses: ./support/actions/checkout-spinn-deps
-      with:
-        repositories: SpiNNUtils SpiNNMachine
-        install: true
-    - name: Setup
-      uses: ./support/actions/run-setup
-
-    - name: Lint with flake8
-      run: flake8 pacman pacman_integration_tests unittests uinit_test_objects
+        package: ${{ env.BASE_PKG }}
 
     - name: Run rat copyright enforcement
+      if: matrix.python-version == 3.8
       uses: ./support/actions/check-copyrights
 
     - name: Validate all XML
+      if: matrix.python-version == 3.8
       uses: ./support/actions/validate-xml
       with:
-        base-path: pacman
+        package: ${{ env.BASE_PKG }}
 
     - name: Build documentation with sphinx
+      if: matrix.python-version == 3.8
       uses: ./support/actions/sphinx
       with:
         directory: doc/source
+
