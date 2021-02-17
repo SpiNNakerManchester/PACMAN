@@ -70,7 +70,6 @@ def _convert_a_route(
                 link_ids.append(route)
                 next_incoming_link = (route + 3) % 6
             if isinstance(next_hop, RoutingTree):
-                next_incoming_link = None
                 next_hops.append((next_hop, next_incoming_link))
 
     entry = MulticastRoutingTableByPartitionEntry(
