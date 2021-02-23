@@ -378,7 +378,7 @@ def setup(app):
 
 # We want to document __call__ when encountered
 autodoc_default_options = {
-    "members": True,
+    "members": None,
     "special-members": "__call__"
 }
 
