@@ -1,0 +1,30 @@
+# Copyright (c) 2017-2021 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Files are listed here if they are NOT imported into their directory/module's
+# __init__.py and reexported with __all__.
+
+pacman/exceptions.py
+pacman/model/partitioner_interfaces/abstract_slices_connect.py
+pacman/operations/algorithm_reports/reports.py
+pacman/operations/router_algorithms/routing_tree.py
+pacman/utilities/constants.py
+pacman/utilities/json_utils.py
+pacman/utilities/utility_calls.py
+pacman/utilities/algorithm_utilities/element_allocator_algorithm.py
+pacman/utilities/algorithm_utilities/machine_algorithm_utilities.py
+pacman/utilities/algorithm_utilities/partition_algorithm_utilities.py
+pacman/utilities/algorithm_utilities/placer_algorithm_utilities.py
+pacman/utilities/algorithm_utilities/routing_info_allocator_utilities.py
