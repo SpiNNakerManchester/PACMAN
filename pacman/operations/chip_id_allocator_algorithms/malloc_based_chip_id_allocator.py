@@ -120,19 +120,8 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             return self._virtual_chips[link_data]
 
         # Allocate a new ID and cache it for later
-        chip_id_x, chip_id_y = self._allocate_id()
+        (chip_id_x, chip_id_y) = machine.get_unused_xy()
         machine_algorithm_utilities.create_virtual_chip(
             machine, link_data, chip_id_x, chip_id_y)
         self._virtual_chips[link_data] = (chip_id_x, chip_id_y)
         return chip_id_x, chip_id_y
-
-    def _allocate_id(self):
-        """ Allocate a chip ID from the free space
-        """
-
-        # can always assume there's at least one element in the free space,
-        # otherwise it will have already been deleted already.
-        free_space_chunk = self._free_space_tracker[0]
-        chip_id = free_space_chunk.start_address
-        self._allocate_elements(chip_id, 1)
-        return (chip_id >> 8), (chip_id & _LOWER_16_BITS)
