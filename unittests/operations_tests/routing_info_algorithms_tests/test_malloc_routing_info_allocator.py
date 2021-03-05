@@ -33,7 +33,7 @@ class MyTestCase(unittest.TestCase):
     def test_allocate_fixed_key_and_mask(self):
         allocator = MallocBasedRoutingInfoAllocator()
         allocator._allocate_fixed_keys_and_masks(
-            [BaseKeyAndMask(0x800, 0xFFFFF800)], None)
+            [BaseKeyAndMask(0x800, 0xFFFFF800)])
         error = ("Allocation has not resulted in the expected free space"
                  " being available")
         print(allocator._free_space_tracker)
@@ -85,7 +85,7 @@ class MyTestCase(unittest.TestCase):
         allocator = MallocBasedRoutingInfoAllocator()
 
         allocator._allocate_fixed_keys_and_masks(
-            [BaseKeyAndMask(0x800, 0xFFFFF800)], None)
+            [BaseKeyAndMask(0x800, 0xFFFFF800)])
 
         print(allocator._free_space_tracker)
 

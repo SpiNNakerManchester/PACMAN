@@ -22,23 +22,17 @@ from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, FixedKeyFieldConstraint,
     FixedMaskConstraint, FixedKeyAndMaskConstraint,
     ContiguousKeyRangeContraint)
-from pacman.model.routing_info import (
-    RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo)
 from pacman.utilities.utility_calls import (
-    check_algorithm_can_support_constraints, locate_constraints_of_type,
-    get_key_ranges)
-from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
+    check_algorithm_can_support_constraints, locate_constraints_of_type)
 from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
     import (
         check_types_of_edge_constraint, get_mulitcast_edge_groups)
-from pacman.exceptions import PacmanRouteInfoAllocationException
-from .key_field_generator import KeyFieldGenerator
-from .utils import get_possible_masks
+from .utils import RoutingInfoAllocator
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
+class CompressibleMallocBasedRoutingInfoAllocator(RoutingInfoAllocator):
     """ A Routing Info Allocation Allocator algorithm that keeps track of\
         free keys and attempts to allocate them as requested, but that also\
         looks at routing tables in an attempt to make things more compressible
@@ -47,7 +41,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     __slots__ = []
 
     def __init__(self):
-        super().__init__([(0, 2 ** 32)])
+        super().__init__(0, 2 ** 32)
 
     def __call__(self, machine_graph, n_keys_map, routing_tables):
         """
@@ -69,8 +63,6 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         # constraints are compatible
         check_types_of_edge_constraint(machine_graph)
 
-        routing_infos = RoutingInfo()
-
         # Get the edges grouped by those that require the same key
         (fixed_keys, _shared_keys, fixed_masks, fixed_fields, continuous,
          noncontinuous) = get_mulitcast_edge_groups(machine_graph)
@@ -87,17 +79,16 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         for group in progress.over(fixed_keys, False):
             # Get any fixed keys and masks from the group and attempt to
             # allocate them
-            fixed_key_and_mask_constraint = locate_constraints_of_type(
+            fixed_key_and_mask = locate_constraints_of_type(
                 group.constraints, FixedKeyAndMaskConstraint)[0]
 
             # attempt to allocate them
             self._allocate_fixed_keys_and_masks(
-                fixed_key_and_mask_constraint.keys_and_masks)
+                fixed_key_and_mask.keys_and_masks)
 
             # update the pacman data objects
             self._update_routing_objects(
-                fixed_key_and_mask_constraint.keys_and_masks, routing_infos,
-                group)
+                fixed_key_and_mask.keys_and_masks, group)
             continuous.remove(group)
 
         for group in progress.over(fixed_masks, False):
@@ -116,7 +107,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 fixed_mask, fields, n_keys_map.n_keys_for_partition(group))
 
             # update the pacman data objects
-            self._update_routing_objects(keys_and_masks, routing_infos, group)
+            self._update_routing_objects(keys_and_masks, group)
             continuous.remove(group)
 
         for group in progress.over(fixed_fields, False):
@@ -128,30 +119,42 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                 None, fields, n_keys_map.n_keys_for_partition(group))
 
             # update the pacman data objects
-            self._update_routing_objects(keys_and_masks, routing_infos, group)
+            self._update_routing_objects(keys_and_masks, group)
             continuous.remove(group)
 
-        # Sort the rest of the groups, using the routing tables for guidance
-        # Group partitions by those which share routes in any table
-        partition_groups = OrderedDict()
-        routers = reversed(sorted(
+        for group in self._group_remaining(routing_tables, continuous):
+            for partition in progress.over(group, False):
+                keys_and_masks = self._allocate_keys_and_masks(
+                    None, None, n_keys_map.n_keys_for_partition(partition))
+
+                # update the pacman data objects
+                self._update_routing_objects(keys_and_masks, partition)
+
+        progress.end()
+        # Return the allocation (built in our utility superclass)
+        return self._get_allocated_routing_info()
+
+    def _group_remaining(self, routing_tables, continuous):
+        """
+        Sort the rest of the groups, using the routing tables for guidance.
+        Group partitions by those which share routes in any table.
+
+        :param MulticastRoutingTableByPartition routing_tables:
+        :param list(AbstractSingleSourcePartition) continuous:
+        :return: the sorted list of groups
+        :rtype: list(tuple(AbstractSingleSourcePartition))
+        """
+        routers = sorted(
             routing_tables.get_routers(),
-            key=lambda item: len(routing_tables.get_entries_for_router(
-                item[0], item[1]))))
+            reverse=True,
+            key=lambda item: len(routing_tables.get_entries_for_router(*item)))
+        partition_groups = OrderedDict()
+        continuous = frozenset(continuous)
         for x, y in routers:
 
-            # Find all partitions that share a route in this table
-            partitions_by_route = defaultdict(OrderedSet)
-            routing_table = routing_tables.get_entries_for_router(x, y)
-            for partition, entry in routing_table.items():
-                if partition in continuous:
-                    entry_hash = sum(
-                        1 << i for i in entry.link_ids)
-                    entry_hash += sum(
-                        1 << (i + 6) for i in entry.processor_ids)
-                    partitions_by_route[entry_hash].add(partition)
-
-            for entry_hash, partitions in partitions_by_route.items():
+            # For all partitions that share a route in this table...
+            for partitions in self.__group_partitions_by_route(
+                    routing_tables.get_entries_for_router(x, y), continuous):
                 found_groups = [
                     partition_groups[partition]
                     for partition in partitions
@@ -178,123 +181,24 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                         partition_groups[partition] = new_group
 
         # Sort partitions by largest group
-        continuous = list(OrderedSet(
-            tuple(group) for group in partition_groups.values()))
+        grouped_partitions = OrderedSet(
+            tuple(group) for group in partition_groups.values())
+        return sorted(grouped_partitions, reverse=True, key=len)
 
-        for group in reversed(sorted(continuous, key=len)):
-            for partition in progress.over(group, False):
-                keys_and_masks = self._allocate_keys_and_masks(
-                    None, None, n_keys_map.n_keys_for_partition(partition))
-
-                # update the pacman data objects
-                self._update_routing_objects(
-                    keys_and_masks, routing_infos, partition)
-
-        progress.end()
-        return routing_infos
-
-    @staticmethod
-    def _update_routing_objects(
-            keys_and_masks, routing_infos, partition):
+    def __group_partitions_by_route(self, routing_table, continuous):
         """
-        :param iterable(BaseKeyAndMask) keys_and_masks:
-        :param RoutingInfo routing_infos:
-        :param AbstractSingleSourcePartition partition:
+        :param routing_table:
+        :type routing_table:
+            dict(AbstractSingleSourcePartition,
+            MulticastRoutingTableByPartitionEntry)
+        :param frozenset(AbstractSingleSourcePartition) continuous:
+        :rtype: ~collections.abc.Iterable(set(AbstractSingleSourcePartition))
         """
-        # Allocate the routing information
-        routing_infos.add_partition_info(PartitionRoutingInfo(
-            keys_and_masks, partition))
-
-    def _allocate_fixed_keys_and_masks(self, keys_and_masks):
-        """ Allocate fixed keys and masks
-
-        :param iterable(BaseKeyAndMask) keys_and_masks:
-            the fixed keys and masks combos
-        :raises PacmanRouteInfoAllocationException:
-        """
-        # If there are fixed keys and masks, allocate them
-        for key_and_mask in keys_and_masks:
-            # Go through the mask sets and allocate
-            for key, n_keys in get_key_ranges(
-                    key_and_mask.key, key_and_mask.mask):
-                self.allocate_elements(key, n_keys)
-
-    def _allocate_keys_and_masks(self, fixed_mask, fields, partition_n_keys,
-                                 contiguous_keys=True):
-        """
-        :param fixed_mask:
-        :type fixed_mask: int or None
-        :param fields:
-        :type fields: iterable(Field) or None
-        :param int partition_n_keys:
-        :param bool contiguous_keys:
-        :rtype: list(BaseKeyAndMask)
-        :raises PacmanRouteInfoAllocationException:
-        """
-        # If there isn't a fixed mask, generate a fixed mask based
-        # on the number of keys required
-        masks_available = [fixed_mask]
-        if fixed_mask is None:
-            masks_available = get_possible_masks(
-                partition_n_keys, contiguous_keys=contiguous_keys)
-
-        # For each usable mask, try all of the possible keys and
-        # see if a match is possible
-        key, mask = self.__find_key_and_mask(
-            fields, masks_available, partition_n_keys)
-
-        # If we found a working key and mask that can be assigned,
-        # Allocate them
-        if key is not None:
-            for base_key, n_keys in get_key_ranges(key, mask):
-                self.allocate_elements(base_key, n_keys)
-
-            # If we get here, we can assign the keys to the edges
-            return [BaseKeyAndMask(base_key=key, mask=mask)]
-
-        raise PacmanRouteInfoAllocationException(
-            "Could not find space to allocate keys")
-
-    def __find_key_and_mask(self, fields, masks_available, partition_n_keys):
-        """
-        :param fields:
-        :type fields: iterable(Field) or None
-        :param list(int) masks_available:
-        :param int partition_n_keys:
-        :rtype: tuple(int,int) or tuple(None,None)
-        """
-        for mask in masks_available:
-            logger.debug("Trying mask {} for {} keys",
-                         hex(mask), partition_n_keys)
-
-            key_generator = KeyFieldGenerator(
-                mask, fields, self._free_space_tracker)
-            for key in key_generator:
-                logger.debug("Trying key {}", hex(key))
-
-                # Check if all the key ranges can be allocated
-                if self.__check_match(key, mask):
-                    logger.debug(
-                        "Matched key {} and mask {}", hex(key), hex(mask))
-                    return key, mask
-        return None, None
-
-    def __check_match(self, key, mask):
-        """
-        :param int key:
-        :param int mask:
-        :rtype: bool
-        """
-        index = 0
-        for base_key, n_keys in get_key_ranges(key, mask):
-            logger.debug("Finding slot for {}, n_keys={}",
-                         hex(base_key), n_keys)
-            index = self._find_slot(base_key, lo=index)
-            logger.debug("Slot for {} is {}", hex(base_key), index)
-            if index is None:
-                return False
-            space = self._check_allocation(index, base_key, n_keys)
-            logger.debug("Space for {} is {}", hex(base_key), space)
-            if space is None:
-                return False
-        return True
+        partitions_by_route = defaultdict(OrderedSet)
+        for partition, entry in routing_table.items():
+            if partition in continuous:
+                # Compute the spinnaker route as the hash
+                entry_hash = sum(1 << i for i in entry.link_ids)
+                entry_hash += sum(1 << (i + 6) for i in entry.processor_ids)
+                partitions_by_route[entry_hash].add(partition)
+        return partitions_by_route.values()
