@@ -13,43 +13,62 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 import sys
-from six import add_metaclass
+from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ordered_set import OrderedSet
-from spinn_utilities.abstract_base import (
-    abstractmethod, abstractproperty, AbstractBase)
+from spinn_utilities.overrides import overrides
+from spinn_utilities.log import FormatAdapter
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanConfigurationException,
+    PacmanInvalidParameterException)
 from pacman.model.graphs import AbstractVertex
-from pacman.exceptions import PacmanValueError, PacmanAlreadyExistsException
+logger = FormatAdapter(logging.getLogger(__file__))
 
 
-@add_metaclass(AbstractBase)
-class ApplicationVertex(AbstractVertex):
-    """ A vertex that can be broken down into a number of smaller vertices
+class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
+    """ A vertex that can be broken down into a number of smaller vertices\
         based on the resources that the vertex requires.
     """
 
-    __slots__ = ["_machine_vertices"]
+    __slots__ = [
+        # List of machine verts associated with this app vertex
+        "_machine_vertices",
+
+        # The splitter object associated with this app vertex
+        "_splitter"]
+
+    SETTING_SPLITTER_ERROR_MSG = (
+        "The splitter object on {} has already been set, it cannot be "
+        "reset. Please fix and try again. ")
 
     def __init__(self, label=None, constraints=None,
-                 max_atoms_per_core=sys.maxsize):
+                 max_atoms_per_core=sys.maxsize, splitter=None):
         """
         :param str label: The optional name of the vertex.
         :param iterable(AbstractConstraint) constraints:
             The optional initial constraints of the vertex.
         :param int max_atoms_per_core: The max number of atoms that can be
             placed on a core, used in partitioning.
+        :param splitter: The splitter object needed for this vertex.
+            Leave as None to delegate the choice of splitter to the selector.
+        :type splitter: None or
+            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
         :raise PacmanInvalidParameterException:
             If one of the constraints is not valid
         """
-
-        super(ApplicationVertex, self).__init__(label, constraints)
+        # Need to set to None temporarily as add_constraint checks splitter
+        self._splitter = None
+        super().__init__(label, constraints)
         self._machine_vertices = OrderedSet()
 
+        # Use setter as there is extra work to do
+        self.splitter = splitter
+
         # add a constraint for max partitioning
-        self.add_constraint(
-            MaxVertexAtomsConstraint(max_atoms_per_core))
+        self.add_constraint(MaxVertexAtomsConstraint(max_atoms_per_core))
 
     def __str__(self):
         return self.label
@@ -58,47 +77,49 @@ class ApplicationVertex(AbstractVertex):
         return "ApplicationVertex(label={}, constraints={}".format(
             self.label, self.constraints)
 
-    @abstractmethod
-    def get_resources_used_by_atoms(self, vertex_slice):
-        """ Get the separate resource requirements for a range of atoms
-
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            the low value of atoms to calculate resources from
-        :return: a Resource container that contains a
-            CPUCyclesPerTickResource, DTCMResource and SDRAMResource
-        :rtype: ~pacman.model.resources.ResourceContainer
+    @property
+    def splitter(self):
         """
-
-    @abstractmethod
-    def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
-        """ Create a machine vertex from this application vertex
-
-        :param vertex_slice:
-            The slice of atoms that the machine vertex will cover,
-            or None to use the default slice
-        :type vertex_slice: ~pacman.model.graphs.common.Slice or None
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources used by the machine vertex.
-        :param label: human readable label for the machine vertex
-        :type label: str or None
-        :param iterable(~pacman.model.constraints.AbstractConstraint) \
-                constraints:
-            Constraints to be passed on to the machine vertex.
+        :rtype:
+            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
         """
+        return self._splitter
 
-    def remember_associated_machine_vertex(self, machine_vertex):
+    @splitter.setter
+    def splitter(self, new_value):
+        """ Sets the splitter object. Does not allow repeated settings.
+
+        :param new_value: The new splitter object
+        :type new_value:
+            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
+        :rtype: None
+        """
+        if self._splitter == new_value:
+            return
+        if self._splitter is not None:
+            raise PacmanConfigurationException(
+                self.SETTING_SPLITTER_ERROR_MSG.format(self._label))
+        self._splitter = new_value
+        self._splitter.set_governed_app_vertex(self)
+        self._splitter.check_supported_constraints()
+
+    @overrides(AbstractVertex.add_constraint)
+    def add_constraint(self, constraint):
+        super().add_constraint(constraint)
+        if self._splitter is not None:
+            self._splitter.check_supported_constraints()
+
+    def remember_machine_vertex(self, machine_vertex):
         """
         Adds the Machine vertex the iterable returned by machine_vertices
-        :param machine_vertex: A pointer to a machine_vertex.
+
+        This method will be called by MachineVertex.app_vertex
+        No other place should call it.
+
+        :param MachineVertex machine_vertex: A pointer to a machine_vertex.
             This vertex may not be fully initialized but will have a slice
         :raises PacmanValueError: If the slice of the machine_vertex is too big
         """
-        if machine_vertex.vertex_slice.hi_atom >= self.n_atoms:
-            raise PacmanValueError(
-                "hi_atom {:d} >= maximum {:d}".format(
-                    machine_vertex.vertex_slice.hi_atom, self.n_atoms))
 
         machine_vertex.index = len(self._machine_vertices)
 
@@ -114,9 +135,31 @@ class ApplicationVertex(AbstractVertex):
         :rtype: int
         """
 
+    def round_n_atoms(self, n_atoms, label="n_atoms"):
+        """
+        Utility function to allow suoer-classes to make sure n_atom is an int
+
+        :param n_atoms: Value convertible to int to be used for n_atoms
+        :type n_atoms: int or float or numpy.
+        :return:
+        """
+        if isinstance(n_atoms, int):
+            return n_atoms
+        # Allow a float which has a near int value
+        temp = int(round(n_atoms))
+        if abs(temp - n_atoms) < 0.001:
+            if temp != n_atoms:
+                logger.warning(
+                    "Size of the {} rounded from {} to {}. "
+                    "Please use int values for n_atoms",
+                    label, n_atoms, temp)
+            return temp
+        raise PacmanInvalidParameterException(
+            label, n_atoms, "int value expected for {}".format(label))
+
     @property
     def machine_vertices(self):
-        """ The machine vertices that this application vertex maps to.
+        """ The machine vertices that this application vertex maps to.\
             Will be the same length as :py:meth:`vertex_slices`.
 
         :rtype: iterable(MachineVertex)
@@ -125,7 +168,7 @@ class ApplicationVertex(AbstractVertex):
 
     @property
     def vertex_slices(self):
-        """ The slices of this vertex that each machine vertex manages.
+        """ The slices of this vertex that each machine vertex manages.\
             Will be the same length as :py:meth:`machine_vertices`.
 
         :rtype: iterable(Slice)
@@ -142,10 +185,11 @@ class ApplicationVertex(AbstractVertex):
         for constraint in self.constraints:
             if isinstance(constraint, MaxVertexAtomsConstraint):
                 return constraint.size
-        return self.n_atoms
 
     def forget_machine_vertices(self):
         """ Arrange to forget all machine vertices that this application
             vertex maps to.
         """
         self._machine_vertices = OrderedSet()
+        if self._splitter is not None:
+            self._splitter.reset_called()

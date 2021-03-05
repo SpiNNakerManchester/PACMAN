@@ -13,12 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
+import os
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
-from collections import defaultdict
-import os
 
 __version__ = None
 exec(open("pacman/_version.py").read())
@@ -65,23 +65,22 @@ setup(
         "Operating System :: MacOS",
 
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
     packages=packages,
     package_data=package_data,
     install_requires=[
         'SpiNNUtilities >= 1!5.1.1, < 1!6.0.0',
         'SpiNNMachine >= 1!5.1.1, < 1!6.0.0',
-        'six',
-        'enum34',
-        'future',
-        'numpy',
+        "numpy > 1.13, < 1.20; python_version == '3.6'",
+        "numpy > 1.13, < 1.21; python_version == '3.7'",
+        "numpy; python_version >= '3.8'",
         'lxml',
         'jsonschema',
-        'sortedcollections'],
+        "sortedcollections"],
     maintainer="SpiNNakerTeam",
     maintainer_email="spinnakerusers@googlegroups.com"
 )

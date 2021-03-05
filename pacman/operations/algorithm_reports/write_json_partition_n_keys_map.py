@@ -28,19 +28,15 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class WriteJsonPartitionNKeysMap(object):
     """ Converter from MulticastRoutingTables to JSON.
-
-    :param AbstractMachinePartitionNKeysMap partition_to_n_keys_map:
-        The number of keys needed for each partition.
-    :param str json_folder: the folder to which the JSON are being written
-    :return: the name of the generated file
-    :rtype: str
     """
 
     def __call__(self, partition_to_n_keys_map, json_folder):
         """ Runs the code to write the n_keys_map in JSON.
 
         :param AbstractMachinePartitionNKeysMap partition_to_n_keys_map:
-        :param str json_folder:
+            The number of keys needed for each partition.
+        :param str json_folder: the folder to which the JSON are being written
+        :return: the name of the generated file
         :rtype: str
         """
         # Steps are tojson, validate and writefile

@@ -13,9 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .pair_compressor import PairCompressor
+from .abstract_one_app_one_machine_vertex import AbstractOneAppOneMachineVertex
 
-
-class UnorderedCompressor(PairCompressor):
-    def __init__(self):
-        super(UnorderedCompressor, self).__init__(False)
+__all__ = ["AbstractOneAppOneMachineVertex"]

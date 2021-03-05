@@ -13,14 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
 
 
-@add_metaclass(AbstractBase)
-class MachineVertex(AbstractVertex):
+class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     """ A machine graph vertex.
     """
 
@@ -50,7 +48,7 @@ class MachineVertex(AbstractVertex):
         """
         if label is None:
             label = str(type(self))
-        super(MachineVertex, self).__init__(label, constraints)
+        super().__init__(label, constraints)
         self._added_to_graph = False
         self._app_vertex = app_vertex
         self._index = None
@@ -58,17 +56,6 @@ class MachineVertex(AbstractVertex):
             self._vertex_slice = vertex_slice
         else:
             self._vertex_slice = self._DEFAULT_SLICE
-        # associate depends on self._vertex_slice and self._app_vertex
-        self.associate_application_vertex()
-
-    def associate_application_vertex(self):
-        """
-        Asks the application vertex (if any) to remember this machine vertex.
-        :raises PacmanValueError: If the slice of the machine_vertex is too big
-        """
-        # remember depends on slice already being set
-        if self._app_vertex:
-            self._app_vertex.remember_associated_machine_vertex(self)
 
     @property
     def app_vertex(self):

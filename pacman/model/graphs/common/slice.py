@@ -33,6 +33,11 @@ class Slice(collections.namedtuple('Slice', 'lo_atom hi_atom n_atoms')):
         :param int hi_atom: Index of the highest atom to represent.
         :raises PacmanValueError: If the bounds of the slice are invalid.
         """
+        if not isinstance(lo_atom, int):
+            raise Exception("lo atom needs to be a int")
+        if not isinstance(hi_atom, int):
+            raise Exception("hi atom needs to be a int")
+
         if lo_atom < 0:
             raise PacmanValueError('lo_atom < 0')
         if hi_atom < lo_atom:
@@ -44,7 +49,7 @@ class Slice(collections.namedtuple('Slice', 'lo_atom hi_atom n_atoms')):
 
         # Create the Slice object as a `namedtuple` with these pre-computed
         # values filled in.
-        return super(cls, Slice).__new__(cls, lo_atom, hi_atom, n_atoms)
+        return super().__new__(cls, lo_atom, hi_atom, n_atoms)
 
     @property
     def as_slice(self):

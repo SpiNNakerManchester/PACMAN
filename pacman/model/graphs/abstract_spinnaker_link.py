@@ -17,14 +17,14 @@ from spinn_utilities.abstract_base import abstractproperty
 from .abstract_virtual import AbstractVirtual
 
 
-class AbstractSpiNNakerLink(AbstractVirtual):
+class AbstractSpiNNakerLink(AbstractVirtual, allow_derivation=True):
     """ An Object (most likely a vertex) connected to a SpiNNaker Link.
 
-        .. note::
-            It is expected that everything that is an instance of
-            AbstractSpiNNakerLink is also an instance of
-            :py:class:`AbstractVertex`.
-            This is not enforced to avoid diamond inheritance.
+    .. note::
+        It is expected that everything that is an instance of
+        AbstractSpiNNakerLink is also an instance of
+        :py:class:`AbstractVertex`.
+        This is not enforced to avoid diamond inheritance.
     """
 
     __slots__ = ()

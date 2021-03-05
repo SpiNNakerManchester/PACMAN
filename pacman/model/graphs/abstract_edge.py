@@ -12,13 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 
-@add_metaclass(AbstractBase)
-class AbstractEdge(object):
+class AbstractEdge(object, metaclass=AbstractBase):
     """ A directed edge in a graph between two vertices.
     """
 
@@ -43,11 +40,4 @@ class AbstractEdge(object):
         """ The vertex at the end of the edge
 
         :rtype: AbstractVertex
-        """
-
-    @abstractproperty
-    def traffic_type(self):
-        """ The traffic type of the edge
-
-        :rtype: EdgeTrafficType
         """

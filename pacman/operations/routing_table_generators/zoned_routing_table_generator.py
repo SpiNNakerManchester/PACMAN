@@ -34,22 +34,22 @@ class SharedEntry(object):
         ]
 
     def __init__(self, entry):
+        """
+        :param MulticastRoutingTableByPartitionEntry entry:
+        """
         self.link_ids = entry.link_ids
         self.processor_ids = entry.processor_ids
         self.defaultable = entry.defaultable
 
     def still_defaultable(self, entry):
+        """
+        :param MulticastRoutingTableByPartitionEntry entry:
+        """
         self.defaultable = self.defaultable & entry.defaultable
 
 
 class ZonedRoutingTableGenerator(object):
     """ An algorithm that can produce routing tables in zones
-
-    :param RoutingInfo routing_infos:
-    :param MulticastRoutingTableByPartition routing_table_by_partitions:
-    :param ~spinn_machine.Machine machine:
-    :param dict(ApplicationVertex,BaseKeyAndMask) info_by_app_vertex:
-    :rtype: MulticastRoutingTables
     """
 
     __slots__ = []
@@ -82,7 +82,8 @@ class ZonedRoutingTableGenerator(object):
         :param ~spinn_machine.Chip chip:
         :param partitions_in_table:
         :type partitions_in_table:
-            dict(OutgoingEdgePartition, MulticastRoutingTableByPartitionEntry)
+            dict(AbstractSingleSourcePartition,
+            MulticastRoutingTableByPartitionEntry)
         :param RoutingInfo routing_infos:
         :param dict(ApplicationVertex,BaseKeyAndMask) info_by_app_vertex:
         :rtype: MulticastRoutingTable
@@ -109,10 +110,11 @@ class ZonedRoutingTableGenerator(object):
 
     def _find_shared_entry(self, partitions, partitions_in_table):
         """
-        :param set(OutgoingEdgePartition) partitions:
+        :param set(AbstractSingleSourcePartition) partitions:
         :param partitions_in_table:
         :type partitions_in_table:
-            dict(OutgoingEdgePartition, MulticastRoutingTableByPartitionEntry)
+            dict(AbstractSingleSourcePartition,
+            MulticastRoutingTableByPartitionEntry)
         :rtype: SharedEntry or None
         """
         shared_entry = None
@@ -131,11 +133,12 @@ class ZonedRoutingTableGenerator(object):
     def _add_partition_based(
             self, partitions, routing_infos, partitions_in_table, table):
         """
-        :param set(OutgoingEdgePartition) partitions:
+        :param set(AbstractSingleSourcePartition) partitions:
         :param RoutingInfo routing_infos:
         :param partitions_in_table:
         :type partitions_in_table:
-            dict(OutgoingEdgePartition, MulticastRoutingTableByPartitionEntry)
+            dict(AbstractSingleSourcePartition,
+            MulticastRoutingTableByPartitionEntry)
         :param MulticastRoutingTable table:
         """
         for partition in partitions:

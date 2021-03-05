@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
@@ -22,21 +23,22 @@ from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.operations.rigged_algorithms.hilbert_state import HilbertState
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class HilbertPlacer(object):
     """ A simple placing algorithm using the Hilbert space-filling curve,\
         translated from RIG.
-
-    :param MachineGraph machine_graph: The machine_graph to place
-    :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
-    :param int plan_n_timesteps: number of timesteps to plan for
-    :return: Placements of vertices on the machine
-    :rtype: Placements
     """
 
     def __call__(self, machine_graph, machine, plan_n_timesteps):
+        """
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :return: Placements of vertices on the machine
+        :rtype: Placements
+        """
         # check that the algorithm can handle the constraints
         self._check_constraints(
             machine_graph.vertices,
@@ -110,7 +112,7 @@ class HilbertPlacer(object):
             tracks the usage of resources of a machine
         :param ~spinn_machine.Machine machine: A SpiNNaker machine object.
         :param Placements placements: Placements of vertices on the machine
-        :param vertices_on_same_chip: a dictionary where keys are a vertex \
+        :param vertices_on_same_chip: a dictionary where keys are a vertex
             and values are a list of vertices
         :type vertices_on_same_chip: dict(MachineVertex,list(MachineVertex))
         :return vertices: an iterable of vertices to be placed
@@ -147,7 +149,7 @@ class HilbertPlacer(object):
 
         :param int level: Number of levels of recursion to use in generating
             the curve. The resulting curve will be `(2**level)-1` wide/tall.
-        :param int angle: `1` if this is the 'positive' \
+        :param int angle: `1` if this is the 'positive'
             expansion of the grammar and `-1` for the 'negative' expansion.
         :param state: The current state of the system in a Hilbert curve.
         :type state:

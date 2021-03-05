@@ -23,6 +23,7 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
     FixedVertexAtomsConstraint)
+from pacman.model.graphs.machine import MulticastEdgePartition
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
     ResourceContainer)
@@ -141,9 +142,10 @@ class TestJsonUtils(unittest.TestCase):
         self.constraint_there_and_back(c1)
 
     def test_same_atoms_as_vertex_constraint(self):
-        v1 = SimpleMachineVertex(None, "v1")
-        c1 = SameAtomsAsVertexConstraint(v1)
-        self.constraint_there_and_back(c1)
+        with self.assertRaises(NotImplementedError):
+            v1 = SimpleMachineVertex(None, "v1")
+            c1 = SameAtomsAsVertexConstraint(v1)
+            self.constraint_there_and_back(c1)
 
     def test_max_vertex_atoms_constraint(self):
         c1 = MaxVertexAtomsConstraint(5)
@@ -232,8 +234,11 @@ class TestJsonUtils(unittest.TestCase):
         for i in range(10):
             vertices.append(
                 SimpleMachineVertex(ResourceContainer(), "V{}".format(i)))
-        vertices[1].add_constraint(SameAtomsAsVertexConstraint(vertices[4]))
-        vertices[4].add_constraint(SameAtomsAsVertexConstraint(vertices[1]))
+        with self.assertRaises(NotImplementedError):
+            vertices[1].add_constraint(SameAtomsAsVertexConstraint(
+                vertices[4]))
+            vertices[4].add_constraint(SameAtomsAsVertexConstraint(
+                vertices[1]))
         for i in range(5):
             edges.append(MachineEdge(vertices[0], vertices[(i + 1)]))
         for i in range(5, 10):
@@ -241,5 +246,9 @@ class TestJsonUtils(unittest.TestCase):
                 vertices[5], vertices[(i + 1) % 10]))
         graph = MachineGraph("foo")
         graph.add_vertices(vertices)
+        graph.add_outgoing_edge_partition(MulticastEdgePartition(
+            identifier="bar", pre_vertex=vertices[0]))
+        graph.add_outgoing_edge_partition(MulticastEdgePartition(
+            identifier="bar", pre_vertex=vertices[5]))
         graph.add_edges(edges, "bar")
         self.graph_there_and_back(graph)

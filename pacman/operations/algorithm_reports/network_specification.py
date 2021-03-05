@@ -23,9 +23,6 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class NetworkSpecification(object):
     """ Generate report on the user's network specification.
-
-    :param str report_folder: the directory to which reports are stored
-    :param ApplicationGraph graph: the graph generated from the tools
     """
 
     _FILENAME = "network_specification.rpt"

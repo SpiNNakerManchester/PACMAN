@@ -51,16 +51,17 @@ class TestPartitionConstraints(unittest.TestCase):
         self.assertEqual(len(d), 2)
 
     def test_same_atoms_as_vertex_constraint(self):
-        v1 = SimpleMachineVertex(None, "v1")
-        v2 = SimpleMachineVertex(None, "v2")
-        c1 = SameAtomsAsVertexConstraint(v1)
-        self.assertEqual(c1.vertex, v1)
-        self.assertEqual(c1, SameAtomsAsVertexConstraint(v1))
-        self.assertEqual(str(c1), 'SameAtomsAsVertexConstraint(vertex=v1)')
-        c2 = SameAtomsAsVertexConstraint(v2)
-        self.assertNotEqual(c1, c2)
-        self.assertNotEqual(c1, "1.2.3.4")
-        d = {}
-        d[c1] = 1
-        d[c2] = 2
-        self.assertEqual(len(d), 2)
+        with self.assertRaises(NotImplementedError):
+            v1 = SimpleMachineVertex(None, "v1")
+            v2 = SimpleMachineVertex(None, "v2")
+            c1 = SameAtomsAsVertexConstraint(v1)
+            self.assertEqual(c1.vertex, v1)
+            self.assertEqual(c1, SameAtomsAsVertexConstraint(v1))
+            self.assertEqual(str(c1), 'SameAtomsAsVertexConstraint(vertex=v1)')
+            c2 = SameAtomsAsVertexConstraint(v2)
+            self.assertNotEqual(c1, c2)
+            self.assertNotEqual(c1, "1.2.3.4")
+            d = {}
+            d[c1] = 1
+            d[c2] = 2
+            self.assertEqual(len(d), 2)

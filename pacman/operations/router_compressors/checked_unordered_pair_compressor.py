@@ -15,10 +15,22 @@
 
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanElementAllocationException
-from .unordered_compressor import UnorderedCompressor
+from .unordered_pair_compressor import UnorderedPairCompressor
 
 
-class CheckedUnorderedCompressor(UnorderedCompressor):
+class CheckedUnorderedPairCompressor(UnorderedPairCompressor):
+    """
+    A version of the pair compressor that does not consider order
+    but does check the lengths
+
+    There is no known case where this would generate a better result than the
+    standard (ordered) Pair Compressor. This class is purely for expirimental
+    purposes.
+
+    The results are checked for length so an error is raised if any table
+    is too big.
+    """
+
     __slots__ = []
 
     def __call__(self, router_tables, target_length=None):
@@ -31,7 +43,7 @@ class CheckedUnorderedCompressor(UnorderedCompressor):
         """
         if target_length is None:
             # Stop when enought
-            self._target_length = self.MAX_SUPPORTED_LENGTH
+            self._target_length = 0
         else:
             self._target_length = target_length
         # create progress bar

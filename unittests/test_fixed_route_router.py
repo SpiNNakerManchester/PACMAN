@@ -95,11 +95,8 @@ def test_all_working(width, height,  with_down_links, with_down_chips):
 
 
 def test_unreachable():
-    try:
+    with pytest.raises(PacmanRoutingException):
         _check_setup(8, 8, [(0, 2), (1, 3), (1, 4)], None)
-        raise Exception("That should not have worked")
-    except PacmanRoutingException:
-        pass
 
 
 if __name__ == '__main__':

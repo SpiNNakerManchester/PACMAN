@@ -30,14 +30,6 @@ _Task = namedtuple("_Task", "constraint, board, tag, vertex, placement")
 class BasicTagAllocator(object):
     """ Basic tag allocator that goes though the boards available and applies\
         the IP tags and reverse IP tags as needed.
-
-    :param ~spinn_machine.Machine machine:
-        The machine with respect to which to partition the application graph
-    :param int plan_n_timesteps: number of timesteps to plan for
-    :param Placements placements:
-    :return: list of IP Tags, list of Reverse IP Tags, tag allocation holder
-    :rtype: tuple(list(~spinn_machine.tags.IPTag),
-        list(~spinn_machine.tags.ReverseIPTag), Tags)
     """
 
     __slots__ = []
@@ -45,8 +37,12 @@ class BasicTagAllocator(object):
     def __call__(self, machine, plan_n_timesteps, placements):
         """
         :param ~spinn_machine.Machine machine:
-        :param int plan_n_timesteps:
+            The machine with respect to which to partition the application
+            graph
+        :param int plan_n_timesteps: number of timesteps to plan for
         :param Placements placements:
+        :return: list of IP Tags, list of Reverse IP Tags,
+            tag allocation holder
         :rtype: tuple(list(~spinn_machine.tags.IPTag),
             list(~spinn_machine.tags.ReverseIPTag), Tags)
         """

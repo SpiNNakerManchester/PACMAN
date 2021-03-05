@@ -15,7 +15,9 @@
 
 -r requirements.txt
 coverage >= 4.4, < 5.0
+flake8
 # pytest will be brought in by pytest-cov
 pytest-cov
-sphinx==1.5.3
+sphinx >= 2
 pylint
+testfixtures

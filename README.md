@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/SpiNNakerManchester/PACMAN.svg?branch=master)](https://travis-ci.org/SpiNNakerManchester/PACMAN)
+[![CI Check](https://github.com/SpiNNakerManchester/PACMAN/workflows/Python%20Actions/badge.svg?branch=master)](https://github.com/SpiNNakerManchester/PACMAN/actions?query=workflow%3A%22Python+Actions%22+branch%3Amaster)
 [![Documentation Status](https://readthedocs.org/projects/pacman/badge/?version=latest)](https://pacman.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/PACMAN/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/PACMAN?branch=master)
 
@@ -9,14 +9,10 @@ Requirements
 ============
 In addition to a standard Python installation, this package depends on:
 
- - six
- - enum34
  - SpiNNMachine
 
 These requirements can be install using `pip`:
 
-    pip install six
-    pip install enum34
     pip install SpiNNMachine
 
 User Installation
@@ -32,6 +28,8 @@ If you want to install only for yourself, run:
 To install in a `virtualenv`, with the `virtualenv` enabled, run:
 
     pip install PACMAN
+
+_Using a virtual environment is recommended for all SpiNNaker software._
 
 Developer Installation
 ======================
@@ -59,9 +57,7 @@ enabled, run:
 Documentation
 =============
 [PACMAN python documentation](http://pacman.readthedocs.io)
-
-[Combined PyNN7 python documentation](http://spinnaker7manchester.readthedocs.io)
-
+<br>
 [Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)
 
 

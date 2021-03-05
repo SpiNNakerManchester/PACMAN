@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 
 
-@add_metaclass(AbstractBase)
-class AbstractSDRAM(object):
+class AbstractSDRAM(object, metaclass=AbstractBase):
     """ Represents an amount of SDRAM used on a chip in the machine.
     """
 
@@ -69,7 +67,7 @@ class AbstractSDRAM(object):
     def per_timestep(self):
         """ Returns extra SDRAM cost for each additional timestep
 
-        .. warn:
+        .. warning::
             May well be zero.
         """
 
@@ -82,12 +80,12 @@ class AbstractSDRAM(object):
 
     @abstractmethod
     def report(self, timesteps, indent="", preamble="", target=None):
-        """
-        Writes a description of this sdram to the target
+        """ Writes a description of this SDRAM to the target.
 
-        :param int timesteps:  Number of timesteps to do total cost for
-        :param String indent: Text at the start of this and all children
-        :param String preamble:
+        :param int timesteps: Number of timesteps to do total cost for
+        :param str indent: Text at the start of this and all children
+        :param str preamble:
             Additional text at the start but not in children
-        :param file target: Where to write the output. None is stanrd print
+        :param file target: Where to write the output.
+            ``None`` is standard print
         """

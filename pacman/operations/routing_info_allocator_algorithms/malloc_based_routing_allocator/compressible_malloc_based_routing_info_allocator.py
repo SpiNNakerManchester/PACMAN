@@ -15,7 +15,6 @@
 
 from collections import defaultdict, OrderedDict
 import logging
-from six import iteritems, itervalues
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
@@ -23,39 +22,32 @@ from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, FixedKeyFieldConstraint,
     FixedMaskConstraint, FixedKeyAndMaskConstraint,
     ContiguousKeyRangeContraint)
-from pacman.model.graphs.common import EdgeTrafficType
-from .key_field_generator import KeyFieldGenerator
 from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo)
 from pacman.utilities.utility_calls import (
-    check_algorithm_can_support_constraints, locate_constraints_of_type)
+    check_algorithm_can_support_constraints, locate_constraints_of_type,
+    get_key_ranges)
 from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
 from pacman.utilities.algorithm_utilities.routing_info_allocator_utilities \
     import (
-        check_types_of_edge_constraint, get_edge_groups,
-        generate_key_ranges_from_mask)
+        check_types_of_edge_constraint, get_mulitcast_edge_groups)
 from pacman.exceptions import PacmanRouteInfoAllocationException
+from .key_field_generator import KeyFieldGenerator
 from .utils import get_possible_masks
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
-    """ A Routing Info Allocation Allocator algorithm that keeps track of
-        free keys and attempts to allocate them as requested, but that also
+    """ A Routing Info Allocation Allocator algorithm that keeps track of\
+        free keys and attempts to allocate them as requested, but that also\
         looks at routing tables in an attempt to make things more compressible
-
-    :param MachineGraph machine_graph:
-    :param AbstractMachinePartitionNKeysMap n_keys_map:
-    :param MulticastRoutingTableByPartition routing_tables:
-    :rtype: RoutingInfo
     """
 
     __slots__ = []
 
     def __init__(self):
-        super(CompressibleMallocBasedRoutingInfoAllocator, self).__init__(
-            [(0, 2 ** 32)])
+        super().__init__([(0, 2 ** 32)])
 
     def __call__(self, machine_graph, n_keys_map, routing_tables):
         """
@@ -81,8 +73,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Get the edges grouped by those that require the same key
         (fixed_keys, _shared_keys, fixed_masks, fixed_fields, continuous,
-         noncontinuous) = get_edge_groups(
-             machine_graph, EdgeTrafficType.MULTICAST)
+         noncontinuous) = get_mulitcast_edge_groups(machine_graph)
 
         # Even non-continuous keys will be continuous
         continuous.extend(noncontinuous)
@@ -152,7 +143,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             # Find all partitions that share a route in this table
             partitions_by_route = defaultdict(OrderedSet)
             routing_table = routing_tables.get_entries_for_router(x, y)
-            for partition, entry in iteritems(routing_table):
+            for partition, entry in routing_table.items():
                 if partition in continuous:
                     entry_hash = sum(
                         1 << i for i in entry.link_ids)
@@ -160,7 +151,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                         1 << (i + 6) for i in entry.processor_ids)
                     partitions_by_route[entry_hash].add(partition)
 
-            for entry_hash, partitions in iteritems(partitions_by_route):
+            for entry_hash, partitions in partitions_by_route.items():
                 found_groups = [
                     partition_groups[partition]
                     for partition in partitions
@@ -188,7 +179,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Sort partitions by largest group
         continuous = list(OrderedSet(
-            tuple(group) for group in itervalues(partition_groups)))
+            tuple(group) for group in partition_groups.values()))
 
         for group in reversed(sorted(continuous, key=len)):
             for partition in progress.over(group, False):
@@ -208,7 +199,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         """
         :param iterable(BaseKeyAndMask) keys_and_masks:
         :param RoutingInfo routing_infos:
-        :param OutgoingEdgePartition partition:
+        :param AbstractSingleSourcePartition partition:
         """
         # Allocate the routing information
         routing_infos.add_partition_info(PartitionRoutingInfo(
@@ -219,13 +210,12 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         :param iterable(BaseKeyAndMask) keys_and_masks:
             the fixed keys and masks combos
-        :rtype: None
         :raises PacmanRouteInfoAllocationException:
         """
         # If there are fixed keys and masks, allocate them
         for key_and_mask in keys_and_masks:
             # Go through the mask sets and allocate
-            for key, n_keys in generate_key_ranges_from_mask(
+            for key, n_keys in get_key_ranges(
                     key_and_mask.key, key_and_mask.mask):
                 self.allocate_elements(key, n_keys)
 
@@ -250,14 +240,33 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # For each usable mask, try all of the possible keys and
         # see if a match is possible
-        mask_found = None
-        key_found = None
-        mask = None
+        key, mask = self.__find_key_and_mask(
+            fields, masks_available, partition_n_keys)
+
+        # If we found a working key and mask that can be assigned,
+        # Allocate them
+        if key is not None:
+            for base_key, n_keys in get_key_ranges(key, mask):
+                self.allocate_elements(base_key, n_keys)
+
+            # If we get here, we can assign the keys to the edges
+            return [BaseKeyAndMask(base_key=key, mask=mask)]
+
+        raise PacmanRouteInfoAllocationException(
+            "Could not find space to allocate keys")
+
+    def __find_key_and_mask(self, fields, masks_available, partition_n_keys):
+        """
+        :param fields:
+        :type fields: iterable(Field) or None
+        :param list(int) masks_available:
+        :param int partition_n_keys:
+        :rtype: tuple(int,int) or tuple(None,None)
+        """
         for mask in masks_available:
             logger.debug("Trying mask {} for {} keys",
                          hex(mask), partition_n_keys)
 
-            key_found = None
             key_generator = KeyFieldGenerator(
                 mask, fields, self._free_space_tracker)
             for key in key_generator:
@@ -265,27 +274,10 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
                 # Check if all the key ranges can be allocated
                 if self.__check_match(key, mask):
-                    logger.debug("Matched key {}", hex(key))
-                    key_found = key
-                    break
-
-            # If we found a matching key, store the mask that worked
-            if key_found is not None:
-                logger.debug("Matched mask {}", hex(mask))
-                mask_found = mask
-                break
-
-        # If we found a working key and mask that can be assigned,
-        # Allocate them
-        if key_found is not None and mask_found is not None:
-            for base_key, n_keys in generate_key_ranges_from_mask(
-                    key_found, mask):
-                self.allocate_elements(base_key, n_keys)
-            # If we get here, we can assign the keys to the edges
-            return [BaseKeyAndMask(base_key=key_found, mask=mask)]
-
-        raise PacmanRouteInfoAllocationException(
-            "Could not find space to allocate keys")
+                    logger.debug(
+                        "Matched key {} and mask {}", hex(key), hex(mask))
+                    return key, mask
+        return None, None
 
     def __check_match(self, key, mask):
         """
@@ -294,7 +286,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         :rtype: bool
         """
         index = 0
-        for base_key, n_keys in generate_key_ranges_from_mask(key, mask):
+        for base_key, n_keys in get_key_ranges(key, mask):
             logger.debug("Finding slot for {}, n_keys={}",
                          hex(base_key), n_keys)
             index = self._find_slot(base_key, lo=index)

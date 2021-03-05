@@ -13,27 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
-from spinn_utilities.progress_bar import ProgressBar
-from pacman.model.graphs.common import EdgeTrafficType
-from pacman.model.placements import Placement, Placements
-from pacman.operations.placer_algorithms import OneToOnePlacer
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
-    create_vertices_groups, get_same_chip_vertex_groups)
-from pacman.utilities.utility_objs import ResourceTracker
-from pacman.model.constraints.placer_constraints import (
-    SameChipAsConstraint, ChipAndCoreConstraint)
+from collections import defaultdict
 import functools
 import math
 import sys
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.placements import Placement, Placements
+from pacman.operations.placer_algorithms import OneToOnePlacer
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    create_vertices_groups, get_same_chip_vertex_groups,
+    create_requirement_collections)
+from pacman.utilities.utility_objs import ResourceTracker
+from pacman.model.constraints.placer_constraints import (
+    SameChipAsConstraint, ChipAndCoreConstraint)
 
 
 class SpreaderPlacer(OneToOnePlacer):
-    """ places vertices on as many chips as available with a effort to
-    reduce the number of packets being received by the router in total.
+    """ Places vertices on as many chips as available with a effort to\
+        reduce the number of packets being received by the router in total.
 
     :param MachineGraph machine_graph: the machine graph
     :param ~spinn_machine.Machine machine: the SpiNNaker machine
@@ -58,10 +55,16 @@ class SpreaderPlacer(OneToOnePlacer):
     # 4. chip and core)
     STEPS = 4
 
-    def __init__(self):
-        OneToOnePlacer.__init__(self)
-
     def __call__(self, machine_graph, machine, n_keys_map, plan_n_timesteps):
+        """
+        :param MachineGraph machine_graph: the machine graph
+        :param ~spinn_machine.Machine machine: the SpiNNaker machine
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
+            the n keys from partition map
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :return: placements.
+        :rtype: Placements
+        """
         # create progress bar
         progress_bar = ProgressBar(
             (machine_graph.n_vertices * self.ITERATIONS) + self.STEPS,
@@ -185,23 +188,19 @@ class SpreaderPlacer(OneToOnePlacer):
         # sent every time step. but this is obviously not valid often
         # handle incoming
         total_incoming_keys = 0
-        for incoming_edge in machine_graph.get_edges_ending_at_vertex(vertex):
-            if incoming_edge.traffic_type == EdgeTrafficType.MULTICAST:
-                incoming_partition = \
-                    machine_graph.get_outgoing_partition_for_edge(
-                        incoming_edge)
-                total_incoming_keys += n_keys_map.n_keys_for_partition(
-                    incoming_partition)
+        for incoming_partition in \
+                machine_graph.get_multicast_edge_partitions_ending_at_vertex(
+                    vertex):
+            total_incoming_keys += n_keys_map.n_keys_for_partition(
+                incoming_partition)
 
         # handle outgoing
         out_going_partitions = \
-            machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
+            machine_graph.get_multicast_edge_partitions_starting_at_vertex(
                 vertex)
         for partition in out_going_partitions:
-            edge = list(partition.edges)[0]
-            if edge.traffic_type == EdgeTrafficType.MULTICAST:
-                total_incoming_keys += \
-                    n_keys_map.n_keys_for_partition(partition)
+            total_incoming_keys += \
+                n_keys_map.n_keys_for_partition(partition)
         return total_incoming_keys
 
     @staticmethod
@@ -248,9 +247,9 @@ class SpreaderPlacer(OneToOnePlacer):
                     to_do_as_group = list()
                     for other_vert in same_chip_vertex_groups[vertex]:
                         if other_vert not in placed_vertices:
-                            to_do_as_group.append(
-                                (other_vert.resources_required,
-                                 other_vert.constraints))
+                            to_do_as_group.extend(
+                                create_requirement_collections(
+                                    [other_vert], machine_graph))
 
                     # allocate as a group to sorted chips so that ones with
                     # least incoming packets are considered first
@@ -279,8 +278,8 @@ class SpreaderPlacer(OneToOnePlacer):
             self, one_to_one_groups, chips_in_order, placements, progress_bar,
             resource_tracker, placed_vertices, cost_per_chip, machine_graph,
             n_keys_map, machine):
-        """ place 1 to 1 groups on the same chip if possible. else radially
-        from it
+        """ place 1 to 1 groups on the same chip if possible. else radially\
+            from it
 
         :param one_to_one_groups: the 1 to 1 groups
         :type one_to_one_groups: iterable(iterable(MachineVertex))
@@ -297,7 +296,6 @@ class SpreaderPlacer(OneToOnePlacer):
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             map between outgoing partition and n keys down it
         :param ~spinn_machine.Machine machine: the SpiNNMachine instance.
-        :rtype: None
         """
 
         # go through each 1 to 1 group separately
@@ -332,16 +330,16 @@ class SpreaderPlacer(OneToOnePlacer):
                 # order chips so that shared chip is first, and the rest are
                 # nearby it in order. or if not all same, just least first
                 if all_matched:
-                    chips = self._generate_radial_chips(
+                    chips = list(self._generate_radial_chips(
                         machine, resource_tracker=None, start_chip_x=x,
-                        start_chip_y=y)
+                        start_chip_y=y))
 
             # allocate verts.
             for one_to_one_vertex in unallocated:
                 (x, y, p, _, _) = \
                     resource_tracker.allocate_constrained_resources(
                         one_to_one_vertex.resources_required,
-                        one_to_one_vertex.constraints, chips)
+                        one_to_one_vertex.constraints, chips=chips)
 
                 # add to placed tracker
                 placed_vertices.add(one_to_one_vertex)
@@ -379,7 +377,6 @@ class SpreaderPlacer(OneToOnePlacer):
         :type cost_per_chip: dict(tuple(int, int), int)
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             map between outgoing partition and n keys down it.
-        :rtype: None
         """
 
         # locate whatever verts are left
@@ -389,7 +386,7 @@ class SpreaderPlacer(OneToOnePlacer):
         for vertex in sorted_verts:
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
                 vertex.resources_required,
-                vertex.constraints, chips_in_order)
+                vertex.constraints, chips=chips_in_order)
             placements.add_placement(Placement(vertex=vertex, x=x, y=y, p=p))
             cost_per_chip[x, y] += self._get_cost(
                 vertex, machine_graph, n_keys_map)

@@ -14,11 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
+from spinn_utilities.abstract_base import AbstractBase
 from pacman.model.resources import ElementFreeSpace
 from pacman.exceptions import PacmanElementAllocationException
 
 
-class ElementAllocatorAlgorithm(object):
+class ElementAllocatorAlgorithm(object, metaclass=AbstractBase):
     """ Abstract element allocator algorithm which allocates elements from\
         a pool of a given size
     """
@@ -31,12 +32,11 @@ class ElementAllocatorAlgorithm(object):
     def __init__(self, ranges):
         """
         :param ranges: iterable of tuples of (size being, size_end)
-        :type ranges: iterable(tuple(int, int))
+        :type ranges: ~collections.abc.Iterable(tuple(int, int))
         """
-        self._free_space_tracker = list()
-        for size_begin, size_end in ranges:
-            self._free_space_tracker.append(
-                ElementFreeSpace(size_begin, size_end))
+        self._free_space_tracker = [
+            ElementFreeSpace(size_begin, size_end)
+            for size_begin, size_end in ranges]
 
     def allocate_elements(self, base_element_id, n_elements):
         """ Handle the allocating of space for a given set of elements

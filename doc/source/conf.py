@@ -27,11 +27,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-# import sys
 import os
 import inspect
-import six
-from sphinx import apidoc
+from sphinx.ext import apidoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -56,8 +54,10 @@ extensions = [
 root_package = "pacman"
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.6', None),
-    'numpy': ("https://docs.scipy.org/doc/numpy/", None),
+    'python': ('https://docs.python.org/3.8', None),
+    'numpy': ("https://numpy.org/doc/1.20/", None),
+    'jsonschema': (
+        'https://python-jsonschema.readthedocs.io/en/stable/', None),
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None)}
 
@@ -75,7 +75,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PACMAN'
-copyright = u'2014-2019'
+copyright = u'2014-2020'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -361,43 +361,50 @@ epub_exclude_files = ['search.html']
 
 autoclass_content = 'both'
 
+# We want to document __call__ when encountered
+autodoc_default_options = {
+    "members": None,
+    "special-members": "__call__"
+}
 
-def maybe_skip(app, what, name, obj, skip, options):  # @UnusedVariable
-    # pylint: disable=unused-argument
-    if what == "module":
-        if isinstance(obj, six.class_types):
-            obj = inspect.getmodule(obj)
-        if inspect.ismodule(obj) and not obj.__name__.startswith(root_package):
-            skip = True
-    return skip
+_output_dir = os.path.abspath(".")
+_unfiltered_files = os.path.abspath("../unfiltered-files.txt")
 
 
 def setup(app):
+    # pylint: disable=unused-argument
+    def maybe_skip(app, what, name, obj, skip, options):  # @UnusedVariable
+        if what == "module":
+            if isinstance(obj, type):
+                obj = inspect.getmodule(obj)
+            if inspect.ismodule(obj) and \
+                    not obj.__name__.startswith(root_package):
+                skip = True
+        return skip
+
     app.connect('autodoc-skip-member', maybe_skip)
 
 
-# Do the rst generation
-for f in os.listdir("."):
-    if (os.path.isfile(f) and f.endswith(
-            ".rst") and f != "index.rst" and f != "modules.rst"):
-        os.remove(f)
-base = "../../" + root_package
-apidoc.main([None, '-o', ".", base,
-             base + "/executor/a*/[a-z]*.py",
-             base + "/executor/*reader.py",
-             base + "/executor/[b-z]*.py",
-             base + "/model/*_constraints/[a-z]*.py",
-             base + "/model/constraints/abstract_constraint.py",
-             base + "/model/decorators/*",
-             base + "/model/graphs/*/[a-z]*.py",
-             base + "/model/graphs/abstract_*.py",
-             base + "/model/graphs/[go]*.py",
-             base + "/model/placements/[a-z]*.py",
-             base + "/model/resources/[a-z]*.py",
-             base + "/model/routing_*/[a-z]*.py",
-             base + "/model/tags/[a-z]*.py",
-             base + "/operations/router_compressors/[a-ep-z]*.py",
-             base + "/operations/router_compressors/malloc*.py",
-             base + "/operations/router_compressors/m*/[a-z]*.py",
-             base + "/utilities/utility_objs/[a-z]*.py",
-             ])
+def filtered_files(unfiltered_files_filename):
+    with open(unfiltered_files_filename) as f:
+        lines = [line.rstrip() for line in f]
+    # Skip comments and empty lines to get list of files we DON'T want to
+    # filter out; this is definitely complicated
+    unfiltered = set(
+        line for line in lines if not line.startswith("#") and line != "")
+    for root, _dirs, files in os.walk(root_package):
+        for filename in files:
+            if filename.endswith(".py") and not filename.startswith("_"):
+                full = root + "/" + filename
+                if full not in unfiltered:
+                    yield full
+
+
+# Do the rst generation; remove files which aren't in git first!
+for fl in os.listdir("."):
+    if (os.path.isfile(fl) and fl.endswith(".rst") and
+            fl not in ("index.rst", "modules.rst")):
+        os.remove(fl)
+os.chdir("../..")  # WARNING! RELATIVE FILENAMES CHANGE MEANING HERE!
+apidoc.main([
+    '-o', _output_dir, root_package, *filtered_files(_unfiltered_files)])

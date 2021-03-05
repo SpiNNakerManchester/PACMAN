@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import print_
 from spinn_utilities.overrides import overrides
 from .abstract_sdram import AbstractSDRAM
 
@@ -31,9 +30,10 @@ class ConstantSDRAM(AbstractSDRAM):
 
     def __init__(self, sdram):
         """
-        :param int sdram: The amount of SDRAM in bytes
+        :param sdram: The amount of SDRAM in bytes
+        :type sdram: int or ~numpy.int64
         """
-        self._sdram = sdram
+        self._sdram = int(sdram)
 
     @overrides(AbstractSDRAM.get_total_sdram)
     def get_total_sdram(self, n_timesteps):  # @UnusedVariable
@@ -76,5 +76,5 @@ class ConstantSDRAM(AbstractSDRAM):
 
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps, indent="", preamble="", target=None):
-        print_(indent, preamble, "Constant {} bytes".format(self._sdram),
-               file=target)
+        print(indent, preamble, "Constant {} bytes".format(self._sdram),
+              file=target)

@@ -13,11 +13,12 @@ PACMAN
 ======
 
 .. automodule:: pacman
+	:noindex:
 
 Contents:
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 5
 
    modules
 

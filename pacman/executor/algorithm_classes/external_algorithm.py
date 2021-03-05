@@ -39,7 +39,7 @@ class ExternalAlgorithm(AbstractAlgorithm):
         :param list(AbstractInput) required_inputs:
             The inputs required by the algorithm
         :param list(AbstractInput) optional_inputs:
-            The optional inputs for the algorithm, which will be provided\
+            The optional inputs for the algorithm, which will be provided
             when available
         :param list(Output) outputs: The output types of the algorithm
         :param list(Token) required_input_tokens:
@@ -57,7 +57,7 @@ class ExternalAlgorithm(AbstractAlgorithm):
                 available inputs as *keyword* arguments.
         """
         # pylint: disable=too-many-arguments
-        super(ExternalAlgorithm, self).__init__(
+        super().__init__(
             algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
             generated_output_tokens)

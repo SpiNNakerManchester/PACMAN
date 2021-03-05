@@ -56,7 +56,7 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
         :param str python_function: The name of the function to call
         """
         # pylint: disable=too-many-arguments
-        super(PythonFunctionAlgorithm, self).__init__(
+        super().__init__(
             algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
             generated_output_tokens, python_module)
@@ -73,11 +73,11 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
         # Run the algorithm and get the results
         try:
             return function(**inputs)
-        except Exception:
+        except Exception as e:
             logger.error("Error when calling {}.{} with inputs {}",
                          self._python_module, self._python_function,
                          inputs.keys())
-            raise
+            raise e
 
     def __repr__(self):
         return (
@@ -91,5 +91,5 @@ class PythonFunctionAlgorithm(AbstractPythonAlgorithm):
     @overrides(AbstractPythonAlgorithm.write_provenance_header)
     def write_provenance_header(self, provenance_file):
         provenance_file.write("{}\n".format(self._algorithm_id))
-        provenance_file.write("\t{}.{}\n".format(self._python_module,
-                                                 self._python_function))
+        provenance_file.write("\t{}.{}\n".format(
+            self._python_module, self._python_function))

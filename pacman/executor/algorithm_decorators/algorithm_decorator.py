@@ -14,17 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import inspect
-try:
-    from inspect import getfullargspec
-except ImportError:
-    # Python 2.7 hack
-    from inspect import getargspec as getfullargspec
+from inspect import getfullargspec
 import logging
 import os
 import pkgutil
 import sys
 from threading import RLock
-from six import iteritems
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanConfigurationException
 from pacman.executor.algorithm_classes import (
@@ -41,7 +37,7 @@ _algorithms = dict()
 # A lock of the algorithms
 _algorithm_lock = RLock()
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class AllOf(object):
@@ -147,7 +143,7 @@ def _decode_algorithm_details(
 
     # Parse the input definitions
     input_defs = dict()
-    for (input_name, input_types) in iteritems(input_definitions):
+    for (input_name, input_types) in input_definitions.items():
         if (input_name not in required_args and
                 input_name not in optional_args):  # pragma: no cover
             raise PacmanConfigurationException(
@@ -369,8 +365,8 @@ def scan_packages(packages, recursive=True):
                     __import__(package_name)
                     package = sys.modules[package_name]
                 except Exception as ex:  # pragma: no cover
-                    logger.warning("Failed to import %s : %s",
-                                   package_name, str(ex))
+                    logger.warning("Failed to import package {}: {}".format(
+                        package_name, str(ex)))
                     continue
             pkg_path = os.path.dirname(package.__file__)
 
@@ -385,8 +381,8 @@ def scan_packages(packages, recursive=True):
                     try:
                         __import__(module)
                     except Exception as ex:  # pragma: no cover
-                        logger.warning("Failed to import %s : %s",
-                                       module, str(ex))
+                        logger.warning("Failed to import module {}: {}".format(
+                            module, str(ex)))
                         continue
 
         new_algorithms = _algorithms

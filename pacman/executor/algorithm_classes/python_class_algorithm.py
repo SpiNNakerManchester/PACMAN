@@ -63,7 +63,7 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
         :type python_method: str or None
         """
         # pylint: disable=too-many-arguments
-        super(PythonClassAlgorithm, self).__init__(
+        super().__init__(
             algorithm_id, required_inputs, optional_inputs, outputs,
             required_input_tokens, optional_input_tokens,
             generated_output_tokens, python_module)
@@ -87,14 +87,14 @@ class PythonClassAlgorithm(AbstractPythonAlgorithm):
             method = getattr(instance, self._python_method)
         try:
             return method(**inputs)
-        except Exception:
+        except Exception as e:
             method = "__call__"
             if self._python_method is not None:
                 method = self._python_method
             logger.error("Error when calling {}.{}.{} with inputs {}",
                          self._python_module, self._python_class, method,
                          inputs.keys())
-            raise
+            raise e
 
     def __repr__(self):
         return (
