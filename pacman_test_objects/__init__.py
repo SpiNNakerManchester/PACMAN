@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .placer_test_support import (
-    MachineVertex as T_MachineVertex, Vertex as T_AppVertex,
+    MachineVertex as T_MachineVertex,
     get_resources_used_by_atoms)
 from .simple_test_edge import SimpleTestEdge
 from .simple_test_partitioning_constraint import NewPartitionerConstraint
@@ -25,5 +25,4 @@ __all__ = [
     "NewPartitionerConstraint",
     "SimpleTestEdge",
     "SimpleTestVertex",
-    "T_AppVertex",
     "T_MachineVertex"]
