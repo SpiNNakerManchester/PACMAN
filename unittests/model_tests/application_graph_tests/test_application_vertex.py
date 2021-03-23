@@ -21,7 +21,7 @@ from pacman.model.constraints.partitioner_constraints import (
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex, MachineGraph
-from uinit_test_objects import SimpleTestVertex
+from pacman_test_objects import SimpleTestVertex
 
 
 class TestApplicationGraphModel(unittest.TestCase):

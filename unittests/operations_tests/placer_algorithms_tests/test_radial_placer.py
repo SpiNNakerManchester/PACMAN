@@ -22,7 +22,7 @@ from pacman.exceptions import PacmanValueError
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
 from pacman.operations.placer_algorithms import RadialPlacer
-from uinit_test_objects import (
+from pacman_test_objects import (
     get_resources_used_by_atoms, T_MachineVertex,)
 
 

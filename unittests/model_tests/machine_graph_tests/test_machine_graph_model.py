@@ -22,7 +22,7 @@ from pacman.model.graphs.machine import (
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanInvalidParameterException)
-from uinit_test_objects import SimpleTestVertex
+from pacman_test_objects import SimpleTestVertex
 
 
 class TestMachineGraphModel(unittest.TestCase):
