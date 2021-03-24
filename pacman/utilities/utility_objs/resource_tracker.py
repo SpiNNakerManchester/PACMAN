@@ -1321,8 +1321,8 @@ class ResourceTracker(object):
                 board_resources["n_tags"] = (
                     len(self._machine.get_chip_at(eth_x, eth_y).tag_ids))
             chips = list()
-            for chip in self._machine.get_chips_by_ethernet(eth_x, eth_y):
-                chip_resources = resources_for_chips.get((chip.x, chip.y))
+            for xy in self._machine.get_existing_xys_by_ethernet(eth_x, eth_y):
+                chip_resources = resources_for_chips.get(xy)
                 if chip_resources is not None:
                     chips.append(chip_resources)
             if chips:

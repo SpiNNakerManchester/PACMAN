@@ -54,8 +54,8 @@ extensions = [
 root_package = "pacman"
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.6', None),
-    'numpy': ("https://numpy.org/doc/1.19/", None),
+    'python': ('https://docs.python.org/3.8', None),
+    'numpy': ("https://numpy.org/doc/1.20/", None),
     'jsonschema': (
         'https://python-jsonschema.readthedocs.io/en/stable/', None),
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
@@ -361,65 +361,50 @@ epub_exclude_files = ['search.html']
 
 autoclass_content = 'both'
 
-
-def maybe_skip(app, what, name, obj, skip, options):  # @UnusedVariable
-    # pylint: disable=unused-argument
-    if what == "module":
-        if isinstance(obj, type):
-            obj = inspect.getmodule(obj)
-        if inspect.ismodule(obj) and not obj.__name__.startswith(root_package):
-            skip = True
-    return skip
-
-
-def setup(app):
-    app.connect('autodoc-skip-member', maybe_skip)
-
-
 # We want to document __call__ when encountered
 autodoc_default_options = {
-    "members": True,
+    "members": None,
     "special-members": "__call__"
 }
 
-# Do the rst generation
-for f in os.listdir("."):
-    if (os.path.isfile(f) and f.endswith(
-            ".rst") and f != "index.rst" and f != "modules.rst"):
-        os.remove(f)
+_output_dir = os.path.abspath(".")
+_unfiltered_files = os.path.abspath("../unfiltered-files.txt")
 
 
-def filtered_files(base, excludes=None):
-    if not excludes:
-        excludes = []
-    for root, _dirs, files in os.walk(base):
+def setup(app):
+    # pylint: disable=unused-argument
+    def maybe_skip(app, what, name, obj, skip, options):  # @UnusedVariable
+        if what == "module":
+            if isinstance(obj, type):
+                obj = inspect.getmodule(obj)
+            if inspect.ismodule(obj) and \
+                    not obj.__name__.startswith(root_package):
+                skip = True
+        return skip
+
+    app.connect('autodoc-skip-member', maybe_skip)
+
+
+def filtered_files(unfiltered_files_filename):
+    with open(unfiltered_files_filename) as f:
+        lines = [line.rstrip() for line in f]
+    # Skip comments and empty lines to get list of files we DON'T want to
+    # filter out; this is definitely complicated
+    unfiltered = set(
+        line for line in lines if not line.startswith("#") and line != "")
+    for root, _dirs, files in os.walk(root_package):
         for filename in files:
             if filename.endswith(".py") and not filename.startswith("_"):
                 full = root + "/" + filename
-                if full not in excludes:
+                if full not in unfiltered:
                     yield full
 
 
-# UGH!
-output_dir = os.path.abspath(".")
-os.chdir("../..")
-
-# We only document __init__.py files... except for these special cases.
-# Use the unix full pathname from the root of the checked out repo
-explicit_wanted_files = [
-    "pacman/exceptions.py",
-    "pacman/operations/algorithm_reports/reports.py",
-    "pacman/operations/router_algorithms/routing_tree.py",
-    "pacman/utilities/constants.py",
-    "pacman/utilities/utility_calls.py",
-    "pacman/utilities/json_utils.py",
-    "pacman/utilities/algorithm_utilities/element_allocator_algorithm.py",
-    "pacman/utilities/algorithm_utilities/machine_algorithm_utilities.py",
-    "pacman/utilities/algorithm_utilities/routing_info_allocator_utilities.py",
-    "pacman/utilities/algorithm_utilities/placer_algorithm_utilities.py",
-    "pacman/utilities/algorithm_utilities/partition_algorithm_utilities.py",
-    "pacman/model/partitioner_interfaces/abstract_slices_connect.py",
-    ]
-arguments = ['-o', output_dir, root_package]
-arguments.extend(filtered_files(root_package, explicit_wanted_files))
-apidoc.main(arguments)
+# Do the rst generation; remove files which aren't in git first!
+for fl in os.listdir("."):
+    if (os.path.isfile(fl) and fl.endswith(".rst") and
+            fl not in ("index.rst", "modules.rst")):
+        os.remove(fl)
+os.chdir("../..")  # WARNING! RELATIVE FILENAMES CHANGE MEANING HERE!
+apidoc.main([
+    '-o', _output_dir, root_package, *filtered_files(_unfiltered_files)])

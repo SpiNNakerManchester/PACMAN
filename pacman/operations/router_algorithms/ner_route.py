@@ -62,13 +62,14 @@ def _convert_a_route(
     link_ids = list()
     for (route, next_hop) in partition_route.children:
         if route is not None:
+            next_incoming_link = None
             if route >= 6:
                 # The route was offset as first 6 are the links
                 processor_ids.append(route - 6)
             else:
                 link_ids.append(route)
+                next_incoming_link = (route + 3) % 6
             if isinstance(next_hop, RoutingTree):
-                next_incoming_link = None
                 next_hops.append((next_hop, next_incoming_link))
 
     entry = MulticastRoutingTableByPartitionEntry(

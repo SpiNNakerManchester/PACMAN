@@ -9,12 +9,11 @@ Requirements
 ============
 In addition to a standard Python installation, this package depends on:
 
- - six
  - SpiNNMachine
 
 These requirements can be install using `pip`:
 
-    pip install six SpiNNMachine
+    pip install SpiNNMachine
 
 User Installation
 =================
