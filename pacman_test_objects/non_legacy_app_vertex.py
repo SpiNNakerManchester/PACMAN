@@ -16,9 +16,8 @@ from pacman.model.graphs.application import ApplicationVertex
 
 
 class NonLegacyApplicationVertex(ApplicationVertex):
-    def __init__(self, label):
-        super().__init__(
-            label=label, constraints=None,  max_atoms_per_core=None)
+    def __init__(self, label="test"):
+        super().__init__(label=label)
 
     def n_atoms(self):
         pass

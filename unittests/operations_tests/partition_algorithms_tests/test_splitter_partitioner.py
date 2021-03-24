@@ -22,34 +22,9 @@ from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractDependentSplitter)
 from pacman.operations.partition_algorithms import SplitterPartitioner
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanPartitionException)
-
-
-class MockVertex(LegacyPartitionerAPI):
-    def __init__(self, splitter, label):
-        self.splitter = splitter
-        self.splitter.set_governed_app_vertex(self)
-        self.label = label
-
-    @property
-    def constraints(self):
-        return []
-
-    def __str__(self):
-        return self.label
-
-    def get_resources_used_by_atoms(self, vertex_slice):
-        raise NotImplementedError()
-
-    def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
-        raise NotImplementedError()
-
-    def n_atoms(self):
-        raise NotImplementedError()
+from pacman_test_objects import SimpleTestVertex
 
 
 class MockDependant(AbstractDependentSplitter):
@@ -85,26 +60,29 @@ class TestSplitterPartitioner(unittest.TestCase):
 
     def test_order_vertices_for_dependent_splitters(self):
         vertices = list()
-        v1 = MockVertex(SplitterSliceLegacy(), "v1")
+        v1 = SimpleTestVertex(1, splitter=SplitterSliceLegacy(), label="v1")
         vertices.append(v1)
         s2 = SplitterSliceLegacy()
-        v2 = MockVertex(s2, "v2")
+        v2 = SimpleTestVertex(1, splitter=s2, label="v2")
         s3 = SplitterSliceLegacy()
         s2a = MockDependant(s2, "depends on v2")
-        v2a = MockVertex(MockDependant(s2, "depends on v2"), "A depends on v2")
+        v2a =SimpleTestVertex(1, splitter=s2a, label="A depends on v2")
         s2a.set_governed_app_vertex(v2a)
-        v2aa = MockVertex(
-            MockDependant(s2a, "depends on v2a"), "A depends on v2a")
+        v2aa = SimpleTestVertex(
+            1, splitter=MockDependant(s2a, "depends on v2a"),
+            label="A depends on v2a")
         vertices.append(v2aa)
-        v3a = MockVertex(MockDependant(s3, "depends on v3"), "A depends on v3")
+        v3a = SimpleTestVertex(1, splitter=MockDependant(s3, "depends on v3"),
+                               label="A depends on v3")
         vertices.append(v3a)
         vertices.append(v2a)
-        v2b = MockVertex(MockDependant(s2, "depends on v2"), "B depends on v2")
+        v2b = SimpleTestVertex(1, splitter=MockDependant(s2, "depends on v2"),
+                               label="B depends on v2")
         vertices.append(v2b)
         vertices.append(v2)
-        v3 = MockVertex(s3, "v3")
+        v3 = SimpleTestVertex(1, splitter=s3, label="v3")
         vertices.append(v3)
-        v4 = MockVertex(SplitterSliceLegacy(), "v4")
+        v4 = SimpleTestVertex(1, splitter=SplitterSliceLegacy(), label="v4")
         vertices.append(v4)
         sp = SplitterPartitioner()
         sp.order_vertices_for_dependent_splitters(vertices)
@@ -118,11 +96,11 @@ class TestSplitterPartitioner(unittest.TestCase):
 
     def test_detect_circular(self):
         s1 = MockDependant(None, "depends on s3")
-        MockVertex(s1, "v1")
+        SimpleTestVertex(1, splitter=s1, label="v1")
         s2 = MockDependant(s1, "depends on s1")
-        MockVertex(s2, "v1")
+        SimpleTestVertex(1, splitter=s2, label="v2")
         s3 = MockDependant(s2, "depends on s2")
-        MockVertex(s3, "v1")
+        SimpleTestVertex(1, splitter=s3, label="v3")
         with self.assertRaises(PacmanAlreadyExistsException):
             s3.other_splitter = s1
         with self.assertRaises(PacmanPartitionException):
