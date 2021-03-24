@@ -66,7 +66,7 @@ class TestSplitterPartitioner(unittest.TestCase):
         v2 = SimpleTestVertex(1, splitter=s2, label="v2")
         s3 = SplitterSliceLegacy()
         s2a = MockDependant(s2, "depends on v2")
-        v2a =SimpleTestVertex(1, splitter=s2a, label="A depends on v2")
+        v2a = SimpleTestVertex(1, splitter=s2a, label="A depends on v2")
         s2a.set_governed_app_vertex(v2a)
         v2aa = SimpleTestVertex(
             1, splitter=MockDependant(s2a, "depends on v2a"),
