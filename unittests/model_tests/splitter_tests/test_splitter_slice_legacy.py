@@ -25,12 +25,12 @@ class TestSplitterSliceLegacy(unittest.TestCase):
         splitter = SplitterSliceLegacy("foo")
         a = str(splitter)
         self.assertIsNotNone(a)
-        v1 = SimpleTestVertex("v1")
+        v1 = SimpleTestVertex(1, "v1")
         splitter.set_governed_app_vertex(v1)
         a = str(splitter)
         self.assertIsNotNone(a)
         splitter.set_governed_app_vertex(v1)
-        v2 = SimpleTestVertex("v1")
+        v2 = SimpleTestVertex(1, "v2")
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v2)
 
