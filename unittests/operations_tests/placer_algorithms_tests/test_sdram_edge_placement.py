@@ -33,7 +33,8 @@ class TestSameChipConstraint(unittest.TestCase):
 
         vertices = [
             MockMachineVertex(
-                ResourceContainer(), label="v{}".format(i), sdram_requirement=20)
+                ResourceContainer(), label="v{}".format(i),
+                sdram_requirement=20)
             for i in range(100)
         ]
         for vertex in vertices:
