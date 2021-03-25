@@ -25,6 +25,7 @@ from pacman.operations.placer_algorithms import SpreaderPlacer
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.operations.chip_id_allocator_algorithms import (
     MallocBasedChipIdAllocator)
+from pacman_test_objects import MockMachineVertex
 
 
 def test_virtual_vertices_spreader():
@@ -163,9 +164,9 @@ def test_sdram_links():
     # Connect a set of vertices in a chain of length 3
     last_vertex = None
     for x in range(20):
-        vertex = SimpleMachineVertex(
+        vertex = MockMachineVertex(
             resources=ResourceContainer(),
-            label="Vertex_{}".format(x), sdram_cost=20)
+            label="Vertex_{}".format(x), sdram_requirement=20)
         machine_graph.add_vertex(vertex)
         last_vertex = vertex
 
