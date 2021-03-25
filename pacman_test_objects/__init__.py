@@ -15,18 +15,15 @@
 
 from .duck_legacy_app_vertex import DuckLegacyApplicationVertex
 from .non_legacy_app_vertex import NonLegacyApplicationVertex
-from .placer_test_support import (
-    MachineVertex as T_MachineVertex,
-    get_resources_used_by_atoms)
+from .placer_test_support import get_resourced_machine_vertext
 from .simple_test_edge import SimpleTestEdge
 from .simple_test_partitioning_constraint import NewPartitionerConstraint
 from .simple_test_vertex import SimpleTestVertex
 
 __all__ = [
     "DuckLegacyApplicationVertex",
-    "get_resources_used_by_atoms",
+    "get_resourced_machine_vertext",
     "NonLegacyApplicationVertex",
     "NewPartitionerConstraint",
     "SimpleTestEdge",
-    "SimpleTestVertex",
-    "T_MachineVertex"]
+    "SimpleTestVertex"]

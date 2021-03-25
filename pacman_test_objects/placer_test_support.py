@@ -13,29 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 
 
-def get_resources_used_by_atoms(lo_atom, hi_atom, vertex_in_edges):
+def get_resourced_machine_vertext(lo_atom, hi_atom, label=None):
     cpu_cycles = 10 * (hi_atom - lo_atom)
     dtcm_requirement = 200 * (hi_atom - lo_atom)
     sdram_requirement = 4000 + 50 * (hi_atom - lo_atom)
-    return ResourceContainer(
+    resources = ResourceContainer(
         cpu_cycles=CPUCyclesPerTickResource(cpu_cycles),
         dtcm=DTCMResource(dtcm_requirement),
         sdram=ConstantSDRAM(sdram_requirement))
-
-
-class MachineVertex(SimpleMachineVertex):
-    def __init__(self, lo_atom, hi_atom, resources_required, label=None,
-                 constraints=None):
-        super().__init__(
-            resources_required, label=label, constraints=constraints,
-            vertex_slice=Slice(lo_atom, hi_atom))
-        self.lo_atom = lo_atom
-        self.hi_atom = hi_atom
-        self._model_based_max_atoms_per_core = 256
+    return SimpleMachineVertex(
+        resources, label=label, vertex_slice=Slice(lo_atom, hi_atom))

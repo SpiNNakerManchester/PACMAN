@@ -15,15 +15,16 @@
 
 import unittest
 from spinn_machine import virtual_machine
-from pacman.model.graphs.machine import MachineGraph, MachineEdge
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import (
+    MachineGraph, MachineEdge, SimpleMachineVertex)
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from pacman.exceptions import PacmanValueError
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
 from pacman.operations.placer_algorithms import ConnectiveBasedPlacer
-from pacman_test_objects import (
-    get_resources_used_by_atoms, T_MachineVertex,)
+from pacman_test_objects import (get_resourced_machine_vertext)
 
 
 class TestConnectivePlacer(unittest.TestCase):
@@ -32,15 +33,10 @@ class TestConnectivePlacer(unittest.TestCase):
         self.machine = virtual_machine(8, 8)
         self.mach_graph = MachineGraph("machine")
         self.vertices = list()
-        self.vertex1 = T_MachineVertex(
-            0, 1, get_resources_used_by_atoms(0, 1, []), "First vertex")
-        self.vertex2 = T_MachineVertex(
-            1, 5, get_resources_used_by_atoms(1, 5, []), "Second vertex")
-        self.vertex3 = T_MachineVertex(
-            5, 10, get_resources_used_by_atoms(5, 10, []), "Third vertex")
-        self.vertex4 = T_MachineVertex(
-            10, 100, get_resources_used_by_atoms(10, 100, []),
-            "Fourth vertex")
+        self.vertex1 = get_resourced_machine_vertext(0, 1, "First vertex")
+        self.vertex2 = get_resourced_machine_vertext(1, 5, "Second vertex")
+        self.vertex3 = get_resourced_machine_vertext(5, 10, "Third vertex")
+        self.vertex4 = get_resourced_machine_vertext(10, 100, "Fourth vertex")
         self.vertices.append(self.vertex1)
         self.mach_graph.add_vertex(self.vertex1)
         self.vertices.append(self.vertex2)
@@ -78,8 +74,8 @@ class TestConnectivePlacer(unittest.TestCase):
             dtcm=DTCMResource(dtcm_requirement),
             sdram=ConstantSDRAM(sdram_requirement))
 
-        large_machine_vertex = T_MachineVertex(
-            0, 499, rc, "Second vertex")
+        large_machine_vertex = SimpleMachineVertex(
+            rc, vertex_slice=Slice(0, 499), label="Second vertex")
         self.mach_graph.add_vertex(large_machine_vertex)
         with self.assertRaises(PacmanValueError):
             ConnectiveBasedPlacer()(self.mach_graph, self.machine, 100)
@@ -103,14 +99,12 @@ class TestConnectivePlacer(unittest.TestCase):
         graph = MachineGraph("machine")
         cores = sum(chip.n_user_processors for chip in self.machine.chips)
         for i in range(cores):  # 50 atoms per each processor on 20 chips
-            graph.add_vertex(T_MachineVertex(
-                0, 50, get_resources_used_by_atoms(0, 50, []),
-                "vertex " + str(i)))
+            graph.add_vertex(get_resourced_machine_vertext(
+                0, 50, "vertex " + str(i)))
         placements = ConnectiveBasedPlacer()(graph, self.machine, 100)
         self.assertEqual(len(placements), cores)
         # One more vertex should be too many
-        graph.add_vertex(T_MachineVertex(
-            0, 50, get_resources_used_by_atoms(0, 50, []), "toomany"))
+        graph.add_vertex(get_resourced_machine_vertext(0, 50, "toomany"))
         with self.assertRaises(PacmanValueError):
             ConnectiveBasedPlacer()(graph, self.machine, 100)
 
