@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
-from six import itervalues
 from spinn_machine.tags import IPTag, ReverseIPTag
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.utilities import utility_calls
@@ -141,7 +140,7 @@ class Tags(object):
 
         :rtype: iterable(~spinn_machine.tags.IPTag)
         """
-        return itervalues(self._ip_tags)
+        return iter(self._ip_tags.values())
 
     @property
     def reverse_ip_tags(self):
@@ -149,7 +148,7 @@ class Tags(object):
 
         :rtype: iterable(~spinn_machine.tags.ReverseIPTag)
         """
-        return itervalues(self._reverse_ip_tags)
+        return iter(self._reverse_ip_tags.values())
 
     def get_ip_tags_for_vertex(self, vertex):
         """ Get the IP Tags assigned to a given machine vertex

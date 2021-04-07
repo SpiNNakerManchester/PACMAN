@@ -101,7 +101,7 @@ def constraint_to_json(constraint):
                     constraint.key_list_function)
         elif isinstance(constraint, FixedMaskConstraint):
             json_dict["mask"] = constraint.mask
-        elif isinstance(constraint, "ContiguousKeyRangeConstraint"):
+        elif isinstance(constraint, ContiguousKeyRangeContraint):
             # No extra parameters
             pass
         else:

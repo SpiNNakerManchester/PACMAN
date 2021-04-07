@@ -14,14 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 from pacman.model.resources import ElementFreeSpace
 from pacman.exceptions import PacmanElementAllocationException
 
 
-@add_metaclass(AbstractBase)
-class ElementAllocatorAlgorithm(object):
+class ElementAllocatorAlgorithm(object, metaclass=AbstractBase):
     """ Abstract element allocator algorithm which allocates elements from\
         a pool of a given size
     """

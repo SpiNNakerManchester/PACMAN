@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanInvalidParameterException
@@ -24,8 +23,7 @@ def _get_class_name(cls):
     return "{}.{}".format(cls.__module__, cls.__name__)
 
 
-@add_metaclass(AbstractBase)
-class ConstrainedObject(object):
+class ConstrainedObject(object, metaclass=AbstractBase):
     """ An implementation of an object which holds constraints.
     """
 

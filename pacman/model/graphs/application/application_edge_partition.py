@@ -39,7 +39,7 @@ class ApplicationEdgePartition(AbstractSingleSourcePartition):
             The weight of traffic going down this partition
         :param traffic_type: the traffic type acceptable here.
         """
-        super(ApplicationEdgePartition, self).__init__(
+        super().__init__(
             pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=ApplicationEdge, constraints=constraints,
             label=label, traffic_weight=traffic_weight,

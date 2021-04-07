@@ -31,7 +31,7 @@ class PacmanInvalidParameterException(PacmanException):
         :param str value: The value of the parameter
         :param str problem: The problem with the value of the parameter
         """
-        super(PacmanInvalidParameterException, self).__init__(problem)
+        super().__init__(problem)
         self.parameter = parameter
         self.value = value
 
@@ -46,8 +46,7 @@ class PacmanAlreadyExistsException(PacmanException):
         :param str item_type: The type of the item that already exists
         :param str item_id: The ID of the item which is in conflict
         """
-        super(PacmanAlreadyExistsException, self).__init__(
-            "{}({}) already exists".format(item_type, item_id))
+        super().__init__("{}({}) already exists".format(item_type, item_id))
         self.item_type = item_type
         self.item_id = item_id
 
@@ -115,7 +114,7 @@ class PacmanAlgorithmFailedToCompleteException(PacmanException):
                 algorithm.algorithm_id, algorithm.inputs, exception.message,
                 traceback.format_exc(tb)))
 
-        super(PacmanAlgorithmFailedToCompleteException, self).__init__(problem)
+        super().__init__(problem)
         self.exception = exception
         self.algorithm = algorithm
         self.traceback = tb
@@ -172,7 +171,7 @@ class PacmanProcessorNotAvailableError(PacmanException):
               " and the processor still being in use from a previous run." \
               .format(x, y, p)
         # Call the base class constructor with the parameters it needs
-        super(PacmanProcessorNotAvailableError, self).__init__(msg)
+        super().__init__(msg)
 
 
 class PacmanValueError(ValueError, PacmanException):
@@ -240,7 +239,7 @@ class MinimisationFailedError(PacmanException):
             chips simultaneously.
         :type chip: tuple(int, int) or None
         """
-        super(MinimisationFailedError, self).__init__()
+        super().__init__()
         self.chip = chip
         self.target_length = target_length
         self.final_length = final_length

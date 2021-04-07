@@ -37,7 +37,7 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
     def __init__(self, splitter_name=None):
         if splitter_name is None:
             splitter_name = type(self).__name__
-        AbstractSplitterCommon.__init__(self, splitter_name)
+        super().__init__(splitter_name)
 
     def __repr__(self):
         return self.__str__()
@@ -48,7 +48,7 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
             raise PacmanConfigurationException(
                 self.NOT_SUITABLE_VERTEX_ERROR.format(
                     app_vertex.label, self._splitter_name))
-        AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
+        super().set_governed_app_vertex(app_vertex)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):

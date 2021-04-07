@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
 import unittest
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints import (
@@ -23,8 +22,8 @@ from pacman.model.graphs.machine import (
 from pacman.model.graphs.machine import MulticastEdgePartition
 from pacman.model.resources import ResourceContainer
 from pacman.operations.routing_info_allocator_algorithms\
-    .malloc_based_routing_allocator.malloc_based_routing_info_allocator\
-    import MallocBasedRoutingInfoAllocator
+    .malloc_based_routing_allocator import (
+        MallocBasedRoutingInfoAllocator)
 from pacman.model.routing_info import (
     BaseKeyAndMask, DictBasedMachinePartitionNKeysMap)
 

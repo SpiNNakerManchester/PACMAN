@@ -12,9 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from pacman.exceptions import PacmanException
+import pytest
 from spinn_machine.virtual_machine import virtual_machine
+from pacman.exceptions import PacmanException
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge,
     SDRAMMachineEdge)
@@ -163,8 +163,5 @@ def test_sdram_links():
 
     # Do placements
     machine = virtual_machine(width=8, height=8)
-    try:
+    with pytest.raises(PacmanException):
         OneToOnePlacer()(machine_graph, machine, plan_n_timesteps=1000)
-        raise Exception("should blow up here")
-    except PacmanException:
-        pass

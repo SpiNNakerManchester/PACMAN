@@ -72,7 +72,7 @@ class MachineGraph(Graph):
             it is derived from one at all.
         :type application_graph: ApplicationGraph or None
         """
-        super(MachineGraph, self).__init__(MachineVertex, MachineEdge, label)
+        super().__init__(MachineVertex, MachineEdge, label)
         if application_graph:
             application_graph.forget_machine_graph()
             # Check the first vertex added
@@ -98,7 +98,7 @@ class MachineGraph(Graph):
 
     @overrides(Graph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
-        edge_partition = super(MachineGraph, self).add_edge(
+        edge_partition = super().add_edge(
             edge, outgoing_edge_partition_name)
         if (isinstance(edge_partition, MulticastEdgePartition)):
             if edge.pre_vertex.app_vertex:
@@ -140,17 +140,17 @@ class MachineGraph(Graph):
 
     @overrides(Graph.add_vertex)
     def add_vertex(self, vertex):
-        super(MachineGraph, self).add_vertex(vertex)
+        super().add_vertex(vertex)
         if self._application_level_used:
             try:
                 vertex.app_vertex.remember_machine_vertex(vertex)
-            except AttributeError:
+            except AttributeError as e:
                 if self.n_vertices == 1:
                     self._application_level_used = False
                 else:
                     raise PacmanInvalidParameterException(
                         "vertex", str(vertex),
-                        self.MISSING_APP_VERTEX_ERROR_MESSAGE)
+                        self.MISSING_APP_VERTEX_ERROR_MESSAGE) from e
         elif vertex.app_vertex:
             raise PacmanInvalidParameterException(
                 "vertex", vertex, self.UNEXPECTED_APP_VERTEX_ERROR_MESSAGE)
@@ -217,7 +217,7 @@ class MachineGraph(Graph):
     def get_fixed_route_edge_partitions_starting_at_vertex(self, vertex):
         """ Get only the fixed_route edge partitions that start at the vertex.
 
-        :param AbstractVertex vertex:\
+        :param MachineVertex vertex:
              The vertex at which the edge partitions to find starts
         :rtype: iterable(FixedRouteEdgePartition)
         """
@@ -226,16 +226,16 @@ class MachineGraph(Graph):
     def get_multicast_edge_partitions_starting_at_vertex(self, vertex):
         """ Get only the multicast edge partitions that start at the vertex.
 
-        :param AbstractVertex vertex:\
+        :param MachineVertex vertex:
             The vertex at which the edge partitions to find starts
         :rtype: iterable(MulticastEdgePartition)
         """
         return self._multicast_edge_partitions_by_pre_vertex.get(vertex, [])
 
     def get_sdram_edge_partitions_starting_at_vertex(self, vertex):
-        """ Get all the sdram edge partitions that start at the given vertex.
+        """ Get all the SDRAM edge partitions that start at the given vertex.
 
-        :param AbstractVertex vertex:\
+        :param MachineVertex vertex:
             The vertex at which the sdram edge partitions to find starts
         :rtype: iterable(AbstractSDRAMPartition)
         """
@@ -256,7 +256,7 @@ class MachineGraph(Graph):
     def get_fixed_route_edge_partitions_ending_at_vertex(self, vertex):
         """ Get only the fixed_route edge partitions that end at the vertex.
 
-        :param AbstractVertex vertex:\
+        :param MachineVertex vertex:
             The vertex at which the edge partitions to find starts
         :rtype: iterable(FixedRouteEdgePartition)
         """
@@ -265,7 +265,7 @@ class MachineGraph(Graph):
     def get_multicast_edge_partitions_ending_at_vertex(self, vertex):
         """ Get only the multicast edge partitions that end at the vertex.
 
-        :param AbstractVertex vertex:\
+        :param MachineVertex vertex:
             The vertex at which the edge partitions to find starts
         :rtype: iterable(MulticastEdgePartition)
         """
@@ -274,8 +274,8 @@ class MachineGraph(Graph):
     def get_sdram_edge_partitions_ending_at_vertex(self, vertex):
         """ Get all the sdram edge partitions that end at the given vertex.
 
-        :param AbstractVertex vertex:\
-            The vertex at which the sdram edge partitions to find starts
+        :param MachineVertex vertex:
+            The vertex at which the SDRAM edge partitions to find starts
         :rtype: iterable(AbstractSDRAMPartition)
         """
         return self._sdram_edge_partitions_by_post_vertex.get(vertex, [])
@@ -283,8 +283,8 @@ class MachineGraph(Graph):
     def get_edge_partitions_ending_at_vertex(self, vertex):
         """ Get all the edge partitions that end at the given vertex.
 
-        :param AbstractVertex vertex:\
-            The vertex at which the sdram edge partitions to find starts
+        :param MachineVertex vertex:
+            The vertex at which the SDRAM edge partitions to find starts
         :rtype: iterable(AbstractPartition)
         """
         for partition in \
@@ -303,8 +303,7 @@ class MachineGraph(Graph):
 
         Vertices and edges are copied over. Partition will be new objects.
 
-        :param application_graph: The application graph with which the clone
-            should be associated
+        :param bool frozen: Whether the copy should be unmodifiable
         :return: A shallow copy of this graph
         :rtype: MachineGraph
         """
@@ -333,7 +332,7 @@ class _FrozenMachineGraph(MachineGraph):
     __slots__ = ["__frozen"]
 
     def __init__(self, label):
-        super(_FrozenMachineGraph, self).__init__(label)
+        super().__init__(label)
         self.__frozen = False
 
     def freeze(self):
@@ -349,15 +348,14 @@ class _FrozenMachineGraph(MachineGraph):
         if self.__frozen:
             raise PacmanConfigurationException(
                 "Please add edges via simulator not directly to this graph")
-        super(_FrozenMachineGraph, self).add_edge(
-            edge, outgoing_edge_partition_name)
+        super().add_edge(edge, outgoing_edge_partition_name)
 
     @overrides(MachineGraph.add_vertex)
     def add_vertex(self, vertex):
         if self.__frozen:
             raise PacmanConfigurationException(
                 "Please add vertices via simulator not directly to this graph")
-        super(_FrozenMachineGraph, self).add_vertex(vertex)
+        super().add_vertex(vertex)
 
     @overrides(MachineGraph.add_outgoing_edge_partition)
     def add_outgoing_edge_partition(self, edge_partition):
@@ -365,5 +363,4 @@ class _FrozenMachineGraph(MachineGraph):
             raise PacmanConfigurationException(
                 "Please add partitions via simulator not directly to this "
                 "graph")
-        super(_FrozenMachineGraph, self).add_outgoing_edge_partition(
-            edge_partition)
+        super().add_outgoing_edge_partition(edge_partition)

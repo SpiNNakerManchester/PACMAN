@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
+import functools
+import math
+import sys
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms import OneToOnePlacer
@@ -26,18 +26,15 @@ from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
-import functools
-import math
-import sys
 
 
 class SpreaderPlacer(OneToOnePlacer):
-    """ Places vertices on as many chips as available with a effort to
-    reduce the number of packets being received by the router in total.
+    """ Places vertices on as many chips as available with a effort to\
+        reduce the number of packets being received by the router in total.
 
     :param MachineGraph machine_graph: the machine graph
     :param ~spinn_machine.Machine machine: the SpiNNaker machine
-    :param AbstractMachinePartitionNKeysMap n_keys_map:\
+    :param AbstractMachinePartitionNKeysMap n_keys_map:
         the n keys from partition map
     :param int plan_n_timesteps: number of timesteps to plan for
     :return: placements.
@@ -57,9 +54,6 @@ class SpreaderPlacer(OneToOnePlacer):
     # 3. 1 to 1 sets,
     # 4. chip and core)
     STEPS = 4
-
-    def __init__(self):
-        OneToOnePlacer.__init__(self)
 
     def __call__(self, machine_graph, machine, n_keys_map, plan_n_timesteps):
         """
@@ -184,7 +178,7 @@ class SpreaderPlacer(OneToOnePlacer):
 
         :param MachineVertex vertex: the vertex the get the cost of
         :param MachineGraph machine_graph: the machine graph
-        :param AbstractMachinePartitionNKeysMap n_keys_map:\
+        :param AbstractMachinePartitionNKeysMap n_keys_map:
             the map of outgoing partition and n keys down it.
         :return: total keys to come into this vertex.
         :rtype: int
@@ -284,8 +278,8 @@ class SpreaderPlacer(OneToOnePlacer):
             self, one_to_one_groups, chips_in_order, placements, progress_bar,
             resource_tracker, placed_vertices, cost_per_chip, machine_graph,
             n_keys_map, machine):
-        """ place 1 to 1 groups on the same chip if possible. else radially
-        from it
+        """ place 1 to 1 groups on the same chip if possible. else radially\
+            from it
 
         :param one_to_one_groups: the 1 to 1 groups
         :type one_to_one_groups: iterable(iterable(MachineVertex))
@@ -302,7 +296,6 @@ class SpreaderPlacer(OneToOnePlacer):
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             map between outgoing partition and n keys down it
         :param ~spinn_machine.Machine machine: the SpiNNMachine instance.
-        :rtype: None
         """
 
         # go through each 1 to 1 group separately
@@ -384,7 +377,6 @@ class SpreaderPlacer(OneToOnePlacer):
         :type cost_per_chip: dict(tuple(int, int), int)
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             map between outgoing partition and n keys down it.
-        :rtype: None
         """
 
         # locate whatever verts are left

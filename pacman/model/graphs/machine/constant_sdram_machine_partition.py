@@ -24,6 +24,9 @@ from pacman.model.graphs.machine import SDRAMMachineEdge
 
 class ConstantSDRAMMachinePartition(
         AbstractSingleSourcePartition, AbstractSDRAMPartition):
+    """ An SDRAM partition that uses a fixed amount of memory. The edges in\
+        the partition must agree on how much memory is required.
+    """
 
     __slots__ = [
         # The sdram base address for this partition.
@@ -35,10 +38,10 @@ class ConstantSDRAMMachinePartition(
     MISSING_EDGE_ERROR_MESSAGE = "Partition {} has no edges"
 
     def __init__(self, identifier, pre_vertex, label):
-        super(ConstantSDRAMMachinePartition, self).__init__(
+        super().__init__(
             pre_vertex, identifier, allowed_edge_types=SDRAMMachineEdge,
             constraints=None, label=label, traffic_weight=1,
-            class_name="ConstantSdramMachinePartition")
+            class_name="ConstantSDRAMMachinePartition")
         self._sdram_size = None
         self._sdram_base_address = None
 
@@ -56,7 +59,7 @@ class ConstantSDRAMMachinePartition(
                 "The edges within the constant sdram partition {} have "
                 "inconsistent memory size requests.".format(self))
         if self._sdram_base_address is None:
-            AbstractSingleSourcePartition.add_edge(self, edge, graph_code)
+            super().add_edge(edge, graph_code)
         else:
             raise PacmanConfigurationException(
                 "Illegal attempt to add an edge after sdram_base_address set")

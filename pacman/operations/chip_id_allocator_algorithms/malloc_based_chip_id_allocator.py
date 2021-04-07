@@ -28,7 +28,7 @@ _LOWER_16_BITS = 0xFFFF
 
 class NoFPGALink(PacmanConfigurationException):
     def __init__(self, vertex):
-        super(NoFPGALink, self).__init__(
+        super().__init__(
             "No FPGA Link {} on FPGA {} found on board {}. This would be "
             "true if another chip was found connected at this point".format(
                 vertex.fpga_link_id, vertex.fpga_id, vertex.board_address))
@@ -36,7 +36,7 @@ class NoFPGALink(PacmanConfigurationException):
 
 class NoSpiNNakerLink(PacmanConfigurationException):
     def __init__(self, vertex):
-        super(NoSpiNNakerLink, self).__init__(
+        super().__init__(
             "No SpiNNaker Link {} found on board {}. This would be true if "
             "another chip was found connected at this point".format(
                 vertex.spinnaker_link_id, vertex.board_address))
@@ -53,7 +53,7 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
     ]
 
     def __init__(self):
-        super(MallocBasedChipIdAllocator, self).__init__(0, 2 ** 32)
+        super().__init__(0, 2 ** 32)
 
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()

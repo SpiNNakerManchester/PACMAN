@@ -17,13 +17,12 @@ from spinn_utilities.abstract_base import abstractproperty
 from .abstract_virtual import AbstractVirtual
 
 
-class AbstractFPGA(AbstractVirtual):
-    """ An Object (most likely a vertex) connected to an FPGA.
+class AbstractFPGA(AbstractVirtual, allow_derivation=True):
+    """ A vertex connected to an FPGA.
 
-        .. note::
-            It is expected that everything that is an instance of AbstractFPGA
-            is also an instance of :py:class:`AbstractVertex`.
-            This is not enforced to avoid diamond inheritance.
+    .. note::
+        Everything that is an instance of AbstractFPGA
+        is also an instance of :py:class:`AbstractVertex`.
     """
 
     __slots__ = ()

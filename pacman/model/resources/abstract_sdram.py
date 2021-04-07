@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 
 
-@add_metaclass(AbstractBase)
-class AbstractSDRAM(object):
+class AbstractSDRAM(object, metaclass=AbstractBase):
     """ Represents an amount of SDRAM used on a chip in the machine.
     """
 

@@ -15,7 +15,6 @@
 
 from collections import defaultdict, OrderedDict
 import logging
-from six import iteritems, itervalues
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
@@ -47,8 +46,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
     __slots__ = []
 
     def __init__(self):
-        super(CompressibleMallocBasedRoutingInfoAllocator, self).__init__(
-            0, 2 ** 32)
+        super().__init__(0, 2 ** 32)
 
     def __call__(self, machine_graph, n_keys_map, routing_tables):
         """
@@ -145,7 +143,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
             # Find all partitions that share a route in this table
             partitions_by_route = defaultdict(OrderedSet)
             routing_table = routing_tables.get_entries_for_router(x, y)
-            for partition, entry in iteritems(routing_table):
+            for partition, entry in routing_table.items():
                 if partition in continuous:
                     entry_hash = sum(
                         1 << i
@@ -155,7 +153,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
                         for i in entry.processor_ids)
                     partitions_by_route[entry_hash].add(partition)
 
-            for entry_hash, partitions in iteritems(partitions_by_route):
+            for entry_hash, partitions in partitions_by_route.items():
                 found_groups = list()
                 for partition in partitions:
                     if partition in partition_groups:
@@ -183,7 +181,7 @@ class CompressibleMallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
         # Sort partitions by largest group
         continuous = list(OrderedSet(
-            tuple(group) for group in itervalues(partition_groups)))
+            tuple(group) for group in partition_groups.values()))
 
         for group in reversed(sorted(continuous, key=len)):
             for partition in progress.over(group, False):

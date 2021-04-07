@@ -12,15 +12,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractEdgePartition
 
 
-@add_metaclass(AbstractBase)
-class AbstractSingleSourcePartition(AbstractEdgePartition):
+class AbstractSingleSourcePartition(
+        AbstractEdgePartition, metaclass=AbstractBase):
+    """ An edge partition that has a single source vertex.
+    """
     __slots__ = [
         # The vertex at the start of all the edges
         "_pre_vertex"
@@ -29,7 +30,7 @@ class AbstractSingleSourcePartition(AbstractEdgePartition):
     def __init__(
             self, pre_vertex, identifier, allowed_edge_types, constraints,
             label, traffic_weight, class_name):
-        super(AbstractSingleSourcePartition, self).__init__(
+        super().__init__(
             identifier=identifier, allowed_edge_types=allowed_edge_types,
             constraints=constraints, label=label,
             traffic_weight=traffic_weight, class_name=class_name)
@@ -40,7 +41,7 @@ class AbstractSingleSourcePartition(AbstractEdgePartition):
         if edge.pre_vertex != self._pre_vertex:
             raise PacmanConfigurationException(
                 "A partition can only contain edges with the same pre_vertex")
-        super(AbstractSingleSourcePartition, self).add_edge(edge, graph_code)
+        super().add_edge(edge, graph_code)
 
     @property
     def pre_vertex(self):

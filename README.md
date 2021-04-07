@@ -9,14 +9,10 @@ Requirements
 ============
 In addition to a standard Python installation, this package depends on:
 
- - six
- - enum34
  - SpiNNMachine
 
 These requirements can be install using `pip`:
 
-    pip install six
-    pip install enum34
     pip install SpiNNMachine
 
 User Installation
@@ -32,6 +28,8 @@ If you want to install only for yourself, run:
 To install in a `virtualenv`, with the `virtualenv` enabled, run:
 
     pip install PACMAN
+
+_Using a virtual environment is recommended for all SpiNNaker software._
 
 Developer Installation
 ======================
@@ -59,9 +57,7 @@ enabled, run:
 Documentation
 =============
 [PACMAN python documentation](http://pacman.readthedocs.io)
-
-[Combined PyNN7 python documentation](http://spinnaker7manchester.readthedocs.io)
-
+<br>
 [Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)
 
 

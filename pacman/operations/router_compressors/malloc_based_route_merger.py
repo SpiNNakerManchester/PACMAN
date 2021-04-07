@@ -12,15 +12,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-from pacman.model.routing_tables.compressed_multicast_routing_table import \
-    CompressedMulticastRoutingTable
+import logging
 from pacman.utilities.constants import FULL_MASK
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
+from pacman.model.routing_tables.compressed_multicast_routing_table import (
+    CompressedMulticastRoutingTable)
 from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.exceptions import PacmanRoutingException
+logger = FormatAdapter(logging.getLogger(__file__))
 
 
 class MallocBasedRouteMerger(object):
@@ -60,9 +61,8 @@ class MallocBasedRouteMerger(object):
             n_entries = sum(
                 not entry.defaultable
                 for entry in new_table.multicast_routing_entries)
-            print("Reduced from {} to {}".format(
-                len(router_table.multicast_routing_entries),
-                n_entries))
+            logger.info("Reduced from {} to {}",
+                        len(router_table.multicast_routing_entries), n_entries)
             if n_entries > 1023:
                 raise PacmanRoutingException(
                     "Cannot make table small enough: {} entries".format(
@@ -102,13 +102,13 @@ class MallocBasedRouteMerger(object):
                 next_pos += 1
             next_pos -= 1
 
-            # print("Pre decision", hex(base_key))
+            # logger.info("Pre decision {}", hex(base_key))
 
             # If there is something to merge, merge it if possible
             merge_done = False
             if next_pos != pos:
 
-                # print("At merge, base_key =", hex(base_key))
+                # logger.info("At merge, base_key = {}", hex(base_key))
 
                 # Find the next nearest power of 2 to the number of keys
                 # that will be covered
