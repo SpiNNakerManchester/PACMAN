@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ setup(
     url="https://github.com/SpiNNakerManchester/PACMAN",
     license="GNU GPLv3.0",
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status ::  5 - Production/Stable",
 
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
@@ -73,8 +73,8 @@ setup(
     packages=packages,
     package_data=package_data,
     install_requires=[
-        'SpiNNUtilities >= 1!5.1.1, < 1!6.0.0',
-        'SpiNNMachine >= 1!5.1.1, < 1!6.0.0',
+        'SpiNNUtilities == 1!6.0.0',
+        'SpiNNMachine == 1!6.0.0',
         "numpy > 1.13, < 1.20; python_version == '3.6'",
         "numpy > 1.13, < 1.21; python_version == '3.7'",
         "numpy; python_version >= '3.8'",
