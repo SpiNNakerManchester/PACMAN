@@ -51,7 +51,7 @@ setup(
     url="https://github.com/SpiNNakerManchester/PACMAN",
     license="GNU GPLv3.0",
     classifiers=[
-        "Development Status ::  5 - Production/Stable",
+        "Development Status :: 5 - Production/Stable",
 
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
