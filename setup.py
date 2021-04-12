@@ -73,8 +73,8 @@ setup(
     packages=packages,
     package_data=package_data,
     install_requires=[
-        'SpiNNUtilities >= 1!5.1.1, < 1!6.0.0',
-        'SpiNNMachine >= 1!5.1.1, < 1!6.0.0',
+        'SpiNNUtilities == 1!6.0.1',
+        'SpiNNMachine == 1!6.0.1',
         "numpy > 1.13, < 1.20; python_version == '3.6'",
         "numpy > 1.13, < 1.21; python_version == '3.7'",
         "numpy; python_version >= '3.8'",
