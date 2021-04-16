@@ -15,5 +15,4 @@
 from .malloc_based_routing_info_allocator import (
     MallocBasedRoutingInfoAllocator)
 
-__all__ = (
-    "MallocBasedRoutingInfoAllocator")
+__all__ = ["MallocBasedRoutingInfoAllocator"]
