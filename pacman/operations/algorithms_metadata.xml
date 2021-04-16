@@ -373,36 +373,6 @@
             <param_type>MemoryRoutingInfos</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="DestinationBasedRoutingInfoAllocator">
-        <python_module>pacman.operations.routing_info_allocator_algorithms.destination_based_key_allocator</python_module>
-        <python_class>DestinationBasedRoutingInfoAllocator</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>n_keys_map</param_name>
-                <param_type>MemoryMachineEdgeNKeysMap</param_type>
-            </parameter>
-            <parameter>
-                <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>machine_graph</param_name>
-            <param_name>n_keys_map</param_name>
-            <param_name>placements</param_name>
-        </required_inputs>
-        <optional_inputs>
-            <token>EdgesFiltered</token>
-        </optional_inputs>
-        <outputs>
-            <param_type>MemoryRoutingInfos</param_type>
-            <param_type>MemoryRoutingTables</param_type>
-        </outputs>
-    </algorithm>
     <algorithm name="MallocBasedRoutingInfoAllocator">
         <python_module>pacman.operations.routing_info_allocator_algorithms.malloc_based_routing_allocator.malloc_based_routing_info_allocator</python_module>
         <python_class>MallocBasedRoutingInfoAllocator</python_class>
