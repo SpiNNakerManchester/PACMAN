@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .basic_routing_info_allocator import BasicRoutingInfoAllocator
-from .destination_based_key_allocator import (
-    DestinationBasedRoutingInfoAllocator)
 from .zoned_routing_info_allocator import (
     ZonedRoutingInfoAllocator)
 from pacman.operations.routing_info_allocator_algorithms.\
@@ -24,6 +22,5 @@ from pacman.operations.routing_info_allocator_algorithms.\
         MallocBasedRoutingInfoAllocator)
 
 __all__ = ['BasicRoutingInfoAllocator',
-           'DestinationBasedRoutingInfoAllocator',
            'MallocBasedRoutingInfoAllocator',
            'ZonedRoutingInfoAllocator']
