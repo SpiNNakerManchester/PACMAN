@@ -40,7 +40,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
             Placement(vertex, chip.x, chip.y, 1)
             for vertex, chip in zip(vertices, eth_chips))
         allocator = BasicTagAllocator()
-        _, _, tags = allocator(
+        tags = allocator(
             machine, plan_n_timesteps=None, placements=placements)
 
         for vertex, chip in zip(vertices, eth_chips):
