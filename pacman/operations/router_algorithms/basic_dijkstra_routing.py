@@ -87,7 +87,7 @@ class BasicDijkstraRouting(object):
         :param MachineGraph machine_graph: the machine_graph object
         :param bool use_progress_bar: whether to show a progress bar
         :return: The discovered routes
-        :rtype: MulticastRoutingTables
+        :rtype: MulticastRoutingTableByPartition
         :raise PacmanRoutingException:
             If something goes wrong with the routing
         """
