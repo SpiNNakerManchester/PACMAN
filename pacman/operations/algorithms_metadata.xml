@@ -625,8 +625,6 @@
             <param_name>plan_n_timesteps</param_name>
          </required_inputs>
         <outputs>
-            <param_type>MemoryIpTags</param_type>
-            <param_type>MemoryReverseIpTags</param_type>
             <param_type>MemoryTags</param_type>
         </outputs>
     </algorithm>
