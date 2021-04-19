@@ -87,7 +87,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
             Placement(vertex, eth_chip_2.x, eth_chip_2.y, proc)
             for proc, vertex in zip(eth2_procs, eth2_vertices))
         allocator = BasicTagAllocator()
-        _, _, tags = allocator(
+        tags = allocator(
             machine, plan_n_timesteps=None, placements=placements)
 
         tags_by_board = defaultdict(set)
