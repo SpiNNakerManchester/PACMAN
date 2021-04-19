@@ -71,7 +71,7 @@ class BasicTagAllocator(object):
         self._allocate_ports_for_reverse_ip_tags(
             tags_to_allocate_ports, ports_to_allocate, tags)
 
-        return list(tags.ip_tags), list(tags.reverse_ip_tags), tags
+        return tags
 
     @staticmethod
     def _gather_placements_with_tags(placement, collector):
