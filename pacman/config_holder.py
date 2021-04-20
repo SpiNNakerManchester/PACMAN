@@ -168,6 +168,8 @@ def set_config(section, option, value):
     :return: The option value.
     """
     __config.set(section, option, value)
+    # Intentionally no try here to force tests that set to
+    # load_default_configs before AND after
 
 
 def config_options(section):
