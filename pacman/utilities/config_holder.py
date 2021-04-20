@@ -18,6 +18,14 @@ import spinn_utilities.conf_loader as conf_loader
 __config = None
 
 
+def clear_configs():
+    """
+    Clears any existing configs
+
+    """
+    __config = None
+
+
 def load_cfgs(configfile, default_config_paths, validation_cfg=None):
     """
     :param str configfile:
