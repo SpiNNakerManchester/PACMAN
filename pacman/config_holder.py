@@ -163,13 +163,23 @@ def set_config(section, option, value):
     """ Sets the value of a config option.
 
     :param str section: What section to set the option in.
-    :param str option: What option to setd.
+    :param str option: What option to set.
     :param object value: Value to set option to
-    :return: The option value.
     """
     __config.set(section, option, value)
     # Intentionally no try here to force tests that set to
     # load_default_configs before AND after
+
+
+def has_config_option(section, option):
+    """ Check if the section has this config option.
+
+    :param str section: What section to check
+    :param str option: What option to check.
+    :rtype: bool
+    :return: True if and only if the option is defined. It may be None
+    """
+    return __config.has_option(section, option)
 
 
 def config_options(section):
