@@ -13,27 +13,47 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+import os
 import spinn_utilities.conf_loader as conf_loader
+from spinn_utilities.configs import CamelCaseConfigParser
+from spinn_utilities.log import FormatAdapter
+
+logger = FormatAdapter(logging.getLogger(__file__))
+
+CONFIG_FILE = "spinnaker.cfg"
 
 __config = None
 
+__default_config_files = [
+    os.path.join(os.path.dirname(__file__), CONFIG_FILE)]
 
-def clear_configs():
+
+def add_default_cfg(default):
     """
-    Clears any existing configs
+    Adds an extra default config to be read after easrlier ones
+
+    :param str default: Absolute path to the cfg file
+    """
+    __default_config_files.append(default)
+
+
+def load_default_configs():
+    """
+    Resets the config to the defaults. Ignoring user configs and setup changes
 
     """
-    __config = None
+    global __config
+    __config = CamelCaseConfigParser()
+    for default in __default_config_files:
+        __config.read(default)
 
 
-def load_cfgs(configfile, default_config_paths, validation_cfg=None):
+def load_cfgs(configfile, validation_cfg=None):
     """
     :param str configfile:
         The base name of the configuration file(s).
         Should not include any path components.
-    :param list(str) default_config_paths:
-        The list of files to get default configurations from.
-    :type default_config_paths: list(str)
     :param validation_cfg:
         The list of files to read a validation configuration from.
         If None, no such validation is performed.
@@ -41,7 +61,7 @@ def load_cfgs(configfile, default_config_paths, validation_cfg=None):
     """
     global __config
     __config = conf_loader.load_config(
-        filename=configfile, defaults=default_config_paths,
+        filename=configfile, defaults=__default_config_files,
         validation_cfg=validation_cfg)
 
 
@@ -53,7 +73,15 @@ def get_config_str(section, option):
     :return: The option value
     :rtype: str or None
     """
-    return __config.get_str(section, option)
+    try:
+        return __config.get_str(section, option)
+    except AttributeError:
+        # Only expected to happen in unittests but just in case
+        logger.warning(
+            "Accessing config before setup is not recommended as setup could"
+            " change some config values. ")
+        load_default_configs()
+        return __config.get_str(section, option)
 
 
 def get_config_str_list(section, option, token=","):
@@ -65,7 +93,14 @@ def get_config_str_list(section, option, token=","):
     :return: The list (possibly empty) of the option values
     :rtype: list(str)
     """
-    return __config.get_str_list(section, option, token)
+    try:
+        return __config.get_str_list(section, option, token)
+    except AttributeError:
+        # Only expected to happen in unittests but just in case
+        logger.warning(
+            "Accessing config before setup is not recommended as setup could"
+            " change some config values. ")
+        load_default_configs()
 
 
 def get_config_int(section, option):
@@ -76,7 +111,15 @@ def get_config_int(section, option):
     :return: The option value
     :rtype: int
     """
-    return __config.get_int(section, option)
+    try:
+        return __config.get_int(section, option)
+    except AttributeError:
+        # Only expected to happen in unittests but just in case
+        logger.warning(
+            "Accessing config before setup is not recommended as setup could"
+            " change some config values. ")
+        load_default_configs()
+        return __config.get_int(section, option)
 
 
 def get_config_float(section, option):
@@ -87,7 +130,15 @@ def get_config_float(section, option):
     :return: The option value.
     :rtype: float
     """
-    return __config.get_float(section, option)
+    try:
+        return __config.get_float(section, option)
+    except AttributeError:
+        # Only expected to happen in unittests but just in case
+        logger.warning(
+            "Accessing config before setup is not recommended as setup could"
+            " change some config values. ")
+        load_default_configs()
+        return __config.get_float(section, option)
 
 
 def get_config_bool(section, option):
@@ -98,7 +149,14 @@ def get_config_bool(section, option):
     :return: The option value.
     :rtype: bool
     """
-    return __config.getboolean(section, option)
+    try:
+        return __config.getboolean(section, option)
+    except AttributeError:
+        # Only expected to happen in unittests but just in case
+        logger.warning(
+            "Accessing config before setup is not recommended as setup could"
+            " change some config values. ")
+        load_default_configs()
 
 
 def set_config(section, option, value):
