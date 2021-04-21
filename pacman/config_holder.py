@@ -153,10 +153,10 @@ def get_config_bool(section, option):
     :rtype: bool
     """
     try:
-        return __config.getboolean(section, option)
+        return __config.get_bool(section, option)
     except AttributeError:
         load_config_cfgs()
-        return __config.getboolean(section, option)
+        return __config.get_bool(section, option)
 
 
 def set_config(section, option, value):
