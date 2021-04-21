@@ -179,7 +179,11 @@ def has_config_option(section, option):
     :rtype: bool
     :return: True if and only if the option is defined. It may be None
     """
-    return __config.has_option(section, option)
+    try:
+        return __config.has_option(section, option)
+    except AttributeError:
+        load_config_cfgs()
+        return __config.has_option(section, option)
 
 
 def config_options(section):
