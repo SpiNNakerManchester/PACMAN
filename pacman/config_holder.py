@@ -80,7 +80,6 @@ def load_config_cfgs():
         __config = CamelCaseConfigParser()
         for default in __default_config_files:
             __config.read(default)
-    print("Here")
 
 
 def get_config_str(section, option):
