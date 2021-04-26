@@ -23,6 +23,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
+from pacman.config_holder import get_config_int
 from pacman.exceptions import MinimisationFailedError
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -33,8 +34,6 @@ class AbstractCompressor(object):
     MAX_SUPPORTED_LENGTH = 1023
 
     __slots__ = [
-        # Max length below which the algorithm should stop compressing
-        "_target_length",
         # String of problems detected. Must be "" to finish
         "_problems",
         # Flag to say if the results can be order dependent
@@ -50,10 +49,6 @@ class AbstractCompressor(object):
         :param int target_length:
         :rtype: MulticastRoutingTables
         """
-        if target_length is None:
-            self._target_length = 0  # Compress as much as you can
-        else:
-            self._target_length = target_length
         # create progress bar
         progress = ProgressBar(
             router_tables.routing_tables,
@@ -134,8 +129,13 @@ class AbstractCompressor(object):
         """
         compressed_tables = MulticastRoutingTables()
         self._problems = ""
+        target_length = get_config_int(
+            "Mapping", "router_table_compression_target_length")
+        if target_length is None:
+            # Compress as much as possible
+            target_length = 0
         for table in progress.over(router_tables.routing_tables):
-            if table.number_of_entries < self._target_length:
+            if table.number_of_entries <target_length:
                 new_table = table
             else:
                 compressed_table = self.compress_table(table)
