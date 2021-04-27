@@ -192,3 +192,54 @@ def config_options(section):
     :param str section: What section to list options for.
     """
     return __config.options(section)
+
+
+def _check_lines(py_path, line, lines, index, method):
+    """
+    Support for check_python_file. Gets section and option name
+
+    :param str line: Line with get_config call
+    :param list(str) lines: All lines in the file
+    :param int index: index of line with get_config call
+    :raise Exception: If an unexpected or uncovered get_config found
+    """
+    while ")" not in line:
+        index += 1
+        line += lines[index]
+    parts = line[line.find("(", line.find("get_config")) + 1:
+                 line.find(")")].split(",")
+    section = parts[0].strip().replace("'", "").replace('"', '')
+    option = parts[1].strip()
+    if option[0] == "'":
+        option = option.replace("'", "")
+    elif option[0] == '"':
+        option = option.replace('"', '')
+    else:
+        print(line)
+        return
+    try:
+        method(section, option)
+    except Exception:
+        raise Exception(f"failed in line:{index} of file: {py_path}")
+
+
+def check_python_file(py_path):
+    """
+    A testing function to check that all the get_config calls work
+
+    :param str py_path: path to file to be checked
+    :raise Exception: If an unexpected or uncovered get_config found
+    """
+    with open(py_path, 'r') as py_file:
+        lines = py_file.readlines()
+        for index, line in enumerate(lines):
+            if "get_config_bool(" in line:
+                _check_lines(py_path, line, lines, index, get_config_bool)
+            if "get_config_float(" in line:
+                _check_lines(py_path, line, lines, index, get_config_float)
+            if "get_config_int(" in line:
+                _check_lines(py_path, line, lines, index, get_config_int)
+            if "get_config_str(" in line:
+                _check_lines(py_path, line, lines, index, get_config_str)
+            if "get_config_str_list(" in line:
+                _check_lines(py_path, line, lines, index, get_config_str_list)
