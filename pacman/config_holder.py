@@ -243,4 +243,3 @@ def check_python_file(py_path):
                 _check_lines(py_path, line, lines, index, get_config_str)
             if "get_config_str_list(" in line:
                 _check_lines(py_path, line, lines, index, get_config_str_list)
-
