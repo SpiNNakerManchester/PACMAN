@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.config_holder import get_config_int
+from spinn_utilities.config_holder import get_config_int
 from pacman.operations.router_compressors import Entry
 from pacman.exceptions import MinimisationFailedError
 from .remove_default_routes import remove_default_routes

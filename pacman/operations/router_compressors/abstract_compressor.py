@@ -19,11 +19,11 @@ based on https://github.com/project-rig/
 
 from abc import abstractmethod
 import logging
+from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
-from pacman.config_holder import get_config_int
 from pacman.exceptions import MinimisationFailedError
 
 logger = FormatAdapter(logging.getLogger(__name__))
