@@ -15,10 +15,16 @@
 
 import os
 import unittest
-from pacman.config_holder import check_python_file
+from spinn_utilities.config_holder import (
+    check_python_file, find_double_defaults)
+from pacman.config_setup import reset_configs
 
 
 class TestCfgChecker(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        reset_configs()
 
     def test_cfg_check(self):
         module = __import__("pacman")
@@ -31,3 +37,6 @@ class TestCfgChecker(unittest.TestCase):
                         continue
                     py_path = os.path.join(root, file_name)
                     check_python_file(py_path)
+
+    def test_double_defaults(self):
+        find_double_defaults()
