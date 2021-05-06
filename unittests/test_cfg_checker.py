@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import unittest
 from spinn_utilities.config_holder import run_config_checks
 from pacman.config_setup import reset_configs
@@ -25,4 +26,10 @@ class TestCfgChecker(unittest.TestCase):
         reset_configs()
 
     def test_cfg_check(self):
-        run_config_checks("pacman")
+        unittests = os.path.dirname(__file__)
+        parent = os.path.dirname(unittests)
+        pacman = os.path.join(parent, "pacman")
+        integration_tests = os.path.join(parent, "pacman_integration_tests")
+        uinit_test_objects = os.path.join(parent, "uinit_test_objects")
+        run_config_checks(directories=[
+            pacman, integration_tests, unittests, uinit_test_objects])
