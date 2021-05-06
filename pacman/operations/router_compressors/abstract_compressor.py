@@ -135,7 +135,7 @@ class AbstractCompressor(object):
             # Compress as much as possible
             target_length = 0
         for table in progress.over(router_tables.routing_tables):
-            if table.number_of_entries <target_length:
+            if table.number_of_entries < target_length:
                 new_table = table
             else:
                 compressed_table = self.compress_table(table)
