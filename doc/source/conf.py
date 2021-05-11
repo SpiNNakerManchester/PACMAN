@@ -28,7 +28,8 @@
 # serve to show the default.
 
 import os
-import inspect
+import re
+import sys
 from sphinx.ext import apidoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -50,8 +51,6 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx'
 ]
-
-root_package = "pacman"
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.8', None),
@@ -367,37 +366,46 @@ autodoc_default_options = {
     "special-members": "__call__"
 }
 
-_output_dir = os.path.abspath(".")
-_unfiltered_files = os.path.abspath("../unfiltered-files.txt")
+_package_base = "pacman"
 
-
+# Automatically called by sphinx at startup
 def setup(app):
-    # pylint: disable=unused-argument
-    def maybe_skip(app, what, name, obj, skip, options):  # @UnusedVariable
-        if what == "module":
-            if isinstance(obj, type):
-                obj = inspect.getmodule(obj)
-            if inspect.ismodule(obj) and \
-                    not obj.__name__.startswith(root_package):
-                skip = True
-        return skip
+    # NB: extra dot at end is deliberate!
+    trim = (_package_base + ".", "spinn_utilities.", "spinn_machine.")
 
-    app.connect('autodoc-skip-member', maybe_skip)
+    # Magic to shorten the names of our classes to their public versions
+    def skip_handler(_app, what, name, obj, skip, _options):
+        if not skip and what == 'module' and hasattr(obj, "__module__"):
+            # Get parent module *and* check if our name is in it
+            m = re.sub(r'\.[a-z0-9_]+$', '', obj.__module__)
+            if any(m.startswith(prefix) for prefix in trim) and \
+                    name in dir(sys.modules[m]):
+                # It is, so update to say that's canonical location for
+                # documentation purposes
+                obj.__module__ = m
+        return skip  # We don't care to change this
+
+    # Connect the callback to the autodoc-skip-member event from apidoc
+    app.connect('autodoc-skip-member', skip_handler)
 
 
-def filtered_files(unfiltered_files_filename):
+def filtered_files(base, unfiltered_files_filename):
     with open(unfiltered_files_filename) as f:
         lines = [line.rstrip() for line in f]
     # Skip comments and empty lines to get list of files we DON'T want to
     # filter out; this is definitely complicated
     unfiltered = set(
         line for line in lines if not line.startswith("#") and line != "")
-    for root, _dirs, files in os.walk(root_package):
+    for root, _dirs, files in os.walk(base):
         for filename in files:
             if filename.endswith(".py") and not filename.startswith("_"):
                 full = root + "/" + filename
                 if full not in unfiltered:
                     yield full
+
+
+_output_dir = os.path.abspath(".")
+_unfiltered_files = os.path.abspath("../unfiltered-files.txt")
 
 
 # Do the rst generation; remove files which aren't in git first!
@@ -407,4 +415,5 @@ for fl in os.listdir("."):
         os.remove(fl)
 os.chdir("../..")  # WARNING! RELATIVE FILENAMES CHANGE MEANING HERE!
 apidoc.main([
-    '-o', _output_dir, root_package, *filtered_files(_unfiltered_files)])
+    '-q', '-o', _output_dir, _package_base,
+    *filtered_files(_package_base, _unfiltered_files)])
