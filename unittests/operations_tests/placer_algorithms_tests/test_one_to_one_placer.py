@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import pytest
 from spinn_machine.virtual_machine import virtual_machine
+from pacman.config_setup import reset_configs
 from pacman.exceptions import PacmanException
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge,
@@ -29,6 +30,7 @@ from pacman.operations.placer_algorithms import OneToOnePlacer
 def test_virtual_vertices_one_to_one():
     """ Test that the placer works with a virtual vertex
     """
+    reset_configs()
 
     # Create a graph with a virtual vertex
     machine_graph = MachineGraph("Test")
@@ -83,6 +85,7 @@ def test_virtual_vertices_one_to_one():
 def test_one_to_one():
     """ Test normal 1-1 placement
     """
+    reset_configs()
 
     # Create a graph
     machine_graph = MachineGraph("Test")
@@ -141,6 +144,7 @@ def test_one_to_one():
 def test_sdram_links():
     """ Test sdram edges which should explode
         """
+    reset_configs()
 
     # Create a graph
     machine_graph = MachineGraph("Test")

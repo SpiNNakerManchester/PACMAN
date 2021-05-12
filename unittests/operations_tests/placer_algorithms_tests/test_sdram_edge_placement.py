@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_machine import virtual_machine
+from pacman.config_setup import reset_configs
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, SDRAMMachineEdge)
 from pacman.model.graphs.machine import ConstantSDRAMMachinePartition
@@ -25,6 +26,9 @@ import unittest
 
 
 class TestSameChipConstraint(unittest.TestCase):
+
+    def setUp(cls):
+        reset_configs()
 
     def _do_test(self, placer):
         machine = virtual_machine(width=8, height=8)

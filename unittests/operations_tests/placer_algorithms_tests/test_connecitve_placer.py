@@ -15,6 +15,7 @@
 
 import unittest
 from spinn_machine import virtual_machine
+from pacman.config_setup import reset_configs
 from pacman.model.graphs.machine import MachineGraph, MachineEdge
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
@@ -28,7 +29,7 @@ from uinit_test_objects import (
 
 class TestConnectivePlacer(unittest.TestCase):
     def setUp(self):
-
+        reset_configs()
         self.machine = virtual_machine(8, 8)
         self.mach_graph = MachineGraph("machine")
         self.vertices = list()

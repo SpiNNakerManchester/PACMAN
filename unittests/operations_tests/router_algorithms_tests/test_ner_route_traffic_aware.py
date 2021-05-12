@@ -26,7 +26,7 @@ from pacman.model.resources import ResourceContainer
 from pacman.model.placements import Placements, Placement
 
 
-class MyTestCase(unittest.TestCase):
+class TestNerRouteTrafficAware(unittest.TestCase):
 
     def setUp(cls):
         reset_configs()

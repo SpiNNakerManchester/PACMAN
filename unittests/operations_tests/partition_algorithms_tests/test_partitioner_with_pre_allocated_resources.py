@@ -15,6 +15,7 @@
 
 import pytest
 from spinn_machine import virtual_machine
+from pacman.config_setup import reset_configs
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.operations.partition_algorithms import SplitterPartitioner
 from pacman.exceptions import (
@@ -35,6 +36,7 @@ class TestPartitionerWithPreAllocatedResources(object):
     """
 
     def test_1_chip_over_pre_allocated(self):
+        reset_configs()
         machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = SplitterPartitioner()
@@ -58,6 +60,7 @@ class TestPartitionerWithPreAllocatedResources(object):
                         pre_allocated_resources=pre_allocated_res)
 
     def test_1_chip_under_pre_allocated(self):
+        reset_configs()
         machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = SplitterPartitioner()
@@ -83,6 +86,7 @@ class TestPartitionerWithPreAllocatedResources(object):
             raise Exception("should have blown up here") from e
 
     def test_1_chip_pre_allocated_same_core(self):
+        reset_configs()
         machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = SplitterPartitioner()
@@ -107,6 +111,7 @@ class TestPartitionerWithPreAllocatedResources(object):
                         pre_allocated_resources=pre_allocated_res)
 
     def test_1_chip_pre_allocated_too_much_sdram(self):
+        reset_configs()
         machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = SplitterPartitioner()
@@ -135,6 +140,7 @@ class TestPartitionerWithPreAllocatedResources(object):
                         pre_allocated_resources=pre_allocated_res)
 
     def test_1_chip_no_pre_allocated_too_much_sdram(self):
+        reset_configs()
         machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = SplitterPartitioner()
