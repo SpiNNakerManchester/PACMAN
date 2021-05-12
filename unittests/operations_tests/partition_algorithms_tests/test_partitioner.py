@@ -17,6 +17,8 @@
 test for partitioning
 """
 import unittest
+from spinn_utilities.config_holder import load_config, set_config
+from pacman.config_setup import reset_configs
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.operations.partition_algorithms import SplitterPartitioner
 from spinn_machine import (
@@ -36,6 +38,13 @@ class TestPartitioner(unittest.TestCase):
     """
     test for partition-and-place partitioning algorithm
     """
+
+    def setUp(self):
+        reset_configs()
+        load_config()
+
+    def tearDown(self):
+        reset_configs()
 
     def setup(self):
         """setup for all basic partitioner tests
@@ -456,12 +465,12 @@ class TestPartitioner(unittest.TestCase):
         """
 
         # Create a 2x2 machine with 10 cores per chip (so 40 cores),
-        # but 1MB off 2MB per chip (so 19MB per chip)
+        # but 1 off 2 per chip (so 19 per chip)
         n_cores_per_chip = 10
         sdram_per_chip = (n_cores_per_chip * 2) - 1
+        set_config("Machine", "max_sdram_allowed_per_chip", sdram_per_chip)
         machine = virtual_machine(
-            width=2, height=2, n_cpus_per_chip=n_cores_per_chip,
-            sdram_per_chip=sdram_per_chip)
+            width=2, height=2, n_cpus_per_chip=n_cores_per_chip)
 
         # Create a vertex where each atom requires 1MB (default) of SDRAM
         # but which can't be subdivided lower than 2 atoms per core.
@@ -486,18 +495,15 @@ class TestPartitioner(unittest.TestCase):
         """
 
         # Create a 2x2 machine with 1 core per chip (so 4 cores),
-        # and 8MB SDRAM per chip
         n_cores_per_chip = 2  # remember 1 is the monitor
-        sdram_per_chip = 8
         machine = virtual_machine(
-            width=2, height=2, n_cpus_per_chip=n_cores_per_chip,
-            sdram_per_chip=sdram_per_chip)
+            width=2, height=2, n_cpus_per_chip=n_cores_per_chip)
 
         # Create a vertex which will need to be split perfectly into 4 cores
         # to work and which max atoms per core must be ignored
         vertex = SimpleTestVertex(
-            sdram_per_chip * 2, max_atoms_per_core=sdram_per_chip,
-            constraints=[FixedVertexAtomsConstraint(sdram_per_chip // 2)])
+            16, max_atoms_per_core=8,
+            constraints=[FixedVertexAtomsConstraint(4)])
         vertex.splitter = SplitterSliceLegacy()
         app_graph = ApplicationGraph("Test")
         app_graph.add_vertex(vertex)
