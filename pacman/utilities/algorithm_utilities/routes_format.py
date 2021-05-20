@@ -14,15 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import os
-import time
-from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
-from spinn_machine import Router
-from pacman import exceptions
-from pacman.model.graphs import AbstractSpiNNakerLink, AbstractFPGA
-from pacman.model.graphs.common import EdgeTrafficType
-#from pacman.operations.algorithm_reports.router_summary import RouterSummary
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
