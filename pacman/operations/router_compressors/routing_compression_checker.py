@@ -19,7 +19,7 @@ import os
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRoutingException
-from pacman.operations.algorithm_reports import reports
+from pacman.utilities.algorithm_utilities.routes_format import format_route
 
 logger = FormatAdapter(logging.getLogger(__name__))
 WILDCARD = "*"
@@ -124,7 +124,7 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
         if covers(o_code, c_code):
             c_route = compressed_dict[c_code]
             if f is not None:
-                f.write("\t\t{}\n".format(reports.format_route(c_route)))
+                f.write("\t\t{}\n".format(format_route(c_route)))
             if o_route.processor_ids != c_route.processor_ids:
                 if set(o_route.processor_ids) != set(c_route.processor_ids):
                     raise PacmanRoutingException(
@@ -204,7 +204,7 @@ def generate_routing_compression_checker_report(
                     get_routing_table_for_chip(x, y)
                 compressed_dict = codify_table(compressed_table)
                 for o_route in original.multicast_routing_entries:
-                    f.write("\t{}\n".format(reports.format_route(o_route)))
+                    f.write("\t{}\n".format(format_route(o_route)))
                     compare_route(o_route, compressed_dict, f=f)
     except IOError:
         logger.exception("Generate_router_comparison_reports: Can't open file"
