@@ -51,7 +51,7 @@ class TestSameChipConstraint(unittest.TestCase):
         n_keys_map = DictBasedMachinePartitionNKeysMap()
 
         inputs = {
-            "MemoryExtendedMachine": machine,
+            "ExtendedMachine": machine,
             "MemoryMachine": machine,
             "MemoryMachineGraph": graph,
             "PlanNTimeSteps": None,

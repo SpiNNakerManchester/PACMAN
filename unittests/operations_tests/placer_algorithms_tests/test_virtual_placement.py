@@ -35,7 +35,7 @@ def test_virtual_placement(placer):
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     inputs = {
-        "MemoryExtendedMachine": machine,
+        "ExtendedMachine": machine,
         "MemoryMachine": machine,
         "MemoryMachineGraph": graph,
         "PlanNTimeSteps": 1000,
