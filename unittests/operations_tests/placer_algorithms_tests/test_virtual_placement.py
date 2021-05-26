@@ -36,10 +36,10 @@ def test_virtual_placement(placer):
 
     inputs = {
         "ExtendedMachine": machine,
-        "MemoryMachine": machine,
-        "MemoryMachineGraph": graph,
+        "Machine": machine,
+        "MachineGraph": graph,
         "PlanNTimeSteps": 1000,
-        "MemoryMachinePartitionNKeysMap": n_keys_map
+        "MachinePartitionNKeysMap": n_keys_map
     }
     algorithms = [placer]
     xml_paths = []

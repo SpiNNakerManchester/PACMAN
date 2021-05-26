@@ -52,10 +52,10 @@ class TestSameChipConstraint(unittest.TestCase):
 
         inputs = {
             "ExtendedMachine": machine,
-            "MemoryMachine": machine,
-            "MemoryMachineGraph": graph,
+            "Machine": machine,
+            "MachineGraph": graph,
             "PlanNTimeSteps": None,
-            "MemoryMachinePartitionNKeysMap": n_keys_map
+            "MachinePartitionNKeysMap": n_keys_map
         }
         algorithms = [placer]
         xml_paths = []
