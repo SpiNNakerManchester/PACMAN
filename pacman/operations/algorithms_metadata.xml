@@ -43,7 +43,7 @@
             <token>EdgesFiltered</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryFixedRoutes</param_type>
+            <param_type>FixedRoutes</param_type>
         </outputs>
     </algorithm>
     <algorithm name="SplitterPartitioner">
