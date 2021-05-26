@@ -65,7 +65,7 @@
             </parameter>
             <parameter>
                 <param_name>pre_allocated_resources</param_name>
-                <param_type>MemoryPreAllocatedResources</param_type>
+                <param_type>PreAllocatedResources</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -300,7 +300,7 @@
             <token>EdgesFiltered</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryRoutingInfos</param_type>
+            <param_type>RoutingInfos</param_type>
         </outputs>
     </algorithm>
     <algorithm name="ZonedRoutingInfoAllocator">
@@ -324,7 +324,7 @@
             <token>EdgesFiltered</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryRoutingInfos</param_type>
+            <param_type>RoutingInfos</param_type>
         </outputs>
     </algorithm>
     <algorithm name="GlobalZonedRoutingInfoAllocator">
@@ -345,7 +345,7 @@
             <param_name>n_keys_map</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryRoutingInfos</param_type>
+            <param_type>RoutingInfos</param_type>
         </outputs>
     </algorithm>
     <algorithm name="MallocBasedRoutingInfoAllocator">
@@ -369,7 +369,7 @@
             <token>EdgesFiltered</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryRoutingInfos</param_type>
+            <param_type>RoutingInfos</param_type>
         </outputs>
     </algorithm>
     <algorithm name="BasicRoutingTableGenerator">
@@ -378,7 +378,7 @@
         <input_definitions>
             <parameter>
                 <param_name>routing_infos</param_name>
-                <param_type>MemoryRoutingInfos</param_type>
+                <param_type>RoutingInfos</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_table_by_partitions</param_name>
@@ -622,7 +622,7 @@
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
-                <param_type>MemoryRoutingInfos</param_type>
+                <param_type>RoutingInfos</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
