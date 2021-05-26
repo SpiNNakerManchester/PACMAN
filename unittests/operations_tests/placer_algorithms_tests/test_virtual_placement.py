@@ -46,7 +46,7 @@ def test_virtual_placement(placer):
     executor = PACMANAlgorithmExecutor(
         algorithms, [], inputs, [], [], [], xml_paths)
     executor.execute_mapping()
-    placements = executor.get_item("MemoryPlacements")
+    placements = executor.get_item("Placements")
 
     placement = placements.get_placement_of_vertex(virtual_vertex)
     chip = extended_machine.get_chip_at(placement.x, placement.y)

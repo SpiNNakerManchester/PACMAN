@@ -71,7 +71,7 @@ class TestSameChipConstraint(unittest.TestCase):
         executor = PACMANAlgorithmExecutor(
             algorithms, [], inputs, [], [], [], xml_paths)
         executor.execute_mapping()
-        placements = executor.get_item("MemoryPlacements")
+        placements = executor.get_item("Placements")
         for edge in sdram_edges:
             pre_place = placements.get_placement_of_vertex(edge.pre_vertex)
             post_place = placements.get_placement_of_vertex(edge.post_vertex)

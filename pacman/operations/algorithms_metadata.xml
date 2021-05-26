@@ -27,7 +27,7 @@
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>destination_class</param_name>
@@ -107,7 +107,7 @@
             <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPlacements</param_type>
+            <param_type>Placements</param_type>
         </outputs>
     </algorithm>
     <algorithm name="OneToOnePlacer">
@@ -133,7 +133,7 @@
             <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPlacements</param_type>
+            <param_type>Placements</param_type>
         </outputs>
     </algorithm>
     <algorithm name="SpreaderPlacer">
@@ -164,7 +164,7 @@
             <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPlacements</param_type>
+            <param_type>Placements</param_type>
         </outputs>
     </algorithm>
     <algorithm name="ConnectiveBasedPlacer">
@@ -190,7 +190,7 @@
             <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPlacements</param_type>
+            <param_type>Placements</param_type>
         </outputs>
     </algorithm>
     <algorithm name="HilbertPlacer">
@@ -216,7 +216,7 @@
             <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPlacements</param_type>
+            <param_type>Placements</param_type>
         </outputs>
     </algorithm>
     <algorithm name="RandomPlacer">
@@ -242,7 +242,7 @@
             <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPlacements</param_type>
+            <param_type>Placements</param_type>
         </outputs>
     </algorithm>
     <algorithm name="BasicDijkstraRouting">
@@ -251,7 +251,7 @@
         <input_definitions>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -288,7 +288,7 @@
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -584,7 +584,7 @@
         <input_definitions>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -610,7 +610,7 @@
         <input_definitions>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -652,7 +652,7 @@
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -681,7 +681,7 @@
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
