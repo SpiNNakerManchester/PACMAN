@@ -271,7 +271,7 @@
             <token>EdgesFiltered</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryRoutingTableByPartition</param_type>
+            <param_type>RoutingTableByPartition</param_type>
         </outputs>
     </algorithm>
     <algorithm name="BasicRoutingInfoAllocator">
@@ -382,7 +382,7 @@
             </parameter>
             <parameter>
                 <param_name>routing_table_by_partitions</param_name>
-                <param_type>MemoryRoutingTableByPartition</param_type>
+                <param_type>RoutingTableByPartition</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -395,7 +395,7 @@
             <param_name>machine</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryRoutingTables</param_type>
+            <param_type>RoutingTables</param_type>
             <token part="UnCompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
     </algorithm>
@@ -405,7 +405,7 @@
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
             <parameter>
                 <param_name>target_length</param_name>
@@ -430,7 +430,7 @@
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
             <parameter>
                 <param_name>target_length</param_name>
@@ -454,7 +454,7 @@
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
             <parameter>
                 <param_name>target_length</param_name>
@@ -477,7 +477,7 @@
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
             <parameter>
                 <param_name>target_length</param_name>
@@ -509,7 +509,7 @@
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -524,7 +524,7 @@
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -543,7 +543,7 @@
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -627,7 +627,7 @@
             <parameter>
                 <param_name>routing_tables</param_name>
                 <param_type>CompressedRoutingTables</param_type>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -664,7 +664,7 @@
             <token>EdgesFiltered</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryRoutingTableByPartition</param_type>
+            <param_type>RoutingTableByPartition</param_type>
         </outputs>
     </algorithm>
     <algorithm name="NerRouteTrafficAware">
@@ -690,7 +690,7 @@
             <param_name>placements</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryRoutingTableByPartition</param_type>
+            <param_type>RoutingTableByPartition</param_type>
         </outputs>
     </algorithm>
 </algorithms>
