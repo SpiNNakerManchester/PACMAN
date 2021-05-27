@@ -24,7 +24,6 @@ from .injection_decorator import injection_context, do_injection
 from .algorithm_decorators import (
     scan_packages, get_algorithms, Token)
 from .algorithm_metadata_xml_reader import AlgorithmMetadataXmlReader
-from pacman.operations import algorithm_reports
 from pacman.executor.token_states import TokenStates
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -213,7 +212,6 @@ class PACMANAlgorithmExecutor(object):
         # set up XML reader for standard PACMAN algorithms XML file reader
         # (used in decode_algorithm_data_objects function)
         xml_paths.append(operations.algorithms_metdata_file)
-        xml_paths.append(algorithm_reports.reports_metadata_file)
 
         # decode the algorithms specs
         xml_decoder = AlgorithmMetadataXmlReader(xml_paths)
@@ -221,7 +219,6 @@ class PACMANAlgorithmExecutor(object):
 
         # Scan for annotated algorithms
         packages.append(operations)
-        packages.append(algorithm_reports)
         algorithm_data_objects.update(scan_packages(packages))
         if use_unscanned_algorithms:
             algorithm_data_objects.update(get_algorithms())
