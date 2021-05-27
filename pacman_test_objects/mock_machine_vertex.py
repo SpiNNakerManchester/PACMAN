@@ -20,7 +20,9 @@ from pacman.model.graphs.machine import SimpleMachineVertex
 
 
 class MockMachineVertex(SimpleMachineVertex, AbstractSupportsSDRAMEdges):
-    """ A MOCK MachineVertex used for tests.
+    """ A MOCK MachineVertex used for tests with extra optional APIs
+
+    This class is for tests where the SimpleMachineVertex is not enough.
 
     .. warning::
         This class may be extended to implement other Abstracts,

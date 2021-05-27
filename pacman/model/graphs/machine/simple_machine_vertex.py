@@ -19,6 +19,10 @@ from spinn_utilities.overrides import overrides
 
 class SimpleMachineVertex(MachineVertex):
     """ A MachineVertex that stores its own resources.
+
+    This class is mainly intended for json and testing as it support the
+        mininal API. If a more complex Vertex is required consider the
+        MockMachineVertex.
     """
     __slots__ = ["_resources"]
 
