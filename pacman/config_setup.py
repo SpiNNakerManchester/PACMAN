@@ -13,14 +13,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .basic_routing_info_allocator import BasicRoutingInfoAllocator
-from .zoned_routing_info_allocator import (
-    ZonedRoutingInfoAllocator)
-from pacman.operations.routing_info_allocator_algorithms.\
-    malloc_based_routing_allocator.malloc_based_routing_info_allocator \
-    import (
-        MallocBasedRoutingInfoAllocator)
+import os
+from spinn_utilities.config_holder import (
+    add_default_cfg, clear_cfg_files)
+from spinn_machine.config_setup import add_spinn_machine_cfg
 
-__all__ = ['BasicRoutingInfoAllocator',
-           'MallocBasedRoutingInfoAllocator',
-           'ZonedRoutingInfoAllocator']
+BASE_CONFIG_FILE = "pacman.cfg"
+
+
+def reset_configs():
+    """
+    Resets the configs so only the local default config is included.
+
+    .. note::
+        This file should only be called from PACMAN/unittests
+
+    """
+    clear_cfg_files()
+    add_pacman_cfg()
+
+
+def add_pacman_cfg():
+    """
+    Add the local cfg and all dependent cfg files.
+    """
+    add_spinn_machine_cfg()  # This add its dependencies too
+    add_default_cfg(os.path.join(os.path.dirname(__file__), BASE_CONFIG_FILE))
