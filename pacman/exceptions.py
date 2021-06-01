@@ -224,37 +224,3 @@ class MinimisationFailedError(PacmanException):
     """ Raised when a routing table could not be minimised to reach a
         specified target.
     """
-
-    def __init__(self, target_length, final_length=None, chip=None):
-        """
-        :param int target_length:
-            The target number of routing entries.
-        :param final_length:
-            The number of routing entries reached when the algorithm completed.
-            (`final_length > target_length`)
-        :type final_length: int or None
-        :param chip:
-            The coordinates of the chip on which routing table minimisation
-            first failed. Only set when minimisation is performed across many
-            chips simultaneously.
-        :type chip: tuple(int, int) or None
-        """
-        super().__init__()
-        self.chip = chip
-        self.target_length = target_length
-        self.final_length = final_length
-
-    def __str__(self):
-        if self.chip is not None:
-            x, y = self.chip
-            text = ("Could not minimise routing table for "
-                    "({}, {}) ".format(x, y))
-        else:
-            text = "Could not minimise routing table "
-
-        text += "to fit in {} entries.".format(self.target_length)
-
-        if self.final_length is not None:
-            text += " Best managed was {} entries.".format(self.final_length)
-
-        return text
