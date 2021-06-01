@@ -27,8 +27,8 @@ from pacman.operations.router_compressors import (
 from pacman.config_setup import reset_configs
 
 reset_configs()
-original_tables = from_json("routing_table_15_25.json")
-# original_tables = from_json("malloc_hard_routing_tables.json.gz")
+# original_tables = from_json("routing_table_15_25.json")
+original_tables = from_json("malloc_hard_routing_tables.json.gz")
 # original_tables = from_json("routing_tables_speader_big.json.gz")
 
 SPLIT = False
