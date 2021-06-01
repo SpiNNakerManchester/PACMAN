@@ -95,31 +95,6 @@ class PacmanNotExistException(PacmanException):
     """
 
 
-class PacmanAlgorithmFailedToCompleteException(PacmanException):
-    """ An exception that indicates that a pacman algorithm ran from inside
-        the software stack has failed to complete for some unknown reason.
-    """
-
-    def __init__(self, algorithm, exception, tb):
-        """
-        :param AbstractAlgorithm algorithm:
-        :param Exception exception:
-        :param traceback tb:
-        """
-        problem = (
-            "Algorithm {} has crashed.\n"
-            "    Inputs: {}\n"
-            "    Error: {}\n"
-            "    Stack: {}\n".format(
-                algorithm.algorithm_id, algorithm.inputs, exception.message,
-                traceback.format_exc(tb)))
-
-        super().__init__(problem)
-        self.exception = exception
-        self.algorithm = algorithm
-        self.traceback = tb
-
-
 class PacmanExternalAlgorithmFailedToCompleteException(PacmanException):
     """ An exception that indicates that an algorithm ran from outside
         the software stack has failed to complete for some unknown reason.
