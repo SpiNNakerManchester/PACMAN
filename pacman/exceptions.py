@@ -155,25 +155,6 @@ class PacmanProcessorNotOccupiedError(KeyError):
     """
 
 
-class PacmanProcessorNotAvailableError(PacmanException):
-    """ An exception that indicates that a processor is unavailable for some
-        reason.
-    """
-
-    def __init__(self, x, y, p):
-        """
-        :param int x:
-        :param int y:
-        :param int p:
-        """
-        msg = "The processor {} {} {} is not available. " \
-              "This may be caused by a clash between a ChipAndCoreConstraint"\
-              " and the processor still being in use from a previous run." \
-              .format(x, y, p)
-        # Call the base class constructor with the parameters it needs
-        super().__init__(msg)
-
-
 class PacmanValueError(ValueError, PacmanException):
     """ An exception that indicates that a value is invalid for some reason.
     """
