@@ -32,7 +32,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :type label: str or None
         :param iterable(AbstractConstraint) constraints:
             The optional initial constraints of the vertex
-        :tpye constraints: iterable(AbstractConstraint)  or None
+        :type constraints: iterable(AbstractConstraint)  or None
         :param app_vertex:
             The application vertex that caused this machine vertex to be
             created. If None, there is no such application vertex.

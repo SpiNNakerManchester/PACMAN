@@ -19,7 +19,7 @@ from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 
 
-def get_resourced_machine_vertext(lo_atom, hi_atom, label=None):
+def get_resourced_machine_vertex(lo_atom, hi_atom, label=None):
     cpu_cycles = 10 * (hi_atom - lo_atom)
     dtcm_requirement = 200 * (hi_atom - lo_atom)
     sdram_requirement = 4000 + 50 * (hi_atom - lo_atom)

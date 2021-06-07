@@ -24,7 +24,7 @@ from pacman.exceptions import PacmanValueError
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
 from pacman.operations.placer_algorithms import ConnectiveBasedPlacer
-from pacman_test_objects import (get_resourced_machine_vertext)
+from pacman_test_objects import (get_resourced_machine_vertex)
 
 
 class TestConnectivePlacer(unittest.TestCase):
@@ -33,10 +33,10 @@ class TestConnectivePlacer(unittest.TestCase):
         self.machine = virtual_machine(8, 8)
         self.mach_graph = MachineGraph("machine")
         self.vertices = list()
-        self.vertex1 = get_resourced_machine_vertext(0, 1, "First vertex")
-        self.vertex2 = get_resourced_machine_vertext(1, 5, "Second vertex")
-        self.vertex3 = get_resourced_machine_vertext(5, 10, "Third vertex")
-        self.vertex4 = get_resourced_machine_vertext(10, 100, "Fourth vertex")
+        self.vertex1 = get_resourced_machine_vertex(0, 1, "First vertex")
+        self.vertex2 = get_resourced_machine_vertex(1, 5, "Second vertex")
+        self.vertex3 = get_resourced_machine_vertex(5, 10, "Third vertex")
+        self.vertex4 = get_resourced_machine_vertex(10, 100, "Fourth vertex")
         self.vertices.append(self.vertex1)
         self.mach_graph.add_vertex(self.vertex1)
         self.vertices.append(self.vertex2)
@@ -99,12 +99,12 @@ class TestConnectivePlacer(unittest.TestCase):
         graph = MachineGraph("machine")
         cores = sum(chip.n_user_processors for chip in self.machine.chips)
         for i in range(cores):  # 50 atoms per each processor on 20 chips
-            graph.add_vertex(get_resourced_machine_vertext(
+            graph.add_vertex(get_resourced_machine_vertex(
                 0, 50, "vertex " + str(i)))
         placements = ConnectiveBasedPlacer()(graph, self.machine, 100)
         self.assertEqual(len(placements), cores)
         # One more vertex should be too many
-        graph.add_vertex(get_resourced_machine_vertext(0, 50, "toomany"))
+        graph.add_vertex(get_resourced_machine_vertex(0, 50, "toomany"))
         with self.assertRaises(PacmanValueError):
             ConnectiveBasedPlacer()(graph, self.machine, 100)
 
