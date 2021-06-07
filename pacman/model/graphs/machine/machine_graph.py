@@ -318,6 +318,8 @@ class MachineGraph(Graph):
 
         :return: A shallow copy of this graph
         :rtype: MachineGraph
+        :raises PacmanInvalidParameterException:
+            If called on a none empty graph when Application Vertexes exist
         """
         new_graph = MachineGraph(self.label)
         for vertex in self.vertices:
