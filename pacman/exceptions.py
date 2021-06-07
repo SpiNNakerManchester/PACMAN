@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import traceback
-
 
 class PacmanException(Exception):
     """ Indicates a general exception from Pacman
@@ -95,31 +93,6 @@ class PacmanNotExistException(PacmanException):
     """
 
 
-class PacmanAlgorithmFailedToCompleteException(PacmanException):
-    """ An exception that indicates that a pacman algorithm ran from inside
-        the software stack has failed to complete for some unknown reason.
-    """
-
-    def __init__(self, algorithm, exception, tb):
-        """
-        :param AbstractAlgorithm algorithm:
-        :param Exception exception:
-        :param traceback tb:
-        """
-        problem = (
-            "Algorithm {} has crashed.\n"
-            "    Inputs: {}\n"
-            "    Error: {}\n"
-            "    Stack: {}\n".format(
-                algorithm.algorithm_id, algorithm.inputs, exception.message,
-                traceback.format_exc(tb)))
-
-        super().__init__(problem)
-        self.exception = exception
-        self.algorithm = algorithm
-        self.traceback = tb
-
-
 class PacmanExternalAlgorithmFailedToCompleteException(PacmanException):
     """ An exception that indicates that an algorithm ran from outside
         the software stack has failed to complete for some unknown reason.
@@ -153,25 +126,6 @@ class PacmanProcessorNotOccupiedError(KeyError):
     """ An exception that indicates that no placement has been made to a
         processor.
     """
-
-
-class PacmanProcessorNotAvailableError(PacmanException):
-    """ An exception that indicates that a processor is unavailable for some
-        reason.
-    """
-
-    def __init__(self, x, y, p):
-        """
-        :param int x:
-        :param int y:
-        :param int p:
-        """
-        msg = "The processor {} {} {} is not available. " \
-              "This may be caused by a clash between a ChipAndCoreConstraint"\
-              " and the processor still being in use from a previous run." \
-              .format(x, y, p)
-        # Call the base class constructor with the parameters it needs
-        super().__init__(msg)
 
 
 class PacmanValueError(ValueError, PacmanException):
@@ -224,37 +178,3 @@ class MinimisationFailedError(PacmanException):
     """ Raised when a routing table could not be minimised to reach a
         specified target.
     """
-
-    def __init__(self, target_length, final_length=None, chip=None):
-        """
-        :param int target_length:
-            The target number of routing entries.
-        :param final_length:
-            The number of routing entries reached when the algorithm completed.
-            (`final_length > target_length`)
-        :type final_length: int or None
-        :param chip:
-            The coordinates of the chip on which routing table minimisation
-            first failed. Only set when minimisation is performed across many
-            chips simultaneously.
-        :type chip: tuple(int, int) or None
-        """
-        super().__init__()
-        self.chip = chip
-        self.target_length = target_length
-        self.final_length = final_length
-
-    def __str__(self):
-        if self.chip is not None:
-            x, y = self.chip
-            text = ("Could not minimise routing table for "
-                    "({}, {}) ".format(x, y))
-        else:
-            text = "Could not minimise routing table "
-
-        text += "to fit in {} entries.".format(self.target_length)
-
-        if self.final_length is not None:
-            text += " Best managed was {} entries.".format(self.final_length)
-
-        return text
