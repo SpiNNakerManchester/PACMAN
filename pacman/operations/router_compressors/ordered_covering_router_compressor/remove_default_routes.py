@@ -71,6 +71,8 @@ def remove_default_routes(table, target_length, check_for_aliases=True):
                 new_table.append(entry)
 
     if target_length and len(new_table) > target_length:
-        raise MinimisationFailedError(target_length, len(new_table))
+        raise MinimisationFailedError(
+            f"Best compression is {len(new_table)} which is "
+            f"still higher than the target {target_length}")
 
     return new_table
