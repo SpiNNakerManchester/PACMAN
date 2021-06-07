@@ -19,15 +19,13 @@ import sys
 import unittest
 
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
-from pacman.operations.algorithm_reports.routing_compression_checker_report \
-    import compare_tables
-from pacman.operations.router_compressors.mundys_router_compressor.\
-    routing_table_condenser import (
-        MundyRouterCompressor)
+from pacman.operations.router_compressors.routing_compression_checker import (
+    compare_tables)
+from pacman.operations.router_compressors.ordered_covering_router_compressor \
+    import OrderedCoveringCompressor
 from pacman.operations.router_compressors.abstract_compressor import \
     AbstractCompressor
-from pacman.operations.router_compressors.unordered_compressor import \
-    UnorderedCompressor
+from pacman.operations.router_compressors import UnorderedPairCompressor
 
 
 class TestBigCompression(unittest.TestCase):
@@ -38,10 +36,10 @@ class TestBigCompression(unittest.TestCase):
         j_router = os.path.join(path, "malloc_hard_routing_tables.json.gz")
         original_tables = from_json(j_router)
 
-        mundy_compressor = MundyRouterCompressor()
+        mundy_compressor = OrderedCoveringCompressor()
         # Hack to stop it throwing a wobly for too many entries
         AbstractCompressor.MAX_SUPPORTED_LENGTH = 5000
-        pre_compressor = UnorderedCompressor()
+        pre_compressor = UnorderedPairCompressor()
 
         start = time.time()
         mundy_tables = mundy_compressor(original_tables)
