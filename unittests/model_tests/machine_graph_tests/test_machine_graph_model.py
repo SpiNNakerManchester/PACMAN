@@ -18,7 +18,8 @@ from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
     ConstantSDRAMMachinePartition, MachineEdge, MachineGraph,
-    MulticastEdgePartition, SDRAMMachineEdge, SimpleMachineVertex)
+    MachineGraphView, MulticastEdgePartition, SDRAMMachineEdge,
+    SimpleMachineVertex)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanInvalidParameterException)
@@ -88,7 +89,7 @@ class TestMachineGraphModel(unittest.TestCase):
         for edge in edges_from_graph:
             self.assertIn(edge, edges)
 
-        second = graph.clone(False)
+        second = graph.clone()
         self.assertEqual(graph.n_vertices, second.n_vertices)
         vertices_from_graph = list(second.vertices)
         for vert in vertices_from_graph:
@@ -102,7 +103,7 @@ class TestMachineGraphModel(unittest.TestCase):
             self.assertIn(edge, edges)
         self.assertEqual(len(edges_from_graph), len(edges))
 
-        third = graph.clone(True)
+        third = MachineGraphView(graph)
         self.assertEqual(graph.n_vertices, third.n_vertices)
         vertices_from_graph = list(third.vertices)
         for vert in vertices_from_graph:
