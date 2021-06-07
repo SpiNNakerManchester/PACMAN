@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .basic_routing_info_allocator import BasicRoutingInfoAllocator
 from .zoned_routing_info_allocator import (
     ZonedRoutingInfoAllocator)
 from pacman.operations.routing_info_allocator_algorithms.\
@@ -21,6 +20,5 @@ from pacman.operations.routing_info_allocator_algorithms.\
     import (
         MallocBasedRoutingInfoAllocator)
 
-__all__ = ['BasicRoutingInfoAllocator',
-           'MallocBasedRoutingInfoAllocator',
+__all__ = ['MallocBasedRoutingInfoAllocator',
            'ZonedRoutingInfoAllocator']
