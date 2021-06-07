@@ -27,7 +27,7 @@ from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.resources import (
     CoreResource, ConstantSDRAM, SpecificCoreResource,
     SpecificChipSDRAMResource, PreAllocatedResourceContainer)
-from uinit_test_objects import SimpleTestVertex
+from pacman_test_objects import SimpleTestVertex
 
 
 class TestPartitionerWithPreAllocatedResources(object):

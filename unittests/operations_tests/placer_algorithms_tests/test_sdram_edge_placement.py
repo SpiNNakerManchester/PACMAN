@@ -13,16 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import random
+import unittest
 from spinn_machine import virtual_machine
 from pacman.config_setup import reset_configs
 from pacman.model.graphs.machine import (
-    MachineGraph, SimpleMachineVertex, SDRAMMachineEdge)
+    MachineGraph, SDRAMMachineEdge)
 from pacman.model.graphs.machine import ConstantSDRAMMachinePartition
 from pacman.model.resources import ResourceContainer
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.executor.pacman_algorithm_executor import PACMANAlgorithmExecutor
-import random
-import unittest
+from pacman_test_objects import MockMachineVertex
 
 
 class TestSameChipConstraint(unittest.TestCase):
@@ -36,16 +37,17 @@ class TestSameChipConstraint(unittest.TestCase):
         plan_n_timesteps = 100
 
         vertices = [
-            SimpleMachineVertex(
-                ResourceContainer(), label="v{}".format(i), sdram_cost=20)
+            MockMachineVertex(
+                ResourceContainer(), label="v{}".format(i),
+                sdram_requirement=20)
             for i in range(100)
         ]
         for vertex in vertices:
             graph.add_vertex(vertex)
 
         same_vertices = [
-            SimpleMachineVertex(ResourceContainer(), label="same{}".format(i),
-                                sdram_cost=20)
+            MockMachineVertex(ResourceContainer(), label="same{}".format(i),
+                              sdram_requirement=20)
             for i in range(10)
         ]
         random.seed(12345)

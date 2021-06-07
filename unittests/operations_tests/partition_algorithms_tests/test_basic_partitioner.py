@@ -31,7 +31,7 @@ from pacman.exceptions import (
     PacmanValueError)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
-from uinit_test_objects import NewPartitionerConstraint, SimpleTestVertex
+from pacman_test_objects import NewPartitionerConstraint, SimpleTestVertex
 
 
 class TestBasicPartitioner(unittest.TestCase):
