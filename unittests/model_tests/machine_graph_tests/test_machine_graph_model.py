@@ -23,7 +23,7 @@ from pacman.model.graphs.machine import (
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanInvalidParameterException)
-from uinit_test_objects import SimpleTestVertex
+from pacman_test_objects import MockMachineVertex, SimpleTestVertex
 
 
 class TestMachineGraphModel(unittest.TestCase):
@@ -271,9 +271,9 @@ class TestMachineGraphModel(unittest.TestCase):
 
     def test_at_vertex_methods(self):
         graph = MachineGraph("foo")
-        mach1 = SimpleMachineVertex("mach1")
-        mach2 = SimpleMachineVertex("mach2")
-        mach3 = SimpleMachineVertex("mach3")
+        mach1 = MockMachineVertex("mach1", sdram_requirement=0)
+        mach2 = MockMachineVertex("mach2", sdram_requirement=0)
+        mach3 = MockMachineVertex("mach3", sdram_requirement=0)
         mach4 = SimpleMachineVertex("mach4")
         graph.add_vertices([mach1, mach2, mach3, mach4])
 
