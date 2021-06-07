@@ -12,59 +12,35 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from pacman.operations.routing_info_allocator_algorithms.\
     zoned_routing_info_allocator import (flexible_allocate, global_allocate)
-from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
-from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.graphs.application.application_graph import ApplicationGraph
+from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.graphs.machine.machine_graph import MachineGraph
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.model.graphs.machine.machine_edge import MachineEdge
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.constraints.key_allocator_constraints \
     import FixedKeyAndMaskConstraint
-
-
-class SimpleAppVertex(ApplicationVertex):
-
-    @property
-    def n_atoms(self):
-        return 1
-
-    def get_resources_used_by_atoms(self, vertex_slice):
-        return None
-
-    def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
-        return SimpleMacVertex()
-
-
-class SimpleMacVertex(MachineVertex):
-
-    @property
-    def resources_required(self):
-        return None
+from pacman_test_objects import SimpleTestVertex
 
 
 def create_graphs1(with_fixed):
     app_graph = ApplicationGraph("Test")
     # An output vertex to aim things at (to make keys required)
-    out_app_vertex = SimpleAppVertex()
+    out_app_vertex = SimpleTestVertex(1)
     app_graph.add_vertex(out_app_vertex)
     # Create 5 application vertices (3 bits)
     app_vertices = list()
     for app_index in range(5):
-        app_vertices.append(SimpleAppVertex())
+        app_vertices.append(SimpleTestVertex(1))
     app_graph.add_vertices(app_vertices)
 
     mac_graph = MachineGraph("Test", app_graph)
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = SimpleMacVertex(app_vertex=out_app_vertex)
+    out_mac_vertex = out_app_vertex.create_machine_vertex(None, None)
     mac_graph.add_vertex(out_mac_vertex)
 
     # Create 5 application vertices (3 bits)
@@ -72,7 +48,7 @@ def create_graphs1(with_fixed):
 
         # For each, create up to (5 x 4) + 1 = 21 machine vertices (5 bits)
         for mac_index in range((app_index * 4) + 1):
-            mac_vertex = SimpleMacVertex(app_vertex=app_vertex)
+            mac_vertex = app_vertex.create_machine_vertex(None, None)
             mac_graph.add_vertex(mac_vertex)
 
             # For each machine vertex create up to
@@ -115,20 +91,20 @@ def create_graphs1(with_fixed):
 def create_graphs_only_fixed():
     app_graph = ApplicationGraph("Test")
     # An output vertex to aim things at (to make keys required)
-    out_app_vertex = SimpleAppVertex()
+    out_app_vertex = SimpleTestVertex(1)
     app_graph.add_vertex(out_app_vertex)
     # Create 5 application vertices (3 bits)
-    app_vertex = SimpleAppVertex()
+    app_vertex = SimpleTestVertex(1)
     app_graph.add_vertex(app_vertex)
 
     mac_graph = MachineGraph("Test", app_graph)
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = SimpleMacVertex(app_vertex=out_app_vertex)
+    out_mac_vertex = out_app_vertex.create_machine_vertex(None, None)
     mac_graph.add_vertex(out_mac_vertex)
 
-    mac_vertex = SimpleMacVertex(app_vertex=app_vertex)
+    mac_vertex = app_vertex.create_machine_vertex(None, None)
     mac_graph.add_vertex(mac_vertex)
     for mac_edge_index in range(2):
         mac_edge = MachineEdge(mac_vertex, out_mac_vertex)
@@ -151,20 +127,20 @@ def create_graphs_only_fixed():
 def create_graphs_no_edge():
     app_graph = ApplicationGraph("Test")
     # An output vertex to aim things at (to make keys required)
-    out_app_vertex = SimpleAppVertex()
+    out_app_vertex = SimpleTestVertex(1)
     app_graph.add_vertex(out_app_vertex)
     # Create 5 application vertices (3 bits)
-    app_vertex = SimpleAppVertex()
+    app_vertex = SimpleTestVertex(1)
     app_graph.add_vertex(app_vertex)
 
     mac_graph = MachineGraph("Test", app_graph)
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = SimpleMacVertex(app_vertex=out_app_vertex)
+    out_mac_vertex = out_app_vertex.create_machine_vertex(None, None)
     mac_graph.add_vertex(out_mac_vertex)
 
-    mac_vertex = SimpleMacVertex(app_vertex=app_vertex)
+    mac_vertex = app_vertex.create_machine_vertex(None, None)
     mac_graph.add_vertex(mac_vertex)
 
     return app_graph, mac_graph, n_keys_map
@@ -177,7 +153,7 @@ def create_app_less():
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = SimpleMacVertex()
+    out_mac_vertex = SimpleMachineVertex(None, None)
     mac_graph.add_vertex(out_mac_vertex)
 
     # Create 5 application vertices (3 bits)
@@ -185,7 +161,7 @@ def create_app_less():
 
         # For each, create up to (5 x 4) + 1 = 21 machine vertices (5 bits)
         for mac_index in range((app_index * 4) + 1):
-            mac_vertex = SimpleMacVertex()
+            mac_vertex = SimpleMachineVertex(None, None)
             mac_graph.add_vertex(mac_vertex)
 
             # For each machine vertex create up to
@@ -308,29 +284,30 @@ def create_big(with_fixed):
     # This test shows how easy it is to trip up the allocator with a retina
     app_graph = ApplicationGraph("Test")
     # Create a single "big" vertex
-    big_app_vertex = SimpleAppVertex(label="Retina")
+    big_app_vertex = SimpleTestVertex(1, label="Retina")
     app_graph.add_vertex(big_app_vertex)
     # Create a single output vertex (which won't send)
-    out_app_vertex = SimpleAppVertex(label="Destination")
+    out_app_vertex = SimpleTestVertex(1, label="Destination")
     app_graph.add_vertex(out_app_vertex)
     # Create a load of middle vertex
-    mid_app_vertex = SimpleAppVertex("Population")
+    mid_app_vertex = SimpleTestVertex(1, "Population")
     app_graph.add_vertex(mid_app_vertex)
 
     mac_graph = MachineGraph("Test", app_graph)
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     # Create a single big machine vertex
-    big_mac_vertex = SimpleMacVertex(app_vertex=big_app_vertex, label="RETINA")
+    big_mac_vertex = big_app_vertex.create_machine_vertex(
+        None, None, label="RETINA")
     mac_graph.add_vertex(big_mac_vertex)
 
     # Create a single output vertex (which won't send)
-    out_mac_vertex = SimpleMacVertex(app_vertex=out_app_vertex)
+    out_mac_vertex = out_app_vertex.create_machine_vertex(None, None)
     mac_graph.add_vertex(out_mac_vertex)
 
     # Create a load of middle vertices and connect them up
     for _ in range(2000):  # 2000 needs 11 bits
-        mid_mac_vertex = SimpleMacVertex(app_vertex=mid_app_vertex)
+        mid_mac_vertex = mid_app_vertex.create_machine_vertex(None, None)
         mac_graph.add_vertex(mid_mac_vertex)
         edge = MachineEdge(big_mac_vertex, mid_mac_vertex)
         mac_graph.add_edge(edge, "Test")

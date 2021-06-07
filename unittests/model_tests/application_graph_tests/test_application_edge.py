@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from uinit_test_objects import SimpleTestEdge, SimpleTestVertex
+from pacman_test_objects import SimpleTestEdge, SimpleTestVertex
 
 
 class TestApplicationEdgeModel(unittest.TestCase):

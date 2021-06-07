@@ -17,38 +17,8 @@ import unittest
 from testfixtures import LogCapture
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
-
-
-class VertexMissingApi(object):
-
-    @property
-    def constraints(self):
-        return []
-
-    @property
-    def label(self):
-        return "mock"
-
-    @property
-    def n_atoms(self):
-        return 100000000
-
-
-class VertexWithApi(VertexMissingApi):
-
-    def get_resources_used_by_atoms(self):
-        return "See params dont matter"
-
-    def create_machine_vertex(self):
-        return "La la la"
-
-
-class APIVertex(VertexWithApi, LegacyPartitionerAPI):
-    """
-    Demonstartes that API does not check params either
-    """
-    pass
+from pacman_test_objects import (
+    DuckLegacyApplicationVertex, NonLegacyApplicationVertex, SimpleTestVertex)
 
 
 class TestSplitterSliceLegacy(unittest.TestCase):
@@ -57,13 +27,13 @@ class TestSplitterSliceLegacy(unittest.TestCase):
 
     def test_no_api(self):
         splitter = SplitterSliceLegacy()
-        vertex = VertexMissingApi()
+        vertex = NonLegacyApplicationVertex()
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(vertex)
 
     def test_with_methods(self):
         splitter = SplitterSliceLegacy()
-        vertex = VertexWithApi()
+        vertex = DuckLegacyApplicationVertex()
         with LogCapture() as lc:
             splitter.set_governed_app_vertex(vertex)
             found = False
@@ -74,7 +44,7 @@ class TestSplitterSliceLegacy(unittest.TestCase):
 
     def test_with_api(self):
         splitter = SplitterSliceLegacy()
-        vertex = APIVertex()
+        vertex = SimpleTestVertex(12)
         with LogCapture() as lc:
             splitter.set_governed_app_vertex(vertex)
             found = False
