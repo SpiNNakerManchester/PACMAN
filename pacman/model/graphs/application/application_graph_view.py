@@ -45,7 +45,6 @@ class ApplicationGraphView(ApplicationGraph):
         self._outgoing_edge_partition_by_edge = \
             other._outgoing_edge_partition_by_edge
 
-
     @overrides(ApplicationGraph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
         raise PacmanConfigurationException(

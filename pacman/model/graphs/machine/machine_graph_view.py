@@ -60,7 +60,6 @@ class MachineGraphView(MachineGraph):
         self._sdram_edge_partitions_by_post_vertex = \
             other._sdram_edge_partitions_by_post_vertex
 
-
     @overrides(MachineGraph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
         raise PacmanConfigurationException(

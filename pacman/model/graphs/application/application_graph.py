@@ -20,8 +20,7 @@ from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanConfigurationException,
-    PacmanInvalidParameterException)
+    PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from pacman.model.graphs.graph import Graph
 
 
