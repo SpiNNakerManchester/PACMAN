@@ -141,12 +141,15 @@ def ordered_covering(
             diff = timer.take_sample()
             if diff.total_seconds() >= time_to_run_for:
                 raise MinimisationFailedError(
-                    target_length, len(routing_table))
+                    f"Best compression is {len(routing_table)} which is "
+                    f"still higher than the target {target_length}")
 
     # If the table is still too big then raise an error
     if (not no_raise and target_length is not None and
             len(routing_table) > target_length):
-        raise MinimisationFailedError(target_length, len(routing_table))
+        raise MinimisationFailedError(
+            f"Best compression is {len(routing_table)} which is "
+            f"still higher than the target {target_length}")
 
     # Return the finished routing table and aliases table
     return routing_table, aliases
