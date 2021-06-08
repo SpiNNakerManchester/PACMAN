@@ -16,6 +16,7 @@
 import unittest
 from spinn_machine import (
     virtual_machine, Chip, Router, SDRAM, machine_from_chips)
+from pacman.config_setup import reset_configs
 from pacman.model.resources import (
     ResourceContainer, ConstantSDRAM, PreAllocatedResourceContainer,
     CoreResource, SpecificCoreResource)
@@ -24,6 +25,10 @@ from pacman.utilities.utility_objs import ResourceTracker
 
 
 class TestResourceTracker(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        reset_configs()
 
     def test_n_cores_available(self):
         machine = virtual_machine(
