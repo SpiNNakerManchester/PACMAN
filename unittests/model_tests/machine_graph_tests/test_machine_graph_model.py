@@ -18,7 +18,8 @@ from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
     ConstantSDRAMMachinePartition, MachineEdge, MachineGraph,
-    MulticastEdgePartition, SDRAMMachineEdge, SimpleMachineVertex)
+    MachineGraphView, MulticastEdgePartition, SDRAMMachineEdge,
+    SimpleMachineVertex)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanInvalidParameterException)
@@ -42,7 +43,7 @@ class TestMachineGraphModel(unittest.TestCase):
         """
         MachineGraph("foo")
 
-    def test_new_graph(self):
+    def check_new_graph(self, app_graph, app_vertex):
         """
         tests that after building a machine graph, all partitined vertices
         and partitioned edges are in existence
@@ -50,13 +51,14 @@ class TestMachineGraphModel(unittest.TestCase):
         vertices = list()
         edges = list()
         for i in range(10):
-            vertices.append(SimpleMachineVertex(None, ""))
+            vertices.append(SimpleMachineVertex(
+                None, "", app_vertex=app_vertex))
         for i in range(5):
             edges.append(MachineEdge(vertices[0], vertices[(i + 1)]))
         for i in range(5, 10):
             edges.append(MachineEdge(
                 vertices[5], vertices[(i + 1) % 10]))
-        graph = MachineGraph("foo")
+        graph = MachineGraph("foo", application_graph=app_graph)
         graph.add_vertices(vertices)
         graph.add_outgoing_edge_partition(
             MulticastEdgePartition(vertices[0], "bar"))
@@ -88,21 +90,25 @@ class TestMachineGraphModel(unittest.TestCase):
         for edge in edges_from_graph:
             self.assertIn(edge, edges)
 
-        second = graph.clone(False)
-        self.assertEqual(graph.n_vertices, second.n_vertices)
-        vertices_from_graph = list(second.vertices)
-        for vert in vertices_from_graph:
-            self.assertIn(vert, vertices)
-        for vert in vertices:
-            self.assertEqual(vert, graph.vertex_by_label(vert.label))
-        self.assertEqual(graph.n_outgoing_edge_partitions,
-                         second.n_outgoing_edge_partitions)
-        edges_from_graph = list(second.edges)
-        for edge in edges_from_graph:
-            self.assertIn(edge, edges)
-        self.assertEqual(len(edges_from_graph), len(edges))
+        if app_graph:
+            with self.assertRaises(PacmanInvalidParameterException):
+                graph.clone()
+        else:
+            second = graph.clone()
+            self.assertEqual(graph.n_vertices, second.n_vertices)
+            vertices_from_graph = list(second.vertices)
+            for vert in vertices_from_graph:
+                self.assertIn(vert, vertices)
+            for vert in vertices:
+                self.assertEqual(vert, graph.vertex_by_label(vert.label))
+            self.assertEqual(graph.n_outgoing_edge_partitions,
+                             second.n_outgoing_edge_partitions)
+            edges_from_graph = list(second.edges)
+            for edge in edges_from_graph:
+                self.assertIn(edge, edges)
+            self.assertEqual(len(edges_from_graph), len(edges))
 
-        third = graph.clone(True)
+        third = MachineGraphView(graph)
         self.assertEqual(graph.n_vertices, third.n_vertices)
         vertices_from_graph = list(third.vertices)
         for vert in vertices_from_graph:
@@ -121,6 +127,13 @@ class TestMachineGraphModel(unittest.TestCase):
             third.add_vertex("mock")
         with self.assertRaises(PacmanConfigurationException):
             third.add_outgoing_edge_partition("mock")
+
+    def test_new_graph_no_app(self):
+        self.check_new_graph(None, None)
+
+    def test_new_graph_with_app(self):
+        self.check_new_graph(
+            ApplicationGraph("test"), SimpleTestVertex(12, "app1"))
 
     def test_add_duplicate_vertex(self):
         """

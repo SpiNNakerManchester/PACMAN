@@ -15,6 +15,7 @@
 
 import unittest
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs.application import ApplicationGraphView
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman_test_objects import SimpleTestVertex
 
@@ -46,10 +47,11 @@ class TestApplicationGraphModel(unittest.TestCase):
         assert edge2 not in graph.get_edges_starting_at_vertex(vert1)
         assert edge3 not in graph.get_edges_ending_at_vertex(vert1)
 
-        second = graph.clone(False)
+        second = graph.clone()
         assert frozenset(verts) == frozenset(second.vertices)
         assert frozenset(edges) == frozenset(second.edges)
-        third = graph.clone(True)
+
+        third = ApplicationGraphView(graph)
         assert frozenset(verts) == frozenset(third.vertices)
         assert frozenset(edges) == frozenset(third.edges)
         with self.assertRaises(PacmanConfigurationException):
