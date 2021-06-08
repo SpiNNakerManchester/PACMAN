@@ -55,8 +55,6 @@ class TestCompressor(unittest.TestCase):
         self.original_tables.add_routing_table(original_table)
         reset_configs()
         load_config()
-        set_config(
-            "Mapping", "router_table_compression_target_length", "None")
 
     def tearDown(self):
         load_config()
