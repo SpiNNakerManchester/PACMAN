@@ -16,7 +16,9 @@
 import random
 import unittest
 from spinn_machine import virtual_machine
-from pacman.model.graphs.machine import (MachineGraph, SDRAMMachineEdge)
+from pacman.config_setup import reset_configs
+from pacman.model.graphs.machine import (
+    MachineGraph, SDRAMMachineEdge)
 from pacman.model.graphs.machine import ConstantSDRAMMachinePartition
 from pacman.model.resources import ResourceContainer
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
@@ -25,6 +27,9 @@ from pacman_test_objects import MockMachineVertex
 
 
 class TestSameChipConstraint(unittest.TestCase):
+
+    def setUp(cls):
+        reset_configs()
 
     def _do_test(self, placer):
         machine = virtual_machine(width=8, height=8)
