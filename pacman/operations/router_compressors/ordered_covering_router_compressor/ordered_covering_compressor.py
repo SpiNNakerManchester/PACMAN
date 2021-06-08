@@ -44,8 +44,7 @@ class OrderedCoveringCompressor(AbstractCompressor):
             entries.append(Entry.from_MulticastRoutingEntry(router_entry))
 
         # compress the router entries
-        compressed_router_table_entries = minimise(
-            entries, self._target_length)
+        compressed_router_table_entries = minimise(entries)
         return compressed_router_table_entries
 
 

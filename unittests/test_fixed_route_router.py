@@ -14,7 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pytest
+from spinn_utilities.config_holder import load_config, set_config
 from spinn_machine import virtual_machine
+from pacman.config_setup import reset_configs
 from pacman.model.placements import Placements, Placement
 from pacman.operations.fixed_route_router import FixedRouteRouter
 from pacman.exceptions import PacmanRoutingException
@@ -43,11 +45,9 @@ def _get_destinations(machine, fixed_route_tables, source_x, source_y):
     return destinations
 
 
-def _check_setup(width, height, down_chips, down_links):
+def _check_setup(width, height):
     router = FixedRouteRouter()
-    machine = virtual_machine(
-        width=width, height=height,
-        down_links=down_links, down_chips=down_chips)
+    machine = virtual_machine(width=width, height=height)
 
     ethernet_chips = machine.ethernet_connected_chips
     placements = Placements(
@@ -79,6 +79,8 @@ def _check_setup(width, height, down_chips, down_links):
      (False, True),
      (True, True)])
 def test_all_working(width, height,  with_down_links, with_down_chips):
+    reset_configs()
+    load_config()
     temp_machine = virtual_machine(width=width, height=height)
     down_links = None
     if with_down_links:
@@ -86,17 +88,24 @@ def test_all_working(width, height,  with_down_links, with_down_chips):
         for ethernet_chip in temp_machine.ethernet_connected_chips:
             down_links.add((ethernet_chip.x + 1, ethernet_chip.y, 5))
             down_links.add((ethernet_chip.x, ethernet_chip.y + 1, 3))
+        down_str = ":".join([f"{x},{y},{link}" for x, y, link in down_links])
+        set_config("Machine", "down_links", down_str)
     down_chips = None
     if with_down_chips:
         down_chips = set(
             (ethernet_chip.x + 1, ethernet_chip.y + 1)
             for ethernet_chip in temp_machine.ethernet_connected_chips)
-    _check_setup(width, height, down_chips, down_links)
+        down_str = ":".join([f"{x},{y}" for x, y in down_chips])
+        set_config("Machine", "down_chips", down_str)
+    _check_setup(width, height)
 
 
 def test_unreachable():
+    reset_configs()
+    load_config()
+    set_config("Machine", "down_chips", "0,2:1,3:1,4")
     with pytest.raises(PacmanRoutingException):
-        _check_setup(8, 8, [(0, 2), (1, 3), (1, 4)], None)
+        _check_setup(8, 8)
 
 
 if __name__ == '__main__':
