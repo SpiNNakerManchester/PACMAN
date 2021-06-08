@@ -30,6 +30,6 @@ class TestCfgChecker(unittest.TestCase):
         parent = os.path.dirname(unittests)
         pacman = os.path.join(parent, "pacman")
         integration_tests = os.path.join(parent, "pacman_integration_tests")
-        uinit_test_objects = os.path.join(parent, "uinit_test_objects")
+        uinit_test_objects = os.path.join(parent, "pacman_test_objects")
         run_config_checks(directories=[
             pacman, integration_tests, unittests, uinit_test_objects])
