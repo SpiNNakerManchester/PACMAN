@@ -296,19 +296,6 @@ class MachineGraph(Graph):
                 self.get_sdram_edge_partitions_ending_at_vertex(vertex):
             yield partition
 
-    def protected_view(self):
-        """
-        Makes a Protected view of the Graph
-
-        All the objects are the same with th exception of the graph's
-        Class and Id
-
-        All methods which provide access should be disabled.
-
-        As this is a view any changes made to the "self" graph will be
-            reflected in the view
-        """
-
     def clone(self):
         """
         Makes as shallow as possible copy of the graph.
