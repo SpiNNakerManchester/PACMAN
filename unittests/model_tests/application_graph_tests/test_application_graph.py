@@ -16,7 +16,6 @@
 import unittest
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationGraphView
-from uinit_test_objects import SimpleTestVertex
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman_test_objects import SimpleTestVertex
 
