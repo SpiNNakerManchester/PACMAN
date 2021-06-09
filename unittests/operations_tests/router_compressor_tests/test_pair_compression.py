@@ -17,6 +17,7 @@ import os
 import sys
 import unittest
 
+from pacman.config_setup import reset_configs
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
 from pacman.operations.router_compressors.routing_compression_checker import (
     compare_tables)
@@ -24,6 +25,9 @@ from pacman.operations.router_compressors import PairCompressor
 
 
 class TestPairCompressor(unittest.TestCase):
+
+    def setUp(self):
+        reset_configs()
 
     def test_pair_big(self):
         class_file = sys.modules[self.__module__].__file__
