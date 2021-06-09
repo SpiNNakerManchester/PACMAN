@@ -18,7 +18,7 @@ from collections import deque
 
 from spinn_utilities.config_holder import load_config, set_config
 from spinn_machine.virtual_machine import virtual_machine
-from pacman.config_setup import reset_configs
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, MulticastEdgePartition, SimpleMachineVertex)
 from pacman.operations.router_algorithms import NerRouteTrafficAware
@@ -29,11 +29,7 @@ from pacman.model.placements import Placements, Placement
 class TestNerRouteTrafficAware(unittest.TestCase):
 
     def setUp(cls):
-        reset_configs()
-        load_config()
-
-    def tearDown(self):
-        reset_configs()
+        unittest_setup()
 
     def test_routing(self):
         graph = MachineGraph("Test")

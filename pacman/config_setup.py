@@ -21,7 +21,7 @@ from spinn_machine.config_setup import add_spinn_machine_cfg
 BASE_CONFIG_FILE = "pacman.cfg"
 
 
-def reset_configs():
+def unittest_setup():
     """
     Resets the configs so only the local default config is included.
 
@@ -29,7 +29,7 @@ def reset_configs():
         This file should only be called from PACMAN/unittests
 
     """
-    clear_cfg_files()
+    clear_cfg_files(True)
     add_pacman_cfg()
 
 

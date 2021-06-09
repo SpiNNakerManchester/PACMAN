@@ -16,7 +16,7 @@
 import pytest
 from spinn_utilities.config_holder import load_config, set_config
 from spinn_machine import virtual_machine
-from pacman.config_setup import reset_configs
+from pacman.config_setup import unittest_setup
 from pacman.model.placements import Placements, Placement
 from pacman.operations.fixed_route_router import FixedRouteRouter
 from pacman.exceptions import PacmanRoutingException
@@ -79,8 +79,7 @@ def _check_setup(width, height):
      (False, True),
      (True, True)])
 def test_all_working(width, height,  with_down_links, with_down_chips):
-    reset_configs()
-    load_config()
+    unittest_setup()
     temp_machine = virtual_machine(width=width, height=height)
     down_links = None
     if with_down_links:
@@ -101,7 +100,7 @@ def test_all_working(width, height,  with_down_links, with_down_chips):
 
 
 def test_unreachable():
-    reset_configs()
+    unittest_setup()
     load_config()
     set_config("Machine", "down_chips", "0,2:1,3:1,4")
     with pytest.raises(PacmanRoutingException):

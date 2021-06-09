@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman_test_objects import (
@@ -21,6 +22,10 @@ from pacman_test_objects import (
 
 
 class TestSplitterSliceLegacy(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
+
     def test_api(self):
         splitter = SplitterSliceLegacy("foo")
         a = str(splitter)

@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.utility_objs import Field
 from pacman.model.constraints.key_allocator_constraints import (
@@ -22,6 +23,10 @@ from pacman.model.constraints.key_allocator_constraints import (
 
 
 class TestKeyAllocatorConstraints(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
+
     def test_contiguous_key_range_constraint(self):
         c1 = ContiguousKeyRangeContraint()
         c2 = ContiguousKeyRangeContraint()

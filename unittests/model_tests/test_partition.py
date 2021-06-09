@@ -14,6 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
+
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
@@ -23,6 +25,9 @@ from pacman.model.constraints.partitioner_constraints import (
 class TestPartitionConstraints(unittest.TestCase):
     """ Tester for pacman.model.constraints.partitioner_constraints
     """
+
+    def setUp(self):
+        unittest_setup()
 
     def test_max_vertex_atoms_constraint(self):
         c1 = MaxVertexAtomsConstraint(5)

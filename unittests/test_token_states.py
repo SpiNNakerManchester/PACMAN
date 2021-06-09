@@ -14,11 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.executor.algorithm_decorators import Token
 from pacman.executor.token_states import TokenStates
 
 
 class TestTokenStates(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def test_union(self):
         token1 = Token("One")
