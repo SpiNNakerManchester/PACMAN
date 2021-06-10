@@ -16,13 +16,11 @@
 import os
 import unittest
 import spinn_utilities.package_loader as package_loader
-from pacman.config_setup import unittest_setup
 
 
 class ImportAllModule(unittest.TestCase):
 
-    def setUp(self):
-        unittest_setup()
+    # no unittest_setup to check all imports work without it
 
     def test_import_all(self):
         if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
