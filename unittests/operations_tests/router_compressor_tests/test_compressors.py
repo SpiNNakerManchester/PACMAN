@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from spinn_utilities.config_holder import set_config, load_config
+from spinn_utilities.config_holder import set_config
 from spinn_machine import MulticastRoutingEntry
 from pacman.config_setup import unittest_setup
 from pacman.model.routing_tables import (

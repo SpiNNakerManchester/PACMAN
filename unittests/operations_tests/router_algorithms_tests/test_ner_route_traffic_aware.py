@@ -16,7 +16,7 @@
 import unittest
 from collections import deque
 
-from spinn_utilities.config_holder import load_config, set_config
+from spinn_utilities.config_holder import set_config
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import (
