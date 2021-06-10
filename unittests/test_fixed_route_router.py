@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pytest
-from spinn_utilities.config_holder import load_config, set_config
+from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
 from pacman.model.placements import Placements, Placement
@@ -101,7 +101,6 @@ def test_all_working(width, height,  with_down_links, with_down_chips):
 
 def test_unreachable():
     unittest_setup()
-    load_config()
     set_config("Machine", "down_chips", "0,2:1,3:1,4")
     with pytest.raises(PacmanRoutingException):
         _check_setup(8, 8)
