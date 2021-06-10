@@ -1068,6 +1068,8 @@ class ResourceTracker(object):
         :rtype: iterable(tuple(int, int, int, list(tuple(int, int, int, int)),
             list(tuple(int, int))))
         """
+        if chips:
+            chips = list(chips)
         x = None
         y = None
         board_address = None
