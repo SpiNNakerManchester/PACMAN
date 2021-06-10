@@ -1091,7 +1091,6 @@ class ResourceTracker(object):
             group_ip_tags.append(this_ip_tags)
             group_reverse_ip_tags.append(this_reverse_ip_tags)
 
-        chips = None
         if x is not None and y is not None:
             chips = [(x, y)]
 
