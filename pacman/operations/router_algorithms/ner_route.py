@@ -24,13 +24,12 @@ https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/ner.py
 https://github.com/project-rig/rig/blob/master/rig/geometry.py
 https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/utils.py
 """
-
+from collections import deque, defaultdict
+import functools
 import heapq
 import itertools
-import functools
-
-from collections import deque, defaultdict
-
+import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import MachineHasDisconnectedSubRegion
 from pacman.model.graphs import (
@@ -38,6 +37,8 @@ from pacman.model.graphs import (
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from .routing_tree import RoutingTree
+
+logger = FormatAdapter(logging.getLogger(__file__))
 
 
 def _convert_a_route(
@@ -642,16 +643,23 @@ def _ner_route(machine_graph, machine, placements, vector_to_nodes):
         for partition in machine_graph.\
                 get_multicast_edge_partitions_starting_at_vertex(
                     source_vertex):
-            post_vertexes = list(
-                e.post_vertex for e in partition.edges)
-            routing_tree = _do_route(
-                source_vertex, post_vertexes, machine, placements,
-                vector_to_nodes)
-            incoming_processor = placements.get_placement_of_vertex(
-                partition.pre_vertex).p
-            _convert_a_route(
-                routing_tables, partition, incoming_processor, None,
-                routing_tree)
+            post_vertexes = [
+                e.post_vertex
+                for e in partition.edges
+                if e.needs_routing(placements)]
+            if post_vertexes:
+                routing_tree = _do_route(
+                    source_vertex, post_vertexes, machine, placements,
+                    vector_to_nodes)
+                incoming_processor = placements.get_placement_of_vertex(
+                    partition.pre_vertex).p
+                _convert_a_route(
+                    routing_tables, partition, incoming_processor, None,
+                    routing_tree)
+            else:
+                logger.warning(
+                    f"Vertex: {source_vertex.label} has a partition: "
+                    f"{partition.identifier} where no edge needs routing")
 
     progress_bar.end()
 

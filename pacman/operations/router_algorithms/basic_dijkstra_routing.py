@@ -125,7 +125,7 @@ class BasicDijkstraRouting(object):
         out_going_edges = (
             edge
             for edge in graph.get_edges_starting_at_vertex(placement.vertex)
-            if edge.traffic_type == EdgeTrafficType.MULTICAST)
+            if edge.needs_routing(self, placements))
 
         dest_chips = set()
         edges_to_route = list()

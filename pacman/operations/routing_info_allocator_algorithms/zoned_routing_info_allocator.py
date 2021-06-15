@@ -80,6 +80,7 @@ class ZonedRoutingInfoAllocator(object):
         # Passed in parameters
         "__machine_graph",
         "__n_keys_map",
+        "__placements",
         # For each App vertex / Partition name zone keep track of the number of
         # bites required for the mask for each machine vertex
         "__atom_bits_per_app_part",
@@ -101,13 +102,14 @@ class ZonedRoutingInfoAllocator(object):
     ]
     # pylint: disable=attribute-defined-outside-init
 
-    def __call__(self, machine_graph, n_keys_map, flexible):
+    def __call__(self, machine_graph, n_keys_map, placements, flexible):
         """
         :param MachineGraph machine_graph:
             The machine graph to allocate the routing info for
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             A map between the edges and the number of keys required by the
             edges
+        :param Placements placements:
         :param bool flexible: Determines if flexible can be use.
             If False, global settings will be attempted
         :return: The routing information
@@ -119,6 +121,7 @@ class ZonedRoutingInfoAllocator(object):
         # partitions
         self.__machine_graph = machine_graph
         self.__n_keys_map = n_keys_map
+        self.__placements = placements
         self.__n_bits_atoms_and_mac = 0
         self.__n_bits_machine = 0
         self.__n_bits_atoms = 0
@@ -300,18 +303,20 @@ class ZonedRoutingInfoAllocator(object):
                     partition = self.__machine_graph.\
                         get_outgoing_edge_partition_starting_at_vertex(
                             vertex, partition_name)
-                    if partition in self.__fixed_partitions:
-                        # Ignore zone calculations and just use fixed
-                        keys_and_masks = self.__fixed_partitions[partition]
-                    else:
-                        mask = self.__mask(n_bits_atoms)
-                        key = app_part_index
-                        key = (key << n_bits_machine) | machine_index
-                        key = key << n_bits_atoms
-                        keys_and_masks = [BaseKeyAndMask(
-                            base_key=key, mask=mask)]
-                    routing_infos.add_partition_info(
-                        PartitionRoutingInfo(keys_and_masks, partition))
+                    if any(e.needs_routing(self.__placements)
+                           for e in partition.edges):
+                        if partition in self.__fixed_partitions:
+                            # Ignore zone calculations and just use fixed
+                            keys_and_masks = self.__fixed_partitions[partition]
+                        else:
+                            mask = self.__mask(n_bits_atoms)
+                            key = app_part_index
+                            key = (key << n_bits_machine) | machine_index
+                            key = key << n_bits_atoms
+                            keys_and_masks = [BaseKeyAndMask(
+                                base_key=key, mask=mask)]
+                        routing_infos.add_partition_info(
+                            PartitionRoutingInfo(keys_and_masks, partition))
                 app_part_index += 1
 
         return routing_infos
@@ -335,7 +340,7 @@ class ZonedRoutingInfoAllocator(object):
         return int(math.ceil(math.log(size, 2)))
 
 
-def flexible_allocate(machine_graph, n_keys_map):
+def flexible_allocate(machine_graph, n_keys_map, placements):
     """
     Allocated with fixed bits for the Application/Partition index but
     with the size of the atom and machine bit changing
@@ -345,6 +350,7 @@ def flexible_allocate(machine_graph, n_keys_map):
     :param AbstractMachinePartitionNKeysMap n_keys_map:
         A map between the edges and the number of keys required by the
         edges
+    :param Placements placements:
     :rtype: tuple(RoutingInfo,
         dict((ApplicationVertex, str), BaseKeyAndMask))
     :raise PacmanRouteInfoAllocationException:
@@ -354,16 +360,17 @@ def flexible_allocate(machine_graph, n_keys_map):
 
     allocator = ZonedRoutingInfoAllocator()
 
-    return allocator(machine_graph, n_keys_map, True)
+    return allocator(machine_graph, n_keys_map, placements, True)
 
 
-def global_allocate(machine_graph, n_keys_map):
+def global_allocate(machine_graph, n_keys_map, placements):
     """
     :param MachineGraph machine_graph:
         The machine graph to allocate the routing info for
     :param AbstractMachinePartitionNKeysMap n_keys_map:
         A map between the edges and the number of keys required by the
         edges
+    :param Placements placements:
     :rtype: tuple(RoutingInfo,
         dict((ApplicationVertex, str), BaseKeyAndMask))
     :raise PacmanRouteInfoAllocationException:
@@ -373,4 +380,4 @@ def global_allocate(machine_graph, n_keys_map):
 
     allocator = ZonedRoutingInfoAllocator()
 
-    return allocator(machine_graph, n_keys_map, False)
+    return allocator(machine_graph, n_keys_map, placements, False)

@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spinn_utilities.overrides import overrides
 from pacman.exceptions import SDRAMEdgeSizeException
 from pacman.model.graphs.abstract_supports_sdram_edges import (
     AbstractSupportsSDRAMEdges)
@@ -103,3 +104,7 @@ class SDRAMMachineEdge(MachineEdge):
 
     def __str__(self):
         return self.__repr__()
+
+    @overrides(MachineEdge.needs_routing)
+    def needs_routing(self, placements):
+        return False

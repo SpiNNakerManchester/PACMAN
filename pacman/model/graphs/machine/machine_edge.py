@@ -129,3 +129,16 @@ class MachineEdge(AbstractEdge):
             "traffic_type={}, label={}, traffic_weight={})".format(
                 self._pre_vertex, self._post_vertex, self._traffic_type,
                 self.label, self._traffic_weight))
+
+    def needs_routing(self, placements):
+        """
+        Defines if the edge needs routing based on placements.
+
+        This method will be overridden by specific edge types where the
+        decision of which machine edges are needed can not be done until after
+        placement.
+
+        :param Placements placements:
+        :return: True if this edge needs routing and therefor keys
+        """
+        return True
