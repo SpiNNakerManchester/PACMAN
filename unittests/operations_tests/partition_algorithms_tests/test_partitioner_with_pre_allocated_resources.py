@@ -85,31 +85,6 @@ class TestPartitionerWithPreAllocatedResources(object):
         except Exception as e:
             raise Exception("should have blown up here") from e
 
-    def test_1_chip_pre_allocated_same_core(self):
-        reset_configs()
-        machine = virtual_machine(width=8, height=8)
-        graph = ApplicationGraph("Test")
-        partitioner = SplitterPartitioner()
-
-        # add graph vertices which reside on 0,0
-        for p in range(0, 13):
-            vertex = SimpleTestVertex(
-                constraints=[ChipAndCoreConstraint(x=0, y=0, p=p)],
-                n_atoms=1)
-            vertex.splitter = SplitterSliceLegacy()
-            graph.add_vertex(vertex)
-
-        # add pre-allocated resources for cores on 0,0
-        core_pre = SpecificCoreResource(
-            chip=machine.get_chip_at(0, 0), cores=[4])
-        pre_allocated_res = PreAllocatedResourceContainer(
-            specific_core_resources=[core_pre])
-
-        # run partitioner that should go boom
-        with pytest.raises(PacmanValueError):
-            partitioner(graph, machine, plan_n_time_steps=None,
-                        pre_allocated_resources=pre_allocated_res)
-
     def test_1_chip_pre_allocated_too_much_sdram(self):
         reset_configs()
         machine = virtual_machine(width=8, height=8)
