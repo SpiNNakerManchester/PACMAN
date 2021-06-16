@@ -190,17 +190,6 @@ class TestResourceModels(unittest.TestCase):
                          "ip_address=1.2.3.4, port=2, strip_sdp=3, tag=4, "
                          "traffic_identifier=5)")
 
-        SpecificBoardReverseIPtagResource(b)  # Minimal args
-        riptr = SpecificBoardReverseIPtagResource(b, 1, 2, 3)
-        self.assertEqual(riptr.board, b)
-        self.assertEqual(riptr.port, 1)
-        self.assertEqual(riptr.sdp_port, 2)
-        self.assertEqual(riptr.tag, 3)
-        self.assertEqual(riptr.get_value(), [b, 1, 2, 3])
-        self.assertEqual(str(riptr),
-                         "ReverseIPTagResource(board=" + b + ", port=1, "
-                         "sdp_port=2, tag=3)")
-
 
 if __name__ == '__main__':
     unittest.main()
