@@ -26,10 +26,6 @@ class PreAllocatedResourceContainer(object):
         #  machine
         "_specific_sdram_usage",
 
-        # An iterable of SpecificCoreResource objects that reflect the number
-        # of specific cores that have been preallocated on a chip.
-        "_specific_core_resources",
-
         # An iterable of CoreResource objects that reflect the number of
         # cores that have been preallocated on a chip, but which don't care
         # which core it uses.
@@ -37,49 +33,32 @@ class PreAllocatedResourceContainer(object):
 
         # An iterable of SpecificIPTagResource objects that reflect the IP tag
         # details that have been preallocated on a board.
-        "_specific_iptag_resources",
-
-        # An iterable of SpecificReverseIPTagResource objects that reflect the
-        # reverse IP tag details that have been preallocated on a board.
-        "_specific_reverse_iptag_resources",
-    ]
+        "_specific_iptag_resources"]
 
     def __init__(
-            self, specific_sdram_usage=None, specific_core_resources=None,
-            core_resources=None, specific_iptag_resources=None,
-            specific_reverse_iptag_resources=None):
+            self, specific_sdram_usage=None,
+            core_resources=None, specific_iptag_resources=None):
         """
         :param iterable(SpecificChipSDRAMResource) specific_sdram_usage:
             iterable of SpecificSDRAMResource which states that specific chips
             have missing SDRAM
-        :param iterable(SpecificCoreResource) specific_core_resources:
-            states which cores have been preallocated
         :param iterable(CoreResource) core_resources:
             states a number of cores have been preallocated but don't care
             which ones they are
         :param list(SpecificBoardTagResource) specific_iptag_resources:
-        :param list(SpecificReverseIPTagResource) \
-                specific_reverse_iptag_resources:
         """
         # pylint: disable=too-many-arguments
         self._specific_sdram_usage = specific_sdram_usage
-        self._specific_core_resources = specific_core_resources
         self._core_resources = core_resources
         self._specific_iptag_resources = specific_iptag_resources
-        self._specific_reverse_iptag_resources = \
-            specific_reverse_iptag_resources
 
         # check for none resources
         if self._specific_sdram_usage is None:
             self._specific_sdram_usage = []
-        if self._specific_core_resources is None:
-            self._specific_core_resources = []
         if self._core_resources is None:
             self._core_resources = []
         if self._specific_iptag_resources is None:
             self._specific_iptag_resources = []
-        if self._specific_reverse_iptag_resources is None:
-            self._specific_reverse_iptag_resources = []
 
     @property
     def specific_sdram_usage(self):
@@ -97,10 +76,6 @@ class PreAllocatedResourceContainer(object):
     def specific_iptag_resources(self):
         return self._specific_iptag_resources
 
-    @property
-    def specific_reverse_iptag_resources(self):
-        return self._specific_reverse_iptag_resources
-
     def extend(self, other):
         """
         :param PreAllocatedResourceContainer other:
@@ -113,15 +88,8 @@ class PreAllocatedResourceContainer(object):
         # add specific SDRAM usage
         self._specific_sdram_usage.extend(other.specific_sdram_usage)
 
-        # add specific cores
-        self._specific_core_resources.extend(other.specific_core_resources)
-
         # add non-specific cores
         self._core_resources.extend(other.core_resources)
 
         # add IP tag resources
         self._specific_iptag_resources.extend(other.specific_iptag_resources)
-
-        # add reverse IP tag resources
-        self._specific_reverse_iptag_resources.extend(
-            other.specific_reverse_iptag_resources)

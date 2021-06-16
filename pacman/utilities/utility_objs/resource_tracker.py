@@ -242,15 +242,6 @@ class ResourceTracker(object):
                 self._plan_n_timesteps)
             self._sdram_tracker[chip.x, chip.y] -= sdram
 
-        # remove specific cores from the tracker
-        for specific_core in preallocated_resources.specific_core_resources:
-            chip = specific_core.chip
-            processor_ids = specific_core.cores
-            if not (chip.x, chip.y) in self._core_tracker:
-                self._fill_in_core_tracker_for_chip((chip.x, chip.y), chip)
-            for processor_id in processor_ids:
-                self._core_tracker[chip.x, chip.y].remove(processor_id)
-
         # create random_core_map
         chip_to_arbitrary_core_requirement = defaultdict(lambda: 0)
         for arbitrary_core in preallocated_resources.core_resources:
@@ -271,13 +262,6 @@ class ResourceTracker(object):
             self._update_data_structures_for_iptag(
                 ip_tag.board, tag, ip_tag.ip_address,
                 ip_tag.traffic_identifier, ip_tag.strip_sdp, ip_tag.port)
-
-        # handle specific reverse IP tags
-        for rip_tag in preallocated_resources.specific_reverse_iptag_resources:
-            self._setup_board_tags(rip_tag.board)
-            tag = self._allocate_tag_id(rip_tag.tag, rip_tag.board)
-            self._update_structures_for_reverse_ip_tag(
-                rip_tag.board, tag, rip_tag.port)
 
         return chip_to_arbitrary_core_requirement
 
