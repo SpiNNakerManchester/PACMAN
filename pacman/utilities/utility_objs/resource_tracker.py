@@ -121,7 +121,7 @@ class ResourceTracker(object):
             the order is no longer guaranteed.
         :type chips: iterable(tuple(int, int)) or None
         :param preallocated_resources:
-        :type preallocated_resources: PreAllocatedResourceContainer or None
+        :type preallocated_resources: ResourceReservations or None
         """
 
         # The amount of SDRAM available on each chip,
@@ -186,8 +186,7 @@ class ResourceTracker(object):
 
         # set of resources that have been pre allocated and therefore need to
         # be taken account of when allocating resources
-        self._n_cores_preallocated = self._convert_preallocated_resources(
-            preallocated_resources)
+        self._convert_preallocated_resources(preallocated_resources)
 
         # update tracker for n cores available per chip
         self._real_chips_with_n_cores_available = \
@@ -227,43 +226,35 @@ class ResourceTracker(object):
 
         :param PreAllocatedResourceContainer preallocated_resources:
             the preallocated resources from the tools
-        :return: a mapping of chip to arbitrary core demands
-        :rtype: dict(tuple(int, int), int)
         """
 
         # If there are no resources, return an empty dict which returns 0
+        self._n_cores_preallocated = defaultdict(lambda: 0)
         if preallocated_resources is None:
-            return defaultdict(lambda: 0)
+            return
 
-        # remove SDRAM by removing from available SDRAM
-        for sdram_pre_allocated in preallocated_resources.specific_sdram_usage:
-            chip = sdram_pre_allocated.chip
-            sdram = sdram_pre_allocated.sdram_usage.get_total_sdram(
-                self._plan_n_timesteps)
-            self._sdram_tracker[chip.x, chip.y] -= sdram
+        sdram_all = preallocated_resources.sdram_all.get_total_sdram(
+            self._plan_n_timesteps)
+        sdram_eth = preallocated_resources.sdram_ethernet.get_total_sdram(
+            self._plan_n_timesteps)
 
-        # create random_core_map
-        chip_to_arbitrary_core_requirement = defaultdict(lambda: 0)
-        for arbitrary_core in preallocated_resources.core_resources:
-            chip = arbitrary_core.chip
-            n_cores = arbitrary_core.n_cores
-            if (chip.x, chip.y) in chip_to_arbitrary_core_requirement:
-                chip_to_arbitrary_core_requirement[chip.x, chip.y] += n_cores
-            else:
-                chip_to_arbitrary_core_requirement[chip.x, chip.y] = n_cores
-
-        # handle specific IP tags
-        ordered_ip_tags = sorted(
-            preallocated_resources.specific_iptag_resources,
-            key=lambda iptag: iptag.tag is None)
-        for ip_tag in ordered_ip_tags:
-            self._setup_board_tags(ip_tag.board)
-            tag = self._allocate_tag_id(ip_tag.tag, ip_tag.board)
-            self._update_data_structures_for_iptag(
-                ip_tag.board, tag, ip_tag.ip_address,
-                ip_tag.traffic_identifier, ip_tag.strip_sdp, ip_tag.port)
-
-        return chip_to_arbitrary_core_requirement
+        for chip in self._machine.chips:
+            self._sdram_tracker[chip.x, chip.y] -= sdram_all
+            self._n_cores_preallocated[chip.x, chip.y] += \
+                preallocated_resources.cores_all
+            if chip.ip_address:
+                self._sdram_tracker[chip.x, chip.y] -= sdram_eth
+                self._n_cores_preallocated[chip.x, chip.y] += \
+                    preallocated_resources.cores_ethernet
+                if preallocated_resources.iptag_resources:
+                    self._setup_board_tags(chip.ip_address)
+                    for ip_tag in preallocated_resources.iptag_resources:
+                        tag = self._allocate_tag_id(
+                            ip_tag.tag, chip.ip_address)
+                        self._update_data_structures_for_iptag(
+                            chip.ip_address, tag, ip_tag.ip_address,
+                            ip_tag.traffic_identifier, ip_tag.strip_sdp,
+                            ip_tag.port)
 
     @staticmethod
     def check_constraints(
