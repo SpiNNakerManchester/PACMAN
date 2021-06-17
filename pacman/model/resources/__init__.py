@@ -24,17 +24,10 @@ from .multi_region_sdram import MultiRegionSDRAM
 from .resource_container import ResourceContainer
 from .resource_reservations import ResourceReservations
 from .reverse_iptag_resource import ReverseIPtagResource
-from .specific_board_iptag_resource import (
-    SpecificBoardTagResource as
-    SpecificBoardIPtagResource)
-from .specific_chip_sdram_resource import SpecificChipSDRAMResource
-from .specific_core_resource import SpecificCoreResource
 from .variable_sdram import VariableSDRAM
 
 __all__ = ["AbstractSDRAM", "ConstantSDRAM", "CoreResource",
            "CPUCyclesPerTickResource", "DTCMResource",
            "ElementFreeSpace", "IPtagResource", "MultiRegionSDRAM",
            "ResourceContainer", "ResourceReservations",
-           "ReverseIPtagResource", "SpecificChipSDRAMResource",
-           "SpecificCoreResource", "SpecificBoardIPtagResource",
-           "VariableSDRAM"]
+           "ReverseIPtagResource", "VariableSDRAM"]
