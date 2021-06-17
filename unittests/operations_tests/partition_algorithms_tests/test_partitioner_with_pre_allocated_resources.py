@@ -18,14 +18,10 @@ from spinn_machine import virtual_machine
 from pacman.config_setup import reset_configs
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.operations.partition_algorithms import SplitterPartitioner
-from pacman.exceptions import (
-    PacmanInvalidParameterException, PacmanPartitionException)
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint)
 from pacman.model.graphs.application import ApplicationGraph
-from pacman.model.resources import (
-    CoreResource, ConstantSDRAM, SpecificChipSDRAMResource,
-    ResourceReservations)
+from pacman.model.resources import (PreAllocatedResourceContainer)
 from pacman_test_objects import SimpleTestVertex
 
 
@@ -52,7 +48,7 @@ class TestPartitionerWithPreAllocatedResources(object):
             graph.add_vertex(vertex)
 
         # add pre-allocated resources for cores on 0,0
-        pre_allocated_res = ResourceReservations()
+        pre_allocated_res = PreAllocatedResourceContainer()
 
         # run partitioner that should go boom
         try:

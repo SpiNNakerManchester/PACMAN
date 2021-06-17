@@ -16,7 +16,7 @@
 from .constant_sdram import ConstantSDRAM
 
 
-class ResourceReservations(object):
+class PreAllocatedResourceContainer(object):
     """ Container object for preallocated resources
     """
 

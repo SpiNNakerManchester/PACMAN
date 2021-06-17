@@ -18,7 +18,7 @@ from spinn_machine import (
     virtual_machine, Chip, Router, SDRAM, machine_from_chips)
 from pacman.config_setup import reset_configs
 from pacman.model.resources import (
-    ResourceContainer, ConstantSDRAM, ResourceReservations, CoreResource,)
+    ResourceContainer, ConstantSDRAM, PreAllocatedResourceContainer, CoreResource,)
 from pacman.exceptions import PacmanValueError
 from pacman.utilities.utility_objs import ResourceTracker
 
@@ -34,7 +34,7 @@ class TestResourceTracker(unittest.TestCase):
             width=2, height=2, n_cpus_per_chip=18)
         chip00 = machine.get_chip_at(0, 0)
         chip01 = machine.get_chip_at(0, 1)
-        preallocated_resources = ResourceReservations()
+        preallocated_resources = PreAllocatedResourceContainer()
         preallocated_resources.add_cores_all(2)
         preallocated_resources.add_cores_ethernet(3)
         tracker = ResourceTracker(

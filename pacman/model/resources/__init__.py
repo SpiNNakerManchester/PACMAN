@@ -22,12 +22,13 @@ from .element_free_space import ElementFreeSpace
 from .iptag_resource import IPtagResource
 from .multi_region_sdram import MultiRegionSDRAM
 from .resource_container import ResourceContainer
-from .resource_reservations import ResourceReservations
+from .pre_allocated_resource_container import \
+    PreAllocatedResourceContainer
 from .reverse_iptag_resource import ReverseIPtagResource
 from .variable_sdram import VariableSDRAM
 
 __all__ = ["AbstractSDRAM", "ConstantSDRAM", "CoreResource",
            "CPUCyclesPerTickResource", "DTCMResource",
            "ElementFreeSpace", "IPtagResource", "MultiRegionSDRAM",
-           "ResourceContainer", "ResourceReservations",
+           "PreAllocatedResourceContainer",
            "ReverseIPtagResource", "VariableSDRAM"]
