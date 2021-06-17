@@ -239,6 +239,8 @@ class ResourceTracker(object):
             self._plan_n_timesteps)
 
         for chip in self._machine.chips:
+            if chip.virtual:
+                continue
             if chip.ip_address:
                 self._sdram_tracker[chip.x, chip.y] -= sdram_eth
                 self._n_cores_preallocated[chip.x, chip.y] += \
