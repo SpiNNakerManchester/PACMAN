@@ -18,8 +18,7 @@ from spinn_machine import (
     virtual_machine, Chip, Router, SDRAM, machine_from_chips)
 from pacman.config_setup import reset_configs
 from pacman.model.resources import (
-    ResourceContainer, ConstantSDRAM, PreAllocatedResourceContainer,
-    CoreResource, SpecificCoreResource)
+    ResourceContainer, ConstantSDRAM, ResourceReservations, CoreResource,)
 from pacman.exceptions import PacmanValueError
 from pacman.utilities.utility_objs import ResourceTracker
 
@@ -33,28 +32,32 @@ class TestResourceTracker(unittest.TestCase):
     def test_n_cores_available(self):
         machine = virtual_machine(
             width=2, height=2, n_cpus_per_chip=18)
-        chip = machine.get_chip_at(0, 0)
-        preallocated_resources = PreAllocatedResourceContainer(
-            core_resources=[
-                CoreResource(chip=chip, n_cores=2)])
+        chip00 = machine.get_chip_at(0, 0)
+        chip01 = machine.get_chip_at(0, 1)
+        preallocated_resources = ResourceReservations()
+        preallocated_resources.add_cores_all(2)
+        preallocated_resources.add_cores_ethernet(3)
         tracker = ResourceTracker(
             machine, plan_n_timesteps=None,
             preallocated_resources=preallocated_resources)
 
-        # Should be 14 cores = 18 - 1 monitor - 1 specific core - 2 other cores
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), None), 15)
+        # Should be 15 cores = 18 - 1 Monitor -3 ethernet -2 all cores
+        self.assertEqual(tracker._n_cores_available(chip00, (0, 0), None), 12)
+
+        # Should be 15 cores = 18 -2 other cores
+        self.assertEqual(tracker._n_cores_available(chip01, (0, 1), None), 15)
 
         # Should be 1 since the core is not pre allocated
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), 2), 1)
+        self.assertEqual(tracker._n_cores_available(chip00, (0, 0), 2), 1)
 
         # Should be 0 since the core is monitor
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), 0), 0)
+        self.assertEqual(tracker._n_cores_available(chip00, (0, 0), 0), 0)
 
         # Allocate a core
-        tracker._allocate_core(chip, (0, 0), 2)
+        tracker._allocate_core(chip00, (0, 0), 2)
 
-        # Should be 13 cores as one now allocated
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), None), 14)
+        # Should be 11 cores as one now allocated
+        self.assertEqual(tracker._n_cores_available(chip00, (0, 0), None), 11)
 
     def test_deallocation_of_resources(self):
         machine = virtual_machine(

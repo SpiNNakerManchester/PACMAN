@@ -22,8 +22,7 @@ import unittest
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
     IPtagResource, MultiRegionSDRAM, ReverseIPtagResource,
-    SpecificBoardIPtagResource, SpecificBoardReverseIPtagResource,
-    VariableSDRAM)
+    SpecificBoardIPtagResource, VariableSDRAM)
 
 
 class MockEnum(Enum):

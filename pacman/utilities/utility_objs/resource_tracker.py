@@ -239,9 +239,6 @@ class ResourceTracker(object):
             self._plan_n_timesteps)
 
         for chip in self._machine.chips:
-            self._sdram_tracker[chip.x, chip.y] -= sdram_all
-            self._n_cores_preallocated[chip.x, chip.y] += \
-                preallocated_resources.cores_all
             if chip.ip_address:
                 self._sdram_tracker[chip.x, chip.y] -= sdram_eth
                 self._n_cores_preallocated[chip.x, chip.y] += \
@@ -255,6 +252,10 @@ class ResourceTracker(object):
                             chip.ip_address, tag, ip_tag.ip_address,
                             ip_tag.traffic_identifier, ip_tag.strip_sdp,
                             ip_tag.port)
+            else:
+                self._sdram_tracker[chip.x, chip.y] -= sdram_all
+                self._n_cores_preallocated[chip.x, chip.y] += \
+                    preallocated_resources.cores_all
 
     @staticmethod
     def check_constraints(
