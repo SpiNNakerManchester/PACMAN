@@ -447,14 +447,6 @@ class ResourceTracker(object):
         raise PacmanCanNotFindChipException(
             "None of the chips {} were ever in the chips list".format(chips))
 
-    @property
-    def chips_available(self):
-        """ The chips currently available
-
-        :rtype: iterable(tuple(int,int))
-        """
-        return self._chips_available
-
     def _is_sdram_available(self, chip, resources):
         """ Check if the SDRAM available on a given chip is enough for the\
             given resources.
@@ -476,17 +468,6 @@ class ResourceTracker(object):
         :rtype: int
         """
         return self._sdram_tracker[chip.x, chip.y]
-
-    def sdram_avilable_on_chip(self, chip_x, chip_y):
-        """ Get the available SDRAM on the chip at coordinates chip_x, chip_y
-
-        :param int chip_x: x coord of the chip in question
-        :param int chip_y: y coord of the chip in question
-        :return: the SDRAM remaining
-        :rtype: int
-        """
-        chip = self._machine.get_chip_at(chip_x, chip_y)
-        return self._sdram_available(chip)
 
     def _best_core_available(self, chip):
         """ Locate the best core available on a chip
@@ -782,21 +763,6 @@ class ResourceTracker(object):
         """
         self._sdram_tracker[chip.x, chip.y] -= \
             resources.sdram.get_total_sdram(self._plan_n_timesteps)
-
-    def allocate_sdram(self, chip_x, chip_y, sdram_value):
-        """ Allocates SDRAM value directly to a chip
-
-        :param int chip_x: machine chip x coord.
-        :param int chip_y: machine chip y coord.
-        :param int sdram_value: the number of bytes to allocate
-        :raises PacmanException: when the SDRAM can't be allocated
-        """
-        if self._sdram_tracker[chip_x, chip_y] - sdram_value < 0:
-            raise PacmanException(self.ALLOCATION_SDRAM_ERROR.format(
-                sdram_value, chip_x, chip_y,
-                self._sdram_tracker[chip_x, chip_y]))
-        else:
-            self._sdram_tracker[chip_x, chip_y] -= sdram_value
 
     def _allocate_core(self, chip, key, processor_id):
         """ Allocates a core on the given chip
@@ -1099,7 +1065,7 @@ class ResourceTracker(object):
         # try to allocate in one block
         group_resources = [item[0] for item in resource_and_constraint_list]
 
-        return self.allocate_group_resources(
+        return self._allocate_group_resources(
             group_resources, chips, processor_ids, board_address,
             group_ip_tags, group_reverse_ip_tags)
 
@@ -1110,7 +1076,7 @@ class ResourceTracker(object):
         """
         return a is not None and b is not None and a != b
 
-    def allocate_group_resources(
+    def _allocate_group_resources(
             self, group_resources, chips=None, processor_ids=None,
             board_address=None, group_ip_tags=None,
             group_reverse_ip_tags=None):
@@ -1346,19 +1312,6 @@ class ResourceTracker(object):
             if n_chips_with_n_cores != 0:
                 return n_cores_available
 
-    def get_maximum_cores_available_on_a_virtual_chip(self):
-        """ Returns the number of available cores of a virtual chip with the
-            maximum number of available cores
-
-        :return: the max cores available on the best real chip
-        :rtype: int
-        """
-        for n_cores_available, n_chips_with_n_cores in reversed(list(
-                enumerate(self._virtual_chips_with_n_cores_available))):
-            if n_chips_with_n_cores != 0:
-                return n_cores_available
-        return 0
-
     def get_maximum_constrained_resources_available(
             self, resources, constraints):
         """ Get the maximum resources available given the constraints
@@ -1408,9 +1361,9 @@ class ResourceTracker(object):
                 ConstantSDRAM(sdram_available),
                 CPUCyclesPerTickResource(max_cpu_available))
 
-        return self.get_maximum_resources_available(area_code)
+        return self._get_maximum_resources_available(area_code)
 
-    def get_maximum_resources_available(self, area_code=None):
+    def _get_maximum_resources_available(self, area_code=None):
         """ Get the maximum resources available
 
         :param area_code: A set of valid (x, y) coordinates to choose from
