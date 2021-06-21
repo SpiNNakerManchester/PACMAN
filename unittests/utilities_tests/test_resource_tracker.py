@@ -18,7 +18,7 @@ from spinn_machine import (
     virtual_machine, Chip, Router, SDRAM, machine_from_chips)
 from pacman.config_setup import reset_configs
 from pacman.model.resources import (
-    ResourceContainer, ConstantSDRAM, PreAllocatedResourceContainer, CoreResource,)
+    ResourceContainer, ConstantSDRAM, PreAllocatedResourceContainer)
 from pacman.exceptions import PacmanValueError
 from pacman.utilities.utility_objs import ResourceTracker
 

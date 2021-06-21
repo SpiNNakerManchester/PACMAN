@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pytest
 from spinn_machine import virtual_machine
 from pacman.config_setup import reset_configs
 from pacman.model.partitioner_splitters import SplitterSliceLegacy

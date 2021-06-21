@@ -253,7 +253,8 @@ class TestPartitioner(unittest.TestCase):
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         with self.assertRaises(PacmanValueError):
-            self.bp(self.graph, self.machine, 3000, PreAllocatedResourceContainer())
+            self.bp(self.graph, self.machine, 3000,
+                    PreAllocatedResourceContainer())
 
     def test_partition_with_less_sdram_than_default(self):
         """
@@ -287,7 +288,8 @@ class TestPartitioner(unittest.TestCase):
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
         self.machine = machine_from_chips(chips)
-        self.bp(self.graph, self.machine, 3000, PreAllocatedResourceContainer())
+        self.bp(self.graph, self.machine, 3000,
+                PreAllocatedResourceContainer())
 
     def test_partition_with_more_sdram_than_default(self):
         """
@@ -321,7 +323,8 @@ class TestPartitioner(unittest.TestCase):
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
         self.machine = machine_from_chips(chips)
-        self.bp(self.graph, self.machine, 3000, PreAllocatedResourceContainer())
+        self.bp(self.graph, self.machine, 3000,
+                PreAllocatedResourceContainer())
 
     def test_partition_with_unsupported_constraints(self):
         """
