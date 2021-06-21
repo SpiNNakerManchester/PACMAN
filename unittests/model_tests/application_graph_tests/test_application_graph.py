@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationGraphView
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
@@ -24,6 +25,9 @@ class TestApplicationGraphModel(unittest.TestCase):
     """
     tests which test the application graph object
     """
+
+    def setUp(self):
+        unittest_setup()
 
     def test_create_new_empty_graph(self):
         ApplicationGraph("foo")

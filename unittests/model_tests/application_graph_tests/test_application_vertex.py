@@ -15,6 +15,7 @@
 
 import numpy
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
@@ -28,6 +29,10 @@ class TestApplicationGraphModel(unittest.TestCase):
     """
     tests which test the application graph object
     """
+
+    def setUp(self):
+        unittest_setup()
+
     def test_create_new_vertex(self):
         """
         test initialisation of a vertex

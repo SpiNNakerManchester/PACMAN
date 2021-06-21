@@ -16,7 +16,7 @@
 import os
 import tempfile
 import unittest
-from pacman.config_setup import reset_configs
+from pacman.config_setup import unittest_setup
 from pacman.executor import PACMANAlgorithmExecutor
 from pacman.executor.algorithm_decorators import algorithm, Token
 from pacman.exceptions import (
@@ -128,9 +128,8 @@ def exception_when_called():
 
 class Test(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        reset_configs()
+    def setUp(self):
+        unittest_setup()
 
     def test_basic_workflow(self):
         """ Test the basic operation of the executor
