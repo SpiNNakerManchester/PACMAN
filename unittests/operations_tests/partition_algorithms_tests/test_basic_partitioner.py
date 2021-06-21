@@ -19,8 +19,8 @@ test for partitioning
 
 import unittest
 
-from spinn_utilities.config_holder import load_config, set_config
-from pacman.config_setup import reset_configs
+from spinn_utilities.config_holder import set_config
+from pacman.config_setup import unittest_setup
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.operations.partition_algorithms import SplitterPartitioner
 from spinn_machine import (
@@ -43,16 +43,10 @@ class TestBasicPartitioner(unittest.TestCase):
     TheTestAddress = "192.162.240.253"
 
     def setUp(self):
-        reset_configs()
-        load_config()
-
-    def tearDown(self):
-        reset_configs()
-
-    def setup(self):
         """
         setup for all basic partitioner tests
         """
+        unittest_setup()
         self.vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1")
         self.vert1.splitter = SplitterSliceLegacy()
         self.vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2")
@@ -103,7 +97,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test a partitioning with a graph with no extra constraints
         """
-        self.setup()
         graph, _ = self.sp(self.graph, self.machine, 3000)
         self.assertEqual(len(list(graph.vertices)), 3)
         vert_sizes = []
@@ -117,7 +110,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that the basic form with an extra edge works
         """
-        self.setup()
         self.graph.add_edge(
             ApplicationEdge(self.vert3, self.vert1, label="extra"), "TEST")
         graph, _ = self.sp(self.graph, self.machine, 3000)
@@ -128,7 +120,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that partitioning 1 large vertex can make it into 2 small ones
         """
-        self.setup()
         large_vertex = SimpleTestVertex(300, "Large vertex")
         large_vertex.splitter = SplitterSliceLegacy()
         self.graph = ApplicationGraph("Graph with large vertex")
@@ -142,7 +133,6 @@ class TestBasicPartitioner(unittest.TestCase):
         test that partitioning 1 large vertex can make it into multiple small
         ones
         """
-        self.setup()
         large_vertex = SimpleTestVertex(500, "Large vertex")
         large_vertex.splitter = SplitterSliceLegacy()
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
@@ -156,7 +146,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that fixed partitioning causes correct number of vertices
         """
-        self.setup()
         large_vertex = SimpleTestVertex(1000, "Large vertex")
         large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
         large_vertex.splitter = SplitterSliceLegacy()
@@ -169,7 +158,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that partitioning will work when close to filling the machine
         """
-        self.setup()
         n_processors = 18
         (e, ne, n, w, _, _) = range(6)
 
@@ -212,7 +200,6 @@ class TestBasicPartitioner(unittest.TestCase):
         test that if there's not enough space, the test the partitioner will
         raise an error
         """
-        self.setup()
         n_processors = 18
         (e, ne, n, w, _, _) = range(6)
 
@@ -253,7 +240,6 @@ class TestBasicPartitioner(unittest.TestCase):
         test that the partitioner works when its machine is slightly malformed
         in that it has less SDRAM available
         """
-        self.setup()
         n_processors = 18
         (e, ne, n, w, _, _) = range(6)
 
@@ -287,7 +273,6 @@ class TestBasicPartitioner(unittest.TestCase):
         test that the partitioner works when its machine is slightly malformed
         in that it has more SDRAM available
         """
-        self.setup()
         n_processors = 18
         (e, ne, n, w, _, _) = range(6)
 
@@ -321,7 +306,6 @@ class TestBasicPartitioner(unittest.TestCase):
         test that when a vertex has a constraint that is unrecognised,
         it raises an error
         """
-        self.setup()
         constrained_vertex = SimpleTestVertex(13, "Constrained")
         constrained_vertex.add_constraint(
             NewPartitionerConstraint("Mock constraint"))
@@ -332,7 +316,6 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that the partitioner can work with an empty graph
         """
-        self.setup()
         self.graph = ApplicationGraph("foo")
         graph, _ = self.sp(self.graph, self.machine, 3000)
         self.assertEqual(len(list(graph.vertices)), 0)

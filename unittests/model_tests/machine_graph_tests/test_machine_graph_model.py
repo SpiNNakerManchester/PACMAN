@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
@@ -30,6 +31,9 @@ class TestMachineGraphModel(unittest.TestCase):
     """
     Tests that test the functionality of the machine graph object
     """
+
+    def setUp(self):
+        unittest_setup()
 
     def test_new_vertex(self):
         """

@@ -14,9 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from spinn_utilities.config_holder import set_config, load_config
+from spinn_utilities.config_holder import set_config
 from spinn_machine import MulticastRoutingEntry
-from pacman.config_setup import reset_configs
+from pacman.config_setup import unittest_setup
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.operations.router_compressors.routing_compression_checker import (
@@ -53,13 +53,9 @@ class TestCompressor(unittest.TestCase):
         original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0010, 0b1011, [4, 5], [], False))
         self.original_tables.add_routing_table(original_table)
-        reset_configs()
-        load_config()
+        unittest_setup()
         set_config(
             "Mapping", "router_table_compression_target_length", "None")
-
-    def tearDown(self):
-        load_config()
 
     def check_compression(self, compressed_tables):
         for original in self.original_tables:

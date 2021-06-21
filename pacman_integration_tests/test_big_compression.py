@@ -18,6 +18,7 @@ import time
 import sys
 import unittest
 
+from pacman.config_setup import unittest_setup
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
 from pacman.operations.router_compressors.routing_compression_checker import (
     compare_tables)
@@ -29,6 +30,9 @@ from pacman.operations.router_compressors import UnorderedPairCompressor
 
 
 class TestBigCompression(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def test_big(self):
         class_file = sys.modules[self.__module__].__file__
