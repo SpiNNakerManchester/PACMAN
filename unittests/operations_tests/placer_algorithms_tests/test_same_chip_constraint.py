@@ -16,7 +16,7 @@
 import random
 import unittest
 from spinn_machine import virtual_machine
-from pacman.config_setup import reset_configs
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.resources import ResourceContainer
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
@@ -27,7 +27,7 @@ from pacman.executor import PACMANAlgorithmExecutor
 class TestSameChipConstraint(unittest.TestCase):
 
     def setUp(self):
-        reset_configs()
+        unittest_setup()
 
     def _do_test(self, placer):
         machine = virtual_machine(width=8, height=8)

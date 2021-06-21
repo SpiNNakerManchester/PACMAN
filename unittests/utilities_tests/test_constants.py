@@ -14,10 +14,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.utilities import constants
 
 
 class TestConstants(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def test_edges_enum(self):
         self.assertEqual(constants.EDGES.EAST.value, 0)

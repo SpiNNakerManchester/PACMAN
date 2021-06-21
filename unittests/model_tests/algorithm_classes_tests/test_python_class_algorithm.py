@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.executor.algorithm_classes import PythonClassAlgorithm
 
 
@@ -21,6 +22,9 @@ class TestPythonClassAlgorithm(unittest.TestCase):
     """
     tests which test the application graph object
     """
+
+    def setUp(self):
+        unittest_setup()
 
     def test_python_class(self):
         python_module = "Foo"

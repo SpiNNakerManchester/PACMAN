@@ -15,6 +15,7 @@
 
 import unittest
 from testfixtures import LogCapture
+from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman_test_objects import (
@@ -24,6 +25,9 @@ from pacman_test_objects import (
 class TestSplitterSliceLegacy(unittest.TestCase):
     """ Tester for pacman.model.constraints.placer_constraints
     """
+
+    def setUp(self):
+        unittest_setup()
 
     def test_no_api(self):
         splitter = SplitterSliceLegacy()

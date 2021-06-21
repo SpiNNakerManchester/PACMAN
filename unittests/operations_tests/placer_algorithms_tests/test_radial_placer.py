@@ -15,7 +15,7 @@
 
 import unittest
 from spinn_machine import virtual_machine
-from pacman.config_setup import reset_configs
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.resources import (
@@ -29,7 +29,7 @@ from pacman_test_objects import (get_resourced_machine_vertex)
 
 class TestRadialPlacer(unittest.TestCase):
     def setUp(self):
-        reset_configs()
+        unittest_setup()
         self.machine = virtual_machine(8, 8)
         self.mach_graph = MachineGraph("machine")
         self.vertices = list()

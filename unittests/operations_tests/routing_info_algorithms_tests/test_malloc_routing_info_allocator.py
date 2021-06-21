@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint, ShareKeyConstraint)
@@ -29,6 +30,9 @@ from pacman.model.routing_info import (
 
 
 class MyTestCase(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def test_allocate_fixed_key_and_mask(self):
         allocator = MallocBasedRoutingInfoAllocator()

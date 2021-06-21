@@ -16,7 +16,7 @@
 import unittest
 from collections import deque
 
-from pacman.config_setup import reset_configs
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import MulticastEdgePartition
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
@@ -29,7 +29,7 @@ from pacman.model.placements import Placements, Placement
 class TestBasicDijkstraRouting(unittest.TestCase):
 
     def setUp(self):
-        reset_configs()
+        unittest_setup()
 
     def test_routing(self):
         graph = MachineGraph("Test")
