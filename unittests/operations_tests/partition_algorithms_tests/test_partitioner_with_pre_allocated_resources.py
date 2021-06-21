@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_machine import virtual_machine
-from pacman.config_setup import reset_configs
+from pacman.config_setup import unittest_setup
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.operations.partition_algorithms import SplitterPartitioner
 from pacman.model.constraints.placer_constraints import (
@@ -30,7 +30,7 @@ class TestPartitionerWithPreAllocatedResources(object):
     """
 
     def test_1_chip_no_pre_allocated_too_much_sdram(self):
-        reset_configs()
+        unittest_setup()
         machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
         partitioner = SplitterPartitioner()

@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
 import json
+from pacman.config_setup import unittest_setup
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
     FixedMaskConstraint)
@@ -45,6 +46,9 @@ class TestJsonUtils(unittest.TestCase):
     # ------------------------------------------------------------------
     # Basic graph comparators
     # ------------------------------------------------------------------
+
+    def setUp(self):
+        unittest_setup()
 
     def _compare_constraint(self, c1, c2, seen=None):
         if seen is None:
