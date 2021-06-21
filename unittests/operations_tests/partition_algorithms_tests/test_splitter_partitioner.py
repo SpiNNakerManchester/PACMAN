@@ -18,6 +18,7 @@ test for SplitterPartitioner functions
 """
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractDependentSplitter)
@@ -57,6 +58,9 @@ class TestSplitterPartitioner(unittest.TestCase):
     test for SplitterPartitioner functions
     """
     # pylint: disable=attribute-defined-outside-init
+
+    def setUp(self):
+        unittest_setup()
 
     def test_order_vertices_for_dependent_splitters(self):
         vertices = list()

@@ -17,6 +17,7 @@
 tests for placement
 """
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanAlreadyPlacedError
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placement, Placements
@@ -26,6 +27,9 @@ class TestPlacement(unittest.TestCase):
     """
     tester for placement object in pacman.model.placements.placement
     """
+
+    def setUp(self):
+        unittest_setup()
 
     def test_create_new_placement(self):
         """

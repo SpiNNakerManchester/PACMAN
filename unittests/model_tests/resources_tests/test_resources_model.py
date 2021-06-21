@@ -19,6 +19,7 @@ test for the resources model
 from enum import Enum
 import tempfile
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
     IPtagResource, MultiRegionSDRAM, ReverseIPtagResource,
@@ -35,6 +36,9 @@ class TestResourceModels(unittest.TestCase):
     """
     unit tests on the resources object
     """
+
+    def setUp(self):
+        unittest_setup()
 
     def test_sdram(self):
         """

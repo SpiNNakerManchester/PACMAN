@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.model.constraints.placer_constraints import (
     BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
     SameChipAsConstraint)
@@ -23,6 +24,9 @@ from pacman.model.graphs.machine import SimpleMachineVertex
 class TestPlacementConstraints(unittest.TestCase):
     """ Tester for pacman.model.constraints.placer_constraints
     """
+
+    def setUp(self):
+        unittest_setup()
 
     def test_board_constraint(self):
         c1 = BoardConstraint("1.2.3.4")
