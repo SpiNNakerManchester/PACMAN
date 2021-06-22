@@ -134,7 +134,7 @@ class AbstractCompressor(object):
         compressed_tables = MulticastRoutingTables()
         self._problems = ""
         if get_config_bool(
-            "Mapping", "router_table_compress_as_far_as_possible"):
+                "Mapping", "router_table_compress_as_far_as_possible"):
             # Compress as much as possible
             target_length = 0
         else:

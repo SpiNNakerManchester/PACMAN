@@ -57,7 +57,6 @@ class TestCompressor(unittest.TestCase):
         set_config(
             "Mapping", "router_table_compress_as_far_as_possible", True)
 
-
     def check_compression(self, compressed_tables):
         for original in self.original_tables:
             compressed = compressed_tables.get_routing_table_for_chip(
