@@ -55,7 +55,7 @@ class TestCompressor(unittest.TestCase):
         self.original_tables.add_routing_table(original_table)
         unittest_setup()
         set_config(
-            "Mapping", "router_table_compression_target_length", "None")
+            "Mapping", "router_table_compress_as_far_as_possible", True)
 
 
     def check_compression(self, compressed_tables):
