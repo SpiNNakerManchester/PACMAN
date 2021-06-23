@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.config_setup import unittest_setup
 from pacman.operations.routing_info_allocator_algorithms.\
     zoned_routing_info_allocator import (flexible_allocate, global_allocate)
 from pacman.model.graphs.application.application_graph import ApplicationGraph
@@ -223,8 +224,9 @@ def check_keys_for_application_partition_pairs(
 
 
 def test_global_allocator():
-    # Allocate something and check it does the right thing
+    unittest_setup()
 
+    # Allocate something and check it does the right thing
     app_graph, mac_graph, n_keys_map = create_graphs1(False)
 
     # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
@@ -241,6 +243,8 @@ def test_global_allocator():
 
 
 def test_flexible_allocator_no_fixed():
+    unittest_setup()
+
     # Allocate something and check it does the right thing
     app_graph, mac_graph, n_keys_map = create_graphs1(False)
 
@@ -254,6 +258,7 @@ def test_flexible_allocator_no_fixed():
 
 
 def test_fixed_only():
+    unittest_setup()
     app_graph, mac_graph, n_keys_map = create_graphs_only_fixed()
     flexible_allocate(mac_graph, n_keys_map)
     routing_info = global_allocate(mac_graph, n_keys_map)
@@ -261,6 +266,7 @@ def test_fixed_only():
 
 
 def test_no_edge():
+    unittest_setup()
     app_graph, mac_graph, n_keys_map = create_graphs_no_edge()
     flexible_allocate(mac_graph, n_keys_map)
     routing_info = global_allocate(mac_graph, n_keys_map)
@@ -268,6 +274,7 @@ def test_no_edge():
 
 
 def test_flexible_allocator_with_fixed():
+    unittest_setup()
     # Allocate something and check it does the right thing
     app_graph, mac_graph, n_keys_map = create_graphs1(True)
 
@@ -329,6 +336,7 @@ def create_big(with_fixed):
 
 
 def test_big_flexible_no_fixed():
+    unittest_setup()
     app_graph, mac_graph, n_keys_map = create_big(False)
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
@@ -342,6 +350,7 @@ def test_big_flexible_no_fixed():
 
 
 def test_big_global_no_fixed():
+    unittest_setup()
     app_graph, mac_graph, n_keys_map = create_big(False)
     # Make the call, and it should fail
     routing_info = global_allocate(mac_graph, n_keys_map)
@@ -360,6 +369,7 @@ def test_big_global_no_fixed():
 
 
 def test_big_flexible_fixed():
+    unittest_setup()
     app_graph, mac_graph, n_keys_map = create_big(True)
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
@@ -372,6 +382,7 @@ def test_big_flexible_fixed():
 
 
 def test_big_global_fixed():
+    unittest_setup()
     app_graph, mac_graph, n_keys_map = create_big(True)
     # Make the call, and it should fail
     routing_info = global_allocate(mac_graph, n_keys_map)
@@ -390,6 +401,7 @@ def test_big_global_fixed():
 
 
 def test_no_app_level_flexible():
+    unittest_setup()
     app_graph, mac_graph, n_keys_map = create_app_less()
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
     routing_info = flexible_allocate(mac_graph, n_keys_map)
@@ -401,6 +413,7 @@ def test_no_app_level_flexible():
 
 
 def test_no_app_level_global():
+    unittest_setup()
     app_graph, mac_graph, n_keys_map = create_app_less()
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
     routing_info = global_allocate(mac_graph, n_keys_map)

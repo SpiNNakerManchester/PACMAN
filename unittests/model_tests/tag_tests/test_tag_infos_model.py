@@ -18,6 +18,7 @@ TestTagsModel
 """
 import unittest
 from spinn_machine.tags import IPTag, ReverseIPTag
+from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.tags import Tags
@@ -27,6 +28,9 @@ class TestTagsModel(unittest.TestCase):
     """
     test that the tags object works as expected
     """
+
+    def setUp(self):
+        unittest_setup()
 
     def test_new_tag_info(self):
         """

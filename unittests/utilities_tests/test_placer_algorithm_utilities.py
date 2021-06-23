@@ -14,11 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     add_set)
 
 
 class TestUtilities(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def test_add_join(self):
         all_sets = list()
