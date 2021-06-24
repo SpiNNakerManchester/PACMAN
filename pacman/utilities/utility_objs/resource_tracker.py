@@ -121,7 +121,7 @@ class ResourceTracker(object):
             the order is no longer guaranteed.
         :type chips: iterable(tuple(int, int)) or None
         :param preallocated_resources:
-        :type preallocated_resources: ResourceReservations or None
+        :type preallocated_resources: PreAllocatedResourceContainer or None
         """
 
         # The amount of SDRAM available on each chip,
