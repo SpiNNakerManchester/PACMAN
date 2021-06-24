@@ -71,10 +71,6 @@ class PreAllocatedResourceContainer(object):
         self._sdram_ethernet += extra
 
     @property
-    def specific_core_resources(self):
-        return self._specific_core_resources
-
-    @property
     def cores_all(self):
         return self._cores_all
 
