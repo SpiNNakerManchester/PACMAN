@@ -18,14 +18,13 @@ import time
 import sys
 import unittest
 
+from spinn_utilities.config_holder import set_config
 from pacman.config_setup import unittest_setup
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
 from pacman.operations.router_compressors.routing_compression_checker import (
     compare_tables)
 from pacman.operations.router_compressors.ordered_covering_router_compressor \
     import OrderedCoveringCompressor
-from pacman.operations.router_compressors.abstract_compressor import \
-    AbstractCompressor
 from pacman.operations.router_compressors import UnorderedPairCompressor
 
 
@@ -35,22 +34,21 @@ class TestBigCompression(unittest.TestCase):
         unittest_setup()
 
     def test_big(self):
+        set_config("Mapping", "router_table_compress_as_far_as_possible", True)
         class_file = sys.modules[self.__module__].__file__
         path = os.path.dirname(os.path.abspath(class_file))
         j_router = os.path.join(path, "malloc_hard_routing_tables.json.gz")
         original_tables = from_json(j_router)
 
         mundy_compressor = OrderedCoveringCompressor()
-        # Hack to stop it throwing a wobly for too many entries
-        AbstractCompressor.MAX_SUPPORTED_LENGTH = 5000
         pre_compressor = UnorderedPairCompressor()
 
         start = time.time()
-        mundy_tables = mundy_compressor(original_tables)
+        mundy_tables = mundy_compressor(original_tables, True)
         mundy_time = time.time()
-        pre_tables = pre_compressor(original_tables)
+        pre_tables = pre_compressor(original_tables, True)
         pre_time = time.time()
-        both_tables = mundy_compressor(pre_tables)
+        both_tables = mundy_compressor(pre_tables, True)
         both_time = time.time()
         for original in original_tables:
             org_routes = set()

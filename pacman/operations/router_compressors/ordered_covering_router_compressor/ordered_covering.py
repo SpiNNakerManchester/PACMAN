@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.config_holder import get_config_int
+from spinn_utilities.config_holder import get_config_bool
+from spinn_machine import Machine
 from pacman.operations.router_compressors import Entry
 from pacman.exceptions import MinimisationFailedError
 from .remove_default_routes import remove_default_routes
@@ -54,8 +55,13 @@ def minimise(
         If the smallest table that can be produced is larger than
         ``target_length``.
     """
-    target_length = get_config_int(
-        "Mapping", "router_table_compression_target_length")
+    if get_config_bool(
+            "Mapping", "router_table_compress_as_far_as_possible"):
+        # Compress as much as possible
+        target_length = None
+    else:
+        target_length = Machine.ROUTER_ENTRIES
+
     # Keep None values as that flags as much as possible
     table, _ = ordered_covering(
         routing_table=routing_table, target_length=target_length,

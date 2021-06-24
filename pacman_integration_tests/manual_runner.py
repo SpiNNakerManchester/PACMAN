@@ -15,6 +15,7 @@
 
 import json
 import time
+from spinn_machine import Machine
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
 from pacman.model.routing_tables.multicast_routing_tables import (to_json)
 from pacman.model.routing_tables import (MulticastRoutingTables)
@@ -23,7 +24,7 @@ from pacman.operations.router_compressors.routing_compression_checker import (
 from pacman.operations.router_compressors.ordered_covering_router_compressor \
     import OrderedCoveringCompressor
 from pacman.operations.router_compressors import (
-    AbstractCompressor, PairCompressor, UnorderedPairCompressor)
+    PairCompressor, UnorderedPairCompressor)
 from pacman.config_setup import unittest_setup
 
 unittest_setup()
@@ -55,7 +56,7 @@ MUNDY = False
 PRE = False
 PAIR = True
 # Hack to stop it throwing a wobly for too many entries
-AbstractCompressor.MAX_SUPPORTED_LENGTH = 50000
+Machine.ROUTER_ENTRIES = 50000
 mundy_compressor = OrderedCoveringCompressor()
 pre_compressor = UnorderedPairCompressor()
 pair_compressor = PairCompressor()
