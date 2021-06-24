@@ -37,12 +37,6 @@ def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
 
     # Create link to the virtual chip from the real chip
     virtual_link_id = (link_data.connected_link + 3) % 6
-    to_virtual_chip_link = Link(
-        destination_x=virtual_chip_x,
-        destination_y=virtual_chip_y,
-        source_x=link_data.connected_chip_x,
-        source_y=link_data.connected_chip_y,
-        source_link_id=link_data.connected_link)
 
     # Create link to the real chip from the virtual chip
     from_virtual_chip_link = Link(
@@ -62,7 +56,15 @@ def create_virtual_chip(machine, link_data, virtual_chip_x, virtual_chip_y):
     connected_chip = machine.get_chip_at(
         link_data.connected_chip_x,
         link_data.connected_chip_y)
-    connected_chip.router.add_link(to_virtual_chip_link)
+    # Note that an FPGA chip can already exist, so check before adding
+    if not connected_chip.router.is_link(link_data.connected_link):
+        to_virtual_chip_link = Link(
+            destination_x=virtual_chip_x,
+            destination_y=virtual_chip_y,
+            source_x=link_data.connected_chip_x,
+            source_y=link_data.connected_chip_y,
+            source_link_id=link_data.connected_link)
+        connected_chip.router.add_link(to_virtual_chip_link)
 
     machine.add_virtual_chip(Chip(
         n_processors=constants.CORES_PER_VIRTUAL_CHIP, router=router_object,

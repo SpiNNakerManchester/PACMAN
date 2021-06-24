@@ -58,29 +58,16 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()
 
-    def __call__(self, machine, graph=None):
+    def __call__(self, machine, machine_graph):
         """
         :param ~spinn_machine.Machine machine:
-        :param graph:
-        :type graph: Graph or None
+        :param MachineGraph graph:
         :rtype: ~spinn_machine.Machine
         :raises PacmanConfigurationException:
             If a virtual chip is in an impossible position.
         """
-        if graph is not None:
-            self.allocate_chip_ids(machine, graph)
-        return machine
-
-    def allocate_chip_ids(self, machine, graph):
-        """ Go through the chips (real and virtual) and allocate keys for each
-
-        :param ~spinn_machine.Machine machine:
-        :param Graph graph:
-        :raises PacmanConfigurationException:
-            If a virtual chip is in an impossible position.
-        """
         progress = ProgressBar(
-            graph.n_vertices + machine.n_chips,
+            machine_graph.n_vertices + machine.n_chips,
             "Allocating virtual identifiers")
 
         # allocate standard IDs for real chips
@@ -89,11 +76,13 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             self._allocate_elements(expected_chip_id, 1)
 
         # allocate IDs for virtual chips
-        for vertex in progress.over(graph.vertices):
+        for vertex in progress.over(machine_graph.vertices):
             if isinstance(vertex, AbstractVirtual):
                 x, y = self._assign_virtual_chip_info(
                     machine, self._get_link_data(machine, vertex))
                 vertex.set_virtual_chip_coordinates(x, y)
+
+        return machine
 
     @staticmethod
     def _get_link_data(machine, vertex):
