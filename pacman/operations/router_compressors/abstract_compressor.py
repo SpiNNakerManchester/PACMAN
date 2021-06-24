@@ -19,9 +19,10 @@ based on https://github.com/project-rig/
 
 from abc import abstractmethod
 import logging
-from spinn_utilities.config_holder import get_config_int
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_machine import Machine
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import MinimisationFailedError
@@ -31,22 +32,24 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class AbstractCompressor(object):
 
-    MAX_SUPPORTED_LENGTH = 1023
-
     __slots__ = [
         # String of problems detected. Must be "" to finish
         "_problems",
         # Flag to say if the results can be order dependent
         "_ordered",
+        # Flag to say that results too large should be ignored
+        "_accept_overflow"
     ]
 
     def __init__(self, ordered=True):
         self._ordered = ordered
 
-    def __call__(self, router_tables, target_length=None):
+    def __call__(self, router_tables, accept_overflow=False):
         """
         :param MulticastRoutingTables router_tables:
-        :param int target_length:
+        :param bool accept_overflow:
+            A flag which should only be used in testing to stop raising an
+            exception if result is too big
         :rtype: MulticastRoutingTables
         """
         # create progress bar
@@ -54,6 +57,7 @@ class AbstractCompressor(object):
             router_tables.routing_tables,
             "Compressing routing Tables using {}".format(
                 self.__class__.__name__))
+        self._accept_overflow = accept_overflow
         return self.compress_tables(router_tables, progress)
 
     @staticmethod
@@ -129,11 +133,12 @@ class AbstractCompressor(object):
         """
         compressed_tables = MulticastRoutingTables()
         self._problems = ""
-        target_length = get_config_int(
-            "Mapping", "router_table_compression_target_length")
-        if target_length is None:
+        if get_config_bool(
+                "Mapping", "router_table_compress_as_far_as_possible"):
             # Compress as much as possible
             target_length = 0
+        else:
+            target_length = Machine.ROUTER_ENTRIES
         for table in progress.over(router_tables.routing_tables):
             if table.number_of_entries < target_length:
                 new_table = table
@@ -145,14 +150,14 @@ class AbstractCompressor(object):
                 for entry in compressed_table:
                     new_table.add_multicast_routing_entry(
                         entry.to_MulticastRoutingEntry())
-                if new_table.number_of_entries > self.MAX_SUPPORTED_LENGTH:
+                if new_table.number_of_entries > Machine.ROUTER_ENTRIES:
                     self._problems += "(x:{},y:{})={} ".format(
                         new_table.x, new_table.y, new_table.number_of_entries)
 
             compressed_tables.add_routing_table(new_table)
 
         if len(self._problems) > 0:
-            if self._ordered:
+            if self._ordered and not self._accept_overflow:
                 raise MinimisationFailedError(
                     "The routing table after compression will still not fit"
                     " within the machines router: {}".format(self._problems))

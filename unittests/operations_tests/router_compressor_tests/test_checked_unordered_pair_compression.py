@@ -19,10 +19,9 @@ import unittest
 
 from pacman.config_setup import unittest_setup
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
-from pacman.operations.router_compressors.routing_compression_checker import (
-    compare_tables)
+from pacman.exceptions import PacmanElementAllocationException
 from pacman.operations.router_compressors import (
-    AbstractCompressor, CheckedUnorderedPairCompressor)
+    CheckedUnorderedPairCompressor)
 
 
 class TestUnorderedPairCompressor(unittest.TestCase):
@@ -33,15 +32,9 @@ class TestUnorderedPairCompressor(unittest.TestCase):
     def test_onordered_pair_big(self):
         class_file = sys.modules[self.__module__].__file__
         path = os.path.dirname(os.path.abspath(class_file))
-        j_router = os.path.join(path,
-                                "many_to_one.json.gz")
+        j_router = os.path.join(path, "many_to_one.json.gz")
         original_tables = from_json(j_router)
 
-        # Hack to stop it throwing a wobly for too many entries
-        AbstractCompressor.MAX_SUPPORTED_LENGTH = 50000
         compressor = CheckedUnorderedPairCompressor()
-        compressed_tables = compressor(original_tables)
-        for original in original_tables:
-            compressed = compressed_tables.get_routing_table_for_chip(
-                original.x, original.y)
-            compare_tables(original, compressed)
+        with self.assertRaises(PacmanElementAllocationException):
+            compressor(original_tables)

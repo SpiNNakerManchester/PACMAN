@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_machine import Machine
 from .abstract_compressor import AbstractCompressor
 from .entry import Entry
 
@@ -337,8 +338,8 @@ class PairCompressor(AbstractCompressor):
         self._all_entries = []
         self._routes_count = 0
         # Imitate creating fixed size arrays
-        self._routes = self.MAX_SUPPORTED_LENGTH * [None]
-        self._routes_frequency = self.MAX_SUPPORTED_LENGTH * [None]
+        self._routes = Machine.ROUTER_ENTRIES * [None]
+        self._routes_frequency = Machine.ROUTER_ENTRIES * [None]
 
         for entry in router_table.multicast_routing_entries:
             self._all_entries.append(

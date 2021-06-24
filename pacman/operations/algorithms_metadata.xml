@@ -419,29 +419,6 @@
             <token part="CompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
     </algorithm>
-    <algorithm name="RoutingCompressionChecker">
-        <python_module>pacman.operations.router_compressors.routing_compression_checker</python_module>
-        <python_function>generate_routing_compression_checker_report</python_function>
-        <input_definitions>
-            <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
-            </parameter>
-            <parameter>
-                <param_name>compressed_routing_tables</param_name>
-                <param_type>MemoryCompressedRoutingTables</param_type>
-            </parameter>
-            <parameter>
-                <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>report_folder</param_name>
-            <param_name>compressed_routing_tables</param_name>
-            <param_name>routing_tables</param_name>
-        </required_inputs>
-    </algorithm>
     <algorithm name="BasicRouteMerger">
         <python_module>pacman.operations.router_compressors.basic_route_merger</python_module>
         <python_class>BasicRouteMerger</python_class>
