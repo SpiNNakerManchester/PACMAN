@@ -24,9 +24,9 @@ from pacman.operations.router_compressors.ordered_covering_router_compressor \
     import OrderedCoveringCompressor
 from pacman.operations.router_compressors import (
     AbstractCompressor, PairCompressor, UnorderedPairCompressor)
-from pacman.config_setup import reset_configs
+from pacman.config_setup import unittest_setup
 
-reset_configs()
+unittest_setup()
 # original_tables = from_json("routing_table_15_25.json")
 original_tables = from_json("malloc_hard_routing_tables.json.gz")
 # original_tables = from_json("routing_tables_speader_big.json.gz")
