@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_machine import Machine
 from pacman.exceptions import PacmanElementAllocationException
 from .unordered_pair_compressor import UnorderedPairCompressor
 
@@ -55,7 +56,7 @@ class CheckedUnorderedPairCompressor(UnorderedPairCompressor):
         """
         problems = ""
         for table in compressed:
-            if table.number_of_entries > self.MAX_SUPPORTED_LENGTH:
+            if table.number_of_entries > Machine.ROUTER_ENTRIES:
                 problems += "(x:{},y:{})={} ".format(
                     table.x, table.y, table.number_of_entries)
         if len(problems) > 0:
