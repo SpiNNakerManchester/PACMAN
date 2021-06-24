@@ -35,7 +35,7 @@ class AbstractVirtual(object):
         """ The IP address of the board to which the device is connected,\
             or ``None`` for the boot board.
 
-        :rtype: str
+        :rtype: str or None
         """
 
     @abstractmethod
