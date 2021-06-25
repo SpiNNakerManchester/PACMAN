@@ -5,7 +5,8 @@ from pacman.model.graphs.application import (
     ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex)
 from pacman.model.graphs.machine import (
     MachineFPGAVertex, MachineSpiNNakerLinkVertex, MachineEdge)
-from pacman.exceptions import PacmanConfigurationException
+from pacman.exceptions import PacmanConfigurationException,\
+    PacmanNotExistException
 from pacman.model.graphs.common.slice import Slice
 
 
@@ -73,11 +74,17 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         # Note, the incoming vertex is how to get packets into this device,
         # so we want to direct it at the outgoing vertex!
         if self.__outgoing_vertex is None:
-            return {}
+            raise PacmanNotExistException(
+                f"There is no way to reach the target device of {edge} via the"
+                " FPGAs.  Please add an outgoing FPGA to the device.")
         return {self.__outgoing_vertex: [MachineEdge]}
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, edge, outgoing_edge_partition):
+        if not self.__incoming_vertices:
+            raise PacmanNotExistException(
+                f"There is no way for the target device of {edge} to send via"
+                " the FPGAs.  Please add an incoming FPGA to the device.")
         return {v: [MachineEdge] for v in self.__incoming_vertices}
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
