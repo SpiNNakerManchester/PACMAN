@@ -42,7 +42,7 @@ class NoSpiNNakerLink(PacmanConfigurationException):
                 vertex.spinnaker_link_id, vertex.board_address))
 
 
-class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
+class MallocBasedChipIdAllocator(object):
     """ A Chip ID Allocation Allocator algorithm that keeps track of\
         chip IDs and attempts to allocate them as requested
     """
@@ -53,7 +53,6 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
     ]
 
     def __init__(self):
-        super().__init__(0, 2 ** 32)
 
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()
@@ -82,11 +81,6 @@ class MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         progress = ProgressBar(
             graph.n_vertices + machine.n_chips,
             "Allocating virtual identifiers")
-
-        # allocate standard IDs for real chips
-        for x, y in progress.over(machine.chip_coordinates, False):
-            expected_chip_id = (x << 8) + y
-            self._allocate_elements(expected_chip_id, 1)
 
         # allocate IDs for virtual chips
         for vertex in progress.over(graph.vertices):
