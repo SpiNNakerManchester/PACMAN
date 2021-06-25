@@ -19,8 +19,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import (
     AbstractFPGA, AbstractSpiNNakerLink, AbstractVirtual)
-from pacman.utilities.algorithm_utilities import (
-    machine_algorithm_utilities, ElementAllocatorAlgorithm)
+from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _LOWER_16_BITS = 0xFFFF
