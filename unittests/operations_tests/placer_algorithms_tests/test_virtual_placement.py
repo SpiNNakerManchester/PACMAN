@@ -15,6 +15,7 @@
 
 import pytest
 from spinn_machine import virtual_machine
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import (
     MachineGraph, MachineSpiNNakerLinkVertex)
 from pacman.operations.chip_id_allocator_algorithms import (
@@ -27,6 +28,7 @@ from pacman.executor import PACMANAlgorithmExecutor
     "placer",
     ["OneToOnePlacer", "RadialPlacer", "SpreaderPlacer"])
 def test_virtual_placement(placer):
+    unittest_setup()
     machine = virtual_machine(width=8, height=8)
     graph = MachineGraph("Test")
     virtual_vertex = MachineSpiNNakerLinkVertex(spinnaker_link_id=0)

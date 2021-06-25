@@ -14,22 +14,27 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
 import unittest
-from spinn_utilities.config_holder import run_config_checks
+
 from pacman.config_setup import unittest_setup
+from pacman.model.routing_tables.multicast_routing_tables import (from_json)
+from pacman.exceptions import PacmanElementAllocationException
+from pacman.operations.router_compressors import (
+    CheckedUnorderedPairCompressor)
 
 
-class TestCfgChecker(unittest.TestCase):
+class TestUnorderedPairCompressor(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         unittest_setup()
 
-    def test_cfg_check(self):
-        unittests = os.path.dirname(__file__)
-        parent = os.path.dirname(unittests)
-        pacman = os.path.join(parent, "pacman")
-        integration_tests = os.path.join(parent, "pacman_integration_tests")
-        uinit_test_objects = os.path.join(parent, "pacman_test_objects")
-        run_config_checks(directories=[
-            pacman, integration_tests, unittests, uinit_test_objects])
+    def test_onordered_pair_big(self):
+        class_file = sys.modules[self.__module__].__file__
+        path = os.path.dirname(os.path.abspath(class_file))
+        j_router = os.path.join(path, "many_to_one.json.gz")
+        original_tables = from_json(j_router)
+
+        compressor = CheckedUnorderedPairCompressor()
+        with self.assertRaises(PacmanElementAllocationException):
+            compressor(original_tables)

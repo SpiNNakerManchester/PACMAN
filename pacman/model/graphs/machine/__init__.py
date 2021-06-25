@@ -29,12 +29,13 @@ from .multicast_edge_partition import MulticastEdgePartition
 from .source_segmented_sdram_machine_partition import (
     SourceSegmentedSDRAMMachinePartition)
 from .machine_graph import MachineGraph
+from .machine_graph_view import MachineGraphView
 
 __all__ = [
     "AbstractMachineEdgePartition", "AbstractSDRAMPartition",
     "ConstantSDRAMMachinePartition",
     "DestinationSegmentedSDRAMMachinePartition", "FixedRouteEdgePartition",
-    "MachineEdge", "MachineFPGAVertex", "MachineGraph",
+    "MachineEdge", "MachineFPGAVertex", "MachineGraph", "MachineGraphView",
     "MachineSpiNNakerLinkVertex", "MachineVertex", "MulticastEdgePartition",
     "SDRAMMachineEdge", "SimpleMachineVertex",
     "SourceSegmentedSDRAMMachinePartition"]

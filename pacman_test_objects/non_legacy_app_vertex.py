@@ -12,16 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.model.graphs.application import ApplicationVertex
 
-"""
-This is a package of algorithms that originated in Rig.
 
-Converted to PACMAN by Sara Summerton.
-"""
+class NonLegacyApplicationVertex(ApplicationVertex):
+    def __init__(self, label="test"):
+        super().__init__(label=label)
 
-from .hilbert_placer import HilbertPlacer
-from .hilbert_state import HilbertState
-from .random_placer import RandomPlacer
+    def n_atoms(self):
+        pass
 
-__all__ = [
-    "HilbertPlacer", "HilbertState", "RandomPlacer"]

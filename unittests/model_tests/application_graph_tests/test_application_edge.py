@@ -14,13 +14,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from uinit_test_objects import SimpleTestEdge, SimpleTestVertex
+from pacman.config_setup import unittest_setup
+from pacman_test_objects import SimpleTestEdge, SimpleTestVertex
 
 
 class TestApplicationEdgeModel(unittest.TestCase):
     """
     tests which test the application graph object
     """
+
+    def setUp(self):
+        unittest_setup()
 
     def test_create_new_edge(self):
         """

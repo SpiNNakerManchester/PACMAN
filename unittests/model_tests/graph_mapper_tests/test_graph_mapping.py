@@ -18,17 +18,21 @@ tests for graph mapping
 """
 import unittest
 
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex, \
     MachineGraph
-from uinit_test_objects import SimpleTestEdge, SimpleTestVertex
+from pacman_test_objects import SimpleTestEdge, SimpleTestVertex
 
 
 class TestGraphMapping(unittest.TestCase):
     """
     graph mapper tests
     """
+
+    def setUp(self):
+        unittest_setup()
 
     def test_get_edges_from_edge(self):
         """

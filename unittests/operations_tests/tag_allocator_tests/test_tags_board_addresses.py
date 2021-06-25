@@ -16,6 +16,7 @@
 import unittest
 from collections import defaultdict
 from spinn_machine import virtual_machine
+from pacman.config_setup import unittest_setup
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ResourceContainer, IPtagResource
@@ -25,6 +26,8 @@ from pacman.operations.tag_allocator_algorithms import BasicTagAllocator
 class TestTagsBoardAddresses(unittest.TestCase):
     """ Tests for ip tags on different boards
     """
+    def setUp(self):
+        unittest_setup()
 
     def test_ip_tags(self):
         machine = virtual_machine(12, 12)

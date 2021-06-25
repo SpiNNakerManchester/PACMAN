@@ -15,9 +15,7 @@
 
 from collections import OrderedDict
 import logging
-import os
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRoutingException
 from pacman.utilities.algorithm_utilities.routes_format import format_route
 
@@ -167,45 +165,3 @@ def compare_tables(original, compressed):
     compressed_dict = codify_table(compressed)
     for o_route in original.multicast_routing_entries:
         compare_route(o_route, compressed_dict)
-
-
-def generate_routing_compression_checker_report(
-        report_folder, routing_tables, compressed_routing_tables):
-    """ Make a full report of how the compressed covers all routes in the\
-        and uncompressed routing table
-
-    :param str report_folder: the folder to store the resulting report
-    :param MulticastRoutingTables routing_tables: the original routing tables
-    :param MulticastRoutingTables compressed_routing_tables:
-        the compressed routing tables
-    :rtype: None
-    """
-    file_name = os.path.join(
-        report_folder, "routing_compression_checker_report.rpt")
-
-    try:
-        with open(file_name, "w") as f:
-            progress = ProgressBar(
-                routing_tables.routing_tables,
-                "Generating routing compression checker report")
-            f.write("If this table did not raise an exception compression "
-                    "was fully checked. \n\n")
-            f.write("The format is:\n"
-                    "Chip x, y\n"
-                    "\t Uncompressed Route\n"
-                    "\t\tCompressed Route\n\n")
-
-            for original in progress.over(routing_tables.routing_tables):
-                x = original.x
-                y = original.y
-                f.write("Chip: X:{} Y:{} \n".format(x, y))
-
-                compressed_table = compressed_routing_tables.\
-                    get_routing_table_for_chip(x, y)
-                compressed_dict = codify_table(compressed_table)
-                for o_route in original.multicast_routing_entries:
-                    f.write("\t{}\n".format(format_route(o_route)))
-                    compare_route(o_route, compressed_dict, f=f)
-    except IOError:
-        logger.exception("Generate_router_comparison_reports: Can't open file"
-                         " {} for writing.", file_name)

@@ -12,13 +12,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.model.graphs.application import ApplicationVertex
 
-from .zoned_routing_info_allocator import (
-    ZonedRoutingInfoAllocator)
-from pacman.operations.routing_info_allocator_algorithms.\
-    malloc_based_routing_allocator.malloc_based_routing_info_allocator \
-    import (
-        MallocBasedRoutingInfoAllocator)
 
-__all__ = ['MallocBasedRoutingInfoAllocator',
-           'ZonedRoutingInfoAllocator']
+class DuckLegacyApplicationVertex(ApplicationVertex):
+    """
+    A mock vertex that is a LegacyPartitionerAPI by ducktyping the methods
+    """
+    def __init__(self, label="test"):
+        super().__init__(label=label)
+
+    def n_atoms(self):
+        pass
+
+    def get_resources_used_by_atoms(self, vertex_slice):
+        pass
+
+    def create_machine_vertex(
+            self, vertex_slice, resources_required, label=None,
+            constraints=None):
+        pass

@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
 from spinn_machine import virtual_machine
@@ -20,6 +21,7 @@ from pacman.operations.router_algorithms.ner_route import NerRoute
 
 
 def test_ner_route_default():
+    unittest_setup()
     graph = MachineGraph("Test")
     machine = virtual_machine(8, 8)
     placements = Placements()

@@ -193,58 +193,6 @@
             <param_type>MemoryPlacements</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="HilbertPlacer">
-        <python_module>pacman.operations.rigged_algorithms.hilbert_placer</python_module>
-        <python_class>HilbertPlacer</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
-            </parameter>
-            <parameter>
-                <param_name>plan_n_timesteps</param_name>
-                <param_type>PlanNTimeSteps</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>machine_graph</param_name>
-            <param_name>machine</param_name>
-            <param_name>plan_n_timesteps</param_name>
-        </required_inputs>
-        <outputs>
-            <param_type>MemoryPlacements</param_type>
-        </outputs>
-    </algorithm>
-    <algorithm name="RandomPlacer">
-        <python_module>pacman.operations.rigged_algorithms.random_placer</python_module>
-        <python_class>RandomPlacer</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
-            </parameter>
-            <parameter>
-                <param_name>plan_n_timesteps</param_name>
-                <param_type>PlanNTimeSteps</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>machine_graph</param_name>
-            <param_name>machine</param_name>
-            <param_name>plan_n_timesteps</param_name>
-        </required_inputs>
-        <outputs>
-            <param_type>MemoryPlacements</param_type>
-        </outputs>
-    </algorithm>
     <algorithm name="BasicDijkstraRouting">
         <python_module>pacman.operations.router_algorithms.basic_dijkstra_routing</python_module>
         <python_class>BasicDijkstraRouting</python_class>
@@ -407,17 +355,12 @@
                 <param_name>router_tables</param_name>
                 <param_type>MemoryRoutingTables</param_type>
             </parameter>
-            <parameter>
-                <param_name>target_length</param_name>
-                <param_type>CompressionTargetSize</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>router_tables</param_name>
         </required_inputs>
         <optional_inputs>
             <token>RoutingTablesPreCompressed</token>
-            <param_name>target_length</param_name>
         </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
@@ -432,17 +375,12 @@
                 <param_name>router_tables</param_name>
                 <param_type>MemoryRoutingTables</param_type>
             </parameter>
-            <parameter>
-                <param_name>target_length</param_name>
-                <param_type>CompressionTargetSize</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>router_tables</param_name>
         </required_inputs>
         <optional_inputs>
             <token>RoutingTablesPreCompressed</token>
-            <param_name>target_length</param_name>
         </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
@@ -456,17 +394,10 @@
                 <param_name>router_tables</param_name>
                 <param_type>MemoryRoutingTables</param_type>
             </parameter>
-            <parameter>
-                <param_name>target_length</param_name>
-                <param_type>CompressionTargetSize</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>router_tables</param_name>
         </required_inputs>
-        <optional_inputs>
-            <param_name>target_length</param_name>
-        </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
         </outputs>
@@ -479,44 +410,14 @@
                 <param_name>router_tables</param_name>
                 <param_type>MemoryRoutingTables</param_type>
             </parameter>
-            <parameter>
-                <param_name>target_length</param_name>
-                <param_type>CompressionTargetSize</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>router_tables</param_name>
         </required_inputs>
-        <optional_inputs>
-            <param_name>target_length</param_name>
-        </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
             <token part="CompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
-    </algorithm>
-    <algorithm name="RoutingCompressionChecker">
-        <python_module>pacman.operations.router_compressors.routing_compression_checker</python_module>
-        <python_function>generate_routing_compression_checker_report</python_function>
-        <input_definitions>
-            <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
-            </parameter>
-            <parameter>
-                <param_name>compressed_routing_tables</param_name>
-                <param_type>MemoryCompressedRoutingTables</param_type>
-            </parameter>
-            <parameter>
-                <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>report_folder</param_name>
-            <param_name>compressed_routing_tables</param_name>
-            <param_name>routing_tables</param_name>
-        </required_inputs>
     </algorithm>
     <algorithm name="BasicRouteMerger">
         <python_module>pacman.operations.router_compressors.basic_route_merger</python_module>

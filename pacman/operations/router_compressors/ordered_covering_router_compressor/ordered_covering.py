@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.config_holder import get_config_bool
+from spinn_machine import Machine
 from pacman.operations.router_compressors import Entry
 from pacman.exceptions import MinimisationFailedError
 from .remove_default_routes import remove_default_routes
@@ -22,7 +24,7 @@ from spinn_utilities.timer import Timer
 
 
 def minimise(
-        routing_table, target_length, use_timer_cut_off=False,
+        routing_table, use_timer_cut_off=False,
         time_to_run_for_before_raising_exception=None):
     """Reduce the size of a routing table by merging together entries where \
     possible and by removing any remaining default routes.
@@ -43,11 +45,6 @@ def minimise(
 
     :param list(Entry) routing_table:
         Routing entries to be merged.
-    :param target_length:
-        Target length of the routing table; the minimisation procedure will
-        halt once either this target is reached or no further minimisation is
-        possible. If ``None`` then the table will be made as small as possible.
-    :type target_length: int or None
     :param bool use_timer_cut_off: flag for timing cutoff to be used.
     :param time_to_run_for_before_raising_exception:
         The time to run for in seconds before raising an exception
@@ -58,6 +55,14 @@ def minimise(
         If the smallest table that can be produced is larger than
         ``target_length``.
     """
+    if get_config_bool(
+            "Mapping", "router_table_compress_as_far_as_possible"):
+        # Compress as much as possible
+        target_length = None
+    else:
+        target_length = Machine.ROUTER_ENTRIES
+
+    # Keep None values as that flags as much as possible
     table, _ = ordered_covering(
         routing_table=routing_table, target_length=target_length,
         no_raise=True, use_timer_cut_off=use_timer_cut_off,
@@ -141,12 +146,15 @@ def ordered_covering(
             diff = timer.take_sample()
             if diff.total_seconds() >= time_to_run_for:
                 raise MinimisationFailedError(
-                    target_length, len(routing_table))
+                    f"Best compression is {len(routing_table)} which is "
+                    f"still higher than the target {target_length}")
 
     # If the table is still too big then raise an error
     if (not no_raise and target_length is not None and
             len(routing_table) > target_length):
-        raise MinimisationFailedError(target_length, len(routing_table))
+        raise MinimisationFailedError(
+            f"Best compression is {len(routing_table)} which is "
+            f"still higher than the target {target_length}")
 
     # Return the finished routing table and aliases table
     return routing_table, aliases
