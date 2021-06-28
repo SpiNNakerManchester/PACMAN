@@ -77,6 +77,7 @@ class ApplicationFPGAVertex(ApplicationVertex):
     def outgoing_fpga_connection(self):
         """ The connection to one FPGA via one link to which packets are sent
             to this device.
+
         :rtype: FPGAConnection or None
         """
         return self._outgoing_fpga_connection
