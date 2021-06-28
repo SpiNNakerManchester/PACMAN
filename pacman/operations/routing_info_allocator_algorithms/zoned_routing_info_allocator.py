@@ -92,12 +92,12 @@ class ZonedRoutingInfoAllocator(object):
         "__n_bits_atoms",
         # Flag to say operating in flexible mode
         "__flexible",
-        # List of (key, n_keys) needed for fixed
-        "__fixed_keys",
         # Map of partition to fixed_+key_and_mask
         "__fixed_partitions",
         # Set of app_part indexes used by fixed
-        "__fixed_used"
+        "__fixed_used",
+        # True if all partitions are fixed
+        "__all_fixed"
     ]
     # pylint: disable=attribute-defined-outside-init
 
@@ -124,9 +124,9 @@ class ZonedRoutingInfoAllocator(object):
         self.__n_bits_atoms = 0
         self.__atom_bits_per_app_part = dict()
         self.__flexible = flexible
-        self.__fixed_keys = list()
         self.__fixed_partitions = dict()
         self.__fixed_used = set()
+        self.__all_fixed = True
 
         check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,
@@ -135,6 +135,9 @@ class ZonedRoutingInfoAllocator(object):
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         self.__find_fixed()
+        if self.__all_fixed:
+            return self.__allocate_all_fixed()
+
         self.__calculate_zones()
         self.__check_zones()
         return self.__allocate()
@@ -145,6 +148,7 @@ class ZonedRoutingInfoAllocator(object):
 
         See :py:meth:`__add_fixed`
         """
+        self.__all_fixed = True
         multicast_partitions = self.__machine_graph.multicast_partitions
         for app_id in multicast_partitions:
             # multicast_partitions is a map of app_id to paritition_vertices
@@ -155,9 +159,13 @@ class ZonedRoutingInfoAllocator(object):
                     partition = self.__machine_graph.\
                         get_outgoing_edge_partition_starting_at_vertex(
                             mac_vertex, partition_name)
+                    is_fixed = False
                     for constraint in partition.constraints:
                         if isinstance(constraint, FixedKeyAndMaskConstraint):
                             self.__add_fixed(partition, constraint)
+                            is_fixed = True
+                    if not is_fixed:
+                        self.__all_fixed = False
 
     def __add_fixed(self, partition, constraint):
         """
@@ -172,11 +180,6 @@ class ZonedRoutingInfoAllocator(object):
         :param FixedKeyAndMaskConstraint constraint:
         """
         self.__fixed_partitions[partition] = constraint.keys_and_masks
-        for key_and_mask in constraint.keys_and_masks:
-            # Go through the mask sets and save keys and n_keys
-            for key, n_keys in get_key_ranges(
-                    key_and_mask.key, key_and_mask.mask):
-                self.__fixed_keys.append((key, n_keys))
 
     def __calculate_zones(self):
         """
@@ -260,13 +263,47 @@ class ZonedRoutingInfoAllocator(object):
         """
         Block the use of ``AP`` indexes that would clash with fixed keys
         """
+        # The idea below is to generate all combinations of the A-P keys that
+        # overlap with one of the fixed keys and masks. Example:
+        # | A | P | M | X |
+        # |1111000|0000000| (1)
+        # |1111111|1100000| (2)
+        # |1010110|0000000| (3)
+        # Case (1): the mask of the key is all within A and P, so it will
+        #           generate 16 AP values which need to be blocked out
+        # Case (2): the mask of the key goes beyond A and P, so it will
+        #           generate only one AP value that can't be used
+        # Case (3): the mask that overlaps AP is complex; all possible
+        #           combinations of AP within the 0s of the mask will be
+        #           blocked from use
+
         self.__fixed_used = set()
-        bucket_size = 2 ** self.__n_bits_atoms_and_mac
-        for (key, n_keys) in self.__fixed_keys:
-            start = key // bucket_size
-            end = (key + n_keys) // bucket_size
-            for i in range(start, end + 1):
-                self.__fixed_used.add(i)
+        n_app_part_bits = BITS_IN_KEY - self.__n_bits_atoms_and_mac
+        for keys_and_masks in self.__fixed_partitions.values():
+            for key_and_mask in keys_and_masks:
+                # Get the key and mask that overlap with the A-P key and mask
+                key = key_and_mask.key >> self.__n_bits_atoms_and_mac
+                mask = key_and_mask.mask >> self.__n_bits_atoms_and_mac
+
+                # Make the mask all 1s in the MSBs where it has been shifted
+                mask |= (((1 << self.__n_bits_atoms_and_mac) - 1) <<
+                         n_app_part_bits)
+
+                # Generate all possible combinations of keys for the remaining
+                # mask
+                for k, n_keys in get_key_ranges(key, mask):
+                    for i in range(n_keys):
+                        self.__fixed_used.add(k + i)
+
+    def __allocate_all_fixed(self):
+        routing_infos = RoutingInfo()
+        progress = ProgressBar(
+            len(self.__fixed_partitions), "Allocating routing keys")
+        for partition, keys_and_masks in progress.over(
+                self.__fixed_partitions.items()):
+            routing_infos.add_partition_info(
+                PartitionRoutingInfo(keys_and_masks, partition))
+        return routing_infos
 
     def __allocate(self):
         multicast_partitions = self.__machine_graph.multicast_partitions
