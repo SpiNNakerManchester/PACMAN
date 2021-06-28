@@ -39,5 +39,5 @@ class FPGAConnection(NamedTuple):
         links = ([self.fpga_link_id] if self.fpga_link_id is not None
                  else FPGA_LINK_IDS)
         for i in ids:
-            for l in links:
-                yield(FPGAConnection(i, l, self.board_address))
+            for lnk in links:
+                yield(FPGAConnection(i, lnk, self.board_address))
