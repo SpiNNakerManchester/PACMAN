@@ -69,6 +69,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
             vertex = MachineSpiNNakerLinkVertex(
                 app_vertex.spinnaker_link_id, app_vertex.board_address, label,
                 app_vertex=app_vertex)
+            machine_graph.add_vertex(vertex)
             self.__incoming_vertices = [vertex]
             self.__outgoing_vertex = vertex
         else:
