@@ -48,13 +48,17 @@ class MallocBasedChipIdAllocator(object):
 
     __slots__ = [
         # dict of [virtual chip data] = (x,y)
-        "_virtual_chips"
+        "_virtual_chips",
+        "__next_id"
     ]
 
     def __init__(self):
 
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()
+
+        # Start allocating and -2, -2 and go down
+        self.__next_id = -2
 
     def __call__(self, machine, machine_graph):
         """
@@ -102,7 +106,8 @@ class MallocBasedChipIdAllocator(object):
             return self._virtual_chips[link_data]
 
         # Allocate a new ID and cache it for later
-        (chip_id_x, chip_id_y) = machine.get_unused_xy()
+        (chip_id_x, chip_id_y) = self.__next_id, self.__next_id
+        self.__next_id -= 1
         machine_algorithm_utilities.create_virtual_chip(
             machine, link_data, chip_id_x, chip_id_y)
         self._virtual_chips[link_data] = (chip_id_x, chip_id_y)
