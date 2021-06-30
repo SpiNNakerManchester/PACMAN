@@ -614,4 +614,19 @@
             <param_type>MemoryRoutingTableByPartition</param_type>
         </outputs>
     </algorithm>
+    <algorithm name="SplitterReset">
+        <python_module>pacman.model.partitioner_splitters.splitter_reset</python_module>
+        <python_function>splitter_reset</python_function>
+        <input_definitions>
+            <parameter>
+                <param_name>app_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>app_graph</param_name>
+        </required_inputs>
+        <outputs>
+        </outputs>
+    </algorithm>
 </algorithms>
