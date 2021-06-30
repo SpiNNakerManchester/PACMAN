@@ -102,4 +102,4 @@ class SDRAMMachineEdge(MachineEdge):
         return self._label
 
     def __str__(self):
-        return self.__repr__()
+        return f"{self.__repr__()}"
