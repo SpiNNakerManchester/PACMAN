@@ -206,6 +206,8 @@ class OneToOnePlacer(RadialPlacer):
                     chips.append((placement.x, placement.y))
                 else:
                     unallocated.append(vert)
+            if not chips:
+                chips = None
 
             if 0 < len(unallocated) <=\
                     resource_tracker.get_maximum_cores_available_on_a_chip():
