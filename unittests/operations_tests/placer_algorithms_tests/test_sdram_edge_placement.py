@@ -66,18 +66,18 @@ class TestSameChipConstraint(unittest.TestCase):
         n_keys_map = DictBasedMachinePartitionNKeysMap()
 
         inputs = {
-            "MemoryExtendedMachine": machine,
-            "MemoryMachine": machine,
-            "MemoryMachineGraph": graph,
+            "ExtendedMachine": machine,
+            "Machine": machine,
+            "MachineGraph": graph,
             "PlanNTimeSteps": plan_n_timesteps,
-            "MemoryMachinePartitionNKeysMap": n_keys_map
+            "MachinePartitionNKeysMap": n_keys_map
         }
         algorithms = [placer]
         xml_paths = []
         executor = PACMANAlgorithmExecutor(
             algorithms, [], inputs, [], [], [], xml_paths)
         executor.execute_mapping()
-        placements = executor.get_item("MemoryPlacements")
+        placements = executor.get_item("Placements")
         for edge in sdram_edges:
             pre_place = placements.get_placement_of_vertex(edge.pre_vertex)
             post_place = placements.get_placement_of_vertex(edge.post_vertex)
