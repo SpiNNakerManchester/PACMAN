@@ -99,7 +99,7 @@ class SDRAMMachineEdge(MachineEdge):
         self._sdram_base_address = new_value
 
     def __repr__(self):
-        return self._label
+        return f"EdgramEdge {self.label} "
 
     def __str__(self):
         return self.__repr__()
