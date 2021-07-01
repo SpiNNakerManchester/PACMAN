@@ -26,6 +26,7 @@ from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
+from pacman.model.graphs.abstract_virtual import AbstractVirtual
 
 
 class SpreaderPlacer(OneToOnePlacer):
@@ -79,8 +80,8 @@ class SpreaderPlacer(OneToOnePlacer):
         # get same chip groups
         same_chip_vertex_groups = get_same_chip_vertex_groups(machine_graph)
         progress_bar.update()
-        # get chip and core placed verts
-        hard_chip_constraints = self._locate_hard_placement_verts(
+        # get chip and core placed vertices, and virtual vertices
+        hard_verts, virtual_verts = self._locate_hard_placement_verts(
             machine_graph)
         progress_bar.update()
         # get one to one groups
@@ -100,8 +101,18 @@ class SpreaderPlacer(OneToOnePlacer):
         cost_per_chip = defaultdict(int)
         progress_bar.update()
 
+        # allocate virtual ones
+        next_virtual_core = dict()
+        for vertex in virtual_verts:
+            x = vertex.virtual_chip_x
+            y = vertex.virtual_chip_y
+            p = next_virtual_core.get((x, y), 0)
+            next_virtual_core[x, y] = p + 1
+            placements.add_placement(Placement(vertex, x, y, p))
+            placed_vertices.add(vertex)
+
         # allocate hard ones
-        for hard_vertex in hard_chip_constraints:
+        for hard_vertex in hard_verts:
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
                 hard_vertex.resources_required, hard_vertex.constraints)
             placements.add_placement(Placement(hard_vertex, x, y, p))
@@ -212,11 +223,15 @@ class SpreaderPlacer(OneToOnePlacer):
         :rtype: list(MachineVertex)
         """
         hard_verts = list()
+        virtual_verts = list()
         for vertex in machine_graph.vertices:
-            for constraint in vertex.constraints:
-                if isinstance(constraint, ChipAndCoreConstraint):
-                    hard_verts.append(vertex)
-        return hard_verts
+            if isinstance(vertex, AbstractVirtual):
+                virtual_verts.append(vertex)
+            else:
+                for constraint in vertex.constraints:
+                    if isinstance(constraint, ChipAndCoreConstraint):
+                        hard_verts.append(vertex)
+        return hard_verts, virtual_verts
 
     def _place_same_chip_verts(
             self, same_chip_vertex_groups, chips_in_order,
