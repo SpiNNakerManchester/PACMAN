@@ -31,7 +31,7 @@ class ApplicationFPGAVertex(ApplicationVertex):
     def __init__(
             self, n_atoms, incoming_fpga_connections=None,
             outgoing_fpga_connection=None, label=None, constraints=None,
-            n_machine_vertices_per_link=None):
+            n_machine_vertices_per_link=1):
         """
 
         :param int n_atoms: The number of atoms in the vertex
