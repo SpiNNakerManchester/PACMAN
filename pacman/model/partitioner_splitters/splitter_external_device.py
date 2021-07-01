@@ -47,12 +47,13 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                     label = (f"Machine vertex for {app_vertex.label}"
                              f":{fpga.fpga_id}:{fpga.fpga_link_id}"
                              f":{fpga.board_address}")
-                    vertex = MachineFPGAVertex(
-                        fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
-                        label, app_vertex=app_vertex)
-                    seen_incoming[fpga] = vertex
-                    machine_graph.add_vertex(vertex)
-                    self.__incoming_vertices.append(vertex)
+                    for i in range(app_vertex.n_machine_vertices_per_link):
+                        vertex = MachineFPGAVertex(
+                            fpga.fpga_id, fpga.fpga_link_id,
+                            fpga.board_address, label, app_vertex=app_vertex)
+                        seen_incoming[fpga] = vertex
+                        machine_graph.add_vertex(vertex)
+                        self.__incoming_vertices.append(vertex)
             fpga = app_vertex.outgoing_fpga_connection
             if fpga is not None:
                 if fpga in seen_incoming:
@@ -97,6 +98,8 @@ class SplitterExternalDevice(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, edge, outgoing_edge_partition):
+        # Note, the outgoing vertex is how to get packets out of this device,
+        # so we want to direct it at the incoming vertices!
         if not self.__incoming_vertices:
             raise PacmanNotExistException(
                 f"There is no way for the target device of {edge} to send via"
