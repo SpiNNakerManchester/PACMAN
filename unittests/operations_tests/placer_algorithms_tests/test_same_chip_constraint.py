@@ -55,11 +55,11 @@ class TestSameChipConstraint(unittest.TestCase):
         n_keys_map = DictBasedMachinePartitionNKeysMap()
 
         inputs = {
-            "MemoryExtendedMachine": machine,
-            "MemoryMachine": machine,
-            "MemoryMachineGraph": graph,
+            "ExtendedMachine": machine,
+            "Machine": machine,
+            "MachineGraph": graph,
             "PlanNTimeSteps": None,
-            "MemoryMachinePartitionNKeysMap": n_keys_map
+            "MachinePartitionNKeysMap": n_keys_map
         }
         algorithms = [placer]
         xml_paths = []
@@ -67,7 +67,7 @@ class TestSameChipConstraint(unittest.TestCase):
             algorithms, [], inputs, [], [], [], xml_paths)
         executor.execute_mapping()
 
-        placements = executor.get_item("MemoryPlacements")
+        placements = executor.get_item("Placements")
         for same in same_vertices:
             print("{0.vertex.label}, {0.x}, {0.y}, {0.p}: {1}".format(
                 placements.get_placement_of_vertex(same),
