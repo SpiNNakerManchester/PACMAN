@@ -91,11 +91,10 @@ class SplitterExternalDevice(AbstractSplitterCommon):
     def get_in_coming_slices(self):
         if self.__outgoing_vertex is None:
             return []
-        if self.__outgoing_slices is None:
+        if self.__outgoing_slice is None:
             # We actually don't care but hopefully this is OK...
-            self.__outgoing_slices = [
-                Slice(0, self._governed_app_vertex.n_atoms)]
-        return self.__outgoing_slices, True
+            self.__outgoing_slice = Slice(0, self._governed_app_vertex.n_atoms)
+        return [self.__outgoing_slice], True
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
