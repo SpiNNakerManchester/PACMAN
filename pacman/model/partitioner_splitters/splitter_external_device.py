@@ -23,6 +23,7 @@ from pacman.model.graphs.machine import (
 from pacman.exceptions import PacmanConfigurationException,\
     PacmanNotExistException
 from pacman.model.graphs.common.slice import Slice
+import math
 
 
 class SplitterExternalDevice(AbstractSplitterCommon):
@@ -31,8 +32,17 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         # Machine vertices that will send packets into the network
         "__incoming_vertices",
         # Machine vertices that will receive packets from the network
-        "__outgoing_vertex"
+        "__outgoing_vertex",
+        # Slices of incoming vertices (not exactly but hopefully close enough)
+        "__incoming_slices",
+        # Slice of outgoing vertex (which really doesn't matter here)
+        "__outgoing_slice"
     ]
+
+    def __init__(self, splitter_name=None):
+        super(SplitterExternalDevice, self).__init__(splitter_name)
+        self.__incoming_slices = None
+        self.__outgoing_slice = None
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
@@ -47,7 +57,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                     label = (f"Machine vertex for {app_vertex.label}"
                              f":{fpga.fpga_id}:{fpga.fpga_link_id}"
                              f":{fpga.board_address}")
-                    for i in range(app_vertex.n_machine_vertices_per_link):
+                    for _ in range(app_vertex.n_machine_vertices_per_link):
                         vertex = MachineFPGAVertex(
                             fpga.fpga_id, fpga.fpga_link_id,
                             fpga.board_address, label, app_vertex=app_vertex)
@@ -79,11 +89,30 @@ class SplitterExternalDevice(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
-        return [Slice(0, self._governed_app_vertex.n_atoms)], True
+        if self.__outgoing_vertex is None:
+            return []
+        if self.__outgoing_slices is None:
+            # We actually don't care but hopefully this is OK...
+            self.__outgoing_slices = [
+                Slice(0, self._governed_app_vertex.n_atoms)]
+        return self.__outgoing_slices, True
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        return [Slice(0, self._governed_app_vertex.n_atoms)], True
+        if self.__incoming_slices is not None:
+            return self.__incoming_slices, True
+
+        # This is a bit convoluted, since the slices are ill-defined here;
+        # The number of slices will at least be correct though.
+        app_vertex = self._governed_app_vertex
+        fpga_conns = list(app_vertex.incoming_fpga_connections)
+        v_per_link = app_vertex.n_machine_vertices_per_link
+        atoms_per_slice = int(math.ceil(
+            app_vertex.n_atoms / (len(fpga_conns) * v_per_link)))
+        self.__incoming_slices = [Slice(0, atoms_per_slice)
+                                  for _ in fpga_conns
+                                  for _ in range(v_per_link)]
+        return self.__incoming_slices, True
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(
