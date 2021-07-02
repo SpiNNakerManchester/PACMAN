@@ -23,11 +23,11 @@
         <input_definitions>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>ExtendedMachine</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>destination_class</param_name>
@@ -43,7 +43,7 @@
             <token>EdgesFiltered</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryFixedRoutes</param_type>
+            <param_type>FixedRoutes</param_type>
         </outputs>
     </algorithm>
     <algorithm name="SplitterPartitioner">
@@ -52,12 +52,12 @@
         <input_definitions>
             <parameter>
                 <param_name>app_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryVirtualMachine</param_type>
-                <param_type>MemoryMachine</param_type>
+                <param_type>VirtualMachine</param_type>
+                <param_type>Machine</param_type>
             </parameter>
             <parameter>
                 <param_name>plan_n_time_steps</param_name>
@@ -65,7 +65,7 @@
             </parameter>
             <parameter>
                 <param_name>pre_allocated_resources</param_name>
-                <param_type>MemoryPreAllocatedResources</param_type>
+                <param_type>PreAllocatedResources</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -79,7 +79,7 @@
             <param_name>pre_allocated_resources</param_name>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryMachineGraph</param_type>
+            <param_type>MachineGraph</param_type>
             <param_type>NChipsRequired</param_type>
             <token>PartitioningDone</token>
         </outputs>
@@ -90,11 +90,11 @@
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>ExtendedMachine</param_type>
             </parameter>
             <parameter>
                 <param_name>plan_n_timesteps</param_name>
@@ -107,7 +107,7 @@
             <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPlacements</param_type>
+            <param_type>Placements</param_type>
         </outputs>
     </algorithm>
     <algorithm name="OneToOnePlacer">
@@ -116,11 +116,11 @@
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>ExtendedMachine</param_type>
             </parameter>
             <parameter>
                 <param_name>plan_n_timesteps</param_name>
@@ -133,7 +133,7 @@
             <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPlacements</param_type>
+            <param_type>Placements</param_type>
         </outputs>
     </algorithm>
     <algorithm name="SpreaderPlacer">
@@ -142,15 +142,15 @@
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>ExtendedMachine</param_type>
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryMachinePartitionNKeysMap</param_type>
+                <param_type>MachinePartitionNKeysMap</param_type>
             </parameter>
             <parameter>
                 <param_name>plan_n_timesteps</param_name>
@@ -164,7 +164,7 @@
             <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPlacements</param_type>
+            <param_type>Placements</param_type>
         </outputs>
     </algorithm>
     <algorithm name="ConnectiveBasedPlacer">
@@ -173,11 +173,11 @@
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>ExtendedMachine</param_type>
             </parameter>
              <parameter>
                 <param_name>plan_n_timesteps</param_name>
@@ -190,7 +190,7 @@
             <param_name>plan_n_timesteps</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryPlacements</param_type>
+            <param_type>Placements</param_type>
         </outputs>
     </algorithm>
     <algorithm name="BasicDijkstraRouting">
@@ -199,15 +199,15 @@
         <input_definitions>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>ExtendedMachine</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -219,7 +219,7 @@
             <token>EdgesFiltered</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryRoutingTableByPartition</param_type>
+            <param_type>RoutingTableByPartition</param_type>
         </outputs>
     </algorithm>
     <algorithm name="BasicRoutingInfoAllocator">
@@ -228,15 +228,15 @@
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryMachinePartitionNKeysMap</param_type>
+                <param_type>MachinePartitionNKeysMap</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -248,7 +248,7 @@
             <token>EdgesFiltered</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryRoutingInfos</param_type>
+            <param_type>RoutingInfos</param_type>
         </outputs>
     </algorithm>
     <algorithm name="ZonedRoutingInfoAllocator">
@@ -257,11 +257,11 @@
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryMachinePartitionNKeysMap</param_type>
+                <param_type>MachinePartitionNKeysMap</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -272,7 +272,7 @@
             <token>EdgesFiltered</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryRoutingInfos</param_type>
+            <param_type>RoutingInfos</param_type>
         </outputs>
     </algorithm>
     <algorithm name="GlobalZonedRoutingInfoAllocator">
@@ -281,11 +281,11 @@
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryMachinePartitionNKeysMap</param_type>
+                <param_type>MachinePartitionNKeysMap</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -293,7 +293,7 @@
             <param_name>n_keys_map</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryRoutingInfos</param_type>
+            <param_type>RoutingInfos</param_type>
         </outputs>
     </algorithm>
     <algorithm name="MallocBasedRoutingInfoAllocator">
@@ -302,11 +302,11 @@
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>MemoryMachinePartitionNKeysMap</param_type>
+                <param_type>MachinePartitionNKeysMap</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -317,7 +317,7 @@
             <token>EdgesFiltered</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryRoutingInfos</param_type>
+            <param_type>RoutingInfos</param_type>
         </outputs>
     </algorithm>
     <algorithm name="BasicRoutingTableGenerator">
@@ -326,15 +326,15 @@
         <input_definitions>
             <parameter>
                 <param_name>routing_infos</param_name>
-                <param_type>MemoryRoutingInfos</param_type>
+                <param_type>RoutingInfos</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_table_by_partitions</param_name>
-                <param_type>MemoryRoutingTableByPartition</param_type>
+                <param_type>RoutingTableByPartition</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>ExtendedMachine</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -343,7 +343,7 @@
             <param_name>machine</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryRoutingTables</param_type>
+            <param_type>RoutingTables</param_type>
             <token part="UnCompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
     </algorithm>
@@ -353,7 +353,7 @@
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -363,7 +363,7 @@
             <token>RoutingTablesPreCompressed</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryCompressedRoutingTables</param_type>
+            <param_type>CompressedRoutingTables</param_type>
         </outputs>
     </algorithm>
     <algorithm name="MundyRouterCompressor">
@@ -373,7 +373,7 @@
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -383,7 +383,7 @@
             <token>RoutingTablesPreCompressed</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryCompressedRoutingTables</param_type>
+            <param_type>CompressedRoutingTables</param_type>
         </outputs>
     </algorithm>
     <algorithm name="PairUnorderedCompressor">
@@ -392,14 +392,14 @@
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>router_tables</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryCompressedRoutingTables</param_type>
+            <param_type>CompressedRoutingTables</param_type>
         </outputs>
     </algorithm>
     <algorithm name="PairCompressor">
@@ -408,14 +408,14 @@
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>router_tables</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryCompressedRoutingTables</param_type>
+            <param_type>CompressedRoutingTables</param_type>
             <token part="CompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
     </algorithm>
@@ -425,7 +425,7 @@
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -435,7 +435,7 @@
             <token>RoutingTablesPreCompressed</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryCompressedRoutingTables</param_type>
+            <param_type>CompressedRoutingTables</param_type>
         </outputs>
     </algorithm>
     <algorithm name="MallocBasedRouteMerger">
@@ -444,7 +444,7 @@
         <input_definitions>
             <parameter>
                 <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -454,7 +454,7 @@
             <token>RoutingTablesPreCompressed</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryCompressedRoutingTables</param_type>
+            <param_type>CompressedRoutingTables</param_type>
         </outputs>
     </algorithm>
     <algorithm name="MallocBasedChipIDAllocator">
@@ -463,11 +463,11 @@
         <input_definitions>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryMachine</param_type>
+                <param_type>Machine</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -475,28 +475,7 @@
             <param_name>machine_graph</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryExtendedMachine</param_type>
-        </outputs>
-    </algorithm>
-    <algorithm name="VirtualMallocBasedChipIDAllocator">
-        <python_module>pacman.operations.chip_id_allocator_algorithms.malloc_based_chip_id_allocator</python_module>
-        <python_class>MallocBasedChipIdAllocator</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>machine</param_name>
-                <param_type>MemoryVirtualMachine</param_type>
-            </parameter>
-            <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>machine</param_name>
-            <param_name>machine_graph</param_name>
-        </required_inputs>
-        <outputs>
-            <param_type>MemoryExtendedVirtualMachine</param_type>
+            <param_type>ExtendedMachine</param_type>
         </outputs>
     </algorithm>
     <algorithm name="BasicTagAllocator">
@@ -505,11 +484,11 @@
         <input_definitions>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>ExtendedMachine</param_type>
             </parameter>
              <parameter>
                 <param_name>plan_n_timesteps</param_name>
@@ -522,7 +501,7 @@
             <param_name>plan_n_timesteps</param_name>
          </required_inputs>
         <outputs>
-            <param_type>MemoryTags</param_type>
+            <param_type>Tags</param_type>
         </outputs>
     </algorithm>
     <algorithm name="ValidRoutesChecker">
@@ -531,24 +510,24 @@
         <input_definitions>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>ExtendedMachine</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
-                <param_type>MemoryRoutingInfos</param_type>
+                <param_type>RoutingInfos</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>MemoryCompressedRoutingTables</param_type>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>CompressedRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -565,15 +544,15 @@
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>ExtendedMachine</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -585,7 +564,7 @@
             <token>EdgesFiltered</token>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryRoutingTableByPartition</param_type>
+            <param_type>RoutingTableByPartition</param_type>
         </outputs>
     </algorithm>
     <algorithm name="NerRouteTrafficAware">
@@ -594,15 +573,15 @@
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>ExtendedMachine</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -611,7 +590,7 @@
             <param_name>placements</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryRoutingTableByPartition</param_type>
+            <param_type>RoutingTableByPartition</param_type>
         </outputs>
     </algorithm>
     <algorithm name="SplitterReset">
@@ -620,7 +599,7 @@
         <input_definitions>
             <parameter>
                 <param_name>app_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
