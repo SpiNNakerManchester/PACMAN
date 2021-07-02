@@ -19,7 +19,8 @@ from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 from pacman.model.graphs.machine import MachineGraph
 from pacman.model.partitioner_interfaces import (
-    AbstractSplitterPartitioner, AbstractSlicesConnect)
+    AbstractSplitterPartitioner, AbstractSlicesConnect,
+    AbstractVerticesConnect)
 from pacman.model.partitioner_splitters.abstract_splitters\
     .abstract_dependent_splitter import AbstractDependentSplitter
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
@@ -286,6 +287,10 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
                 app_edge.could_connect(
                     src_machine_vertex.vertex_slice,
                     dest_machine_vertex.vertex_slice)):
+            return
+        if (isinstance(app_edge, AbstractVerticesConnect) and not
+                app_edge.could_vertices_connect(
+                    src_machine_vertex, dest_machine_vertex)):
             return
 
         # build edge and add to machine graph
