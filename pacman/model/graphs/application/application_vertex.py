@@ -128,6 +128,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
                 str(machine_vertex), machine_vertex)
         self._machine_vertices.add(machine_vertex)
 
+    @property
     def atoms_shape(self):
         """ The "shape" of the atoms in the vertex i.e. how the atoms are split
             between the dimensions of the vertex.  By default everything is
