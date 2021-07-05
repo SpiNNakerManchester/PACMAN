@@ -19,7 +19,8 @@ from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint, BoardConstraint, ChipAndCoreConstraint,
     AbstractPlacerConstraint)
 from pacman.model.resources import (
-    ConstantSDRAM, ResourceContainer, DTCMResource, CPUCyclesPerTickResource)
+    CoreTracker, ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource,
+    ResourceContainer)
 from pacman.utilities.utility_calls import (
     check_algorithm_can_support_constraints, check_constrained_value,
     is_equal_or_None)
@@ -50,6 +51,8 @@ class ResourceTracker(object):
 
         # the number of timesteps that should be planned for
         "_plan_n_timesteps",
+
+        "_preallocated_resources",
 
         # Set of tags available indexed by board address
         # Note that entries are only added when a board is first used
@@ -186,6 +189,7 @@ class ResourceTracker(object):
 
         # set of resources that have been pre allocated and therefore need to
         # be taken account of when allocating resources
+        self._preallocated_resources = preallocated_resources
         self._convert_preallocated_resources(preallocated_resources)
 
         # update tracker for n cores available per chip
@@ -343,19 +347,15 @@ class ResourceTracker(object):
                     "The constraint cannot be met with the given chips")
         return x, y, p
 
-    def _chip_available(self, x, y):
-        """
-        :param int x:
-        :param int y:
-        :rtype: bool
-        """
-        if not self._machine.is_chip_at(x, y):
-            return False
+    def _get_core_tracker(self, x, y):
         if (x, y) in self._core_tracker:
-            projected_id = len(self._core_tracker[x, y])
-        else:
-            projected_id = self._machine.get_chip_at(x, y).n_user_processors
-        return projected_id > self._n_cores_preallocated[x, y]
+            return self._core_tracker[(x, y)]
+        chip = self._machine.get_chip_at(x, y)
+        if chip:
+            self._core_tracker[(x, y)] = CoreTracker(
+                chip, self._preallocated_resources,
+                self._real_chips_with_n_cores_available)
+            return self._core_tracker[(x, y)]
 
     def _get_usable_chips(self, chips, board_address):
         """ Get all chips that are available on a board given the constraints
@@ -390,7 +390,7 @@ class ResourceTracker(object):
             chip_found = False
             for (x, y) in chips:
                 if ((area_code is None or (x, y) in area_code) and
-                        self._chip_available(x, y)):
+                        self._get_core_tracker(x, y).is_available):
                     chip_found = True
                     yield (x, y)
             if not chip_found:
@@ -401,11 +401,11 @@ class ResourceTracker(object):
                     "No valid chips found on the specified board")
         elif board_address is not None:
             for (x, y) in self._machine.get_existing_xys_on_board(eth_chip):
-                if self._chip_available(x, y):
+                if self._get_core_tracker(x, y).is_available:
                     yield (x, y)
         else:
             for (x, y) in self._chips_available:
-                if self._chip_available(x, y):
+                if self._get_core_tracker(x, y).is_available:
                     yield (x, y)
 
     def _check_chip_not_used(self, chips):
@@ -446,82 +446,6 @@ class ResourceTracker(object):
         :rtype: int
         """
         return self._sdram_tracker[chip.x, chip.y]
-
-    def _best_core_available(self, chip):
-        """ Locate the best core available on a chip
-
-        :param ~spinn_machine.Chip chip: The chip to check the resources of
-        :return: The processor ID selected as the best on this chip
-        :rtype: int
-        """
-
-        # TODO: Check for the best core; currently assumes all are the same
-        key = (chip.x, chip.y)
-        if key not in self._core_tracker:
-            for processor in chip.processors:
-                if not processor.is_monitor:
-                    return processor.processor_id
-        return next(iter(self._core_tracker[key]))
-
-    def _is_core_available(self, chip, key, processor_id):
-        """ Check if there is a core available on a given chip given the\
-            constraints
-
-        :param ~spinn_machine.Chip chip: The chip to check the resources of
-        :param key: The (x, y) coordinates of the chip
-        :type key: tuple(int, int)
-        :param processor_id: A constraining fixed processor ID
-        :type processor_id: int or None
-        :return: whether there is a core available given the constraints
-        :rtype: bool
-        """
-        return self._n_cores_available(chip, key, processor_id) > 0
-
-    def _n_cores_available(self, chip, key, processor_id):
-        """ Get the number of cores available on the given chip given the\
-            constraints
-
-        :param ~spinn_machine.Chip chip: The chip to check the resources of
-        :param key: The (x, y) coordinates of the chip
-        :type key: tuple(int, int)
-        :param processor_id: A constraining fixed processor ID
-        :type processor_id: int or None
-        :return: The number of cores that meet the given constraints
-        :rtype: int
-        """
-
-        # If a specific processor has been requested, perform special checks
-        if processor_id is not None:
-
-            # If the chip has already had cores allocated...
-            if key in self._core_tracker:
-
-                # Check if there is enough space for preallocated cores,
-                # and that the processor specified is available
-                return int(
-                    len(self._core_tracker[key]) -
-                    self._n_cores_preallocated[key] > 0
-                    and processor_id in self._core_tracker[key])
-
-            # If here, the chip has no cores allocated, so check that there
-            # are enough cores on the chip for preallocated cores
-            elif chip.n_user_processors - self._n_cores_preallocated[key] > 0:
-
-                # Check that the processor is not a monitor core
-                processor = chip.get_processor_with_id(processor_id)
-                return int(processor is not None and not processor.is_monitor)
-
-            # If we get here, the core has been allocated
-            return 0
-
-        # Check how many cores are available
-        # TODO: Check the resources can be met with the processor
-        # Currently assumes all processors are equal
-        if key in self._core_tracker:
-            n_cores = len(self._core_tracker[key])
-        else:
-            n_cores = sum(not proc.is_monitor for proc in chip.processors)
-        return n_cores - self._n_cores_preallocated[key]
 
     def _get_matching_ip_tag(
             self, chip, board_address, tag_id, ip_address, port, strip_sdp,
@@ -741,55 +665,6 @@ class ResourceTracker(object):
         """
         self._sdram_tracker[chip.x, chip.y] -= \
             resources.sdram.get_total_sdram(self._plan_n_timesteps)
-
-    def _allocate_core(self, chip, key, processor_id):
-        """ Allocates a core on the given chip
-
-        :param ~spinn_machine.Chip chip: The chip to allocate the resources of
-        :param tuple(int,int) key: The (x, y) coordinates of the chip
-        :param processor_id:
-            The ID of the processor to allocate, or None to pick automatically
-        :type processor_id: int or None
-        :rtype: int
-        """
-        if key not in self._core_tracker:
-            self._fill_in_core_tracker_for_chip(key, chip)
-        if processor_id is not None:
-            self._core_tracker[key].remove(processor_id)
-        else:
-            # TODO: Find a core that meets the resource requirements
-            processor_id = self._core_tracker[key].pop()
-
-        # update number tracker
-        if chip.virtual:
-            self._virtual_chips_with_n_cores_available[
-                len(self._core_tracker[key])] -= 1
-            self._virtual_chips_with_n_cores_available[
-                len(self._core_tracker[key]) - 1] += 1
-        else:
-            self._real_chips_with_n_cores_available[
-                len(self._core_tracker[key])] -= 1
-            self._real_chips_with_n_cores_available[
-                len(self._core_tracker[key]) - 1] += 1
-
-        if len(self._core_tracker[key]) == self._n_cores_preallocated[key]:
-            self._chips_available.remove(key)
-
-        # update chip tracker
-        self._chips_used.add(key)
-
-        # return processor ID
-        return processor_id
-
-    def _fill_in_core_tracker_for_chip(self, key, chip):
-        """
-        :param tuple(int,int) key:
-        :param ~spinn_machine.Chip chip:
-        """
-        self._core_tracker[key] = set()
-        for processor in chip.processors:
-            if not processor.is_monitor:
-                self._core_tracker[key].add(processor.processor_id)
 
     def _allocate_tag(self, chip, board_address, tag_id):
         """ Allocate a tag given the constraints
@@ -1109,8 +984,8 @@ class ResourceTracker(object):
 
             # No point in continuing if the chip doesn't have space for
             # everything
-            if (self._n_cores_available(chip, key, None) >=
-                    len(group_resources) and
+            tracker = self._get_core_tracker(chip_x, chip_y)
+            if (tracker.n_cores_available >= len(group_resources) and
                     self._sdram_available(chip) >= total_sdram):
 
                 # Check that the constraints of all the resources can be met
@@ -1118,8 +993,7 @@ class ResourceTracker(object):
                 for resources, processor_id, ip_tags, reverse_ip_tags in zip(
                         group_resources, processor_ids, group_ip_tags,
                         group_reverse_ip_tags):
-                    if (not self._is_core_available(
-                            chip, key, processor_id) or
+                    if (not tracker.is_core_available(processor_id) or
                             not self._are_ip_tags_available(
                                 board_address, ip_tags) or
                             not self._are_reverse_ip_tags_available(
@@ -1133,7 +1007,8 @@ class ResourceTracker(object):
                     for resources, proc_id, ip_tags, reverse_ip_tags in zip(
                             group_resources, processor_ids, group_ip_tags,
                             group_reverse_ip_tags):
-                        processor_id = self._allocate_core(chip, key, proc_id)
+                        self._chips_used.add(key)
+                        processor_id = tracker.allocate(proc_id)
                         self._allocate_sdram(chip, resources)
                         ip_tags_allocated = self._allocate_ip_tags(
                             chip, board_address, ip_tags)
@@ -1187,13 +1062,14 @@ class ResourceTracker(object):
         for (chip_x, chip_y) in self._get_usable_chips(chips, board_address):
             chip = self._machine.get_chip_at(chip_x, chip_y)
             key = (chip_x, chip_y)
-
-            if (self._is_core_available(chip, key, processor_id) and
+            tracker = self._get_core_tracker(chip_x, chip_y)
+            if (tracker.is_core_available(processor_id) and
                     self._is_sdram_available(chip, resources) and
                     self._are_ip_tags_available(board_address, ip_tags) and
                     self._are_reverse_ip_tags_available(board_address,
                                                         reverse_ip_tags)):
-                processor_id = self._allocate_core(chip, key, processor_id)
+                self._chips_used.add(key)
+                processor_id = tracker.allocate(processor_id)
                 self._allocate_sdram(chip, resources)
                 ip_tags_allocated = self._allocate_ip_tags(
                     chip, board_address, ip_tags)
@@ -1246,14 +1122,8 @@ class ResourceTracker(object):
             resources_for_chip = dict()
             resources_for_chip["coords"] = (x, y)
             chip = self._machine.get_chip_at(x, y)
-            if (x, y) in self._core_tracker:
-                resources_for_chip["n_cores"] = (
-                    len(self._core_tracker[x, y]) -
-                    self._n_cores_preallocated[x, y])
-            else:
-                resources_for_chip["n_cores"] = (
-                    chip.n_user_processors -
-                    self._n_cores_preallocated[x, y])
+            tracker = self._get_core_tracker(x, y)
+            resources_for_chip["n_cores"] = tracker.n_cores_available
             sdram_available = self._sdram_available(chip)
             resources_for_chip["sdram"] = sdram_available
             resources_for_chips[x, y] = resources_for_chip
@@ -1319,7 +1189,8 @@ class ResourceTracker(object):
 
         (x, y, p) = self.get_chip_and_core(constraints)
         if x is not None and y is not None:
-            if not self._chip_available(x, y):
+            tracker = self._get_core_tracker(x, y)
+            if not tracker.is_available:
                 return ResourceContainer()
             if area_code is not None and (x, y) not in area_code:
                 return ResourceContainer()
@@ -1327,10 +1198,10 @@ class ResourceTracker(object):
             chip = self._machine.get_chip_at(x, y)
             key = (x, y)
             sdram_available = self._sdram_available(chip)
-            if p is not None and not self._is_core_available(chip, key, p):
+            if p is not None and not tracker.is_core_available(p):
                 return ResourceContainer()
             if p is None:
-                best_processor_id = self._best_core_available(chip)
+                best_processor_id = tracker.available_core()
             processor = chip.get_processor_with_id(best_processor_id)
             max_dtcm_available = processor.dtcm_available
             max_cpu_available = processor.cpu_cycles_available
@@ -1351,10 +1222,11 @@ class ResourceTracker(object):
         """
         # Go through the chips in order of sdram
         for ((chip_x, chip_y), sdram_available) in self._sdram_tracker.items():
-            if self._chip_available(chip_x, chip_y) and (
+            tracker = self._get_core_tracker(chip_x, chip_y)
+            if tracker.is_available and (
                     area_code is None or (chip_x, chip_y) in area_code):
                 chip = self._machine.get_chip_at(chip_x, chip_y)
-                best_processor_id = self._best_core_available(chip)
+                best_processor_id = tracker.available_core()
                 processor = chip.get_processor_with_id(best_processor_id)
                 max_dtcm_available = processor.dtcm_available
                 max_cpu_available = processor.cpu_cycles_available
@@ -1386,24 +1258,13 @@ class ResourceTracker(object):
         self._sdram_tracker[chip_x, chip_y] += \
             resources.sdram.get_total_sdram(self._plan_n_timesteps)
 
-        # update number tracker
-        if self._machine.get_chip_at(chip_x, chip_y).virtual:
-            self._virtual_chips_with_n_cores_available[
-                len(self._core_tracker[chip_x, chip_y])] -= 1
-            self._virtual_chips_with_n_cores_available[
-                len(self._core_tracker[chip_x, chip_y]) + 1] += 1
-        else:
-            self._real_chips_with_n_cores_available[
-                len(self._core_tracker[chip_x, chip_y])] -= 1
-            self._real_chips_with_n_cores_available[
-                len(self._core_tracker[chip_x, chip_y]) + 1] += 1
-
-        self._core_tracker[chip_x, chip_y].add(processor_id)
+        tracker = self._get_core_tracker(chip_x, chip_y)
+        tracker.deallocate(processor_id)
 
         # check if chip used needs updating
-        if (len(self._core_tracker[chip_x, chip_y]) ==
-                self._machine.get_chip_at(chip_x, chip_y).n_user_processors):
-            self._chips_used.remove((chip_x, chip_y))
+        #if (len(self._core_tracker[chip_x, chip_y]) ==
+        #        self._machine.get_chip_at(chip_x, chip_y).n_user_processors):
+        #    self._chips_used.remove((chip_x, chip_y))
 
         # Deallocate the IP tags
         if ip_tags is not None:
