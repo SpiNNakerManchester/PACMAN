@@ -128,6 +128,16 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
                 str(machine_vertex), machine_vertex)
         self._machine_vertices.add(machine_vertex)
 
+    def atoms_shape(self):
+        """ The "shape" of the atoms in the vertex i.e. how the atoms are split
+            between the dimensions of the vertex.  By default everything is
+            1-dimensional, so the return will be a 1-tuple but can be
+            overridden by a vertex that supports multiple dimensions.
+
+        :rtype: tuple(int, ...)
+        """
+        return (self.n_atoms,)
+
     @abstractproperty
     def n_atoms(self):
         """ The number of atoms in the vertex

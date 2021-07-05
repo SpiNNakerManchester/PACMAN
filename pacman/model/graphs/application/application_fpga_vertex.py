@@ -16,6 +16,7 @@
 from .application_vertex import ApplicationVertex
 from pacman.exceptions import PacmanInvalidParameterException
 from spinn_utilities.overrides import overrides
+from spinn_utilities.abstract_base import abstractmethod
 
 
 class ApplicationFPGAVertex(ApplicationVertex):
@@ -77,6 +78,25 @@ class ApplicationFPGAVertex(ApplicationVertex):
         :rtype: int
         """
         return self._n_machine_vertices_per_link
+
+    @abstractmethod
+    def get_incoming_slice_for_link(self, link, index):
+        """ Get the slice to be given to the connection from the given link
+
+        :param FPGAConnection link: The FPGA connection to get the slice for
+        :param int index:
+            The index of the connection on the FGPA link, for when
+            n_machine_vertices_per_link > 1
+
+        :rtype: ~pacman.model.graphs.common.Slice
+        """
+
+    @abstractmethod
+    def get_outgoing_slice(self):
+        """ Get the slice to be given to the outgoing connection
+
+        :rtype: ~pacman.model.graphs.common.Slice
+        """
 
     @property
     def incoming_fpga_connections(self):

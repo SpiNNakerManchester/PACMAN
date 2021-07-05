@@ -22,8 +22,6 @@ from pacman.model.graphs.machine import (
     MachineFPGAVertex, MachineSpiNNakerLinkVertex, MachineEdge)
 from pacman.exceptions import PacmanConfigurationException,\
     PacmanNotExistException
-from pacman.model.graphs.common.slice import Slice
-import math
 
 
 class SplitterExternalDevice(AbstractSplitterCommon):
@@ -36,19 +34,21 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         # Slices of incoming vertices (not exactly but hopefully close enough)
         "__incoming_slices",
         # Slice of outgoing vertex (which really doesn't matter here)
-        "__outgoing_slice"
+        "__outgoing_slice",
+        # If the outgoing vertex is one of the incoming ones
+        "__outgoing_is_incoming"
     ]
 
-    def __init__(self, splitter_name=None):
-        super(SplitterExternalDevice, self).__init__(splitter_name)
-        self.__incoming_slices = None
-        self.__outgoing_slice = None
+    @overrides(AbstractSplitterCommon.set_governed_app_vertex)
+    def set_governed_app_vertex(self, app_vertex):
+        super(SplitterExternalDevice, self).set_governed_app_vertex(app_vertex)
 
-    @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
         self.__incoming_vertices = list()
+        self.__incoming_slices = list()
         self.__outgoing_vertex = None
-        app_vertex = self._governed_app_vertex
+        self.__outgoing_slice = None
+        # Easier to set this True first to avoid a None check later
+        self.__outgoing_is_incoming = True
         if isinstance(app_vertex, ApplicationFPGAVertex):
             # This can have multiple FPGA connections per board
             seen_incoming = dict()
@@ -57,22 +57,29 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                     label = (f"Machine vertex for {app_vertex.label}"
                              f":{fpga.fpga_id}:{fpga.fpga_link_id}"
                              f":{fpga.board_address}")
-                    for _ in range(app_vertex.n_machine_vertices_per_link):
+                    for i in range(app_vertex.n_machine_vertices_per_link):
+                        vertex_slice = app_vertex.get_incoming_slice_for_link(
+                            fpga, i)
                         vertex = MachineFPGAVertex(
                             fpga.fpga_id, fpga.fpga_link_id,
-                            fpga.board_address, label, app_vertex=app_vertex)
-                        seen_incoming[fpga] = vertex
-                        machine_graph.add_vertex(vertex)
+                            fpga.board_address, label, app_vertex=app_vertex,
+                            vertex_slice=vertex_slice)
+                        seen_incoming[fpga] = (vertex, vertex_slice)
                         self.__incoming_vertices.append(vertex)
+                        self.__incoming_slices.append(vertex_slice)
             fpga = app_vertex.outgoing_fpga_connection
             if fpga is not None:
                 if fpga in seen_incoming:
-                    self.__outgoing_vertex = seen_incoming[fpga]
+                    self.__outgoing_vertex, self.__outgoing_slice =\
+                        seen_incoming[fpga]
                 else:
+                    vertex_slice = app_vertex.get_outgoing_slice()
                     vertex = MachineFPGAVertex(
-                        fpga.fpga_id, fpga.fpga_link_id, fpga.board_address)
-                    machine_graph.add_vertex(vertex)
+                        fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
+                        app_vertex=app_vertex, vertex_slice=vertex_slice)
                     self.__outgoing_vertex = vertex
+                    self.__outgoing_slice = vertex_slice
+                    self.__outgoing_is_incoming = False
 
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
             # So far this only handles one connection in total
@@ -80,37 +87,27 @@ class SplitterExternalDevice(AbstractSplitterCommon):
             vertex = MachineSpiNNakerLinkVertex(
                 app_vertex.spinnaker_link_id, app_vertex.board_address, label,
                 app_vertex=app_vertex)
-            machine_graph.add_vertex(vertex)
             self.__incoming_vertices = [vertex]
             self.__outgoing_vertex = vertex
         else:
             raise PacmanConfigurationException(
                 f"Unknown vertex type to splitter: {app_vertex}")
 
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
+    def create_machine_vertices(self, resource_tracker, machine_graph):
+        for vertex in self.__incoming_vertices:
+            machine_graph.add_vertex(vertex)
+        if not self.__outgoing_is_incoming:
+            machine_graph.add_vertex(self.__outgoing_vertex)
+
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
         if self.__outgoing_vertex is None:
             return []
-        if self.__outgoing_slice is None:
-            # We actually don't care but hopefully this is OK...
-            self.__outgoing_slice = Slice(0, self._governed_app_vertex.n_atoms)
         return [self.__outgoing_slice], True
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        if self.__incoming_slices is not None:
-            return self.__incoming_slices, True
-
-        # This is a bit convoluted, since the slices are ill-defined here;
-        # The number of slices will at least be correct though.
-        app_vertex = self._governed_app_vertex
-        fpga_conns = list(app_vertex.incoming_fpga_connections)
-        v_per_link = app_vertex.n_machine_vertices_per_link
-        atoms_per_slice = int(math.ceil(
-            app_vertex.n_atoms / (len(fpga_conns) * v_per_link)))
-        self.__incoming_slices = [Slice(0, atoms_per_slice)
-                                  for _ in fpga_conns
-                                  for _ in range(v_per_link)]
         return self.__incoming_slices, True
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
