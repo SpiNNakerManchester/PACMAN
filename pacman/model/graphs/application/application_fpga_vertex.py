@@ -15,7 +15,6 @@
 
 from .application_vertex import ApplicationVertex
 from pacman.exceptions import PacmanInvalidParameterException
-from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
 
 
@@ -24,18 +23,16 @@ class ApplicationFPGAVertex(ApplicationVertex):
     """
 
     __slots__ = [
-        "_n_atoms",
         "_incoming_fpga_connections",
         "_outgoing_fpga_connection",
         "_n_machine_vertices_per_link"]
 
     def __init__(
-            self, n_atoms, incoming_fpga_connections=None,
+            self, incoming_fpga_connections=None,
             outgoing_fpga_connection=None, label=None, constraints=None,
             n_machine_vertices_per_link=1):
         """
 
-        :param int n_atoms: The number of atoms in the vertex
         :param incoming_fpga_connections:
             The connections from one or more FPGAs that that packets are
             expected to be received from for this device, or None if no
@@ -54,7 +51,6 @@ class ApplicationFPGAVertex(ApplicationVertex):
             link (1 by default)
         """
         super().__init__(label=label, constraints=constraints)
-        self._n_atoms = n_atoms
         self._incoming_fpga_connections = incoming_fpga_connections
         self._outgoing_fpga_connection = outgoing_fpga_connection
         self._n_machine_vertices_per_link = n_machine_vertices_per_link
@@ -65,11 +61,6 @@ class ApplicationFPGAVertex(ApplicationVertex):
                 "outgoing_fpga_connection", outgoing_fpga_connection,
                 "The outgoing connection must have a specific FPGA ID and "
                 "link ID")
-
-    @property
-    @overrides(ApplicationVertex.n_atoms)
-    def n_atoms(self):
-        return self._n_atoms
 
     @property
     def n_machine_vertices_per_link(self):
