@@ -55,6 +55,8 @@ class CoreTracker(object):
             self._cores_counter = None
         else:
             self._cores_counter = cores_counter
+        if self._cores_counter:
+            self._cores_counter[self._n_cores] += 1
 
     @property
     def n_cores_available(self):
