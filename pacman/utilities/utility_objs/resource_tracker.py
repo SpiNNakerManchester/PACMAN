@@ -344,6 +344,79 @@ class ResourceTracker(object):
                     f"There is no Chip {x}:{y} in the machine")
         return self._core_tracker[(x, y)]
 
+    def _get_usable_chips_on_baord(self, chips, board_address):
+        """ Get all chips that are available on a board given the constraints
+
+        :param chips: iterable of tuples of (x, y) coordinates of chips to
+            look though for usable chips, or None to use all available chips
+        :type chips: iterable(tuple(int, int))
+        :param board_address: the board address to check for usable chips on
+        :type board_address: str or None
+        :return: iterable of tuples of (x, y) coordinates of usable chips
+        :rtype: iterable(tuple(int, int))
+        :raise PacmanInvalidParameterException:
+            * If the board address is unknown
+            * When either or both chip coordinates of any chip are none
+            * When a non-existent chip is specified
+            * When all the chips in the specified board have been used
+        """
+        if board_address not in self._ethernet_chips:
+            raise PacmanInvalidParameterException(
+                "board_address", str(board_address),
+                "Unrecognised board address")
+        eth_chip = self._machine.get_chip_at(
+            *self._ethernet_chips[board_address])
+
+        if chips is None:
+            for (x, y) in self._machine.get_existing_xys_on_board(eth_chip):
+                if self._get_core_tracker(x, y).is_available:
+                    yield (x, y)
+        else:
+            area_code = set(self._machine.get_existing_xys_on_board(eth_chip))
+            chip_found = False
+            for (x, y) in chips:
+                if ((x, y) in area_code and
+                        self._get_core_tracker(x, y).is_available):
+                    chip_found = True
+                    yield (x, y)
+            if not chip_found:
+                self._check_chip_not_used(chips)
+                raise PacmanInvalidParameterException(
+                    "chips and board_address",
+                    "{} and {}".format(chips, board_address),
+                    "No valid chips found on the specified board")
+
+    def _get_usable_chips_any_board(self, chips):
+        """ Get all chips that are available on a board given the constraints
+
+        :param chips: iterable of tuples of (x, y) coordinates of chips to
+            look though for usable chips, or None to use all available chips
+        :type chips: iterable(tuple(int, int))
+        :return: iterable of tuples of (x, y) coordinates of usable chips
+        :rtype: iterable(tuple(int, int))
+        :raise PacmanInvalidParameterException:
+            * If the board address is unknown
+            * When either or both chip coordinates of any chip are none
+            * When a non-existent chip is specified
+            * When all the chips in the specified board have been used
+        """
+        if chips is None:
+            for (x, y) in self._chips_available:
+                if self._get_core_tracker(x, y).is_available:
+                    yield (x, y)
+        else:
+            chip_found = False
+            for (x, y) in chips:
+                if self._get_core_tracker(x, y).is_available:
+                    chip_found = True
+                    yield (x, y)
+            if not chip_found:
+                self._check_chip_not_used(chips)
+                raise PacmanInvalidParameterException(
+                    "chips",
+                    f"{chips}".format(chips),
+                    "No valid chips found")
+
     def _get_usable_chips(self, chips, board_address):
         """ Get all chips that are available on a board given the constraints
 
@@ -360,40 +433,10 @@ class ResourceTracker(object):
             * When a non-existent chip is specified
             * When all the chips in the specified board have been used
         """
-        eth_chip = None
         if board_address is not None:
-            if board_address not in self._ethernet_chips:
-                raise PacmanInvalidParameterException(
-                    "board_address", str(board_address),
-                    "Unrecognised board address")
-            eth_chip = self._machine.get_chip_at(
-                *self._ethernet_chips[board_address])
-
-        if chips is not None:
-            area_code = None
-            if eth_chip is not None:
-                area_code = set(self._machine.get_existing_xys_on_board(
-                    eth_chip))
-            chip_found = False
-            for (x, y) in chips:
-                if ((area_code is None or (x, y) in area_code) and
-                        self._get_core_tracker(x, y).is_available):
-                    chip_found = True
-                    yield (x, y)
-            if not chip_found:
-                self._check_chip_not_used(chips)
-                raise PacmanInvalidParameterException(
-                    "chips and board_address",
-                    "{} and {}".format(chips, board_address),
-                    "No valid chips found on the specified board")
-        elif board_address is not None:
-            for (x, y) in self._machine.get_existing_xys_on_board(eth_chip):
-                if self._get_core_tracker(x, y).is_available:
-                    yield (x, y)
+            yield from self._get_usable_chips_on_baord(chips, board_address)
         else:
-            for (x, y) in self._chips_available:
-                if self._get_core_tracker(x, y).is_available:
-                    yield (x, y)
+            yield from self._get_usable_chips_any_board(chips)
 
     def _check_chip_not_used(self, chips):
         """
@@ -1114,6 +1157,8 @@ class ResourceTracker(object):
         :return: the max cores available on the best real chip
         :rtype: int
         """
+        if len(self._core_tracker) < len(self._machine):
+            return self._machine.max_cores_per_chip()
         for n_cores_available, n_chips_with_n_cores in reversed(list(
                 enumerate(self._real_chips_with_n_cores_available))):
             if n_chips_with_n_cores != 0:
