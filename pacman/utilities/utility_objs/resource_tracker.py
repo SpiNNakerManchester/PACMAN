@@ -97,17 +97,11 @@ class ResourceTracker(object):
         # processors
         "_chips_available",
 
-        # Number of cores preallocated on each chip (by x, y coordinates)
-        "_n_cores_preallocated",
-
         # counter of chips that have had processors allocated to them
         "_chips_used",
 
         # The number of chips with the n cores currently available
         "_real_chips_with_n_cores_available",
-
-        # the number of virtual chips with the n cores currently available
-        "_virtual_chips_with_n_cores_available"
     ]
 
     ALLOCATION_SDRAM_ERROR = (
@@ -205,19 +199,6 @@ class ResourceTracker(object):
         # update tracker for n cores available per chip
         self._real_chips_with_n_cores_available = \
             [0] * (machine.max_cores_per_chip() + 1)
-        self._virtual_chips_with_n_cores_available = \
-            [0] * (constants.CORES_PER_VIRTUAL_CHIP + 1)
-
-        for chip in machine.chips:
-            pre_allocated = 0
-            if (chip.x, chip.y) in self._n_cores_preallocated:
-                pre_allocated = self._n_cores_preallocated[(chip.x, chip.y)]
-            if chip.virtual:
-                self._virtual_chips_with_n_cores_available[
-                    chip.n_user_processors - pre_allocated] += 1
-            else:
-                self._real_chips_with_n_cores_available[
-                    chip.n_user_processors - pre_allocated] += 1
 
         # Set of (x, y) tuples of coordinates of chips which have available
         # processors
@@ -243,7 +224,6 @@ class ResourceTracker(object):
         """
 
         # If there are no resources, return an empty dict which returns 0
-        self._n_cores_preallocated = defaultdict(lambda: 0)
         if preallocated_resources is None:
             return
 
@@ -251,8 +231,6 @@ class ResourceTracker(object):
             if chip.virtual:
                 continue
             if chip.ip_address:
-                self._n_cores_preallocated[chip.x, chip.y] += \
-                    preallocated_resources.cores_ethernet
                 if preallocated_resources.iptag_resources:
                     self._setup_board_tags(chip.ip_address)
                     for ip_tag in preallocated_resources.iptag_resources:
@@ -262,9 +240,6 @@ class ResourceTracker(object):
                             chip.ip_address, tag, ip_tag.ip_address,
                             ip_tag.traffic_identifier, ip_tag.strip_sdp,
                             ip_tag.port)
-            else:
-                self._n_cores_preallocated[chip.x, chip.y] += \
-                    preallocated_resources.cores_all
 
     @staticmethod
     def check_constraints(
