@@ -19,7 +19,8 @@ from spinn_machine import (
 from pacman.config_setup import unittest_setup
 from pacman.model.resources import (
     ResourceContainer, ConstantSDRAM, PreAllocatedResourceContainer)
-from pacman.exceptions import PacmanValueError
+from pacman.exceptions import (
+    PacmanInvalidParameterException, PacmanValueError)
 from pacman.utilities.utility_objs import ResourceTracker
 
 
@@ -31,8 +32,6 @@ class TestResourceTracker(unittest.TestCase):
     def test_n_cores_available(self):
         machine = virtual_machine(
             width=2, height=2, n_cpus_per_chip=18)
-        chip00 = machine.get_chip_at(0, 0)
-        chip01 = machine.get_chip_at(0, 1)
         preallocated_resources = PreAllocatedResourceContainer()
         preallocated_resources.add_cores_all(2)
         preallocated_resources.add_cores_ethernet(3)
@@ -57,6 +56,9 @@ class TestResourceTracker(unittest.TestCase):
 
         # Should be 11 cores as one now allocated
         self.assertEqual(tracker._get_core_tracker(0, 0).n_cores_available, 11)
+
+        with self.assertRaises(PacmanInvalidParameterException):
+            tracker._get_core_tracker(2, 2)
 
     def test_deallocation_of_resources(self):
         machine = virtual_machine(
