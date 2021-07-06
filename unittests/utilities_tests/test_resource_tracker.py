@@ -77,10 +77,17 @@ class TestResourceTracker(unittest.TestCase):
         if (0, 0) in tracker._core_tracker:
             raise Exception("shouldnt exist")
 
+        tracker._get_core_tracker(1, 1)
+
+        # verify core tracker not empty
+        if (1, 1) not in tracker._core_tracker:
+            raise Exception("should exist")
+
         # verify sdram tracker
-        if tracker._sdram_tracker[0, 0] != chip_sdram:
+        # 0, 0 in _sdram_tracker due to the get_core_tracker(0, 0) call
+        if tracker._sdram_tracker[1, 1] != chip_sdram:
             raise Exception("incorrect sdram of {}".format(
-                tracker._sdram_tracker[0, 0]))
+                tracker._sdram_tracker[1, 1]))
 
         # allocate some res
         chip_x, chip_y, processor_id, ip_tags, reverse_ip_tags = \

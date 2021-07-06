@@ -54,6 +54,10 @@ class ResourceTracker(object):
 
         "_preallocated_resources",
 
+        "_sdram_ethernet",
+
+        "_sdram_all",
+
         # Set of tags available indexed by board address
         # Note that entries are only added when a board is first used
         "_tags_by_board",
@@ -131,8 +135,6 @@ class ResourceTracker(object):
         # indexed by the (x, y) tuple of coordinates of the chip
         # Items are sorted in reverse order so highest comes out first
         self._sdram_tracker = ValueSortedDict(lambda x: -x)
-        for chip in machine.chips:
-            self._sdram_tracker[chip.x, chip.y] = chip.sdram.size
 
         # The set of processor IDs available on each chip,
         # indexed by the (x, y) tuple of coordinates of the chip
@@ -190,6 +192,14 @@ class ResourceTracker(object):
         # set of resources that have been pre allocated and therefore need to
         # be taken account of when allocating resources
         self._preallocated_resources = preallocated_resources
+        if preallocated_resources:
+            self._sdram_ethernet = preallocated_resources.sdram_ethernet. \
+                get_total_sdram(self._plan_n_timesteps)
+            self._sdram_all = preallocated_resources.sdram_all.get_total_sdram(
+                self._plan_n_timesteps)
+        else:
+            self._sdram_ethernet = 0
+            self._sdram_all = 0
         self._convert_preallocated_resources(preallocated_resources)
 
         # update tracker for n cores available per chip
@@ -237,16 +247,10 @@ class ResourceTracker(object):
         if preallocated_resources is None:
             return
 
-        sdram_all = preallocated_resources.sdram_all.get_total_sdram(
-            self._plan_n_timesteps)
-        sdram_eth = preallocated_resources.sdram_ethernet.get_total_sdram(
-            self._plan_n_timesteps)
-
         for chip in self._machine.chips:
             if chip.virtual:
                 continue
             if chip.ip_address:
-                self._sdram_tracker[chip.x, chip.y] -= sdram_eth
                 self._n_cores_preallocated[chip.x, chip.y] += \
                     preallocated_resources.cores_ethernet
                 if preallocated_resources.iptag_resources:
@@ -259,7 +263,6 @@ class ResourceTracker(object):
                             ip_tag.traffic_identifier, ip_tag.strip_sdp,
                             ip_tag.port)
             else:
-                self._sdram_tracker[chip.x, chip.y] -= sdram_all
                 self._n_cores_preallocated[chip.x, chip.y] += \
                     preallocated_resources.cores_all
 
@@ -354,6 +357,11 @@ class ResourceTracker(object):
                 self._core_tracker[(x, y)] = CoreTracker(
                     chip, self._preallocated_resources,
                     self._real_chips_with_n_cores_available)
+                self._sdram_tracker[x, y] = chip.sdram.size
+                if chip.ip_address:
+                     self._sdram_tracker[x, y] -= self._sdram_ethernet
+                else:
+                    self._sdram_tracker[x, y] -= self._sdram_all
             except AttributeError:
                 raise PacmanInvalidParameterException(
                     "x and y",
@@ -428,28 +436,6 @@ class ResourceTracker(object):
                 return
         raise PacmanCanNotFindChipException(
             "None of the chips {} were ever in the chips list".format(chips))
-
-    def _is_sdram_available(self, chip, resources):
-        """ Check if the SDRAM available on a given chip is enough for the\
-            given resources.
-
-        :param ~spinn_machine.Chip chip: The chip to check the resources of
-        :param ResourceContainer resources:
-            the resources containing the SDRAM required
-        :return: True if there is enough SDRAM available, or False otherwise
-        :rtype: bool
-        """
-        return (self._sdram_tracker[chip.x, chip.y] >=
-                resources.sdram.get_total_sdram(self._plan_n_timesteps))
-
-    def _sdram_available(self, chip):
-        """ Return the amount of SDRAM available on a chip
-
-        :param ~spinn_machine.Chip chip: The chip to check the resources of
-        :return: the SDRAM available
-        :rtype: int
-        """
-        return self._sdram_tracker[chip.x, chip.y]
 
     def _get_matching_ip_tag(
             self, chip, board_address, tag_id, ip_address, port, strip_sdp,
@@ -659,16 +645,6 @@ class ResourceTracker(object):
         return all(
             self._is_reverse_ip_tag_available(board_address, rip.tag, rip.port)
             for rip in reverse_ip_tags)
-
-    def _allocate_sdram(self, chip, resources):
-        """ Allocates the SDRAM on the given chip
-
-        :param tuple(int,int) key: The (x, y) coordinates of the chip
-        :param ResourceContainer resources:
-            the resources containing the SDRAM required
-        """
-        self._sdram_tracker[chip.x, chip.y] -= \
-            resources.sdram.get_total_sdram(self._plan_n_timesteps)
 
     def _allocate_tag(self, chip, board_address, tag_id):
         """ Allocate a tag given the constraints
@@ -990,7 +966,7 @@ class ResourceTracker(object):
             # everything
             tracker = self._get_core_tracker(chip_x, chip_y)
             if (tracker.n_cores_available >= len(group_resources) and
-                    self._sdram_available(chip) >= total_sdram):
+                    self._sdram_tracker[(chip_x, chip_y)] >= total_sdram):
 
                 # Check that the constraints of all the resources can be met
                 is_available = True
@@ -1013,7 +989,9 @@ class ResourceTracker(object):
                             group_reverse_ip_tags):
                         self._chips_used.add(key)
                         processor_id = tracker.allocate(proc_id)
-                        self._allocate_sdram(chip, resources)
+                        self._sdram_tracker[key] -= \
+                            resources.sdram.get_total_sdram(
+                                self._plan_n_timesteps)
                         ip_tags_allocated = self._allocate_ip_tags(
                             chip, board_address, ip_tags)
                         reverse_ip_tags_allocated = \
@@ -1067,14 +1045,18 @@ class ResourceTracker(object):
             chip = self._machine.get_chip_at(chip_x, chip_y)
             key = (chip_x, chip_y)
             tracker = self._get_core_tracker(chip_x, chip_y)
+            sdram_available = self._sdram_tracker[chip_x, chip_y] >= \
+                resources.sdram.get_total_sdram(self._plan_n_timesteps)
+
             if (tracker.is_core_available(processor_id) and
-                    self._is_sdram_available(chip, resources) and
+                    sdram_available and
                     self._are_ip_tags_available(board_address, ip_tags) and
                     self._are_reverse_ip_tags_available(board_address,
                                                         reverse_ip_tags)):
                 self._chips_used.add(key)
                 processor_id = tracker.allocate(processor_id)
-                self._allocate_sdram(chip, resources)
+                self._sdram_tracker[chip_x, chip_y] -= \
+                    resources.sdram.get_total_sdram(self._plan_n_timesteps)
                 ip_tags_allocated = self._allocate_ip_tags(
                     chip, board_address, ip_tags)
                 reverse_ip_tags_allocated = self._allocate_reverse_ip_tags(
@@ -1125,11 +1107,9 @@ class ResourceTracker(object):
         for x, y in usable_chips:
             resources_for_chip = dict()
             resources_for_chip["coords"] = (x, y)
-            chip = self._machine.get_chip_at(x, y)
             tracker = self._get_core_tracker(x, y)
             resources_for_chip["n_cores"] = tracker.n_cores_available
-            sdram_available = self._sdram_available(chip)
-            resources_for_chip["sdram"] = sdram_available
+            resources_for_chip["sdram"] = self._sdram_tracker[x, y]
             resources_for_chips[x, y] = resources_for_chip
         resources = dict()
         for board_address in self._boards_with_ip_tags:
@@ -1200,8 +1180,7 @@ class ResourceTracker(object):
                 return ResourceContainer()
             best_processor_id = p
             chip = self._machine.get_chip_at(x, y)
-            key = (x, y)
-            sdram_available = self._sdram_available(chip)
+            sdram_available = self._sdram_tracker[(x, y)]
             if p is not None and not tracker.is_core_available(p):
                 return ResourceContainer()
             if p is None:
