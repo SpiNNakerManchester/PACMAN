@@ -220,7 +220,6 @@ class ResourceTracker(object):
     def plan_n_time_steps(self):
         return self._plan_n_timesteps
 
-
     @staticmethod
     def check_constraints(
             vertices, additional_placement_constraints=None):
@@ -1304,7 +1303,7 @@ class ResourceTracker(object):
         tracker.deallocate(processor_id)
 
         # check if chip used needs updating
-        #if (len(self._core_tracker[chip_x, chip_y]) ==
+        # if (len(self._core_tracker[chip_x, chip_y]) ==
         #        self._machine.get_chip_at(chip_x, chip_y).n_user_processors):
         #    self._chips_used.remove((chip_x, chip_y))
 

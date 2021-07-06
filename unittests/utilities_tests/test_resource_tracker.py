@@ -113,7 +113,7 @@ class TestResourceTracker(unittest.TestCase):
                 chip_0.n_user_processors:
             raise Exception("shouldn't exist or should be right size")
 
-        #if (0, 0) in tracker._chips_used:
+        # if (0, 0) in tracker._chips_used:
         #   raise Exception("shouldnt exist")
 
         # verify sdram tracker

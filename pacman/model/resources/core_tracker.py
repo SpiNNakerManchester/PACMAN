@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.ordered_set import OrderedSet
-from spinn_machine import Machine
 
 
 class CoreTracker(object):
