@@ -12,17 +12,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 """ A collection of methods which support partitioning algorithms.
 """
 
+import math
 from collections import OrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.utilities import utility_calls as utils
-from pacman.exceptions import PacmanPartitionException
+from pacman.exceptions import (
+    PacmanPartitionException, PacmanConfigurationException)
 from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint, SameAtomsAsVertexConstraint,
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
+from pacman.model.graphs.common import Slice
 
 
 VERTICES_NEED_TO_BE_SAME_SIZE_ERROR = (
@@ -144,3 +146,45 @@ def get_same_size_vertex_groups(vertices):
                 same_size_vertices[vertex] = group
 
     return same_size_vertices
+
+
+def get_multidimensional_slices(n_atoms, atoms_per_core):
+    if isinstance(atoms_per_core, int):
+        atoms_per_core = [atoms_per_core] * len(n_atoms)
+    while len(atoms_per_core) != len(n_atoms):
+        raise PacmanConfigurationException(
+            "The length of atoms_per_core doesn't match the number of"
+            " dimensions")
+
+    # Find out how many vertices we will create, keeping track of the
+    # total atoms per core, and the numerator to divide by when working
+    # out positions
+    n_vertices = 1
+    total_atoms_per_core = 1
+    dim_numerator = [0] * len(n_atoms)
+    for d in range(len(n_atoms)):
+        dim_numerator[d] = n_vertices
+        n_this_dim = int(math.ceil(n_atoms[d] / atoms_per_core[d]))
+        n_vertices *= n_this_dim
+        total_atoms_per_core *= atoms_per_core[d]
+
+    # Run over all the vertices and create slices for them
+    slices = list()
+    for v in range(n_vertices):
+        # Work out where in each of the dimensions this vertex starts by
+        # dividing the remainder from the previous dimension by the
+        # numerator of each dimension
+        start = [0] * len(n_atoms)
+        remainder = v
+        for d in reversed(range(len(n_atoms))):
+            start[d] = (remainder // dim_numerator[d]) * atoms_per_core[d]
+            remainder = remainder % dim_numerator[d]
+
+        # Make a slice and a vertex
+        lo_atom = v * total_atoms_per_core
+        hi_atom = (lo_atom + total_atoms_per_core) - 1
+        vertex_slice = Slice(
+            lo_atom, hi_atom, tuple(atoms_per_core), tuple(start))
+        slices.append(vertex_slice)
+
+    return slices
