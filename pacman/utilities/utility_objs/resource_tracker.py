@@ -334,7 +334,8 @@ class ResourceTracker(object):
             self._tracked_ethernet_chips[board_address] = chip
             if board_address in self._untracked_ethernet_chips:
                 self._untracked_ethernet_chips.pop(board_address)
-            self._sdram_tracker[x, y] -= self._sdram_ethernet
+            if not chip.virtual:
+                self._sdram_tracker[x, y] -= self._sdram_ethernet
             self._tags_by_board[board_address] = set(chip.tag_ids)
             self._boards_with_ip_tags.add(board_address)
             if self._preallocated_resources:
@@ -346,7 +347,8 @@ class ResourceTracker(object):
                         ip_tag.traffic_identifier, ip_tag.strip_sdp,
                         ip_tag.port)
         else:
-            self._sdram_tracker[x, y] -= self._sdram_all
+            if not chip.virtual:
+                self._sdram_tracker[x, y] -= self._sdram_all
 
     def _get_core_tracker(self, x, y):
         """
@@ -1127,9 +1129,9 @@ class ResourceTracker(object):
                 raise PacmanValueError(
                     "Processor id {} is not available on any of the chips"
                     "".format(processor_id))
-        tried_chips = self._get_usable_chips(chips, board_address)
+        tried_chips = list(self._get_usable_chips(chips, board_address))
         left_resources = self._available_resources(tried_chips)
-        all_chips = self._get_usable_chips(None, None)
+        all_chips = list(self._get_usable_chips(None, None))
         all_resources = self._available_resources(all_chips)
         raise PacmanValueError(
             "No resources available to allocate the given resources"
@@ -1166,7 +1168,7 @@ class ResourceTracker(object):
         resources = dict()
 
         # make sure all boards are tracked
-        for board_address in self._untracked_ethernet_chips:
+        for board_address in list(self._untracked_ethernet_chips):
             self._track_board(board_address)
 
         for board_address in self._boards_with_ip_tags:
