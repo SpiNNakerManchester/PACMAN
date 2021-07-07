@@ -82,4 +82,4 @@ class Slice(collections.namedtuple('Slice',
         if n < 0 or n > len(self.shape):
             raise IndexError(f"{n} is invalid for slice with {len(self.shape)}"
                              " dimensions")
-        return slice(self.start[n], self.shape[n])
+        return slice(self.start[n], self.start[n] + self.shape[n])
