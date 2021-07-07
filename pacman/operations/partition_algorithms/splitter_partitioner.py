@@ -284,8 +284,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
 
         if (isinstance(app_edge, AbstractSlicesConnect) and not
                 app_edge.could_connect(
-                    src_machine_vertex.vertex_slice,
-                    dest_machine_vertex.vertex_slice)):
+                    src_machine_vertex,  dest_machine_vertex)):
             return
 
         # build edge and add to machine graph

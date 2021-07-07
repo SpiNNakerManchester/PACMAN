@@ -30,7 +30,7 @@ class AbstractSlicesConnect(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def could_connect(self, pre_slice, post_slice):
+    def could_connect(self, src_machine_vertex, dest_machine_vertex):
         """ Determine if there is a chance that one of the indexes in the\
             pre-slice could connect to at least one of the indexes in the\
             post-slice.
@@ -39,8 +39,8 @@ class AbstractSlicesConnect(object, metaclass=AbstractBase):
             This method should never return a false negative,
             but may return a false positives
 
-        :param ~pacman.model.graphs.common.Slice pre_slice:
-        :param ~pacman.model.graphs.common.Slice post_slice:
+        :param ~pacman.model.graphs.machine.MachineVertex src_machine_vertexx:
+        :param ~pacman.model.graphs.machine.MachineVertex dest_machine_vertex:
         :return: True if a connection could be possible
         :rtype: bool
         """
