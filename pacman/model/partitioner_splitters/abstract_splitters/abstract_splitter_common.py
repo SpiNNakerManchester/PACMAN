@@ -125,13 +125,13 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
                         self.FIXED_ABOVE_MAX.format(
                             max_atoms_per_core, self._max_atoms_per_core))
                 else:  # Set the new fixed
-                    self._max_atoms_per_core = max_atoms_per_core
+                    self._max_atoms_per_core = int(max_atoms_per_core)
                     self._is_fixed_atoms_per_core = True
             else:
                 # Both max so only change if new max if lower
                 if max_atoms_per_core < self._max_atoms_per_core:
                     # Set the new max but leave fixed false
-                    self._max_atoms_per_core = max_atoms_per_core
+                    self._max_atoms_per_core = int(max_atoms_per_core)
                 else:
                     return  # Ok to Ignore a higher or same max
 
