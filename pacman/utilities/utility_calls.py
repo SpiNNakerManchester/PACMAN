@@ -15,6 +15,7 @@
 
 import hashlib
 import numpy
+import math
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanValueError)
 
@@ -222,3 +223,49 @@ def get_key_ranges(key, mask):
         generated_key[remaining_zeros] = \
             expand_to_bit_array(value)[-len(remaining_zeros):]
         yield compress_from_bit_array(generated_key), n_keys
+
+
+def get_n_bits(n_values):
+    """ Determine how many bits are required for the given number of values
+
+    :param int n_values: the number of values (starting at 0)
+    :return: the number of bits required to express that many values
+    :rtype: int
+    """
+    if n_values == 0:
+        return 0
+    if n_values == 1:
+        return 1
+    return int(math.ceil(math.log(n_values, 2)))
+
+
+def get_field_based_keys(self, key, vertex_slice):
+    """ Translate a vertex slice with potentially multiple dimensions into
+        a list of keys, one for each atom of the vertex, by putting the values
+        into fields of the keys based on the shape of the slice.
+
+    :param int key: The base key
+    :param Slice vertex_slice: The slice to translate
+    :rtype: list(int)
+    """
+
+    # Find the size of field required for each coordinate, and the shift
+    # required to get to this field position (the first field has a shift
+    # of 0)
+    field_sizes = numpy.array([get_n_bits(n) for n in vertex_slice.shape])
+    shifts = numpy.cumsum(field_sizes - field_sizes[0])
+
+    # Convert each atom into x, y coordinates based on shape
+    # This uses numpy.unravel_index, the result of which needs to be
+    # made into an array (it is a list of tuples) and transposed (it
+    # gives the coordinates separately per axis)
+    coords = numpy.array(numpy.unravel_index(
+        numpy.arange(vertex_slice.n_atoms),
+        vertex_slice.shape, order='F')).T
+
+    # We now left shift each coordinate into its field and add them up to
+    # get the key
+    keys = numpy.sum(numpy.left_shift(coords, shifts), axis=1)
+
+    # The final result is the above with the base key added
+    return keys + key
