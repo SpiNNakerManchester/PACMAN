@@ -18,5 +18,4 @@ def splitter_reset(app_graph):
     """ Performs resetting of splitters to indicate a new phase of operation
     """
     for vertex in app_graph.vertices:
-        if vertex.splitter is not None:
-            vertex.splitter.reset_called()
+        vertex.splitter.reset_called()
