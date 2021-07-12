@@ -671,7 +671,7 @@ class PACMANAlgorithmExecutor(object):
         for algorithm in self._algorithms:
             # set up timer
             timer = None
-            if self._do_timing:
+            if self._do_timing or self._print_timings:
                 timer = Timer()
                 timer.start_timing()
 
@@ -682,7 +682,7 @@ class PACMANAlgorithmExecutor(object):
                 self._report_full_provenance(algorithm, results)
 
             # handle_prov_data
-            if self._do_timing:
+            if self._do_timing or self._print_timings:
                 self._update_timings(timer, algorithm)
 
             if results is not None:
@@ -741,8 +741,9 @@ class PACMANAlgorithmExecutor(object):
         if self._print_timings:
             logger.info("Time {} taken by {}",
                         time_taken, algorithm.algorithm_id)
-        self._algorithm_timings.append(
-            (algorithm.algorithm_id, time_taken, self._provenance_name))
+        if self._do_timing:
+            self._algorithm_timings.append(
+                (algorithm.algorithm_id, time_taken, self._provenance_name))
 
     def _report_full_provenance(self, algorithm, results):
         """
