@@ -222,35 +222,6 @@
             <param_type>RoutingTableByPartition</param_type>
         </outputs>
     </algorithm>
-    <algorithm name="BasicRoutingInfoAllocator">
-        <python_module>pacman.operations.routing_info_allocator_algorithms.basic_routing_info_allocator</python_module>
-        <python_class>BasicRoutingInfoAllocator</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MachineGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>n_keys_map</param_name>
-                <param_type>MachinePartitionNKeysMap</param_type>
-            </parameter>
-            <parameter>
-                <param_name>placements</param_name>
-                <param_type>Placements</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>machine_graph</param_name>
-            <param_name>n_keys_map</param_name>
-            <param_name>placements</param_name>
-        </required_inputs>
-        <optional_inputs>
-            <token>EdgesFiltered</token>
-        </optional_inputs>
-        <outputs>
-            <param_type>RoutingInfos</param_type>
-        </outputs>
-    </algorithm>
     <algorithm name="ZonedRoutingInfoAllocator">
         <python_module>pacman.operations.routing_info_allocator_algorithms.zoned_routing_info_allocator</python_module>
         <python_function>flexible_allocate</python_function>
