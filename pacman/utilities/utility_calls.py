@@ -239,7 +239,7 @@ def get_n_bits(n_values):
     return int(math.ceil(math.log(n_values, 2)))
 
 
-def get_field_based_keys(self, key, vertex_slice):
+def get_field_based_keys(key, vertex_slice):
     """ Translate a vertex slice with potentially multiple dimensions into
         a list of keys, one for each atom of the vertex, by putting the values
         into fields of the keys based on the shape of the slice.
@@ -253,7 +253,7 @@ def get_field_based_keys(self, key, vertex_slice):
     # required to get to this field position (the first field has a shift
     # of 0)
     field_sizes = numpy.array([get_n_bits(n) for n in vertex_slice.shape])
-    shifts = numpy.cumsum(field_sizes - field_sizes[0])
+    shifts = numpy.cumsum(field_sizes) - field_sizes[0]
 
     # Convert each atom into x, y coordinates based on shape
     # This uses numpy.unravel_index, the result of which needs to be
