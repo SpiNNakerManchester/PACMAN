@@ -148,3 +148,11 @@ class ResourceContainer(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __repr__(self):
+        return (f"ResourceContainer(dtcm_usage={self._dtcm_usage.get_value()},"
+                f" sdram_usage={self._sdram_usage.fixed}:"
+                f"{self._sdram_usage.per_timestep},"
+                f" cpu_cycles={self._cpu_cycles.get_value()},"
+                f" iptags={self._iptags},"
+                f" reverse_iptags={self._reverse_iptags})")
