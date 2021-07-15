@@ -37,6 +37,8 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         # List of machine verts associated with this app vertex
         "_machine_vertices",
 
+        "_vertex_slices",
+
         # The splitter object associated with this app vertex
         "_splitter"]
 
@@ -63,7 +65,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         self._splitter = None
         super().__init__(label, constraints)
         self._machine_vertices = OrderedSet()
-
+        self._vertex_slices = None
         # Use setter as there is extra work to do
         self.splitter = splitter
 
@@ -127,6 +129,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             raise PacmanAlreadyExistsException(
                 str(machine_vertex), machine_vertex)
         self._machine_vertices.add(machine_vertex)
+        self._vertex_slices = None
 
     @property
     def atoms_shape(self):
@@ -184,7 +187,10 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
         :rtype: iterable(Slice)
         """
-        return list(map(lambda x: x.vertex_slice, self._machine_vertices))
+        if self._vertex_slices is None:
+            self._vertex_slices = \
+                list(map(lambda x: x.vertex_slice, self._machine_vertices))
+        return self._vertex_slices
 
     def get_max_atoms_per_core(self):
         """ Gets the maximum number of atoms per core, which is either the\
