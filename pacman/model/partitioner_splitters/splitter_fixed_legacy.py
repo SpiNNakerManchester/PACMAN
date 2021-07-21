@@ -87,11 +87,11 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        return self.__fixed_slices
+        return self.__fixed_slices, True
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
-        return self.__fixed_slices
+        return self.__fixed_slices, True
 
     @overrides(AbstractSplitterCommon.set_max_atoms_per_core)
     def set_max_atoms_per_core(self, max_atoms_per_core, is_fixed_atoms):
