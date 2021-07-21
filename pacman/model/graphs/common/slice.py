@@ -93,6 +93,7 @@ class Slice(collections.namedtuple('Slice',
             The size of each dimension of the whole shape
         :return: A list of the global raster IDs of the atoms in this slice
         """
-        slices = tuple(self.get_slice(n) for n in range(len(self.start)))
+        slices = tuple(self.get_slice(n)
+                       for n in reversed(range(len(self.start))))
         ids = numpy.arange(numpy.prod(atoms_shape)).reshape(atoms_shape)
         return ids[slices].flatten()
