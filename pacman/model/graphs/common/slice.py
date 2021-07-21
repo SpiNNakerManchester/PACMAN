@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import collections
+import numpy
 from pacman.exceptions import PacmanValueError
 
 
@@ -83,3 +84,15 @@ class Slice(collections.namedtuple('Slice',
             raise IndexError(f"{n} is invalid for slice with {len(self.shape)}"
                              " dimensions")
         return slice(self.start[n], self.start[n] + self.shape[n])
+
+    def get_raster_ids(self, atoms_shape):
+        """ Get the IDs of the atoms in the slice as they would appear in a
+            "raster scan" of the atoms over the whole shape.
+
+        :param tuple(int) atoms_shape:
+            The size of each dimension of the whole shape
+        :return: A list of the global raster IDs of the atoms in this slice
+        """
+        slices = tuple(self.get_slice(n) for n in range(len(self.start)))
+        ids = numpy.arange(numpy.prod(atoms_shape)).reshape(atoms_shape)
+        return ids[slices].flatten()
