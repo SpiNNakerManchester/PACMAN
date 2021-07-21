@@ -162,29 +162,37 @@ def get_multidimensional_slices(n_atoms, atoms_per_core):
     n_vertices = 1
     total_atoms_per_core = 1
     dim_numerator = [0] * len(n_atoms)
+    total_n_atoms = 1
     for d in range(len(n_atoms)):
         dim_numerator[d] = n_vertices
         n_this_dim = int(math.ceil(n_atoms[d] / atoms_per_core[d]))
         n_vertices *= n_this_dim
         total_atoms_per_core *= atoms_per_core[d]
+        total_n_atoms *= n_atoms[d]
 
     # Run over all the vertices and create slices for them
     slices = list()
+    hi_atom = -1
     for v in range(n_vertices):
         # Work out where in each of the dimensions this vertex starts by
         # dividing the remainder from the previous dimension by the
         # numerator of each dimension
         start = [0] * len(n_atoms)
+        n_on_core = [0] * len(n_atoms)
         remainder = v
+        total_on_core = 1
         for d in reversed(range(len(n_atoms))):
             start[d] = (remainder // dim_numerator[d]) * atoms_per_core[d]
             remainder = remainder % dim_numerator[d]
+            hi_d = min(start[d] + atoms_per_core[d], n_atoms[d])
+            n_on_core[d] = hi_d - start[d]
+            total_on_core *= n_on_core[d]
 
         # Make a slice and a vertex
-        lo_atom = v * total_atoms_per_core
-        hi_atom = (lo_atom + total_atoms_per_core) - 1
+        lo_atom = hi_atom + 1
+        hi_atom = (lo_atom + total_on_core) - 1
         vertex_slice = Slice(
-            lo_atom, hi_atom, tuple(atoms_per_core), tuple(start))
+            lo_atom, hi_atom, tuple(n_on_core), tuple(start))
         slices.append(vertex_slice)
 
     return slices
