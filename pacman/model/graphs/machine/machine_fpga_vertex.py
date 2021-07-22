@@ -29,11 +29,13 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         "_fpga_link_id",
         "_board_address",
         "_virtual_chip_x",
-        "_virtual_chip_y"]
+        "_virtual_chip_y",
+        "_outgoing_keys_and_masks"]
 
     def __init__(
             self, fpga_id, fpga_link_id, board_address=None, label=None,
-            constraints=None, app_vertex=None, vertex_slice=None):
+            constraints=None, app_vertex=None, vertex_slice=None,
+            outgoing_keys_and_masks=None):
         super().__init__(
             label=label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
@@ -43,6 +45,7 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         self._board_address = board_address
         self._virtual_chip_x = None
         self._virtual_chip_y = None
+        self._outgoing_keys_and_masks = outgoing_keys_and_masks
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -81,3 +84,7 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
             self._virtual_chip_y = virtual_chip_y
             self.add_constraint(ChipAndCoreConstraint(
                 self._virtual_chip_x, self._virtual_chip_y))
+
+    @overrides(AbstractVirtual.outgoing_keys_and_masks)
+    def outgoing_keys_and_masks(self):
+        return self._outgoing_keys_and_masks

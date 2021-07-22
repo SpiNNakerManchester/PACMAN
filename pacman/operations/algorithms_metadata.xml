@@ -608,4 +608,30 @@
         <outputs>
         </outputs>
     </algorithm>
+    <algorithm name="ExternalDeviceNullRoutingTableGenerator">
+        <python_module>pacman.operations.routing_table_generators.external_device_null_routing_table_generator</python_module>
+        <python_function>external_device_null_routing_table_generator</python_function>
+        <input_definitions>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>ExtendedMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>RoutingTables</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine</param_name>
+            <param_name>machine_graph</param_name>
+            <param_name>routing_tables</param_name>
+        </required_inputs>
+        <outputs>
+            <token part="ExternalDeviceRoutingTablesGenerated">RoutingTablesGenerated</token>
+        </outputs>
+    </algorithm>
 </algorithms>

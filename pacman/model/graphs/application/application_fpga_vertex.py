@@ -118,3 +118,13 @@ class ApplicationFPGAVertex(ApplicationVertex):
         :rtype: FPGAConnection or None
         """
         return self._outgoing_fpga_connection
+
+    def get_outgoing_keys_and_masks(self, machine_vertex):
+        """ Get the outgoing keys and masks for a machine vertex of this vertex
+            or None if this isn't explicitly defined.  By default this returns
+            None, but can be overridden to allow the routing information
+            to be passed to the machine vertex.
+
+        :rtype: list of KeyAndMask or None
+        """
+        return None
