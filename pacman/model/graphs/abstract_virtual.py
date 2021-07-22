@@ -16,7 +16,6 @@
 from spinn_utilities.abstract_base import abstractmethod, abstractproperty
 from spinn_utilities.require_subclass import require_subclass
 from pacman.model.graphs.abstract_vertex import AbstractVertex
-from pacman.exceptions import PacmanConfigurationException
 
 
 @require_subclass(AbstractVertex)
