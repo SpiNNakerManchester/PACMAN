@@ -79,11 +79,26 @@ class Slice(collections.namedtuple('Slice',
         """ Get a slice in the n-th dimension
 
         :param int n: The 0-indexed dimension to get the shape of
+        :type: slice
         """
         if n < 0 or n > len(self.shape):
             raise IndexError(f"{n} is invalid for slice with {len(self.shape)}"
                              " dimensions")
         return slice(self.start[n], self.start[n] + self.shape[n])
+
+    @property
+    def slices(self):
+        """ Get slices for every dimension
+
+        :rtype: tuple(slice)
+        """
+        return tuple(self.get_slice(n) for n in range(len(self.shape)))
+
+    @property
+    def end(self):
+        """ The end positions of the slice in each dimension
+        """
+        return tuple((numpy.array(self.start) + numpy.array(self.shape)) - 1)
 
     def get_raster_ids(self, atoms_shape):
         """ Get the IDs of the atoms in the slice as they would appear in a
