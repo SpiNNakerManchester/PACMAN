@@ -22,6 +22,7 @@ from pacman.model.graphs.machine import (
     MachineFPGAVertex, MachineSpiNNakerLinkVertex, MachineEdge)
 from pacman.exceptions import PacmanConfigurationException,\
     PacmanNotExistException
+from pacman.model.graphs.common.slice import Slice
 
 
 class SplitterExternalDevice(AbstractSplitterCommon):
@@ -84,11 +85,16 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
             # So far this only handles one connection in total
             label = f"Machine vertex for {app_vertex.label}"
+            vertex_slice = Slice(
+                0, app_vertex.n_atoms - 1, shape=app_vertex.atoms_shape,
+                start=tuple([0] * len(app_vertex.atoms_shape)))
             vertex = MachineSpiNNakerLinkVertex(
                 app_vertex.spinnaker_link_id, app_vertex.board_address, label,
-                app_vertex=app_vertex)
+                app_vertex=app_vertex, vertex_slice=vertex_slice)
             self.__incoming_vertices = [vertex]
+            self.__incoming_slices = [vertex_slice]
             self.__outgoing_vertex = vertex
+            self.__outgoing_slice = vertex_slice
         else:
             raise PacmanConfigurationException(
                 f"Unknown vertex type to splitter: {app_vertex}")
