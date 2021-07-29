@@ -110,5 +110,6 @@ class Slice(collections.namedtuple('Slice',
         """
         slices = tuple(self.get_slice(n)
                        for n in reversed(range(len(self.start))))
-        ids = numpy.arange(numpy.prod(atoms_shape)).reshape(atoms_shape)
+        ids = numpy.arange(numpy.prod(atoms_shape)).reshape(
+            tuple(reversed(atoms_shape)))
         return ids[slices].flatten()
