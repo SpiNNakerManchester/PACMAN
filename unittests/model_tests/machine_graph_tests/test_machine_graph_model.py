@@ -297,12 +297,14 @@ class TestMachineGraphModel(unittest.TestCase):
         edge_m_21 = MachineEdge(
             mach3, mach4, traffic_type=EdgeTrafficType.MULTICAST)
         graph.add_edge(edge_m_21, "spikes")
-        part_m_2 = graph.get_outgoing_partition_for_edge(edge_m_21)
+        part_m_2 = graph.get_outgoing_edge_partition_starting_at_vertex(
+            mach3, "spikes")
 
         edge_f_1 = MachineEdge(
             mach1, mach3, traffic_type=EdgeTrafficType.FIXED_ROUTE)
         graph.add_edge(edge_f_1, "Control")
-        part_f = graph.get_outgoing_partition_for_edge(edge_f_1)
+        part_f = graph.get_outgoing_edge_partition_starting_at_vertex(
+            mach1, "Control")
 
         part_s_1 = ConstantSDRAMMachinePartition("ram", mach1, "ram1")
         graph.add_outgoing_edge_partition(part_s_1)

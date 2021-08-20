@@ -46,8 +46,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         "_incoming_edges",
         # map between incoming edges and edge.post_vertex, edge_partition_name
         "_incoming_edges_by_partition_name",
-        # the outgoing partitions by edge
-        "_outgoing_edge_partition_by_edge",
         # The label of the graph
         "_label",
         # map between labels and vertex
@@ -76,7 +74,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         self._outgoing_edges = DefaultOrderedDict(OrderedSet)
         self._incoming_edges = DefaultOrderedDict(OrderedSet)
         self._incoming_edges_by_partition_name = DefaultOrderedDict(list)
-        self._outgoing_edge_partition_by_edge = OrderedDict()
         self._label = label
 
     @property
@@ -189,9 +186,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         self._incoming_edges_by_partition_name[
             edge.post_vertex, partition.identifier].append(edge)
         self._incoming_edges[edge.post_vertex].add(edge)
-        if edge in self._outgoing_edge_partition_by_edge:
-            raise PacmanAlreadyExistsException("edge", edge)
-        self._outgoing_edge_partition_by_edge[edge] = partition
 
     @abstractmethod
     def new_edge_partition(self, name, edge):
@@ -281,14 +275,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         :rtype: int
         """
 
-    def get_outgoing_partition_for_edge(self, edge):
-        """ Gets the partition this edge is associated with.
-
-        :param AbstractEdge edge: the edge to find associated partition
-        :rtype: AbstractEdgePartition
-        """
-        return self._outgoing_edge_partition_by_edge[edge]
-
     def get_edges_starting_at_vertex(self, vertex):
         """ Get all the edges that start at the given vertex.
 
@@ -358,7 +344,7 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         if isinstance(value, AbstractEdgePartition):
             return value in self._outgoing_edge_partitions_by_name.values()
         elif isinstance(value, AbstractEdge):
-            return value in self._outgoing_edge_partition_by_edge
+            return value in self._incoming_edges
         elif isinstance(value, AbstractVertex):
             return value in self._vertices
         return False

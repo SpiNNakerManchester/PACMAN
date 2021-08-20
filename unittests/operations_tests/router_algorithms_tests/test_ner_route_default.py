@@ -34,7 +34,8 @@ def test_ner_route_default():
     placements.add_placement(Placement(target_vertex, 0, 2, 1))
     edge = MachineEdge(source_vertex, target_vertex)
     graph.add_edge(edge, "Test")
-    partition = graph.get_outgoing_partition_for_edge(edge)
+    partition = graph.get_outgoing_edge_partition_starting_at_vertex(
+        source_vertex, "Test")
 
     router = NerRoute()
     routes = router.__call__(graph, machine, placements)
