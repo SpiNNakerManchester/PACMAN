@@ -44,8 +44,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         "_outgoing_edges",
         # The incoming edges by post-vertex
         "_incoming_edges",
-        # map between incoming edges and edge.post_vertex, edge_partition_name
-        "_incoming_edges_by_partition_name",
         # The label of the graph
         "_label",
         # map between labels and vertex
@@ -73,7 +71,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         self._outgoing_edge_partitions_by_name = OrderedDict()
         self._outgoing_edges = DefaultOrderedDict(OrderedSet)
         self._incoming_edges = DefaultOrderedDict(OrderedSet)
-        self._incoming_edges_by_partition_name = DefaultOrderedDict(list)
         self._label = label
 
     @property
@@ -183,8 +180,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
 
         # Add the edge to the indices
         self._outgoing_edges[edge.pre_vertex].add(edge)
-        self._incoming_edges_by_partition_name[
-            edge.post_vertex, partition.identifier].append(edge)
         self._incoming_edges[edge.post_vertex].add(edge)
 
     @abstractmethod
@@ -294,20 +289,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         if vertex not in self._incoming_edges:
             return []
         return self._incoming_edges[vertex]
-
-    def get_edges_ending_at_vertex_with_partition_name(
-            self, vertex, partition_name):
-        """ Get all the edges that end at the given vertex, and reside in the\
-            correct partition ID.
-
-        :param AbstractVertex vertex: The vertex at which the edges to get end
-        :param str partition_name: the label for the partition
-        :return: iterable(AbstractEdge)
-        """
-        key = (vertex, partition_name)
-        if key not in self._incoming_edges_by_partition_name:
-            return []
-        return self._incoming_edges_by_partition_name[key]
 
     @abstractmethod
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
