@@ -38,25 +38,12 @@ class MachineGraphView(MachineGraph):
         self._unlabelled_vertex_count = None
         self._outgoing_edge_partitions_by_name = \
             other._outgoing_edge_partitions_by_name
-        self._outgoing_edges = other._outgoing_edges
         self._incoming_edges = other._incoming_edges
-        self._incoming_edges_by_partition_name = \
-            other._incoming_edges_by_partition_name
-        self._outgoing_edge_partition_by_edge = \
-            other._outgoing_edge_partition_by_edge
         self._application_level_used = other._application_level_used
-        self._multicast_partitions = other._multicast_partitions
-        self._edge_partitions = other._edge_partitions
         self._fixed_route_edge_partitions_by_pre_vertex = \
             other._fixed_route_edge_partitions_by_pre_vertex
         self._multicast_edge_partitions_by_pre_vertex = \
             other._multicast_edge_partitions_by_pre_vertex
-        self._sdram_edge_partitions_by_pre_vertex = \
-            other._sdram_edge_partitions_by_pre_vertex
-        self._fixed_route_edge_partitions_by_post_vertex = \
-            other._fixed_route_edge_partitions_by_post_vertex
-        self._multicast_edge_partitions_by_post_vertex = \
-            other._multicast_edge_partitions_by_post_vertex
         self._sdram_edge_partitions_by_post_vertex = \
             other._sdram_edge_partitions_by_post_vertex
 

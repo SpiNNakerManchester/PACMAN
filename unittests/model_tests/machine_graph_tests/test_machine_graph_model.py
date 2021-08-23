@@ -329,23 +329,6 @@ class TestMachineGraphModel(unittest.TestCase):
             graph.get_outgoing_edge_partitions_starting_at_vertex(mach4))
         self.assertEqual(0, len(starting_at_mach4))
 
-        ending_at_mach2 = list(
-            graph.get_edge_partitions_ending_at_vertex(mach2))
-        self.assertIn(part_m_1, ending_at_mach2)
-        self.assertIn(part_s_1, ending_at_mach2)
-        self.assertEqual(2, len(ending_at_mach2))
-
-        ending_at_mach3 = list(
-            graph.get_edge_partitions_ending_at_vertex(mach3))
-        self.assertIn(part_m_1, ending_at_mach3)
-        self.assertIn(part_f, ending_at_mach3)
-        self.assertIn(part_s_1, ending_at_mach3)
-        self.assertEqual(3, len(ending_at_mach3))
-
-        ending_at_mach1 = list(
-            graph.get_edge_partitions_ending_at_vertex(mach1))
-        self.assertEqual(0, len(ending_at_mach1))
-
 
 if __name__ == '__main__':
     unittest.main()

@@ -16,7 +16,8 @@ from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
-    PacmanConfigurationException, PacmanInvalidParameterException)
+    PacmanConfigurationException, PacmanInvalidParameterException,
+    PacmanAlreadyExistsException)
 from pacman.model.graphs.common import ConstrainedObject
 
 _REPR_TEMPLATE = "{}(identifier={}, edges={}, constraints={}, label={})"
@@ -103,6 +104,8 @@ class AbstractEdgePartition(ConstrainedObject, metaclass=AbstractBase):
                 "edge", str(edge.__class__),
                 "Edges of this graph must be one of the following types:"
                 " {}".format(self._allowed_edge_types))
+        if edge in self._edges:
+            raise PacmanAlreadyExistsException("Edge", edge)
         self._edges.add(edge)
 
     def register_graph_code(self, graph_code):

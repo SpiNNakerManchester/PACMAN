@@ -15,6 +15,7 @@
 
 import logging
 import math
+from collections import defaultdict
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_info import (
@@ -129,15 +130,28 @@ class ZonedRoutingInfoAllocator(object):
         self.__fixed_used = set()
 
         check_algorithm_can_support_constraints(
-            constrained_vertices=machine_graph.outgoing_edge_partitions,
+            constrained_vertices=(
+                machine_graph.outgoing_multicast_edge_partitions),
             supported_constraints=[
                 ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
 
         self.__find_fixed()
-        self.__calculate_zones()
+        multicast_parts = self.__find_groups()
+        self.__calculate_zones(multicast_parts)
         self.__check_zones()
-        return self.__allocate()
+        return self.__allocate(multicast_parts)
+
+    def __find_groups(self):
+        multicast_parts = defaultdict(list)
+        partitions = self.__machine_graph.outgoing_multicast_edge_partitions
+        for partition in partitions:
+            pre_vert = partition.pre_vertex.app_vertex
+            if not pre_vert:
+                pre_vert = partition.pre_vertex
+            multicast_parts[pre_vert, partition.identifier].append(
+                partition)
+        return multicast_parts
 
     def __find_fixed(self):
         """
@@ -145,19 +159,11 @@ class ZonedRoutingInfoAllocator(object):
 
         See :py:meth:`__add_fixed`
         """
-        multicast_partitions = self.__machine_graph.multicast_partitions
-        for app_id in multicast_partitions:
-            # multicast_partitions is a map of app_id to paritition_vertices
-            # paritition_vertices is a map of partition(name) to set(vertex)
-            by_app = multicast_partitions[app_id]
-            for partition_name, paritition_vertices in by_app.items():
-                for mac_vertex in paritition_vertices:
-                    partition = self.__machine_graph.\
-                        get_outgoing_edge_partition_starting_at_vertex(
-                            mac_vertex, partition_name)
-                    for constraint in partition.constraints:
-                        if isinstance(constraint, FixedKeyAndMaskConstraint):
-                            self.__add_fixed(partition, constraint)
+        partitions = self.__machine_graph.outgoing_multicast_edge_partitions
+        for partition in partitions:
+            for constraint in partition.constraints:
+                if isinstance(constraint, FixedKeyAndMaskConstraint):
+                    self.__add_fixed(partition, constraint)
 
     def __add_fixed(self, partition, constraint):
         """
@@ -178,7 +184,7 @@ class ZonedRoutingInfoAllocator(object):
                     key_and_mask.key, key_and_mask.mask):
                 self.__fixed_keys.append((key, n_keys))
 
-    def __calculate_zones(self):
+    def __calculate_zones(self, multicast_parts):
         """
         Computes the size for the zones.
 
@@ -190,35 +196,29 @@ class ZonedRoutingInfoAllocator(object):
 
         :raises PacmanRouteInfoAllocationException:
         """
-        multicast_partitions = self.__machine_graph.multicast_partitions
-        progress = ProgressBar(
-            len(multicast_partitions), "Calculating zones")
+        progress = ProgressBar(len(multicast_parts), "Calculating zones")
 
         # search for size of regions
-        for app_id in progress.over(multicast_partitions):
-            by_app = multicast_partitions[app_id]
-            for partition_name, paritition_vertices in by_app.items():
+        for key in progress.over(multicast_parts):
+            machine_parts = multicast_parts[key]
+            for partition in machine_parts:
                 max_keys = 0
-                for mac_vertex in paritition_vertices:
-                    partition = self.__machine_graph.\
-                        get_outgoing_edge_partition_starting_at_vertex(
-                            mac_vertex, partition_name)
-                    if partition not in self.__fixed_partitions:
-                        n_keys = self.__n_keys_map.n_keys_for_partition(
-                            partition)
-                        max_keys = max(max_keys, n_keys)
-                if max_keys > 0:
-                    atom_bits = self.__bits_needed(max_keys)
-                    self.__n_bits_atoms = max(self.__n_bits_atoms, atom_bits)
-                    machine_bits = self.__bits_needed(len(paritition_vertices))
-                    self.__n_bits_machine = max(
-                        self.__n_bits_machine, machine_bits)
-                    self.__n_bits_atoms_and_mac = max(
-                        self.__n_bits_atoms_and_mac, machine_bits + atom_bits)
-                    self.__atom_bits_per_app_part[
-                        (app_id, partition_name)] = atom_bits
-                else:
-                    self.__atom_bits_per_app_part[(app_id, partition_name)] = 0
+                if partition not in self.__fixed_partitions:
+                    n_keys = self.__n_keys_map.n_keys_for_partition(
+                        partition)
+                    max_keys = max(max_keys, n_keys)
+
+            if max_keys > 0:
+                atom_bits = self.__bits_needed(max_keys)
+                self.__n_bits_atoms = max(self.__n_bits_atoms, atom_bits)
+                machine_bits = self.__bits_needed(len(machine_parts))
+                self.__n_bits_machine = max(
+                    self.__n_bits_machine, machine_bits)
+                self.__n_bits_atoms_and_mac = max(
+                    self.__n_bits_atoms_and_mac, machine_bits + atom_bits)
+                self.__atom_bits_per_app_part[key] = atom_bits
+            else:
+                self.__atom_bits_per_app_part[key] = 0
 
     def __check_zones(self):
         # See if it could fit even before considerding fixed
@@ -268,51 +268,44 @@ class ZonedRoutingInfoAllocator(object):
             for i in range(start, end + 1):
                 self.__fixed_used.add(i)
 
-    def __allocate(self):
-        multicast_partitions = self.__machine_graph.multicast_partitions
-        progress = ProgressBar(
-            len(multicast_partitions), "Allocating routing keys")
+    def __allocate(self, multicast_parts):
+        progress = ProgressBar(len(multicast_parts), "Allocating routing keys")
         routing_infos = RoutingInfo()
         app_part_index = 0
-        for app_id in progress.over(multicast_partitions):
+        for key in progress.over(multicast_parts):
             while app_part_index in self.__fixed_used:
                 app_part_index += 1
-            for partition_name, paritition_vertices in \
-                    multicast_partitions[app_id].items():
-                # convert set to a list and sort by slice
-                machine_vertices = list(paritition_vertices)
-                machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
-                n_bits_atoms = self.__atom_bits_per_app_part[
-                    (app_id, partition_name)]
-                if self.__flexible:
-                    n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
+            # Get a list of machine partitions ordered by pre-slice
+            machine_parts = list(multicast_parts[key])
+            machine_parts.sort(key=lambda x: x.pre_vertex.vertex_slice.lo_atom)
+            n_bits_atoms = self.__atom_bits_per_app_part[key]
+            if self.__flexible:
+                n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
+            else:
+                if n_bits_atoms <= self.__n_bits_atoms:
+                    # Ok it fits use global sizes
+                    n_bits_atoms = self.__n_bits_atoms
+                    n_bits_machine = self.__n_bits_machine
                 else:
-                    if n_bits_atoms <= self.__n_bits_atoms:
-                        # Ok it fits use global sizes
-                        n_bits_atoms = self.__n_bits_atoms
-                        n_bits_machine = self.__n_bits_machine
-                    else:
-                        # Nope need more bits! Use the flexible approach here
-                        n_bits_machine = \
-                            self.__n_bits_atoms_and_mac - n_bits_atoms
+                    # Nope need more bits! Use the flexible approach here
+                    n_bits_machine = \
+                        self.__n_bits_atoms_and_mac - n_bits_atoms
 
-                for machine_index, vertex in enumerate(machine_vertices):
-                    partition = self.__machine_graph.\
-                        get_outgoing_edge_partition_starting_at_vertex(
-                            vertex, partition_name)
-                    if partition in self.__fixed_partitions:
-                        # Ignore zone calculations and just use fixed
-                        keys_and_masks = self.__fixed_partitions[partition]
-                    else:
-                        mask = self.__mask(n_bits_atoms)
-                        key = app_part_index
-                        key = (key << n_bits_machine) | machine_index
-                        key = key << n_bits_atoms
-                        keys_and_masks = [BaseKeyAndMask(
-                            base_key=key, mask=mask)]
-                    routing_infos.add_partition_info(
-                        PartitionRoutingInfo(keys_and_masks, partition))
-                app_part_index += 1
+            for machine_index, partition in enumerate(machine_parts):
+
+                if partition in self.__fixed_partitions:
+                    # Ignore zone calculations and just use fixed
+                    keys_and_masks = self.__fixed_partitions[partition]
+                else:
+                    mask = self.__mask(n_bits_atoms)
+                    key = app_part_index
+                    key = (key << n_bits_machine) | machine_index
+                    key = key << n_bits_atoms
+                    keys_and_masks = [BaseKeyAndMask(
+                        base_key=key, mask=mask)]
+                routing_infos.add_partition_info(
+                    PartitionRoutingInfo(keys_and_masks, partition))
+            app_part_index += 1
 
         return routing_infos
 

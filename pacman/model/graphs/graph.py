@@ -40,8 +40,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         # The outgoing edge partitions of the graph by
         # (edge.pre_vertex, outgoing_edge_partition_name)
         "_outgoing_edge_partitions_by_name",
-        # The outgoing edges by pre-vertex
-        "_outgoing_edges",
         # The incoming edges by post-vertex
         "_incoming_edges",
         # The label of the graph
@@ -69,7 +67,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         self._vertex_by_label = dict()
         self._unlabelled_vertex_count = 0
         self._outgoing_edge_partitions_by_name = OrderedDict()
-        self._outgoing_edges = DefaultOrderedDict(OrderedSet)
         self._incoming_edges = DefaultOrderedDict(OrderedSet)
         self._label = label
 
@@ -179,7 +176,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
                 "Post-vertex must be known in graph")
 
         # Add the edge to the indices
-        self._outgoing_edges[edge.pre_vertex].add(edge)
         self._incoming_edges[edge.post_vertex].add(edge)
 
     @abstractmethod
@@ -277,7 +273,10 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
             The vertex at which the edges to get start
         :rtype: iterable(AbstractEdge)
         """
-        return self._outgoing_edges[vertex]
+        parts = self.get_outgoing_edge_partitions_starting_at_vertex(vertex)
+        for partition in parts:
+            for edge in partition.edges:
+                yield edge
 
     def get_edges_ending_at_vertex(self, vertex):
         """ Get all the edges that end at the given vertex.

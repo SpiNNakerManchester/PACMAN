@@ -38,12 +38,7 @@ class ApplicationGraphView(ApplicationGraph):
         self._unlabelled_vertex_count = None
         self._outgoing_edge_partitions_by_name = \
             other._outgoing_edge_partitions_by_name
-        self._outgoing_edges = other._outgoing_edges
         self._incoming_edges = other._incoming_edges
-        self._incoming_edges_by_partition_name = \
-            other._incoming_edges_by_partition_name
-        self._outgoing_edge_partition_by_edge = \
-            other._outgoing_edge_partition_by_edge
 
     @overrides(ApplicationGraph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):

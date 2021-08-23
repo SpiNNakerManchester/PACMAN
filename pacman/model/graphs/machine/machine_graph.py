@@ -18,8 +18,7 @@ from .machine_edge import MachineEdge
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
-from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanInvalidParameterException)
+from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs import Graph
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
@@ -35,21 +34,12 @@ class MachineGraph(Graph):
         # Flags to say the application level is used so all machine vertices
         # will have an application vertex
         "_application_level_used",
-        # Ordered set of partitions
-        "_edge_partitions",
-        # A double dictionary of MULTICAST edges by their
-        # application id and then their (partition name)
-        "_multicast_partitions",
         # The sets of multicast edge partitions by pre-vertex
         "_multicast_edge_partitions_by_pre_vertex",
         # The sets of fixed_point edge partitions by pre-vertex
         "_fixed_route_edge_partitions_by_pre_vertex",
         # The sdram outgoing edge partitions by pre-vertex
         "_sdram_edge_partitions_by_pre_vertex",
-        # The sets of multicast edge partitions by pre-vertex
-        "_multicast_edge_partitions_by_post_vertex",
-        # The sets of fixed_point edge partitions by pre-vertex
-        "_fixed_route_edge_partitions_by_post_vertex",
         # The sdram outgoing edge partitions by pre-vertex
         "_sdram_edge_partitions_by_post_vertex",
     ]
@@ -79,18 +69,11 @@ class MachineGraph(Graph):
         else:
             # Must be false as there is no App_graph
             self._application_level_used = False
-        self._multicast_partitions = DefaultOrderedDict(
-            lambda: DefaultOrderedDict(set))
-        self._edge_partitions = OrderedSet()
         self._fixed_route_edge_partitions_by_pre_vertex = (
             DefaultOrderedDict(OrderedSet))
         self._multicast_edge_partitions_by_pre_vertex = (
             DefaultOrderedDict(OrderedSet))
         self._sdram_edge_partitions_by_pre_vertex = (
-            DefaultOrderedDict(OrderedSet))
-        self._fixed_route_edge_partitions_by_post_vertex = (
-            DefaultOrderedDict(OrderedSet))
-        self._multicast_edge_partitions_by_post_vertex = (
             DefaultOrderedDict(OrderedSet))
         self._sdram_edge_partitions_by_post_vertex = (
             DefaultOrderedDict(OrderedSet))
@@ -99,43 +82,10 @@ class MachineGraph(Graph):
     def add_edge(self, edge, outgoing_edge_partition_name):
         edge_partition = super().add_edge(
             edge, outgoing_edge_partition_name)
-        if (isinstance(edge_partition, MulticastEdgePartition)):
-            if edge.pre_vertex.app_vertex:
-                by_app = self._multicast_partitions[
-                    edge.pre_vertex.app_vertex]
-            else:
-                by_app = self._multicast_partitions[
-                    edge.pre_vertex]
-            by_partition = by_app[outgoing_edge_partition_name]
-            by_partition.add(edge.pre_vertex)
-            self._multicast_edge_partitions_by_post_vertex[
-                edge.post_vertex].add(edge_partition)
-        elif isinstance(edge_partition, FixedRouteEdgePartition):
-            self._fixed_route_edge_partitions_by_post_vertex[
-                edge.post_vertex].add(edge_partition)
-        elif isinstance(edge_partition, AbstractSDRAMPartition):
+        if isinstance(edge_partition, AbstractSDRAMPartition):
             self._sdram_edge_partitions_by_post_vertex[
                 edge.post_vertex].add(edge_partition)
-        else:
-            raise NotImplementedError(
-                "Unexpected edge_partition: {}".format(edge_partition))
         return edge_partition
-
-    @property
-    def multicast_partitions(self):
-        """
-        Returns a double dictionary of app id then
-        outgoing_edge_partition_name to a set of machine_vertex that act as
-        pre vertices for these multicast edges
-
-        The app_id is normally the (machine) edge.pre_vertex.app_vertex.
-        This then groups the edges which come from the same app_vertex
-        If the (machine) edge.pre_vertex has no app vertex then the app_id will
-        be the machine vertex which will then form its own group of 1
-
-        :rtype: dict(ApplicationVertex, dict(str, set(MachineVertex))
-        """
-        return self._multicast_partitions
 
     @overrides(Graph.add_vertex)
     def add_vertex(self, vertex):
@@ -163,12 +113,6 @@ class MachineGraph(Graph):
                 "Partitions of this graph must be an "
                 "AbstractMachineEdgePartition")
 
-        # check this partition doesn't already exist
-        if edge_partition in self._edge_partitions:
-            raise PacmanAlreadyExistsException(
-                str(AbstractMachineEdgePartition), edge_partition)
-
-        self._edge_partitions.add(edge_partition)
         edge_partition.register_graph_code(id(self))
 
         for pre_vertex in edge_partition.pre_vertices:
@@ -206,12 +150,33 @@ class MachineGraph(Graph):
     @property
     @overrides(Graph.outgoing_edge_partitions)
     def outgoing_edge_partitions(self):
-        return self._edge_partitions
+        for partitions in \
+                self._fixed_route_edge_partitions_by_pre_vertex.values():
+            for partition in partitions:
+                yield partition
+        for partitions in \
+                self._multicast_edge_partitions_by_pre_vertex.values():
+            for partition in partitions:
+                yield partition
+        for partitions in \
+                self._sdram_edge_partitions_by_pre_vertex.values():
+            for partition in partitions:
+                yield partition
 
     @property
     @overrides(Graph.n_outgoing_edge_partitions)
     def n_outgoing_edge_partitions(self):
-        return len(self._edge_partitions)
+        return sum((
+            len(self._fixed_route_edge_partitions_by_pre_vertex),
+            len(self._multicast_edge_partitions_by_pre_vertex),
+            len(self._sdram_edge_partitions_by_pre_vertex)))
+
+    @property
+    def outgoing_multicast_edge_partitions(self):
+        for partitions in \
+                self._multicast_edge_partitions_by_pre_vertex.values():
+            for partition in partitions:
+                yield partition
 
     def get_fixed_route_edge_partitions_starting_at_vertex(self, vertex):
         """ Get only the fixed_route edge partitions that start at the vertex.
@@ -252,24 +217,6 @@ class MachineGraph(Graph):
                 self.get_sdram_edge_partitions_starting_at_vertex(vertex):
             yield partition
 
-    def get_fixed_route_edge_partitions_ending_at_vertex(self, vertex):
-        """ Get only the fixed_route edge partitions that end at the vertex.
-
-        :param MachineVertex vertex:
-            The vertex at which the edge partitions to find starts
-        :rtype: iterable(FixedRouteEdgePartition)
-        """
-        return self._fixed_route_edge_partitions_by_post_vertex.get(vertex, [])
-
-    def get_multicast_edge_partitions_ending_at_vertex(self, vertex):
-        """ Get only the multicast edge partitions that end at the vertex.
-
-        :param MachineVertex vertex:
-            The vertex at which the edge partitions to find starts
-        :rtype: iterable(MulticastEdgePartition)
-        """
-        return self._multicast_edge_partitions_by_post_vertex.get(vertex, [])
-
     def get_sdram_edge_partitions_ending_at_vertex(self, vertex):
         """ Get all the sdram edge partitions that end at the given vertex.
 
@@ -278,23 +225,6 @@ class MachineGraph(Graph):
         :rtype: iterable(AbstractSDRAMPartition)
         """
         return self._sdram_edge_partitions_by_post_vertex.get(vertex, [])
-
-    def get_edge_partitions_ending_at_vertex(self, vertex):
-        """ Get all the edge partitions that end at the given vertex.
-
-        :param MachineVertex vertex:
-            The vertex at which the SDRAM edge partitions to find starts
-        :rtype: iterable(AbstractPartition)
-        """
-        for partition in \
-                self.get_fixed_route_edge_partitions_ending_at_vertex(vertex):
-            yield partition
-        for partition in \
-                self.get_multicast_edge_partitions_ending_at_vertex(vertex):
-            yield partition
-        for partition in \
-                self.get_sdram_edge_partitions_ending_at_vertex(vertex):
-            yield partition
 
     def clone(self):
         """
