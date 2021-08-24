@@ -76,8 +76,8 @@ class ApplicationGraph(Graph):
         # check this partition doesn't already exist
         key = (edge_partition.pre_vertex,
                edge_partition.identifier)
-        if self._outgoing_edge_partitions_by_pre_vertex[
-                edge_partition.pre_vertex].contains(edge_partition):
+        if edge_partition in self._outgoing_edge_partitions_by_pre_vertex[
+                edge_partition.pre_vertex]:
             raise PacmanAlreadyExistsException(
                 str(ApplicationEdgePartition), key)
 
