@@ -42,6 +42,8 @@ class MachineGraph(Graph):
         "_sdram_edge_partitions_by_pre_vertex",
         # The sdram outgoing edge partitions by pre-vertex
         "_sdram_edge_partitions_by_post_vertex",
+        # The total number of outgoing edge partitions
+        "_n_outgoing_edge_partitions"
     ]
 
     MISSING_APP_VERTEX_ERROR_MESSAGE = (
@@ -77,6 +79,7 @@ class MachineGraph(Graph):
             DefaultOrderedDict(OrderedSet))
         self._sdram_edge_partitions_by_post_vertex = (
             DefaultOrderedDict(OrderedSet))
+        self._n_outgoing_edge_partitions = 0
 
     @overrides(Graph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
@@ -116,8 +119,6 @@ class MachineGraph(Graph):
         edge_partition.register_graph_code(id(self))
 
         for pre_vertex in edge_partition.pre_vertices:
-            key = (pre_vertex, edge_partition.identifier)
-            self._outgoing_edge_partitions_by_name[key] = edge_partition
             if isinstance(edge_partition, MulticastEdgePartition):
                 self._multicast_edge_partitions_by_pre_vertex[
                     pre_vertex].add(edge_partition)
@@ -132,6 +133,8 @@ class MachineGraph(Graph):
                     "Unexpected edge_partition: {}".format(edge_partition))
         for edge in edge_partition.edges:
             self._register_edge(edge, edge_partition)
+
+        self._n_outgoing_edge_partitions += 1
 
     @overrides(Graph.new_edge_partition)
     def new_edge_partition(self, name, edge):
@@ -166,10 +169,7 @@ class MachineGraph(Graph):
     @property
     @overrides(Graph.n_outgoing_edge_partitions)
     def n_outgoing_edge_partitions(self):
-        return sum((
-            len(self._fixed_route_edge_partitions_by_pre_vertex),
-            len(self._multicast_edge_partitions_by_pre_vertex),
-            len(self._sdram_edge_partitions_by_pre_vertex)))
+        return self._n_outgoing_edge_partitions
 
     @property
     def outgoing_multicast_edge_partitions(self):

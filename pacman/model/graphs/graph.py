@@ -13,16 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
-from .abstract_edge_partition import AbstractEdgePartition
-from .abstract_edge import AbstractEdge
-from .abstract_vertex import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
 
 
@@ -37,9 +33,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         "_allowed_edge_types",
         # The vertices of the graph
         "_vertices",
-        # The outgoing edge partitions of the graph by
-        # (edge.pre_vertex, outgoing_edge_partition_name)
-        "_outgoing_edge_partitions_by_name",
         # The incoming edges by post-vertex
         "_incoming_edges",
         # The label of the graph
@@ -66,7 +59,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         self._vertices = []
         self._vertex_by_label = dict()
         self._unlabelled_vertex_count = 0
-        self._outgoing_edge_partitions_by_name = OrderedDict()
         self._incoming_edges = DefaultOrderedDict(OrderedSet)
         self._label = label
 
@@ -310,21 +302,10 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         :return: the named edge partition, or None if no such partition exists
         :rtype: AbstractEdgePartition or None
         """
-        return self._outgoing_edge_partitions_by_name.get(
-            (vertex, outgoing_edge_partition_name), None)
-
-    def __contains__(self, value):
-        """ Determines if a value is an object that is in the graph.
-
-        :param value: The object to see if it is in the graph
-        :type value: AbstractVertex or AbstractEdge or AbstractEdgePartition
-        :return: True if the value is in the graph, False otherwise
-        :rtype: bool
-        """
-        if isinstance(value, AbstractEdgePartition):
-            return value in self._outgoing_edge_partitions_by_name.values()
-        elif isinstance(value, AbstractEdge):
-            return value in self._incoming_edges
-        elif isinstance(value, AbstractVertex):
-            return value in self._vertices
-        return False
+        # In general, very few partitions start at a given vertex, so iteration
+        # isn't going to be as onerous as it looks
+        parts = self.get_outgoing_edge_partitions_starting_at_vertex(vertex)
+        for partition in parts:
+            if partition.identifier == outgoing_edge_partition_name:
+                return partition
+        return None

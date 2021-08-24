@@ -36,9 +36,8 @@ class ApplicationGraphView(ApplicationGraph):
         self._vertex_by_label = other._vertex_by_label
         # should never be needed
         self._unlabelled_vertex_count = None
-        self._outgoing_edge_partitions_by_name = \
-            other._outgoing_edge_partitions_by_name
         self._incoming_edges = other._incoming_edges
+        self._n_outgoing_edge_partitions = other._n_outgoing_edge_partitions
 
     @overrides(ApplicationGraph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):

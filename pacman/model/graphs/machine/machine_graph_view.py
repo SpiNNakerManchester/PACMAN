@@ -36,8 +36,6 @@ class MachineGraphView(MachineGraph):
         self._vertex_by_label = other._vertex_by_label
         # should never be needed
         self._unlabelled_vertex_count = None
-        self._outgoing_edge_partitions_by_name = \
-            other._outgoing_edge_partitions_by_name
         self._incoming_edges = other._incoming_edges
         self._application_level_used = other._application_level_used
         self._fixed_route_edge_partitions_by_pre_vertex = \
@@ -46,6 +44,7 @@ class MachineGraphView(MachineGraph):
             other._multicast_edge_partitions_by_pre_vertex
         self._sdram_edge_partitions_by_post_vertex = \
             other._sdram_edge_partitions_by_post_vertex
+        self._n_outgoing_edge_partitions = other._n_outgoing_edge_partitions
 
     @overrides(MachineGraph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
