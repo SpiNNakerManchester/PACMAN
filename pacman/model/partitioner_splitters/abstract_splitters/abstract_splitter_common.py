@@ -78,18 +78,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
     def __repr__(self):
         return self.__str__()
 
-    def _get_map(self, edge_types):
-        """ builds map of machine vertex to edge type
-
-        :param edge_types: the type of edges to add to the dict.
-        :return: dict of vertex as key, edge types as list in value
-        :rtype: dict(MachineVertex, EdgeType)
-        """
-        result = OrderedDict()
-        for vertex in self._governed_app_vertex.machine_vertices:
-            result[vertex] = edge_types
-        return result
-
     def set_max_atoms_per_core(self, max_atoms_per_core, is_fixed_atoms):
         """ sets max atoms per core for this splitter object
 
@@ -243,42 +231,29 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_out_going_vertices(self, edge, outgoing_edge_partition):
-        """ gets pre vertices and their acceptable edge types
+    def get_out_going_vertices(self, outgoing_edge_partition):
+        """ Get machine pre vertices
 
         The output vertices are the ones that will serve as source vertices
-        for external edges.  If more than one set of vertices match this
-        description the splitter should use the ones used by the most general
-        edge type/ down stream splitter.
+        for external edges.
 
-        :param ~pacman.model.graphs.application.ApplicationEdge edge: app edge
         :param outgoing_edge_partition: outgoing edge partition
         :type outgoing_edge_partition:
             ~pacman.model.graphs.OutgoingEdgePartition
-        :return: dict of keys being machine vertices and values are a list
-            of acceptable edge types.
-        :rtype: dict(~pacman.model.graphs.machine.MachineVertex,list(class))
+        :rtype: list(MachineVertex)
         """
 
     @abstractmethod
-    def get_in_coming_vertices(self, edge, outgoing_edge_partition,
-                               src_machine_vertex):
-        """ gets incoming vertices and their acceptable edge types
+    def get_in_coming_vertices(self, outgoing_edge_partition):
+        """ Get machine post vertices
 
         The input vertices are the ones that will serve as dest vertices
-        for external edges.  If more than one set of vertices match this
-        description the splitter should use the ones used by the most general
-        edge type/ down stream splitter.
+        for external edges.
 
-        :param ~pacman.model.graphs.application.ApplicationEdge edge: app edge
         :param outgoing_edge_partition: outgoing edge partition
         :type outgoing_edge_partition:
             ~pacman.model.graphs.OutgoingEdgePartition
-        :param ~pacman.model.graphs.machine.MachineVertex src_machine_vertex:
-            the src machine vertex
-        :return: dict of keys being machine vertices and values are a list
-            of acceptable edge types.
-        :rtype: dict(~pacman.model.graphs.machine.MachineVertex,list(class))
+        :rtype: list(MachineVertex)
         """
 
     @abstractmethod

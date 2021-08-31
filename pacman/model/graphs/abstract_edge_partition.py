@@ -112,7 +112,7 @@ class AbstractEdgePartition(ConstrainedObject, metaclass=AbstractBase):
         """
         Allows the graph to register its code when the partition is added
         """
-        if self._graph_code is not None:
+        if self._graph_code is not None and self._graph_code != graph_code:
             raise PacmanConfigurationException(
                 "Illegal attempt to add partition {} to a second "
                 "graph".format(self))

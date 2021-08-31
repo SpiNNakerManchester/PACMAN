@@ -17,7 +17,8 @@ from collections import OrderedDict
 from pacman.exceptions import (PacmanConfigurationException)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
-from pacman.model.graphs.machine import MachineGraph
+from pacman.model.graphs.machine import (
+    MachineGraph, MachineEdge, MulticastEdgePartition)
 from pacman.model.partitioner_interfaces import (
     AbstractSplitterPartitioner, AbstractSlicesConnect)
 from pacman.model.partitioner_splitters.abstract_splitters\
@@ -25,7 +26,6 @@ from pacman.model.partitioner_splitters.abstract_splitters\
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints)
 from pacman.utilities.utility_objs import ResourceTracker
-from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls as utils
 
@@ -239,57 +239,37 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         # process edges
         progress = ProgressBar(
             app_graph.n_outgoing_edge_partitions, self.__PROGRESS_BAR_EDGES)
+        graph_code = id(machine_graph)
 
         # go over outgoing partitions
-        for app_outgoing_edge_partition in progress.over(
-                app_graph.outgoing_edge_partitions):
+        for app_edge_part in progress.over(app_graph.outgoing_edge_partitions):
 
-            # go through each edge
-            for app_edge in app_outgoing_edge_partition.edges:
-                src_vertices_edge_type_map = (
-                    app_edge.pre_vertex.splitter.get_out_going_vertices(
-                        app_edge, app_outgoing_edge_partition))
+            pres = app_edge_part.pre_vertex.splitter.get_out_going_vertices(
+                app_edge_part)
 
-                # go through each pre vertices
-                for src_machine_vertex in src_vertices_edge_type_map:
-                    splitter = app_edge.post_vertex.splitter
-                    dest_vertices_edge_type_map = (
-                        splitter.get_in_coming_vertices(
-                            app_edge, app_outgoing_edge_partition,
-                            src_machine_vertex))
+            # Go through each pre and create partitions
+            for pre in pres:
+                edge_part = MulticastEdgePartition(
+                    pre, app_edge_part.identifier)
+                edge_part.register_graph_code(graph_code)
 
-                    # go through the post vertices
-                    for dest_machine_vertex in dest_vertices_edge_type_map:
-                        # get the accepted edge types for each vertex
-                        pre_edge_types = (
-                            src_vertices_edge_type_map[src_machine_vertex])
-                        post_edge_types = (
-                            dest_vertices_edge_type_map[dest_machine_vertex])
+                # go through each edge and make machine edges
+                for app_edge in app_edge_part.edges:
+                    posts = app_edge.post_vertex.splitter\
+                        .get_in_coming_vertices(app_edge_part)
+                    posts = [post for post in posts
+                             if self.__keep_edge(app_edge, pre, post)]
+                    for post in posts:
+                        label = self.MACHINE_EDGE_LABEL.format(app_edge.label)
+                        edge = MachineEdge(
+                            pre, post, app_edge=app_edge, label=label)
+                        edge_part.add_edge(edge, graph_code)
 
-                        # locate the common edge type
-                        common_edge_type = self.__locate_common_edge_type(
-                            pre_edge_types, post_edge_types,
-                            src_machine_vertex, dest_machine_vertex)
+                machine_graph.add_outgoing_edge_partition(edge_part)
 
-                        self.create_machine_edge(
-                            src_machine_vertex, dest_machine_vertex,
-                            common_edge_type, app_edge, machine_graph,
-                            app_outgoing_edge_partition, resource_tracker)
-
-    @overrides(AbstractSplitterPartitioner.create_machine_edge)
-    def create_machine_edge(
-            self, src_machine_vertex, dest_machine_vertex,
-            common_edge_type, app_edge, machine_graph,
-            app_outgoing_edge_partition, resource_tracker):
-
-        if (isinstance(app_edge, AbstractSlicesConnect) and not
-                app_edge.could_connect(
-                    src_machine_vertex,  dest_machine_vertex)):
-            return
-
-        # build edge and add to machine graph
-        machine_edge = common_edge_type(
-            src_machine_vertex, dest_machine_vertex, app_edge=app_edge,
-            label=self.MACHINE_EDGE_LABEL.format(app_edge.label))
-        machine_graph.add_edge(
-            machine_edge, app_outgoing_edge_partition.identifier)
+    def __keep_edge(self, app_edge, pre_vertex, post_vertex):
+        """ Decide whether an edge should be made
+        """
+        return (
+            not isinstance(app_edge, AbstractSlicesConnect) or
+            app_edge.could_connect(pre_vertex, post_vertex))

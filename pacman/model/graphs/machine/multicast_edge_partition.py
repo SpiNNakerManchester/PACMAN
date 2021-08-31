@@ -65,3 +65,7 @@ class MulticastEdgePartition(
         return MulticastEdgePartition(
             self._pre_vertex, self._identifier, self._constraints,
             self._label, self._traffic_weight)
+
+    def __repr__(self):
+        return (f"MulticastEdgePartition(pre_vertex={self.pre_vertex},"
+                f" identifier={self.identifier})")
