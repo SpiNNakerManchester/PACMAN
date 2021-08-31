@@ -178,6 +178,13 @@ class MachineGraph(Graph):
             for partition in partitions:
                 yield partition
 
+    @property
+    def outgoing_sdram_edge_partitions(self):
+        for partitions in \
+                self._sdram_edge_partitions_by_pre_vertex.values():
+            for partition in partitions:
+                yield partition
+
     def get_fixed_route_edge_partitions_starting_at_vertex(self, vertex):
         """ Get only the fixed_route edge partitions that start at the vertex.
 

@@ -13,9 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import functools
-from collections import OrderedDict
-
 from pacman.model.resources import ResourceContainer, ConstantSDRAM
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
@@ -24,6 +21,7 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.utilities import VertexSorter, ConstraintOrder
 from pacman.model.graphs.abstract_virtual import AbstractVirtual
+from collections import OrderedDict
 
 
 def sort_vertices_by_known_constraints(vertices):
@@ -64,25 +62,30 @@ def get_vertices_on_same_chip(vertex, graph):
     return same_chip_as_vertices
 
 
-def get_same_chip_vertex_groups(graph):
-    """ Get a dictionary of vertex to list of vertices that must be placed on\
+def get_same_chip_vertex_groups(machine_graph):
+    """ Get a dictionary of vertex to set of vertices that must be placed on\
        the same chip
 
-    :param Graph graph: The graph containing the vertices
-    :rtype: dict(AbstractVertex, set(AbstractVertex))
+    :param MachineGraph machine_graph: The graph containing the vertices
+    :rtype: dict(MachineVertex, set(MachineVertex))
     """
-    groups = create_vertices_groups(graph.vertices, functools.partial(
-        get_vertices_on_same_chip, graph=graph))
-    # Dict of vertex to set of vertices on same chip (repeated lists expected)
-    # A empty set value indicates a set that is too big.
-    same_chip_vertices = OrderedDict()
-    for group in groups:
-        for vertex in group:
-            same_chip_vertices[vertex] = group
-    for vertex in graph.vertices:
-        if vertex not in same_chip_vertices:
-            same_chip_vertices[vertex] = {vertex}
-    return same_chip_vertices
+    same_chip = OrderedDict()
+    couples = list()
+    for vertex in machine_graph.vertices:
+        for constraint in vertex.constraints:
+            if isinstance(constraint, SameChipAsConstraint):
+                couples.append((vertex, constraint.vertex))
+        same_chip[vertex] = {vertex}
+    for partition in machine_graph.outgoing_sdram_edge_partitions:
+        for edge in partition.edges:
+            couples.append((edge.pre_vertex, edge.post_vertex))
+
+    for (pre, post) in couples:
+        group = same_chip[pre].union(same_chip[post])
+        for v in group:
+            same_chip[v] = group
+
+    return same_chip
 
 
 def add_set(all_sets, new_set):
