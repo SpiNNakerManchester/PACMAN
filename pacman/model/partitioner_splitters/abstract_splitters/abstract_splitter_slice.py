@@ -15,7 +15,6 @@
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from pacman.model.graphs.machine import MachineEdge
 from pacman.utilities.algorithm_utilities.\
     partition_algorithm_utilities import (
         get_remaining_constraints)

@@ -18,7 +18,6 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
