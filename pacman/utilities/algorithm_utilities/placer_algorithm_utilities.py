@@ -18,9 +18,7 @@ from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
     RadialPlacementFromChipConstraint)
-from pacman.model.graphs.common.edge_traffic_type import EdgeTrafficType
 from pacman.utilities import VertexSorter, ConstraintOrder
-from pacman.model.graphs.abstract_virtual import AbstractVirtual
 from collections import OrderedDict
 
 
@@ -38,28 +36,6 @@ def sort_vertices_by_known_constraints(vertices):
         ConstraintOrder(BoardConstraint, 4),
         ConstraintOrder(RadialPlacementFromChipConstraint, 5)])
     return sorter.sort(vertices)
-
-
-def get_vertices_on_same_chip(vertex, graph):
-    """ Get the vertices that must be on the same chip as the given vertex
-
-    :param AbstractVertex vertex: The vertex to search with
-    :param Graph graph: The graph containing the vertex
-    :rtype: set(AbstractVertex)
-    """
-    # Virtual vertices can't be forced on different chips
-    if isinstance(vertex, AbstractVirtual):
-        return []
-    same_chip_as_vertices = OrderedSet()
-    for constraint in vertex.constraints:
-        if isinstance(constraint, SameChipAsConstraint):
-            same_chip_as_vertices.add(constraint.vertex)
-
-    same_chip_as_vertices.update(
-        edge.post_vertex
-        for edge in graph.get_edges_starting_at_vertex(vertex)
-        if edge.traffic_type == EdgeTrafficType.SDRAM)
-    return same_chip_as_vertices
 
 
 def get_same_chip_vertex_groups(machine_graph):

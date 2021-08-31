@@ -91,7 +91,8 @@ class SpreaderPlacer(OneToOnePlacer):
         one_to_one_groups = create_vertices_groups(
             machine_graph.vertices,
             functools.partial(
-                self._find_one_to_one_vertices, graph=machine_graph))
+                self._find_one_to_one_vertices, graph=machine_graph,
+                same_chip_vertex_groups=same_chip_vertex_groups))
         progress_bar.update()
 
         # sort chips so that they are radial from a given point and other

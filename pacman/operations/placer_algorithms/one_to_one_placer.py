@@ -25,7 +25,7 @@ from pacman.operations.placer_algorithms import RadialPlacer
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     create_vertices_groups, get_same_chip_vertex_groups,
-    get_vertices_on_same_chip, create_requirement_collections)
+    create_requirement_collections)
 from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint,
     RadialPlacementFromChipConstraint)
@@ -81,7 +81,8 @@ class OneToOnePlacer(RadialPlacer):
         one_to_one_groups = create_vertices_groups(
             machine_graph.vertices,
             functools.partial(
-                self._find_one_to_one_vertices, graph=machine_graph))
+                self._find_one_to_one_vertices, graph=machine_graph,
+                same_chip_vertex_groups=same_chip_vertex_groups))
         progress.update()
 
         return self._do_allocation(
@@ -89,7 +90,7 @@ class OneToOnePlacer(RadialPlacer):
             plan_n_timesteps, machine_graph, progress)
 
     @staticmethod
-    def _find_one_to_one_vertices(vertex, graph):
+    def _find_one_to_one_vertices(vertex, graph, same_chip_vertex_groups):
         """ Find vertices which have one to one connections with the given\
             vertex, and where their constraints don't force them onto\
             different chips.
@@ -140,7 +141,7 @@ class OneToOnePlacer(RadialPlacer):
                         edge.pre_vertex for edge in incoming
                         if edge.pre_vertex not in vertices_seen)
 
-        found_vertices.update(get_vertices_on_same_chip(vertex, graph))
+        found_vertices.update(same_chip_vertex_groups[vertex])
         return found_vertices
 
     def _do_allocation(
