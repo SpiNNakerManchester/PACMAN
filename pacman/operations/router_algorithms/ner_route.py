@@ -101,7 +101,11 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
         these items.
     :rtype: tuple(RoutingTree, dict(tuple(int,int),RoutingTree))
     """
+    # The radius to check for neighbours, and the total number of chips that
+    # could appear in the radius
     radius = 20
+    n_nodes_radius = 1261
+
     # Map from (x, y) to RoutingTree objects
     route = {src: RoutingTree(src)}
 
@@ -115,20 +119,25 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
 
         # Try to find a nearby (within radius hops) node in the routing tree
         # that we can route to (falling back on just routing to the source).
-        #
-        # This implementation scans the list of all route nodes created so far
-        # and finds the closest node which is < radius hops
-        # (falling back on the origin if no node is closer than radius hops).
-
-        neighbour = None
-        neighbour_distance = None
-        for candidate_neighbour in route:
-            distance = machine.get_vector_length(
-                candidate_neighbour, destination)
-            if distance <= radius and (
-                    neighbour is None or distance < neighbour_distance):
-                neighbour = candidate_neighbour
-                neighbour_distance = distance
+        if len(route) / 3 > n_nodes_radius:
+            # This implementation scans potential neighbours in an expanding
+            # radius; this is ~3x faster per iteration than the one below.
+            for candidate in machine.concentric_chips(radius, destination):
+                if candidate in route:
+                    neighbour = candidate
+                    break
+        else:
+            # This implementation scans the list of all route nodes created so
+            # far and finds the closest node which is < radius hops.  This is
+            # ~3x slower per iteration than the one above.
+            neighbour_distance = None
+            for candidate_neighbour in route:
+                distance = machine.get_vector_length(
+                    candidate_neighbour, destination)
+                if distance <= radius and (
+                        neighbour is None or distance < neighbour_distance):
+                    neighbour = candidate_neighbour
+                    neighbour_distance = distance
 
         # Fall back on routing directly to the source if no nodes within radius
         # hops of the destination was found.
