@@ -48,11 +48,9 @@ class TestBasicDijkstraRouting(unittest.TestCase):
 
         for vertex in vertices:
             graph.add_outgoing_edge_partition(
-                MulticastEdgePartition(
-                    identifier="Test", pre_vertex=vertex))
+                MulticastEdgePartition(identifier="Test", pre_vertex=vertex))
             for vertex_to in vertices:
-                if vertex != vertex_to:
-                    graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
+                graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
         router = BasicDijkstraRouting()
         routing_paths = router.__call__(placements, machine, graph)
@@ -87,8 +85,7 @@ class TestBasicDijkstraRouting(unittest.TestCase):
                         queue.append((dest_x, dest_y))
 
             for vertex_to in vertices:
-                if vertex != vertex_to:
-                    self.assertIn(vertex_to, vertices_reached)
+                self.assertIn(vertex_to, vertices_reached)
 
 
 if __name__ == '__main__':
