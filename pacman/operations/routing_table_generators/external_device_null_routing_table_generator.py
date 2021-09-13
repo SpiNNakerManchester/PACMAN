@@ -41,6 +41,9 @@ def external_device_null_routing_table_generator(
 
             if not edges:
                 keys_and_masks = vertex.outgoing_keys_and_masks()
+                if keys_and_masks is None and vertex.app_vertex is not None:
+                    keys_and_masks = \
+                        vertex.app_vertex.get_outgoing_keys_and_masks(vertex)
 
                 # If there are no edges, there has to be some outgoing keys
                 # and masks, as otherwise this isn't going to work

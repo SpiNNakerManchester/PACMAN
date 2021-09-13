@@ -15,6 +15,7 @@
 
 from .application_vertex import ApplicationVertex
 from spinn_utilities.overrides import overrides
+from spinn_utilities.abstract_base import abstractmethod
 
 
 class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
@@ -24,15 +25,17 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
     __slots__ = [
         "_n_atoms",
         "_spinnaker_link_id",
-        "_board_address"]
+        "_board_address",
+        "_n_machine_vertices"]
 
     def __init__(
             self, n_atoms, spinnaker_link_id, board_address=None, label=None,
-            constraints=None):
+            constraints=None, n_machine_vertices=1):
         super().__init__(label=label, constraints=constraints)
         self._n_atoms = self.round_n_atoms(n_atoms)
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address
+        self._n_machine_vertices = n_machine_vertices
 
     @property
     @overrides(ApplicationVertex.n_atoms)
@@ -55,3 +58,39 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
         :rtype: str or None
         """
         return self._board_address
+
+    @property
+    def n_machine_vertices(self):
+        """ The number of machine vertices to create
+
+        :rtype: int
+        """
+        return self._n_machine_vertices
+
+    @abstractmethod
+    def get_incoming_slice(self, index):
+        """ Get the slice to be given to the connection
+
+        :param int index:
+            The index of the connection, for when n_machine_vertices > 1
+
+        :rtype: ~pacman.model.graphs.common.Slice
+        """
+
+    @abstractmethod
+    def get_outgoing_slice(self):
+        """ Get the slice to be given to the outgoing connection
+
+        :rtype: ~pacman.model.graphs.common.Slice
+        """
+
+    def get_outgoing_keys_and_masks(self, machine_vertex):
+        """ Get the outgoing keys and masks for a machine vertex of this vertex
+            or None if this isn't explicitly defined.  By default this returns
+            None, but can be overridden to allow the routing information
+            to be passed to the machine vertex.
+
+        :rtype: list of KeyAndMask or None
+        """
+        return None
+

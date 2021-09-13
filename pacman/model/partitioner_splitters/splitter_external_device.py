@@ -70,31 +70,30 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                         self.__incoming_slices.append(vertex_slice)
             fpga = app_vertex.outgoing_fpga_connection
             if fpga is not None:
-                if fpga in seen_incoming:
-                    self.__outgoing_vertex, self.__outgoing_slice =\
-                        seen_incoming[fpga]
-                else:
-                    vertex_slice = app_vertex.get_outgoing_slice()
-                    vertex = MachineFPGAVertex(
-                        fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
-                        app_vertex=app_vertex, vertex_slice=vertex_slice)
-                    self.__outgoing_vertex = vertex
-                    self.__outgoing_slice = vertex_slice
-                    self.__outgoing_is_incoming = False
+                vertex_slice = app_vertex.get_outgoing_slice()
+                vertex = MachineFPGAVertex(
+                    fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
+                    app_vertex=app_vertex, vertex_slice=vertex_slice)
+                self.__outgoing_vertex = vertex
+                self.__outgoing_slice = vertex_slice
+                self.__outgoing_is_incoming = False
 
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
             # So far this only handles one connection in total
             label = f"Machine vertex for {app_vertex.label}"
-            vertex_slice = Slice(
-                0, app_vertex.n_atoms - 1, shape=app_vertex.atoms_shape,
-                start=tuple([0] * len(app_vertex.atoms_shape)))
-            vertex = MachineSpiNNakerLinkVertex(
-                app_vertex.spinnaker_link_id, app_vertex.board_address, label,
-                app_vertex=app_vertex, vertex_slice=vertex_slice)
-            self.__incoming_vertices = [vertex]
-            self.__incoming_slices = [vertex_slice]
-            self.__outgoing_vertex = vertex
-            self.__outgoing_slice = vertex_slice
+
+            for i in range(app_vertex.n_machine_vertices):
+                vertex_slice = app_vertex.get_incoming_slice(i)
+                vertex = MachineSpiNNakerLinkVertex(
+                    app_vertex.spinnaker_link_id, app_vertex.board_address,
+                    label, app_vertex=app_vertex, vertex_slice=vertex_slice)
+                self.__incoming_vertices.append(vertex)
+                self.__incoming_slices.append(vertex_slice)
+            self.__outgoing_slice = app_vertex.get_outgoing_slice()
+            self.__outgoing_vertex = MachineSpiNNakerLinkVertex(
+                app_vertex.spinnaker_link_id, app_vertex.board_address,
+                label, app_vertex=app_vertex,
+                vertex_slice=self.__outgoing_slice)
         else:
             raise PacmanConfigurationException(
                 f"Unknown vertex type to splitter: {app_vertex}")
