@@ -31,10 +31,10 @@ class Application2DSpiNNakerLinkVertex(
     def __init__(
             self, width, height, sub_width, sub_height,
             spinnaker_link_id, board_address=None, label=None,
-            constraints=None, n_machine_vertices=1):
+            constraints=None):
         super(Application2DSpiNNakerLinkVertex, self).__init__(
             self, width * height, spinnaker_link_id, board_address,
-            label, constraints, n_machine_vertices)
+            label, constraints, n_machine_vertices=self._n_sub_rectangles)
         self.__width = width
         self.__height = height
         self.__sub_width = sub_width
