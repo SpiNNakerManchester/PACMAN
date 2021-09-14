@@ -51,7 +51,6 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         self.__outgoing_is_incoming = True
         if isinstance(app_vertex, ApplicationFPGAVertex):
             # This can have multiple FPGA connections per board
-            seen_incoming = dict()
             if app_vertex.incoming_fpga_connections:
                 for fpga in app_vertex.incoming_fpga_connections:
                     label = (f"Machine vertex for {app_vertex.label}"
@@ -64,7 +63,6 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                             fpga.fpga_id, fpga.fpga_link_id,
                             fpga.board_address, label, app_vertex=app_vertex,
                             vertex_slice=vertex_slice)
-                        seen_incoming[fpga] = (vertex, vertex_slice)
                         self.__incoming_vertices.append(vertex)
                         self.__incoming_slices.append(vertex_slice)
             fpga = app_vertex.outgoing_fpga_connection

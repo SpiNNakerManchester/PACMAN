@@ -59,6 +59,14 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         :rtype: int
         """
 
+    def __is_power_of_2(self, v):
+        """ Determine if a value is a power of 2
+
+        :param int v: The value to test
+        :rtype: bool
+        """
+        return 2 ** int(math.log2(v)) == v
+
     def _verify_sub_size(self):
         """ Ensure the sub width and height are within constraints
         """
