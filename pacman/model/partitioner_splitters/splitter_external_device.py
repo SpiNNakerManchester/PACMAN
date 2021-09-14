@@ -22,7 +22,6 @@ from pacman.model.graphs.machine import (
     MachineFPGAVertex, MachineSpiNNakerLinkVertex, MachineEdge)
 from pacman.exceptions import PacmanConfigurationException,\
     PacmanNotExistException
-from pacman.model.graphs.common.slice import Slice
 
 
 class SplitterExternalDevice(AbstractSplitterCommon):
