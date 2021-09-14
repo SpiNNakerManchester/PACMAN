@@ -34,9 +34,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         # Slices of incoming vertices (not exactly but hopefully close enough)
         "__incoming_slices",
         # Slice of outgoing vertex (which really doesn't matter here)
-        "__outgoing_slice",
-        # If the outgoing vertex is one of the incoming ones
-        "__outgoing_is_incoming"
+        "__outgoing_slice"
     ]
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
@@ -48,7 +46,6 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         self.__outgoing_vertex = None
         self.__outgoing_slice = None
         # Easier to set this True first to avoid a None check later
-        self.__outgoing_is_incoming = True
         if isinstance(app_vertex, ApplicationFPGAVertex):
             # This can have multiple FPGA connections per board
             if app_vertex.incoming_fpga_connections:
@@ -62,7 +59,8 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                         vertex = MachineFPGAVertex(
                             fpga.fpga_id, fpga.fpga_link_id,
                             fpga.board_address, label, app_vertex=app_vertex,
-                            vertex_slice=vertex_slice)
+                            vertex_slice=vertex_slice, incoming=True,
+                            outgoing=False)
                         self.__incoming_vertices.append(vertex)
                         self.__incoming_slices.append(vertex_slice)
             fpga = app_vertex.outgoing_fpga_connection
@@ -70,27 +68,32 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                 vertex_slice = app_vertex.get_outgoing_slice()
                 vertex = MachineFPGAVertex(
                     fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
-                    app_vertex=app_vertex, vertex_slice=vertex_slice)
+                    app_vertex=app_vertex, vertex_slice=vertex_slice,
+                    incoming=False, outgoing=True)
                 self.__outgoing_vertex = vertex
                 self.__outgoing_slice = vertex_slice
-                self.__outgoing_is_incoming = False
 
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
             # So far this only handles one connection in total
             label = f"Machine vertex for {app_vertex.label}"
 
-            for i in range(app_vertex.n_machine_vertices):
-                vertex_slice = app_vertex.get_incoming_slice(i)
-                vertex = MachineSpiNNakerLinkVertex(
+            if app_vertex.incoming:
+                for i in range(app_vertex.n_machine_vertices):
+                    vertex_slice = app_vertex.get_incoming_slice(i)
+                    vertex = MachineSpiNNakerLinkVertex(
+                        app_vertex.spinnaker_link_id, app_vertex.board_address,
+                        label, app_vertex=app_vertex,
+                        vertex_slice=vertex_slice, incoming=True,
+                        outgoing=False)
+                    self.__incoming_vertices.append(vertex)
+                    self.__incoming_slices.append(vertex_slice)
+            if app_vertex.outgoing:
+                self.__outgoing_slice = app_vertex.get_outgoing_slice()
+                self.__outgoing_vertex = MachineSpiNNakerLinkVertex(
                     app_vertex.spinnaker_link_id, app_vertex.board_address,
-                    label, app_vertex=app_vertex, vertex_slice=vertex_slice)
-                self.__incoming_vertices.append(vertex)
-                self.__incoming_slices.append(vertex_slice)
-            self.__outgoing_slice = app_vertex.get_outgoing_slice()
-            self.__outgoing_vertex = MachineSpiNNakerLinkVertex(
-                app_vertex.spinnaker_link_id, app_vertex.board_address,
-                label, app_vertex=app_vertex,
-                vertex_slice=self.__outgoing_slice)
+                    label, app_vertex=app_vertex,
+                    vertex_slice=self.__outgoing_slice, incoming=False,
+                    outgoing=True)
         else:
             raise PacmanConfigurationException(
                 f"Unknown vertex type to splitter: {app_vertex}")
@@ -99,7 +102,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
     def create_machine_vertices(self, resource_tracker, machine_graph):
         for vertex in self.__incoming_vertices:
             machine_graph.add_vertex(vertex)
-        if not self.__outgoing_is_incoming:
+        if self.__outgoing_vertex is not None:
             machine_graph.add_vertex(self.__outgoing_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
@@ -119,8 +122,8 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         # so we want to direct it at the outgoing vertex!
         if self.__outgoing_vertex is None:
             raise PacmanNotExistException(
-                f"There is no way to reach the target device of {edge} via the"
-                " FPGAs.  Please add an outgoing FPGA to the device.")
+                f"The target device of {edge} doesn't support outgoing"
+                " traffic")
         return {self.__outgoing_vertex: [MachineEdge]}
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
@@ -129,8 +132,8 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         # so we want to direct it at the incoming vertices!
         if not self.__incoming_vertices:
             raise PacmanNotExistException(
-                f"There is no way for the target device of {edge} to send via"
-                " the FPGAs.  Please add an incoming FPGA to the device.")
+                f"The target device of {edge} doesn't support incoming"
+                " traffic")
         return {v: [MachineEdge] for v in self.__incoming_vertices}
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)

@@ -70,3 +70,17 @@ class AbstractVirtual(object):
 
         :rtype: list of KeyAndMask or None
         """
+
+    @abstractproperty
+    def incoming(self):
+        """ Indicates if this device sends traffic into SpiNNaker
+
+        :rtype: bool
+        """
+
+    @abstractproperty
+    def outgoing(self):
+        """ Indicates if this device receives traffic from SpiNNaker
+
+        :rtype: bool
+        """

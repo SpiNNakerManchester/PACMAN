@@ -15,7 +15,7 @@
 
 from .application_vertex import ApplicationVertex
 from spinn_utilities.overrides import overrides
-from spinn_utilities.abstract_base import abstractmethod
+from pacman.model.graphs.common.slice import Slice
 
 
 class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
@@ -26,16 +26,21 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
         "_n_atoms",
         "_spinnaker_link_id",
         "_board_address",
-        "_n_machine_vertices"]
+        "_n_machine_vertices",
+        "_incoming",
+        "_outgoing"]
 
     def __init__(
             self, n_atoms, spinnaker_link_id, board_address=None, label=None,
-            constraints=None, n_machine_vertices=1):
+            constraints=None, n_machine_vertices=1,
+            incoming=True, outgoing=False):
         super().__init__(label=label, constraints=constraints)
         self._n_atoms = self.round_n_atoms(n_atoms)
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address
         self._n_machine_vertices = n_machine_vertices
+        self._incoming = incoming
+        self._outgoing = outgoing
 
     @property
     @overrides(ApplicationVertex.n_atoms)
@@ -67,7 +72,6 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
         """
         return self._n_machine_vertices
 
-    @abstractmethod
     def get_incoming_slice(self, index):
         """ Get the slice to be given to the connection
 
@@ -76,13 +80,18 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
+        atoms_per_slice = self.n_atoms // self._n_machine_vertices
+        low_atom = atoms_per_slice * index
+        hi_atom = (atoms_per_slice * (index + 1)) - 1
+        hi_atom = min((hi_atom, self.n_atoms - 1))
+        return Slice(low_atom, hi_atom)
 
-    @abstractmethod
     def get_outgoing_slice(self):
         """ Get the slice to be given to the outgoing connection
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
+        return Slice(0, self.n_atoms - 1)
 
     def get_outgoing_keys_and_masks(self, machine_vertex):
         """ Get the outgoing keys and masks for a machine vertex of this vertex
@@ -93,3 +102,11 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
         :rtype: list of KeyAndMask or None
         """
         return None
+
+    @property
+    def incoming(self):
+        return self._incoming
+
+    @property
+    def outgoing(self):
+        return self._outgoing

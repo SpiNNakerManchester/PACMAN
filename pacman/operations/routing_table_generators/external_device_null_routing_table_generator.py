@@ -36,7 +36,7 @@ def external_device_null_routing_table_generator(
     """
 
     for vertex in machine_graph.vertices:
-        if isinstance(vertex, AbstractVirtual):
+        if isinstance(vertex, AbstractVirtual) and vertex.incoming:
             edges = machine_graph.get_edges_starting_at_vertex(vertex)
 
             if not edges:

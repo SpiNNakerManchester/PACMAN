@@ -30,12 +30,14 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         "_board_address",
         "_virtual_chip_x",
         "_virtual_chip_y",
-        "_outgoing_keys_and_masks"]
+        "_outgoing_keys_and_masks",
+        "_incoming",
+        "_outgoing"]
 
     def __init__(
             self, fpga_id, fpga_link_id, board_address=None, label=None,
             constraints=None, app_vertex=None, vertex_slice=None,
-            outgoing_keys_and_masks=None):
+            outgoing_keys_and_masks=None, incoming=True, outgoing=False):
         super().__init__(
             label=label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
@@ -46,6 +48,8 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         self._virtual_chip_x = None
         self._virtual_chip_y = None
         self._outgoing_keys_and_masks = outgoing_keys_and_masks
+        self._incoming = incoming
+        self._outgoing = outgoing
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -88,3 +92,13 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
     @overrides(AbstractVirtual.outgoing_keys_and_masks)
     def outgoing_keys_and_masks(self):
         return self._outgoing_keys_and_masks
+
+    @property
+    @overrides(AbstractVirtual.incoming)
+    def incoming(self):
+        return self._incoming
+
+    @property
+    @overrides(AbstractVirtual.outgoing)
+    def outgoing(self):
+        return self._outgoing

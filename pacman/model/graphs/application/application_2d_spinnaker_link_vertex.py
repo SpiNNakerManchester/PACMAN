@@ -31,10 +31,11 @@ class Application2DSpiNNakerLinkVertex(
     def __init__(
             self, width, height, sub_width, sub_height,
             spinnaker_link_id, board_address=None, label=None,
-            constraints=None):
+            constraints=None, incoming=True, outgoing=False):
         super(Application2DSpiNNakerLinkVertex, self).__init__(
             width * height, spinnaker_link_id, board_address,
-            label, constraints, n_machine_vertices=self._n_sub_rectangles)
+            label, constraints, n_machine_vertices=self._n_sub_rectangles,
+            incoming=incoming, outgoing=outgoing)
         self.__width = width
         self.__height = height
         self.__sub_width = sub_width
@@ -69,7 +70,3 @@ class Application2DSpiNNakerLinkVertex(
     @overrides(ApplicationSpiNNakerLinkVertex.get_incoming_slice)
     def get_incoming_slice(self, index):
         return self._get_slice(index)
-
-    @overrides(ApplicationSpiNNakerLinkVertex.get_outgoing_slice)
-    def get_outgoing_slice(self):
-        return None
