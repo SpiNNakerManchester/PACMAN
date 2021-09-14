@@ -93,4 +93,3 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
         :rtype: list of KeyAndMask or None
         """
         return None
-
