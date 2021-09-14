@@ -21,8 +21,12 @@ from .application_spinnaker_link_vertex import ApplicationSpiNNakerLinkVertex
 from .application_vertex import ApplicationVertex
 from .application_edge_partition import ApplicationEdgePartition
 from .fpga_connection import FPGAConnection
+from .application_2d_fpga_vertex import Application2DFPGAVertex
+from .application_2d_spinnaker_link_vertex import (
+    Application2DSpiNNakerLinkVertex)
 
 __all__ = ["ApplicationEdge", "ApplicationEdgePartition",
            "ApplicationFPGAVertex", "ApplicationGraph", "ApplicationGraphView",
            "ApplicationSpiNNakerLinkVertex", "ApplicationVertex",
-           "FPGAConnection"]
+           "FPGAConnection", "Application2DFPGAVertex",
+           "Application2DSpiNNakerLinkVertex"]
