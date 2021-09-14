@@ -32,14 +32,15 @@ class Application2DSpiNNakerLinkVertex(
             self, width, height, sub_width, sub_height,
             spinnaker_link_id, board_address=None, label=None,
             constraints=None, incoming=True, outgoing=False):
-        super(Application2DSpiNNakerLinkVertex, self).__init__(
-            width * height, spinnaker_link_id, board_address,
-            label, constraints, n_machine_vertices=self._n_sub_rectangles,
-            incoming=incoming, outgoing=outgoing)
+        # Set variables first as this lets us call properties
         self.__width = width
         self.__height = height
         self.__sub_width = sub_width
         self.__sub_height = sub_height
+        super(Application2DSpiNNakerLinkVertex, self).__init__(
+            width * height, spinnaker_link_id, board_address,
+            label, constraints, n_machine_vertices=self._n_sub_rectangles,
+            incoming=incoming, outgoing=outgoing)
         self._verify_sub_size()
 
     @property
