@@ -33,13 +33,13 @@ class Application2DSpiNNakerLinkVertex(
             spinnaker_link_id, board_address=None, label=None,
             constraints=None):
         super(Application2DSpiNNakerLinkVertex, self).__init__(
-            self, width * height, spinnaker_link_id, board_address,
+            width * height, spinnaker_link_id, board_address,
             label, constraints, n_machine_vertices=self._n_sub_rectangles)
         self.__width = width
         self.__height = height
         self.__sub_width = sub_width
         self.__sub_height = sub_height
-        self._vertify_sub_size()
+        self._verify_sub_size()
 
     @property
     @overrides(Abstract2DDeviceVertex._width)

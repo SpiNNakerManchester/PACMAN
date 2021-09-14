@@ -32,14 +32,14 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
             incoming_fpga_connections=None, outgoing_fpga_connection=None,
             label=None, constraints=None):
         super(Application2DFPGAVertex, self).__init__(
-            self, width * height, incoming_fpga_connections,
+            width * height, incoming_fpga_connections,
             outgoing_fpga_connection, label, constraints,
             n_machine_vertices_per_link=self._n_sub_rectangles)
         self.__width = width
         self.__height = height
         self.__sub_width = sub_width
         self.__sub_height = sub_height
-        self._vertify_sub_size()
+        self._verify_sub_size()
 
     @property
     @overrides(Abstract2DDeviceVertex._width)
