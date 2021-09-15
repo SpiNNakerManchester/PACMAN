@@ -27,7 +27,7 @@ from pacman.operations.placer_algorithms import (
 
 @pytest.mark.parametrize(
     "placer",
-    ["ConnectiveBasedPlacer","OneToOnePlacer", "RadialPlacer",
+    ["ConnectiveBasedPlacer", "OneToOnePlacer", "RadialPlacer",
      "SpreaderPlacer"])
 def test_virtual_placement(placer):
     unittest_setup()

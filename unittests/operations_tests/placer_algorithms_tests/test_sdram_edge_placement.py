@@ -36,7 +36,6 @@ class TestSameChipConstraint(unittest.TestCase):
     def _do_test(self, placer):
         machine = virtual_machine(width=8, height=8)
         graph = MachineGraph("Test")
-        plan_n_timesteps = 100
 
         vertices = [
             MockMachineVertex(
