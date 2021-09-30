@@ -1129,25 +1129,26 @@ class ResourceTracker(object):
                 raise PacmanValueError(
                     "Processor id {} is not available on any of the chips"
                     "".format(processor_id))
+        message = \
+            f"No resources available to allocate the given resources" \
+            f" within the given constraints:\n" \
+            f"    Request for CPU: {resources.cpu_cycles.get_value()}, " \
+            f"DTCM: {resources.dtcm.get_value()}, " \
+            f"SDRAM fixed: {resources.sdram.fixed} " \
+            f"per_timestep: {resources.sdram.per_timestep}, " \
+            f"IP TAGS: {resources.iptags}, {resources.reverse_iptags}\n" \
+            f"    Planning to run for {self._plan_n_timesteps} timesteps.\n"
         tried_chips = list(self._get_usable_chips(chips, board_address))
         left_resources = self._available_resources(tried_chips)
+        if len(tried_chips) < 60:
+            message += f"    Resources available which meet constraints:\n" \
+                       f"       {left_resources}\n"
         all_chips = list(self._get_usable_chips(None, None))
-        all_resources = self._available_resources(all_chips)
-        raise PacmanValueError(
-            "No resources available to allocate the given resources"
-            " within the given constraints:\n"
-            "    Request for CPU: {}, DTCM: {}, "
-            "SDRAM fixed: {} per_timestep: {}, IP TAGS: {}, {}\n"
-            "    Planning to run for {} timesteps.\n"
-            "    Resources available which meet constraints:\n"
-            "      {}\n"
-            "    All resources available:\n"
-            "      {}\n"
-            .format(
-                resources.cpu_cycles.get_value(), resources.dtcm.get_value(),
-                resources.sdram.fixed, resources.sdram.per_timestep,
-                resources.iptags, resources.reverse_iptags,
-                self._plan_n_timesteps, left_resources, all_resources))
+        if len(all_chips) < 60:
+            all_resources = self._available_resources(all_chips)
+            message += f"    All resources available:\n" \
+                       f"      {all_resources}\n"
+        raise PacmanValueError(message)
 
     def _available_resources(self, usable_chips):
         """ Describe how much of the various resource types are available.
