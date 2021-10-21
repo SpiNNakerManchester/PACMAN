@@ -30,6 +30,7 @@ def supports_injection(injectable_class):
     """ A :py:obj:`decorator` that indicates that the class has methods on
         which objects can be injected.
     """
+    raise NotImplementedError("OOPS")
     orig_init = injectable_class.__init__
 
     def new_init(self, *args, **kwargs):
@@ -51,6 +52,7 @@ def inject(type_to_inject):
 
     :param str type_to_inject: The type to be injected using this method
     """
+    raise NotImplementedError("OOPS")
     def wrap(method):
         # pylint: disable=protected-access
 
@@ -75,6 +77,8 @@ def requires_injection(types_required):
         A list of types that must have been injected
     """
     def wrap(wrapped_method):
+
+        raise NotImplementedError("OH")
 
         @wraps(wrapped_method)
         def wrapper(obj, *args, **kwargs):
@@ -227,6 +231,7 @@ def do_injection(objects_to_inject, objects_to_inject_into=None):
         all instances that have been created
     :type objects_to_inject_into: list or None
     """
+    return
     if objects_to_inject is None:
         return
     injectees = objects_to_inject_into
