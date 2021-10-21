@@ -18,6 +18,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.utilities.algorithm_utilities.\
     partition_algorithm_utilities import (
         get_remaining_constraints)
+from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPartitionException, PacmanValueError
 from pacman.model.graphs import AbstractVirtual
 from pacman.model.graphs.common import Slice
@@ -345,7 +346,8 @@ class AbstractSplitterSlice(AbstractSplitterCommon, metaclass=AbstractBase):
         return max((cpu_ratio, dtcm_ratio, sdram_ratio))
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
+    def create_machine_vertices(self):
+        resource_tracker = ResourceTracker()
         slices_resources_map = self.__split(resource_tracker)
         for vertex_slice in slices_resources_map:
             machine_vertex = self.create_machine_vertex(
@@ -354,9 +356,9 @@ class AbstractSplitterSlice(AbstractSplitterCommon, metaclass=AbstractBase):
                     self._governed_app_vertex.label, vertex_slice.lo_atom,
                     vertex_slice.hi_atom),
                 get_remaining_constraints(self._governed_app_vertex))
-            machine_graph.add_vertex(machine_vertex)
+            self._governed_app_vertex.remember_machine_vertex(machine_vertex)
         self._called = True
-        return True
+        return resource_tracker.chips_used
 
     @abstractmethod
     def create_machine_vertex(

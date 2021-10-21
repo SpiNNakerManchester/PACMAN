@@ -39,12 +39,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         "_is_fixed_atoms_per_core"
     ]
 
-    SETTING_SPLITTER_ERROR_MSG = (
-        "The app vertex {} is already governed by this {}. "
-        "And so cannot govern app vertex {}. Please fix and try again.")
-
-    STR_MESSAGE = "{} governing app vertex {}"
-
     FIX_ATOMS_RESET = (
         "Illegal attempt to set fixed atoms per core to {} "
         "as it was already set to {}")
@@ -71,8 +65,9 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         self._governed_app_vertex = None
 
     def __str__(self):
-        return self.STR_MESSAGE.format(
-            self._splitter_name, self._governed_app_vertex)
+        return (
+            f"{self._splitter_name} governing app vertex"
+            f" {self._governed_app_vertex}")
 
     def __repr__(self):
         return self.__str__()
@@ -141,9 +136,8 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
             return
         if self._governed_app_vertex is not None:
             raise PacmanConfigurationException(
-                self.SETTING_SPLITTER_ERROR_MSG.format(
-                    self._governed_app_vertex, self._splitter_name,
-                    app_vertex))
+                f"The app vertex {self._governed_app_vertex} is already"
+                f" governed by this splitter. ")
         self._governed_app_vertex = app_vertex
         self.check_supported_constraints()
         app_vertex.splitter = self
@@ -161,28 +155,24 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
                 MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
-    def split(self, resource_tracker, machine_graph):
-        """ executes splitting
+    def split(self):
+        """ Executes splitting
 
-        :param ~pacman.utilities.utility_objs.ResourceTracker resource_tracker:
-            machine resources
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            machine graph
-        :return: true if successful, false otherwise
-        :rtype: bool
+        :return: estimate of number of chips required
+        :rtype: int
         """
-        return self.create_machine_vertices(resource_tracker, machine_graph)
+        return self.create_machine_vertices()
 
     @abstractmethod
-    def create_machine_vertices(self, resource_tracker, machine_graph):
-        """ method for specific splitter objects to use.
+    def create_machine_vertices(self):
+        """ Method for specific splitter objects to override.
 
         :param ~pacman.utilities.utility_objs.ResourceTracker resource_tracker:
             machine resources
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             machine graph
-        :return: true if successful, false otherwise
-        :rtype: bool
+        :return: estimate of number of chips required
+        :rtype: int
         """
 
     @abstractmethod
@@ -253,6 +243,14 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         :type outgoing_edge_partition:
             ~pacman.model.graphs.OutgoingEdgePartition
         :rtype: list(MachineVertex)
+        """
+
+    @abstractmethod
+    def get_internal_sdram_partitions(self):
+        """ Get edge partitions between machine vertices that are to be
+            handled by SDRAM
+
+        :rtype: list(AbstractSDRAMPartition)
         """
 
     @abstractmethod
