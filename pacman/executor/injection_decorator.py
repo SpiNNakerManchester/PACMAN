@@ -25,6 +25,7 @@ class InjectionException(Exception):
     """ Raised when there is an error with injection.
     """
 
+
 def inject_items(types):
     """ A :py:obj:`decorator` that ndicates values that need to be injected
         into the method

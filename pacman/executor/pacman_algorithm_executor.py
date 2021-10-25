@@ -639,7 +639,6 @@ class PACMANAlgorithmExecutor(object):
             self.__execute_mapping()
 
     def __execute_mapping(self):
-        new_outputs = dict()
         for algorithm in self._algorithms:
             # set up timer
             timer = None
