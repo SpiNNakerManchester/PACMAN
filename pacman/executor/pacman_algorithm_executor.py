@@ -20,7 +20,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.timer import Timer
 from pacman.exceptions import PacmanConfigurationException
 from pacman import operations
-from .injection_decorator import injection_context, do_injection
+from .injection_decorator import injection_context
 from .algorithm_decorators import (
     scan_packages, get_algorithms, Token)
 from .algorithm_metadata_xml_reader import AlgorithmMetadataXmlReader
@@ -58,15 +58,6 @@ class PACMANAlgorithmExecutor(object):
         # True if timing is to be printed
         "_print_timings",
 
-        # True if injection is to be done during the run
-        "_do_immediate_injection",
-
-        # True if injection is to be done after the run
-        "_do_post_run_injection",
-
-        # True if the inputs are to be injected
-        "_inject_inputs",
-
         # True if direct injection is to be done
         "_do_direct_injection",
 
@@ -83,8 +74,7 @@ class PACMANAlgorithmExecutor(object):
     def __init__(
             self, algorithms, optional_algorithms, inputs, required_outputs,
             tokens, required_output_tokens, xml_paths=None, packages=None,
-            do_timings=True, print_timings=False, do_immediate_injection=True,
-            do_post_run_injection=False, inject_inputs=True,
+            do_timings=True, print_timings=False,
             do_direct_injection=True, use_unscanned_annotated_algorithms=True,
             provenance_path=None, provenance_name=None):
         """
@@ -113,18 +103,6 @@ class PACMANAlgorithmExecutor(object):
         :param bool print_timings:
             True if timing information should be printed after each algorithm,
             False otherwise
-        :param bool do_immediate_injection:
-            Perform injection with objects as they are created; can result in
-            multiple calls to the same inject-annotated methods
-        :param bool do_post_run_injection:
-            Perform injection at the end of the run. This will only set the
-            last object of any type created.
-        :param bool inject_inputs:
-            True if inputs should be injected; only active if one of
-            `do_immediate_injection` or `do_post_run_injection` is True. These
-            variables define when the injection of inputs is done; if
-            immediate injection is True, injection of inputs is done at the
-            start of the run, otherwise it is done at the end.
         :param bool do_direct_injection:
             True if direct injection into methods should be supported.  This
             will allow any of the inputs or generated outputs to be injected
@@ -158,10 +136,6 @@ class PACMANAlgorithmExecutor(object):
         # print timings as you go
         self._print_timings = print_timings
 
-        # injection
-        self._do_immediate_injection = do_immediate_injection
-        self._do_post_run_injection = do_post_run_injection
-        self._inject_inputs = inject_inputs
         self._do_direct_injection = do_direct_injection
 
         if provenance_name is None:
@@ -665,8 +639,6 @@ class PACMANAlgorithmExecutor(object):
             self.__execute_mapping()
 
     def __execute_mapping(self):
-        if self._inject_inputs and self._do_immediate_injection:
-            do_injection(self._inputs)
         new_outputs = dict()
         for algorithm in self._algorithms:
             # set up timer
@@ -687,19 +659,6 @@ class PACMANAlgorithmExecutor(object):
 
             if results is not None:
                 self._internal_type_mapping.update(results)
-                if self._do_immediate_injection and not self._inject_inputs:
-                    new_outputs.update(results)
-
-            # Do injection with the outputs produced
-            if self._do_immediate_injection:
-                do_injection(results)
-
-        # Do injection with all the outputs
-        if self._do_post_run_injection:
-            if self._inject_inputs:
-                do_injection(self._internal_type_mapping)
-            else:
-                do_injection(new_outputs)
 
     def get_item(self, item_type):
         """ Get an item from the outputs of the execution
