@@ -50,6 +50,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         assert edge1 not in graph.get_edges_ending_at_vertex(vert1)
         assert edge2 not in graph.get_edges_starting_at_vertex(vert1)
         assert edge3 not in graph.get_edges_ending_at_vertex(vert1)
+        self.assertEqual(0, graph.n_machine_vertices)
 
         second = graph.clone()
         assert frozenset(verts) == frozenset(second.vertices)

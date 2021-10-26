@@ -108,6 +108,15 @@ class ApplicationGraph(Graph):
         """
         return self._outgoing_edge_partitions_by_pre_vertex[vertex]
 
+    @property
+    def n_machine_vertices(self):
+        """
+        The total number of machine vertices in the graph
+
+        :rtpye: int
+        """
+        return sum(len(m.machine_vertices) for m in self.vertices)
+
     def clone(self):
         """
         Makes as shallow as possible copy of the graph.
