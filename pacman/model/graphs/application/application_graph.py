@@ -109,6 +109,11 @@ class ApplicationGraph(Graph):
         return self._outgoing_edge_partitions_by_pre_vertex[vertex]
 
     @property
+    def machine_vertices(self):
+        for app_vertex in self.vertices:
+            yield from app_vertex.machine_vertices
+
+    @property
     def n_machine_vertices(self):
         """
         The total number of machine vertices in the graph
