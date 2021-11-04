@@ -30,7 +30,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls as utils
 
 
-class SplitterPartitioner(AbstractSplitterPartitioner):
+class _SplitterPartitioner(AbstractSplitterPartitioner):
     """ Partitioner which hands the partitioning work to application vertices'\
         splitter objects.
     """
@@ -293,3 +293,28 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
             label=self.MACHINE_EDGE_LABEL.format(app_edge.label))
         machine_graph.add_edge(
             machine_edge, app_outgoing_edge_partition.identifier)
+
+
+def splitter_partitioner(
+        app_graph, machine, plan_n_time_steps, pre_allocated_resources=None):
+    """
+     :param ApplicationGraph app_graph: The application_graph to partition
+     :param ~spinn_machine.Machine machine:
+         The machine with respect to which to partition the application
+         graph
+     :param plan_n_time_steps:
+         the number of time steps to plan to run for
+     :type plan_n_time_steps: int or None
+     :param pre_allocated_resources:
+         res needed to be preallocated before making new machine vertices
+     :type pre_allocated_resources: PreAllocatedResourceContainer or None
+     :return:
+         A machine_graph of partitioned vertices and partitioned edges,
+         and the number of chips needed to satisfy this partitioning.
+     :rtype: tuple(MachineGraph, int)
+     :raise PacmanPartitionException:
+         If something goes wrong with the partitioning
+     """
+    partitioner = _SplitterPartitioner()
+    return partitioner(
+        app_graph, machine, plan_n_time_steps, pre_allocated_resources)
