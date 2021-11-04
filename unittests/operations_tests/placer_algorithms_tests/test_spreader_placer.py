@@ -25,7 +25,7 @@ from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.operations.placer_algorithms import SpreaderPlacer
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.operations.chip_id_allocator_algorithms import (
-    MallocBasedChipIdAllocator)
+    malloc_based_chip_id_allocator)
 from pacman_test_objects import MockMachineVertex
 
 
@@ -68,7 +68,7 @@ def test_virtual_vertices_spreader():
 
     # Get and extend the machine for the virtual chip
     machine = virtual_machine(width=8, height=8)
-    extended_machine = MallocBasedChipIdAllocator()(machine, machine_graph)
+    extended_machine = malloc_based_chip_id_allocator(machine, machine_graph)
 
     # Do placements
     placements = SpreaderPlacer()(

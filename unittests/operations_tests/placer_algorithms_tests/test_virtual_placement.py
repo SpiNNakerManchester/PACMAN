@@ -19,7 +19,7 @@ from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import (
     MachineGraph, MachineSpiNNakerLinkVertex)
 from pacman.operations.chip_id_allocator_algorithms import (
-    MallocBasedChipIdAllocator)
+    malloc_based_chip_id_allocator)
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.operations.placer_algorithms import (
     ConnectiveBasedPlacer, OneToOnePlacer, RadialPlacer, SpreaderPlacer)
@@ -35,7 +35,7 @@ def test_virtual_placement(placer):
     graph = MachineGraph("Test")
     virtual_vertex = MachineSpiNNakerLinkVertex(spinnaker_link_id=0)
     graph.add_vertex(virtual_vertex)
-    extended_machine = MallocBasedChipIdAllocator()(machine, graph)
+    extended_machine = malloc_based_chip_id_allocator(machine, graph)
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     if placer == "ConnectiveBasedPlacer":
