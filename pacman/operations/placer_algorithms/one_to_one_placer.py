@@ -21,7 +21,7 @@ from pacman.exceptions import (
     PacmanException, PacmanInvalidParameterException, PacmanValueError,
     PacmanPlaceException)
 from pacman.model.placements import Placement, Placements
-from pacman.operations.placer_algorithms import RadialPlacer
+from pacman.operations.placer_algorithms import _RadialPlacer
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     create_vertices_groups, get_same_chip_vertex_groups,
@@ -42,7 +42,7 @@ def _conflict(x, y, post_x, post_y):
     return False
 
 
-class OneToOnePlacer(RadialPlacer):
+class OneToOnePlacer(_RadialPlacer):
     """ Placer that puts vertices which are directly connected to only its\
         destination on the same chip
     """

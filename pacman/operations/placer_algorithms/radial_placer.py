@@ -29,7 +29,25 @@ from pacman.exceptions import PacmanPlaceException
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class RadialPlacer(object):
+def radial_placer(machine_graph, machine, plan_n_timesteps):
+    """ A placement algorithm that can place a machine graph onto a\
+        machine choosing chips radiating in a circle from the boot chip
+
+        :param MachineGraph machine_graph: The machine_graph to place
+        :param ~spinn_machine.Machine machine:
+            The machine with respect to which to partition the application
+            graph
+        :param int plan_n_timesteps: number of timesteps to plan for
+        :return: A set of placements
+        :rtype: Placements
+        :raise PacmanPlaceException:
+            If something goes wrong with the placement
+    """
+    placer = _RadialPlacer()
+    return placer(machine_graph, machine, plan_n_timesteps)
+
+
+class _RadialPlacer(object):
     """ A placement algorithm that can place a machine graph onto a\
         machine choosing chips radiating in a circle from the boot chip
     """

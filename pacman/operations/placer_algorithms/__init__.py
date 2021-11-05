@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .radial_placer import RadialPlacer
+from .radial_placer import radial_placer
 from .one_to_one_placer import OneToOnePlacer
 from .spreader_placer import SpreaderPlacer
 from .connective_based_placer import ConnectiveBasedPlacer
 
-__all__ = ['RadialPlacer', 'OneToOnePlacer', "SpreaderPlacer",
+__all__ = ['radial_placer', 'OneToOnePlacer', "SpreaderPlacer",
            'ConnectiveBasedPlacer']

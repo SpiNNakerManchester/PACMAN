@@ -22,7 +22,7 @@ from pacman.operations.chip_id_allocator_algorithms import (
     malloc_based_chip_id_allocator)
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.operations.placer_algorithms import (
-    ConnectiveBasedPlacer, OneToOnePlacer, RadialPlacer, SpreaderPlacer)
+    ConnectiveBasedPlacer, OneToOnePlacer, radial_placer, SpreaderPlacer)
 
 
 @pytest.mark.parametrize(
@@ -45,7 +45,7 @@ def test_virtual_placement(placer):
         placer = OneToOnePlacer()
         placements = placer(graph, machine, None)
     elif placer == "RadialPlacer":
-        placer = RadialPlacer()
+        placer = radial_placer()
         placements = placer(graph, machine, None)
     elif placer == "SpreaderPlacer":
         placer = SpreaderPlacer()
