@@ -24,7 +24,7 @@ from pacman.model.graphs.machine import ConstantSDRAMMachinePartition
 from pacman.model.resources import ResourceContainer
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.operations.placer_algorithms import (
-    connective_based_placer, one_to_one_placer, radial_placer, SpreaderPlacer)
+    connective_based_placer, one_to_one_placer, radial_placer, spreader_placer)
 from pacman_test_objects import MockMachineVertex
 
 
@@ -75,8 +75,7 @@ class TestSameChipConstraint(unittest.TestCase):
             placer = radial_placer()
             placements = placer(graph, machine, None)
         elif placer == "SpreaderPlacer":
-            placer = SpreaderPlacer()
-            placements = placer(graph, machine, n_keys_map, None)
+            placements = spreader_placer(graph, machine, n_keys_map, None)
         else:
             raise NotImplementedError(placer)
         for edge in sdram_edges:

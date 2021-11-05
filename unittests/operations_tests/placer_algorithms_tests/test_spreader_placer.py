@@ -22,7 +22,7 @@ from pacman.model.graphs.machine import (
 from pacman.model.graphs.machine import ConstantSDRAMMachinePartition
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
-from pacman.operations.placer_algorithms import SpreaderPlacer
+from pacman.operations.placer_algorithms import spreader_placer
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.operations.chip_id_allocator_algorithms import (
     malloc_based_chip_id_allocator)
@@ -71,7 +71,7 @@ def test_virtual_vertices_spreader():
     extended_machine = malloc_based_chip_id_allocator(machine, machine_graph)
 
     # Do placements
-    placements = SpreaderPlacer()(
+    placements = spreader_placer(
         machine_graph, extended_machine, n_keys_map, plan_n_timesteps=1000)
 
     # The virtual vertex should be on a virtual chip
@@ -138,7 +138,7 @@ def test_one_to_one():
 
     # Do placements
     machine = virtual_machine(width=8, height=8)
-    placements = SpreaderPlacer()(
+    placements = spreader_placer(
         machine_graph, machine, n_keys_map, plan_n_timesteps=1000)
 
     # The 1-1 connected vertices should be on the same chip
@@ -185,5 +185,5 @@ def test_sdram_links():
     # Do placements
     machine = virtual_machine(width=8, height=8)
     with pytest.raises(PacmanException):
-        SpreaderPlacer()(machine_graph, machine, n_keys_map,
+        spreader_placer(machine_graph, machine, n_keys_map,
                          plan_n_timesteps=1000)
