@@ -23,7 +23,7 @@ from pacman.model.resources import ResourceContainer
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.operations.placer_algorithms import (
-    connective_based_placer, OneToOnePlacer, radial_placer, SpreaderPlacer)
+    connective_based_placer, one_to_one_placer, radial_placer, SpreaderPlacer)
 
 
 class TestSameChipConstraint(unittest.TestCase):
@@ -59,7 +59,7 @@ class TestSameChipConstraint(unittest.TestCase):
         if placer == "ConnectiveBasedPlacer":
             placements = connective_based_placer(graph, machine, None)
         elif placer == "OneToOnePlacer":
-            placer = OneToOnePlacer()
+            placer = one_to_one_placer()
             placements = placer(graph, machine, None)
         elif placer == "RadialPlacer":
             placements = radial_placer(graph, machine, None)

@@ -24,7 +24,7 @@ from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.operations.chip_id_allocator_algorithms import (
     malloc_based_chip_id_allocator)
-from pacman.operations.placer_algorithms import OneToOnePlacer
+from pacman.operations.placer_algorithms import one_to_one_placer
 from pacman_test_objects import MockMachineVertex
 
 
@@ -65,7 +65,7 @@ def test_virtual_vertices_one_to_one():
     extended_machine = malloc_based_chip_id_allocator(machine, machine_graph)
 
     # Do placements
-    placements = OneToOnePlacer()(
+    placements = one_to_one_placer(
         machine_graph, extended_machine, plan_n_timesteps=1000)
 
     # The virtual vertex should be on a virtual chip
@@ -123,7 +123,7 @@ def test_one_to_one():
 
     # Do placements
     machine = virtual_machine(width=8, height=8)
-    placements = OneToOnePlacer()(
+    placements = one_to_one_placer(
         machine_graph, machine, plan_n_timesteps=1000)
 
     # The 1-1 connected vertices should be on the same chip
@@ -169,4 +169,4 @@ def test_sdram_links():
     # Do placements
     machine = virtual_machine(width=8, height=8)
     with pytest.raises(PacmanException):
-        OneToOnePlacer()(machine_graph, machine, plan_n_timesteps=1000)
+        one_to_one_placer(machine_graph, machine, plan_n_timesteps=1000)
