@@ -19,7 +19,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.placer_constraints import (
     AbstractPlacerConstraint)
 from pacman.model.placements import Placements
-from pacman.operations.placer_algorithms import _RadialPlacer
+from pacman.operations.placer_algorithms.radial_placer import _RadialPlacer
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints, get_same_chip_vertex_groups)
 from pacman.utilities.utility_calls import locate_constraints_of_type
@@ -28,7 +28,30 @@ from pacman.utilities.utility_objs import ResourceTracker
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class ConnectiveBasedPlacer(_RadialPlacer):
+def connective_based_placer(machine_graph, machine, plan_n_timesteps):
+    """
+    Runs a placer that considers connectivity
+
+    A radial algorithm that can place a machine graph onto a\
+        machine using a circle out behaviour from a Ethernet at a given point\
+        and which will place things that are most connected closest to each\
+        other
+
+    :param MachineGraph machine_graph: The machine_graph to place
+    :param ~spinn_machine.Machine machine:
+        The machine with respect to which to partition the application
+        graph
+    :param int plan_n_timesteps: number of timesteps to plan for
+    :return: A set of placements
+    :rtype: ~pacman.model.placements.Placements
+    :raise PacmanPlaceException:
+        If something goes wrong with the placement
+    """
+    placer = _ConnectiveBasedPlacer()
+    return placer(machine_graph, machine, plan_n_timesteps)
+
+
+class _ConnectiveBasedPlacer(_RadialPlacer):
     """ A radial algorithm that can place a machine graph onto a\
         machine using a circle out behaviour from a Ethernet at a given point\
         and which will place things that are most connected closest to each\

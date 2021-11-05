@@ -24,7 +24,7 @@ from pacman.model.graphs.machine import ConstantSDRAMMachinePartition
 from pacman.model.resources import ResourceContainer
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.operations.placer_algorithms import (
-    ConnectiveBasedPlacer, OneToOnePlacer, radial_placer, SpreaderPlacer)
+    connective_based_placer, OneToOnePlacer, radial_placer, SpreaderPlacer)
 from pacman_test_objects import MockMachineVertex
 
 
@@ -67,8 +67,7 @@ class TestSameChipConstraint(unittest.TestCase):
         n_keys_map = DictBasedMachinePartitionNKeysMap()
 
         if placer == "ConnectiveBasedPlacer":
-            placer = ConnectiveBasedPlacer()
-            placements = placer(graph, machine, None)
+            placements = connective_based_placer(graph, machine, None)
         elif placer == "OneToOnePlacer":
             placer = OneToOnePlacer()
             placements = placer(graph, machine, None)
