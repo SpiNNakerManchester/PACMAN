@@ -22,8 +22,7 @@ from pacman.model.constraints.placer_constraints import (
     BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
     SameChipAsConstraint)
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
-    FixedVertexAtomsConstraint)
+    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 from pacman.model.graphs.machine import MulticastEdgePartition
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
@@ -145,12 +144,6 @@ class TestJsonUtils(unittest.TestCase):
         c1 = SameChipAsConstraint(v1)
         self.constraint_there_and_back(c1)
 
-    def test_same_atoms_as_vertex_constraint(self):
-        with self.assertRaises(NotImplementedError):
-            v1 = SimpleMachineVertex(None, "v1")
-            c1 = SameAtomsAsVertexConstraint(v1)
-            self.constraint_there_and_back(c1)
-
     def test_max_vertex_atoms_constraint(self):
         c1 = MaxVertexAtomsConstraint(5)
         self.constraint_there_and_back(c1)
@@ -227,32 +220,3 @@ class TestJsonUtils(unittest.TestCase):
         """
         m1 = MachineGraph("foo")
         self.graph_there_and_back(m1)
-
-    def test_new_graph(self):
-        """
-        tests that after building a machine graph, all partitined vertices
-        and partitioned edges are in existence
-        """
-        vertices = list()
-        edges = list()
-        for i in range(10):
-            vertices.append(
-                SimpleMachineVertex(ResourceContainer(), "V{}".format(i)))
-        with self.assertRaises(NotImplementedError):
-            vertices[1].add_constraint(SameAtomsAsVertexConstraint(
-                vertices[4]))
-            vertices[4].add_constraint(SameAtomsAsVertexConstraint(
-                vertices[1]))
-        for i in range(5):
-            edges.append(MachineEdge(vertices[0], vertices[(i + 1)]))
-        for i in range(5, 10):
-            edges.append(MachineEdge(
-                vertices[5], vertices[(i + 1) % 10]))
-        graph = MachineGraph("foo")
-        graph.add_vertices(vertices)
-        graph.add_outgoing_edge_partition(MulticastEdgePartition(
-            identifier="bar", pre_vertex=vertices[0]))
-        graph.add_outgoing_edge_partition(MulticastEdgePartition(
-            identifier="bar", pre_vertex=vertices[5]))
-        graph.add_edges(edges, "bar")
-        self.graph_there_and_back(graph)

@@ -17,12 +17,12 @@ import unittest
 from testfixtures import LogCapture
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.partitioner_splitters import SplitterSliceLegacy
+from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman_test_objects import (
     DuckLegacyApplicationVertex, NonLegacyApplicationVertex, SimpleTestVertex)
 
 
-class TestSplitterSliceLegacy(unittest.TestCase):
+class TestSplitterFixedLegacy(unittest.TestCase):
     """ Tester for pacman.model.constraints.placer_constraints
     """
 
@@ -30,13 +30,13 @@ class TestSplitterSliceLegacy(unittest.TestCase):
         unittest_setup()
 
     def test_no_api(self):
-        splitter = SplitterSliceLegacy()
+        splitter = SplitterFixedLegacy()
         vertex = NonLegacyApplicationVertex()
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(vertex)
 
     def test_with_methods(self):
-        splitter = SplitterSliceLegacy()
+        splitter = SplitterFixedLegacy()
         vertex = DuckLegacyApplicationVertex()
         with LogCapture() as lc:
             splitter.set_governed_app_vertex(vertex)
@@ -47,7 +47,7 @@ class TestSplitterSliceLegacy(unittest.TestCase):
             self.assertTrue(found)
 
     def test_with_api(self):
-        splitter = SplitterSliceLegacy()
+        splitter = SplitterFixedLegacy()
         vertex = SimpleTestVertex(12)
         with LogCapture() as lc:
             splitter.set_governed_app_vertex(vertex)

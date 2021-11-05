@@ -50,20 +50,18 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
         super().set_governed_app_vertex(app_vertex)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
-        machine_vertex = self._governed_app_vertex.machine_vertex
-        resource_tracker.allocate_constrained_resources(
-            machine_vertex.resources_required, machine_vertex.constraints)
-        machine_graph.add_vertex(machine_vertex)
-        return machine_vertex
+    def create_machine_vertices(self, plan_n_timesteps):
+        # This can do no work, as the machine vertex already exists
+        # Return 1 as at most 1 chip is used!
+        return 1
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        return [self._governed_app_vertex.machine_vertex.vertex_slice], True
+        return [self._governed_app_vertex.machine_vertex.vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
-        return [self._governed_app_vertex.machine_vertex.vertex_slice], True
+        return [self._governed_app_vertex.machine_vertex.vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, outgoing_edge_partition):

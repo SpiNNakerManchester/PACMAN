@@ -26,8 +26,7 @@ from pacman.model.constraints.placer_constraints import (
     BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
     SameChipAsConstraint)
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
-    FixedVertexAtomsConstraint)
+    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 from pacman.model.resources import (
     CPUCyclesPerTickResource, DTCMResource, IPtagResource, ResourceContainer,
     VariableSDRAM)
@@ -58,7 +57,7 @@ def json_to_object(json_object):
 
 _LOCATION_CONSTRAINTS = (
     ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
-_VERTEX_CONSTRAINTS = (SameChipAsConstraint, SameAtomsAsVertexConstraint)
+_VERTEX_CONSTRAINTS = (SameChipAsConstraint)
 _SIZE_CONSTRAINTS = (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)
 
 
@@ -145,9 +144,6 @@ def constraint_from_json(json_dict, graph=None):
             json_dict["x"], json_dict["y"])
     if json_dict["class"] == "SameChipAsConstraint":
         return SameChipAsConstraint(vertex_lookup(json_dict["vertex"], graph))
-    if json_dict["class"] == "SameAtomsAsVertexConstraint":
-        return SameAtomsAsVertexConstraint(
-            vertex_lookup(json_dict["vertex"], graph))
     raise NotImplementedError("constraint {}".format(json_dict["class"]))
 
 

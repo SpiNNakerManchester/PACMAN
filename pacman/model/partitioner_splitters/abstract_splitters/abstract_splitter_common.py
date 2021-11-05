@@ -155,68 +155,38 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
                 MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
-    def split(self):
+    def split(self, plan_n_timesteps):
         """ Executes splitting
 
+        :param plan_n_time_steps: the number of time steps to plan to run for
         :return: estimate of number of chips required
         :rtype: int
         """
-        return self.create_machine_vertices()
+        return self.create_machine_vertices(plan_n_timesteps)
 
     @abstractmethod
-    def create_machine_vertices(self):
+    def create_machine_vertices(self, plan_n_timesteps):
         """ Method for specific splitter objects to override.
 
-        :param ~pacman.utilities.utility_objs.ResourceTracker resource_tracker:
-            machine resources
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            machine graph
+        :param plan_n_time_steps: the number of time steps to plan to run for
         :return: estimate of number of chips required
         :rtype: int
         """
 
     @abstractmethod
     def get_out_going_slices(self):
-        """ A best effort prediction of the slices of the output vertices.
+        """ The slices of the output vertices.
 
-        If this method is called after create_machine_vertices the splitter
-        should return the actual slices of the output vertices.
-        The second value returned is then always ``True``
-
-        If this method is called before create_machine_vertices the splitter
-        will have to make an estimate unless the actual slices it will use are
-        already known. The second value returned is ``True`` if and only if
-        the slices will not be changed.
-
-        The output vertices are the ones that will serve as source vertices
-        for external edges.  If more than one set of vertices match this
-        description the splitter should use the ones used by the most general
-        edge type/down-stream splitter.
-
-        :return: list of Slices and bool of estimate or not
-        :rtype: tuple(list(~pacman.model.graphs.common.Slice), bool)
+        :return: list of Slices
+        :rtype: list(~pacman.model.graphs.common.Slice)
         """
 
     @abstractmethod
     def get_in_coming_slices(self):
-        """ A best effort prediction of the slices of the input vertices.
+        """ The slices of the input vertices.
 
-        If this method is called after create_machine_vertices the splitter
-        should return the actual slices of the input vertices.
-        The second value returned is then always ``True``
-
-        If this method is called before create_machine_vertices the splitter
-        will have to make an estimate unless the actual slices it will use are
-        already known. The second value returned is ``True`` if and only if
-        the slices will not be changed.
-
-        The output vertices are the ones that will serve as source vertices
-        for external edges.  If more than one set of vertices match this
-        description the splitter should use the ones used by the most general
-        edge type/ down stream splitter.
-
-        :return: the slices incoming to this vertex, bool if estimate or exact
-        :rtype: tuple(list(~pacman.model.graphs.common.Slice), bool)
+        :return: list of Slices
+        :rtype: list(~pacman.model.graphs.common.Slice)
         """
 
     @abstractmethod
@@ -246,14 +216,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_internal_sdram_partitions(self):
-        """ Get edge partitions between machine vertices that are to be
-            handled by SDRAM
-
-        :rtype: list(AbstractSDRAMPartition)
-        """
-
-    @abstractmethod
     def machine_vertices_for_recording(self, variable_to_record):
         """ Gets the machine vertices which are recording this variable.
 
@@ -266,3 +228,21 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
     def reset_called(self):
         """ reset the splitter to be as if it has not operated a splitting yet.
         """
+
+    def get_internal_multicast_partitions(self):
+        """ Get edge partitions between machine vertices that are to be
+            handled by Multicast.  Returns empty by default, override if there
+            are Multicast connections between internal vertices
+
+        :rtype: list(MulticastEdgePartition)
+        """
+        return []
+
+    def get_internal_sdram_partitions(self):
+        """ Get edge partitions between machine vertices that are to be
+            handled by SDRAM.  Returns empty by default, override if there
+            are SDRAM connections between internal vertices
+
+        :rtype: list(AbstractSDRAMPartition)
+        """
+        return []
