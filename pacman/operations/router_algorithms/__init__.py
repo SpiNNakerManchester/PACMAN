@@ -14,6 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .basic_dijkstra_routing import BasicDijkstraRouting
-from .ner_route import NerRoute, NerRouteTrafficAware
+from .ner_route import ner_route, ner_route_traffic_aware
 
-__all__ = ['BasicDijkstraRouting', 'NerRoute', 'NerRouteTrafficAware']
+__all__ = ['BasicDijkstraRouting', 'ner_route', 'ner_route_traffic_aware']
