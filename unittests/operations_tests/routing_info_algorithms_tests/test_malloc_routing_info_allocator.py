@@ -24,7 +24,7 @@ from pacman.model.graphs.machine import MulticastEdgePartition
 from pacman.model.resources import ResourceContainer
 from pacman.operations.routing_info_allocator_algorithms\
     .malloc_based_routing_allocator import (
-        MallocBasedRoutingInfoAllocator)
+        malloc_based_routing_info_allocator)
 from pacman.model.routing_info import (
     BaseKeyAndMask, DictBasedMachinePartitionNKeysMap)
 
