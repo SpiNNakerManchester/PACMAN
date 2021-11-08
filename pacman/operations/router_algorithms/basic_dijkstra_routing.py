@@ -52,7 +52,29 @@ class _DijkstraInfo(object):
         self.cost = None
 
 
-class BasicDijkstraRouting(object):
+def basic_dijkstra_routing(placements, machine, machine_graph,
+                 bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW,
+                 use_progress_bar=True):
+    """ Find routes between the edges with the allocated information,
+        placed in the given places
+
+    :param Placements placements: The placements of the edges
+    :param ~spinn_machine.Machine machine:
+        The machine through which the routes are to be found
+    :param MachineGraph machine_graph: the machine_graph object
+    :param bool use_progress_bar: whether to show a progress bar
+    :return: The discovered routes
+    :rtype: MulticastRoutingTables
+    :raise PacmanRoutingException:
+        If something goes wrong with the routing
+    """
+    router = BasicDijkstraRouting()
+    return router(
+        placements, machine, machine_graph,
+        bw_per_route_entry, max_bw, use_progress_bar)
+
+
+class _BasicDijkstraRouting(object):
     """ An routing algorithm that can find routes for edges between vertices\
         in a machine graph that have been placed on a machine by the use of a\
         Dijkstra shortest path algorithm.
