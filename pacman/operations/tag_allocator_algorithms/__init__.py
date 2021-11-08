@@ -13,6 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .basic_tag_allocator import BasicTagAllocator
+from .basic_tag_allocator import basic_tag_allocator
 
-__all__ = ['BasicTagAllocator', ]
+__all__ = ['basic_tag_allocator', ]
