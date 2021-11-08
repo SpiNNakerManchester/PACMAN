@@ -19,8 +19,24 @@ from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanRoutingException)
 
+def fixed_route_router(machine, placements, destination_class):
+    """ Runs the fixed route generator for all boards on machine
 
-class FixedRouteRouter(object):
+    :param ~spinn_machine.Machine machine: SpiNNMachine object
+    :param Placements placements: placements object
+    :param destination_class: the destination class to route packets to
+    :type destination_class: type or tuple(type,...)
+    :return: router tables for fixed route paths
+    :rtype: dict(tuple(int,int), ~spinn_machine.FixedRouteEntry)
+    :raises PacmanConfigurationException: if no placement processor found
+    :raises PacmanRoutingException:
+    :raises PacmanAlreadyExistsException:
+    """
+    router = _FixedRouteRouter()
+    return router(machine, placements, destination_class)
+
+
+class _FixedRouteRouter(object):
     """ Computes the fixed routes used to direct data out traffic to the
         board-local gatherer processors.
     """
