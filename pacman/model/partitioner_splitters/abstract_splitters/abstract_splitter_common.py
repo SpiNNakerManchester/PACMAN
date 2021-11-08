@@ -229,6 +229,17 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         """ reset the splitter to be as if it has not operated a splitting yet.
         """
 
+    def get_same_chip_groups(self):
+        """ Get a list of lists of vertices and sdram which must be
+            allocated on the same chip.  By default this returns a list of each
+            machine vertex and its SDRAM; override if there are groups of
+            machine vertices on the same chip.
+
+        :rtype: list(list(MachineVertex), AbstractSDRAM)
+        """
+        return [([v], v.resources_required.sdram)
+                for v in self._governed_app_vertex.machine_vertices]
+
     def get_internal_multicast_partitions(self):
         """ Get edge partitions between machine vertices that are to be
             handled by Multicast.  Returns empty by default, override if there
