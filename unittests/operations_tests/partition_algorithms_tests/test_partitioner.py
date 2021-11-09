@@ -239,7 +239,7 @@ class TestPartitioner(unittest.TestCase):
         self.graph.add_vertex(large_vertex)
         with self.assertRaises(PacmanValueError):
             splitter_partitioner(self.graph, self.machine, 3000,
-                    PreAllocatedResourceContainer())
+                                 PreAllocatedResourceContainer())
 
     def test_partition_with_less_sdram_than_default(self):
         """
@@ -273,7 +273,7 @@ class TestPartitioner(unittest.TestCase):
 
         self.machine = machine_from_chips(chips)
         splitter_partitioner(self.graph, self.machine, 3000,
-                PreAllocatedResourceContainer())
+                             PreAllocatedResourceContainer())
 
     def test_partition_with_more_sdram_than_default(self):
         """
@@ -307,7 +307,7 @@ class TestPartitioner(unittest.TestCase):
 
         self.machine = machine_from_chips(chips)
         splitter_partitioner(self.graph, self.machine, 3000,
-                PreAllocatedResourceContainer())
+                             PreAllocatedResourceContainer())
 
     def test_partition_with_unsupported_constraints(self):
         """

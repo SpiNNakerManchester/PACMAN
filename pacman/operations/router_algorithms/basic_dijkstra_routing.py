@@ -16,7 +16,7 @@
 import logging
 import sys
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.progress_bar import ProgressBar, DummyProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.routing_table_by_partition import (
@@ -55,8 +55,9 @@ class _DijkstraInfo(object):
         self.cost = None
 
 
-def basic_dijkstra_routing(placements, machine, machine_graph,
-                 bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
+def basic_dijkstra_routing(
+        placements, machine, machine_graph,
+        bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
     """ Find routes between the edges with the allocated information,
         placed in the given places
 

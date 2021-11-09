@@ -185,5 +185,5 @@ def test_sdram_links():
     # Do placements
     machine = virtual_machine(width=8, height=8)
     with pytest.raises(PacmanException):
-        spreader_placer(machine_graph, machine, n_keys_map,
-                         plan_n_timesteps=1000)
+        spreader_placer(
+            machine_graph, machine, n_keys_map, plan_n_timesteps=1000)
