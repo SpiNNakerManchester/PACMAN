@@ -19,16 +19,11 @@ test for partitioning
 
 import unittest
 
-from spinn_utilities.config_holder import set_config
 from pacman.config_setup import unittest_setup
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman.operations.partition_algorithms import SplitterPartitioner
-from spinn_machine import (
-    SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
-from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
-from pacman.exceptions import (
-    PacmanInvalidParameterException, PacmanException,
-    PacmanValueError)
+from pacman.model.graphs.application import ApplicationGraph
+from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 from pacman_test_objects import NewPartitionerConstraint, SimpleTestVertex

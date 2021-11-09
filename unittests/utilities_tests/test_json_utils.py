@@ -23,7 +23,6 @@ from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
-from pacman.model.graphs.machine import MulticastEdgePartition
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
     ResourceContainer)
