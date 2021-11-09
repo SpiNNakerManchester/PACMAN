@@ -54,7 +54,7 @@ class _MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
 
     __slots__ = ["_n_keys_map"]
 
-    def __init__(self):
+    def __init__(self, n_keys_map):
         super().__init__(0, 2 ** 32)
         self._n_keys_map = n_keys_map
 
