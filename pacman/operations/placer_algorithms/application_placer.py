@@ -36,11 +36,11 @@ def place_application_graph(machine, app_graph, plan_n_timesteps):
         # Always start each application vertex with a new chip
         next_chip, space = spaces.get_next_chip_and_space()
 
-        same_chip_vertices = app_vertex.splitter.get_same_chip_vertices()
+        same_chip_groups = app_vertex.splitter.get_same_chip_groups()
 
         # Go through the groups
-        for vertices, resources in same_chip_vertices:
-            sdram = resources.sdram.get_total_sdram(plan_n_timesteps)
+        for vertices, sdram in same_chip_groups:
+            sdram = sdram.get_total_sdram(plan_n_timesteps)
             n_cores = len(vertices)
 
             # If we can't use the next chip, use the next one after
