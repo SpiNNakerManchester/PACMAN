@@ -25,6 +25,9 @@ from pacman.model.routing_table_by_partition import (
 logger = FormatAdapter(logging.getLogger(__name__))
 infinity = float("inf")
 
+BW_PER_ROUTE_ENTRY = 0.01
+MAX_BW = 250
+
 
 class _NodeInfo(object):
     """
@@ -53,8 +56,7 @@ class _DijkstraInfo(object):
 
 
 def basic_dijkstra_routing(placements, machine, machine_graph,
-                 bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW,
-                 use_progress_bar=True):
+                 bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
     """ Find routes between the edges with the allocated information,
         placed in the given places
 
@@ -68,10 +70,8 @@ def basic_dijkstra_routing(placements, machine, machine_graph,
     :raise PacmanRoutingException:
         If something goes wrong with the routing
     """
-    router = BasicDijkstraRouting()
-    return router(
-        placements, machine, machine_graph,
-        bw_per_route_entry, max_bw, use_progress_bar)
+    router = _BasicDijkstraRouting(machine, bw_per_route_entry, max_bw)
+    return router(placements, machine_graph)
 
 
 class _BasicDijkstraRouting(object):
@@ -94,12 +94,14 @@ class _BasicDijkstraRouting(object):
         "_machine"
     ]
 
-    BW_PER_ROUTE_ENTRY = 0.01
-    MAX_BW = 250
+    def __init__(self, machine, bw_per_route_entry, max_bw):
+        # set up basic data structures
+        self._routing_paths = MulticastRoutingTableByPartition()
+        self._bw_per_route_entry = bw_per_route_entry
+        self._max_bw = max_bw
+        self._machine = machine
 
-    def __call__(self, placements, machine, machine_graph,
-                 bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW,
-                 use_progress_bar=True):
+    def _run(self, placements, machine_graph):
         """ Find routes between the edges with the allocated information,
             placed in the given places
 
@@ -114,31 +116,23 @@ class _BasicDijkstraRouting(object):
             If something goes wrong with the routing
         """
 
-        # set up basic data structures
-        self._routing_paths = MulticastRoutingTableByPartition()
-        self._bw_per_route_entry = bw_per_route_entry
-        self._max_bw = max_bw
-        self._machine = machine
-
-        nodes_info = self._initiate_node_info(machine)
-        tables = self._initiate_dijkstra_tables(machine)
+        nodes_info = self._initiate_node_info()
+        tables = self._initiate_dijkstra_tables()
         self._update_all_weights(nodes_info)
 
         # each vertex represents a core in the board
-        pb_factory = ProgressBar if use_progress_bar else DummyProgressBar
-        progress = pb_factory(placements.n_placements,
-                              "Creating routing entries")
+        progress = ProgressBar(
+            placements.n_placements, "Creating routing entries")
 
         for placement in progress.over(placements.placements):
-            self._route(placement, placements, machine, machine_graph,
+            self._route(placement, placements, machine_graph,
                         nodes_info, tables)
         return self._routing_paths
 
-    def _route(self, placement, placements, machine, graph, node_info, tables):
+    def _route(self, placement, placements, graph, node_info, tables):
         """
         :param Placement placement:
         :param Placements placements:
-        :param ~spinn_machine.Machine machine:
         :param MachineGraph graph:
         :param dict(tuple(int,int),_NodeInfo) node_info:
         :param dict(tuple(int,int),_DijkstraInfo) tables:
@@ -155,7 +149,7 @@ class _BasicDijkstraRouting(object):
         for edge in out_going_edges:
             destination = edge.post_vertex
             dest_place = placements.get_placement_of_vertex(destination)
-            chip = machine.get_chip_at(dest_place.x, dest_place.y)
+            chip = self._machine.get_chip_at(dest_place.x, dest_place.y)
             dest_chips.add((chip.x, chip.y))
             edges_to_route.append(edge)
 
@@ -173,16 +167,15 @@ class _BasicDijkstraRouting(object):
             self._retrace_back_to_source(
                 dest_placement, tables, edge, node_info, placement.p, graph)
 
-    def _initiate_node_info(self, machine):
+    def _initiate_node_info(self):
         """ Set up a dictionary which contains data for each chip in the\
             machine
 
-        :param ~spinn_machine.Machine machine: the machine object
         :return: nodes_info dictionary
         :rtype: dict(tuple(int,int),_NodeInfo)
         """
         nodes_info = dict()
-        for chip in machine.chips:
+        for chip in self._machine.chips:
             # get_neighbours should return a list of
             # dictionaries of 'x' and 'y' values
             node = _NodeInfo()
@@ -194,19 +187,17 @@ class _BasicDijkstraRouting(object):
             nodes_info[chip.x, chip.y] = node
         return nodes_info
 
-    @staticmethod
-    def _initiate_dijkstra_tables(machine):
+    def _initiate_dijkstra_tables(self):
         """ Set up the Dijkstra's table which includes if you've reached a\
             given node
 
-        :param ~spinn_machine.Machine machine: the machine object
         :return: the  Dijkstra's table dictionary
         :rtype: dict(tuple(int,int),_DijkstraInfo)
         """
         # Holds all the information about nodes within one full run of
         # Dijkstra's algorithm
         tables = dict()
-        for chip in machine.chips:
+        for chip in self._machine.chips:
             tables[chip.x, chip.y] = _DijkstraInfo()
         return tables
 
