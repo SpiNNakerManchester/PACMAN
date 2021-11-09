@@ -19,6 +19,7 @@ from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanRoutingException)
 
+
 def fixed_route_router(machine, placements, destination_class):
     """ Runs the fixed route generator for all boards on machine
 
@@ -32,8 +33,8 @@ def fixed_route_router(machine, placements, destination_class):
     :raises PacmanRoutingException:
     :raises PacmanAlreadyExistsException:
     """
-    router = _FixedRouteRouter()
-    return router(machine, placements, destination_class)
+    router = _FixedRouteRouter(machine, placements, destination_class)
+    return router._run()
 
 
 class _FixedRouteRouter(object):
@@ -45,7 +46,13 @@ class _FixedRouteRouter(object):
         "_destination_class", "_fixed_route_tables",
         "_machine", "_placements"]
 
-    def __call__(self, machine, placements, destination_class):
+    def __init__(self, machine, placements, destination_class):
+        self._machine = machine
+        self._destination_class = destination_class
+        self._placements = placements
+        self._fixed_route_tables = dict()
+
+    def _run(self):
         """ Runs the fixed route generator for all boards on machine
 
         :param ~spinn_machine.Machine machine: SpiNNMachine object
@@ -59,18 +66,13 @@ class _FixedRouteRouter(object):
         :raises PacmanAlreadyExistsException:
         """
         # pylint: disable=attribute-defined-outside-init
-
-        self._machine = machine
-        self._destination_class = destination_class
-        self._placements = placements
-        self._fixed_route_tables = dict()
-
         progress = ProgressBar(
-            len(machine.ethernet_connected_chips),
+            len(self._machine.ethernet_connected_chips),
             "Generating fixed router routes")
 
         # handle per board
-        for ethernet_chip in progress.over(machine.ethernet_connected_chips):
+        for ethernet_chip in progress.over(
+                self._machine.ethernet_connected_chips):
             self._do_fixed_routing(ethernet_chip)
         return self._fixed_route_tables
 
