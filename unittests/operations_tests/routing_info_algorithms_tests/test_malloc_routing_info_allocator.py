@@ -36,7 +36,7 @@ class MyTestCase(unittest.TestCase):
         unittest_setup()
 
     def test_allocate_fixed_key_and_mask(self):
-        allocator = _MallocBasedRoutingInfoAllocator()
+        allocator = _MallocBasedRoutingInfoAllocator(None)
         allocator._allocate_fixed_keys_and_masks(
             [BaseKeyAndMask(0x800, 0xFFFFF800)], None)
         error = ("Allocation has not resulted in the expected free space"
@@ -58,7 +58,7 @@ class MyTestCase(unittest.TestCase):
                   "mask =", hex(key_and_mask.mask))
 
     def test_allocate_fixed_mask(self):
-        allocator = _MallocBasedRoutingInfoAllocator()
+        allocator = _MallocBasedRoutingInfoAllocator(None)
         self._print_keys_and_masks(allocator._allocate_keys_and_masks(
             0xFFFFFF00, None, 20))
         error = ("Allocation has not resulted in the expected free space"
@@ -71,7 +71,7 @@ class MyTestCase(unittest.TestCase):
                          error)
 
     def test_allocate_n_keys(self):
-        allocator = _MallocBasedRoutingInfoAllocator()
+        allocator = _MallocBasedRoutingInfoAllocator(None)
         self._print_keys_and_masks(allocator._allocate_keys_and_masks(
             None, None, 20))
         error = ("Allocation has not resulted in the expected free space"
@@ -87,7 +87,7 @@ class MyTestCase(unittest.TestCase):
         fixed_masks = [None, None, 0xFFFFFF00, 0xFFFFF800]
         n_keys = [200, 20, 20, 256]
 
-        allocator = _MallocBasedRoutingInfoAllocator()
+        allocator = _MallocBasedRoutingInfoAllocator(None)
 
         allocator._allocate_fixed_keys_and_masks(
             [BaseKeyAndMask(0x800, 0xFFFFF800)], None)

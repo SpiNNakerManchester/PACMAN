@@ -53,8 +53,7 @@ class TestNerRouteTrafficAware(unittest.TestCase):
             for vertex_to in vertices:
                 graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
-        router = ner_route_traffic_aware()
-        routing_paths = router.__call__(graph, machine, placements)
+        routing_paths = ner_route_traffic_aware(graph, machine, placements)
 
         for vertex in vertices:
             vertices_reached = set()
