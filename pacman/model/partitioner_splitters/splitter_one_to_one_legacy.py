@@ -51,7 +51,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         self._resources_required = None
 
     def __str__(self):
-        return self.STR_MESSAGE.format(self._governed_app_vertex)
+        return f"SplitterOneToOneLegacy for {self._governed_app_vertex}"
 
     def __repr__(self):
         return self.__str__()
