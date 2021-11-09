@@ -48,7 +48,7 @@ def connective_based_placer(machine_graph, machine, plan_n_timesteps):
         If something goes wrong with the placement
     """
     placer = _ConnectiveBasedPlacer()
-    return placer(machine_graph, machine, plan_n_timesteps)
+    return placer._run(machine_graph, machine, plan_n_timesteps)
 
 
 class _ConnectiveBasedPlacer(_RadialPlacer):
@@ -60,7 +60,7 @@ class _ConnectiveBasedPlacer(_RadialPlacer):
 
     __slots__ = []
 
-    def __call__(self, machine_graph, machine, plan_n_timesteps):
+    def _run(self, machine_graph, machine, plan_n_timesteps):
         """
         :param MachineGraph machine_graph: The machine_graph to place
         :param ~spinn_machine.Machine machine:

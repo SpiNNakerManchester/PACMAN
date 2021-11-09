@@ -69,11 +69,9 @@ class TestSameChipConstraint(unittest.TestCase):
         if placer == "ConnectiveBasedPlacer":
             placements = connective_based_placer(graph, machine, None)
         elif placer == "OneToOnePlacer":
-            placer = one_to_one_placer()
-            placements = placer(graph, machine, None)
+            placements = one_to_one_placer(graph, machine, None)
         elif placer == "RadialPlacer":
-            placer = radial_placer()
-            placements = placer(graph, machine, None)
+            placements = radial_placer(graph, machine, None)
         elif placer == "SpreaderPlacer":
             placements = spreader_placer(graph, machine, n_keys_map, None)
         else:

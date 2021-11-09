@@ -56,8 +56,8 @@ def one_to_one_placer(machine_graph, machine, plan_n_timesteps):
     :raise PacmanPlaceException:
         If something goes wrong with the placement
     """
-    placer = _OneToOnePlacer
-    return placer(machine_graph, machine, plan_n_timesteps)
+    placer = _OneToOnePlacer()
+    return placer._run(machine_graph, machine, plan_n_timesteps)
 
 
 class _OneToOnePlacer(_RadialPlacer):
@@ -67,7 +67,7 @@ class _OneToOnePlacer(_RadialPlacer):
 
     __slots__ = []
 
-    def __call__(self, machine_graph, machine, plan_n_timesteps):
+    def _run(self, machine_graph, machine, plan_n_timesteps):
         """
         :param MachineGraph machine_graph: The machine_graph to place
         :param ~spinn_machine.Machine machine:

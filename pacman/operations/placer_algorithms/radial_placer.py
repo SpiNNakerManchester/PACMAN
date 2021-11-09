@@ -44,7 +44,7 @@ def radial_placer(machine_graph, machine, plan_n_timesteps):
             If something goes wrong with the placement
     """
     placer = _RadialPlacer()
-    return placer(machine_graph, machine, plan_n_timesteps)
+    return placer._run(machine_graph, machine, plan_n_timesteps)
 
 
 class _RadialPlacer(object):
@@ -52,7 +52,7 @@ class _RadialPlacer(object):
         machine choosing chips radiating in a circle from the boot chip
     """
 
-    def __call__(self, machine_graph, machine, plan_n_timesteps):
+    def _run(self, machine_graph, machine, plan_n_timesteps):
         """
         :param MachineGraph machine_graph: The machine_graph to place
         :param ~spinn_machine.Machine machine:

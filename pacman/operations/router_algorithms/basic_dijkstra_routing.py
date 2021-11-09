@@ -71,7 +71,7 @@ def basic_dijkstra_routing(placements, machine, machine_graph,
         If something goes wrong with the routing
     """
     router = _BasicDijkstraRouting(machine, bw_per_route_entry, max_bw)
-    return router(placements, machine_graph)
+    return router._run(placements, machine_graph)
 
 
 class _BasicDijkstraRouting(object):
