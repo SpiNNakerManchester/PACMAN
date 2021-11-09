@@ -24,6 +24,8 @@ from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints, get_same_chip_vertex_groups)
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
+from pacman.model.graphs import AbstractVirtual
+from pacman.model.placements import Placement
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -58,6 +60,16 @@ class ConnectiveBasedPlacer(RadialPlacer):
         constrained = list()
         unconstrained = set()
         for vertex in machine_graph.vertices:
+            if isinstance(vertex, AbstractVirtual):
+                virtual_p = 0
+                while placements.is_processor_occupied(
+                        vertex.virtual_chip_x, vertex.virtual_chip_y,
+                        virtual_p):
+                    virtual_p += 1
+                placements.add_placement(Placement(
+                    vertex, vertex.virtual_chip_x, vertex.virtual_chip_y,
+                    virtual_p))
+                continue
             if locate_constraints_of_type(
                     vertex.constraints, AbstractPlacerConstraint):
                 constrained.append(vertex)

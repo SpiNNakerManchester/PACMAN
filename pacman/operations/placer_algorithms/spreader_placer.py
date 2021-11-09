@@ -26,6 +26,7 @@ from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
+from pacman.model.graphs.abstract_virtual import AbstractVirtual
 
 
 class SpreaderPlacer(OneToOnePlacer):
@@ -107,10 +108,21 @@ class SpreaderPlacer(OneToOnePlacer):
 
         # allocate hard ones
         for hard_vertex in hard_chip_constraints:
+            placed_vertices.add(hard_vertex)
+            if isinstance(hard_vertex, AbstractVirtual):
+                virtual_p = 0
+                while placements.is_processor_occupied(
+                        hard_vertex.virtual_chip_x, hard_vertex.virtual_chip_y,
+                        virtual_p):
+                    virtual_p += 1
+                placements.add_placement(Placement(
+                    hard_vertex, hard_vertex.virtual_chip_x,
+                    hard_vertex.virtual_chip_y, virtual_p))
+                continue
+
             (x, y, p, _, _) = resource_tracker.allocate_constrained_resources(
                 hard_vertex.resources_required, hard_vertex.constraints)
             placements.add_placement(Placement(hard_vertex, x, y, p))
-            placed_vertices.add(hard_vertex)
             cost_per_chip[x, y] += cost_per_vertex[hard_vertex]
 
         # place groups of verts that need the same chip on the same chip,
@@ -199,6 +211,8 @@ class SpreaderPlacer(OneToOnePlacer):
             for constraint in vertex.constraints:
                 if isinstance(constraint, ChipAndCoreConstraint):
                     hard_verts.append(vertex)
+            if isinstance(vertex, AbstractVirtual):
+                hard_verts.append(vertex)
         return hard_verts
 
     def _place_same_chip_verts(

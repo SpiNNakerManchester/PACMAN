@@ -25,6 +25,7 @@ from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
 from pacman.model.placements import Placement, Placements
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.exceptions import PacmanPlaceException
+from pacman.model.graphs.abstract_virtual import AbstractVirtual
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -61,10 +62,21 @@ class RadialPlacer(object):
         all_vertices_placed = set()
         for vertex in progress.over(vertices):
             if vertex not in all_vertices_placed:
-                vertices_placed = self._place_vertex(
-                    vertex, resource_tracker, machine, placements,
-                    vertices_on_same_chip, machine_graph)
-                all_vertices_placed.update(vertices_placed)
+                if isinstance(vertex, AbstractVirtual):
+                    virtual_p = 0
+                    while placements.is_processor_occupied(
+                            vertex.virtual_chip_x, vertex.virtual_chip_y,
+                            virtual_p):
+                        virtual_p += 1
+                    placements.add_placement(Placement(
+                        vertex, vertex.virtual_chip_x, vertex.virtual_chip_y,
+                        virtual_p))
+                    all_vertices_placed.add(vertex)
+                else:
+                    vertices_placed = self._place_vertex(
+                        vertex, resource_tracker, machine, placements,
+                        vertices_on_same_chip, machine_graph)
+                    all_vertices_placed.update(vertices_placed)
         return placements
 
     def _check_constraints(
