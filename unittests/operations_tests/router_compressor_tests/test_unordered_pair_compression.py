@@ -22,7 +22,7 @@ from pacman.model.routing_tables.multicast_routing_tables import (from_json)
 from pacman.operations.router_compressors.routing_compression_checker import (
     compare_tables)
 from pacman.operations.router_compressors import (
-    UnorderedPairCompressor)
+    pair_compressor)
 
 
 class TestUnorderedPairCompressor(unittest.TestCase):
@@ -37,8 +37,7 @@ class TestUnorderedPairCompressor(unittest.TestCase):
         original_tables = from_json(j_router)
 
         # Hack to stop it throwing a wobly for too many entries
-        compressor = UnorderedPairCompressor()
-        compressed_tables = compressor(original_tables)
+        compressed_tables = pair_compressor(original_tables, ordered=False)
         for original in original_tables:
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)

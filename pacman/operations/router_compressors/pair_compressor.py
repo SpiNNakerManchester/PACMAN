@@ -14,11 +14,49 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_machine import Machine
+from pacman.exceptions import PacmanElementAllocationException
 from .abstract_compressor import AbstractCompressor
 from .entry import Entry
 
 
-class PairCompressor(AbstractCompressor):
+def pair_compressor(router_tables, ordered=True, accept_overflow=False, verify=False):
+    """
+
+    :param MulticastRoutingTables router_tables:
+    :param bool accept_overflow:
+        A flag which should only be used in testing to stop raising an
+        exception if result is too big
+    :param bool verify: If set to true will verify the length before returning
+    :rtype: MulticastRoutingTables
+    """
+    compressor = _PairCompressor(ordered)
+    compressed = compressor(router_tables, accept_overflow)
+    # TODO currenly normal pari compressor does not verify lengths
+    if verify:
+        verify_lengths(compressed)
+    return compressed
+
+
+def verify_lengths(compressed):
+    """
+    :param MulticastRoutingTables compressed:
+    :raises PacmanElementAllocationException:
+        if the compressed table won't fit
+    """
+    problems = ""
+    for table in compressed:
+        if table.x ==1 and table.y == 1:
+            print(table.number_of_entries)
+        if table.number_of_entries > Machine.ROUTER_ENTRIES:
+            problems += "(x:{},y:{})={} ".format(
+                table.x, table.y, table.number_of_entries)
+    if len(problems) > 0:
+        raise PacmanElementAllocationException(
+            "The routing table after compression will still not fit"
+            " within the machines router: {}".format(problems))
+
+
+class _PairCompressor(AbstractCompressor):
     """ Routing Table compressor based on brute force. \
     Finds mergable pairs to replace.
 
