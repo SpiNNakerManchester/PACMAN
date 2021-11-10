@@ -366,3 +366,57 @@ class PairCompressor(AbstractCompressor):
             self._previous_index = self._write_index
 
         return self._all_entries[0:self._write_index]
+
+    @staticmethod
+    def intersect(key_a, mask_a, key_b, mask_b):
+        """
+        Return if key-mask pairs intersect (i.e., would both match some of
+        the same keys).
+
+        For example, the key-mask pairs ``00XX`` and ``001X`` both match the
+        keys ``0010`` and ``0011`` (i.e., they do intersect)::
+
+            >>> intersect(0b0000, 0b1100, 0b0010, 0b1110)
+            True
+
+        But the key-mask pairs ``00XX`` and ``11XX`` do not match any of the
+        same keys (i.e., they do not intersect)::
+
+            >>> intersect(0b0000, 0b1100, 0b1100, 0b1100)
+            False
+
+        :param int key_a: The key of first key-mask pair
+        :param int mask_a: The mask of first key-mask pair
+        :param int key_b: The key of second key-mask pair
+        :param int mask_b: The mask of second key-mask pair
+        :return: True if the two key-mask pairs intersect otherwise False.
+        :rtype: bool
+        """
+        return (key_a & mask_b) == (key_b & mask_a)
+
+    def merge(self, entry1, entry2):
+        """ Merges two entries/triples into one that covers both
+
+        The assumption is that they both have the same known spinnaker_route
+
+        :param ~pacman.operations.router_compressors.Entry entry1:
+            Key, Mask, defaultable from the first entry
+        :param ~pacman.operations.router_compressors.Entry entry2:
+            Key, Mask, defaultable from the second entry
+        :return: Key, Mask, defaultable from merged entry
+        :rtype: tuple(int, int, bool)
+        """
+        any_ones = entry1.key | entry2.key
+        all_ones = entry1.key & entry2.key
+        all_selected = entry1.mask & entry2.mask
+
+        # Compute the new mask  and key
+        any_zeros = ~all_ones
+        new_xs = any_ones ^ any_zeros
+        mask = all_selected & new_xs  # Combine existing and new Xs
+        key = all_ones & mask
+        return key, mask, entry1.defaultable and entry2.defaultable
+
+    @property
+    def ordered(self):
+        return self._ordered
