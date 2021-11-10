@@ -46,13 +46,3 @@ class OrderedCoveringCompressor(AbstractCompressor):
         # compress the router entries
         compressed_router_table_entries = minimise(entries)
         return compressed_router_table_entries
-
-
-class MundyRouterCompressor(OrderedCoveringCompressor):
-    """ DEPRECATED use OrderedCoveringCompressor """
-    def __new__(cls, *args, **kwargs):
-        logger.warning(
-            "MundyRouterCompressor algorithm name is deprecated. "
-            "Please use OrderedCoveringCompressor instead. "
-            "Remove algorithms from your cfg to use defaults")
-        return super().__new__(cls, *args, **kwargs)
