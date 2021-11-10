@@ -19,7 +19,8 @@ from .abstract_compressor import AbstractCompressor
 from .entry import Entry
 
 
-def pair_compressor(router_tables, ordered=True, accept_overflow=False, verify=False):
+def pair_compressor(
+        router_tables, ordered=True, accept_overflow=False, verify=False):
     """
 
     :param MulticastRoutingTables router_tables:
