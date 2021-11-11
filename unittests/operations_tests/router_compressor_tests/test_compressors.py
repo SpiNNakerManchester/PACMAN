@@ -24,7 +24,7 @@ from pacman.operations.router_compressors.routing_compression_checker import (
 from pacman.operations.router_compressors.pair_compressor import (
     pair_compressor)
 from pacman.operations.router_compressors.ordered_covering_router_compressor \
-    import OrderedCoveringCompressor
+    import ordered_covering_compressor
 
 
 class TestCompressor(unittest.TestCase):
@@ -75,8 +75,7 @@ class TestCompressor(unittest.TestCase):
         self.check_compression(compressed_tables)
 
     def test_ordered_covering_compressor(self):
-        compressor = OrderedCoveringCompressor()
-        compressed_tables = compressor(self.original_tables)
+        compressed_tables = ordered_covering_compressor(self.original_tables)
         self.check_compression(compressed_tables)
 
 

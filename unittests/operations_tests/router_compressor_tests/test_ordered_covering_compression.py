@@ -22,7 +22,7 @@ from pacman.model.routing_tables.multicast_routing_tables import (from_json)
 from pacman.operations.router_compressors.routing_compression_checker import (
     compare_tables)
 from pacman.operations.router_compressors.ordered_covering_router_compressor \
-    import OrderedCoveringCompressor
+    import ordered_covering_compressor
 
 
 class TestOrderedCoveringCompressor(unittest.TestCase):
@@ -37,7 +37,7 @@ class TestOrderedCoveringCompressor(unittest.TestCase):
                                 "many_to_one.json.gz")
         original_tables = from_json(j_router)
 
-        compressor = OrderedCoveringCompressor()
+        compressor = ordered_covering_compressor()
         compressed_tables = compressor(original_tables)
         for original in original_tables:
             compressed = compressed_tables.get_routing_table_for_chip(

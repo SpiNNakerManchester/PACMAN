@@ -30,8 +30,8 @@ def pair_compressor(
     :param bool verify: If set to true will verify the length before returning
     :rtype: MulticastRoutingTables
     """
-    compressor = _PairCompressor(ordered)
-    compressed = compressor(router_tables, accept_overflow)
+    compressor = _PairCompressor(ordered, accept_overflow)
+    compressed = compressor._run(router_tables)
     # TODO currenly normal pari compressor does not verify lengths
     if verify:
         verify_lengths(compressed)

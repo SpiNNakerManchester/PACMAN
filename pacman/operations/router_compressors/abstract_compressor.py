@@ -41,10 +41,11 @@ class AbstractCompressor(object):
         "_accept_overflow"
     ]
 
-    def __init__(self, ordered=True):
+    def __init__(self, ordered=True, accept_overflow=False):
         self._ordered = ordered
+        self._accept_overflow = accept_overflow
 
-    def __call__(self, router_tables, accept_overflow=False):
+    def _run(self, router_tables):
         """
         :param MulticastRoutingTables router_tables:
         :param bool accept_overflow:
@@ -57,7 +58,6 @@ class AbstractCompressor(object):
             router_tables.routing_tables,
             "Compressing routing Tables using {}".format(
                 self.__class__.__name__))
-        self._accept_overflow = accept_overflow
         return self.compress_tables(router_tables, progress)
 
 
