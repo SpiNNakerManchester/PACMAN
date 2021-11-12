@@ -21,12 +21,14 @@ from pacman.model.graphs.machine import (
 from pacman.operations.chip_id_allocator_algorithms import (
     MallocBasedChipIdAllocator)
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
-from pacman.executor import PACMANAlgorithmExecutor
+from pacman.operations.placer_algorithms import (
+    ConnectiveBasedPlacer, OneToOnePlacer, RadialPlacer, SpreaderPlacer)
 
 
 @pytest.mark.parametrize(
     "placer",
-    ["OneToOnePlacer", "RadialPlacer", "SpreaderPlacer"])
+    ["ConnectiveBasedPlacer", "OneToOnePlacer", "RadialPlacer",
+     "SpreaderPlacer"])
 def test_virtual_placement(placer):
     unittest_setup()
     machine = virtual_machine(width=8, height=8)
@@ -36,19 +38,20 @@ def test_virtual_placement(placer):
     extended_machine = MallocBasedChipIdAllocator()(machine, graph)
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
-    inputs = {
-        "ExtendedMachine": machine,
-        "Machine": machine,
-        "MachineGraph": graph,
-        "PlanNTimeSteps": 1000,
-        "MachinePartitionNKeysMap": n_keys_map
-    }
-    algorithms = [placer]
-    xml_paths = []
-    executor = PACMANAlgorithmExecutor(
-        algorithms, [], inputs, [], [], [], xml_paths)
-    executor.execute_mapping()
-    placements = executor.get_item("Placements")
+    if placer == "ConnectiveBasedPlacer":
+        placer = ConnectiveBasedPlacer()
+        placements = placer(graph, machine, None)
+    elif placer == "OneToOnePlacer":
+        placer = OneToOnePlacer()
+        placements = placer(graph, machine, None)
+    elif placer == "RadialPlacer":
+        placer = RadialPlacer()
+        placements = placer(graph, machine, None)
+    elif placer == "SpreaderPlacer":
+        placer = SpreaderPlacer()
+        placements = placer(graph, machine, n_keys_map, None)
+    else:
+        raise NotImplementedError(placer)
 
     placement = placements.get_placement_of_vertex(virtual_vertex)
     chip = extended_machine.get_chip_at(placement.x, placement.y)

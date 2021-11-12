@@ -17,12 +17,14 @@ import random
 import unittest
 from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
+from pacman.exceptions import PacmanAlreadyPlacedError
 from pacman.model.graphs.machine import (
     MachineGraph, SDRAMMachineEdge)
 from pacman.model.graphs.machine import ConstantSDRAMMachinePartition
 from pacman.model.resources import ResourceContainer
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
-from pacman.executor.pacman_algorithm_executor import PACMANAlgorithmExecutor
+from pacman.operations.placer_algorithms import (
+    ConnectiveBasedPlacer, OneToOnePlacer, RadialPlacer, SpreaderPlacer)
 from pacman_test_objects import MockMachineVertex
 
 
@@ -34,7 +36,6 @@ class TestSameChipConstraint(unittest.TestCase):
     def _do_test(self, placer):
         machine = virtual_machine(width=8, height=8)
         graph = MachineGraph("Test")
-        plan_n_timesteps = 100
 
         vertices = [
             MockMachineVertex(
@@ -65,24 +66,32 @@ class TestSameChipConstraint(unittest.TestCase):
                 graph.add_edge(sdram_edge, "Test")
         n_keys_map = DictBasedMachinePartitionNKeysMap()
 
-        inputs = {
-            "ExtendedMachine": machine,
-            "Machine": machine,
-            "MachineGraph": graph,
-            "PlanNTimeSteps": plan_n_timesteps,
-            "MachinePartitionNKeysMap": n_keys_map
-        }
-        algorithms = [placer]
-        xml_paths = []
-        executor = PACMANAlgorithmExecutor(
-            algorithms, [], inputs, [], [], [], xml_paths)
-        executor.execute_mapping()
-        placements = executor.get_item("Placements")
+        if placer == "ConnectiveBasedPlacer":
+            placer = ConnectiveBasedPlacer()
+            placements = placer(graph, machine, None)
+        elif placer == "OneToOnePlacer":
+            placer = OneToOnePlacer()
+            placements = placer(graph, machine, None)
+        elif placer == "RadialPlacer":
+            placer = RadialPlacer()
+            placements = placer(graph, machine, None)
+        elif placer == "SpreaderPlacer":
+            placer = SpreaderPlacer()
+            placements = placer(graph, machine, n_keys_map, None)
+        else:
+            raise NotImplementedError(placer)
         for edge in sdram_edges:
             pre_place = placements.get_placement_of_vertex(edge.pre_vertex)
             post_place = placements.get_placement_of_vertex(edge.post_vertex)
             assert pre_place.x == post_place.x
             assert pre_place.y == post_place.y
+
+    def test_connective_based(self):
+        try:
+            self._do_test("ConnectiveBasedPlacer")
+        except PacmanAlreadyPlacedError:
+            raise unittest.SkipTest(
+                "https://github.com/SpiNNakerManchester/PACMAN/issues/406")
 
     def test_one_to_one(self):
         self._do_test("OneToOnePlacer")
