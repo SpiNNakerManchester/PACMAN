@@ -37,8 +37,7 @@ class TestOrderedCoveringCompressor(unittest.TestCase):
                                 "many_to_one.json.gz")
         original_tables = from_json(j_router)
 
-        compressor = ordered_covering_compressor()
-        compressed_tables = compressor(original_tables)
+        compressed_tables = ordered_covering_compressor(original_tables)
         for original in original_tables:
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)
