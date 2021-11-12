@@ -32,10 +32,19 @@ class AbstractVirtual(object):
 
     @abstractproperty
     def board_address(self):
-        """ The IP address of the board to which the device is connected,\
-            or ``None`` for the boot board.
+        """ The IP address of the board to which the device is connected,
+            or ``None`` for the boot board, or when using linked chip
+            coordinates.
 
         :rtype: str or None
+        """
+
+    @abstractproperty
+    def linked_chip_coordinates(self):
+        """ The coordinates of the chip to which the device is connected,
+            or ``None`` for the boot board, or when using a board address.
+
+        :rtype: tuple(int, int) or None
         """
 
     @abstractmethod

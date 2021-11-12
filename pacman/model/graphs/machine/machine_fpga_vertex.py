@@ -28,6 +28,7 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         "_fpga_id",
         "_fpga_link_id",
         "_board_address",
+        "_linked_chip_coordinates",
         "_virtual_chip_x",
         "_virtual_chip_y",
         "_outgoing_keys_and_masks",
@@ -35,9 +36,10 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         "_outgoing"]
 
     def __init__(
-            self, fpga_id, fpga_link_id, board_address=None, label=None,
-            constraints=None, app_vertex=None, vertex_slice=None,
-            outgoing_keys_and_masks=None, incoming=True, outgoing=False):
+            self, fpga_id, fpga_link_id, board_address=None,
+            linked_chip_coordinates=None, label=None, constraints=None,
+            app_vertex=None, vertex_slice=None, outgoing_keys_and_masks=None,
+            incoming=True, outgoing=False):
         super().__init__(
             label=label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
@@ -45,6 +47,7 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         self._fpga_id = fpga_id
         self._fpga_link_id = fpga_link_id
         self._board_address = board_address
+        self._linked_chip_coordinates = linked_chip_coordinates
         self._virtual_chip_x = None
         self._virtual_chip_y = None
         self._outgoing_keys_and_masks = outgoing_keys_and_masks
@@ -70,6 +73,11 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
     @overrides(AbstractVirtual.board_address)
     def board_address(self):
         return self._board_address
+
+    @property
+    @overrides(AbstractVirtual.linked_chip_coordinates)
+    def linked_chip_coordinates(self):
+        return self._linked_chip_coordinates
 
     @property
     @overrides(AbstractVirtual.virtual_chip_x)

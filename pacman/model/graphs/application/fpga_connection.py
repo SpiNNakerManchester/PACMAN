@@ -33,7 +33,12 @@ class FPGAConnection(NamedTuple):
     fpga_link_id: int
 
     #: The IP address of the board with the FPGA, or None for the default board
+    #: or if using chip_coords
     board_address: str
+
+    #: The coordinates of the chip connected to the FPGA, or None for the
+    #: default board or if using board_address
+    chip_coords: tuple
 
     @property
     def is_concrete(self):
@@ -55,4 +60,5 @@ class FPGAConnection(NamedTuple):
                  else FPGA_LINK_IDS)
         for i in ids:
             for lnk in links:
-                yield(FPGAConnection(i, lnk, self.board_address))
+                yield(FPGAConnection(
+                    i, lnk, self.board_address, self.chip_coords))

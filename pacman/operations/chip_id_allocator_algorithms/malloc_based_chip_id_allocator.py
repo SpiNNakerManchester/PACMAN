@@ -85,13 +85,15 @@ class MallocBasedChipIdAllocator(object):
     def _get_link_data(machine, vertex):
         if isinstance(vertex, AbstractFPGA):
             link_data = machine.get_fpga_link_with_id(
-                vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
+                vertex.fpga_id, vertex.fpga_link_id, vertex.board_address,
+                vertex.linked_chip_coordinates)
             if link_data is None:
                 raise NoFPGALink(vertex)
             return link_data
         elif isinstance(vertex, AbstractSpiNNakerLink):
             link_data = machine.get_spinnaker_link_with_id(
-                vertex.spinnaker_link_id, vertex.board_address)
+                vertex.spinnaker_link_id, vertex.board_address,
+                vertex.linked_chip_coordinates)
             if link_data is None:
                 raise NoSpiNNakerLink(vertex)
             return link_data
