@@ -155,22 +155,11 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
                 MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
-    def split(self, plan_n_timesteps):
-        """ Executes splitting
-
-        :param plan_n_time_steps: the number of time steps to plan to run for
-        :return: estimate of number of chips required
-        :rtype: int
-        """
-        return self.create_machine_vertices(plan_n_timesteps)
-
     @abstractmethod
-    def create_machine_vertices(self, plan_n_timesteps):
+    def create_machine_vertices(self, chip_counter):
         """ Method for specific splitter objects to override.
 
-        :param plan_n_time_steps: the number of time steps to plan to run for
-        :return: estimate of number of chips required
-        :rtype: int
+        :param ChipCounter chip_counter: counter of used chips
         """
 
     @abstractmethod

@@ -18,6 +18,7 @@ from pacman.model.constraints.partitioner_constraints import (
 from pacman.model.partitioner_interfaces import AbstractSplitterPartitioner
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls as utils
+from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 
 class SplitterPartitioner(AbstractSplitterPartitioner):
@@ -45,11 +46,11 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
         self.__set_max_atoms_to_splitters(app_graph)
 
         # Partition one vertex at a time
-        n_chips_required = 0
+        chip_counter = ChipCounter(plan_n_time_steps)
         for vertex in progress.over(vertices):
-            n_chips_required += vertex.splitter.split(plan_n_time_steps)
+            vertex.splitter.create_machine_vertices(chip_counter)
 
-        return n_chips_required
+        return chip_counter.n_chips
 
     @staticmethod
     def __set_max_atoms_to_splitters(app_graph):

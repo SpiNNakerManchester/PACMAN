@@ -15,14 +15,12 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.model.graphs.machine import MulticastEdgePartition
 from pacman.model.resources import ResourceContainer
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException)
 from pacman.model.routing_info import (
-    RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo,
-    DictBasedMachinePartitionNKeysMap)
-from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex
+    RoutingInfo, BaseKeyAndMask, MachineVertexRoutingInfo)
+from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.utilities.constants import FULL_MASK
 
 
@@ -32,81 +30,56 @@ class TestRoutingInfo(unittest.TestCase):
         unittest_setup()
 
     def test_routing_info(self):
-        # mock to avoid having to create a graph for this test
-        graph_code = 123
         pre_vertex = SimpleMachineVertex(resources=ResourceContainer())
-        partition = MulticastEdgePartition(pre_vertex, "Test")
-        partition.register_graph_code(graph_code)  # This is a hack
-        post_vertex = SimpleMachineVertex(resources=ResourceContainer())
-        edge = MachineEdge(pre_vertex, post_vertex)
         key = 12345
-        partition_info = PartitionRoutingInfo(
-            [BaseKeyAndMask(key, FULL_MASK)], partition)
-        partition.add_edge(edge, graph_code)
-        routing_info = RoutingInfo([partition_info])
+        info = MachineVertexRoutingInfo(
+            [BaseKeyAndMask(key, FULL_MASK)], "Test", pre_vertex)
+        routing_info = RoutingInfo([info])
 
         with self.assertRaises(PacmanAlreadyExistsException):
-            routing_info.add_partition_info(partition_info)
-
-        assert routing_info.get_first_key_from_partition(partition) == key
-        assert routing_info.get_first_key_from_partition(None) is None
-
-        assert routing_info.get_routing_info_from_partition(partition) == \
-            partition_info
-        assert routing_info.get_routing_info_from_partition(None) is None
+            routing_info.add_routing_info(info)
 
         assert routing_info.get_routing_info_from_pre_vertex(
-            pre_vertex, "Test") == partition_info
+            pre_vertex, "Test") == info
         assert routing_info.get_routing_info_from_pre_vertex(
-            post_vertex, "Test") is None
+            None, "Test") is None
         assert routing_info.get_routing_info_from_pre_vertex(
             pre_vertex, "None") is None
 
         assert routing_info.get_first_key_from_pre_vertex(
             pre_vertex, "Test") == key
         assert routing_info.get_first_key_from_pre_vertex(
-            post_vertex, "Test") is None
+            None, "Test") is None
         assert routing_info.get_first_key_from_pre_vertex(
             pre_vertex, "None") is None
 
-        assert routing_info.get_routing_info_for_edge(edge) == partition_info
-        assert routing_info.get_routing_info_for_edge(None) is None
+        assert next(iter(routing_info)) == info
 
-        assert routing_info.get_first_key_for_edge(edge) == key
-        assert routing_info.get_first_key_for_edge(None) is None
-
-        assert next(iter(routing_info)) == partition_info
-
-        partition2 = MulticastEdgePartition(pre_vertex, "Test")
-        partition2.register_graph_code(graph_code)  # This is a hack
-        partition2.add_edge(MachineEdge(pre_vertex, post_vertex), graph_code)
+        info2 = MachineVertexRoutingInfo(
+            [BaseKeyAndMask(key, FULL_MASK)], "Test", pre_vertex)
 
         with self.assertRaises(PacmanAlreadyExistsException):
-            routing_info.add_partition_info(PartitionRoutingInfo(
-                [BaseKeyAndMask(key, FULL_MASK)], partition2))
-        assert partition != partition2
+            routing_info.add_routing_info(info2)
+        assert info != info2
 
-        partition3 = MulticastEdgePartition(pre_vertex, "Test2")
-        partition3.register_graph_code(graph_code)  # This is a hack
-        partition3.add_edge(MachineEdge(pre_vertex, post_vertex), graph_code)
-        routing_info.add_partition_info(PartitionRoutingInfo(
-            [BaseKeyAndMask(key, FULL_MASK)], partition3))
+        info3 = MachineVertexRoutingInfo(
+            [BaseKeyAndMask(key, FULL_MASK)], "Test2", pre_vertex)
+        routing_info.add_routing_info(info3)
+        assert info != info3
+        assert routing_info.get_routing_info_from_pre_vertex(
+                pre_vertex, "Test2") !=\
+            routing_info.get_routing_info_from_pre_vertex(
+                pre_vertex, "Test")
+        assert routing_info.get_routing_info_from_pre_vertex(
+            pre_vertex, "Test2").get_keys().tolist() == [key]
 
-        assert routing_info.get_routing_info_from_partition(partition) != \
-            routing_info.get_routing_info_from_partition(partition3)
-        assert partition != partition3
-        assert routing_info.get_routing_info_from_partition(
-            partition3).get_keys().tolist() == [key]
-
-        partition4 = MulticastEdgePartition(pre_vertex, "Test4")
-        partition4.register_graph_code(graph_code)  # This is a hack
-        partition4.add_edge(MachineEdge(pre_vertex, post_vertex), graph_code)
-        routing_info.add_partition_info(PartitionRoutingInfo(
+        info4 = MachineVertexRoutingInfo(
             [BaseKeyAndMask(key, FULL_MASK),
-             BaseKeyAndMask(key * 2, FULL_MASK)], partition4))
+             BaseKeyAndMask(key * 2, FULL_MASK)], "Test4", pre_vertex)
+        routing_info.add_routing_info(info4)
 
-        assert routing_info.get_routing_info_from_partition(
-            partition4).get_keys().tolist() == [key, key * 2]
+        assert routing_info.get_routing_info_from_pre_vertex(
+            pre_vertex, "Test4").get_keys().tolist() == [key, key * 2]
 
     def test_base_key_and_mask(self):
         with self.assertRaises(PacmanConfigurationException):
@@ -122,15 +95,6 @@ class TestRoutingInfo(unittest.TestCase):
         k, n = bkm2.get_keys()
         assert k.tolist() == [1073741824, 1073741825]
         assert n == 2
-
-    def test_dict_based_machine_partition_n_keys_map(self):
-        pmap = DictBasedMachinePartitionNKeysMap()
-        p1 = MulticastEdgePartition(None, "foo")
-        p2 = MulticastEdgePartition(None, "bar")
-        pmap.set_n_keys_for_partition(p1, 1)
-        pmap.set_n_keys_for_partition(p2, 2)
-        assert pmap.n_keys_for_partition(p1) == 1
-        assert pmap.n_keys_for_partition(p2) == 2
 
 
 if __name__ == "__main__":

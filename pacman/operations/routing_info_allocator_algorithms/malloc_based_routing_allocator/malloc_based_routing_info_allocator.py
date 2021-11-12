@@ -21,7 +21,7 @@ from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint, ContiguousKeyRangeContraint)
 from .key_field_generator import KeyFieldGenerator
 from pacman.model.routing_info import (
-    RoutingInfo, BaseKeyAndMask, PartitionRoutingInfo)
+    RoutingInfo, BaseKeyAndMask, MachineVertexRoutingInfo)
 from pacman.utilities.utility_calls import (
     check_algorithm_can_support_constraints, get_key_ranges)
 from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
@@ -194,7 +194,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         :param ConstraintGroup group:
         """
         # Allocate the routing information
-        partition_info = PartitionRoutingInfo(keys_and_masks, group)
+        partition_info = MachineVertexRoutingInfo(keys_and_masks, group)
         routing_infos.add_partition_info(partition_info)
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):

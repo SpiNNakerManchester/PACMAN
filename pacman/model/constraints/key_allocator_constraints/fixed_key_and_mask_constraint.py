@@ -37,11 +37,15 @@ class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
         #           An iterable of keys and masks
         #           A machine edge
         #           Number of keys to generate (may be None)
-        "_key_list_function"
+        "_key_list_function",
+
+        # The identifier of the partition to which this applies, or None
+        # if only one partition is expected
+        "_partition"
 
     ]
 
-    def __init__(self, keys_and_masks, key_list_function=None):
+    def __init__(self, keys_and_masks, key_list_function=None, partition=None):
         """
         :param iterable(BaseKeyAndMask) keys_and_masks:
             The key and mask combinations to fix
@@ -54,6 +58,11 @@ class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
             * Number of keys to generate (may be None)
         :type key_list_function: callable(iterable(tuple(
             BaseKeyAndMask, MachineEdge, int)), iterable(int))
+        :param partition:
+            The identifier of the partition to which this constraint applies,
+            or None if it applies to all partitions (meaning there is only
+            one partition expected)
+        :type partition: str or None
         """
         for keys_and_mask in keys_and_masks:
             if not isinstance(keys_and_mask, BaseKeyAndMask):
@@ -63,6 +72,7 @@ class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
 
         self._keys_and_masks = keys_and_masks
         self._key_list_function = key_list_function
+        self._partition = partition
 
     @property
     def keys_and_masks(self):
@@ -83,11 +93,28 @@ class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
         """
         return self._key_list_function
 
+    @property
+    def partition(self):
+        """ The identifier of the partition to which this constraint applies,
+            or None if it applies to the only expected partition
+
+        :rtype: str or None
+        """
+        return self._partition
+
+    def applies_to_partition(self, partition):
+        """ Determine if this applies to the given partition identifier or not
+
+        :param str partition: The identifier of the partition to check
+        :rtype: bool
+        """
+        return self._partition is None or self._partition == partition
+
     def __repr__(self):
         return (
             "FixedKeyAndMaskConstraint("
-            "keys_and_masks={}, key_list_function={})".format(
-                self._keys_and_masks, self.key_list_function))
+            "keys_and_masks={}, key_list_function={}, partition={})".format(
+                self._keys_and_masks, self.key_list_function, self._partition))
 
     def __eq__(self, other):
         if not isinstance(other, FixedKeyAndMaskConstraint):

@@ -80,9 +80,8 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
                 logger.warning(self.NOT_API_WARNING)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, plan_n_timesteps):
-        # The vertex has already been created, so just return 1 chip
-        return 1
+    def create_machine_vertices(self, chip_counter):
+        chip_counter.add_core(self._resources_required)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):

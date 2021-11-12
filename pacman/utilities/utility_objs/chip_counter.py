@@ -22,6 +22,9 @@ class ChipCounter(object):
     """
 
     __slots__ = [
+        # How many time steps to plan for
+        "__plan_n_timesteps",
+
         # How many cores there are to be used on a chip
         "__n_cores_per_chip",
 
@@ -37,14 +40,18 @@ class ChipCounter(object):
         # The number of chips used, including the current one
         "__n_chips"]
 
-    def __init__(self, n_cores_per_chip=15, sdram_per_chip=100 * 1024 * 1024):
+    def __init__(
+            self, plan_n_timesteps=0, n_cores_per_chip=15,
+            sdram_per_chip=100 * 1024 * 1024):
+        self.__plan_n_timesteps = plan_n_timesteps
         self.__n_cores_per_chip = n_cores_per_chip
         self.__sdram_per_chip = sdram_per_chip
         self.__cores_free = 0
         self.__sdram_free = 0
         self.__n_chips = 0
 
-    def add_core(self, sdram):
+    def add_core(self, resources):
+        sdram = resources.sdram.get_total_sdram(self.__plan_n_timesteps)
         if self.__cores_free == 0 or self.__sdram_free < sdram:
             self.__n_chips += 1
             self.__cores_free = self.__n_cores_per_chip
