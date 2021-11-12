@@ -46,8 +46,6 @@ def verify_lengths(compressed):
     """
     problems = ""
     for table in compressed:
-        if table.x ==1 and table.y == 1:
-            print(table.number_of_entries)
         if table.number_of_entries > Machine.ROUTER_ENTRIES:
             problems += "(x:{},y:{})={} ".format(
                 table.x, table.y, table.number_of_entries)

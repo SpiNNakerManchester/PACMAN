@@ -37,4 +37,5 @@ class TestUnorderedPairCompressor(unittest.TestCase):
 
         with self.assertRaises(PacmanElementAllocationException):
             pair_compressor(
-                original_tables, ordered=False, accept_overflow=False, verify=True)
+                original_tables, ordered=False, accept_overflow=False,
+                verify=True)

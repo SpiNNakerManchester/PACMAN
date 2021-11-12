@@ -60,7 +60,6 @@ class AbstractCompressor(object):
                 self.__class__.__name__))
         return self.compress_tables(router_tables, progress)
 
-
     @abstractmethod
     def compress_table(self, router_table):
         """
@@ -115,4 +114,3 @@ class AbstractCompressor(object):
             else:
                 logger.warning(self._problems)
         return compressed_tables
-
