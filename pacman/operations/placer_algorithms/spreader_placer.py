@@ -42,7 +42,7 @@ def spreader_placer(machine_graph, machine, n_keys_map, plan_n_timesteps):
     :rtype: Placements
     """
     placer = _SpreaderPlacer()
-    return placer(machine_graph, machine, n_keys_map, plan_n_timesteps)
+    return placer._run(machine_graph, machine, n_keys_map, plan_n_timesteps)
 
 
 class _SpreaderPlacer(_OneToOnePlacer):
@@ -72,7 +72,7 @@ class _SpreaderPlacer(_OneToOnePlacer):
     # 4. chip and core)
     STEPS = 4
 
-    def __call__(self, machine_graph, machine, n_keys_map, plan_n_timesteps):
+    def _run(self, machine_graph, machine, n_keys_map, plan_n_timesteps):
         """
         :param MachineGraph machine_graph: the machine graph
         :param ~spinn_machine.Machine machine: the SpiNNaker machine
