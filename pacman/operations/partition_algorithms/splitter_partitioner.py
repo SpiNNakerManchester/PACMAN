@@ -51,7 +51,7 @@ def splitter_partitioner(
          If something goes wrong with the partitioning
      """
     partitioner = _SplitterPartitioner()
-    partitioner._run(
+    return partitioner._run(
         app_graph, machine, plan_n_time_steps, pre_allocated_resources)
 
 
