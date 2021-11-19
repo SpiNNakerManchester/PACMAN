@@ -100,7 +100,8 @@ def _real_xy(vertex, machine):
     link_data = None
     if isinstance(vertex, AbstractFPGA):
         link_data = machine.get_fpga_link_with_id(
-            vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
+            vertex.fpga_id, vertex.fpga_link_id, vertex.board_address,
+            vertex.linked_chip_coordinates)
     elif isinstance(vertex, AbstractSpiNNakerLink):
         link_data = machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)

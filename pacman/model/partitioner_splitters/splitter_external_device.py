@@ -58,9 +58,9 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                             fpga, i)
                         vertex = MachineFPGAVertex(
                             fpga.fpga_id, fpga.fpga_link_id,
-                            fpga.board_address, label, app_vertex=app_vertex,
-                            vertex_slice=vertex_slice, incoming=True,
-                            outgoing=False)
+                            fpga.board_address, fpga.chip_coords, label=label,
+                            app_vertex=app_vertex, vertex_slice=vertex_slice,
+                            incoming=True, outgoing=False)
                         self.__incoming_vertices.append(vertex)
                         self.__incoming_slices.append(vertex_slice)
             fpga = app_vertex.outgoing_fpga_connection
@@ -68,8 +68,8 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                 vertex_slice = app_vertex.get_outgoing_slice()
                 vertex = MachineFPGAVertex(
                     fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
-                    app_vertex=app_vertex, vertex_slice=vertex_slice,
-                    incoming=False, outgoing=True)
+                    fpga.chip_coords, app_vertex=app_vertex,
+                    vertex_slice=vertex_slice, incoming=False, outgoing=True)
                 self.__outgoing_vertex = vertex
                 self.__outgoing_slice = vertex_slice
 
@@ -82,7 +82,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                     vertex_slice = app_vertex.get_incoming_slice(i)
                     vertex = MachineSpiNNakerLinkVertex(
                         app_vertex.spinnaker_link_id, app_vertex.board_address,
-                        label, app_vertex=app_vertex,
+                        None, label=label, app_vertex=app_vertex,
                         vertex_slice=vertex_slice, incoming=True,
                         outgoing=False)
                     self.__incoming_vertices.append(vertex)
@@ -91,7 +91,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                 self.__outgoing_slice = app_vertex.get_outgoing_slice()
                 self.__outgoing_vertex = MachineSpiNNakerLinkVertex(
                     app_vertex.spinnaker_link_id, app_vertex.board_address,
-                    label, app_vertex=app_vertex,
+                    None, label=label, app_vertex=app_vertex,
                     vertex_slice=self.__outgoing_slice, incoming=False,
                     outgoing=True)
         else:
