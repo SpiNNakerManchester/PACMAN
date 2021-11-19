@@ -22,7 +22,6 @@ from spinn_utilities.log import FormatAdapter
 from pacman.utilities.algorithm_utilities\
     .partition_algorithm_utilities import get_remaining_constraints
 from pacman.model.graphs.common.slice import Slice
-from pacman.utilities.utility_objs import ChipCounter
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
