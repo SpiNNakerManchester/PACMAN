@@ -194,7 +194,7 @@ class MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         :param ConstraintGroup group:
         """
         # Allocate the routing information
-        partition_info = MachineVertexRoutingInfo(keys_and_masks, group)
+        partition_info = MachineVertexRoutingInfo(keys_and_masks, None, None)
         routing_infos.add_partition_info(partition_info)
 
     def _allocate_fixed_keys_and_masks(self, keys_and_masks, fixed_mask):
