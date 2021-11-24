@@ -18,7 +18,7 @@ from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
 from pacman.model.placements import Placements, Placement
-from pacman.operations.fixed_route_router import FixedRouteRouter
+from pacman.operations.fixed_route_router import fixed_route_router
 from pacman.exceptions import PacmanRoutingException
 
 
@@ -46,7 +46,6 @@ def _get_destinations(machine, fixed_route_tables, source_x, source_y):
 
 
 def _check_setup(width, height):
-    router = FixedRouteRouter()
     machine = virtual_machine(width=width, height=height)
 
     ethernet_chips = machine.ethernet_connected_chips
@@ -54,7 +53,8 @@ def _check_setup(width, height):
         Placement(DestinationVertex(), ethernet_chip.x, ethernet_chip.y, 1)
         for ethernet_chip in ethernet_chips)
 
-    fixed_route_tables = router(machine, placements, DestinationVertex)
+    fixed_route_tables = fixed_route_router(
+        machine, placements, DestinationVertex)
 
     for x, y in machine.chip_coordinates:
         assert (x, y) in fixed_route_tables

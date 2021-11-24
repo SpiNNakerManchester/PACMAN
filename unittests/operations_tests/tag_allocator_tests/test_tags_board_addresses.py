@@ -20,7 +20,7 @@ from pacman.config_setup import unittest_setup
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ResourceContainer, IPtagResource
-from pacman.operations.tag_allocator_algorithms import BasicTagAllocator
+from pacman.operations.tag_allocator_algorithms import basic_tag_allocator
 
 
 class TestTagsBoardAddresses(unittest.TestCase):
@@ -42,8 +42,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         placements = Placements(
             Placement(vertex, chip.x, chip.y, 1)
             for vertex, chip in zip(vertices, eth_chips))
-        allocator = BasicTagAllocator()
-        tags = allocator(
+        tags = basic_tag_allocator(
             machine, plan_n_timesteps=None, placements=placements)
 
         for vertex, chip in zip(vertices, eth_chips):
@@ -89,8 +88,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         placements.add_placements(
             Placement(vertex, eth_chip_2.x, eth_chip_2.y, proc)
             for proc, vertex in zip(eth2_procs, eth2_vertices))
-        allocator = BasicTagAllocator()
-        tags = allocator(
+        tags = basic_tag_allocator(
             machine, plan_n_timesteps=None, placements=placements)
 
         tags_by_board = defaultdict(set)

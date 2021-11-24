@@ -13,6 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .fixed_route_router import FixedRouteRouter
+from .fixed_route_router import fixed_route_router
 
-__all__ = ["FixedRouteRouter"]
+__all__ = ["fixed_route_router"]

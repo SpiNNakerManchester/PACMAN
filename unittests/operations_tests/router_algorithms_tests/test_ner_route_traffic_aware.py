@@ -21,7 +21,7 @@ from spinn_machine.virtual_machine import virtual_machine
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, MulticastEdgePartition, SimpleMachineVertex)
-from pacman.operations.router_algorithms import NerRouteTrafficAware
+from pacman.operations.router_algorithms import ner_route_traffic_aware
 from pacman.model.resources import ResourceContainer
 from pacman.model.placements import Placements, Placement
 
@@ -53,8 +53,7 @@ class TestNerRouteTrafficAware(unittest.TestCase):
             for vertex_to in vertices:
                 graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
-        router = NerRouteTrafficAware()
-        routing_paths = router.__call__(graph, machine, placements)
+        routing_paths = ner_route_traffic_aware(graph, machine, placements)
 
         for vertex in vertices:
             vertices_reached = set()

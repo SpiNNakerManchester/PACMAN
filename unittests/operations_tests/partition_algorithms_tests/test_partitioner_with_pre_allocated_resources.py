@@ -16,7 +16,7 @@
 from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
-from pacman.operations.partition_algorithms import SplitterPartitioner
+from pacman.operations.partition_algorithms import splitter_partitioner
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint)
 from pacman.model.graphs.application import ApplicationGraph
@@ -33,7 +33,6 @@ class TestPartitionerWithPreAllocatedResources(object):
         unittest_setup()
         machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
-        partitioner = SplitterPartitioner()
 
         eight_meg = 8 * 1024 * 1024
 
@@ -51,8 +50,8 @@ class TestPartitionerWithPreAllocatedResources(object):
 
         # run partitioner that should go boom
         try:
-            partitioner(graph, machine, plan_n_time_steps=None,
-                        pre_allocated_resources=pre_allocated_res)
+            splitter_partitioner(graph, machine, plan_n_time_steps=None,
+                                 pre_allocated_resources=pre_allocated_res)
         except Exception as e:
             raise Exception("should have blown up here") from e
 
