@@ -20,7 +20,24 @@ from pacman.exceptions import (
     PacmanRoutingException)
 
 
-class FixedRouteRouter(object):
+def fixed_route_router(machine, placements, destination_class):
+    """ Runs the fixed route generator for all boards on machine
+
+    :param ~spinn_machine.Machine machine: SpiNNMachine object
+    :param Placements placements: placements object
+    :param destination_class: the destination class to route packets to
+    :type destination_class: type or tuple(type,...)
+    :return: router tables for fixed route paths
+    :rtype: dict(tuple(int,int), ~spinn_machine.FixedRouteEntry)
+    :raises PacmanConfigurationException: if no placement processor found
+    :raises PacmanRoutingException:
+    :raises PacmanAlreadyExistsException:
+    """
+    router = _FixedRouteRouter(machine, placements, destination_class)
+    return router._run()
+
+
+class _FixedRouteRouter(object):
     """ Computes the fixed routes used to direct data out traffic to the
         board-local gatherer processors.
     """
@@ -29,7 +46,13 @@ class FixedRouteRouter(object):
         "_destination_class", "_fixed_route_tables",
         "_machine", "_placements"]
 
-    def __call__(self, machine, placements, destination_class):
+    def __init__(self, machine, placements, destination_class):
+        self._machine = machine
+        self._destination_class = destination_class
+        self._placements = placements
+        self._fixed_route_tables = dict()
+
+    def _run(self):
         """ Runs the fixed route generator for all boards on machine
 
         :param ~spinn_machine.Machine machine: SpiNNMachine object
@@ -43,18 +66,13 @@ class FixedRouteRouter(object):
         :raises PacmanAlreadyExistsException:
         """
         # pylint: disable=attribute-defined-outside-init
-
-        self._machine = machine
-        self._destination_class = destination_class
-        self._placements = placements
-        self._fixed_route_tables = dict()
-
         progress = ProgressBar(
-            len(machine.ethernet_connected_chips),
+            len(self._machine.ethernet_connected_chips),
             "Generating fixed router routes")
 
         # handle per board
-        for ethernet_chip in progress.over(machine.ethernet_connected_chips):
+        for ethernet_chip in progress.over(
+                self._machine.ethernet_connected_chips):
             self._do_fixed_routing(ethernet_chip)
         return self._fixed_route_tables
 

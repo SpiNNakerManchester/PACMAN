@@ -14,10 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_compressor import AbstractCompressor
-from .checked_unordered_pair_compressor import CheckedUnorderedPairCompressor
 from .entry import Entry
-from .pair_compressor import PairCompressor
-from .unordered_pair_compressor import UnorderedPairCompressor
+from .pair_compressor import pair_compressor
 
-__all__ = ['AbstractCompressor', 'CheckedUnorderedPairCompressor',
-           'Entry', 'PairCompressor', 'UnorderedPairCompressor']
+__all__ = ['AbstractCompressor', 'Entry', 'pair_compressor']

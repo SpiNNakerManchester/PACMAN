@@ -22,7 +22,8 @@ from pacman.config_setup import unittest_setup
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractDependentSplitter)
-from pacman.operations.partition_algorithms import SplitterPartitioner
+from pacman.operations.partition_algorithms.splitter_partitioner import (
+    _SplitterPartitioner)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanPartitionException)
 from pacman_test_objects import SimpleTestVertex
@@ -88,7 +89,7 @@ class TestSplitterPartitioner(unittest.TestCase):
         vertices.append(v3)
         v4 = SimpleTestVertex(1, splitter=SplitterSliceLegacy(), label="v4")
         vertices.append(v4)
-        sp = SplitterPartitioner()
+        sp = _SplitterPartitioner()
         sp.order_vertices_for_dependent_splitters(vertices)
         self.assertLess(vertices.index(v1), vertices.index(v2))
         self.assertLess(vertices.index(v2), vertices.index(v3))
