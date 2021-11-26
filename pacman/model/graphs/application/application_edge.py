@@ -16,7 +16,6 @@
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.graphs import AbstractEdge
-from pacman.model.graphs.machine import MachineEdge
 
 
 class ApplicationEdge(AbstractEdge):
@@ -30,19 +29,12 @@ class ApplicationEdge(AbstractEdge):
         # The edge at the end of the vertex
         "_post_vertex",
 
-        # Machine edge type
-        "_machine_edge_type",
-
         # The label
-        "_label",
-
-        # Ordered set of associated machine edges
-        "__machine_edges"
+        "_label"
     ]
 
     def __init__(
-            self, pre_vertex, post_vertex, label=None,
-            machine_edge_type=MachineEdge):
+            self, pre_vertex, post_vertex, label=None):
         """
         :param ApplicationVertex pre_vertex:
             The application vertex at the start of the edge.
@@ -58,11 +50,6 @@ class ApplicationEdge(AbstractEdge):
         self._label = label
         self._pre_vertex = pre_vertex
         self._post_vertex = post_vertex
-        if not issubclass(machine_edge_type, MachineEdge):
-            raise ValueError(
-                "machine_edge_type must be a kind of machine edge")
-        self._machine_edge_type = machine_edge_type
-        self.__machine_edges = OrderedSet()
 
     @property
     @overrides(AbstractEdge.label)
@@ -78,25 +65,3 @@ class ApplicationEdge(AbstractEdge):
     @overrides(AbstractEdge.post_vertex)
     def post_vertex(self):
         return self._post_vertex
-
-    @property
-    def machine_edges(self):
-        """ The machine
-
-        :rtype: iterable(MachineEdge)
-        """
-        return self.__machine_edges
-
-    def remember_associated_machine_edge(self, machine_edge):
-        """ Adds the Machine Edge to the iterable returned by machine_edges
-
-        :param MachineEdge machine_edge: A pointer to a machine_edge.
-            This edge may not be fully initialised
-        """
-        self.__machine_edges.add(machine_edge)
-
-    def forget_machine_edges(self):
-        """ Clear the collection of machine edges created by this application
-            edge.
-        """
-        self.__machine_edges = OrderedSet()
