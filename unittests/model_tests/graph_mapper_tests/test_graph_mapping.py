@@ -21,9 +21,8 @@ import unittest
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineEdge, SimpleMachineVertex, \
-    MachineGraph
-from pacman_test_objects import SimpleTestEdge, SimpleTestVertex
+from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman_test_objects import SimpleTestVertex
 
 
 class TestGraphMapping(unittest.TestCase):
@@ -44,13 +43,12 @@ class TestGraphMapping(unittest.TestCase):
         app_graph.add_vertex(vert)
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
-        mac_graph = MachineGraph("cooked bacon", application_graph=app_graph)
         vertex1 = SimpleMachineVertex(
             None, "", vertex_slice=Slice(0, 1), app_vertex=vert)
         vertex2 = SimpleMachineVertex(
             None, "", vertex_slice=Slice(2, 3), app_vertex=vert)
-        mac_graph.add_vertex(vertex1)
-        mac_graph.add_vertex(vertex2)
+        vert.remember_machine_vertex(vertex1)
+        vert.remember_machine_vertex(vertex2)
 
         returned_vertices = vert.machine_vertices
 
@@ -70,10 +68,8 @@ class TestGraphMapping(unittest.TestCase):
                                       vertex_slice=Slice(0, 1))
         vertex2 = SimpleMachineVertex(None, "", app_vertex=vert,
                                       vertex_slice=Slice(2, 3))
-        machine_graph = MachineGraph(
-            application_graph=app_graph, label="cooked_bacon")
-        machine_graph.add_vertex(vertex1)
-        machine_graph.add_vertex(vertex2)
+        vert.remember_machine_vertex(vertex1)
+        vert.remember_machine_vertex(vertex2)
 
         self.assertEqual(vert, vertex1.app_vertex)
         self.assertEqual(vert, vertex2.app_vertex)
