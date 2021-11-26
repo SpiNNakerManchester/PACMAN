@@ -20,6 +20,7 @@ from pacman.model.graphs.application.abstract import (
     AbstractOneAppOneMachineVertex)
 from pacman.model.partitioner_splitters import SplitterOneAppOneMachine
 from pacman_test_objects import NonLegacyApplicationVertex
+from pacman.model.graphs.machine import SimpleMachineVertex
 
 
 class TestSplitterOneAppOneMachine(unittest.TestCase):
@@ -35,7 +36,8 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v1)
         v2 = AbstractOneAppOneMachineVertex(
-            machine_vertex=None, label="v1", constraints=None)
+            machine_vertex=SimpleMachineVertex(None),
+            label="v1", constraints=None)
         splitter.set_governed_app_vertex(v2)
         a = str(splitter)
         self.assertIsNotNone(a)

@@ -38,10 +38,10 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
         """
         super().__init__(label, constraints, n_atoms)
         self._machine_vertex = machine_vertex
+        super().remember_machine_vertex(machine_vertex)
 
     @overrides(ApplicationVertex.remember_machine_vertex)
     def remember_machine_vertex(self, machine_vertex):
-        super().remember_machine_vertex(machine_vertex)
         assert (machine_vertex == self._machine_vertex)
 
     @property
