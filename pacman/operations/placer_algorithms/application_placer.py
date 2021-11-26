@@ -116,9 +116,9 @@ class _Spaces(object):
 
             # Start a new space by finding all the chips that can be reached
             # from the start chip but have not been used
-            return (
-                _ChipWithSpace(self.__next_chip),
-                self.__usable_from_chip(self.__next_chip))
+            self.__used_chips.add(self.__next_chip)
+            chip = self.__machine.get_chip_at(*self.__next_chip)
+            return _ChipWithSpace(chip), self.__usable_from_chip(chip)
 
         except StopIteration:
             raise PacmanPlaceException("No more chips to place on")
