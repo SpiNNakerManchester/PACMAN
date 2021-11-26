@@ -185,22 +185,23 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         The output vertices are the ones that will serve as source vertices
         for external edges.
 
-        :param outgoing_edge_partition: outgoing edge partition
+        :param outgoing_edge_partition: application outgoing edge partition
         :type outgoing_edge_partition:
             ~pacman.model.graphs.OutgoingEdgePartition
         :rtype: list(MachineVertex)
         """
 
     @abstractmethod
-    def get_in_coming_vertices(self, outgoing_edge_partition):
+    def get_in_coming_vertices(self, outgoing_edge_partition, pre_m_vertex):
         """ Get machine post vertices
 
         The input vertices are the ones that will serve as dest vertices
         for external edges.
 
-        :param outgoing_edge_partition: outgoing edge partition
+        :param outgoing_edge_partition: application outgoing edge partition
         :type outgoing_edge_partition:
             ~pacman.model.graphs.OutgoingEdgePartition
+        :param MachineVertex pre_m_vertex: source machine vertex
         :rtype: list(MachineVertex)
         """
 
