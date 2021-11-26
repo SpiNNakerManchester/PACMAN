@@ -166,8 +166,6 @@ class TestApplicationGraphModel(unittest.TestCase):
         machine_graph.add_vertex(sub2)
         self.assertIn(sub1, vert.machine_vertices)
         self.assertIn(sub2, vert.machine_vertices)
-        self.assertIn(Slice(0, 7), vert.vertex_slices)
-        self.assertIn(Slice(7, 11), vert.vertex_slices)
 
     def test_round_n_atoms(self):
         # .1 is not exact in floating point

@@ -22,8 +22,7 @@ from spinn_utilities.log import FormatAdapter
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanConfigurationException,
-    PacmanInvalidParameterException)
+    PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.model.graphs import AbstractVertex
 logger = FormatAdapter(logging.getLogger(__file__))
 
@@ -36,8 +35,6 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
     __slots__ = [
         # List of machine verts associated with this app vertex
         "_machine_vertices",
-
-        "_vertex_slices",
 
         # The splitter object associated with this app vertex
         "_splitter"]
@@ -65,7 +62,6 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         self._splitter = None
         super().__init__(label, constraints)
         self._machine_vertices = OrderedSet()
-        self._vertex_slices = None
         # Use setter as there is extra work to do
         self.splitter = splitter
 
@@ -115,21 +111,11 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """
         Adds the Machine vertex the iterable returned by machine_vertices
 
-        This method will be called by MachineVertex.app_vertex
-        No other place should call it.
-
-        :param MachineVertex machine_vertex: A pointer to a machine_vertex.
-            This vertex may not be fully initialized but will have a slice
-        :raises PacmanValueError: If the slice of the machine_vertex is too big
+        :param MachineVertex machine_vertex: A pointer to a machine_vertex
         """
 
         machine_vertex.index = len(self._machine_vertices)
-
-        if machine_vertex in self._machine_vertices:
-            raise PacmanAlreadyExistsException(
-                str(machine_vertex), machine_vertex)
         self._machine_vertices.add(machine_vertex)
-        self._vertex_slices = None
 
     @abstractproperty
     def n_atoms(self):
@@ -162,24 +148,11 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     @property
     def machine_vertices(self):
-        """ The machine vertices that this application vertex maps to.\
-            Will be the same length as :py:meth:`vertex_slices`.
+        """ The machine vertices that this application vertex maps to
 
         :rtype: iterable(MachineVertex)
         """
         return self._machine_vertices
-
-    @property
-    def vertex_slices(self):
-        """ The slices of this vertex that each machine vertex manages.\
-            Will be the same length as :py:meth:`machine_vertices`.
-
-        :rtype: iterable(Slice)
-        """
-        if self._vertex_slices is None:
-            self._vertex_slices = \
-                list(map(lambda x: x.vertex_slice, self._machine_vertices))
-        return self._vertex_slices
 
     def get_max_atoms_per_core(self):
         """ Gets the maximum number of atoms per core, which is either the\
