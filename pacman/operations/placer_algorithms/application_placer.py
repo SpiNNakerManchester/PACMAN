@@ -15,8 +15,8 @@
 
 from pacman.model.placements import Placements, Placement
 from pacman.exceptions import PacmanPlaceException
-from pacman.operations.placer_algorithms import radial_placer
 from spinn_utilities.ordered_set import OrderedSet
+from .radial_placer import generate_radial_chips
 
 
 def place_application_graph(machine, app_graph, plan_n_timesteps):
@@ -104,7 +104,7 @@ class _Spaces(object):
 
     def __init__(self, machine):
         self.__machine = machine
-        self.__chips = iter(RadialPlacer._generate_radial_chips(machine))
+        self.__chips = iter(generate_radial_chips(machine))
         self.__next_chip = next(self.__chips)
         self.__used_chips = set()
 
