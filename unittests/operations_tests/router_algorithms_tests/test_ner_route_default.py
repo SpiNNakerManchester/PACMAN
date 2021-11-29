@@ -17,7 +17,7 @@ from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
 from spinn_machine import virtual_machine
 from pacman.model.placements import Placement, Placements
-from pacman.operations.router_algorithms.ner_route import NerRoute
+from pacman.operations.router_algorithms.ner_route import ner_route
 
 
 def test_ner_route_default():
@@ -37,8 +37,7 @@ def test_ner_route_default():
     partition = graph.get_outgoing_edge_partition_starting_at_vertex(
         source_vertex, "Test")
 
-    router = NerRoute()
-    routes = router.__call__(graph, machine, placements)
+    routes = ner_route(graph, machine, placements)
 
     source_route = routes.get_entries_for_router(0, 0)[partition]
     assert(not source_route.defaultable)

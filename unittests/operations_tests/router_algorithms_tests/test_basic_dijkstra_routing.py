@@ -21,7 +21,7 @@ from pacman.model.graphs.machine import MulticastEdgePartition
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
-from pacman.operations.router_algorithms import BasicDijkstraRouting
+from pacman.operations.router_algorithms import basic_dijkstra_routing
 from pacman.model.resources import ResourceContainer
 from pacman.model.placements import Placements, Placement
 
@@ -52,8 +52,7 @@ class TestBasicDijkstraRouting(unittest.TestCase):
             for vertex_to in vertices:
                 graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
-        router = BasicDijkstraRouting()
-        routing_paths = router.__call__(placements, machine, graph)
+        routing_paths = basic_dijkstra_routing(placements, machine, graph)
 
         for vertex in vertices:
             vertices_reached = set()

@@ -21,7 +21,23 @@ from pacman.utilities import utility_calls as utils
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 
-class SplitterPartitioner(AbstractSplitterPartitioner):
+def splitter_partitioner(app_graph, plan_n_time_steps):
+    """
+     :param ApplicationGraph app_graph: The application_graph to partition
+     :param plan_n_time_steps:
+         the number of time steps to plan to run for
+     :type plan_n_time_steps: int or None
+     :return:
+         The number of chips needed to satisfy this partitioning.
+     :rtype: int
+     :raise PacmanPartitionException:
+         If something goes wrong with the partitioning
+     """
+    partitioner = _SplitterPartitioner()
+    return partitioner._run(app_graph, plan_n_time_steps)
+
+
+class _SplitterPartitioner(AbstractSplitterPartitioner):
     """ Partitioner which hands the partitioning work to application vertices'\
         splitter objects.
     """
@@ -29,7 +45,7 @@ class SplitterPartitioner(AbstractSplitterPartitioner):
     __slots__ = []
 
     # inherited from AbstractPartitionAlgorithm
-    def __call__(self, app_graph, plan_n_time_steps):
+    def _run(self, app_graph, plan_n_time_steps):
         """
         :param ApplicationGraph app_graph: The application_graph to partition
         :param plan_n_time_steps: the number of time steps to plan to run for

@@ -21,7 +21,7 @@ from pacman.exceptions import (
     PacmanException, PacmanInvalidParameterException, PacmanValueError,
     PacmanPlaceException)
 from pacman.model.placements import Placement, Placements
-from pacman.operations.placer_algorithms import RadialPlacer
+from pacman.operations.placer_algorithms.radial_placer import _RadialPlacer
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     create_vertices_groups, get_same_chip_vertex_groups,
@@ -42,14 +42,32 @@ def _conflict(x, y, post_x, post_y):
     return False
 
 
-class OneToOnePlacer(RadialPlacer):
+def one_to_one_placer(machine_graph, machine, plan_n_timesteps):
+    """ Placer that puts vertices which are directly connected to only its\
+        destination on the same chip
+
+    :param MachineGraph machine_graph: The machine_graph to place
+    :param ~spinn_machine.Machine machine:
+        The machine with respect to which to partition the application
+        graph
+    :param int plan_n_timesteps: number of timesteps to plan for
+    :return: A set of placements
+    :rtype: Placements
+    :raise PacmanPlaceException:
+        If something goes wrong with the placement
+    """
+    placer = _OneToOnePlacer()
+    return placer._run(machine_graph, machine, plan_n_timesteps)
+
+
+class _OneToOnePlacer(_RadialPlacer):
     """ Placer that puts vertices which are directly connected to only its\
         destination on the same chip
     """
 
     __slots__ = []
 
-    def __call__(self, machine_graph, machine, plan_n_timesteps):
+    def _run(self, machine_graph, machine, plan_n_timesteps):
         """
         :param MachineGraph machine_graph: The machine_graph to place
         :param ~spinn_machine.Machine machine:

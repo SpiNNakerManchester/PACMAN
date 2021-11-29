@@ -146,7 +146,7 @@ Implementation API
 """
 from .ordered_covering import get_generality, minimise, ordered_covering
 from .remove_default_routes import remove_default_routes
-from .ordered_covering_compressor import OrderedCoveringCompressor
+from .ordered_covering_compressor import ordered_covering_compressor
 from .utils import intersect
 
 __all__ = (
@@ -154,6 +154,6 @@ __all__ = (
     "intersect",
     "minimise",
     "ordered_covering",
-    "OrderedCoveringCompressor",
+    "ordered_covering_compressor",
     "remove_default_routes"
     )

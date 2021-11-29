@@ -15,6 +15,7 @@
 
 import json
 import time
+from spinn_utilities.config_holder import set_config
 from spinn_machine import Machine
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
 from pacman.model.routing_tables.multicast_routing_tables import (to_json)
@@ -22,12 +23,12 @@ from pacman.model.routing_tables import (MulticastRoutingTables)
 from pacman.operations.router_compressors.routing_compression_checker import (
     compare_tables)
 from pacman.operations.router_compressors.ordered_covering_router_compressor \
-    import OrderedCoveringCompressor
-from pacman.operations.router_compressors import (
-    PairCompressor, UnorderedPairCompressor)
+    import ordered_covering_compressor
+from pacman.operations.router_compressors import pair_compressor
 from pacman.config_setup import unittest_setup
 
 unittest_setup()
+
 # original_tables = from_json("routing_table_15_25.json")
 original_tables = from_json("malloc_hard_routing_tables.json.gz")
 # original_tables = from_json("routing_tables_speader_big.json.gz")
@@ -52,24 +53,22 @@ if SPLIT:
         json.dump(json_obj, f)
     original_tables = bad
 
-MUNDY = False
-PRE = False
+MUNDY = True
+PRE = True
 PAIR = True
 # Hack to stop it throwing a wobly for too many entries
 Machine.ROUTER_ENTRIES = 50000
-mundy_compressor = OrderedCoveringCompressor()
-pre_compressor = UnorderedPairCompressor()
-pair_compressor = PairCompressor()
+set_config("Mapping", "router_table_compress_as_far_as_possible", True)
 
 if MUNDY:
     start = time.time()
-    mundy_tables = mundy_compressor(original_tables)
+    mundy_tables = ordered_covering_compressor(original_tables)
 mundy_time = time.time()
 if PRE:
-    pre_tables = pre_compressor(original_tables)
+    pre_tables = pair_compressor(original_tables, ordered=False)
 pre_time = time.time()
 if MUNDY and PRE:
-    both_tables = mundy_compressor(pre_tables)
+    both_tables = ordered_covering_compressor(pre_tables)
 both_time = time.time()
 if PAIR:
     pair_tables = pair_compressor(original_tables)

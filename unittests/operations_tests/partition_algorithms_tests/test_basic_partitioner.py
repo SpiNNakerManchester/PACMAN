@@ -21,7 +21,7 @@ import unittest
 
 from pacman.config_setup import unittest_setup
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
-from pacman.operations.partition_algorithms import SplitterPartitioner
+from pacman.operations.partition_algorithms import splitter_partitioner
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.constraints.partitioner_constraints import (
@@ -60,8 +60,7 @@ class TestBasicPartitioner(unittest.TestCase):
         verts = [vert1, vert2, vert3]
         graph = ApplicationGraph("Graph")
         graph.add_vertices(verts)
-        sp = SplitterPartitioner()
-        sp(graph, 3000)
+        splitter_partitioner(graph, 3000)
         self.assertEqual(_n_machine_vertices(graph), 3)
         for vert in verts:
             for m_vert in vert.machine_vertices:
@@ -76,8 +75,7 @@ class TestBasicPartitioner(unittest.TestCase):
         graph = ApplicationGraph("Graph with large vertex")
         graph.add_vertex(large_vertex)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        sp = SplitterPartitioner()
-        sp(graph, 1000)
+        splitter_partitioner(graph, 1000)
         self.assertEqual(_n_machine_vertices(graph), 2)
 
     def test_partition_on_target_size_vertex_than_has_to_be_split(self):
@@ -89,8 +87,7 @@ class TestBasicPartitioner(unittest.TestCase):
         large_vertex.splitter = SplitterFixedLegacy()
         graph = ApplicationGraph("Graph with large vertex")
         graph.add_vertex(large_vertex)
-        sp = SplitterPartitioner()
-        sp(graph, 3000)
+        splitter_partitioner(graph, 3000)
         self.assertEqual(_n_machine_vertices(graph), 100)
 
     def test_partition_with_unsupported_constraints(self):
@@ -109,8 +106,7 @@ class TestBasicPartitioner(unittest.TestCase):
         test that the partitioner can work with an empty graph
         """
         graph = ApplicationGraph("foo")
-        sp = SplitterPartitioner()
-        sp(graph, 3000)
+        splitter_partitioner(graph, 3000)
         self.assertEqual(_n_machine_vertices(graph), 0)
 
     def test_partition_with_fixed_atom_constraints(self):
