@@ -129,7 +129,9 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         :param Graph other:
         :return: True if the graph has been updated since the clone was created
         """
-        return self._updated_timestamp != other._clone_timestamp
+        if other:
+            return self._updated_timestamp != other._clone_timestamp
+        return True
 
     def add_vertex(self, vertex):
         """ Add a vertex to the graph.

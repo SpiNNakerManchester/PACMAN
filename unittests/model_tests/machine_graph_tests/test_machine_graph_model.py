@@ -97,6 +97,7 @@ class TestMachineGraphModel(unittest.TestCase):
             with self.assertRaises(PacmanInvalidParameterException):
                 graph.clone()
         else:
+            self.assertTrue(graph.updated_since_cloned(None))
             second = graph.clone()
             self.assertEqual(graph.n_vertices, second.n_vertices)
             vertices_from_graph = list(second.vertices)
