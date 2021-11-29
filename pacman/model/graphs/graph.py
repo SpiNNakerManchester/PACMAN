@@ -20,7 +20,8 @@ from spinn_utilities.abstract_base import (
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
-    GraphFrozenException, PacmanAlreadyExistsException, PacmanInvalidParameterException)
+    GraphFrozenException, PacmanAlreadyExistsException,
+    PacmanInvalidParameterException)
 from .abstract_edge_partition import AbstractEdgePartition
 from .abstract_edge import AbstractEdge
 from .abstract_vertex import AbstractVertex

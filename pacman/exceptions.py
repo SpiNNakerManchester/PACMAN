@@ -179,6 +179,7 @@ class MinimisationFailedError(PacmanException):
         specified target.
     """
 
+
 class GraphFrozenException(PacmanException):
     """
     Raise when an attempt is made to update a frozen graph
