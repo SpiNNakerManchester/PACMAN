@@ -14,12 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
+import time
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanInvalidParameterException)
+    GraphFrozenException, PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from .abstract_edge_partition import AbstractEdgePartition
 from .abstract_edge import AbstractEdge
 from .abstract_vertex import AbstractVertex
@@ -53,7 +54,14 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         # map between labels and vertex
         "_vertex_by_label",
         # count of vertex which had a None or already used label
-        "_unlabelled_vertex_count"]
+        "_unlabelled_vertex_count",
+        # Current method to run every time updated
+        "_updater",
+        # Timestamp of the last updated
+        "_updated_timestamp",
+        # None or If cloned updated_timestamp of source at clone time
+        "_clone_timestamp"
+    ]
 
     def __init__(self, allowed_vertex_types, allowed_edge_types, label):
         """
@@ -78,6 +86,8 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         self._incoming_edges_by_partition_name = DefaultOrderedDict(list)
         self._outgoing_edge_partition_by_edge = OrderedDict()
         self._label = label
+        self._updater = self._update_timestamp
+        self._updater()
 
     @property
     def label(self):
@@ -91,6 +101,36 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         self._unlabelled_vertex_count += 1
         return str(self._unlabelled_vertex_count)
 
+    def _update_timestamp(self):
+        """
+        Updates the timestamp of when last updated
+
+        """
+        self._updated_timestamp = time.time()
+
+    def _update_disabled(self):
+        """
+        Inidactes a grpah is frozen and may not be updated
+
+        :raises: GraphFrozenException
+        """
+        raise GraphFrozenException("No farther changes to graph allowed")
+
+    def freeze(self):
+        """
+        Freezes the graph so any add call with raise an exception
+        """
+        self._updater = self._update_disabled
+
+    def updated_since_cloned(self, other):
+        """
+        Check if this graph has been updated since the other was cloned off
+
+        :param Graph other:
+        :return: True if the graph has been updated since the clone was created
+        """
+        return self._updated_timestamp != other._clone_timestamp
+
     def add_vertex(self, vertex):
         """ Add a vertex to the graph.
 
@@ -100,6 +140,7 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         :raises PacmanConfigurationException:
             If there is an attempt to add the same vertex more than once
         """
+        self._updater()
         if not isinstance(vertex, self._allowed_vertex_types):
             raise PacmanInvalidParameterException(
                 "vertex", str(vertex.__class__),
@@ -146,6 +187,7 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
             one
         """
         # Add the edge to the partition
+        self._updater()
         partition = self.get_outgoing_edge_partition_starting_at_vertex(
             edge.pre_vertex, outgoing_edge_partition_name)
         if partition is None:

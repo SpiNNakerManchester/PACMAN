@@ -19,10 +19,9 @@ from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
     ConstantSDRAMMachinePartition, MachineEdge, MachineGraph,
-    MachineGraphView, MulticastEdgePartition, SDRAMMachineEdge,
-    SimpleMachineVertex)
+    MulticastEdgePartition, SDRAMMachineEdge, SimpleMachineVertex)
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanConfigurationException,
+    PacmanAlreadyExistsException, GraphFrozenException,
     PacmanInvalidParameterException)
 from pacman_test_objects import MockMachineVertex, SimpleTestVertex
 
@@ -111,26 +110,18 @@ class TestMachineGraphModel(unittest.TestCase):
             for edge in edges_from_graph:
                 self.assertIn(edge, edges)
             self.assertEqual(len(edges_from_graph), len(edges))
+            self.assertFalse(graph.updated_since_cloned(second))
+            graph.add_outgoing_edge_partition(
+                MulticastEdgePartition(vertices[1], "gamma"))
+            self.assertTrue(graph.updated_since_cloned(second))
 
-        third = MachineGraphView(graph)
-        self.assertEqual(graph.n_vertices, third.n_vertices)
-        vertices_from_graph = list(third.vertices)
-        for vert in vertices_from_graph:
-            self.assertIn(vert, vertices)
-        for vert in vertices:
-            self.assertEqual(vert, graph.vertex_by_label(vert.label))
-        self.assertEqual(graph.n_outgoing_edge_partitions,
-                         third.n_outgoing_edge_partitions)
-        edges_from_graph = list(third.edges)
-        for edge in edges_from_graph:
-            self.assertIn(edge, edges)
-        self.assertEqual(len(edges_from_graph), len(edges))
-        with self.assertRaises(PacmanConfigurationException):
-            third.add_edge("mock", "mock")
-        with self.assertRaises(PacmanConfigurationException):
-            third.add_vertex("mock")
-        with self.assertRaises(PacmanConfigurationException):
-            third.add_outgoing_edge_partition("mock")
+            second.freeze()
+            with self.assertRaises(GraphFrozenException):
+                second.add_edge("mock", "mock")
+            with self.assertRaises(GraphFrozenException):
+                second.add_vertex("mock")
+            with self.assertRaises(GraphFrozenException):
+                second.add_outgoing_edge_partition("mock")
 
     def test_new_graph_no_app(self):
         self.check_new_graph(None, None)

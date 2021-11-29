@@ -64,6 +64,8 @@ class ApplicationGraph(Graph):
 
     @overrides(Graph.add_outgoing_edge_partition)
     def add_outgoing_edge_partition(self, edge_partition):
+        self._updater()
+
         # verify that this partition is suitable for this graph
         if not isinstance(edge_partition, ApplicationEdgePartition):
             raise PacmanInvalidParameterException(
@@ -118,6 +120,7 @@ class ApplicationGraph(Graph):
         :rtype: ApplicationGraph
         """
         new_graph = ApplicationGraph(label=self.label)
+        new_graph._clone_timestamp = self._updated_timestamp
         for vertex in self.vertices:
             new_graph.add_vertex(vertex)
         for outgoing_partition in self.outgoing_edge_partitions:

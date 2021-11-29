@@ -178,3 +178,8 @@ class MinimisationFailedError(PacmanException):
     """ Raised when a routing table could not be minimised to reach a
         specified target.
     """
+
+class GraphFrozenException(PacmanException):
+    """
+    Raise when an attempt is made to update a frozen graph
+    """

@@ -156,6 +156,8 @@ class MachineGraph(Graph):
 
     @overrides(Graph.add_outgoing_edge_partition)
     def add_outgoing_edge_partition(self, edge_partition):
+        self._updater()
+
         # verify that this partition is suitable for this graph
         if not isinstance(edge_partition, AbstractMachineEdgePartition):
             raise PacmanInvalidParameterException(
@@ -308,6 +310,7 @@ class MachineGraph(Graph):
             If called on a none empty graph when Application Vertexes exist
         """
         new_graph = MachineGraph(self.label)
+        new_graph._clone_timestamp = self._updated_timestamp
         for vertex in self.vertices:
             new_graph.add_vertex(vertex)
         for outgoing_partition in \

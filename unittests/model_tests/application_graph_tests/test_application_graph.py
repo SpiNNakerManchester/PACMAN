@@ -15,8 +15,7 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.application import ApplicationGraphView
+from pacman.exceptions import GraphFrozenException
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman_test_objects import SimpleTestVertex
 
@@ -54,16 +53,20 @@ class TestApplicationGraphModel(unittest.TestCase):
         second = graph.clone()
         assert frozenset(verts) == frozenset(second.vertices)
         assert frozenset(edges) == frozenset(second.edges)
+        assert not graph.updated_since_cloned(second)
+        vert4 = SimpleTestVertex(4, "New AbstractConstrainedVertex 4", 123)
+        second.add_vertex(vert4)
+        graph.add_vertex(vert4)
+        # Even adding the same same vertex results in updated
+        assert graph.updated_since_cloned(second)
 
-        third = ApplicationGraphView(graph)
-        assert frozenset(verts) == frozenset(third.vertices)
-        assert frozenset(edges) == frozenset(third.edges)
-        with self.assertRaises(PacmanConfigurationException):
-            third.add_edge("mock", "mock")
-        with self.assertRaises(PacmanConfigurationException):
-            third.add_vertex("mock")
-        with self.assertRaises(PacmanConfigurationException):
-            third.add_outgoing_edge_partition("mock")
+        second.freeze()
+        with self.assertRaises(GraphFrozenException):
+            second.add_edge("mock", "mock")
+        with self.assertRaises(GraphFrozenException):
+            second.add_vertex("mock")
+        with self.assertRaises(GraphFrozenException):
+            second.add_outgoing_edge_partition("mock")
 
 
 if __name__ == '__main__':
