@@ -123,8 +123,7 @@ class TestBasicPartitioner(unittest.TestCase):
         app_graph.add_vertex(vertex)
 
         # Do the partitioning - this should just work
-        partitioner = SplitterPartitioner()
-        partitioner(app_graph, 3000)
+        splitter_partitioner(app_graph, 3000)
         self.assertEqual(4, _n_machine_vertices(app_graph))
 
 

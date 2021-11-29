@@ -19,8 +19,6 @@ import math
 import sys
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.placements import Placement, Placements
-from pacman.operations.placer_algorithms.one_to_one_placer import (
-    _OneToOnePlacer)
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     create_vertices_groups, get_same_chip_vertex_groups,
     create_requirement_collections)
@@ -28,6 +26,7 @@ from pacman.utilities.utility_objs import ResourceTracker
 from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
 from pacman.model.graphs.abstract_virtual import AbstractVirtual
+from .one_to_one_placer import _OneToOnePlacer, generate_radial_chips
 
 
 def spreader_placer(machine_graph, machine, n_keys_map, plan_n_timesteps):
@@ -343,7 +342,7 @@ class _SpreaderPlacer(_OneToOnePlacer):
                 # order chips so that shared chip is first, and the rest are
                 # nearby it in order. or if not all same, just least first
                 if all_matched:
-                    chips = list(self._generate_radial_chips(
+                    chips = list(generate_radial_chips(
                         machine, resource_tracker=None, start_chip_x=x,
                         start_chip_y=y))
 
@@ -443,6 +442,6 @@ class _SpreaderPlacer(_OneToOnePlacer):
             middle_chip_y = closest_chip.y
 
         # return the radial list from this middle point
-        return list(self._generate_radial_chips(
+        return list(generate_radial_chips(
             machine, resource_tracker=None, start_chip_x=middle_chip_x,
             start_chip_y=middle_chip_y))

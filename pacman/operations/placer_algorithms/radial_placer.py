@@ -48,6 +48,49 @@ def radial_placer(machine_graph, machine, plan_n_timesteps):
     return placer._run(machine_graph, machine, plan_n_timesteps)
 
 
+def generate_radial_chips(
+        machine, resource_tracker=None, start_chip_x=None, start_chip_y=None):
+    """ Generates the list of chips from a given starting point in a radial\
+        format.
+
+    :param ~spinn_machine.Machine machine: the SpiNNaker machine object
+    :param resource_tracker:
+        the resource tracker object which contains what resources of the
+        machine have currently been used
+    :type resource_tracker: ResourceTracker or None
+    :param start_chip_x:
+        The chip x coordinate to start with for radial iteration
+    :type start_chip_x: int or None
+    :param start_chip_y:
+        the chip y coordinate to start with for radial iteration
+    :type start_chip_y: int or None
+    :return: list of chips.
+    :rtype: iterable(tuple(int,int))
+    """
+
+    if start_chip_x is None or start_chip_y is None:
+        first_chip = machine.boot_chip
+    else:
+        first_chip = machine.get_chip_at(start_chip_x, start_chip_y)
+    done_chips = {first_chip}
+    search = deque([first_chip])
+    while search:
+        chip = search.pop()
+        if (resource_tracker is None or
+                resource_tracker.is_chip_available(chip.x, chip.y)):
+            yield chip.x, chip.y
+
+        # Examine the links of the chip to find the next chips
+        for link in chip.router.links:
+            next_chip = machine.get_chip_at(
+                link.destination_x, link.destination_y)
+
+            # Don't search done chips again
+            if next_chip not in done_chips:
+                search.appendleft(next_chip)
+                done_chips.add(next_chip)
+
+
 class _RadialPlacer(object):
     """ A placement algorithm that can place a machine graph onto a\
         machine choosing chips radiating in a circle from the boot chip
@@ -75,7 +118,7 @@ class _RadialPlacer(object):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps, self._generate_radial_chips(machine))
+            machine, plan_n_timesteps, generate_radial_chips(machine))
         vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         all_vertices_placed = set()
         for vertex in progress.over(vertices):
@@ -128,7 +171,7 @@ class _RadialPlacer(object):
         start_x, start_y = self._get_start(radial_constraints)
         chips = None
         if start_x is not None and start_y is not None:
-            chips = self._generate_radial_chips(
+            chips = generate_radial_chips(
                 machine, resource_tracker, start_x, start_y)
 
         if len(vertices) > 1:
@@ -166,46 +209,3 @@ class _RadialPlacer(object):
                 raise PacmanPlaceException("Non-matching constraints")
         return x, y
 
-    @staticmethod
-    def _generate_radial_chips(
-            machine, resource_tracker=None, start_chip_x=None,
-            start_chip_y=None):
-        """ Generates the list of chips from a given starting point in a radial\
-            format.
-
-        :param ~spinn_machine.Machine machine: the SpiNNaker machine object
-        :param resource_tracker:
-            the resource tracker object which contains what resources of the
-            machine have currently been used
-        :type resource_tracker: ResourceTracker or None
-        :param start_chip_x:
-            The chip x coordinate to start with for radial iteration
-        :type start_chip_x: int or None
-        :param start_chip_y:
-            the chip y coordinate to start with for radial iteration
-        :type start_chip_y: int or None
-        :return: list of chips.
-        :rtype: iterable(tuple(int,int))
-        """
-
-        if start_chip_x is None or start_chip_y is None:
-            first_chip = machine.boot_chip
-        else:
-            first_chip = machine.get_chip_at(start_chip_x, start_chip_y)
-        done_chips = {first_chip}
-        search = deque([first_chip])
-        while search:
-            chip = search.pop()
-            if (resource_tracker is None or
-                    resource_tracker.is_chip_available(chip.x, chip.y)):
-                yield chip.x, chip.y
-
-            # Examine the links of the chip to find the next chips
-            for link in chip.router.links:
-                next_chip = machine.get_chip_at(
-                    link.destination_x, link.destination_y)
-
-                # Don't search done chips again
-                if next_chip not in done_chips:
-                    search.appendleft(next_chip)
-                    done_chips.add(next_chip)

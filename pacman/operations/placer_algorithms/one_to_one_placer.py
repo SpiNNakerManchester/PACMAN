@@ -21,7 +21,6 @@ from pacman.exceptions import (
     PacmanException, PacmanInvalidParameterException, PacmanValueError,
     PacmanPlaceException)
 from pacman.model.placements import Placement, Placements
-from pacman.operations.placer_algorithms.radial_placer import _RadialPlacer
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     create_vertices_groups, get_same_chip_vertex_groups,
@@ -32,6 +31,7 @@ from pacman.model.constraints.placer_constraints import (
 from pacman.utilities.utility_calls import (
     is_single, locate_constraints_of_type)
 from pacman.model.graphs import AbstractVirtual
+from .radial_placer import _RadialPlacer, generate_radial_chips
 
 
 def _conflict(x, y, post_x, post_y):
@@ -184,7 +184,7 @@ class _OneToOnePlacer(_RadialPlacer):
         placements = Placements()
 
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps, self._generate_radial_chips(machine))
+            machine, plan_n_timesteps, generate_radial_chips(machine))
         all_vertices_placed = set()
 
         # RadialPlacementFromChipConstraint won't work here

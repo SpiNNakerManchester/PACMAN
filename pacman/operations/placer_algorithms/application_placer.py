@@ -15,7 +15,7 @@
 
 from pacman.model.placements import Placements, Placement
 from pacman.exceptions import PacmanPlaceException
-from pacman.operations.placer_algorithms.radial_placer import RadialPlacer
+from pacman.operations.placer_algorithms import radial_placer
 from spinn_utilities.ordered_set import OrderedSet
 
 

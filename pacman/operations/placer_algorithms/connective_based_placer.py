@@ -19,13 +19,13 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.placer_constraints import (
     AbstractPlacerConstraint)
 from pacman.model.placements import Placements
-from pacman.operations.placer_algorithms.radial_placer import _RadialPlacer
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     sort_vertices_by_known_constraints, get_same_chip_vertex_groups)
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.utility_objs import ResourceTracker
 from pacman.model.graphs import AbstractVirtual
 from pacman.model.placements import Placement
+from .radial_placer import _RadialPlacer, generate_radial_chips
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -103,7 +103,7 @@ class _ConnectiveBasedPlacer(_RadialPlacer):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps, self._generate_radial_chips(machine))
+            machine, plan_n_timesteps, generate_radial_chips(machine))
         constrained = sort_vertices_by_known_constraints(constrained)
         vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         for vertex in progress.over(constrained, False):
