@@ -208,4 +208,3 @@ class _RadialPlacer(object):
             elif y != constraint.y:
                 raise PacmanPlaceException("Non-matching constraints")
         return x, y
-
