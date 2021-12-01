@@ -19,7 +19,8 @@ from spinn_utilities.ordered_set import OrderedSet
 from .radial_placer import generate_radial_chips
 
 
-def place_application_graph(machine, app_graph, plan_n_timesteps):
+def place_application_graph(
+        machine, app_graph, plan_n_timesteps, system_placements):
     """ Perform placement of an application graph on the machine.
         NOTE: app_graph must have been partitioned
     """
