@@ -20,6 +20,7 @@ import logging
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
+from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -36,13 +37,11 @@ PlacementTuple = namedtuple('PlacementTuple', 'x y p')
 _Failure = namedtuple('_Failure', 'router_x router_y keys source_mask')
 
 
-def validate_routes(machine_graph, placements, routing_infos,
-                    routing_tables, machine):
+def validate_routes(placements, routing_infos, routing_tables, machine):
     """ Go though the placements given and check that the routing entries\
         within the routing tables support reach the correction destinations\
         as well as not producing any cycles.
 
-    :param MachineGraph machine_graph: the graph
     :param Placements placements: the placements container
     :param RoutingInfo routing_infos: the routing info container
     :param MulticastRoutingTables routing_tables:
@@ -55,6 +54,7 @@ def validate_routes(machine_graph, placements, routing_infos,
     def traffic_multicast(edge):
         return edge.traffic_type == EdgeTrafficType.MULTICAST
 
+    machine_graph = PacmanDataView().runtime_machine_graph
     progress = ProgressBar(
         placements.placements,
         "Verifying the routes from each core travel to the correct locations")

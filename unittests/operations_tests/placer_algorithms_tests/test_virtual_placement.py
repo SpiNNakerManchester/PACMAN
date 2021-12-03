@@ -37,7 +37,7 @@ def test_virtual_placement(placer):
     virtual_vertex = MachineSpiNNakerLinkVertex(spinnaker_link_id=0)
     graph.add_vertex(virtual_vertex)
     PacmanDataWriter().set_runtime_machine_graph(graph)
-    extended_machine = malloc_based_chip_id_allocator(machine, graph)
+    extended_machine = malloc_based_chip_id_allocator(machine)
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     if placer == "ConnectiveBasedPlacer":

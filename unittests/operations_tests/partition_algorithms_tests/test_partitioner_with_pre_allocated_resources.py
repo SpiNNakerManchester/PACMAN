@@ -15,6 +15,7 @@
 
 from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.operations.partition_algorithms import splitter_partitioner
 from pacman.model.constraints.placer_constraints import (
@@ -48,18 +49,10 @@ class TestPartitionerWithPreAllocatedResources(object):
         # add pre-allocated resources for cores on 0,0
         pre_allocated_res = PreAllocatedResourceContainer()
 
+        PacmanDataWriter()._set_runtime_graph(graph)
         # run partitioner that should go boom
         try:
-            splitter_partitioner(graph, machine, plan_n_time_steps=None,
+            splitter_partitioner(machine, plan_n_time_steps=None,
                                  pre_allocated_resources=pre_allocated_res)
         except Exception as e:
             raise Exception("should have blown up here") from e
-
-
-if __name__ == "__main__":
-
-    test = TestPartitionerWithPreAllocatedResources()
-    test.test_1_chip_over_pre_allocated()
-    test.test_1_chip_under_pre_allocated()
-    test.test_1_chip_pre_allocated_same_core()
-    test.test_1_chip_pre_allocated_too_much_sdram()

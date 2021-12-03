@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
+from pacman.data import PacmanDataView
 from pacman.exceptions import (PacmanConfigurationException)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
@@ -31,9 +32,8 @@ from pacman.utilities import utility_calls as utils
 
 
 def splitter_partitioner(
-        app_graph, machine, plan_n_time_steps, pre_allocated_resources=None):
+        machine, plan_n_time_steps, pre_allocated_resources=None):
     """
-     :param ApplicationGraph app_graph: The application_graph to partition
      :param ~spinn_machine.Machine machine:
          The machine with respect to which to partition the application
          graph
@@ -52,7 +52,7 @@ def splitter_partitioner(
      """
     partitioner = _SplitterPartitioner()
     return partitioner._run(
-        app_graph, machine, plan_n_time_steps, pre_allocated_resources)
+        machine, plan_n_time_steps, pre_allocated_resources)
 
 
 class _SplitterPartitioner(AbstractSplitterPartitioner):
@@ -84,11 +84,8 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
     __slots__ = []
 
     # inherited from AbstractPartitionAlgorithm
-    def _run(
-            self, app_graph, machine, plan_n_time_steps,
-            pre_allocated_resources=None):
+    def _run(self, machine, plan_n_time_steps, pre_allocated_resources=None):
         """
-        :param ApplicationGraph app_graph: The application_graph to partition
         :param ~spinn_machine.Machine machine:
             The machine with respect to which to partition the application
             graph
@@ -105,7 +102,7 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
         :raise PacmanPartitionException:
             If something goes wrong with the partitioning
         """
-
+        app_graph = PacmanDataView().runtime_graph
         # check resource tracker can handle constraints
         ResourceTracker.check_constraints(app_graph.vertices)
 
