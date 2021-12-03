@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 from pacman.model.placements import Placements, Placement
 from pacman.exceptions import PacmanPlaceException
 from spinn_utilities.ordered_set import OrderedSet
@@ -24,12 +25,14 @@ def place_application_graph(
     """ Perform placement of an application graph on the machine.
         NOTE: app_graph must have been partitioned
     """
+    # Work out how many cores have been used on each chip from system
+    n_cores_by_chip = defaultdict(int)
 
     # Track the space
-    spaces = _Spaces(machine)
+    spaces = _Spaces(machine, system_placements)
 
     # Keep placements
-    placements = Placements()
+    placements = Placements(system_placements)
 
     # Go through the application graph by application vertex
     for app_vertex in app_graph.vertices:
@@ -75,9 +78,9 @@ class _ChipWithSpace(object):
 
     __slots__ = ["chip", "n_cores", "sdram"]
 
-    def __init__(self, chip):
+    def __init__(self, chip, used_processors):
         self.chip = chip
-        self.n_cores = chip.n_user_processors
+        self.n_cores = chip.n_user_processors - used_processors
         self.sdram = chip.sdram.size
 
     @property
@@ -101,10 +104,12 @@ class _ChipWithSpace(object):
 
 class _Spaces(object):
 
-    __slots__ = ["__machine", "__chips", "__next_chip", "__used_chips"]
+    __slots__ = ["__machine", "__chips", "__next_chip", "__used_chips",
+                 "__system_placements"]
 
-    def __init__(self, machine):
+    def __init__(self, machine, system_placements):
         self.__machine = machine
+        self.__system_placements = system_placements
         self.__chips = iter(generate_radial_chips(machine))
         self.__next_chip = next(self.__chips)
         self.__used_chips = set()
@@ -119,7 +124,10 @@ class _Spaces(object):
             # from the start chip but have not been used
             self.__used_chips.add(self.__next_chip)
             chip = self.__machine.get_chip_at(*self.__next_chip)
-            return _ChipWithSpace(chip), self.__usable_from_chip(chip)
+            n_cores_used = self.__system_placements.n_placements_on_chip(
+                chip.x, chip.y)
+            return (_ChipWithSpace(chip, n_cores_used),
+                    self.__usable_from_chip(chip))
 
         except StopIteration:
             raise PacmanPlaceException("No more chips to place on")
@@ -129,7 +137,9 @@ class _Spaces(object):
         self.__used_chips.add((next_x, next_y))
         chip = self.__machine.get_chip_at(next_x, next_y)
         space.update(self.__usable_from_chip(chip))
-        return _ChipWithSpace(chip)
+        n_cores_used = self.__system_placements.n_placements_on_chip(
+            chip.x, chip.y)
+        return _ChipWithSpace(chip, n_cores_used)
 
     def __usable_from_chip(self, chip):
         chips = OrderedSet()
