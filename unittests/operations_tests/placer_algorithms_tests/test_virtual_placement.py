@@ -16,6 +16,7 @@
 import pytest
 from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.machine import (
     MachineGraph, MachineSpiNNakerLinkVertex)
 from pacman.operations.chip_id_allocator_algorithms import (
@@ -35,6 +36,7 @@ def test_virtual_placement(placer):
     graph = MachineGraph("Test")
     virtual_vertex = MachineSpiNNakerLinkVertex(spinnaker_link_id=0)
     graph.add_vertex(virtual_vertex)
+    PacmanDataWriter().set_runtime_machine_graph(graph)
     extended_machine = malloc_based_chip_id_allocator(machine, graph)
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 

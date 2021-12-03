@@ -16,6 +16,7 @@
 import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import (
     AbstractFPGA, AbstractSpiNNakerLink, AbstractVirtual)
@@ -42,17 +43,16 @@ class NoSpiNNakerLink(PacmanConfigurationException):
                 vertex.spinnaker_link_id, vertex.board_address))
 
 
-def malloc_based_chip_id_allocator(machine, graph):
+def malloc_based_chip_id_allocator(machine):
     """
     :param ~spinn_machine.Machine machine:
-    :param graph:
-    :type graph: Graph
     :rtype: ~spinn_machine.Machine
     :raises PacmanConfigurationException:
         If a virtual chip is in an impossible position.
     """
     allocator = _MallocBasedChipIdAllocator()
-    return allocator._run(machine, graph)
+    allocator.allocate_chip_ids(machine)
+    return machine
 
 
 class _MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
@@ -71,27 +71,14 @@ class _MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()
 
-    def _run(self, machine, graph=None):
-        """
-        :param ~spinn_machine.Machine machine:
-        :param graph:
-        :type graph: Graph or None
-        :rtype: ~spinn_machine.Machine
-        :raises PacmanConfigurationException:
-            If a virtual chip is in an impossible position.
-        """
-        if graph is not None:
-            self.allocate_chip_ids(machine, graph)
-        return machine
-
-    def allocate_chip_ids(self, machine, graph):
+    def allocate_chip_ids(self, machine):
         """ Go through the chips (real and virtual) and allocate keys for each
 
         :param ~spinn_machine.Machine machine:
-        :param Graph graph:
         :raises PacmanConfigurationException:
             If a virtual chip is in an impossible position.
         """
+        graph = PacmanDataView().runtime_best_graph
         progress = ProgressBar(
             graph.n_vertices + machine.n_chips,
             "Allocating virtual identifiers")

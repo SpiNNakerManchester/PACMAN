@@ -15,6 +15,7 @@
 import pytest
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanException
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex,
@@ -68,7 +69,8 @@ def test_virtual_vertices_spreader():
 
     # Get and extend the machine for the virtual chip
     machine = virtual_machine(width=8, height=8)
-    extended_machine = malloc_based_chip_id_allocator(machine, machine_graph)
+    PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+    extended_machine = malloc_based_chip_id_allocator(machine)
 
     # Do placements
     placements = spreader_placer(
