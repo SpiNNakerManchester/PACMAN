@@ -25,8 +25,6 @@ def place_application_graph(
     """ Perform placement of an application graph on the machine.
         NOTE: app_graph must have been partitioned
     """
-    # Work out how many cores have been used on each chip from system
-    n_cores_by_chip = defaultdict(int)
 
     # Track the space
     spaces = _Spaces(machine, system_placements)
