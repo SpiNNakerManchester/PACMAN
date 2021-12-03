@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import defaultdict
 from pacman.model.placements import Placements, Placement
 from pacman.exceptions import PacmanPlaceException
 from spinn_utilities.ordered_set import OrderedSet
