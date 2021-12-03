@@ -269,3 +269,20 @@ def get_field_based_keys(key, vertex_slice):
 
     # The final result is the above with the base key added
     return keys + key
+
+
+def get_field_based_index(base_key, vertex_slice):
+    """ Map field based keys back to indices
+
+    :param int base_key: The base key
+    :param Slice vertex_slice: The slice to translate
+    :rtype: dict(int,int)
+    """
+    # Get the field based keys
+    field_based_keys = get_field_based_keys(base_key, vertex_slice)
+
+    # Inverse the index
+    return {
+        key: i
+        for i, key in enumerate(field_based_keys)
+    }
