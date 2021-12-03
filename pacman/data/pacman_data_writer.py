@@ -68,16 +68,10 @@ class PacmanDataWriter(UtilsDataWriter, PacmanDataView):
         UtilsDataWriter.soft_reset(self)
         self.__pacman_data._soft_reset()
 
-    @property
-    def graph(self):
-        if self.__pacman_data._graph is None:
-            raise self._exception("graph")
+    def get_graph(self):
         return self.__pacman_data._graph
 
-    @property
-    def machine_graph(self):
-        if self.__pacman_data._machine_graph is None:
-            raise self._exception("machine_graph")
+    def get_machine_graph(self):
         return self.__pacman_data._machine_graph
 
     def create_graphs(self, graph_label):

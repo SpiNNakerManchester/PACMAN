@@ -78,8 +78,8 @@ class TestSimulatorData(unittest.TestCase):
         writer.runtime_graph
         writer.runtime_machine_graph
         # the writer still has access to the user graphs
-        writer.graph
-        writer.machine_graph
+        writer.get_graph()
+        writer.get_machine_graph()
         # The view does not while in run mode
         with self.assertRaises(DataNotYetAvialable):
             view.graph
