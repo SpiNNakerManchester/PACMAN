@@ -222,9 +222,13 @@ class PacmanDataView(UtilsDataView):
             If the runtime_graph is currently unavailable, or if this method
             is used except during run
         """
-        graph = self.runtime_graph
-        if graph.n_vertices:
-            return graph
-        if self.__pacman_data._runtime_machine_graph.n_vertices:
-            return self.__pacman_data._runtime_machine_graph.n_vertices
-        return graph
+        try:
+            if self.runtime_graph.n_vertices:
+                return self.runtime_graph
+        except Exception:
+            # In mocked there may only be a machine_graph
+            if self.status != Data_Status.MOCKED:
+                raise
+        if self.runtime_machine_graph.n_vertices:
+            return self.runtime_machine_graph
+        return self.runtime_graph
