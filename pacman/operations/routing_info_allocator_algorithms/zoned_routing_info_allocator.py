@@ -17,6 +17,7 @@ import logging
 import math
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.data import PacmanDataView
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.utilities.utility_calls import (
@@ -101,10 +102,8 @@ class ZonedRoutingInfoAllocator(object):
     ]
     # pylint: disable=attribute-defined-outside-init
 
-    def __call__(self, machine_graph, n_keys_map, flexible):
+    def __call__(self, n_keys_map, flexible):
         """
-        :param MachineGraph machine_graph:
-            The machine graph to allocate the routing info for
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             A map between the edges and the number of keys required by the
             edges
@@ -117,7 +116,7 @@ class ZonedRoutingInfoAllocator(object):
         """
         # check that this algorithm supports the constraints put onto the
         # partitions
-        self.__machine_graph = machine_graph
+        self.__machine_graph = PacmanDataView().runtime_machine_graph
         self.__n_keys_map = n_keys_map
         self.__n_bits_atoms_and_mac = 0
         self.__n_bits_machine = 0
@@ -129,7 +128,7 @@ class ZonedRoutingInfoAllocator(object):
         self.__fixed_used = set()
 
         check_algorithm_can_support_constraints(
-            constrained_vertices=machine_graph.outgoing_edge_partitions,
+            constrained_vertices=self.__machine_graph.outgoing_edge_partitions,
             supported_constraints=[
                 ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint],
             abstract_constraint_type=AbstractKeyAllocatorConstraint)
@@ -335,13 +334,11 @@ class ZonedRoutingInfoAllocator(object):
         return int(math.ceil(math.log(size, 2)))
 
 
-def flexible_allocate(machine_graph, n_keys_map):
+def flexible_allocate(n_keys_map):
     """
     Allocated with fixed bits for the Application/Partition index but
     with the size of the atom and machine bit changing
 
-    :param MachineGraph machine_graph:
-        The machine graph to allocate the routing info for
     :param AbstractMachinePartitionNKeysMap n_keys_map:
         A map between the edges and the number of keys required by the
         edges
@@ -354,13 +351,11 @@ def flexible_allocate(machine_graph, n_keys_map):
 
     allocator = ZonedRoutingInfoAllocator()
 
-    return allocator(machine_graph, n_keys_map, True)
+    return allocator(n_keys_map, True)
 
 
-def global_allocate(machine_graph, n_keys_map):
+def global_allocate(n_keys_map):
     """
-    :param MachineGraph machine_graph:
-        The machine graph to allocate the routing info for
     :param AbstractMachinePartitionNKeysMap n_keys_map:
         A map between the edges and the number of keys required by the
         edges
@@ -373,4 +368,4 @@ def global_allocate(machine_graph, n_keys_map):
 
     allocator = ZonedRoutingInfoAllocator()
 
-    return allocator(machine_graph, n_keys_map, False)
+    return allocator(n_keys_map, False)

@@ -15,6 +15,7 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint, ShareKeyConstraint)
@@ -174,8 +175,8 @@ class MyTestCase(unittest.TestCase):
         partition2.add_constraint(ShareKeyConstraint([partition3]))
         partition3.add_constraint(ShareKeyConstraint([partition1]))
 
-        results = malloc_based_routing_info_allocator(
-            machine_graph, n_keys_map)
+        PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+        results = malloc_based_routing_info_allocator(n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -208,8 +209,9 @@ class MyTestCase(unittest.TestCase):
         partition.add_constraint(FixedKeyAndMaskConstraint(
             [BaseKeyAndMask(base_key=25, mask=0xFFFFFFF)]))
 
+        PacmanDataWriter().set_runtime_machine_graph(machine_graph)
         with self.assertRaises(PacmanRouteInfoAllocationException):
-            malloc_based_routing_info_allocator(machine_graph, n_keys_map)
+            malloc_based_routing_info_allocator(n_keys_map)
 
     def test_share_key_with_fixed_key_on_new_partitions_other_order(self):
         machine_graph, n_keys_map, v1, v2, _v3, _v4, e1, e2, e3, e4 = \
@@ -223,8 +225,8 @@ class MyTestCase(unittest.TestCase):
         partition.add_constraint(FixedKeyAndMaskConstraint(
             [BaseKeyAndMask(base_key=25, mask=0xFFFFFFF)]))
 
-        results = malloc_based_routing_info_allocator(
-            machine_graph, n_keys_map)
+        PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+        results = malloc_based_routing_info_allocator(n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -252,8 +254,8 @@ class MyTestCase(unittest.TestCase):
         other_partition.add_constraint(FixedKeyAndMaskConstraint(
             [BaseKeyAndMask(base_key=25, mask=0xFFFFFFF)]))
 
-        results = malloc_based_routing_info_allocator(
-            machine_graph, n_keys_map)
+        PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+        results = malloc_based_routing_info_allocator(n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -279,8 +281,8 @@ class MyTestCase(unittest.TestCase):
             get_outgoing_edge_partition_starting_at_vertex(v1, "part2")
         partition.add_constraint(ShareKeyConstraint([other_partition]))
 
-        results = malloc_based_routing_info_allocator(
-            machine_graph, n_keys_map)
+        PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+        results = malloc_based_routing_info_allocator(n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -305,8 +307,8 @@ class MyTestCase(unittest.TestCase):
             get_outgoing_edge_partition_starting_at_vertex(v2, "part2")
         partition.add_constraint(ShareKeyConstraint([other_partition]))
 
-        results = malloc_based_routing_info_allocator(
-            machine_graph, n_keys_map)
+        PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+        results = malloc_based_routing_info_allocator(n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -325,8 +327,8 @@ class MyTestCase(unittest.TestCase):
         machine_graph, n_keys_map, v1, _v2, _v3, _v4, e1, e2, e3, e4 = \
             self._integration_setup()
 
-        results = malloc_based_routing_info_allocator(
-            machine_graph, n_keys_map)
+        PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+        results = malloc_based_routing_info_allocator(n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(

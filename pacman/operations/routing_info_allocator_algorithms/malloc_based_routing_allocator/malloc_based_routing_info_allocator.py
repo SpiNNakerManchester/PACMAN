@@ -16,6 +16,7 @@
 import logging
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
+from pacman.data import PacmanDataView
 from pacman.model.constraints.key_allocator_constraints import (
     AbstractKeyAllocatorConstraint, ShareKeyConstraint, FixedMaskConstraint,
     FixedKeyAndMaskConstraint, ContiguousKeyRangeContraint)
@@ -33,7 +34,7 @@ from .utils import get_possible_masks
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def malloc_based_routing_info_allocator(machine_graph, n_keys_map):
+def malloc_based_routing_info_allocator(n_keys_map):
     """
     A Routing Info Allocation Allocator algorithm that keeps track of\
         free keys and attempts to allocate them as requested.
@@ -44,7 +45,7 @@ def malloc_based_routing_info_allocator(machine_graph, n_keys_map):
     :raises PacmanRouteInfoAllocationException:
     """
     allocator = _MallocBasedRoutingInfoAllocator(n_keys_map)
-    return allocator.run(machine_graph)
+    return allocator.run()
 
 
 class _MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
@@ -58,13 +59,14 @@ class _MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         super().__init__(0, 2 ** 32)
         self._n_keys_map = n_keys_map
 
-    def run(self, machine_graph):
+    def run(self):
         """
         :param MachineGraph machine_graph:
         :param AbstractMachinePartitionNKeysMap n_keys_map:
         :rtype: RoutingInfo
         :raises PacmanRouteInfoAllocationException:
         """
+        machine_graph = PacmanDataView().runtime_machine_graph
         # check that this algorithm supports the constraints
         check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,
