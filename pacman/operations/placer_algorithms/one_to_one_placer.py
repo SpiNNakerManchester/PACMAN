@@ -17,6 +17,7 @@ from collections import deque
 import functools
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
+from pacman.data import PacmanDataView
 from pacman.exceptions import (
     PacmanException, PacmanInvalidParameterException, PacmanValueError,
     PacmanPlaceException)
@@ -42,11 +43,10 @@ def _conflict(x, y, post_x, post_y):
     return False
 
 
-def one_to_one_placer(machine_graph, machine, plan_n_timesteps):
+def one_to_one_placer(machine, plan_n_timesteps):
     """ Placer that puts vertices which are directly connected to only its\
         destination on the same chip
 
-    :param MachineGraph machine_graph: The machine_graph to place
     :param ~spinn_machine.Machine machine:
         The machine with respect to which to partition the application
         graph
@@ -57,7 +57,7 @@ def one_to_one_placer(machine_graph, machine, plan_n_timesteps):
         If something goes wrong with the placement
     """
     placer = _OneToOnePlacer()
-    return placer._run(machine_graph, machine, plan_n_timesteps)
+    return placer._run(machine, plan_n_timesteps)
 
 
 class _OneToOnePlacer(_RadialPlacer):
@@ -67,9 +67,8 @@ class _OneToOnePlacer(_RadialPlacer):
 
     __slots__ = []
 
-    def _run(self, machine_graph, machine, plan_n_timesteps):
+    def _run(self, machine, plan_n_timesteps):
         """
-        :param MachineGraph machine_graph: The machine_graph to place
         :param ~spinn_machine.Machine machine:
             The machine with respect to which to partition the application
             graph
@@ -79,6 +78,7 @@ class _OneToOnePlacer(_RadialPlacer):
         :raise PacmanPlaceException:
             If something goes wrong with the placement
         """
+        machine_graph = PacmanDataView().runtime_machine_graph
         # Iterate over vertices and generate placements
         # +3 covers check_constraints, get_same_chip_vertex_groups and
         #    create_vertices_groups

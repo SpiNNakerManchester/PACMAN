@@ -17,6 +17,7 @@ from collections import deque
 import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.data import PacmanDataView
 from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint, SameChipAsConstraint)
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
@@ -29,11 +30,10 @@ from pacman.exceptions import PacmanPlaceException
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def radial_placer(machine_graph, machine, plan_n_timesteps):
+def radial_placer(machine, plan_n_timesteps):
     """ A placement algorithm that can place a machine graph onto a\
         machine choosing chips radiating in a circle from the boot chip
 
-        :param MachineGraph machine_graph: The machine_graph to place
         :param ~spinn_machine.Machine machine:
             The machine with respect to which to partition the application
             graph
@@ -44,7 +44,7 @@ def radial_placer(machine_graph, machine, plan_n_timesteps):
             If something goes wrong with the placement
     """
     placer = _RadialPlacer()
-    return placer._run(machine_graph, machine, plan_n_timesteps)
+    return placer._run(machine, plan_n_timesteps)
 
 
 class _RadialPlacer(object):
@@ -52,9 +52,8 @@ class _RadialPlacer(object):
         machine choosing chips radiating in a circle from the boot chip
     """
 
-    def _run(self, machine_graph, machine, plan_n_timesteps):
+    def _run(self, machine, plan_n_timesteps):
         """
-        :param MachineGraph machine_graph: The machine_graph to place
         :param ~spinn_machine.Machine machine:
             The machine with respect to which to partition the application
             graph
@@ -64,6 +63,7 @@ class _RadialPlacer(object):
         :raise PacmanPlaceException:
             If something goes wrong with the placement
         """
+        machine_graph = PacmanDataView().runtime_machine_graph
         # check that the algorithm can handle the constraints
         self._check_constraints(machine_graph.vertices)
 

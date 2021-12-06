@@ -17,6 +17,7 @@ import random
 import unittest
 from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanAlreadyPlacedError
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.resources import ResourceContainer
@@ -56,14 +57,15 @@ class TestSameChipConstraint(unittest.TestCase):
 
         n_keys_map = DictBasedMachinePartitionNKeysMap()
 
+        PacmanDataWriter().set_runtime_machine_graph(graph)
         if placer == "ConnectiveBasedPlacer":
-            placements = connective_based_placer(graph, machine, None)
+            placements = connective_based_placer(machine, None)
         elif placer == "OneToOnePlacer":
-            placements = one_to_one_placer(graph, machine, None)
+            placements = one_to_one_placer(machine, None)
         elif placer == "RadialPlacer":
-            placements = radial_placer(graph, machine, None)
+            placements = radial_placer(machine, None)
         elif placer == "SpreaderPlacer":
-            placements = spreader_placer(graph, machine, n_keys_map, None)
+            placements = spreader_placer(machine, n_keys_map, None)
         else:
             raise NotImplementedError(placer)
 

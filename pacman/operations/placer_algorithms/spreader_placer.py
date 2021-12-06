@@ -18,6 +18,7 @@ import functools
 import math
 import sys
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.data import PacmanDataView
 from pacman.model.placements import Placement, Placements
 from pacman.operations.placer_algorithms.one_to_one_placer import (
     _OneToOnePlacer)
@@ -29,11 +30,10 @@ from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
 
 
-def spreader_placer(machine_graph, machine, n_keys_map, plan_n_timesteps):
+def spreader_placer(machine, n_keys_map, plan_n_timesteps):
     """ Places vertices on as many chips as available with a effort to\
         reduce the number of packets being received by the router in total.
 
-    :param MachineGraph machine_graph: the machine graph
     :param ~spinn_machine.Machine machine: the SpiNNaker machine
     :param AbstractMachinePartitionNKeysMap n_keys_map:
         the n keys from partition map
@@ -42,7 +42,7 @@ def spreader_placer(machine_graph, machine, n_keys_map, plan_n_timesteps):
     :rtype: Placements
     """
     placer = _SpreaderPlacer()
-    return placer._run(machine_graph, machine, n_keys_map, plan_n_timesteps)
+    return placer._run(machine, n_keys_map, plan_n_timesteps)
 
 
 class _SpreaderPlacer(_OneToOnePlacer):
@@ -72,9 +72,8 @@ class _SpreaderPlacer(_OneToOnePlacer):
     # 4. chip and core)
     STEPS = 4
 
-    def _run(self, machine_graph, machine, n_keys_map, plan_n_timesteps):
+    def _run(self, machine, n_keys_map, plan_n_timesteps):
         """
-        :param MachineGraph machine_graph: the machine graph
         :param ~spinn_machine.Machine machine: the SpiNNaker machine
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             the n keys from partition map
@@ -82,6 +81,7 @@ class _SpreaderPlacer(_OneToOnePlacer):
         :return: placements.
         :rtype: Placements
         """
+        machine_graph = PacmanDataView().runtime_machine_graph
         # create progress bar
         progress_bar = ProgressBar(
             (machine_graph.n_vertices * self.ITERATIONS) + self.STEPS,

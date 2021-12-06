@@ -66,9 +66,9 @@ def test_virtual_vertices_one_to_one():
     PacmanDataWriter().set_runtime_machine_graph(machine_graph)
     extended_machine = malloc_based_chip_id_allocator(machine)
 
+    PacmanDataWriter().set_runtime_machine_graph(machine_graph)
     # Do placements
-    placements = one_to_one_placer(
-        machine_graph, extended_machine, plan_n_timesteps=1000)
+    placements = one_to_one_placer(extended_machine, plan_n_timesteps=1000)
 
     # The virtual vertex should be on a virtual chip
     placement = placements.get_placement_of_vertex(virtual_vertex)
@@ -125,8 +125,8 @@ def test_one_to_one():
 
     # Do placements
     machine = virtual_machine(width=8, height=8)
-    placements = one_to_one_placer(
-        machine_graph, machine, plan_n_timesteps=1000)
+    PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+    placements = one_to_one_placer(machine, plan_n_timesteps=1000)
 
     # The 1-1 connected vertices should be on the same chip
     for chain in one_to_one_chains:
@@ -170,5 +170,6 @@ def test_sdram_links():
 
     # Do placements
     machine = virtual_machine(width=8, height=8)
+    PacmanDataWriter().set_runtime_machine_graph(machine_graph)
     with pytest.raises(PacmanException):
-        one_to_one_placer(machine_graph, machine, plan_n_timesteps=1000)
+        one_to_one_placer(machine, plan_n_timesteps=1000)

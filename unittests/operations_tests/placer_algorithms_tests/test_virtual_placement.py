@@ -41,13 +41,13 @@ def test_virtual_placement(placer):
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     if placer == "ConnectiveBasedPlacer":
-        placements = connective_based_placer(graph, machine, None)
+        placements = connective_based_placer(machine, None)
     elif placer == "OneToOnePlacer":
-        placements = one_to_one_placer(graph, machine, None)
+        placements = one_to_one_placer(machine, None)
     elif placer == "RadialPlacer":
-        placements = radial_placer(graph, machine, None)
+        placements = radial_placer(machine, None)
     elif placer == "SpreaderPlacer":
-        placements = spreader_placer(graph, machine, n_keys_map, None)
+        placements = spreader_placer(machine, n_keys_map, None)
     else:
         raise NotImplementedError(placer)
 
