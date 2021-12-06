@@ -102,7 +102,6 @@ class PacmanDataView(UtilsDataView):
     __pacman_data = _PacmanDataModel()
     __slots__ = []
 
-
     # graph methods
 
     @property

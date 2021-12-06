@@ -13,16 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import unittest
-from spinn_utilities.config_holder import set_config
-from spinn_utilities.data.data_status import Data_Status
-# hack do not copy
-from spinn_utilities.data.utils_data_writer import _UtilsDataModel
-from spinn_utilities.exceptions import (
-    DataNotYetAvialable, NotSetupException)
+from spinn_utilities.exceptions import (DataNotYetAvialable)
 from pacman.config_setup import unittest_setup
-from pacman.exceptions import PacmanConfigurationException
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 
@@ -46,6 +39,7 @@ class TestSimulatorData(unittest.TestCase):
         writer = PacmanDataWriter()
         writer.mock()
         # check there is a value not what it is
+        view.run_dir_path
 
     def test_graphs(self):
         view = PacmanDataView()

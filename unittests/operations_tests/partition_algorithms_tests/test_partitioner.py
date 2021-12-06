@@ -391,7 +391,8 @@ class TestPartitioner(unittest.TestCase):
             new_large_vertex.splitter_object = SplitterSliceLegacy()
             self.graph.add_vertices([constrained_vertex, new_large_vertex])
             PacmanDataWriter()._set_runtime_graph(self.graph)
-            graph, _ = splitter_partitioner(self.machine, plan_n_time_steps=100,
+            graph, _ = splitter_partitioner(
+                self.machine, plan_n_time_steps=100,
                 pre_allocated_resources=PreAllocatedResourceContainer())
             # split in 256 each, so 4 machine vertices
             self.assertEqual(len(list(graph.vertices)), 7)
