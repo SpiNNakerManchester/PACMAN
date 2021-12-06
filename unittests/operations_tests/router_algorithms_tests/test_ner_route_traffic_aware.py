@@ -19,6 +19,7 @@ from collections import deque
 from spinn_utilities.config_holder import set_config
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, MulticastEdgePartition, SimpleMachineVertex)
 from pacman.operations.router_algorithms import ner_route_traffic_aware
@@ -53,7 +54,8 @@ class TestNerRouteTrafficAware(unittest.TestCase):
             for vertex_to in vertices:
                 graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
-        routing_paths = ner_route_traffic_aware(graph, machine, placements)
+        PacmanDataWriter().set_runtime_machine_graph(graph)
+        routing_paths = ner_route_traffic_aware(machine, placements)
 
         for vertex in vertices:
             vertices_reached = set()

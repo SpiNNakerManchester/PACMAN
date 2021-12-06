@@ -17,6 +17,7 @@ import unittest
 from collections import deque
 
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.machine import MulticastEdgePartition
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.model.graphs.machine import (
@@ -53,8 +54,8 @@ class TestBasicDijkstraRouting(unittest.TestCase):
             for vertex_to in vertices:
                 if vertex != vertex_to:
                     graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
-
-        routing_paths = basic_dijkstra_routing(placements, machine, graph)
+        PacmanDataWriter().set_runtime_machine_graph(graph)
+        routing_paths = basic_dijkstra_routing(placements, machine)
 
         for vertex in vertices:
             vertices_reached = set()

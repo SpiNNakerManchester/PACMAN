@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
 from spinn_machine import virtual_machine
@@ -36,7 +37,8 @@ def test_ner_route_default():
     graph.add_edge(edge, "Test")
     partition = graph.get_outgoing_partition_for_edge(edge)
 
-    routes = ner_route(graph, machine, placements)
+    PacmanDataWriter().set_runtime_machine_graph(graph)
+    routes = ner_route(machine, placements)
 
     source_route = routes.get_entries_for_router(0, 0)[partition]
     assert(not source_route.defaultable)

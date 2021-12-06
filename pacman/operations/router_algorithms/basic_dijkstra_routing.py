@@ -17,6 +17,7 @@ import logging
 import sys
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.routing_table_by_partition import (
@@ -56,7 +57,7 @@ class _DijkstraInfo(object):
 
 
 def basic_dijkstra_routing(
-        placements, machine, machine_graph,
+        placements, machine,
         bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
     """ Find routes between the edges with the allocated information,
         placed in the given places
@@ -64,7 +65,6 @@ def basic_dijkstra_routing(
     :param Placements placements: The placements of the edges
     :param ~spinn_machine.Machine machine:
         The machine through which the routes are to be found
-    :param MachineGraph machine_graph: the machine_graph object
     :param bool use_progress_bar: whether to show a progress bar
     :return: The discovered routes
     :rtype: MulticastRoutingTables
@@ -72,7 +72,7 @@ def basic_dijkstra_routing(
         If something goes wrong with the routing
     """
     router = _BasicDijkstraRouting(machine, bw_per_route_entry, max_bw)
-    return router._run(placements, machine_graph)
+    return router._run(placements)
 
 
 class _BasicDijkstraRouting(object):
@@ -102,14 +102,13 @@ class _BasicDijkstraRouting(object):
         self._max_bw = max_bw
         self._machine = machine
 
-    def _run(self, placements, machine_graph):
+    def _run(self, placements):
         """ Find routes between the edges with the allocated information,
             placed in the given places
 
         :param Placements placements: The placements of the edges
         :param ~spinn_machine.Machine machine:
             The machine through which the routes are to be found
-        :param MachineGraph machine_graph: the machine_graph object
         :param bool use_progress_bar: whether to show a progress bar
         :return: The discovered routes
         :rtype: MulticastRoutingTables
@@ -126,18 +125,17 @@ class _BasicDijkstraRouting(object):
             placements.n_placements, "Creating routing entries")
 
         for placement in progress.over(placements.placements):
-            self._route(placement, placements, machine_graph,
-                        nodes_info, tables)
+            self._route(placement, placements, nodes_info, tables)
         return self._routing_paths
 
-    def _route(self, placement, placements, graph, node_info, tables):
+    def _route(self, placement, placements, node_info, tables):
         """
         :param Placement placement:
         :param Placements placements:
-        :param MachineGraph graph:
         :param dict(tuple(int,int),_NodeInfo) node_info:
         :param dict(tuple(int,int),_DijkstraInfo) tables:
         """
+        graph = PacmanDataView().runtime_machine_graph
         # pylint: disable=too-many-arguments
         out_going_edges = (
             edge
