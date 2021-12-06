@@ -13,10 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from pacman.data import PacmanDataView
 
-def splitter_reset(app_graph):
+
+def splitter_reset():
     """ Performs resetting of splitters to indicate a new phase of operation
     """
-    for vertex in app_graph.vertices:
+    for vertex in PacmanDataView().runtime_graph.vertices:
         if vertex.splitter is not None:
             vertex.splitter.reset_called()
