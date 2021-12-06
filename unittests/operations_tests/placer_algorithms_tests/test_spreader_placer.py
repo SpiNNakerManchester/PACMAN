@@ -74,7 +74,8 @@ def test_virtual_vertices_spreader():
 
     PacmanDataWriter().set_runtime_machine_graph(machine_graph)
     # Do placements
-    placements = spreader_placer(extended_machine, n_keys_map, plan_n_timesteps=1000)
+    placements = spreader_placer(
+        extended_machine, n_keys_map, plan_n_timesteps=1000)
 
     # The virtual vertex should be on a virtual chip
     placement = placements.get_placement_of_vertex(virtual_vertex)
