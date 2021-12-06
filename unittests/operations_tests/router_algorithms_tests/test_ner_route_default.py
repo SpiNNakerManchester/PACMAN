@@ -39,10 +39,13 @@ def test_ner_route_default():
 
     routes = ner_route(graph, machine, placements)
 
-    source_route = routes.get_entries_for_router(0, 0)[partition]
+    source_route = routes.get_entries_for_router(0, 0)[
+        partition.pre_vertex, partition.identifier]
     assert(not source_route.defaultable)
-    mid_route = routes.get_entries_for_router(0, 1)[partition]
+    mid_route = routes.get_entries_for_router(0, 1)[
+        partition.pre_vertex, partition.identifier]
     print(mid_route.incoming_link, mid_route.link_ids)
     assert(mid_route.defaultable)
-    end_route = routes.get_entries_for_router(0, 2)[partition]
+    end_route = routes.get_entries_for_router(0, 2)[
+        partition.pre_vertex, partition.identifier]
     assert(not end_route.defaultable)

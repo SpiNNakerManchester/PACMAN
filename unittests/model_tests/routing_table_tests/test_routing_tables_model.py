@@ -15,7 +15,6 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.model.graphs.machine import MulticastEdgePartition
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
@@ -26,6 +25,7 @@ from pacman.model.routing_table_by_partition import (
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from pacman.utilities import file_format_schemas
+from pacman.model.graphs.machine import SimpleMachineVertex
 
 
 class TestRoutingTable(unittest.TestCase):
@@ -190,22 +190,25 @@ class TestRoutingTable(unittest.TestCase):
 
     def test_multicast_routing_table_by_partition(self):
         mrt = MulticastRoutingTableByPartition()
-        partition = MulticastEdgePartition(None, "foo")
+        partition_id = "foo"
+        source_vertex = SimpleMachineVertex(resources=None)
         entry = MulticastRoutingTableByPartitionEntry(range(2), range(4))
-        mrt.add_path_entry(entry, 0, 0, partition)
+        mrt.add_path_entry(entry, 0, 0, source_vertex, partition_id)
         entry = MulticastRoutingTableByPartitionEntry(range(2, 4), range(4, 8))
-        mrt.add_path_entry(entry, 0, 0, partition)
+        mrt.add_path_entry(entry, 0, 0, source_vertex, partition_id)
         entry = MulticastRoutingTableByPartitionEntry(
             range(4, 6), range(8, 12))
-        mrt.add_path_entry(entry, 0, 0, partition)
+        mrt.add_path_entry(entry, 0, 0, source_vertex, partition_id)
         assert list(mrt.get_routers()) == [(0, 0)]
         assert len(mrt.get_entries_for_router(0, 0)) == 1
-        assert next(iter(mrt.get_entries_for_router(0, 0))) == partition
-        mre = mrt.get_entries_for_router(0, 0)[partition]
+        assert next(iter(mrt.get_entries_for_router(0, 0))) == (
+            source_vertex, partition_id)
+        mre = mrt.get_entries_for_router(0, 0)[source_vertex, partition_id]
         assert str(mre) == (
             "None:None:False:"
             "{0, 1, 2, 3, 4, 5}:{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}")
-        assert mre == mrt.get_entry_on_coords_for_edge(partition, 0, 0)
+        assert mre == mrt.get_entry_on_coords_for_edge(
+            source_vertex, partition_id, 0, 0)
 
     def test_multicast_routing_table_by_partition_entry(self):
         with self.assertRaises(PacmanInvalidParameterException):

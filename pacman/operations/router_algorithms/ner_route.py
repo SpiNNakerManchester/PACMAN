@@ -41,8 +41,8 @@ from .routing_tree import RoutingTree
 
 
 def _convert_a_route(
-        routing_tables, partition, incoming_processor, incoming_link,
-        partition_route):
+        routing_tables, source_vertex, partition_id, incoming_processor,
+        incoming_link, route):
     """
     Converts the algorithm specific partition_route back to standard spinnaker
     and ands it to the routing_tables.
@@ -53,14 +53,14 @@ def _convert_a_route(
         Partition this route applies to
     :param int or None incoming_processor: processor this link came from
     :param int or None incoming_link: link this link came from
-    :param RoutingTree partition_route: algorithm specific format of the route
+    :param RoutingTree route: algorithm specific format of the route
     """
-    x, y = partition_route.chip
+    x, y = route.chip
 
     next_hops = list()
     processor_ids = list()
     link_ids = list()
-    for (route, next_hop) in partition_route.children:
+    for (route, next_hop) in route.children:
         if route is not None:
             next_incoming_link = None
             if route >= 6:
@@ -74,11 +74,12 @@ def _convert_a_route(
 
     entry = MulticastRoutingTableByPartitionEntry(
         link_ids, processor_ids, incoming_processor, incoming_link)
-    routing_tables.add_path_entry(entry, x, y, partition)
+    routing_tables.add_path_entry(entry, x, y, source_vertex, partition_id)
 
     for next_hop, next_incoming_link in next_hops:
         _convert_a_route(
-            routing_tables, partition, None, next_incoming_link, next_hop)
+            routing_tables, source_vertex, partition_id, None,
+            next_incoming_link, next_hop)
 
 
 def _ner_net(src, destinations, machine, vector_to_nodes):
@@ -659,8 +660,8 @@ def _ner_route(machine_graph, machine, placements, vector_to_nodes):
             incoming_processor = placements.get_placement_of_vertex(
                 partition.pre_vertex).p
             _convert_a_route(
-                routing_tables, partition, incoming_processor, None,
-                routing_tree)
+                routing_tables, partition.pre_vertex, partition.identifier,
+                incoming_processor, None, routing_tree)
 
     progress_bar.end()
 

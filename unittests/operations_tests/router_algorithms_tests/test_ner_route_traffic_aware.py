@@ -63,13 +63,14 @@ class TestNerRouteTrafficAware(unittest.TestCase):
             partition = graph.get_outgoing_edge_partition_starting_at_vertex(
                 vertex, "Test")
             entry = routing_paths.get_entry_on_coords_for_edge(
-                partition, placement.x, placement.y)
+                partition.pre_vertex, partition.identifier,
+                placement.x, placement.y)
             self.assertEqual(entry.incoming_processor, placement.p)
             queue.append((placement.x, placement.y))
             while len(queue) > 0:
                 x, y = queue.pop()
                 entry = routing_paths.get_entry_on_coords_for_edge(
-                    partition, x, y)
+                    partition.pre_vertex, partition.identifier, x, y)
                 self.assertIsNotNone(entry)
                 chip = machine.get_chip_at(x, y)
                 for p in entry.processor_ids:

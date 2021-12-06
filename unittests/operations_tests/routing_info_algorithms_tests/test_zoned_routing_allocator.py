@@ -146,11 +146,12 @@ def check_masks_all_the_same(routing_info, mask):
     # for the maximum number of keys in total
     seen_keys = set()
     for r_info in routing_info:
-        assert(len(r_info.keys_and_masks) == 1)
-        assert(r_info.first_mask == mask or
-               r_info.machine_vertex.label == "RETINA")
-        assert(r_info.first_key not in seen_keys)
-        seen_keys.add(r_info.first_key)
+        if isinstance(r_info.machine_vertex, MachineVertex):
+            assert(len(r_info.keys_and_masks) == 1)
+            assert(r_info.first_mask == mask or
+                   r_info.machine_vertex.label == "RETINA")
+            assert(r_info.first_key not in seen_keys)
+            seen_keys.add(r_info.first_key)
 
 
 def check_fixed(m_vertex, part_id, key):
@@ -221,7 +222,7 @@ def test_fixed_only():
     app_graph = create_graphs_only_fixed()
     flexible_allocate(app_graph)
     routing_info = global_allocate(app_graph)
-    assert len(list(routing_info)) == 2
+    assert len(list(routing_info)) == 4
 
 
 def test_no_edge():

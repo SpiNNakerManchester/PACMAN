@@ -377,7 +377,8 @@ class _BasicDijkstraRouting(object):
                     out_going_links=routing_entry_route_links,
                     outgoing_processors=routing_entry_route_processors)
                 self._routing_paths.add_path_entry(
-                    entry, dest.x, dest.y, partition)
+                    entry, dest.x, dest.y, partition.pre_vertex,
+                    partition.identifier)
                 prev_entry = entry
 
         while tables[x, y].cost != 0:
@@ -452,7 +453,8 @@ class _BasicDijkstraRouting(object):
                     previous_entry.incoming_link = neighbour_index
                     # add entry for next hop going backwards into path
                     self._routing_paths.add_path_entry(
-                        entry, neighbour_xy[0], neighbour_xy[1], partition)
+                        entry, neighbour_xy[0], neighbour_xy[1],
+                        partition.pre_vertex, partition.identifier)
             previous_entry = entry
             made_an_entry = True
 
