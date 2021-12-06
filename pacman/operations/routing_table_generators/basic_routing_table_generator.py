@@ -46,15 +46,16 @@ def __create_routing_table(chip, partitions_in_table, routing_infos):
     :param ~spinn_machine.Chip chip:
     :param partitions_in_table:
     :type partitions_in_table:
-        dict(AbstractSingleSourcePartition,
+        dict(((ApplicationVertex or MachineVertex), str),
         MulticastRoutingTableByPartitionEntry)
     :param RoutingInfo routing_infos:
     :rtype: MulticastRoutingTable
     """
     table = UnCompressedMulticastRoutingTable(chip.x, chip.y)
-    for partition in partitions_in_table:
-        r_info = routing_infos.get_routing_info_from_partition(partition)
-        entry = partitions_in_table[partition]
+    for source_vertex, partition_id in partitions_in_table:
+        r_info = routing_infos.get_routing_info_from_pre_vertex(
+            source_vertex, partition_id)
+        entry = partitions_in_table[source_vertex, partition_id]
         for key_and_mask in r_info.keys_and_masks:
             table.add_multicast_routing_entry(
                 __create_entry(key_and_mask, entry))

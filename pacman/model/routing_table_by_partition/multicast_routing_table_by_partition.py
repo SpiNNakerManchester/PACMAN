@@ -21,21 +21,24 @@ class MulticastRoutingTableByPartition(object):
     """
 
     __slots__ = [
-        # dict mapping (x,y) -> dict mapping (partition) -> routing table entry
+        # dict mapping (x,y) -> dict mapping (source_vertex, partition_id))
+        # -> routing table entry
         "_router_to_entries_map"
     ]
 
     def __init__(self):
         self._router_to_entries_map = OrderedDict()
 
-    def add_path_entry(self, entry, router_x, router_y, partition):
+    def add_path_entry(
+            self, entry, router_x, router_y, source_vertex, partition_id):
         """ Adds a multicast routing path entry
 
         :param MulticastRoutingTableByPartitionEntry entry: the entry to add
         :param int router_x: the x coord of the router
         :param int router_y: the y coord of the router
-        :param AbstractSingleSourcePartition partition:\
-            the partition containing the machine edge
+        :param source_vertex: The source that will send via this entry
+        :type source_vertex: ApplicationVertex or MachineVertex
+        :param str partition_id: The id of the partition being sent
         """
 
         # update router_to_entries_map
@@ -43,11 +46,12 @@ class MulticastRoutingTableByPartition(object):
         if key not in self._router_to_entries_map:
             self._router_to_entries_map[key] = OrderedDict()
 
-        if partition not in self._router_to_entries_map[key]:
-            self._router_to_entries_map[key][partition] = entry
+        source_key = (source_vertex, partition_id)
+        if source_key not in self._router_to_entries_map[key]:
+            self._router_to_entries_map[key][source_key] = entry
         else:
-            self._router_to_entries_map[key][partition] = entry.merge_entry(
-                self._router_to_entries_map[key][partition])
+            self._router_to_entries_map[key][source_key] = entry.merge_entry(
+                self._router_to_entries_map[key][source_key])
 
     def get_routers(self):
         """ Get the coordinates of all stored routers
@@ -62,7 +66,7 @@ class MulticastRoutingTableByPartition(object):
         :param int router_x: the x coord of the router
         :param int router_y: the y coord of the router
         :return: all router_path_entries for the router.
-        :rtype: dict(AbstractSingleSourcePartition,\
+        :rtype: dict((ApplicationVertex or MachineVertex), str),\
             MulticastRoutingTableByPartitionEntry)
         """
         key = (router_x, router_y)
@@ -70,15 +74,16 @@ class MulticastRoutingTableByPartition(object):
             return ()
         return self._router_to_entries_map[key]
 
-    def get_entry_on_coords_for_edge(self, partition, router_x, router_y):
+    def get_entry_on_coords_for_edge(
+            self, source_vertex, partition_id, router_x, router_y):
         """ Get an entry from a specific coordinate
 
-        :param AbstractSingleSourcePartition partition:
+        :param source_vertex:
+        :type source_vertex: ApplicationVertex or MachineVertex
+        :param str partition_id:
         :param int router_x: the x coord of the router
         :param int router_y: the y coord of the router
         :rtype: MulticastRoutingTableByPartitionEntry or None
         """
         entries = self.get_entries_for_router(router_x, router_y)
-        if partition in entries:
-            return entries[partition]
-        return None
+        return entries.get((source_vertex, partition_id))

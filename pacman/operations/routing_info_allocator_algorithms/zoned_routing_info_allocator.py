@@ -149,6 +149,8 @@ class ZonedRoutingInfoAllocator(object):
                     if constraint.applies_to_partition(part.identifier):
                         for vert in part.pre_vertex.machine_vertices:
                             self.__add_fixed(part.identifier, vert, constraint)
+                        self.__add_fixed(
+                            part.identifier, part.pre_vertex, constraint)
                 else:
                     self.__check_constraint_supported(constraint)
 
@@ -307,10 +309,20 @@ class ZonedRoutingInfoAllocator(object):
                     key = app_part_index
                     key = (key << n_bits_machine) | machine_index
                     key = key << n_bits_atoms
-                    keys_and_masks = [BaseKeyAndMask(
-                        base_key=key, mask=mask)]
+                    keys_and_masks = [BaseKeyAndMask(base_key=key, mask=mask)]
                 routing_infos.add_routing_info(MachineVertexRoutingInfo(
                     keys_and_masks, partition.identifier, machine_vertex))
+
+            # Add application-level routing information
+            key = (partition.identifier, partition.pre_vertex)
+            if key in self.__fixed_partitions:
+                keys_and_masks = self.__fixed_partitions[key]
+            else:
+                key = app_part_index << (n_bits_atoms + n_bits_machine)
+                mask = self.__mask(n_bits_atoms + n_bits_machine)
+                keys_and_masks = [BaseKeyAndMask(key, mask)]
+            routing_infos.add_routing_info(MachineVertexRoutingInfo(
+                keys_and_masks, partition.identifier, partition.pre_vertex))
             app_part_index += 1
 
         return routing_infos
