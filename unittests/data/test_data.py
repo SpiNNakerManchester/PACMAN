@@ -18,6 +18,8 @@ from spinn_utilities.exceptions import (DataNotYetAvialable)
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
+from pacman.model.graphs.machine import (MachineGraph, SimpleMachineVertex)
+from pacman_test_objects import SimpleTestVertex
 
 
 class TestSimulatorData(unittest.TestCase):
@@ -87,3 +89,35 @@ class TestSimulatorData(unittest.TestCase):
             writer.runtime_graph
         with self.assertRaises(DataNotYetAvialable):
             writer.runtime_machine_graph()
+
+    def test_graph_support(self):
+        view = PacmanDataView()
+        writer = PacmanDataWriter()
+        writer.setup()
+        writer.create_graphs("test")
+        writer.start_run()
+        writer.clone_graphs()
+        app1 = SimpleTestVertex(12, "app1")
+        app2 = SimpleTestVertex(23, "app21")
+        app3 = SimpleTestVertex(33, "app3")
+        writer.runtime_graph.add_vertices([app1, app2, app3])
+        mach11 = SimpleMachineVertex("mach11",  app_vertex=app1)
+        mach12 = SimpleMachineVertex("mach12",  app_vertex=app1)
+        mach13 = SimpleMachineVertex("mach13",  app_vertex=app1)
+        mach21 = SimpleMachineVertex("mach21",  app_vertex=app2)
+        mach22 = SimpleMachineVertex("mach22",  app_vertex=app2)
+        mach31 = SimpleMachineVertex("mach31",  app_vertex=app3)
+        mg = MachineGraph(
+            label="my test", application_graph=writer.runtime_graph)
+        m_vertices = set([mach11, mach12, mach13, mach21, mach22, mach31])
+        mg.add_vertices(m_vertices)
+        writer.set_runtime_machine_graph(mg)
+        self.assertEqual(6, view.runtime_machine_graph.n_vertices)
+        self.assertEqual(6, view.runtime_n_machine_vertices)
+        self.assertEqual(6, view.runtime_n_machine_vertices2)
+        self.assertSetEqual(
+            m_vertices, set(view.runtime_machine_graph.vertices))
+        self.assertSetEqual(
+            m_vertices, set(view.runtime_machine_vertices))
+        self.assertSetEqual(
+            m_vertices, set(view.runtime_machine_vertices2))

@@ -189,7 +189,7 @@ class PacmanDataView(UtilsDataView):
             The graph returned by this method may be immutable depending on
             when it is called
 
-        :rtype: ApplicationGraph
+        :rtype: MachineGraph
         :raises SpinnFrontEndException:
             If the runtime_graph is currently unavailable, or if this method
             is used except during run
@@ -199,6 +199,40 @@ class PacmanDataView(UtilsDataView):
         if self.status not in [Data_Status.IN_RUN, Data_Status.MOCKED]:
             raise self._exception("runtime_machine_graph")
         return self.__pacman_data._runtime_machine_graph
+
+    @property
+    def runtime_n_machine_vertices(self):
+        """
+        The number of machine vertices in the runtime graph(s)
+
+         .. note::
+            This method can still exists without a machine_graph
+
+        :rtype: int
+        """
+        return self.runtime_machine_graph.n_vertices
+
+    @property
+    def runtime_n_machine_vertices2(self):
+        return sum(len(vertex.machine_vertices)
+                   for vertex in self.runtime_graph.vertices)
+
+    @property
+    def runtime_machine_vertices(self):
+        """
+        The machine vertices in the runtime graph(s)
+
+         .. note::
+            This method can still exists without a machine_graph
+
+        :rtype: iterator(MachineVertex)
+        """
+        return self.runtime_machine_graph.vertices
+
+    @property
+    def runtime_machine_vertices2(self):
+        for app_vertex in self.runtime_graph.vertices:
+            yield from app_vertex.machine_vertices
 
     @property
     def runtime_best_graph(self):
