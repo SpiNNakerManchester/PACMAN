@@ -31,7 +31,7 @@ def route_application_graph(machine, app_graph, placements):
 
         # Work out if there are internal edges
         is_internal = False
-        for edge in partition:
+        for edge in partition.edges:
             if edge.post_vertex == partition.pre_vertex:
                 is_internal = True
                 break
@@ -43,28 +43,35 @@ def route_application_graph(machine, app_graph, placements):
             contact_point, routing_tree_in = _route_internal_all_to_all(
                 routing_tables, partition.pre_vertex, machine, placements,
                 partition.identifier)
+            routing_trees_in[partition.pre_vertex] = routing_tree_in
 
         # Otherwise, pick a contact point and route all internal vertices to it
         # and from it
         else:
-            contact_point, routing_tree_in = _route_internal_to_from_point(
+            contact_point = _route_internal_to_from_point(
                 routing_tables, partition.pre_vertex, machine, placements,
                 partition.identifier)
 
         # Store for the next loop
         contact_points[partition.pre_vertex] = contact_point
-        routing_trees_in[partition.pre_vertex] = routing_tree_in
 
     # Now go through the app edges and route app vertex by app vertex
     for partition in app_graph.outgoing_edge_partitions:
         start = contact_points[edge.pre_vertex]
         for edge in partition.edges:
+            if edge.post_vertex not in contact_points:
+                contact_points[edge.post_vertex] = _find_contact_placement(
+                    edge.post_vertex, placements)
             end = contact_points[edge.post_vertex]
+            if end.vertex not in routing_trees_in:
+                routing_trees_in[end.vertex] = _do_route(
+                    end.vertex, edge.post_vertex.machine_vertices, machine,
+                    placements, _longest_dimension_first)
             _route_from_to(
-                start.vertex, partition.identifier, [end], machine, placements,
-                routing_tables)
+                start.vertex, partition.identifier, [end.vertex], machine,
+                placements, routing_tables)
             _convert_a_route(
-                routing_tables, start.vertex, partition.id, None, None,
+                routing_tables, start.vertex, partition.identifier, None, None,
                 routing_trees_in[end.vertex])
 
     # Return the routing tables
@@ -75,27 +82,36 @@ def _route_internal_all_to_all(
         routing_tables, app_vertex, machine, placements, partition_id):
     # Route everything all-to-all
     max_placement = None
+    max_routing_tree = None
     for source_vertex in app_vertex.machine_vertices:
-        placement = _route_from_to(
-            source_vertex, partition_id, app_vertex.machine_vertices,
-            machine, placements, routing_tables)
+        routing_tree, placement = _route_from_to(
+            source_vertex, partition_id, app_vertex.machine_vertices, machine,
+            placements, routing_tables)
         if max_placement is None:
             max_placement = placement
+            max_routing_tree = routing_tree
         elif max_placement.x < placement.x or max_placement.y < placement.y:
             max_placement = placement
+            max_routing_tree = routing_tree
 
-    # Keep the routing from the connection point to the vertices for later use
-    routing_tree_in = _do_route(
-        max_placement.vertex, app_vertex.machine_vertices, machine, placements,
-        _longest_dimension_first)
-
-    return max_placement, routing_tree_in
+    return max_placement, max_routing_tree
 
 
 def _route_internal_to_from_point(
         routing_tables, app_vertex, machine, placements, partition_id):
 
     # Find a place to route to/from
+    contact_placement = _find_contact_placement(app_vertex, placements)
+    for source_vertex in app_vertex.machine_vertices:
+        # Do the routing from the sources to the connection point
+        _route_from_to(
+            source_vertex, partition_id, [contact_placement.vertex], machine,
+            placements, routing_tables)
+
+    return contact_placement
+
+
+def _find_contact_placement(app_vertex, placements):
     max_placement = None
     for source_vertex in app_vertex.machine_vertices:
         placement = placements.get_placement_of_vertex(source_vertex)
@@ -103,19 +119,7 @@ def _route_internal_to_from_point(
             max_placement = placement
         elif max_placement.x < placement.x or max_placement.y < placement.y:
             max_placement = placement
-
-    for source_vertex in app_vertex.machine_vertices:
-        # Do the routing from the sources to the connection point
-        _route_from_to(
-            source_vertex, partition_id, [max_placement.vertex], machine,
-            placements, routing_tables)
-
-    # Keep the routing from the connection point to the vertices for later use
-    routing_tree_in = _do_route(
-        max_placement.vertex, app_vertex.machine_vertices, machine, placements,
-        _longest_dimension_first)
-
-    return max_placement, routing_tree_in
+    return max_placement
 
 
 def _route_from_to(
@@ -128,4 +132,4 @@ def _route_from_to(
     _convert_a_route(
         routing_tables, source_vertex, partition_id, placement.p, None,
         routing_tree)
-    return placement
+    return routing_tree, placement
