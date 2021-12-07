@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from spinn_utilities.exceptions import (DataNotYetAvialable)
+from spinn_utilities.exceptions import (DataLocked, DataNotYetAvialable)
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
@@ -65,9 +65,9 @@ class TestSimulatorData(unittest.TestCase):
             writer.runtime_machine_graph()
 
         writer.clone_graphs()
-        with self.assertRaises(DataNotYetAvialable):
+        with self.assertRaises(DataLocked):
             writer.runtime_graph
-        with self.assertRaises(DataNotYetAvialable):
+        with self.assertRaises(DataLocked):
             writer.runtime_machine_graph()
 
         writer.start_run()
@@ -77,17 +77,17 @@ class TestSimulatorData(unittest.TestCase):
         writer.get_graph()
         writer.get_machine_graph()
         # The view does not while in run mode
-        with self.assertRaises(DataNotYetAvialable):
+        with self.assertRaises(DataLocked):
             view.graph
-        with self.assertRaises(DataNotYetAvialable):
+        with self.assertRaises(DataLocked):
             view.machine_graph
 
         writer.finish_run()
         writer.graph
         writer.machine_graph
-        with self.assertRaises(DataNotYetAvialable):
+        with self.assertRaises(DataLocked):
             writer.runtime_graph
-        with self.assertRaises(DataNotYetAvialable):
+        with self.assertRaises(DataLocked):
             writer.runtime_machine_graph()
 
     def test_graph_support(self):

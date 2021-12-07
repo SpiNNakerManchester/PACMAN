@@ -15,6 +15,7 @@
 
 from spinn_utilities.data.data_status import Data_Status
 from spinn_utilities.data import UtilsDataView
+from spinn_utilities.exceptions import DataLocked
 
 
 class _PacmanDataModel(object):
@@ -115,7 +116,7 @@ class PacmanDataView(UtilsDataView):
         Changes to this graph will only affect the next run
 
         :rtype: ApplicationGraph
-        :raises SpinnFrontEndException:
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable, or if this method
             is used during run
         """
@@ -123,7 +124,7 @@ class PacmanDataView(UtilsDataView):
             raise self._exception("graph")
         # The writer overrides this method without this safety
         if self.status == Data_Status.IN_RUN:
-            raise self._exception("graph")
+            raise DataLocked("graph", self.status)
         return self.__pacman_data._graph
 
     @property
@@ -136,7 +137,7 @@ class PacmanDataView(UtilsDataView):
        Changes to this graph will only affect the next run
 
         :rtype: MachineGraph
-        :raises SpinnFrontEndException:
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the machine_graph is currently unavailable, or if this method
             is used during run
         """
@@ -144,7 +145,7 @@ class PacmanDataView(UtilsDataView):
             raise self._exception("machine_graph")
         # The writer overrides this method without this safety
         if self.status == Data_Status.IN_RUN:
-            raise self._exception("machine_graph")
+            raise DataLocked("machine_graph", self.status)
         return self.__pacman_data._machine_graph
 
     @property
@@ -164,14 +165,14 @@ class PacmanDataView(UtilsDataView):
             when it is called
 
         :rtype: ApplicationGraph
-        :raises SpinnFrontEndException:
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the runtime_graph is currently unavailable, or if this method
             is used except during run
         """
         if self.__pacman_data._runtime_graph is None:
             raise self._exception("runtime_graph")
         if self.status not in [Data_Status.IN_RUN, Data_Status.MOCKED]:
-            raise self._exception("runtime_graph")
+            raise DataLocked("runtime_graph", self.status)
         return self.__pacman_data._runtime_graph
 
     @property
@@ -190,14 +191,14 @@ class PacmanDataView(UtilsDataView):
             when it is called
 
         :rtype: MachineGraph
-        :raises SpinnFrontEndException:
+        :raises SpiNNUtilsException:
             If the runtime_graph is currently unavailable, or if this method
             is used except during run
         """
         if self.__pacman_data._runtime_machine_graph is None:
             raise self._exception("runtime_machine_graph")
         if self.status not in [Data_Status.IN_RUN, Data_Status.MOCKED]:
-            raise self._exception("runtime_machine_graph")
+            raise DataLocked("runtime_machine_graph", self.status)
         return self.__pacman_data._runtime_machine_graph
 
     @property
@@ -251,7 +252,7 @@ class PacmanDataView(UtilsDataView):
             when it is called
 
         :rtype: ApplicationGraph or MachineGraph
-        :raises SpinnFrontEndException:
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the runtime_graph is currently unavailable, or if this method
             is used except during run
         """
