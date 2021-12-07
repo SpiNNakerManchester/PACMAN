@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from spinn_utilities.data.utils_data_writer import UtilsDataWriter
 from spinn_utilities.log import FormatAdapter
+from spinn_machine.data.machine_data_writer import MachineDataWriter
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph
 from pacman.exceptions import PacmanConfigurationException
@@ -27,7 +27,7 @@ __temp_dir = None
 REPORTS_DIRNAME = "reports"
 
 
-class PacmanDataWriter(UtilsDataWriter, PacmanDataView):
+class PacmanDataWriter(MachineDataWriter, PacmanDataView):
     """
     Writer class for the Fec Data
 
@@ -49,7 +49,7 @@ class PacmanDataWriter(UtilsDataWriter, PacmanDataView):
         Unittest that depend on a specific value should call mock and then
         set that value.
         """
-        UtilsDataWriter.mock(self)
+        MachineDataWriter.mock(self)
         self.__pacman_data._clear()
 
     def setup(self):
@@ -57,15 +57,15 @@ class PacmanDataWriter(UtilsDataWriter, PacmanDataView):
         Puts all data back into the state expected at sim.setup time
 
         """
-        UtilsDataWriter.setup(self)
+        MachineDataWriter.setup(self)
         self.__pacman_data._clear()
 
     def hard_reset(self):
-        UtilsDataWriter.hard_reset(self)
+        MachineDataWriter.hard_reset(self)
         self.__pacman_data._hard_reset()
 
     def soft_reset(self):
-        UtilsDataWriter.soft_reset(self)
+        MachineDataWriter.soft_reset(self)
         self.__pacman_data._soft_reset()
 
     def get_graph(self):

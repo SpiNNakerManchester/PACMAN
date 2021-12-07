@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.data.data_status import Data_Status
-from spinn_utilities.data import UtilsDataView
 from spinn_utilities.exceptions import DataLocked
+from spinn_machine.data import MachineDataView
 
 
 class _PacmanDataModel(object):
@@ -75,7 +75,7 @@ class _PacmanDataModel(object):
         # Holder for any later additions
 
 
-class PacmanDataView(UtilsDataView):
+class PacmanDataView(MachineDataView):
     """
     A read only view of the data available at Pacman level
 
