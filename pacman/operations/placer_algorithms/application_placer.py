@@ -14,7 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.model.placements import Placements, Placement
-from pacman.exceptions import PacmanPlaceException
+from pacman.exceptions import (
+    PacmanPlaceException, PacmanConfigurationException)
+from pacman.utilities.utility_calls import locate_constraints_of_type
+from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from spinn_utilities.ordered_set import OrderedSet
 from .radial_placer import generate_radial_chips
 
@@ -44,6 +47,9 @@ def place_application_graph(
             sdram = sdram.get_total_sdram(plan_n_timesteps)
             n_cores = len(vertices)
 
+            if _do_constraints(vertices, placements):
+                continue
+
             # If we can't use the next chip, use the next one after
             if not next_chip.is_space(n_cores, sdram):
                 try:
@@ -62,6 +68,28 @@ def place_application_graph(
             _place_on_chip(placements, vertices, sdram, next_chip)
 
     return placements
+
+
+def _do_constraints(vertices, placements):
+    x = None
+    y = None
+    for vertex in vertices:
+        constraints = locate_constraints_of_type(
+            vertex.constraints, ChipAndCoreConstraint)
+        for constraint in constraints:
+            if ((x is not None and constraint.x != x) or
+                    (y is not None and constraint.y != y)):
+                raise PacmanConfigurationException(
+                    "Multiple conflicting constraints!")
+            x = constraint.x
+            y = constraint.y
+    if x is not None or y is not None:
+        next_core = placements.n_placements_on_chip(x, y) + 1
+        for vertex in vertices:
+            placements.add_placement(Placement(vertex, x, y, next_core))
+            next_core += 1
+        return True
+    return False
 
 
 def _place_on_chip(placements, vertices, sdram, chip):
