@@ -24,7 +24,7 @@ from pacman.exceptions import PacmanNotFoundError
 _BOARD_PORTS = range(17896, 18000)
 
 # The set of tags available on any chip
-_CHIP_TAGS = range(8)
+_CHIP_TAGS = range(1, 8)
 
 
 _Task = namedtuple("_Task", "constraint, board, tag, vertex, placement")
