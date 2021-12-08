@@ -109,7 +109,7 @@ def __find_free_tag(machine, tags_available):
         if tags_on_chip:
             tag = tags_on_chip.pop()
             return eth_chip, tag
-    raise PacmanNotFoundError(f"Out of tags!")
+    raise PacmanNotFoundError("Out of tags!")
 
 
 def __create_tag(eth_chip, placement, iptag, tag):
