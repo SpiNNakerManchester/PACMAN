@@ -123,7 +123,7 @@ class PacmanDataView(UtilsDataView):
         if self.__pacman_data._graph is None:
             raise self._exception("graph")
         # The writer overrides this method without this safety
-        if self.status == Data_Status.IN_RUN:
+        if self.status in [Data_Status.IN_RUN, Data_Status.STOPPING]:
             raise DataLocked("graph", self.status)
         return self.__pacman_data._graph
 
@@ -144,7 +144,7 @@ class PacmanDataView(UtilsDataView):
         if self.__pacman_data._machine_graph is None:
             raise self._exception("machine_graph")
         # The writer overrides this method without this safety
-        if self.status == Data_Status.IN_RUN:
+        if self.status in [Data_Status.IN_RUN, Data_Status.STOPPING]:
             raise DataLocked("machine_graph", self.status)
         return self.__pacman_data._machine_graph
 
@@ -171,7 +171,8 @@ class PacmanDataView(UtilsDataView):
         """
         if self.__pacman_data._runtime_graph is None:
             raise self._exception("runtime_graph")
-        if self.status not in [Data_Status.IN_RUN, Data_Status.MOCKED]:
+        if self.status not in [
+                Data_Status.IN_RUN, Data_Status.MOCKED, Data_Status.STOPPING]:
             raise DataLocked("runtime_graph", self.status)
         return self.__pacman_data._runtime_graph
 
@@ -197,7 +198,8 @@ class PacmanDataView(UtilsDataView):
         """
         if self.__pacman_data._runtime_machine_graph is None:
             raise self._exception("runtime_machine_graph")
-        if self.status not in [Data_Status.IN_RUN, Data_Status.MOCKED]:
+        if self.status not in [
+                Data_Status.IN_RUN, Data_Status.MOCKED, Data_Status.STOPPING]:
             raise DataLocked("runtime_machine_graph", self.status)
         return self.__pacman_data._runtime_machine_graph
 
