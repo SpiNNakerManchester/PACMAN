@@ -90,6 +90,26 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataLocked):
             writer.runtime_machine_graph()
 
+        writer.stopping()
+        writer.runtime_graph
+        writer.runtime_machine_graph
+        # the writer still has access to the user graphs
+        writer.get_graph()
+        writer.get_machine_graph()
+        # The view does not while in run mode
+        with self.assertRaises(DataLocked):
+            view.graph
+        with self.assertRaises(DataLocked):
+            view.machine_graph
+
+        writer.shut_down()
+        writer.graph
+        writer.machine_graph
+        with self.assertRaises(DataLocked):
+            writer.runtime_graph
+        with self.assertRaises(DataLocked):
+            writer.runtime_machine_graph()
+
     def test_graph_support(self):
         view = PacmanDataView()
         writer = PacmanDataWriter()
