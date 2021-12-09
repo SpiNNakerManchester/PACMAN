@@ -74,6 +74,12 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
     def get_machine_graph(self):
         return self.__pacman_data._machine_graph
 
+    def get_runtime_graph(self):
+        return self.__pacman_data._runtime_graph
+
+    def get_runtime_machine_graph(self):
+        return self.__pacman_data._runtime_machine_graph
+
     def create_graphs(self, graph_label):
         """
         Creates the user/ original graphs based on the label
