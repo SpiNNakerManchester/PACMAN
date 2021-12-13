@@ -39,6 +39,7 @@ class _PacmanDataModel(object):
         # Data values cached
         "_graph",
         "_machine_graph",
+        "_routing_infos",
         "_runtime_graph",
         "_runtime_machine_graph",
     ]
@@ -66,6 +67,7 @@ class _PacmanDataModel(object):
         """
         self._runtime_graph = None
         self._runtime_machine_graph = None
+        self._routing_infos = None
         self._soft_reset()
 
     def _soft_reset(self):
@@ -268,3 +270,17 @@ class PacmanDataView(MachineDataView):
         if self.runtime_machine_graph.n_vertices:
             return self.runtime_machine_graph
         return self.runtime_graph
+
+    # routing_infos
+
+    @ property
+    def routing_infos(self):
+        """
+        The routing_infos if known
+
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the routing_infos is currently unavailable
+        """
+        if self.__pacman_data._routing_infos is None:
+            raise self._exception("routing_infos")
+        return self.__pacman_data._routing_infos

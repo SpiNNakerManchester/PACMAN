@@ -19,6 +19,7 @@ from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.machine import (MachineGraph, SimpleMachineVertex)
+from pacman.model.routing_info import RoutingInfo
 from pacman_test_objects import SimpleTestVertex
 
 
@@ -150,3 +151,15 @@ class TestSimulatorData(unittest.TestCase):
             m_vertices, set(view.runtime_machine_vertices))
         self.assertSetEqual(
             m_vertices, set(view.runtime_machine_vertices2))
+
+    def test_routing_infos(self):
+        view = PacmanDataView()
+        writer = PacmanDataWriter()
+        writer.setup()
+        with self.assertRaises(DataNotYetAvialable):
+            view.routing_infos
+        info = RoutingInfo()
+        writer.set_routing_infos(info)
+        self.assertEqual(info, view.routing_infos)
+        with self.assertRaises(TypeError):
+            writer.set_routing_infos("Bacon")
