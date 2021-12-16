@@ -103,7 +103,7 @@ class TestSimulatorData(unittest.TestCase):
         # the writer still has access to the user graphs
         writer.get_graph()
         writer.get_machine_graph()
-        # The view does not while in run mode
+        # The view does not while in stopping mode
         with self.assertRaises(DataLocked):
             view.graph
         with self.assertRaises(DataLocked):
