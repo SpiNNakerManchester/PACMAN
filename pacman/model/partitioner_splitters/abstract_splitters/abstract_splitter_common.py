@@ -192,7 +192,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_in_coming_vertices(self, outgoing_edge_partition, pre_m_vertex):
+    def get_in_coming_vertices(self, outgoing_edge_partition):
         """ Get machine post vertices
 
         The input vertices are the ones that will serve as dest vertices
@@ -201,7 +201,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         :param outgoing_edge_partition: application outgoing edge partition
         :type outgoing_edge_partition:
             ~pacman.model.graphs.OutgoingEdgePartition
-        :param MachineVertex pre_m_vertex: source machine vertex
         :rtype: list(MachineVertex)
         """
 
