@@ -94,9 +94,6 @@ class AbstractEdgePartition(ConstrainedObject, metaclass=AbstractBase):
         if graph_code != self._graph_code:
             raise PacmanConfigurationException(
                 "Only one graph should add edges")
-        if self._graph_code is None:
-            raise PacmanConfigurationException(
-                "Only Graphs can add edges to partitions")
 
         # Check for an incompatible edge
         if not isinstance(edge, self._allowed_edge_types):
