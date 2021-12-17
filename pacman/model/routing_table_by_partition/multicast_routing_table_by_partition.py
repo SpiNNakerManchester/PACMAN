@@ -60,6 +60,14 @@ class MulticastRoutingTableByPartition(object):
         """
         return iter(self._router_to_entries_map.keys())
 
+    @property
+    def n_routers(self):
+        """ Get the number of routers stored
+
+        :rtype: int
+        """
+        return len(self._router_to_entries_map)
+
     def get_entries_for_router(self, router_x, router_y):
         """ Get the set of multicast path entries assigned to this router
 

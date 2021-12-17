@@ -20,7 +20,7 @@ from pacman.model.routing_tables import (
 
 
 def basic_routing_table_generator(
-        routing_infos, routing_table_by_partitions, machine):
+        routing_infos, routing_table_by_partitions):
     """
      An basic algorithm that can produce routing tables
 
@@ -29,21 +29,21 @@ def basic_routing_table_generator(
     :param ~spinn_machine.Machine machine:
     :rtype: MulticastRoutingTables
     """
-    progress = ProgressBar(machine.n_chips, "Generating routing tables")
+    progress = ProgressBar(
+        routing_table_by_partitions.n_routers, "Generating routing tables")
     routing_tables = MulticastRoutingTables()
-    for chip in progress.over(machine.chips):
-        partitions_in_table = routing_table_by_partitions.\
-            get_entries_for_router(chip.x, chip.y)
-        if partitions_in_table:
-            routing_tables.add_routing_table(__create_routing_table(
-                chip, partitions_in_table, routing_infos))
+    for x, y in progress.over(routing_table_by_partitions.get_routers()):
+        parts = routing_table_by_partitions.get_entries_for_router(x, y)
+        routing_tables.add_routing_table(__create_routing_table(
+            x, y, parts, routing_infos))
 
     return routing_tables
 
 
-def __create_routing_table(chip, partitions_in_table, routing_infos):
+def __create_routing_table(x, y, partitions_in_table, routing_infos):
     """
-    :param ~spinn_machine.Chip chip:
+    :param int x:
+    :param int y:
     :param partitions_in_table:
     :type partitions_in_table:
         dict(((ApplicationVertex or MachineVertex), str),
@@ -51,7 +51,7 @@ def __create_routing_table(chip, partitions_in_table, routing_infos):
     :param RoutingInfo routing_infos:
     :rtype: MulticastRoutingTable
     """
-    table = UnCompressedMulticastRoutingTable(chip.x, chip.y)
+    table = UnCompressedMulticastRoutingTable(x, y)
     for source_vertex, partition_id in partitions_in_table:
         r_info = routing_infos.get_routing_info_from_pre_vertex(
             source_vertex, partition_id)
