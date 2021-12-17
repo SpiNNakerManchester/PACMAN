@@ -19,8 +19,34 @@ from pacman.model.graphs.application import (
     ApplicationGraph, ApplicationEdge, ApplicationVertex)
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.model.partitioner_splitters.abstract_splitters import (
+    AbstractSplitterCommon)
 from pacman.model.constraints.key_allocator_constraints \
     import FixedKeyAndMaskConstraint
+
+
+class TestSplitter(AbstractSplitterCommon):
+
+    def create_machine_vertices(self, chip_counter):
+        return 1
+
+    def get_out_going_vertices(self, outgoing_edge_partition):
+        return self._governed_app_vertex.machine_vertices
+
+    def get_in_coming_vertices(self, outgoing_edge_partition):
+        return self._governed_app_vertex.machine_vertices
+
+    def machine_vertices_for_recording(self, variable_to_record):
+        return list(self._governed_app_vertex.machine_vertices)
+
+    def get_out_going_slices(self):
+        return [m.slice for m in self._governed_app_vertex.machine_vertices]
+
+    def get_in_coming_slices(self):
+        return [m.slice for m in self._governed_app_vertex.machine_vertices]
+
+    def reset_called(self):
+        pass
 
 
 class TestAppVertex(ApplicationVertex):
@@ -51,12 +77,12 @@ class TestMacVertex(MachineVertex):
 def create_graphs1(with_fixed):
     app_graph = ApplicationGraph("Test")
     # An output vertex to aim things at (to make keys required)
-    out_app_vertex = TestAppVertex()
+    out_app_vertex = TestAppVertex(splitter=TestSplitter())
     app_graph.add_vertex(out_app_vertex)
     # Create 5 application vertices (3 bits)
     app_vertices = list()
     for app_index in range(5):
-        app_vertices.append(TestAppVertex())
+        app_vertices.append(TestAppVertex(splitter=TestSplitter()))
     app_graph.add_vertices(app_vertices)
 
     # An output vertex to aim things at (to make keys required)
@@ -99,9 +125,9 @@ def create_graphs1(with_fixed):
 def create_graphs_only_fixed():
     app_graph = ApplicationGraph("Test")
     # An output vertex to aim things at (to make keys required)
-    out_app_vertex = TestAppVertex()
+    out_app_vertex = TestAppVertex(splitter=TestSplitter())
     app_graph.add_vertex(out_app_vertex)
-    app_vertex = TestAppVertex()
+    app_vertex = TestAppVertex(splitter=TestSplitter())
     app_graph.add_vertex(app_vertex)
 
     # An output vertex to aim things at (to make keys required)
@@ -126,9 +152,9 @@ def create_graphs_only_fixed():
 
 def create_graphs_no_edge():
     app_graph = ApplicationGraph("Test")
-    out_app_vertex = TestAppVertex()
+    out_app_vertex = TestAppVertex(splitter=TestSplitter())
     app_graph.add_vertex(out_app_vertex)
-    app_vertex = TestAppVertex()
+    app_vertex = TestAppVertex(splitter=TestSplitter())
     app_graph.add_vertex(app_vertex)
 
     # An output vertex to aim things at (to make keys required)
@@ -251,13 +277,14 @@ def create_big(with_fixed):
     # This test shows how easy it is to trip up the allocator with a retina
     app_graph = ApplicationGraph("Test")
     # Create a single "big" vertex
-    big_app_vertex = TestAppVertex(label="Retina")
+    big_app_vertex = TestAppVertex(label="Retina", splitter=TestSplitter())
     app_graph.add_vertex(big_app_vertex)
     # Create a single output vertex (which won't send)
-    out_app_vertex = TestAppVertex(label="Destination")
+    out_app_vertex = TestAppVertex(
+        label="Destination", splitter=TestSplitter())
     app_graph.add_vertex(out_app_vertex)
     # Create a load of middle vertex
-    mid_app_vertex = TestAppVertex(label="Population")
+    mid_app_vertex = TestAppVertex(label="Population", splitter=TestSplitter())
     app_graph.add_vertex(mid_app_vertex)
 
     app_graph.add_edge(ApplicationEdge(big_app_vertex, mid_app_vertex), "Test")

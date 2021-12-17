@@ -205,7 +205,8 @@ class ZonedRoutingInfoAllocator(object):
         # search for size of regions
         partitions = self.__app_graph.outgoing_edge_partitions
         for partition in progress.over(partitions):
-            machine_vertices = partition.pre_vertex.machine_vertices
+            splitter = partition.pre_vertex.splitter
+            machine_vertices = splitter.get_out_going_vertices(partition)
             for machine_vertex in machine_vertices:
                 max_keys = 0
                 if ((partition.identifier, machine_vertex) not in
@@ -285,7 +286,8 @@ class ZonedRoutingInfoAllocator(object):
             while app_part_index in self.__fixed_used:
                 app_part_index += 1
             # Get a list of machine vertices ordered by pre-slice
-            machine_vertices = list(partition.pre_vertex.machine_vertices)
+            splitter = partition.pre_vertex.splitter
+            machine_vertices = list(splitter.get_out_going_vertices(partition))
             machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
             n_bits_atoms = self.__atom_bits_per_app_part[partition]
             if self.__flexible:
