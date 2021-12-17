@@ -15,7 +15,6 @@
 
 import random
 import unittest
-from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanAlreadyPlacedError
@@ -35,7 +34,6 @@ class TestSameChipConstraint(unittest.TestCase):
         unittest_setup()
 
     def _do_test(self, placer):
-        machine = virtual_machine(width=8, height=8)
         graph = MachineGraph("Test")
 
         vertices = [
@@ -69,13 +67,13 @@ class TestSameChipConstraint(unittest.TestCase):
 
         PacmanDataWriter().set_runtime_machine_graph(graph)
         if placer == "ConnectiveBasedPlacer":
-            placements = connective_based_placer(machine, None)
+            placements = connective_based_placer(None)
         elif placer == "OneToOnePlacer":
-            placements = one_to_one_placer(machine, None)
+            placements = one_to_one_placer(None)
         elif placer == "RadialPlacer":
-            placements = radial_placer(machine, None)
+            placements = radial_placer(None)
         elif placer == "SpreaderPlacer":
-            placements = spreader_placer(machine, n_keys_map, None)
+            placements = spreader_placer(n_keys_map, None)
         else:
             raise NotImplementedError(placer)
         for edge in sdram_edges:

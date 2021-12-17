@@ -30,13 +30,10 @@ from pacman.exceptions import PacmanPlaceException
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def radial_placer(machine, plan_n_timesteps):
+def radial_placer(plan_n_timesteps):
     """ A placement algorithm that can place a machine graph onto a\
         machine choosing chips radiating in a circle from the boot chip
 
-        :param ~spinn_machine.Machine machine:
-            The machine with respect to which to partition the application
-            graph
         :param int plan_n_timesteps: number of timesteps to plan for
         :return: A set of placements
         :rtype: Placements
@@ -44,7 +41,7 @@ def radial_placer(machine, plan_n_timesteps):
             If something goes wrong with the placement
     """
     placer = _RadialPlacer()
-    return placer._run(machine, plan_n_timesteps)
+    return placer._run(plan_n_timesteps)
 
 
 class _RadialPlacer(object):
@@ -52,11 +49,8 @@ class _RadialPlacer(object):
         machine choosing chips radiating in a circle from the boot chip
     """
 
-    def _run(self, machine, plan_n_timesteps):
+    def _run(self, plan_n_timesteps):
         """
-        :param ~spinn_machine.Machine machine:
-            The machine with respect to which to partition the application
-            graph
         :param int plan_n_timesteps: number of timesteps to plan for
         :return: A set of placements
         :rtype: Placements
@@ -74,13 +68,13 @@ class _RadialPlacer(object):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps, self._generate_radial_chips(machine))
+            plan_n_timesteps, self._generate_radial_chips())
         vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         all_vertices_placed = set()
         for vertex in progress.over(vertices):
             if vertex not in all_vertices_placed:
                 vertices_placed = self._place_vertex(
-                    vertex, resource_tracker, machine, placements,
+                    vertex, resource_tracker, placements,
                     vertices_on_same_chip, machine_graph)
                 all_vertices_placed.update(vertices_placed)
         return placements
@@ -96,12 +90,11 @@ class _RadialPlacer(object):
             vertices, additional_placement_constraints=placement_constraints)
 
     def _place_vertex(
-            self, vertex, resource_tracker, machine, placements,
+            self, vertex, resource_tracker, placements,
             vertices_on_same_chip, machine_graph):
         """
         :param MachineVertex vertex:
         :param ResourceTracker resource_tracker:
-        :param ~spinn_machine.Machine machine:
         :param Placements placements:
         :param vertices_on_same_chip:
         :type vertices_on_same_chip: dict(MachineVertex, set(MachineVertex))
@@ -117,7 +110,7 @@ class _RadialPlacer(object):
         chips = None
         if start_x is not None and start_y is not None:
             chips = self._generate_radial_chips(
-                machine, resource_tracker, start_x, start_y)
+                resource_tracker, start_x, start_y)
 
         if len(vertices) > 1:
             assigned_values = \
@@ -156,12 +149,10 @@ class _RadialPlacer(object):
 
     @staticmethod
     def _generate_radial_chips(
-            machine, resource_tracker=None, start_chip_x=None,
-            start_chip_y=None):
+            resource_tracker=None, start_chip_x=None, start_chip_y=None):
         """ Generates the list of chips from a given starting point in a radial\
             format.
 
-        :param ~spinn_machine.Machine machine: the SpiNNaker machine object
         :param resource_tracker:
             the resource tracker object which contains what resources of the
             machine have currently been used
@@ -175,7 +166,7 @@ class _RadialPlacer(object):
         :return: list of chips.
         :rtype: iterable(tuple(int,int))
         """
-
+        machine = PacmanDataView().machine
         if start_chip_x is None or start_chip_y is None:
             first_chip = machine.boot_chip
         else:

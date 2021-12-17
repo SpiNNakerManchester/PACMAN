@@ -32,7 +32,6 @@ from pacman_test_objects import (get_resourced_machine_vertex)
 class TestConnectivePlacer(unittest.TestCase):
     def setUp(self):
         unittest_setup()
-        self.machine = virtual_machine(8, 8)
         self.mach_graph = MachineGraph("machine")
         self.vertices = list()
         self.vertex1 = get_resourced_machine_vertex(0, 1, "First vertex")
@@ -64,13 +63,14 @@ class TestConnectivePlacer(unittest.TestCase):
 
     def test_simple(self):
         PacmanDataWriter().set_runtime_machine_graph(self.mach_graph)
-        placements = connective_based_placer(self.machine, 100)
+        placements = connective_based_placer(100)
         self.assertEqual(len(self.vertices), len(placements))
 
     def test_place_vertex_too_big_with_vertex(self):
         cpu_cycles = 1000
         dtcm_requirement = 1000
-        sdram_requirement = self.machine.get_chip_at(0, 0).sdram.size * 20
+        chip00 = PacmanDataWriter().get_chip_at(0, 0)
+        sdram_requirement = chip00.sdram.size * 20
         rc = ResourceContainer(
             cpu_cycles=CPUCyclesPerTickResource(cpu_cycles),
             dtcm=DTCMResource(dtcm_requirement),
@@ -81,13 +81,13 @@ class TestConnectivePlacer(unittest.TestCase):
         self.mach_graph.add_vertex(large_machine_vertex)
         PacmanDataWriter().set_runtime_machine_graph(self.mach_graph)
         with self.assertRaises(PacmanValueError):
-            connective_based_placer(self.machine, 100)
+            connective_based_placer(100)
 
     def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
         self.vertex2.add_constraint(ChipAndCoreConstraint(3, 5, 7))
         self.vertex3.add_constraint(RadialPlacementFromChipConstraint(2, 4))
         PacmanDataWriter().set_runtime_machine_graph(self.mach_graph)
-        placements = connective_based_placer(self.machine, 100)
+        placements = connective_based_placer(100)
         for placement in placements.placements:
             if placement.vertex == self.vertex2:
                 self.assertEqual(placement.x, 3)
@@ -100,17 +100,18 @@ class TestConnectivePlacer(unittest.TestCase):
 
     def test_fill_machine(self):
         graph = MachineGraph("machine")
-        cores = sum(chip.n_user_processors for chip in self.machine.chips)
+        chips = PacmanDataWriter().machine.chips
+        cores = sum(chip.n_user_processors for chip in chips)
         for i in range(cores):  # 50 atoms per each processor on 20 chips
             graph.add_vertex(get_resourced_machine_vertex(
                 0, 50, "vertex " + str(i)))
         PacmanDataWriter().set_runtime_machine_graph(graph)
-        placements = connective_based_placer(self.machine, 100)
+        placements = connective_based_placer(100)
         self.assertEqual(len(placements), cores)
         # One more vertex should be too many
         graph.add_vertex(get_resourced_machine_vertex(0, 50, "toomany"))
         with self.assertRaises(PacmanValueError):
-            connective_based_placer(self.machine, 100)
+            connective_based_placer(100)
 
 
 if __name__ == '__main__':

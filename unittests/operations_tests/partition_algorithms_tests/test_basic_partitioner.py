@@ -66,39 +66,13 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertices(self.verts)
         self.graph.add_edges(self.edges, "foo")
 
-        n_processors = 18
-        (e, ne, n, w, _, _) = range(6)
-
-        links = list()
-        links.append(Link(0, 0, e, 0, 1))
-
-        _sdram = SDRAM(128 * (2**20))
-
-        links = list()
-
-        links.append(Link(0, 0, e, 1, 1))
-        links.append(Link(0, 1, ne, 1, 0))
-        links.append(Link(1, 1, n, 0, 0))
-        links.append(Link(1, 0, w, 0, 1))
-        r = Router(links, False, 1024)
-
-        ip = TestBasicPartitioner.TheTestAddress
-        chips = list()
-        for x in range(5):
-            for y in range(5):
-                if x == y == 0:
-                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0, ip))
-                else:
-                    chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
-
-        self.machine = machine_from_chips(chips)
 
     def test_partition_with_no_additional_constraints(self):
         """
         test a partitioning with a graph with no extra constraints
         """
         PacmanDataWriter()._set_runtime_graph(self.graph)
-        graph, _ = splitter_partitioner(self.machine, 3000)
+        graph, _ = splitter_partitioner(3000)
         self.assertEqual(len(list(graph.vertices)), 3)
         vert_sizes = []
         for vert in self.verts:
@@ -114,7 +88,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_edge(
             ApplicationEdge(self.vert3, self.vert1, label="extra"), "TEST")
         PacmanDataWriter()._set_runtime_graph(self.graph)
-        graph, _ = splitter_partitioner(self.machine, 3000)
+        graph, _ = splitter_partitioner(3000)
         self.assertEqual(len(list(graph.vertices)), 3)
         self.assertEqual(len(list(graph.edges)), 4)
 
@@ -128,7 +102,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertex(large_vertex)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         PacmanDataWriter()._set_runtime_graph(self.graph)
-        graph, _ = splitter_partitioner(self.machine, 1000)
+        graph, _ = splitter_partitioner(1000)
         self.assertGreater(len(list(graph.vertices)), 1)
 
     def test_partition_on_very_large_vertex_than_has_to_be_split(self):
@@ -142,7 +116,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         PacmanDataWriter()._set_runtime_graph(self.graph)
-        graph, _ = splitter_partitioner(self.machine, 3000)
+        graph, _ = splitter_partitioner(3000)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.assertGreater(len(list(graph.vertices)), 1)
 
@@ -156,7 +130,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         PacmanDataWriter()._set_runtime_graph(self.graph)
-        graph, _ = splitter_partitioner(self.machine, 3000)
+        graph, _ = splitter_partitioner(3000)
         self.assertEqual(len(list(graph.vertices)), 100)
 
     def test_partition_with_barely_sufficient_space(self):
@@ -188,7 +162,7 @@ class TestBasicPartitioner(unittest.TestCase):
                 else:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
-        self.machine = machine_from_chips(chips)
+        PacmanDataWriter().set_machine(machine_from_chips(chips))
         n_neurons = 17 * 5 * 5
         singular_vertex = SimpleTestVertex(n_neurons, "Large vertex",
                                            max_atoms_per_core=1)
@@ -197,7 +171,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(singular_vertex)
         PacmanDataWriter()._set_runtime_graph(self.graph)
-        graph, _ = splitter_partitioner(self.machine, 3000)
+        graph, _ = splitter_partitioner(3000)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.assertEqual(len(list(graph.vertices)), n_neurons)
 
@@ -231,7 +205,7 @@ class TestBasicPartitioner(unittest.TestCase):
                 else:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
-        self.machine = machine_from_chips(chips)
+        PacmanDataWriter().set_machine(machine_from_chips(chips))
         large_vertex = SimpleTestVertex(3000, "Large vertex",
                                         max_atoms_per_core=1)
         large_vertex.splitter = SplitterSliceLegacy()
@@ -240,7 +214,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertex(large_vertex)
         PacmanDataWriter()._set_runtime_graph(self.graph)
         with self.assertRaises(PacmanException):
-            splitter_partitioner(self.machine, 3000)
+            splitter_partitioner(3000)
 
     def test_partition_with_less_sdram_than_default(self):
         """
@@ -272,9 +246,9 @@ class TestBasicPartitioner(unittest.TestCase):
                 else:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
-        self.machine = machine_from_chips(chips)
+        PacmanDataWriter().set_machine(machine_from_chips(chips))
         PacmanDataWriter()._set_runtime_graph(self.graph)
-        splitter_partitioner(self.machine, 3000)
+        splitter_partitioner(3000)
 
     def test_partition_with_more_sdram_than_default(self):
         """
@@ -306,9 +280,9 @@ class TestBasicPartitioner(unittest.TestCase):
                 else:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
-        self.machine = machine_from_chips(chips)
+        PacmanDataWriter().set_machine(machine_from_chips(chips))
         PacmanDataWriter()._set_runtime_graph(self.graph)
-        splitter_partitioner(self.machine, 3000)
+        splitter_partitioner(3000)
 
     def test_partition_with_unsupported_constraints(self):
         """
@@ -327,7 +301,7 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.graph = ApplicationGraph("foo")
         PacmanDataWriter()._set_runtime_graph(self.graph)
-        graph, _ = splitter_partitioner(self.machine, 3000)
+        graph, _ = splitter_partitioner(3000)
         self.assertEqual(len(list(graph.vertices)), 0)
 
     def test_partition_with_fixed_atom_constraints(self):

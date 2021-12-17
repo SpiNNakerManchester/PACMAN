@@ -15,20 +15,21 @@
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
+from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 
 
 def basic_routing_table_generator(
-        routing_infos, routing_table_by_partitions, machine):
+        routing_infos, routing_table_by_partitions):
     """
      An basic algorithm that can produce routing tables
 
     :param RoutingInfo routing_infos:
     :param MulticastRoutingTableByPartition routing_table_by_partitions:
-    :param ~spinn_machine.Machine machine:
     :rtype: MulticastRoutingTables
     """
+    machine = PacmanDataView().machine
     progress = ProgressBar(machine.n_chips, "Generating routing tables")
     routing_tables = MulticastRoutingTables()
     for chip in progress.over(machine.chips):

@@ -43,13 +43,10 @@ def _conflict(x, y, post_x, post_y):
     return False
 
 
-def one_to_one_placer(machine, plan_n_timesteps):
+def one_to_one_placer(plan_n_timesteps):
     """ Placer that puts vertices which are directly connected to only its\
         destination on the same chip
 
-    :param ~spinn_machine.Machine machine:
-        The machine with respect to which to partition the application
-        graph
     :param int plan_n_timesteps: number of timesteps to plan for
     :return: A set of placements
     :rtype: Placements
@@ -57,7 +54,7 @@ def one_to_one_placer(machine, plan_n_timesteps):
         If something goes wrong with the placement
     """
     placer = _OneToOnePlacer()
-    return placer._run(machine, plan_n_timesteps)
+    return placer._run(plan_n_timesteps)
 
 
 class _OneToOnePlacer(_RadialPlacer):
@@ -67,11 +64,8 @@ class _OneToOnePlacer(_RadialPlacer):
 
     __slots__ = []
 
-    def _run(self, machine, plan_n_timesteps):
+    def _run(self, plan_n_timesteps):
         """
-        :param ~spinn_machine.Machine machine:
-            The machine with respect to which to partition the application
-            graph
         :param int plan_n_timesteps: number of timesteps to plan for
         :return: A set of placements
         :rtype: Placements
@@ -103,7 +97,7 @@ class _OneToOnePlacer(_RadialPlacer):
         progress.update()
 
         return self._do_allocation(
-            one_to_one_groups, same_chip_vertex_groups, machine,
+            one_to_one_groups, same_chip_vertex_groups,
             plan_n_timesteps, machine_graph, progress)
 
     @staticmethod
@@ -163,7 +157,7 @@ class _OneToOnePlacer(_RadialPlacer):
 
     def _do_allocation(
             self, one_to_one_groups, same_chip_vertex_groups,
-            machine, plan_n_timesteps, machine_graph, progress):
+            plan_n_timesteps, machine_graph, progress):
         """
         :param list(set(MachineVertex)) one_to_one_groups:
             Groups of vertexes that would be nice on same chip
@@ -171,9 +165,6 @@ class _OneToOnePlacer(_RadialPlacer):
             Mapping of Vertex to the Vertex that must be on the same Chip
         :type same_chip_vertex_groups:
             dict(MachineVertex, collection(MachineVertex))
-        :param ~spinn_machine.Machine machine:
-            The machine with respect to which to partition the application
-            graph
         :param int plan_n_timesteps: number of timesteps to plan for
         :param MachineGraph machine_graph: The machine_graph to place
         :param ~spinn_utilities.progress_bar.ProgressBar progress:
@@ -183,7 +174,7 @@ class _OneToOnePlacer(_RadialPlacer):
         placements = Placements()
 
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps, self._generate_radial_chips(machine))
+            plan_n_timesteps, self._generate_radial_chips())
         all_vertices_placed = set()
 
         # RadialPlacementFromChipConstraint won't work here

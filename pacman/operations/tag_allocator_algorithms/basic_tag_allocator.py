@@ -42,7 +42,7 @@ def basic_tag_allocator(machine, plan_n_timesteps, placements):
     :rtype: tuple(list(~spinn_machine.tags.IPTag),
         list(~spinn_machine.tags.ReverseIPTag), Tags)
     """
-    resource_tracker = ResourceTracker(machine, plan_n_timesteps)
+    resource_tracker = ResourceTracker(plan_n_timesteps)
 
     # Keep track of ports allocated to reverse IP tags and tags that still
     # need a port to be allocated

@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import pytest
-from spinn_machine.virtual_machine import virtual_machine
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanException
@@ -68,14 +67,13 @@ def test_virtual_vertices_spreader():
     n_keys_map.set_n_keys_for_partition(partition, 1)
 
     # Get and extend the machine for the virtual chip
-    machine = virtual_machine(width=8, height=8)
     PacmanDataWriter().set_runtime_machine_graph(machine_graph)
-    extended_machine = malloc_based_chip_id_allocator(machine)
+    machine = PacmanDataWriter().machine
+    malloc_based_chip_id_allocator()
 
     PacmanDataWriter().set_runtime_machine_graph(machine_graph)
     # Do placements
-    placements = spreader_placer(
-        extended_machine, n_keys_map, plan_n_timesteps=1000)
+    placements = spreader_placer(n_keys_map, plan_n_timesteps=1000)
 
     # The virtual vertex should be on a virtual chip
     placement = placements.get_placement_of_vertex(virtual_vertex)
@@ -140,9 +138,8 @@ def test_one_to_one():
         last_vertex = vertex
 
     # Do placements
-    machine = virtual_machine(width=8, height=8)
     PacmanDataWriter().set_runtime_machine_graph(machine_graph)
-    placements = spreader_placer(machine, n_keys_map, plan_n_timesteps=1000)
+    placements = spreader_placer(n_keys_map, plan_n_timesteps=1000)
 
     # The 1-1 connected vertices should be on the same chip
     for chain in one_to_one_chains:
@@ -186,7 +183,6 @@ def test_sdram_links():
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     # Do placements
-    machine = virtual_machine(width=8, height=8)
     PacmanDataWriter().set_runtime_machine_graph(machine_graph)
     with pytest.raises(PacmanException):
-        spreader_placer(machine, n_keys_map, plan_n_timesteps=1000)
+        spreader_placer(n_keys_map, plan_n_timesteps=1000)

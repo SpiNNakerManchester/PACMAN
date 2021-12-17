@@ -30,11 +30,10 @@ from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
 
 
-def spreader_placer(machine, n_keys_map, plan_n_timesteps):
+def spreader_placer(n_keys_map, plan_n_timesteps):
     """ Places vertices on as many chips as available with a effort to\
         reduce the number of packets being received by the router in total.
 
-    :param ~spinn_machine.Machine machine: the SpiNNaker machine
     :param AbstractMachinePartitionNKeysMap n_keys_map:
         the n keys from partition map
     :param int plan_n_timesteps: number of timesteps to plan for
@@ -42,7 +41,7 @@ def spreader_placer(machine, n_keys_map, plan_n_timesteps):
     :rtype: Placements
     """
     placer = _SpreaderPlacer()
-    return placer._run(machine, n_keys_map, plan_n_timesteps)
+    return placer._run(n_keys_map, plan_n_timesteps)
 
 
 class _SpreaderPlacer(_OneToOnePlacer):
@@ -72,9 +71,8 @@ class _SpreaderPlacer(_OneToOnePlacer):
     # 4. chip and core)
     STEPS = 4
 
-    def _run(self, machine, n_keys_map, plan_n_timesteps):
+    def _run(self, n_keys_map, plan_n_timesteps):
         """
-        :param ~spinn_machine.Machine machine: the SpiNNaker machine
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             the n keys from partition map
         :param int plan_n_timesteps: number of timesteps to plan for
@@ -109,9 +107,9 @@ class _SpreaderPlacer(_OneToOnePlacer):
 
         # sort chips so that they are radial from a given point and other
         # init data structs
-        chips_in_order = self._determine_chip_list(machine)
+        chips_in_order = self._determine_chip_list()
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps, chips=chips_in_order)
+            plan_n_timesteps, chips=chips_in_order)
         placements = Placements()
         placed_vertices = set()
         cost_per_chip = defaultdict(int)
@@ -137,7 +135,7 @@ class _SpreaderPlacer(_OneToOnePlacer):
         self._place_one_to_one_verts(
             one_to_one_groups, chips_in_order, placements, progress_bar,
             resource_tracker, placed_vertices, cost_per_chip, machine_graph,
-            n_keys_map, machine)
+            n_keys_map)
 
         # place vertices which don't have annoying placement constraints.
         # spread them over the chips so that they have minimal impact on the
@@ -294,7 +292,7 @@ class _SpreaderPlacer(_OneToOnePlacer):
     def _place_one_to_one_verts(
             self, one_to_one_groups, chips_in_order, placements, progress_bar,
             resource_tracker, placed_vertices, cost_per_chip, machine_graph,
-            n_keys_map, machine):
+            n_keys_map):
         """ place 1 to 1 groups on the same chip if possible. else radially\
             from it
 
@@ -312,7 +310,6 @@ class _SpreaderPlacer(_OneToOnePlacer):
         :param MachineGraph machine_graph: machine graph
         :param AbstractMachinePartitionNKeysMap n_keys_map:
             map between outgoing partition and n keys down it
-        :param ~spinn_machine.Machine machine: the SpiNNMachine instance.
         """
 
         # go through each 1 to 1 group separately
@@ -348,7 +345,7 @@ class _SpreaderPlacer(_OneToOnePlacer):
                 # nearby it in order. or if not all same, just least first
                 if all_matched:
                     chips = list(self._generate_radial_chips(
-                        machine, resource_tracker=None, start_chip_x=x,
+                        resource_tracker=None, start_chip_x=x,
                         start_chip_y=y))
 
             # allocate verts.
@@ -413,14 +410,13 @@ class _SpreaderPlacer(_OneToOnePlacer):
 
         progress_bar.update(len(machine_graph.vertices))
 
-    def _determine_chip_list(self, machine):
+    def _determine_chip_list(self):
         """ determines the radial list from a deduced middle of the machine
 
-        :param ~spinn_machine.Machine machine:
-            the machine to find a middle from
         :return: a list of chips radially from a deduced middle
         :rtype: list(tuple(int,int))
         """
+        machine = PacmanDataView().machine
         # try the middle chip
         middle_chip_x = math.ceil(machine.max_chip_x / 2)
         middle_chip_y = math.ceil(machine.max_chip_y / 2)
@@ -451,5 +447,5 @@ class _SpreaderPlacer(_OneToOnePlacer):
 
         # return the radial list from this middle point
         return list(self._generate_radial_chips(
-            machine, resource_tracker=None, start_chip_x=middle_chip_x,
+            resource_tracker=None, start_chip_x=middle_chip_x,
             start_chip_y=middle_chip_y))

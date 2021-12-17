@@ -29,7 +29,7 @@ from pacman.utilities.utility_objs import ResourceTracker
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def connective_based_placer(machine, plan_n_timesteps):
+def connective_based_placer(plan_n_timesteps):
     """
     Runs a placer that considers connectivity
 
@@ -38,9 +38,6 @@ def connective_based_placer(machine, plan_n_timesteps):
         and which will place things that are most connected closest to each\
         other
 
-    :param ~spinn_machine.Machine machine:
-        The machine with respect to which to partition the application
-        graph
     :param int plan_n_timesteps: number of timesteps to plan for
     :return: A set of placements
     :rtype: ~pacman.model.placements.Placements
@@ -60,11 +57,8 @@ class _ConnectiveBasedPlacer(_RadialPlacer):
 
     __slots__ = []
 
-    def _run(self, machine, plan_n_timesteps):
+    def _run(self, plan_n_timesteps):
         """
-        :param ~spinn_machine.Machine machine:
-            The machine with respect to which to partition the application
-            graph
         :param int plan_n_timesteps: number of timesteps to plan for
         :return: A set of placements
         :rtype: ~pacman.model.placements.Placements
@@ -91,12 +85,12 @@ class _ConnectiveBasedPlacer(_RadialPlacer):
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
         resource_tracker = ResourceTracker(
-            machine, plan_n_timesteps, self._generate_radial_chips(machine))
+            plan_n_timesteps, self._generate_radial_chips())
         constrained = sort_vertices_by_known_constraints(constrained)
         vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         for vertex in progress.over(constrained, False):
             self._place_vertex(
-                vertex, resource_tracker, machine, placements,
+                vertex, resource_tracker, placements,
                 vertices_on_same_chip, machine_graph)
 
         while unconstrained:
@@ -105,8 +99,7 @@ class _ConnectiveBasedPlacer(_RadialPlacer):
                 unconstrained, machine_graph)
             self._place_unconstrained_subgraph(
                 max_connected_vertex, machine_graph, unconstrained,
-                machine, placements, resource_tracker, progress,
-                vertices_on_same_chip)
+                placements, resource_tracker, progress, vertices_on_same_chip)
 
         # finished, so stop progress bar and return placements
         progress.end()
@@ -114,8 +107,7 @@ class _ConnectiveBasedPlacer(_RadialPlacer):
 
     def _place_unconstrained_subgraph(
             self, starting_vertex, machine_graph, unplaced_vertices,
-            machine, placements, resource_tracker, progress,
-            vertices_on_same_chip):
+            placements, resource_tracker, progress, vertices_on_same_chip):
         # pylint: disable=too-many-arguments
         # Keep track of all unplaced_vertices connected to the currently
         # placed ones
@@ -128,7 +120,7 @@ class _ConnectiveBasedPlacer(_RadialPlacer):
 
             # Place the vertex
             self._place_vertex(
-                vertex, resource_tracker, machine, placements,
+                vertex, resource_tracker, placements,
                 vertices_on_same_chip, machine_graph)
             progress.update()
 

@@ -16,6 +16,7 @@
 from collections import defaultdict
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_machine import Processor, SDRAM
+from pacman.data import PacmanDataView
 from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint, BoardConstraint, ChipAndCoreConstraint,
     AbstractPlacerConstraint)
@@ -118,11 +119,9 @@ class ResourceTracker(object):
         "are only {} bytes of SDRAM available on the chip at this time. "
         "Please fix and try again")
 
-    def __init__(self, machine, plan_n_timesteps, chips=None,
+    def __init__(self, plan_n_timesteps, chips=None,
                  preallocated_resources=None):
         """
-        :param ~spinn_machine.Machine machine:
-            The machine to track the usage of
         :param int plan_n_timesteps: number of timesteps to plan for
         :param chips: If specified, this list of chips will be used instead
             of the list from the machine. Note that the order will be
@@ -145,7 +144,7 @@ class ResourceTracker(object):
         self._core_tracker = dict()
 
         # The machine object
-        self._machine = machine
+        self._machine = PacmanDataView().machine
 
         # The number of timesteps that should be planned for.
         self._plan_n_timesteps = plan_n_timesteps
@@ -204,7 +203,7 @@ class ResourceTracker(object):
 
         # update tracker for n cores available per chip
         self._real_chips_with_n_cores_available = \
-            [0] * (machine.max_cores_per_chip() + 1)
+            [0] * (self._machine.max_cores_per_chip() + 1)
 
         # Set of (x, y) tuples of coordinates of chips which have available
         # processors

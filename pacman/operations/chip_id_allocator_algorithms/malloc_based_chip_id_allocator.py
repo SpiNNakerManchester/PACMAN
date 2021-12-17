@@ -43,16 +43,13 @@ class NoSpiNNakerLink(PacmanConfigurationException):
                 vertex.spinnaker_link_id, vertex.board_address))
 
 
-def malloc_based_chip_id_allocator(machine):
+def malloc_based_chip_id_allocator():
     """
-    :param ~spinn_machine.Machine machine:
-    :rtype: ~spinn_machine.Machine
     :raises PacmanConfigurationException:
         If a virtual chip is in an impossible position.
     """
     allocator = _MallocBasedChipIdAllocator()
-    allocator.allocate_chip_ids(machine)
-    return machine
+    allocator.allocate_chip_ids()
 
 
 class _MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
@@ -71,14 +68,15 @@ class _MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()
 
-    def allocate_chip_ids(self, machine):
+    def allocate_chip_ids(self):
         """ Go through the chips (real and virtual) and allocate keys for each
 
-        :param ~spinn_machine.Machine machine:
         :raises PacmanConfigurationException:
             If a virtual chip is in an impossible position.
         """
-        graph = PacmanDataView().runtime_best_graph
+        view = PacmanDataView()
+        graph = view.runtime_best_graph
+        machine = view.machine
         progress = ProgressBar(
             graph.n_vertices + machine.n_chips,
             "Allocating virtual identifiers")

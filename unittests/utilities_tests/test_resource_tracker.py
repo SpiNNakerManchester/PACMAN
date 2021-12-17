@@ -17,6 +17,7 @@ import unittest
 from spinn_machine import (
     virtual_machine, Chip, Router, SDRAM, machine_from_chips)
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.resources import (
     ResourceContainer, ConstantSDRAM, PreAllocatedResourceContainer)
 from pacman.exceptions import (
@@ -30,13 +31,13 @@ class TestResourceTracker(unittest.TestCase):
         unittest_setup()
 
     def test_n_cores_available(self):
-        machine = virtual_machine(
-            width=2, height=2, n_cpus_per_chip=18)
+        PacmanDataWriter().set_machine(virtual_machine(
+            width=2, height=2, n_cpus_per_chip=18))
         preallocated_resources = PreAllocatedResourceContainer()
         preallocated_resources.add_cores_all(2)
         preallocated_resources.add_cores_ethernet(3)
         tracker = ResourceTracker(
-            machine, plan_n_timesteps=None,
+            plan_n_timesteps=None,
             preallocated_resources=preallocated_resources)
 
         # Should be 15 cores = 18 - 1 Monitor -3 ethernet -2 all cores
@@ -63,11 +64,12 @@ class TestResourceTracker(unittest.TestCase):
     def test_deallocation_of_resources(self):
         machine = virtual_machine(
             width=2, height=2, n_cpus_per_chip=18)
+        PacmanDataWriter().set_machine(machine)
         chip_sdram = machine.get_chip_at(1, 1).sdram.size
         res_sdram = 12345
 
-        tracker = ResourceTracker(machine, plan_n_timesteps=None,
-                                  preallocated_resources=None)
+        tracker = ResourceTracker(
+            plan_n_timesteps=None, preallocated_resources=None)
 
         sdram_res = ConstantSDRAM(res_sdram)
         resources = ResourceContainer(sdram=sdram_res)
@@ -127,8 +129,8 @@ class TestResourceTracker(unittest.TestCase):
         empty_chip = Chip(
             0, 0, 1, router, sdram, 0, 0, "127.0.0.1",
             virtual=False, tag_ids=[1])
-        machine = machine_from_chips([empty_chip])
-        resource_tracker = ResourceTracker(machine, plan_n_timesteps=None)
+        PacmanDataWriter.set_machine(machine_from_chips([empty_chip]))
+        resource_tracker = ResourceTracker(plan_n_timesteps=None)
         with self.assertRaises(PacmanValueError):
             resource_tracker.allocate_resources(
                 ResourceContainer(sdram=ConstantSDRAM(1024)))

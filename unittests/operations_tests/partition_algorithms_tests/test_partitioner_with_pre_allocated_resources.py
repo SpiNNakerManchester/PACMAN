@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
@@ -32,7 +31,6 @@ class TestPartitionerWithPreAllocatedResources(object):
 
     def test_1_chip_no_pre_allocated_too_much_sdram(self):
         unittest_setup()
-        machine = virtual_machine(width=8, height=8)
         graph = ApplicationGraph("Test")
 
         eight_meg = 8 * 1024 * 1024
@@ -52,7 +50,7 @@ class TestPartitionerWithPreAllocatedResources(object):
         PacmanDataWriter()._set_runtime_graph(graph)
         # run partitioner that should go boom
         try:
-            splitter_partitioner(machine, plan_n_time_steps=None,
+            splitter_partitioner(plan_n_time_steps=None,
                                  pre_allocated_resources=pre_allocated_res)
         except Exception as e:
             raise Exception("should have blown up here") from e
