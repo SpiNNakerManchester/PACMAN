@@ -17,6 +17,7 @@ import pytest
 from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.placements import Placements, Placement
 from pacman.operations.fixed_route_router import fixed_route_router
 from pacman.exceptions import PacmanRoutingException
@@ -47,14 +48,14 @@ def _get_destinations(machine, fixed_route_tables, source_x, source_y):
 
 def _check_setup(width, height):
     machine = virtual_machine(width=width, height=height)
-
+    PacmanDataWriter().set_machine(machine)
     ethernet_chips = machine.ethernet_connected_chips
     placements = Placements(
         Placement(DestinationVertex(), ethernet_chip.x, ethernet_chip.y, 1)
         for ethernet_chip in ethernet_chips)
 
     fixed_route_tables = fixed_route_router(
-        machine, placements, DestinationVertex)
+        placements, DestinationVertex)
 
     for x, y in machine.chip_coordinates:
         assert (x, y) in fixed_route_tables

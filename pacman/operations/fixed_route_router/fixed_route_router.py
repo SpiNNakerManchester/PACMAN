@@ -15,15 +15,15 @@
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import FixedRouteEntry, Machine
+from pacman.data import PacmanDataView
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanRoutingException)
 
 
-def fixed_route_router(machine, placements, destination_class):
+def fixed_route_router(placements, destination_class):
     """ Runs the fixed route generator for all boards on machine
 
-    :param ~spinn_machine.Machine machine: SpiNNMachine object
     :param Placements placements: placements object
     :param destination_class: the destination class to route packets to
     :type destination_class: type or tuple(type,...)
@@ -33,7 +33,7 @@ def fixed_route_router(machine, placements, destination_class):
     :raises PacmanRoutingException:
     :raises PacmanAlreadyExistsException:
     """
-    router = _FixedRouteRouter(machine, placements, destination_class)
+    router = _FixedRouteRouter(placements, destination_class)
     return router._run()
 
 
@@ -44,10 +44,10 @@ class _FixedRouteRouter(object):
 
     __slots__ = [
         "_destination_class", "_fixed_route_tables",
-        "_machine", "_placements"]
+        "_placements"]
 
-    def __init__(self, machine, placements, destination_class):
-        self._machine = machine
+    def __init__(self, placements, destination_class):
+        self._machine = PacmanDataView().machine
         self._destination_class = destination_class
         self._placements = placements
         self._fixed_route_tables = dict()
