@@ -31,7 +31,6 @@ from pacman.operations.placer_algorithms import (
      "SpreaderPlacer"])
 def test_virtual_placement(placer):
     unittest_setup()
-    #PacmanDataWriter().set_machine(machine)
     graph = MachineGraph("Test")
     virtual_vertex = MachineSpiNNakerLinkVertex(spinnaker_link_id=0)
     graph.add_vertex(virtual_vertex)

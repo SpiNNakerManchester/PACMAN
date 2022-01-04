@@ -66,7 +66,6 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph.add_vertices(self.verts)
         self.graph.add_edges(self.edges, "foo")
 
-
     def test_partition_with_no_additional_constraints(self):
         """
         test a partitioning with a graph with no extra constraints
@@ -343,6 +342,8 @@ class TestBasicPartitioner(unittest.TestCase):
         # Create a 2x2 machine with 1 core per chip (so 4 cores),
         # and SDRAM per chip
         n_cores_per_chip = 2  # Remember 1 core is the monitor
+        PacmanDataWriter().set_machine(virtual_machine(
+            width=2, height=2, n_cpus_per_chip=n_cores_per_chip))
 
         # Create a vertex which will need to be split perfectly into 4 cores
         # to work and which max atoms per core must be ignored

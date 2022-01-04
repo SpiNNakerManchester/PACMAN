@@ -26,8 +26,7 @@ from spinn_machine import (
     SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.exceptions import (
-    PacmanException, PacmanPartitionException, PacmanInvalidParameterException,
-    PacmanValueError)
+    PacmanException, PacmanInvalidParameterException, PacmanValueError)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
     SameAtomsAsVertexConstraint)

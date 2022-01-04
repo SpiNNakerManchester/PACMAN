@@ -16,7 +16,6 @@ from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
-from spinn_machine import virtual_machine
 from pacman.model.placements import Placement, Placements
 from pacman.operations.router_algorithms.ner_route import ner_route
 

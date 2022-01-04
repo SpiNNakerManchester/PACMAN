@@ -27,14 +27,11 @@ _BOARD_PORTS = range(17896, 18000)
 _Task = namedtuple("_Task", "constraint, board, tag, vertex, placement")
 
 
-def basic_tag_allocator(machine, plan_n_timesteps, placements):
+def basic_tag_allocator(plan_n_timesteps, placements):
     """
     Basic tag allocator that goes though the boards available and applies\
         the IP tags and reverse IP tags as needed.
 
-    :param ~spinn_machine.Machine machine:
-        The machine with respect to which to partition the application
-        graph
     :param int plan_n_timesteps: number of timesteps to plan for
     :param Placements placements:
     :return: list of IP Tags, list of Reverse IP Tags,
