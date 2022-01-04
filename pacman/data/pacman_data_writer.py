@@ -18,6 +18,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_machine.data.machine_data_writer import MachineDataWriter
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph
+from pacman.model.placements import Placements
 from pacman.model.routing_info import RoutingInfo
 from pacman.exceptions import PacmanConfigurationException
 from .pacman_data_view import PacmanDataView, _PacmanDataModel
@@ -129,11 +130,21 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             raise TypeError("runtime_machine_graph should be a MachineGraph")
         self.__pacman_data._runtime_machine_graph = runtime_machine_graph
 
+    def set_placements(self, placements):
+        """
+        Set the placements
+
+        :param Placements placements:
+        """
+        if not isinstance(placements, Placements):
+            raise TypeError("placements should be a Placements")
+        self.__pacman_data._placements = placements
+
     def set_routing_infos(self, routing_infos):
         """
         Set the routing_infos
 
-        :param MachineGraph routing_infos:
+        :param RoutingInfo routing_infos:
         """
         if not isinstance(routing_infos, RoutingInfo):
             raise TypeError("routing_infos should be a RoutingInfo")

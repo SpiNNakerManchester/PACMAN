@@ -39,6 +39,7 @@ class _PacmanDataModel(object):
         # Data values cached
         "_graph",
         "_machine_graph",
+        "_placements",
         "_routing_infos",
         "_runtime_graph",
         "_runtime_machine_graph",
@@ -65,6 +66,7 @@ class _PacmanDataModel(object):
         """
         Clears out all data that should change after a reset and graaph change
         """
+        self._placements = None
         self._runtime_graph = None
         self._runtime_machine_graph = None
         self._routing_infos = None
@@ -270,6 +272,20 @@ class PacmanDataView(MachineDataView):
         if self.runtime_machine_graph.n_vertices:
             return self.runtime_machine_graph
         return self.runtime_graph
+
+    # placements
+
+    @ property
+    def placements(self):
+        """
+        The placements if known
+
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the placements is currently unavailable
+        """
+        if self.__pacman_data._placements is None:
+            raise self._exception("placements")
+        return self.__pacman_data._placements
 
     # routing_infos
 
