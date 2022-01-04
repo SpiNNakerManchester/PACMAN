@@ -44,7 +44,7 @@ class _FixedRouteRouter(object):
 
     __slots__ = [
         "_destination_class", "_fixed_route_tables",
-        "_placements"]
+        "_machine", "_placements"]
 
     def __init__(self, placements, destination_class):
         self._machine = PacmanDataView().machine
@@ -55,10 +55,6 @@ class _FixedRouteRouter(object):
     def _run(self):
         """ Runs the fixed route generator for all boards on machine
 
-        :param ~spinn_machine.Machine machine: SpiNNMachine object
-        :param Placements placements: placements object
-        :param destination_class: the destination class to route packets to
-        :type destination_class: type or tuple(type,...)
         :return: router tables for fixed route paths
         :rtype: dict(tuple(int,int), ~spinn_machine.FixedRouteEntry)
         :raises PacmanConfigurationException: if no placement processor found
