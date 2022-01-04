@@ -31,13 +31,12 @@ from pacman.operations.placer_algorithms import (
      "SpreaderPlacer"])
 def test_virtual_placement(placer):
     unittest_setup()
-    PacmanDataWriter().set_machine(machine)
+    #PacmanDataWriter().set_machine(machine)
     graph = MachineGraph("Test")
     virtual_vertex = MachineSpiNNakerLinkVertex(spinnaker_link_id=0)
     graph.add_vertex(virtual_vertex)
     PacmanDataWriter().set_runtime_machine_graph(graph)
-    machine = PacmanDataWriter().machine
-    malloc_based_chip_id_allocator(machine)
+    malloc_based_chip_id_allocator()
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     if placer == "ConnectiveBasedPlacer":
@@ -52,5 +51,5 @@ def test_virtual_placement(placer):
         raise NotImplementedError(placer)
 
     placement = placements.get_placement_of_vertex(virtual_vertex)
-    chip = machine.get_chip_at(placement.x, placement.y)
+    chip = PacmanDataWriter().get_chip_at(placement.x, placement.y)
     assert chip.virtual

@@ -129,7 +129,8 @@ class TestResourceTracker(unittest.TestCase):
         empty_chip = Chip(
             0, 0, 1, router, sdram, 0, 0, "127.0.0.1",
             virtual=False, tag_ids=[1])
-        PacmanDataWriter.set_machine(machine_from_chips([empty_chip]))
+        machine = machine_from_chips([empty_chip])
+        PacmanDataWriter().set_machine(machine)
         resource_tracker = ResourceTracker(plan_n_timesteps=None)
         with self.assertRaises(PacmanValueError):
             resource_tracker.allocate_resources(

@@ -17,6 +17,7 @@ import unittest
 from collections import defaultdict
 from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ResourceContainer, IPtagResource
@@ -31,6 +32,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
 
     def test_ip_tags(self):
         machine = virtual_machine(12, 12)
+        PacmanDataWriter().set_machine(machine)
         eth_chips = machine.ethernet_connected_chips
         vertices = [
             SimpleMachineVertex(
@@ -61,6 +63,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
     def test_too_many_ip_tags_for_1_board(self):
         n_extra_vertices = 3
         machine = virtual_machine(12, 12)
+        PacmanDataWriter().set_machine(machine)
         eth_chips = machine.ethernet_connected_chips
         eth_chip = eth_chips[0]
         eth_chip_2 = machine.get_chip_at(eth_chip.x + 1, eth_chip.y + 1)

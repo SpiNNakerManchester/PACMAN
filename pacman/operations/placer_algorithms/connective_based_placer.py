@@ -45,7 +45,7 @@ def connective_based_placer(plan_n_timesteps):
         If something goes wrong with the placement
     """
     placer = _ConnectiveBasedPlacer()
-    return placer._run(machine, plan_n_timesteps)
+    return placer._run(plan_n_timesteps)
 
 
 class _ConnectiveBasedPlacer(_RadialPlacer):

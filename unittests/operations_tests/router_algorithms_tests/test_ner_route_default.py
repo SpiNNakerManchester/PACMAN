@@ -24,7 +24,6 @@ from pacman.operations.router_algorithms.ner_route import ner_route
 def test_ner_route_default():
     unittest_setup()
     graph = MachineGraph("Test")
-    machine = virtual_machine(8, 8)
     placements = Placements()
 
     source_vertex = SimpleMachineVertex(None)
@@ -38,7 +37,7 @@ def test_ner_route_default():
     partition = graph.get_outgoing_partition_for_edge(edge)
 
     PacmanDataWriter().set_runtime_machine_graph(graph)
-    routes = ner_route(machine, placements)
+    routes = ner_route(placements)
 
     source_route = routes.get_entries_for_router(0, 0)[partition]
     assert(not source_route.defaultable)

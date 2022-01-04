@@ -316,6 +316,7 @@ class TestBasicPartitioner(unittest.TestCase):
         set_config("Machine", "max_sdram_allowed_per_chip", sdram_per_chip)
         machine = virtual_machine(
             width=2, height=2, n_cpus_per_chip=n_cores_per_chip)
+        PacmanDataWriter().set_machine(machine)
 
         # Create a vertex where each atom requires 1MB (default) of SDRAM
         # but which can't be subdivided lower than 2 atoms per core.
@@ -331,7 +332,7 @@ class TestBasicPartitioner(unittest.TestCase):
         # Do the partitioning - this should result in an error
         PacmanDataWriter()._set_runtime_graph(app_graph)
         with self.assertRaises(PacmanValueError):
-            splitter_partitioner(machine, 3000)
+            splitter_partitioner(3000)
 
     def test_partition_with_fixed_atom_constraints_at_limit(self):
         """
@@ -342,8 +343,6 @@ class TestBasicPartitioner(unittest.TestCase):
         # Create a 2x2 machine with 1 core per chip (so 4 cores),
         # and SDRAM per chip
         n_cores_per_chip = 2  # Remember 1 core is the monitor
-        machine = virtual_machine(
-            width=2, height=2, n_cpus_per_chip=n_cores_per_chip)
 
         # Create a vertex which will need to be split perfectly into 4 cores
         # to work and which max atoms per core must be ignored
@@ -355,7 +354,7 @@ class TestBasicPartitioner(unittest.TestCase):
 
         # Do the partitioning - this should just work
         PacmanDataWriter()._set_runtime_graph(app_graph)
-        machine_graph, _ = splitter_partitioner(machine, 3000)
+        machine_graph, _ = splitter_partitioner(3000)
         self.assertEqual(4, len(machine_graph.vertices))
 
 

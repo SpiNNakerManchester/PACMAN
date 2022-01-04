@@ -17,8 +17,8 @@ import unittest
 from collections import deque
 
 from spinn_utilities.config_holder import set_config
-from spinn_machine.virtual_machine import virtual_machine
 from pacman.config_setup import unittest_setup
+from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, MulticastEdgePartition, SimpleMachineVertex)
@@ -35,10 +35,9 @@ class TestNerRouteTrafficAware(unittest.TestCase):
     def test_routing(self):
         graph = MachineGraph("Test")
         set_config("Machine", "down_chips", "1,2:5,4:3,3")
-        machine = virtual_machine(8, 8)
         placements = Placements()
         vertices = list()
-
+        machine = PacmanDataView().machine
         for chip in machine.chips:
             for processor in chip.processors:
                 if not processor.is_monitor:
@@ -55,7 +54,7 @@ class TestNerRouteTrafficAware(unittest.TestCase):
                 graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
         PacmanDataWriter().set_runtime_machine_graph(graph)
-        routing_paths = ner_route_traffic_aware(machine, placements)
+        routing_paths = ner_route_traffic_aware(placements)
 
         for vertex in vertices:
             vertices_reached = set()

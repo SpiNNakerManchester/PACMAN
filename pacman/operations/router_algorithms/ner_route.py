@@ -625,15 +625,16 @@ def _get_route(dm_vector, start, machine):
     return out
 
 
-def _ner_route(machine, placements, vector_to_nodes):
+def _ner_route(placements, vector_to_nodes):
     """ Performs routing using rig algorithm
 
-    :param ~spinn_machine.Machine machine:
     :param Placements placements:
     :return:
     :rtype: MulticastRoutingTableByPartition
     """
-    machine_graph = PacmanDataView().runtime_machine_graph
+    view = PacmanDataView()
+    machine = view.machine
+    machine_graph = view.runtime_machine_graph
     routing_tables = MulticastRoutingTableByPartition()
 
     progress_bar = ProgressBar(len(machine_graph.vertices), "Routing")
@@ -659,21 +660,19 @@ def _ner_route(machine, placements, vector_to_nodes):
     return routing_tables
 
 
-def ner_route(machine, placements):
+def ner_route(placements):
     """ basic ner router
 
-    :param ~spinn_machine.Machine machine: spinnaker machine
     :param Placements placements: the placements
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition
     """
-    return _ner_route(machine, placements, _longest_dimension_first)
+    return _ner_route(placements, _longest_dimension_first)
 
 
-def ner_route_traffic_aware(machine, placements):
+def ner_route_traffic_aware(placements):
     """ traffic-aware ner router
 
-    :param MachineGraph machine_graph: the machine graph
     :param ~spinn_machine.Machine machine: spinnaker machine
     :param Placements placements: the placements
     :return: a routing table by partition
@@ -681,5 +680,5 @@ def ner_route_traffic_aware(machine, placements):
     """
     traffic = defaultdict(lambda: 0)
     return _ner_route(
-        machine, placements,
+        placements,
         functools.partial(_least_busy_dimension_first, traffic))

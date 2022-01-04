@@ -382,9 +382,8 @@ class TestPartitioner(unittest.TestCase):
             vertex_2.splitter_object = SplitterSliceLegacy()
             vertex_3.splitter_object = SplitterSliceLegacy()
             graph.add_vertices([vertex_1, vertex_2, vertex_3])
-            machine = virtual_machine(width=2, height=2)
             PacmanDataWriter()._set_runtime_graph(graph)
-            splitter_partitioner(machine, plan_n_time_steps=None)
+            splitter_partitioner(plan_n_time_steps=None)
             subvertices_1 = list(vertex_1.machine_vertices)
             subvertices_2 = list(vertex_2.machine_vertices)
             subvertices_3 = list(vertex_3.machine_vertices)
@@ -413,7 +412,7 @@ class TestPartitioner(unittest.TestCase):
         set_config("Machine", "max_sdram_allowed_per_chip", sdram_per_chip)
         machine = virtual_machine(
             width=2, height=2, n_cpus_per_chip=n_cores_per_chip)
-
+        PacmanDataWriter().set_machine(machine)
         # Create a vertex where each atom requires 1MB (default) of SDRAM
         # but which can't be subdivided lower than 2 atoms per core.
         # The vertex has 1 atom per MB of SDRAM, and so would fit but will
@@ -428,7 +427,7 @@ class TestPartitioner(unittest.TestCase):
         # Do the partitioning - this should result in an error
         PacmanDataWriter()._set_runtime_graph(app_graph)
         with self.assertRaises(PacmanException):
-            splitter_partitioner(machine, 3000)
+            splitter_partitioner(3000)
 
     def test_partition_with_fixed_atom_constraints_at_limit(self):
         """
@@ -440,6 +439,7 @@ class TestPartitioner(unittest.TestCase):
         n_cores_per_chip = 2  # remember 1 is the monitor
         machine = virtual_machine(
             width=2, height=2, n_cpus_per_chip=n_cores_per_chip)
+        PacmanDataWriter().set_machine(machine)
 
         # Create a vertex which will need to be split perfectly into 4 cores
         # to work and which max atoms per core must be ignored
@@ -452,7 +452,7 @@ class TestPartitioner(unittest.TestCase):
 
         # Do the partitioning - this should just work
         PacmanDataWriter()._set_runtime_graph(app_graph)
-        machine_graph, _ = splitter_partitioner(machine, 3000)
+        machine_graph, _ = splitter_partitioner(3000)
         self.assertEqual(4, len(machine_graph.vertices))
 
 
