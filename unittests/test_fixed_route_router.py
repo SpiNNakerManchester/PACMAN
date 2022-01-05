@@ -50,12 +50,11 @@ def _check_setup(width, height):
     machine = virtual_machine(width=width, height=height)
     PacmanDataWriter().set_machine(machine)
     ethernet_chips = machine.ethernet_connected_chips
-    placements = Placements(
+    PacmanDataWriter().set_placements(Placements(
         Placement(DestinationVertex(), ethernet_chip.x, ethernet_chip.y, 1)
-        for ethernet_chip in ethernet_chips)
+        for ethernet_chip in ethernet_chips))
 
-    fixed_route_tables = fixed_route_router(
-        placements, DestinationVertex)
+    fixed_route_tables = fixed_route_router(DestinationVertex)
 
     for x, y in machine.chip_coordinates:
         assert (x, y) in fixed_route_tables

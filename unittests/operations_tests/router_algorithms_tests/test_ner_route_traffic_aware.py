@@ -54,7 +54,8 @@ class TestNerRouteTrafficAware(unittest.TestCase):
                 graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
         PacmanDataWriter().set_runtime_machine_graph(graph)
-        routing_paths = ner_route_traffic_aware(placements)
+        PacmanDataWriter().set_placements(placements)
+        routing_paths = ner_route_traffic_aware()
 
         for vertex in vertices:
             vertices_reached = set()

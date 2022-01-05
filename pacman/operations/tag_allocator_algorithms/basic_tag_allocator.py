@@ -17,6 +17,7 @@ from collections import namedtuple
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_machine.tags import IPTag, ReverseIPTag
+from pacman.data import PacmanDataView
 from pacman.model.tags import Tags
 from pacman.utilities.utility_objs import ResourceTracker
 
@@ -39,6 +40,7 @@ def basic_tag_allocator(plan_n_timesteps, placements):
     :rtype: tuple(list(~spinn_machine.tags.IPTag),
         list(~spinn_machine.tags.ReverseIPTag), Tags)
     """
+    placements = PacmanDataView().placements
     resource_tracker = ResourceTracker(plan_n_timesteps)
 
     # Keep track of ports allocated to reverse IP tags and tags that still

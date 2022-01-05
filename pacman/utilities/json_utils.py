@@ -19,6 +19,7 @@ Miscellaneous minor functions for converting between JSON and Python objects.
 from collections import OrderedDict
 import json
 import gzip
+from pacman.data import PacmanDataView
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
     FixedMaskConstraint)
@@ -361,9 +362,9 @@ def placement_to_json(placement):
     return json_dict
 
 
-def placements_to_json(placements):
+def placements_to_json():
     json_list = []
-    for placement in placements:
+    for placement in PacmanDataView().placements:
         json_list.append(placement_to_json(placement))
     return json_list
 

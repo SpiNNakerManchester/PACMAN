@@ -57,12 +57,10 @@ class _DijkstraInfo(object):
 
 
 def basic_dijkstra_routing(
-        placements,
         bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
     """ Find routes between the edges with the allocated information,
         placed in the given places
 
-    :param Placements placements: The placements of the edges
     :param bool use_progress_bar: whether to show a progress bar
     :return: The discovered routes
     :rtype: MulticastRoutingTables
@@ -70,7 +68,7 @@ def basic_dijkstra_routing(
         If something goes wrong with the routing
     """
     router = _BasicDijkstraRouting(bw_per_route_entry, max_bw)
-    return router._run(placements)
+    return router._run()
 
 
 class _BasicDijkstraRouting(object):
@@ -97,11 +95,10 @@ class _BasicDijkstraRouting(object):
         self._bw_per_route_entry = bw_per_route_entry
         self._max_bw = max_bw
 
-    def _run(self, placements):
+    def _run(self):
         """ Find routes between the edges with the allocated information,
             placed in the given places
 
-        :param Placements placements: The placements of the edges
         :param ~spinn_machine.Machine machine:
             The machine through which the routes are to be found
         :param bool use_progress_bar: whether to show a progress bar
@@ -114,7 +111,7 @@ class _BasicDijkstraRouting(object):
         nodes_info = self._initiate_node_info()
         tables = self._initiate_dijkstra_tables()
         self._update_all_weights(nodes_info)
-
+        placements = PacmanDataView().placements
         # each vertex represents a core in the board
         progress = ProgressBar(
             placements.n_placements, "Creating routing entries")

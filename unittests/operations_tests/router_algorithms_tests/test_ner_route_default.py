@@ -36,7 +36,8 @@ def test_ner_route_default():
     partition = graph.get_outgoing_partition_for_edge(edge)
 
     PacmanDataWriter().set_runtime_machine_graph(graph)
-    routes = ner_route(placements)
+    PacmanDataWriter().set_placements(placements)
+    routes = ner_route()
 
     source_route = routes.get_entries_for_router(0, 0)[partition]
     assert(not source_route.defaultable)

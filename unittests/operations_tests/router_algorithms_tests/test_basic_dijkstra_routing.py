@@ -55,7 +55,8 @@ class TestBasicDijkstraRouting(unittest.TestCase):
                 if vertex != vertex_to:
                     graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
         PacmanDataWriter().set_runtime_machine_graph(graph)
-        routing_paths = basic_dijkstra_routing(placements)
+        PacmanDataWriter().set_placements(placements)
+        routing_paths = basic_dijkstra_routing()
 
         for vertex in vertices:
             vertices_reached = set()

@@ -44,6 +44,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         placements = Placements(
             Placement(vertex, chip.x, chip.y, 1)
             for vertex, chip in zip(vertices, eth_chips))
+        PacmanDataWriter().set_placements(placements)
         tags = basic_tag_allocator(
             plan_n_timesteps=None, placements=placements)
 
@@ -91,6 +92,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         placements.add_placements(
             Placement(vertex, eth_chip_2.x, eth_chip_2.y, proc)
             for proc, vertex in zip(eth2_procs, eth2_vertices))
+        PacmanDataWriter().set_placements(placements)
         tags = basic_tag_allocator(
            plan_n_timesteps=None, placements=placements)
 

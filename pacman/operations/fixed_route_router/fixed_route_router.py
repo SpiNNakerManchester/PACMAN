@@ -21,10 +21,9 @@ from pacman.exceptions import (
     PacmanRoutingException)
 
 
-def fixed_route_router(placements, destination_class):
+def fixed_route_router(destination_class):
     """ Runs the fixed route generator for all boards on machine
 
-    :param Placements placements: placements object
     :param destination_class: the destination class to route packets to
     :type destination_class: type or tuple(type,...)
     :return: router tables for fixed route paths
@@ -33,7 +32,7 @@ def fixed_route_router(placements, destination_class):
     :raises PacmanRoutingException:
     :raises PacmanAlreadyExistsException:
     """
-    router = _FixedRouteRouter(placements, destination_class)
+    router = _FixedRouteRouter(destination_class)
     return router._run()
 
 
@@ -46,10 +45,11 @@ class _FixedRouteRouter(object):
         "_destination_class", "_fixed_route_tables",
         "_machine", "_placements"]
 
-    def __init__(self, placements, destination_class):
-        self._machine = PacmanDataView().machine
+    def __init__(self, destination_class):
+        view = PacmanDataView()
+        self._machine = view.machine
         self._destination_class = destination_class
-        self._placements = placements
+        self._placements = view.placements
         self._fixed_route_tables = dict()
 
     def _run(self):
