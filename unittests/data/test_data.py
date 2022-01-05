@@ -158,7 +158,7 @@ class TestSimulatorData(unittest.TestCase):
         writer = PacmanDataWriter()
         writer.setup()
         with self.assertRaises(DataNotYetAvialable):
-            a = view.placements
+            view.placements
         info = Placements([])
         writer.set_placements(info)
         self.assertEqual(info, view.placements)
