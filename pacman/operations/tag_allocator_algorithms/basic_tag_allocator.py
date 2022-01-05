@@ -51,7 +51,7 @@ def basic_tag_allocator(plan_n_timesteps, placements):
     # Check that the algorithm can handle the constraints
     progress = ProgressBar(placements.n_placements, "Discovering tags")
     placements_with_tags = list()
-    for placement in progress.over(placements.placements):
+    for placement in progress.over(placements):
         __gather_placements_with_tags(placement, placements_with_tags)
 
     # Go through and allocate the IP tags and constrained reverse IP tags

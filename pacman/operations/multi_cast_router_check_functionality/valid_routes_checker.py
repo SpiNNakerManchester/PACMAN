@@ -56,9 +56,9 @@ def validate_routes(placements, routing_infos, routing_tables, machine):
 
     machine_graph = PacmanDataView().runtime_machine_graph
     progress = ProgressBar(
-        placements.placements,
+        placements.n_placements,
         "Verifying the routes from each core travel to the correct locations")
-    for placement in progress.over(placements.placements):
+    for placement in progress.over(placements):
 
         # locate all placements to which this placement/vertex will
         # communicate with for a given key_and_mask and search its

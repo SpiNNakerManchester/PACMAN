@@ -75,7 +75,7 @@ class TestRadialPlacer(unittest.TestCase):
         self.vertex3.add_constraint(RadialPlacementFromChipConstraint(2, 4))
         PacmanDataWriter().set_runtime_machine_graph(self.mach_graph)
         placements = radial_placer(100)
-        for placement in placements.placements:
+        for placement in placements:
             if placement.vertex == self.vertex2:
                 self.assertEqual(placement.x, 3)
                 self.assertEqual(placement.y, 5)

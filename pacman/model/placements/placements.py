@@ -147,15 +147,6 @@ class Placements(object):
         """
         return (x, y, p) in self._placements
 
-    @property
-    def placements(self):
-        """ All of the placements
-
-        :return: iterable of placements
-        :rtype: iterable(Placement)
-        """
-        return iter(self._placements.values())
-
     def __repr__(self):
         output = ""
         for placement in self._placements:
@@ -165,7 +156,7 @@ class Placements(object):
     def __iter__(self):
         """ An iterator for the placements object within
         """
-        return iter(self.placements)
+        return iter(self._placements.values())
 
     def __len__(self):
         return len(self._placements)
