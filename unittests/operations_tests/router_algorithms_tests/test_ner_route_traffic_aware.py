@@ -33,6 +33,7 @@ class TestNerRouteTrafficAware(unittest.TestCase):
         unittest_setup()
 
     def test_routing(self):
+        writer = PacmanDataWriter.mock()
         graph = MachineGraph("Test")
         set_config("Machine", "down_chips", "1,2:5,4:3,3")
         placements = Placements()
@@ -53,8 +54,8 @@ class TestNerRouteTrafficAware(unittest.TestCase):
             for vertex_to in vertices:
                 graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
-        PacmanDataWriter().set_runtime_machine_graph(graph)
-        PacmanDataWriter().set_placements(placements)
+        writer.set_runtime_machine_graph(graph)
+        writer.set_placements(placements)
         routing_paths = ner_route_traffic_aware()
 
         for vertex in vertices:

@@ -70,7 +70,7 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test a partitioning with a graph with no extra constraints
         """
-        PacmanDataWriter()._set_runtime_graph(self.graph)
+        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
         graph, _ = splitter_partitioner(3000)
         self.assertEqual(len(list(graph.vertices)), 3)
         vert_sizes = []
@@ -86,7 +86,7 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         self.graph.add_edge(
             ApplicationEdge(self.vert3, self.vert1, label="extra"), "TEST")
-        PacmanDataWriter()._set_runtime_graph(self.graph)
+        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
         graph, _ = splitter_partitioner(3000)
         self.assertEqual(len(list(graph.vertices)), 3)
         self.assertEqual(len(list(graph.edges)), 4)
@@ -100,7 +100,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        PacmanDataWriter()._set_runtime_graph(self.graph)
+        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
         graph, _ = splitter_partitioner(1000)
         self.assertGreater(len(list(graph.vertices)), 1)
 
@@ -114,7 +114,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        PacmanDataWriter()._set_runtime_graph(self.graph)
+        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
         graph, _ = splitter_partitioner(3000)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.assertGreater(len(list(graph.vertices)), 1)
@@ -128,7 +128,7 @@ class TestBasicPartitioner(unittest.TestCase):
         large_vertex.splitter = SplitterSliceLegacy()
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        PacmanDataWriter()._set_runtime_graph(self.graph)
+        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
         graph, _ = splitter_partitioner(3000)
         self.assertEqual(len(list(graph.vertices)), 100)
 
@@ -136,6 +136,7 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that partitioning will work when close to filling the machine
         """
+        writer = PacmanDataWriter.mock()
         n_processors = 18
         (e, ne, n, w, _, _) = range(6)
 
@@ -161,7 +162,7 @@ class TestBasicPartitioner(unittest.TestCase):
                 else:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
-        PacmanDataWriter().set_machine(machine_from_chips(chips))
+        writer.set_machine(machine_from_chips(chips))
         n_neurons = 17 * 5 * 5
         singular_vertex = SimpleTestVertex(n_neurons, "Large vertex",
                                            max_atoms_per_core=1)
@@ -169,7 +170,7 @@ class TestBasicPartitioner(unittest.TestCase):
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(singular_vertex)
-        PacmanDataWriter()._set_runtime_graph(self.graph)
+        writer._set_runtime_graph(self.graph)
         graph, _ = splitter_partitioner(3000)
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.assertEqual(len(list(graph.vertices)), n_neurons)
@@ -179,6 +180,7 @@ class TestBasicPartitioner(unittest.TestCase):
         test that if there's not enough space, the test the partitioner will
         raise an error
         """
+        writer = PacmanDataWriter.mock()
         n_processors = 18
         (e, ne, n, w, _, _) = range(6)
 
@@ -204,14 +206,14 @@ class TestBasicPartitioner(unittest.TestCase):
                 else:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
-        PacmanDataWriter().set_machine(machine_from_chips(chips))
+        writer.set_machine(machine_from_chips(chips))
         large_vertex = SimpleTestVertex(3000, "Large vertex",
                                         max_atoms_per_core=1)
         large_vertex.splitter = SplitterSliceLegacy()
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        PacmanDataWriter()._set_runtime_graph(self.graph)
+        writer._set_runtime_graph(self.graph)
         with self.assertRaises(PacmanException):
             splitter_partitioner(3000)
 
@@ -220,6 +222,7 @@ class TestBasicPartitioner(unittest.TestCase):
         test that the partitioner works when its machine is slightly malformed
         in that it has less SDRAM available
         """
+        writer = PacmanDataWriter.mock()
         n_processors = 18
         (e, ne, n, w, _, _) = range(6)
 
@@ -245,8 +248,8 @@ class TestBasicPartitioner(unittest.TestCase):
                 else:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
-        PacmanDataWriter().set_machine(machine_from_chips(chips))
-        PacmanDataWriter()._set_runtime_graph(self.graph)
+        writer.set_machine(machine_from_chips(chips))
+        writer._set_runtime_graph(self.graph)
         splitter_partitioner(3000)
 
     def test_partition_with_more_sdram_than_default(self):
@@ -254,6 +257,7 @@ class TestBasicPartitioner(unittest.TestCase):
         test that the partitioner works when its machine is slightly malformed
         in that it has more SDRAM available
         """
+        writer = PacmanDataWriter.mock()
         n_processors = 18
         (e, ne, n, w, _, _) = range(6)
 
@@ -279,8 +283,8 @@ class TestBasicPartitioner(unittest.TestCase):
                 else:
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
-        PacmanDataWriter().set_machine(machine_from_chips(chips))
-        PacmanDataWriter()._set_runtime_graph(self.graph)
+        writer.set_machine(machine_from_chips(chips))
+        writer._set_runtime_graph(self.graph)
         splitter_partitioner(3000)
 
     def test_partition_with_unsupported_constraints(self):
@@ -299,7 +303,7 @@ class TestBasicPartitioner(unittest.TestCase):
         test that the partitioner can work with an empty graph
         """
         self.graph = ApplicationGraph("foo")
-        PacmanDataWriter()._set_runtime_graph(self.graph)
+        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
         graph, _ = splitter_partitioner(3000)
         self.assertEqual(len(list(graph.vertices)), 0)
 
@@ -307,7 +311,7 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test a partitioning with a graph with fixed atom constraint
         """
-
+        writer = PacmanDataWriter.mock()
         # Create a 2x2 machine with 10 cores per chip (so 40 cores),
         # but 1 off 2 per chip (so 19 per chip)
         n_cores_per_chip = 10
@@ -315,7 +319,7 @@ class TestBasicPartitioner(unittest.TestCase):
         set_config("Machine", "max_sdram_allowed_per_chip", sdram_per_chip)
         machine = virtual_machine(
             width=2, height=2, n_cpus_per_chip=n_cores_per_chip)
-        PacmanDataWriter().set_machine(machine)
+        writer.set_machine(machine)
 
         # Create a vertex where each atom requires 1MB (default) of SDRAM
         # but which can't be subdivided lower than 2 atoms per core.
@@ -329,7 +333,7 @@ class TestBasicPartitioner(unittest.TestCase):
         app_graph.add_vertex(vertex)
 
         # Do the partitioning - this should result in an error
-        PacmanDataWriter()._set_runtime_graph(app_graph)
+        writer._set_runtime_graph(app_graph)
         with self.assertRaises(PacmanValueError):
             splitter_partitioner(3000)
 
@@ -338,11 +342,11 @@ class TestBasicPartitioner(unittest.TestCase):
         test a partitioning with a graph with fixed atom constraint which\
         should fit but is close to the limit
         """
-
+        writer = PacmanDataWriter.mock()
         # Create a 2x2 machine with 1 core per chip (so 4 cores),
         # and SDRAM per chip
         n_cores_per_chip = 2  # Remember 1 core is the monitor
-        PacmanDataWriter().set_machine(virtual_machine(
+        writer.set_machine(virtual_machine(
             width=2, height=2, n_cpus_per_chip=n_cores_per_chip))
 
         # Create a vertex which will need to be split perfectly into 4 cores
@@ -354,7 +358,7 @@ class TestBasicPartitioner(unittest.TestCase):
         app_graph.add_vertex(vertex)
 
         # Do the partitioning - this should just work
-        PacmanDataWriter()._set_runtime_graph(app_graph)
+        writer._set_runtime_graph(app_graph)
         machine_graph, _ = splitter_partitioner(3000)
         self.assertEqual(4, len(machine_graph.vertices))
 

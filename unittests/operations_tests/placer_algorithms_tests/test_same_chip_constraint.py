@@ -55,7 +55,7 @@ class TestSameChipConstraint(unittest.TestCase):
 
         n_keys_map = DictBasedMachinePartitionNKeysMap()
 
-        PacmanDataWriter().set_runtime_machine_graph(graph)
+        PacmanDataWriter.mock().set_runtime_machine_graph(graph)
         if placer == "ConnectiveBasedPlacer":
             placements = connective_based_placer(None)
         elif placer == "OneToOnePlacer":

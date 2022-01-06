@@ -47,7 +47,7 @@ class TestPartitionerWithPreAllocatedResources(object):
         # add pre-allocated resources for cores on 0,0
         pre_allocated_res = PreAllocatedResourceContainer()
 
-        PacmanDataWriter()._set_runtime_graph(graph)
+        PacmanDataWriter.mock()._set_runtime_graph(graph)
         # run partitioner that should go boom
         try:
             splitter_partitioner(plan_n_time_steps=None,

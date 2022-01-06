@@ -31,24 +31,21 @@ class TestSimulatorData(unittest.TestCase):
 
     def test_setup(self):
         view = PacmanDataView()
-        writer = PacmanDataWriter()
         # What happens before setup depends on the previous test
         # Use manual_check to verify this without dependency
-        writer.setup()
+        PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             view.graph
 
     def test_mock(self):
         view = PacmanDataView()
-        writer = PacmanDataWriter()
-        writer.mock()
+        PacmanDataWriter.mock()
         # check there is a value not what it is
         view.run_dir_path
 
     def test_graphs(self):
         view = PacmanDataView()
-        writer = PacmanDataWriter()
-        writer.setup()
+        writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             writer.graph
         with self.assertRaises(DataNotYetAvialable):
@@ -121,8 +118,7 @@ class TestSimulatorData(unittest.TestCase):
 
     def test_graph_support(self):
         view = PacmanDataView()
-        writer = PacmanDataWriter()
-        writer.setup()
+        writer = PacmanDataWriter.setup()
         writer.create_graphs("test")
         writer.start_run()
         writer.clone_graphs()
@@ -153,8 +149,7 @@ class TestSimulatorData(unittest.TestCase):
 
     def test_placements(self):
         view = PacmanDataView()
-        writer = PacmanDataWriter()
-        writer.setup()
+        writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             view.placements
         info = Placements([])
@@ -165,8 +160,7 @@ class TestSimulatorData(unittest.TestCase):
 
     def test_routing_infos(self):
         view = PacmanDataView()
-        writer = PacmanDataWriter()
-        writer.setup()
+        writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             view.routing_infos
         info = RoutingInfo()

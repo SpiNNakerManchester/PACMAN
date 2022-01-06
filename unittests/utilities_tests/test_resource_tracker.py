@@ -31,7 +31,7 @@ class TestResourceTracker(unittest.TestCase):
         unittest_setup()
 
     def test_n_cores_available(self):
-        PacmanDataWriter().set_machine(virtual_machine(
+        PacmanDataWriter.mock().set_machine(virtual_machine(
             width=2, height=2, n_cpus_per_chip=18))
         preallocated_resources = PreAllocatedResourceContainer()
         preallocated_resources.add_cores_all(2)
@@ -64,7 +64,7 @@ class TestResourceTracker(unittest.TestCase):
     def test_deallocation_of_resources(self):
         machine = virtual_machine(
             width=2, height=2, n_cpus_per_chip=18)
-        PacmanDataWriter().set_machine(machine)
+        PacmanDataWriter.mock().set_machine(machine)
         chip_sdram = machine.get_chip_at(1, 1).sdram.size
         res_sdram = 12345
 
@@ -130,7 +130,7 @@ class TestResourceTracker(unittest.TestCase):
             0, 0, 1, router, sdram, 0, 0, "127.0.0.1",
             virtual=False, tag_ids=[1])
         machine = machine_from_chips([empty_chip])
-        PacmanDataWriter().set_machine(machine)
+        PacmanDataWriter.mock().set_machine(machine)
         resource_tracker = ResourceTracker(plan_n_timesteps=None)
         with self.assertRaises(PacmanValueError):
             resource_tracker.allocate_resources(

@@ -31,8 +31,9 @@ class TestTagsBoardAddresses(unittest.TestCase):
         unittest_setup()
 
     def test_ip_tags(self):
+        writer = PacmanDataWriter.mock()
         machine = virtual_machine(12, 12)
-        PacmanDataWriter().set_machine(machine)
+        writer.set_machine(machine)
         eth_chips = machine.ethernet_connected_chips
         vertices = [
             SimpleMachineVertex(
@@ -44,7 +45,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         placements = Placements(
             Placement(vertex, chip.x, chip.y, 1)
             for vertex, chip in zip(vertices, eth_chips))
-        PacmanDataWriter().set_placements(placements)
+        writer.set_placements(placements)
         tags = basic_tag_allocator(plan_n_timesteps=None)
 
         for vertex, chip in zip(vertices, eth_chips):
@@ -61,9 +62,10 @@ class TestTagsBoardAddresses(unittest.TestCase):
             print(placement, "has tag", iptags[0])
 
     def test_too_many_ip_tags_for_1_board(self):
+        writer = PacmanDataWriter.mock()
         n_extra_vertices = 3
         machine = virtual_machine(12, 12)
-        PacmanDataWriter().set_machine(machine)
+        writer.set_machine(machine)
         eth_chips = machine.ethernet_connected_chips
         eth_chip = eth_chips[0]
         eth_chip_2 = machine.get_chip_at(eth_chip.x + 1, eth_chip.y + 1)
@@ -91,7 +93,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         placements.add_placements(
             Placement(vertex, eth_chip_2.x, eth_chip_2.y, proc)
             for proc, vertex in zip(eth2_procs, eth2_vertices))
-        PacmanDataWriter().set_placements(placements)
+        writer.set_placements(placements)
         tags = basic_tag_allocator(plan_n_timesteps=None)
 
         tags_by_board = defaultdict(set)

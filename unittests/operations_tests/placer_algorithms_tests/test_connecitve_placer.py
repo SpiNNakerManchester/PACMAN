@@ -61,14 +61,14 @@ class TestConnectivePlacer(unittest.TestCase):
         self.plan_n_timesteps = 100
 
     def test_simple(self):
-        PacmanDataWriter().set_runtime_machine_graph(self.mach_graph)
+        PacmanDataWriter.mock().set_runtime_machine_graph(self.mach_graph)
         placements = connective_based_placer(100)
         self.assertEqual(len(self.vertices), len(placements))
 
     def test_place_vertex_too_big_with_vertex(self):
         cpu_cycles = 1000
         dtcm_requirement = 1000
-        chip00 = PacmanDataWriter().get_chip_at(0, 0)
+        chip00 = PacmanDataWriter.mock().get_chip_at(0, 0)
         sdram_requirement = chip00.sdram.size * 20
         rc = ResourceContainer(
             cpu_cycles=CPUCyclesPerTickResource(cpu_cycles),
@@ -78,14 +78,14 @@ class TestConnectivePlacer(unittest.TestCase):
         large_machine_vertex = SimpleMachineVertex(
             rc, vertex_slice=Slice(0, 499), label="Second vertex")
         self.mach_graph.add_vertex(large_machine_vertex)
-        PacmanDataWriter().set_runtime_machine_graph(self.mach_graph)
+        PacmanDataWriter.mock().set_runtime_machine_graph(self.mach_graph)
         with self.assertRaises(PacmanValueError):
             connective_based_placer(100)
 
     def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
         self.vertex2.add_constraint(ChipAndCoreConstraint(3, 5, 7))
         self.vertex3.add_constraint(RadialPlacementFromChipConstraint(2, 4))
-        PacmanDataWriter().set_runtime_machine_graph(self.mach_graph)
+        PacmanDataWriter.mock().set_runtime_machine_graph(self.mach_graph)
         placements = connective_based_placer(100)
         for placement in placements:
             if placement.vertex == self.vertex2:
@@ -98,13 +98,14 @@ class TestConnectivePlacer(unittest.TestCase):
         self.assertEqual(len(self.vertices), len(placements))
 
     def test_fill_machine(self):
+        writer = PacmanDataWriter.mock()
         graph = MachineGraph("machine")
-        chips = PacmanDataWriter().machine.chips
+        chips = writer.machine.chips
         cores = sum(chip.n_user_processors for chip in chips)
         for i in range(cores):  # 50 atoms per each processor on 20 chips
             graph.add_vertex(get_resourced_machine_vertex(
                 0, 50, "vertex " + str(i)))
-        PacmanDataWriter().set_runtime_machine_graph(graph)
+        writer.set_runtime_machine_graph(graph)
         placements = connective_based_placer(100)
         self.assertEqual(len(placements), cores)
         # One more vertex should be too many

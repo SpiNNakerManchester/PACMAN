@@ -33,6 +33,7 @@ def test_virtual_vertices_spreader():
     """ Test that the placer works with a virtual vertex
     """
     unittest_setup()
+    writer = PacmanDataWriter.mock()
 
     # Create a graph with a virtual vertex
     machine_graph = MachineGraph("Test")
@@ -67,11 +68,11 @@ def test_virtual_vertices_spreader():
     n_keys_map.set_n_keys_for_partition(partition, 1)
 
     # Get and extend the machine for the virtual chip
-    PacmanDataWriter().set_runtime_machine_graph(machine_graph)
-    machine = PacmanDataWriter().machine
+    writer.set_runtime_machine_graph(machine_graph)
+    machine = writer.machine
     malloc_based_chip_id_allocator()
 
-    PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+    writer.set_runtime_machine_graph(machine_graph)
     # Do placements
     placements = spreader_placer(n_keys_map, plan_n_timesteps=1000)
 
@@ -138,7 +139,7 @@ def test_one_to_one():
         last_vertex = vertex
 
     # Do placements
-    PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+    PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
     placements = spreader_placer(n_keys_map, plan_n_timesteps=1000)
 
     # The 1-1 connected vertices should be on the same chip
@@ -183,6 +184,6 @@ def test_sdram_links():
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
     # Do placements
-    PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+    PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
     with pytest.raises(PacmanException):
         spreader_placer(n_keys_map, plan_n_timesteps=1000)

@@ -31,10 +31,11 @@ from pacman.operations.placer_algorithms import (
      "SpreaderPlacer"])
 def test_virtual_placement(placer):
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     graph = MachineGraph("Test")
     virtual_vertex = MachineSpiNNakerLinkVertex(spinnaker_link_id=0)
     graph.add_vertex(virtual_vertex)
-    PacmanDataWriter().set_runtime_machine_graph(graph)
+    writer.set_runtime_machine_graph(graph)
     malloc_based_chip_id_allocator()
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
@@ -50,5 +51,5 @@ def test_virtual_placement(placer):
         raise NotImplementedError(placer)
 
     placement = placements.get_placement_of_vertex(virtual_vertex)
-    chip = PacmanDataWriter().get_chip_at(placement.x, placement.y)
+    chip = writer.get_chip_at(placement.x, placement.y)
     assert chip.virtual

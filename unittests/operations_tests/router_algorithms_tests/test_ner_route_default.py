@@ -22,6 +22,7 @@ from pacman.operations.router_algorithms.ner_route import ner_route
 
 def test_ner_route_default():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     graph = MachineGraph("Test")
     placements = Placements()
 
@@ -35,8 +36,8 @@ def test_ner_route_default():
     graph.add_edge(edge, "Test")
     partition = graph.get_outgoing_partition_for_edge(edge)
 
-    PacmanDataWriter().set_runtime_machine_graph(graph)
-    PacmanDataWriter().set_placements(placements)
+    writer.set_runtime_machine_graph(graph)
+    writer.set_placements(placements)
     routes = ner_route()
 
     source_route = routes.get_entries_for_router(0, 0)[partition]

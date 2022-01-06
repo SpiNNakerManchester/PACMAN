@@ -48,9 +48,10 @@ def _get_destinations(machine, fixed_route_tables, source_x, source_y):
 
 def _check_setup(width, height):
     machine = virtual_machine(width=width, height=height)
-    PacmanDataWriter().set_machine(machine)
+    writer = PacmanDataWriter.mock()
+    writer.set_machine(machine)
     ethernet_chips = machine.ethernet_connected_chips
-    PacmanDataWriter().set_placements(Placements(
+    writer.set_placements(Placements(
         Placement(DestinationVertex(), ethernet_chip.x, ethernet_chip.y, 1)
         for ethernet_chip in ethernet_chips))
 

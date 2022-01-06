@@ -32,6 +32,7 @@ def test_virtual_vertices_one_to_one():
     """ Test that the placer works with a virtual vertex
     """
     unittest_setup()
+    writer = PacmanDataWriter.mock()
 
     # Create a graph with a virtual vertex
     machine_graph = MachineGraph("Test")
@@ -61,11 +62,11 @@ def test_virtual_vertices_one_to_one():
         one_to_one_vertices.append(one_to_one_vertex)
 
     # Get and extend the machine for the virtual chip
-    PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+    writer.set_runtime_machine_graph(machine_graph)
     malloc_based_chip_id_allocator()
-    machine = PacmanDataWriter().machine
+    machine = writer.machine
 
-    PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+    writer.set_runtime_machine_graph(machine_graph)
     # Do placements
     placements = one_to_one_placer(plan_n_timesteps=1000)
 
@@ -123,7 +124,7 @@ def test_one_to_one():
         last_vertex = vertex
 
     # Do placements
-    PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+    PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
     placements = one_to_one_placer(plan_n_timesteps=1000)
 
     # The 1-1 connected vertices should be on the same chip
@@ -167,6 +168,6 @@ def test_sdram_links():
         machine_graph.add_edge(edge, "SDRAM")
 
     # Do placements
-    PacmanDataWriter().set_runtime_machine_graph(machine_graph)
+    PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
     with pytest.raises(PacmanException):
         one_to_one_placer(plan_n_timesteps=1000)

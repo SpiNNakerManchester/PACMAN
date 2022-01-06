@@ -32,7 +32,7 @@ def unittest_setup():
     """
     clear_cfg_files(True)
     add_pacman_cfg()
-    PacmanDataWriter().mock()
+    PacmanDataWriter.mock()
 
 
 def add_pacman_cfg():

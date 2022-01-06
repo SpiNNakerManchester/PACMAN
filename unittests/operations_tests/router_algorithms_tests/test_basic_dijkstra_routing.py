@@ -33,6 +33,7 @@ class TestBasicDijkstraRouting(unittest.TestCase):
         unittest_setup()
 
     def test_routing(self):
+        writer = PacmanDataWriter.mock()
         graph = MachineGraph("Test")
         machine = PacmanDataView().machine
         placements = Placements()
@@ -54,8 +55,8 @@ class TestBasicDijkstraRouting(unittest.TestCase):
             for vertex_to in vertices:
                 if vertex != vertex_to:
                     graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
-        PacmanDataWriter().set_runtime_machine_graph(graph)
-        PacmanDataWriter().set_placements(placements)
+        writer.set_runtime_machine_graph(graph)
+        writer.set_placements(placements)
         routing_paths = basic_dijkstra_routing()
 
         for vertex in vertices:
