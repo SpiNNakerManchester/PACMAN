@@ -15,6 +15,7 @@
 
 import logging
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
 from spinn_machine.data.machine_data_writer import MachineDataWriter
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph
@@ -37,29 +38,14 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
     __pacman_data = _PacmanDataModel()
     __slots__ = []
 
-    def mock(self):
-        """
-        Clears out all data and adds mock values where needed.
-
-        This should set the most likely defaults values.
-        But be aware that what is considered the most likely default could
-        change over time.
-
-        Unittests that depend on any valid value being set should be able to
-        depend on Mock.
-
-        Unittest that depend on a specific value should call mock and then
-        set that value.
-        """
-        MachineDataWriter.mock(self)
+    @overrides(MachineDataWriter._mock)
+    def _mock(self):
+        MachineDataWriter._mock(self)
         self.__pacman_data._clear()
 
-    def setup(self):
-        """
-        Puts all data back into the state expected at sim.setup time
-
-        """
-        MachineDataWriter.setup(self)
+    @overrides(MachineDataWriter._setup)
+    def _setup(self):
+        MachineDataWriter._setup(self)
         self.__pacman_data._clear()
 
     def hard_reset(self):
