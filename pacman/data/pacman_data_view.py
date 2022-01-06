@@ -13,9 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 from spinn_utilities.data.data_status import Data_Status
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.exceptions import DataLocked
 from spinn_machine.data import MachineDataView
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class _PacmanDataModel(object):
@@ -177,7 +181,12 @@ class PacmanDataView(MachineDataView):
             raise self._exception("runtime_graph")
         if self.status not in [
                 Data_Status.IN_RUN, Data_Status.MOCKED, Data_Status.STOPPING]:
-            raise DataLocked("runtime_graph", self.status)
+            if self.status == Data_Status.FINISHED:
+                logger.warning(
+                    "The runtime_graph is from the previous run and "
+                    "may change during the next run")
+            else:
+                raise DataLocked("runtime_graph", self.status)
         return self.__pacman_data._runtime_graph
 
     @property
@@ -204,7 +213,12 @@ class PacmanDataView(MachineDataView):
             raise self._exception("runtime_machine_graph")
         if self.status not in [
                 Data_Status.IN_RUN, Data_Status.MOCKED, Data_Status.STOPPING]:
-            raise DataLocked("runtime_machine_graph", self.status)
+            if self.status == Data_Status.FINISHED:
+                logger.warning(
+                    "The runtime_machine_graph is from the previous run and "
+                    "may change during the next run")
+            else:
+                raise DataLocked("runtime_machine_graph", self.status)
         return self.__pacman_data._runtime_machine_graph
 
     @property

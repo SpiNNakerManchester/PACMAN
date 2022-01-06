@@ -90,10 +90,8 @@ class TestSimulatorData(unittest.TestCase):
         writer.finish_run()
         writer.graph
         writer.machine_graph
-        with self.assertRaises(DataLocked):
-            writer.runtime_graph
-        with self.assertRaises(DataLocked):
-            writer.runtime_machine_graph()
+        writer.runtime_graph
+        writer.runtime_machine_graph
         # the writer still has access to the runtime graphs
         writer.get_runtime_graph()
         writer.get_runtime_machine_graph()
