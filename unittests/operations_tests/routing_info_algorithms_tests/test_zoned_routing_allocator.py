@@ -30,10 +30,10 @@ class TestSplitter(AbstractSplitterCommon):
     def create_machine_vertices(self, chip_counter):
         return 1
 
-    def get_out_going_vertices(self, outgoing_edge_partition):
+    def get_out_going_vertices(self, partition_id):
         return self._governed_app_vertex.machine_vertices
 
-    def get_in_coming_vertices(self, outgoing_edge_partition):
+    def get_in_coming_vertices(self, partition_id):
         return self._governed_app_vertex.machine_vertices
 
     def machine_vertices_for_recording(self, variable_to_record):

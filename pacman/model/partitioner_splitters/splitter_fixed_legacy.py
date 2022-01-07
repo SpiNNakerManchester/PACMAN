@@ -64,11 +64,11 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
                 logger.warning(self.NOT_API_WARNING)
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, outgoing_edge_partition):
+    def get_out_going_vertices(self, partition_id):
         return self._governed_app_vertex.machine_vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, outgoing_edge_partition):
+    def get_in_coming_vertices(self, partition_id):
         return self._governed_app_vertex.machine_vertices
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)

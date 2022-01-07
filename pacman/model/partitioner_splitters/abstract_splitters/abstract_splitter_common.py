@@ -179,30 +179,50 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_out_going_vertices(self, outgoing_edge_partition):
+    def get_out_going_vertices(self, partition_id):
         """ Get machine pre vertices
 
         The output vertices are the ones that will serve as source vertices
         for external edges.
 
-        :param outgoing_edge_partition: application outgoing edge partition
-        :type outgoing_edge_partition:
-            ~pacman.model.graphs.OutgoingEdgePartition
+        :param str partition_id: The identifier of the outgoing partition
         :rtype: list(MachineVertex)
         """
 
     @abstractmethod
-    def get_in_coming_vertices(self, outgoing_edge_partition):
-        """ Get machine post vertices
+    def get_in_coming_vertices(self, partition_id):
+        """ Get machine post vertices for a given partition.
 
-        The input vertices are the ones that will serve as dest vertices
-        for external edges.
+        The input vertices are the ones that will serve as target vertices
+        for external edges.  Note this method returns all that could be used
+        for any source machine vertex in the given partition.
 
-        :param outgoing_edge_partition: application outgoing edge partition
-        :type outgoing_edge_partition:
-            ~pacman.model.graphs.OutgoingEdgePartition
+        :param str partition_id: The identifier of the incoming partition
         :rtype: list(MachineVertex)
         """
+
+    def get_source_specific_in_coming_vertices(
+            self, source_vertex, partition_id):
+        """ Get machine post vertices for a given source.
+
+        The input vertices are the ones that will serve as target vertices
+        for external edges.  Note this method allows filtering of the targets
+        for a specific source machine vertex.
+
+        This default method makes every machine vertex a target for the source.
+        This should be overridden if there are specific machine vertices for
+        any given source vertex.
+
+        :param ApplicationVertex source_vertex:
+            The source to get incoming vertices for
+        :param str partition_id: The identifier of the incoming partition
+        :return: A list of tuples of (target machine vertex, list of source
+            machine or application vertices that should hit the target)
+        :rtype: list(tuple(MachineVertex,
+                     list(MachineVertex or ApplicationVertex)))
+        """
+        return [(m_vertex, [source_vertex])
+                for m_vertex in self.get_in_coming_vertices(partition_id)]
 
     @abstractmethod
     def machine_vertices_for_recording(self, variable_to_record):

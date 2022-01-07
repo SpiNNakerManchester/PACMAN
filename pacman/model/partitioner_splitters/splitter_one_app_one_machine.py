@@ -63,11 +63,11 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
         return [self._governed_app_vertex.machine_vertex.vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, outgoing_edge_partition):
+    def get_out_going_vertices(self, partition_id):
         return [self._governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, outgoing_edge_partition):
+    def get_in_coming_vertices(self, partition_id):
         return [self._governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)

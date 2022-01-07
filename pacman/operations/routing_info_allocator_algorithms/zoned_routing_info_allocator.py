@@ -206,7 +206,8 @@ class ZonedRoutingInfoAllocator(object):
         partitions = self.__app_graph.outgoing_edge_partitions
         for partition in progress.over(partitions):
             splitter = partition.pre_vertex.splitter
-            machine_vertices = splitter.get_out_going_vertices(partition)
+            machine_vertices = splitter.get_out_going_vertices(
+                partition.identifier)
             for machine_vertex in machine_vertices:
                 max_keys = 0
                 if ((partition.identifier, machine_vertex) not in
@@ -287,7 +288,8 @@ class ZonedRoutingInfoAllocator(object):
                 app_part_index += 1
             # Get a list of machine vertices ordered by pre-slice
             splitter = partition.pre_vertex.splitter
-            machine_vertices = list(splitter.get_out_going_vertices(partition))
+            machine_vertices = list(splitter.get_out_going_vertices(
+                partition.identifier))
             machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
             n_bits_atoms = self.__atom_bits_per_app_part[partition]
             if self.__flexible:
