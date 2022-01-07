@@ -131,8 +131,8 @@ class PacmanDataView(MachineDataView):
         if self.__pacman_data._graph is None:
             raise self._exception("graph")
         # The writer overrides this method without this safety
-        if self.status in [Data_Status.IN_RUN, Data_Status.STOPPING]:
-            raise DataLocked("graph", self.status)
+        if self.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
+            raise DataLocked("graph", self.get_status())
         return self.__pacman_data._graph
 
     @property
@@ -152,8 +152,8 @@ class PacmanDataView(MachineDataView):
         if self.__pacman_data._machine_graph is None:
             raise self._exception("machine_graph")
         # The writer overrides this method without this safety
-        if self.status in [Data_Status.IN_RUN, Data_Status.STOPPING]:
-            raise DataLocked("machine_graph", self.status)
+        if self.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
+            raise DataLocked("machine_graph", self.get_status())
         return self.__pacman_data._machine_graph
 
     @property
@@ -179,14 +179,14 @@ class PacmanDataView(MachineDataView):
         """
         if self.__pacman_data._runtime_graph is None:
             raise self._exception("runtime_graph")
-        if self.status not in [
+        if self.get_status() not in [
                 Data_Status.IN_RUN, Data_Status.MOCKED, Data_Status.STOPPING]:
-            if self.status == Data_Status.FINISHED:
+            if self.get_status() == Data_Status.FINISHED:
                 logger.warning(
                     "The runtime_graph is from the previous run and "
                     "may change during the next run")
             else:
-                raise DataLocked("runtime_graph", self.status)
+                raise DataLocked("runtime_graph", self.get_status())
         return self.__pacman_data._runtime_graph
 
     @property
@@ -211,14 +211,14 @@ class PacmanDataView(MachineDataView):
         """
         if self.__pacman_data._runtime_machine_graph is None:
             raise self._exception("runtime_machine_graph")
-        if self.status not in [
+        if self.get_status() not in [
                 Data_Status.IN_RUN, Data_Status.MOCKED, Data_Status.STOPPING]:
-            if self.status == Data_Status.FINISHED:
+            if self.get_status() == Data_Status.FINISHED:
                 logger.warning(
                     "The runtime_machine_graph is from the previous run and "
                     "may change during the next run")
             else:
-                raise DataLocked("runtime_machine_graph", self.status)
+                raise DataLocked("runtime_machine_graph", self.get_status())
         return self.__pacman_data._runtime_machine_graph
 
     @property
@@ -281,7 +281,7 @@ class PacmanDataView(MachineDataView):
                 return self.runtime_graph
         except Exception:
             # In mocked there may only be a machine_graph
-            if self.status != Data_Status.MOCKED:
+            if self.get_status() != Data_Status.MOCKED:
                 raise
         if self.runtime_machine_graph.n_vertices:
             return self.runtime_machine_graph

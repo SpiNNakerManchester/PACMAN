@@ -38,10 +38,9 @@ class TestSimulatorData(unittest.TestCase):
             view.graph
 
     def test_mock(self):
-        view = PacmanDataView()
         PacmanDataWriter.mock()
         # check there is a value not what it is
-        view.run_dir_path
+        PacmanDataView.get_run_dir_path()
 
     def test_graphs(self):
         view = PacmanDataView()
