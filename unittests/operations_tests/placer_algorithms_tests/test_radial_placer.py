@@ -15,6 +15,7 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
+from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
@@ -57,7 +58,7 @@ class TestRadialPlacer(unittest.TestCase):
         writer = PacmanDataWriter.mock()
         cpu_cycles = 1000
         dtcm_requirement = 1000
-        chip00 = writer.get_chip_at(0, 0)
+        chip00 = PacmanDataView.get_chip_at(0, 0)
         sdram_requirement = chip00.sdram.size * 20
         rc = ResourceContainer(
             cpu_cycles=CPUCyclesPerTickResource(cpu_cycles),
@@ -89,7 +90,7 @@ class TestRadialPlacer(unittest.TestCase):
     def test_fill_machine(self):
         writer = PacmanDataWriter.mock()
         graph = MachineGraph("machine")
-        chips = writer.machine.chips
+        chips = PacmanDataWriter.get_machine().chips
         cores = sum(chip.n_user_processors for chip in chips)
         for i in range(cores):  # 50 atoms per each processor on 20 chips
             graph.add_vertex(get_resourced_machine_vertex(

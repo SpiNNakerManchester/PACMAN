@@ -15,6 +15,7 @@
 
 import pytest
 from pacman.config_setup import unittest_setup
+from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.machine import (
     MachineGraph, MachineSpiNNakerLinkVertex)
@@ -51,5 +52,5 @@ def test_virtual_placement(placer):
         raise NotImplementedError(placer)
 
     placement = placements.get_placement_of_vertex(virtual_vertex)
-    chip = writer.get_chip_at(placement.x, placement.y)
+    chip = PacmanDataView.get_chip_at(placement.x, placement.y)
     assert chip.virtual

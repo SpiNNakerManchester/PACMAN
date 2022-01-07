@@ -64,7 +64,6 @@ def test_virtual_vertices_one_to_one():
     # Get and extend the machine for the virtual chip
     writer.set_runtime_machine_graph(machine_graph)
     malloc_based_chip_id_allocator()
-    machine = writer.machine
 
     writer.set_runtime_machine_graph(machine_graph)
     # Do placements
@@ -72,7 +71,7 @@ def test_virtual_vertices_one_to_one():
 
     # The virtual vertex should be on a virtual chip
     placement = placements.get_placement_of_vertex(virtual_vertex)
-    assert machine.get_chip_at(placement.x, placement.y).virtual
+    assert PacmanDataWriter.get_chip_at(placement.x, placement.y).virtual
 
     # The 0, 0 vertices should be on 0, 0
     for vertex in misc_vertices:
@@ -82,7 +81,8 @@ def test_virtual_vertices_one_to_one():
     # The other vertices should *not* be on a virtual chip
     for vertex in one_to_one_vertices:
         placement = placements.get_placement_of_vertex(vertex)
-        assert not machine.get_chip_at(placement.x, placement.y).virtual
+        assert not PacmanDataWriter.get_chip_at(
+            placement.x, placement.y).virtual
 
 
 def test_one_to_one():
