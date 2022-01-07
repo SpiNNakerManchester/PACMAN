@@ -169,15 +169,14 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
     return route[src], route
 
 
-def _is_linked(source, target, direction, machine):
+def _is_linked(source, target, direction):
     """
     :param tuple(int,int) source:
     :param tuple(int,int) target:
     :param int direction:
-    :param ~spinn_machine.Machine machine:
     :rtype: bool
     """
-    s_chip = machine.get_chip_at(source[0], source[1])
+    s_chip = PacmanDataView.get_chip_at(source[0], source[1])
     if s_chip is None:
         return False
     link = s_chip.router.get_link(direction)
@@ -252,7 +251,7 @@ def _copy_and_disconnect_tree(root, machine):
                 # node (no reason to check connectivity between a dead node
                 # and its parent).
                 if _is_linked(
-                        new_parent.chip, new_node.chip, direction, machine):
+                        new_parent.chip, new_node.chip, direction):
                     # Is connected via working link
                     new_parent.append_child((direction, new_node))
                 else:
