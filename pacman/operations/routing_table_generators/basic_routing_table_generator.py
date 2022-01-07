@@ -29,7 +29,7 @@ def basic_routing_table_generator(
     :param MulticastRoutingTableByPartition routing_table_by_partitions:
     :rtype: MulticastRoutingTables
     """
-    machine = PacmanDataView().machine
+    machine = PacmanDataView.get_machine()
     progress = ProgressBar(machine.n_chips, "Generating routing tables")
     routing_tables = MulticastRoutingTables()
     for chip in progress.over(machine.chips):

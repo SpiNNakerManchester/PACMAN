@@ -76,7 +76,7 @@ class _MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         """
         view = PacmanDataView()
         graph = view.runtime_best_graph
-        machine = view.machine
+        machine = PacmanDataView.get_machine()
         progress = ProgressBar(
             graph.n_vertices + machine.n_chips,
             "Allocating virtual identifiers")

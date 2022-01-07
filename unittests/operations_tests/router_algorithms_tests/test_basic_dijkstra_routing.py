@@ -35,7 +35,7 @@ class TestBasicDijkstraRouting(unittest.TestCase):
     def test_routing(self):
         writer = PacmanDataWriter.mock()
         graph = MachineGraph("Test")
-        machine = PacmanDataView().machine
+        machine = PacmanDataView.get_machine()
         placements = Placements()
         vertices = list()
 

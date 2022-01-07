@@ -633,7 +633,7 @@ def _ner_route(vector_to_nodes):
     :rtype: MulticastRoutingTableByPartition
     """
     view = PacmanDataView()
-    machine = view.machine
+    machine = PacmanDataView.get_machine()
     machine_graph = view.runtime_machine_graph
     placements = view.placements
     routing_tables = MulticastRoutingTableByPartition()

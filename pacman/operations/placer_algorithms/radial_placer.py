@@ -166,7 +166,7 @@ class _RadialPlacer(object):
         :return: list of chips.
         :rtype: iterable(tuple(int,int))
         """
-        machine = PacmanDataView().machine
+        machine = PacmanDataView.get_machine()
         if start_chip_x is None or start_chip_y is None:
             first_chip = machine.boot_chip
         else:

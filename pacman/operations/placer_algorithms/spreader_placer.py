@@ -416,7 +416,7 @@ class _SpreaderPlacer(_OneToOnePlacer):
         :return: a list of chips radially from a deduced middle
         :rtype: list(tuple(int,int))
         """
-        machine = PacmanDataView().machine
+        machine = PacmanDataView.get_machine()
         # try the middle chip
         middle_chip_x = math.ceil(machine.max_chip_x / 2)
         middle_chip_y = math.ceil(machine.max_chip_y / 2)

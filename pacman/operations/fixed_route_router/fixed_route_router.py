@@ -47,7 +47,7 @@ class _FixedRouteRouter(object):
 
     def __init__(self, destination_class):
         view = PacmanDataView()
-        self._machine = view.machine
+        self._machine = PacmanDataView.get_machine()
         self._destination_class = destination_class
         self._placements = view.placements
         self._fixed_route_tables = dict()

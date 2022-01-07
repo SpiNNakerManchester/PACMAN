@@ -38,7 +38,7 @@ class TestNerRouteTrafficAware(unittest.TestCase):
         set_config("Machine", "down_chips", "1,2:5,4:3,3")
         placements = Placements()
         vertices = list()
-        machine = PacmanDataView().machine
+        machine = PacmanDataView.get_machine()
         for chip in machine.chips:
             for processor in chip.processors:
                 if not processor.is_monitor:

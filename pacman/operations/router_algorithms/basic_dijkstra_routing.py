@@ -167,7 +167,7 @@ class _BasicDijkstraRouting(object):
         :rtype: dict(tuple(int,int),_NodeInfo)
         """
         nodes_info = dict()
-        for chip in PacmanDataView().machine.chips:
+        for chip in PacmanDataView.get_machine().chips:
             # get_neighbours should return a list of
             # dictionaries of 'x' and 'y' values
             node = _NodeInfo()
@@ -189,7 +189,7 @@ class _BasicDijkstraRouting(object):
         # Holds all the information about nodes within one full run of
         # Dijkstra's algorithm
         tables = dict()
-        for chip in PacmanDataView().machine.chips:
+        for chip in PacmanDataView.get_machine().chips:
             tables[chip.x, chip.y] = _DijkstraInfo()
         return tables
 

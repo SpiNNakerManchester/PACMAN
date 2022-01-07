@@ -144,7 +144,7 @@ class ResourceTracker(object):
         self._core_tracker = dict()
 
         # The machine object
-        self._machine = PacmanDataView().machine
+        self._machine = PacmanDataView.get_machine()
 
         # The number of timesteps that should be planned for.
         self._plan_n_timesteps = plan_n_timesteps
