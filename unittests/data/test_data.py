@@ -42,14 +42,13 @@ class TestSimulatorData(unittest.TestCase):
         PacmanDataView.get_run_dir_path()
 
     def test_graphs(self):
-        view = PacmanDataView()
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_graph()
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_machine_graph()
         with self.assertRaises(DataNotYetAvialable):
-            writer.runtime_graph
+            PacmanDataView.get_runtime_graph()
         with self.assertRaises(DataNotYetAvialable):
             writer.runtime_machine_graph()
 
@@ -57,13 +56,13 @@ class TestSimulatorData(unittest.TestCase):
         writer.get_graph()
         writer.get_machine_graph()
         with self.assertRaises(DataNotYetAvialable):
-            writer.runtime_graph
+            PacmanDataView.get_runtime_graph()
         with self.assertRaises(DataNotYetAvialable):
             writer.runtime_machine_graph()
 
         writer.clone_graphs()
         with self.assertRaises(DataLocked):
-            writer.runtime_graph
+            PacmanDataView.get_runtime_graph()
         with self.assertRaises(DataLocked):
             writer.runtime_machine_graph()
         # the writer still has access to the runtime graphs
@@ -71,7 +70,7 @@ class TestSimulatorData(unittest.TestCase):
         writer.get_runtime_machine_graph()
 
         writer.start_run()
-        writer.runtime_graph
+        PacmanDataView.get_runtime_graph()
         writer.runtime_machine_graph
         # the writer still has access to the user graphs
         writer.get_graph()
@@ -85,14 +84,14 @@ class TestSimulatorData(unittest.TestCase):
         writer.finish_run()
         PacmanDataView.get_graph()
         PacmanDataView.get_machine_graph()
-        writer.runtime_graph
+        PacmanDataView.get_runtime_graph()
         writer.runtime_machine_graph
         # the writer still has access to the runtime graphs
         writer.get_runtime_graph()
         writer.get_runtime_machine_graph()
 
         writer.stopping()
-        writer.runtime_graph
+        PacmanDataView.get_runtime_graph()
         writer.runtime_machine_graph
         # the writer still has access to the user graphs
         writer.get_graph()
@@ -107,7 +106,7 @@ class TestSimulatorData(unittest.TestCase):
         PacmanDataView.get_graph()
         PacmanDataView.get_machine_graph()
         with self.assertRaises(DataLocked):
-            writer.runtime_graph
+            PacmanDataView.get_runtime_graph()
         with self.assertRaises(DataLocked):
             writer.runtime_machine_graph()
         # the writer still has access to the runtime graphs
@@ -123,7 +122,7 @@ class TestSimulatorData(unittest.TestCase):
         app1 = SimpleTestVertex(12, "app1")
         app2 = SimpleTestVertex(23, "app21")
         app3 = SimpleTestVertex(33, "app3")
-        writer.runtime_graph.add_vertices([app1, app2, app3])
+        PacmanDataView.get_runtime_graph().add_vertices([app1, app2, app3])
         mach11 = SimpleMachineVertex("mach11",  app_vertex=app1)
         mach12 = SimpleMachineVertex("mach12",  app_vertex=app1)
         mach13 = SimpleMachineVertex("mach13",  app_vertex=app1)
@@ -131,7 +130,7 @@ class TestSimulatorData(unittest.TestCase):
         mach22 = SimpleMachineVertex("mach22",  app_vertex=app2)
         mach31 = SimpleMachineVertex("mach31",  app_vertex=app3)
         mg = MachineGraph(
-            label="my test", application_graph=writer.runtime_graph)
+            label="my test", application_graph=PacmanDataView.get_runtime_graph())
         m_vertices = set([mach11, mach12, mach13, mach21, mach22, mach31])
         mg.add_vertices(m_vertices)
         writer.set_runtime_machine_graph(mg)

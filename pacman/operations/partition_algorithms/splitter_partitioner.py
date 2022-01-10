@@ -94,7 +94,7 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
         :raise PacmanPartitionException:
             If something goes wrong with the partitioning
         """
-        app_graph = PacmanDataView().runtime_graph
+        app_graph = PacmanDataView.get_runtime_graph()
         # check resource tracker can handle constraints
         ResourceTracker.check_constraints(app_graph.vertices)
 

@@ -189,6 +189,39 @@ class PacmanDataView(MachineDataView):
                 raise DataLocked("runtime_graph", self.get_status())
         return self.__pacman_data._runtime_graph
 
+    @classmethod
+    def get_runtime_graph(cls):
+        """
+        The runtime application graph
+
+        This is the run time version of the graph which is created by the
+        simulator to add system vertices.
+        Previously known as asb.application_graph.
+
+        Changes to this graph by anything except the insert algorithms is not
+        supported.
+
+         .. note::
+            The graph returned by this method may be immutable depending on
+            when it is called
+
+        :rtype: ApplicationGraph
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the runtime_graph is currently unavailable, or if this method
+            is used except during run
+        """
+        if cls.__pacman_data._runtime_graph is None:
+            raise cls._exception("runtime_graph")
+        if cls.get_status() not in [
+                Data_Status.IN_RUN, Data_Status.MOCKED, Data_Status.STOPPING]:
+            if cls.get_status() == Data_Status.FINISHED:
+                logger.warning(
+                    "The runtime_graph is from the previous run and "
+                    "may change during the next run")
+            else:
+                raise DataLocked("runtime_graph", cls.get_status())
+        return cls.__pacman_data._runtime_graph
+
     @property
     def runtime_machine_graph(self):
         """
@@ -236,7 +269,7 @@ class PacmanDataView(MachineDataView):
     @property
     def runtime_n_machine_vertices2(self):
         return sum(len(vertex.machine_vertices)
-                   for vertex in self.runtime_graph.vertices)
+                   for vertex in self.get_runtime_graph().vertices)
 
     @property
     def runtime_machine_vertices(self):
@@ -252,7 +285,7 @@ class PacmanDataView(MachineDataView):
 
     @property
     def runtime_machine_vertices2(self):
-        for app_vertex in self.runtime_graph.vertices:
+        for app_vertex in self.get_runtime_graph().vertices:
             yield from app_vertex.machine_vertices
 
     @property
@@ -277,15 +310,17 @@ class PacmanDataView(MachineDataView):
             is used except during run
         """
         try:
-            if self.runtime_graph.n_vertices:
-                return self.runtime_graph
+            runtime_graph = self.get_runtime_graph()
+            if runtime_graph.n_vertices:
+                return runtime_graph
         except Exception:
             # In mocked there may only be a machine_graph
             if self.get_status() != Data_Status.MOCKED:
                 raise
         if self.runtime_machine_graph.n_vertices:
             return self.runtime_machine_graph
-        return self.runtime_graph
+        # both empty for return the application level
+        return self.get_runtime_graph()
 
     # placements
 
