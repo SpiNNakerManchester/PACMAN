@@ -443,8 +443,7 @@ def _avoid_dead_links(root, machine):
     return root, lookup
 
 
-def _do_route(source_vertex, post_vertexes, machine, placements,
-              vector_to_nodes):
+def _do_route(source_vertex, post_vertexes, machine, vector_to_nodes):
     """ Routing algorithm based on Neighbour Exploring Routing (NER).
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
@@ -459,13 +458,12 @@ def _do_route(source_vertex, post_vertexes, machine, placements,
     :param MachineVertex source_vertex:
     :param iterable(MachineVertex) post_vertexes:
     :param ~spinn_machine.Machine machine:
-    :param Placements placements:
     :param vector_to_nodes:
     :return:
     :rtype: RoutingTree
     """
-    source_xy = _vertex_xy(source_vertex, placements, machine)
-    destinations = set(_vertex_xy(post_vertex, placements, machine)
+    source_xy = _vertex_xy(source_vertex, machine)
+    destinations = set(_vertex_xy(post_vertex, machine)
                        for post_vertex in post_vertexes)
     # Generate routing tree (assuming a perfect machine)
     root, lookup = _ner_net(source_xy, destinations, machine, vector_to_nodes)
@@ -476,14 +474,14 @@ def _do_route(source_vertex, post_vertexes, machine, placements,
 
     # Add the sinks in the net to the RoutingTree
     for post_vertex in post_vertexes:
-        tree_node = lookup[_vertex_xy(post_vertex, placements, machine)]
+        tree_node = lookup[_vertex_xy(post_vertex, machine)]
         if isinstance(post_vertex, AbstractVirtual):
             # Sinks with route-to-endpoint constraints must be routed
             # in the according directions.
             route = _route_to_endpoint(post_vertex, machine)
             tree_node.append_child((route, post_vertex))
         else:
-            core = placements.get_placement_of_vertex(post_vertex).p
+            core = PacmanDataView.get_placement_of_vertex(post_vertex).p
             if core is not None:
                 #  Offset the core by 6 as first 6 are the links
                 tree_node.append_child((core + 6, post_vertex))
@@ -495,15 +493,14 @@ def _do_route(source_vertex, post_vertexes, machine, placements,
     return root
 
 
-def _vertex_xy(vertex, placements, machine):
+def _vertex_xy(vertex, machine):
     """
     :param MachineVertex vertex:
-    :param Placements placements:
     :param ~spinn_machine.Machine machine:
     :rtype: tuple(int,int)
     """
     if not isinstance(vertex, AbstractVirtual):
-        placement = placements.get_placement_of_vertex(vertex)
+        placement = PacmanDataView.get_placement_of_vertex(vertex)
         return placement.x, placement.y
     link_data = None
     if isinstance(vertex, AbstractFPGA):
@@ -634,7 +631,6 @@ def _ner_route(vector_to_nodes):
     view = PacmanDataView()
     machine = PacmanDataView.get_machine()
     machine_graph = PacmanDataView.get_runtime_machine_graph()
-    placements = view.placements
     routing_tables = MulticastRoutingTableByPartition()
 
     progress_bar = ProgressBar(len(machine_graph.vertices), "Routing")
@@ -647,9 +643,8 @@ def _ner_route(vector_to_nodes):
             post_vertexes = list(
                 e.post_vertex for e in partition.edges)
             routing_tree = _do_route(
-                source_vertex, post_vertexes, machine, placements,
-                vector_to_nodes)
-            incoming_processor = placements.get_placement_of_vertex(
+                source_vertex, post_vertexes, machine, vector_to_nodes)
+            incoming_processor = PacmanDataView.get_placement_of_vertex(
                 partition.pre_vertex).p
             _convert_a_route(
                 routing_tables, partition, incoming_processor, None,

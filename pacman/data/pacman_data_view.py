@@ -18,6 +18,7 @@ from spinn_utilities.data.data_status import Data_Status
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.exceptions import DataLocked
 from spinn_machine.data import MachineDataView
+from pacman.exceptions import PacmanNotPlacedError
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -292,7 +293,7 @@ class PacmanDataView(MachineDataView):
 
     # placements
 
-    @ property
+    @property
     def placements(self):
         """
         The placements if known
@@ -303,6 +304,27 @@ class PacmanDataView(MachineDataView):
         if self.__pacman_data._placements is None:
             raise self._exception("placements")
         return self.__pacman_data._placements
+
+    @classmethod
+    def get_placement_of_vertex(cls, vertex):
+        """ Return the placement information for a vertex
+
+        Semantic sugar for get_placements().get_placement_of_vertex(vertex)
+        Optimised for speed
+
+        :param MachineVertex vertex: The vertex to find the placement of
+        :return: The placement
+        :rtype: Placement
+        :raise PacmanNotPlacedError: If the vertex has not been placed.
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the placements is currently unavailable
+        """
+        if cls.__pacman_data._placements is None:
+            raise cls._exception("placements")
+        try:
+            return cls.__pacman_data._placements._machine_vertices[vertex]
+        except KeyError as e:
+            raise PacmanNotPlacedError(vertex) from e
 
     # routing_infos
 

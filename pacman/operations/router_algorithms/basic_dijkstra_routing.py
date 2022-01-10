@@ -117,13 +117,12 @@ class _BasicDijkstraRouting(object):
             placements.n_placements, "Creating routing entries")
 
         for placement in progress.over(placements):
-            self._route(placement, placements, nodes_info, tables)
+            self._route(placement, nodes_info, tables)
         return self._routing_paths
 
-    def _route(self, placement, placements, node_info, tables):
+    def _route(self, placement, node_info, tables):
         """
         :param Placement placement:
-        :param Placements placements:
         :param dict(tuple(int,int),_NodeInfo) node_info:
         :param dict(tuple(int,int),_DijkstraInfo) tables:
         """
@@ -140,7 +139,7 @@ class _BasicDijkstraRouting(object):
         view = PacmanDataView()
         for edge in out_going_edges:
             destination = edge.post_vertex
-            dest_place = placements.get_placement_of_vertex(destination)
+            dest_place = PacmanDataView.get_placement_of_vertex(destination)
             chip = view.get_chip_at(dest_place.x, dest_place.y)
             dest_chips.add((chip.x, chip.y))
             edges_to_route.append(edge)
@@ -155,7 +154,7 @@ class _BasicDijkstraRouting(object):
 
         for edge in edges_to_route:
             dest = edge.post_vertex
-            dest_placement = placements.get_placement_of_vertex(dest)
+            dest_placement = PacmanDataView.get_placement_of_vertex(dest)
             self._retrace_back_to_source(
                 dest_placement, tables, edge, node_info, placement.p, graph)
 
