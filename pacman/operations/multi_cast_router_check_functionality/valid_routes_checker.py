@@ -53,7 +53,7 @@ def validate_routes(placements, routing_infos, routing_tables):
     def traffic_multicast(edge):
         return edge.traffic_type == EdgeTrafficType.MULTICAST
 
-    machine_graph = PacmanDataView().runtime_machine_graph
+    machine_graph = PacmanDataView.get_runtime_machine_graph()
     progress = ProgressBar(
         placements.n_placements,
         "Verifying the routes from each core travel to the correct locations")

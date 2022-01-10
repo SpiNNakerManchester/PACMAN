@@ -66,7 +66,7 @@ class _MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         :rtype: RoutingInfo
         :raises PacmanRouteInfoAllocationException:
         """
-        machine_graph = PacmanDataView().runtime_machine_graph
+        machine_graph = PacmanDataView.get_runtime_machine_graph()
         # check that this algorithm supports the constraints
         check_algorithm_can_support_constraints(
             constrained_vertices=machine_graph.outgoing_edge_partitions,

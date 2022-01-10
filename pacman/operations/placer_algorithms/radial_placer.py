@@ -57,7 +57,7 @@ class _RadialPlacer(object):
         :raise PacmanPlaceException:
             If something goes wrong with the placement
         """
-        machine_graph = PacmanDataView().runtime_machine_graph
+        machine_graph = PacmanDataView.get_runtime_machine_graph()
         # check that the algorithm can handle the constraints
         self._check_constraints(machine_graph.vertices)
 

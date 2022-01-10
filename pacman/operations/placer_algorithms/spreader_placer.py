@@ -79,7 +79,7 @@ class _SpreaderPlacer(_OneToOnePlacer):
         :return: placements.
         :rtype: Placements
         """
-        machine_graph = PacmanDataView().runtime_machine_graph
+        machine_graph = PacmanDataView.get_runtime_machine_graph()
         # create progress bar
         progress_bar = ProgressBar(
             (machine_graph.n_vertices * self.ITERATIONS) + self.STEPS,

@@ -633,7 +633,7 @@ def _ner_route(vector_to_nodes):
     """
     view = PacmanDataView()
     machine = PacmanDataView.get_machine()
-    machine_graph = view.runtime_machine_graph
+    machine_graph = PacmanDataView.get_runtime_machine_graph()
     placements = view.placements
     routing_tables = MulticastRoutingTableByPartition()
 

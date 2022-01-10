@@ -127,7 +127,7 @@ class _BasicDijkstraRouting(object):
         :param dict(tuple(int,int),_NodeInfo) node_info:
         :param dict(tuple(int,int),_DijkstraInfo) tables:
         """
-        graph = PacmanDataView().runtime_machine_graph
+        graph = PacmanDataView.get_runtime_machine_graph()
         # pylint: disable=too-many-arguments
         out_going_edges = (
             edge

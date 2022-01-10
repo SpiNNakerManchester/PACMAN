@@ -72,7 +72,7 @@ class _OneToOnePlacer(_RadialPlacer):
         :raise PacmanPlaceException:
             If something goes wrong with the placement
         """
-        machine_graph = PacmanDataView().runtime_machine_graph
+        machine_graph = PacmanDataView.get_runtime_machine_graph()
         # Iterate over vertices and generate placements
         # +3 covers check_constraints, get_same_chip_vertex_groups and
         #    create_vertices_groups

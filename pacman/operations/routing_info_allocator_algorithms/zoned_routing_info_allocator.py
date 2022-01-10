@@ -116,7 +116,7 @@ class ZonedRoutingInfoAllocator(object):
         """
         # check that this algorithm supports the constraints put onto the
         # partitions
-        self.__machine_graph = PacmanDataView().runtime_machine_graph
+        self.__machine_graph = PacmanDataView.get_runtime_machine_graph()
         self.__n_keys_map = n_keys_map
         self.__n_bits_atoms_and_mac = 0
         self.__n_bits_machine = 0
