@@ -113,8 +113,8 @@ class PacmanDataView(MachineDataView):
 
     # graph methods
 
-    @property
-    def graph(self):
+    @classmethod
+    def get_graph(cls):
         """
         The user level application graph
 
@@ -128,12 +128,12 @@ class PacmanDataView(MachineDataView):
             If the graph is currently unavailable, or if this method
             is used during run
         """
-        if self.__pacman_data._graph is None:
-            raise self._exception("graph")
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
         # The writer overrides this method without this safety
-        if self.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
-            raise DataLocked("graph", self.get_status())
-        return self.__pacman_data._graph
+        if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
+            raise DataLocked("graph", cls.get_status())
+        return cls.__pacman_data._graph
 
     @property
     def machine_graph(self):

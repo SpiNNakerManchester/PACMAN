@@ -30,12 +30,11 @@ class TestSimulatorData(unittest.TestCase):
         unittest_setup()
 
     def test_setup(self):
-        view = PacmanDataView()
         # What happens before setup depends on the previous test
         # Use manual_check to verify this without dependency
         PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            view.graph
+            PacmanDataView.get_graph()
 
     def test_mock(self):
         PacmanDataWriter.mock()
@@ -46,7 +45,7 @@ class TestSimulatorData(unittest.TestCase):
         view = PacmanDataView()
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            writer.graph
+            PacmanDataView.get_graph()
         with self.assertRaises(DataNotYetAvialable):
             writer.machine_graph
         with self.assertRaises(DataNotYetAvialable):
@@ -79,12 +78,12 @@ class TestSimulatorData(unittest.TestCase):
         writer.get_machine_graph()
         # The view does not while in run mode
         with self.assertRaises(DataLocked):
-            view.graph
+            PacmanDataView.get_graph()
         with self.assertRaises(DataLocked):
             view.machine_graph
 
         writer.finish_run()
-        writer.graph
+        PacmanDataView.get_graph()
         writer.machine_graph
         writer.runtime_graph
         writer.runtime_machine_graph
@@ -100,12 +99,12 @@ class TestSimulatorData(unittest.TestCase):
         writer.get_machine_graph()
         # The view does not while in stopping mode
         with self.assertRaises(DataLocked):
-            view.graph
+            PacmanDataView.get_graph()
         with self.assertRaises(DataLocked):
             view.machine_graph
 
         writer.shut_down()
-        writer.graph
+        PacmanDataView.get_graph()
         writer.machine_graph
         with self.assertRaises(DataLocked):
             writer.runtime_graph

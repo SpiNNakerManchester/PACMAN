@@ -57,6 +57,13 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         self.__pacman_data._soft_reset()
 
     def get_graph(self):
+        """
+        The user level application graph
+
+        this removes the safety check so ASB can access the graph during run
+
+        :rtype: ApplicationGraph
+        """
         return self.__pacman_data._graph
 
     def get_machine_graph(self):
