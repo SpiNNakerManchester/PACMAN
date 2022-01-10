@@ -136,15 +136,15 @@ class TestSimulatorData(unittest.TestCase):
         mg.add_vertices(m_vertices)
         writer.set_runtime_machine_graph(mg)
         self.assertEqual(6, PacmanDataView.get_runtime_machine_graph().n_vertices)
-        self.assertEqual(6, view.runtime_n_machine_vertices)
-        self.assertEqual(6, view.runtime_n_machine_vertices2)
+        self.assertEqual(6, PacmanDataView.get_runtime_n_machine_vertices())
+        self.assertEqual(6, PacmanDataView.get_runtime_n_machine_vertices2())
         self.assertSetEqual(
             m_vertices,
             set(PacmanDataView.get_runtime_machine_graph().vertices))
         self.assertSetEqual(
-            m_vertices, set(view.runtime_machine_vertices))
+            m_vertices, set(PacmanDataView.get_runtime_machine_vertices()))
         self.assertSetEqual(
-            m_vertices, set(view.runtime_machine_vertices2))
+            m_vertices, set(PacmanDataView.get_runtime_machine_vertices2()))
 
     def test_placements(self):
         view = PacmanDataView()

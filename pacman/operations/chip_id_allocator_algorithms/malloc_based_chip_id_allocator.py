@@ -74,8 +74,7 @@ class _MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         :raises PacmanConfigurationException:
             If a virtual chip is in an impossible position.
         """
-        view = PacmanDataView()
-        graph = view.runtime_best_graph
+        graph = PacmanDataView.get_runtime_best_graph()
         machine = PacmanDataView.get_machine()
         progress = ProgressBar(
             graph.n_vertices + machine.n_chips,

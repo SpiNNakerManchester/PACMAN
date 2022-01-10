@@ -221,8 +221,8 @@ class PacmanDataView(MachineDataView):
                 raise DataLocked("runtime_machine_graph", cls.get_status())
         return cls.__pacman_data._runtime_machine_graph
 
-    @property
-    def runtime_n_machine_vertices(self):
+    @classmethod
+    def get_runtime_n_machine_vertices(cls):
         """
         The number of machine vertices in the runtime graph(s)
 
@@ -231,15 +231,15 @@ class PacmanDataView(MachineDataView):
 
         :rtype: int
         """
-        return self.get_runtime_machine_graph().n_vertices
+        return cls.get_runtime_machine_graph().n_vertices
 
-    @property
-    def runtime_n_machine_vertices2(self):
+    @classmethod
+    def get_runtime_n_machine_vertices2(cls):
         return sum(len(vertex.machine_vertices)
-                   for vertex in self.get_runtime_graph().vertices)
+                   for vertex in cls.get_runtime_graph().vertices)
 
-    @property
-    def runtime_machine_vertices(self):
+    @classmethod
+    def get_runtime_machine_vertices(cls):
         """
         The machine vertices in the runtime graph(s)
 
@@ -248,15 +248,15 @@ class PacmanDataView(MachineDataView):
 
         :rtype: iterator(MachineVertex)
         """
-        return self.get_runtime_machine_graph().vertices
+        return cls.get_runtime_machine_graph().vertices
 
-    @property
-    def runtime_machine_vertices2(self):
-        for app_vertex in self.get_runtime_graph().vertices:
+    @classmethod
+    def get_runtime_machine_vertices2(cls):
+        for app_vertex in cls.get_runtime_graph().vertices:
             yield from app_vertex.machine_vertices
 
-    @property
-    def runtime_best_graph(self):
+    @classmethod
+    def get_runtime_best_graph(cls):
         """
         The runtime application graph unless it is empty and the
         machine graph one is not
@@ -277,18 +277,18 @@ class PacmanDataView(MachineDataView):
             is used except during run
         """
         try:
-            runtime_graph = self.get_runtime_graph()
+            runtime_graph = cls.get_runtime_graph()
             if runtime_graph.n_vertices:
                 return runtime_graph
         except Exception:
             # In mocked there may only be a machine_graph
-            if self.get_status() != Data_Status.MOCKED:
+            if cls.get_status() != Data_Status.MOCKED:
                 raise
-        runtime_machine_graph = self.get_runtime_machine_graph()
+        runtime_machine_graph = cls.get_runtime_machine_graph()
         if runtime_machine_graph.n_vertices:
             return runtime_machine_graph
         # both empty for return the application level
-        return self.get_runtime_graph()
+        return cls.get_runtime_graph()
 
     # placements
 
