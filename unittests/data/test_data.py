@@ -130,7 +130,8 @@ class TestSimulatorData(unittest.TestCase):
         mach22 = SimpleMachineVertex("mach22",  app_vertex=app2)
         mach31 = SimpleMachineVertex("mach31",  app_vertex=app3)
         mg = MachineGraph(
-            label="my test", application_graph=PacmanDataView.get_runtime_graph())
+            label="my test",
+            application_graph=PacmanDataView.get_runtime_graph())
         m_vertices = set([mach11, mach12, mach13, mach21, mach22, mach31])
         mg.add_vertices(m_vertices)
         writer.set_runtime_machine_graph(mg)
