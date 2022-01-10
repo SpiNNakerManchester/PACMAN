@@ -60,13 +60,24 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         The user level application graph
 
-        this removes the safety check so ASB can access the graph during run
+        This removes the safety check so ASB can access the graph during run
 
         :rtype: ApplicationGraph
         """
         return self.__pacman_data._graph
 
     def get_machine_graph(self):
+        """
+        The user level machine graph
+
+        Previously known as asb._original_machine_graph.
+
+        Changes to this graph will only affect the next run
+
+        This removes the safety check so ASB can access the graph during run
+
+        :rtype: MachineGraph
+        """
         return self.__pacman_data._machine_graph
 
     def get_runtime_graph(self):

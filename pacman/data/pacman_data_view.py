@@ -135,8 +135,8 @@ class PacmanDataView(MachineDataView):
             raise DataLocked("graph", cls.get_status())
         return cls.__pacman_data._graph
 
-    @property
-    def machine_graph(self):
+    @classmethod
+    def get_machine_graph(cls):
         """
         The user level machine graph
 
@@ -149,12 +149,12 @@ class PacmanDataView(MachineDataView):
             If the machine_graph is currently unavailable, or if this method
             is used during run
         """
-        if self.__pacman_data._machine_graph is None:
-            raise self._exception("machine_graph")
+        if cls.__pacman_data._machine_graph is None:
+            raise cls._exception("machine_graph")
         # The writer overrides this method without this safety
-        if self.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
-            raise DataLocked("machine_graph", self.get_status())
-        return self.__pacman_data._machine_graph
+        if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
+            raise DataLocked("machine_graph", cls.get_status())
+        return cls.__pacman_data._machine_graph
 
     @property
     def runtime_graph(self):

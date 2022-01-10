@@ -47,15 +47,15 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_graph()
         with self.assertRaises(DataNotYetAvialable):
-            writer.machine_graph
+            PacmanDataView.get_machine_graph()
         with self.assertRaises(DataNotYetAvialable):
             writer.runtime_graph
         with self.assertRaises(DataNotYetAvialable):
             writer.runtime_machine_graph()
 
         writer.create_graphs("bacon")
-        writer.graph
-        writer.machine_graph
+        writer.get_graph()
+        writer.get_machine_graph()
         with self.assertRaises(DataNotYetAvialable):
             writer.runtime_graph
         with self.assertRaises(DataNotYetAvialable):
@@ -80,11 +80,11 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataLocked):
             PacmanDataView.get_graph()
         with self.assertRaises(DataLocked):
-            view.machine_graph
+            PacmanDataView.get_machine_graph()
 
         writer.finish_run()
         PacmanDataView.get_graph()
-        writer.machine_graph
+        PacmanDataView.get_machine_graph()
         writer.runtime_graph
         writer.runtime_machine_graph
         # the writer still has access to the runtime graphs
@@ -101,11 +101,11 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataLocked):
             PacmanDataView.get_graph()
         with self.assertRaises(DataLocked):
-            view.machine_graph
+            PacmanDataView.get_machine_graph()
 
         writer.shut_down()
         PacmanDataView.get_graph()
-        writer.machine_graph
+        PacmanDataView.get_machine_graph()
         with self.assertRaises(DataLocked):
             writer.runtime_graph
         with self.assertRaises(DataLocked):
