@@ -158,12 +158,11 @@ class TestSimulatorData(unittest.TestCase):
             writer.set_placements("Bacon")
 
     def test_routing_infos(self):
-        view = PacmanDataView()
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            view.routing_infos
+            PacmanDataView.get_routing_infos()
         info = RoutingInfo()
         writer.set_routing_infos(info)
-        self.assertEqual(info, view.routing_infos)
+        self.assertEqual(info, PacmanDataView.get_routing_infos())
         with self.assertRaises(TypeError):
             writer.set_routing_infos("Bacon")

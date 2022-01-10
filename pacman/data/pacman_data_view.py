@@ -328,14 +328,14 @@ class PacmanDataView(MachineDataView):
 
     # routing_infos
 
-    @ property
-    def routing_infos(self):
+    @classmethod
+    def get_routing_infos(cls):
         """
         The routing_infos if known
 
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the routing_infos is currently unavailable
         """
-        if self.__pacman_data._routing_infos is None:
-            raise self._exception("routing_infos")
-        return self.__pacman_data._routing_infos
+        if cls.__pacman_data._routing_infos is None:
+            raise cls._exception("routing_infos")
+        return cls.__pacman_data._routing_infos
