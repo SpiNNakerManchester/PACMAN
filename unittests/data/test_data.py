@@ -150,10 +150,10 @@ class TestSimulatorData(unittest.TestCase):
         view = PacmanDataView()
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            view.placements
+            PacmanDataView.get_placements()
         info = Placements([])
         writer.set_placements(info)
-        self.assertEqual(info, view.placements)
+        self.assertEqual(info, PacmanDataView.get_placements())
         with self.assertRaises(TypeError):
             writer.set_placements("Bacon")
 

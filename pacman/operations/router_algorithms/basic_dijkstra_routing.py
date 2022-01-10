@@ -111,7 +111,7 @@ class _BasicDijkstraRouting(object):
         nodes_info = self._initiate_node_info()
         tables = self._initiate_dijkstra_tables()
         self._update_all_weights(nodes_info)
-        placements = PacmanDataView().placements
+        placements = PacmanDataView.get_placements()
         # each vertex represents a core in the board
         progress = ProgressBar(
             placements.n_placements, "Creating routing entries")

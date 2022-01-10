@@ -293,17 +293,17 @@ class PacmanDataView(MachineDataView):
 
     # placements
 
-    @property
-    def placements(self):
+    @classmethod
+    def get_placements(cls):
         """
         The placements if known
 
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the placements is currently unavailable
         """
-        if self.__pacman_data._placements is None:
-            raise self._exception("placements")
-        return self.__pacman_data._placements
+        if cls.__pacman_data._placements is None:
+            raise cls._exception("placements")
+        return cls.__pacman_data._placements
 
     @classmethod
     def get_placement_of_vertex(cls, vertex):

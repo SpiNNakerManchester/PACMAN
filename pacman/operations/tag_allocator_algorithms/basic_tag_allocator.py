@@ -39,7 +39,7 @@ def basic_tag_allocator(plan_n_timesteps):
     :rtype: tuple(list(~spinn_machine.tags.IPTag),
         list(~spinn_machine.tags.ReverseIPTag), Tags)
     """
-    placements = PacmanDataView().placements
+    placements = PacmanDataView.get_placements()
     resource_tracker = ResourceTracker(plan_n_timesteps)
 
     # Keep track of ports allocated to reverse IP tags and tags that still
