@@ -114,7 +114,6 @@ class TestSimulatorData(unittest.TestCase):
         writer.get_runtime_machine_graph()
 
     def test_graph_support(self):
-        view = PacmanDataView()
         writer = PacmanDataWriter.setup()
         writer.create_graphs("test")
         writer.start_run()
@@ -135,7 +134,8 @@ class TestSimulatorData(unittest.TestCase):
         m_vertices = set([mach11, mach12, mach13, mach21, mach22, mach31])
         mg.add_vertices(m_vertices)
         writer.set_runtime_machine_graph(mg)
-        self.assertEqual(6, PacmanDataView.get_runtime_machine_graph().n_vertices)
+        self.assertEqual(
+            6, PacmanDataView.get_runtime_machine_graph().n_vertices)
         self.assertEqual(6, PacmanDataView.get_runtime_n_machine_vertices())
         self.assertEqual(6, PacmanDataView.get_runtime_n_machine_vertices2())
         self.assertSetEqual(
@@ -147,7 +147,6 @@ class TestSimulatorData(unittest.TestCase):
             m_vertices, set(PacmanDataView.get_runtime_machine_vertices2()))
 
     def test_placements(self):
-        view = PacmanDataView()
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_placements()
