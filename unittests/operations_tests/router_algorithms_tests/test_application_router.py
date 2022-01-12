@@ -108,7 +108,7 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
         return self.__outgoing_machine_vertices
 
     def get_in_coming_vertices(self, partition_id):
-        return [v for l in self.__incoming_machine_vertices for v in l]
+        return [v for lst in self.__incoming_machine_vertices for v in lst]
 
     def get_source_specific_in_coming_vertices(
             self, source_vertex, partition_id):
@@ -196,8 +196,8 @@ def _find_targets(
                 raise Exception(
                     f"Potential Loop found when adding routes at {x}, {y}")
             found_targets.add((x, y, p))
-        for l in next_to_follow.link_ids:
-            next_x, next_y = machine.xy_over_link(x, y, l)
+        for link in next_to_follow.link_ids:
+            next_x, next_y = machine.xy_over_link(x, y, link)
             to_follow.append((next_x, next_y, _get_entry(
                     routing_tables, next_x, next_y, source_vertex,
                     partition_id)))
