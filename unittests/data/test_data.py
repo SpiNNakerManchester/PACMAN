@@ -173,7 +173,6 @@ class TestSimulatorData(unittest.TestCase):
             PacmanDataView.get_tags()
         tags = Tags()
         writer.set_tags(tags)
-        a = PacmanDataView.get_tags()
         self.assertEqual(tags, PacmanDataView.get_tags())
         with self.assertRaises(TypeError):
             writer.set_tags("Bacon")
