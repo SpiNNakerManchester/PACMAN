@@ -14,6 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.exceptions import PacmanInvalidParameterException
+import logging
+
+log = logging.getLogger(__name__)
 
 _INCOMING_LINK_MASK = 0x07000000
 _INCOMING_LINK_SHIFT = 24
@@ -215,16 +218,20 @@ class MulticastRoutingTableByPartitionEntry(object):
                 "be merged.")
 
         # validate incoming
-        in_proc = self.__merge_none_or_equal(
-            self.incoming_processor, other.incoming_processor,
-            "incoming_processor")
-        in_link = self.__merge_none_or_equal(
-            self.incoming_link, other.incoming_link, "incoming_link")
-        if in_proc is not None and in_link is not None:
-            raise PacmanInvalidParameterException(
-                "other", "merge error",
-                f"Cannot merge {other} and {self}: both incoming processor"
-                " and link are set")
+        try:
+            in_proc = self.__merge_none_or_equal(
+                self.incoming_processor, other.incoming_processor,
+                "incoming_processor")
+            in_link = self.__merge_none_or_equal(
+                self.incoming_link, other.incoming_link, "incoming_link")
+            if in_proc is not None and in_link is not None:
+                raise PacmanInvalidParameterException(
+                    "other", "merge error",
+                    f"Cannot merge {other} and {self}: both incoming processor"
+                    " and link are set")
+        except PacmanInvalidParameterException as e:
+            log.error(f"Error merging entry {other} into {self}")
+            raise e
 
         # Set the value directly as faster
         entry = MulticastRoutingTableByPartitionEntry(None, None)

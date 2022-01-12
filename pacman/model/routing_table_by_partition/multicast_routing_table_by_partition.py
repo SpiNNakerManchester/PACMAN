@@ -14,6 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
+from pacman.exceptions import PacmanInvalidParameterException
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class MulticastRoutingTableByPartition(object):
@@ -50,8 +54,13 @@ class MulticastRoutingTableByPartition(object):
         if source_key not in self._router_to_entries_map[key]:
             self._router_to_entries_map[key][source_key] = entry
         else:
-            self._router_to_entries_map[key][source_key] = entry.merge_entry(
-                self._router_to_entries_map[key][source_key])
+            try:
+                self._router_to_entries_map[key][source_key] = \
+                    entry.merge_entry(
+                        self._router_to_entries_map[key][source_key])
+            except PacmanInvalidParameterException as e:
+                log.error(f"Error merging entries on {key} for {source_key}")
+                raise e
 
     def get_routers(self):
         """ Get the coordinates of all stored routers
@@ -78,9 +87,7 @@ class MulticastRoutingTableByPartition(object):
             MulticastRoutingTableByPartitionEntry)
         """
         key = (router_x, router_y)
-        if key not in self._router_to_entries_map:
-            return ()
-        return self._router_to_entries_map[key]
+        return self._router_to_entries_map.get(key)
 
     def get_entry_on_coords_for_edge(
             self, source_vertex, partition_id, router_x, router_y):
@@ -94,4 +101,6 @@ class MulticastRoutingTableByPartition(object):
         :rtype: MulticastRoutingTableByPartitionEntry or None
         """
         entries = self.get_entries_for_router(router_x, router_y)
+        if entries is None:
+            return None
         return entries.get((source_vertex, partition_id))
