@@ -195,7 +195,8 @@ def check_keys_for_application_partition_pairs(
     # The bits that should be the same are all but the bottom 12
     for part in app_graph.outgoing_edge_partitions:
         mapped_key = None
-        for m_vertex in part.pre_vertex.machine_vertices:
+        for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
+                part.identifier):
             key = routing_info.get_first_key_from_pre_vertex(
                 m_vertex, part.identifier)
             if check_fixed(m_vertex, part.identifier, key):

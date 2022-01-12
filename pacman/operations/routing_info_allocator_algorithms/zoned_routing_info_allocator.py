@@ -143,11 +143,13 @@ class ZonedRoutingInfoAllocator(object):
         """
         partitions = self.__app_graph.outgoing_edge_partitions
         for part in partitions:
+            pre = part.pre_vertex
             # Try the application vertex
-            for constraint in part.pre_vertex.constraints:
+            for constraint in pre.constraints:
                 if isinstance(constraint, FixedKeyAndMaskConstraint):
                     if constraint.applies_to_partition(part.identifier):
-                        for vert in part.pre_vertex.machine_vertices:
+                        for vert in pre.splitter.get_out_going_vertices(
+                                part.identifier):
                             self.__add_fixed(part.identifier, vert, constraint)
                         self.__add_fixed(
                             part.identifier, part.pre_vertex, constraint)
@@ -155,7 +157,8 @@ class ZonedRoutingInfoAllocator(object):
                     self.__check_constraint_supported(constraint)
 
             # Try the machine vertices
-            for vert in part.pre_vertex.machine_vertices:
+            for vert in pre.splitter.get_out_going_vertices(
+                    part.identifier):
                 for constraint in vert.constraints:
                     if isinstance(constraint, FixedKeyAndMaskConstraint):
                         if constraint.applies_to_partition(part.identifier):
