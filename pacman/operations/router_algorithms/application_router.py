@@ -345,8 +345,9 @@ def _edges_by_distance(partition, placements, machine):
 
 
 def _convert_a_route(
-        routing_tables, source_vertex, partition_id, incoming_processor,
-        incoming_link, route, targets=None, use_source_for_targets=False):
+        routing_tables, source_vertex, partition_id, first_incoming_processor,
+        first_incoming_link, first_route, targets=None,
+        use_source_for_targets=False):
     """ Convert the algorithm specific partition_route back to SpiNNaker and
         adds it to the routing_tables.
 
@@ -367,38 +368,37 @@ def _convert_a_route(
         If true, targets for the given source_vertex will be requested;
         If false all targets for matching chips will be used.
     """
-    x, y = route.chip
 
-    next_hops = list()
-    processor_ids = list()
-    link_ids = list()
-    for (route, next_hop) in route.children:
-        if route is not None:
-            link_ids.append(route)
-            next_incoming_link = (route + 3) % 6
-        if next_hop is not None:
-            next_hops.append((next_hop, next_incoming_link))
+    to_process = [(first_incoming_processor, first_incoming_link, first_route)]
+    while to_process:
+        incoming_processor, incoming_link, route = to_process.pop()
+        x, y = route.chip
 
-    if targets is not None and (x, y) in targets:
-        chip_targets = targets[x, y]
-        if use_source_for_targets:
-            cores_by_source = [
-                (source_vertex,
-                 chip_targets.get_cores_for_source(source_vertex))]
+        processor_ids = list()
+        link_ids = list()
+        for (route, next_hop) in route.children:
+            if route is not None:
+                link_ids.append(route)
+                next_incoming_link = (route + 3) % 6
+            if next_hop is not None:
+                to_process.append((None, next_incoming_link, next_hop))
+
+        if targets is not None and (x, y) in targets:
+            chip_targets = targets[x, y]
+            if use_source_for_targets:
+                cores_by_source = [
+                    (source_vertex,
+                     chip_targets.get_cores_for_source(source_vertex))]
+            else:
+                cores_by_source = chip_targets.cores_by_source
+            for (source, additional_cores) in cores_by_source:
+                entry = MulticastRoutingTableByPartitionEntry(
+                    link_ids, processor_ids + additional_cores,
+                    incoming_processor, incoming_link)
+                routing_tables.add_path_entry(
+                    entry, x, y, source, partition_id)
         else:
-            cores_by_source = chip_targets.cores_by_source
-        for (source, additional_cores) in cores_by_source:
             entry = MulticastRoutingTableByPartitionEntry(
-                link_ids, processor_ids + additional_cores, incoming_processor,
-                incoming_link)
-            routing_tables.add_path_entry(entry, x, y, source, partition_id)
-    else:
-        entry = MulticastRoutingTableByPartitionEntry(
-            link_ids, processor_ids, incoming_processor, incoming_link)
-        routing_tables.add_path_entry(
-            entry, x, y, source_vertex, partition_id)
-
-    for next_hop, next_incoming_link in next_hops:
-        _convert_a_route(
-            routing_tables, source_vertex, partition_id, None,
-            next_incoming_link, next_hop, targets, use_source_for_targets)
+                link_ids, processor_ids, incoming_processor, incoming_link)
+            routing_tables.add_path_entry(
+                entry, x, y, source_vertex, partition_id)
