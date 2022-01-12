@@ -14,10 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
-from collections import defaultdict
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     longest_dimension_first)
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
+from pacman.model.graphs.application import ApplicationVertex
+from collections import deque, defaultdict
+from spinn_utilities.progress_bar import ProgressBar
 
 
 class _Targets(object):
@@ -28,17 +30,36 @@ class _Targets(object):
     def __init__(self):
         self.__cores_by_source = defaultdict(list)
 
+    def ensure_source(self, source_vertex):
+        if source_vertex not in self.__cores_by_source:
+            self.__cores_by_source[source_vertex] = list()
+
     def add_sources_for_core(self, core, source_vertices):
         """ Add a set of vertices that target a given core
         """
         for vertex in source_vertices:
             self.__cores_by_source[vertex].append(core)
 
+    def add_machine_sources_for_core(
+            self, core, source_vertices, partition_id):
+        for vertex in source_vertices:
+            if isinstance(vertex, ApplicationVertex):
+                for m_vertex in vertex.splitter.get_out_going_vertices(
+                        partition_id):
+                    self.__cores_by_source[m_vertex].append(core)
+            else:
+                self.__cores_by_source[vertex].append(core)
+
     @property
     def cores_by_source(self):
         """ Get a list of (source, list of cores) for the targets
         """
         return self.__cores_by_source.items()
+
+    def get_cores_for_source(self, vertex):
+        """ Get the cores for a specific source
+        """
+        return self.__cores_by_source[vertex]
 
 
 def route_application_graph(machine, app_graph, placements):
@@ -49,11 +70,13 @@ def route_application_graph(machine, app_graph, placements):
     # Keep track of all chips in each application vertex.  This allows routes
     # between vertices to be filtered so that they only include chips outside
     # of those containing the application vertex.
-    incoming_chips = dict()
     outgoing_chips = dict()
+    all_chips = dict()
+
+    progress = ProgressBar(app_graph.n_outgoing_edge_partitions, "Routing")
 
     # Now go through the app edges and route app vertex by app vertex
-    for partition in app_graph.outgoing_edge_partitions:
+    for partition in progress.over(app_graph.outgoing_edge_partitions):
         # Store the source vertex of the partition
         source = partition.pre_vertex
 
@@ -62,6 +85,9 @@ def route_application_graph(machine, app_graph, placements):
         source_chip, source_chips = _get_outgoing_chips(
             outgoing_chips, partition.pre_vertex, partition.identifier,
             placements)
+
+        # Get all source chips
+        all_source_chips = _get_all_chips(all_chips, source, placements)
 
         # Keep track of the source edge chips
         source_edge_chips = set()
@@ -75,29 +101,45 @@ def route_application_graph(machine, app_graph, placements):
 
         # Remember if we see a self-connection
         self_connected = False
+        self_chips = set()
 
         for edge in _edges_by_distance(partition, placements, machine):
             # Store the target vertex
             target = edge.post_vertex
 
-            # Pick a place in the target that we can route to.  Note that
-            # this might not end up being the actual target in the end.
-            target_chip, target_chips = _get_incoming_chips(
-                incoming_chips, edge.post_vertex, partition.identifier,
-                placements)
-
             # If not self-connected
             if source != target:
 
-                # Make a route between source and target
+                # Find all chips that are in the target
+                target_chips = _get_all_chips(all_chips, target, placements)
+
+                # Pick one to actually use as a target
+                target_chip = _find_target_chip(target_chips, routes)
+
+                # Make a route between source and target, without any source
+                # or target chips in it
                 source_edge_chip, target_edge_chip = _route_pre_to_post(
                     source_chip, target_chip, routes, machine,
-                    source_chips, target_chips)
+                    all_source_chips, target_chips)
+
+                # Add all the targets for the route
+                target_vertices = \
+                    target.splitter.get_source_specific_in_coming_vertices(
+                        source, partition.identifier)
+                real_target_chips = set()
+                for tgt, srcs in target_vertices:
+                    # TODO: Deal with virtual vertices
+                    place = placements.get_placement_of_vertex(tgt)
+                    targets[place.chip].add_sources_for_core(place.p, srcs)
+                    real_target_chips.add(place.chip)
 
                 # Route from target edge chip to all the targets
-                for chip in target_chips:
-                    _route_pre_to_post(target_edge_chip, chip, routes, machine)
+                _route_to_target_chips(
+                    target_edge_chip, target_chips, machine, routes,
+                    real_target_chips)
 
+                # If the start of the route is still part of the source vertex
+                # chips, add it
                 if source_edge_chip in source_chips:
                     source_edge_chips.add(source_edge_chip)
 
@@ -105,49 +147,63 @@ def route_application_graph(machine, app_graph, placements):
             else:
                 self_connected = True
 
-            # Add the target cores that need to be hit
-            target_vertices = \
-                target.splitter.get_source_specific_in_coming_vertices(
-                    source, partition.identifier)
-            for tgt, srcs in target_vertices:
-                # TODO: Deal with virtual vertices
-                place = placements.get_placement_of_vertex(tgt)
-                targets[place.chip].add_sources_for_core(place.p, srcs)
+                # If self-connected, add the targets of the sources
+                target_vertices = \
+                    source.splitter.get_source_specific_in_coming_vertices(
+                        source, partition.identifier)
+                for tgt, srcs in target_vertices:
+                    # TODO: Deal with virtual vertices
+                    place = placements.get_placement_of_vertex(tgt)
+                    targets[place.chip].add_machine_sources_for_core(
+                        place.p, srcs, partition.identifier)
+                    self_chips.add(place.chip)
 
+        # Make the real routes from source edges to targets
         for source_edge_chip in source_edge_chips:
+            # Make sure that we add the machine sources on the source edge chip
+            if source_edge_chip not in targets:
+                edge_targets = _Targets()
+                for source_chip in source_chips:
+                    for place in source_chips[source_chip]:
+                        edge_targets.ensure_source(place.vertex)
+                targets[source_edge_chip] = edge_targets
+
             _convert_a_route(
                 routing_tables, source, partition.identifier, None, None,
                 routes[source_edge_chip], targets=targets)
 
+        # Now make the routes from actual sources to source edges
         if self_connected:
-            # If self-connected, the sources are also the targets
-            for chip in target_chips:
-                source_edge_chips.add(chip)
-
-        source_routes = dict()
-        for chip in source_chips:
-            for edge_chip in source_edge_chips:
-                _route_pre_to_post(chip, edge_chip, source_routes, machine)
-            _convert_a_route(
-                routing_tables, source, partition.identifier, None, None,
-                source_routes[chip], targets=targets)
+            for chip in source_chips:
+                source_routes = dict()
+                _route_to_target_chips(
+                    chip, all_source_chips, machine, source_routes,
+                    source_edge_chips.union(self_chips))
+                for plce in source_chips[chip]:
+                    _convert_a_route(
+                        routing_tables, plce.vertex, partition.identifier,
+                        plce.p, None, source_routes[chip], targets=targets,
+                        use_source_for_targets=True)
+        else:
+            for chip in source_chips:
+                source_routes = dict()
+                _route_to_target_chips(
+                    chip, all_source_chips, machine, source_routes,
+                    source_edge_chips)
+                for plce in source_chips[chip]:
+                    _convert_a_route(
+                        routing_tables, plce.vertex, partition.identifier,
+                        plce.p, None, source_routes[chip])
 
     # Return the routing tables
     return routing_tables
 
 
-def _get_incoming_chips(incoming_chips, app_vertex, partition_id, placements):
-    # TODO: Deal with virtual chips
-    if app_vertex in incoming_chips:
-        return incoming_chips[app_vertex]
-    vertex_chips = defaultdict(list)
-    for m_vertex in app_vertex.splitter.get_in_coming_vertices(partition_id):
-        place = placements.get_placement_of_vertex(m_vertex)
-        vertex_chips[place.chip].append(place)
-    first_chip = next(iter(vertex_chips.keys()))
-    data = (first_chip, vertex_chips)
-    incoming_chips[app_vertex] = data
-    return data
+def _find_target_chip(target_chips, routes):
+    for chip in target_chips:
+        if chip in routes:
+            return chip
+    return chip
 
 
 def _get_outgoing_chips(outgoing_chips, app_vertex, partition_id, placements):
@@ -164,6 +220,73 @@ def _get_outgoing_chips(outgoing_chips, app_vertex, partition_id, placements):
     return data
 
 
+def _get_all_chips(all_chips, app_vertex, placements):
+    if app_vertex in all_chips:
+        return all_chips[app_vertex]
+    vertex_chips = set()
+    for m_vertex in app_vertex.machine_vertices:
+        place = placements.get_placement_of_vertex(m_vertex)
+        vertex_chips.add(place.chip)
+    all_chips[app_vertex] = vertex_chips
+    return vertex_chips
+
+
+def _route_to_all_chips(first_chip, chips, machine, routes):
+    # Keep a queue of chip to visit, parent route, link from parent
+    chips_to_explore = deque([(first_chip, None, None)])
+    visited = set()
+    while chips_to_explore:
+        chip, parent_route, direction = chips_to_explore.popleft()
+        if chip in visited:
+            continue
+        visited.add(chip)
+        if chip not in routes:
+            routes[chip] = RoutingTree(chip)
+        if parent_route is not None:
+            parent_route.append_child(direction, routes[chip])
+        for link in range(6):
+            next_chip = machine.xy_over_link(chip[0], chip[1], link)
+            if next_chip in chips and next_chip not in visited:
+                chips_to_explore.append((next_chip, routes[chip], link))
+
+
+def _route_to_target_chips(first_chip, chips, machine, routes, targets):
+    # Keep a queue of chip to visit, list of (parent chip, link from parent)
+    chips_to_explore = deque([(first_chip, list())])
+    visited = set()
+    while chips_to_explore:
+        chip, path = chips_to_explore.popleft()
+        if chip in visited:
+            continue
+        visited.add(chip)
+
+        # If we have reached a chip that has already been routed to,
+        # cut the path off here
+        if chip in routes:
+            path = list()
+
+        # If we have reached a target, add the path to the routes
+        if chip in targets:
+            if chip not in routes:
+                routes[chip] = RoutingTree(chip)
+            last_route = routes[chip]
+            for parent, link in reversed(path):
+                if parent not in routes:
+                    routes[parent] = RoutingTree(parent)
+                routes[parent].append_child((link, last_route))
+                last_route = routes[parent]
+
+            # The path can be reset from here as we have already routed here
+            path = list()
+
+        for link in range(6):
+            next_chip = machine.xy_over_link(chip[0], chip[1], link)
+            if next_chip in chips and next_chip not in visited:
+                new_path = list(path)
+                new_path.append((chip, link))
+                chips_to_explore.append((next_chip, new_path))
+
+
 def _route_pre_to_post(
         source_xy, dest_xy, routes, machine, source_group=None,
         target_group=None):
@@ -172,7 +295,7 @@ def _route_pre_to_post(
     nodes = longest_dimension_first(vector, source_xy, machine)
 
     # Start from the end and move backwards until we find a chip
-    # not in the source group, or a already in the route
+    # in the source group, or a already in the route
     route_pre = source_xy
     for i, (_direction, (x, y)) in reversed(list(enumerate(nodes))):
         if _in_group((x, y), source_group) or (x, y) in routes:
@@ -223,7 +346,7 @@ def _edges_by_distance(partition, placements, machine):
 
 def _convert_a_route(
         routing_tables, source_vertex, partition_id, incoming_processor,
-        incoming_link, route, route_source_by_machine=None, targets=None):
+        incoming_link, route, targets=None, use_source_for_targets=False):
     """ Convert the algorithm specific partition_route back to SpiNNaker and
         adds it to the routing_tables.
 
@@ -236,15 +359,13 @@ def _convert_a_route(
     :param incoming_link: link this link came from
     :type incoming_link: int or None
     :param RoutingTree route: algorithm specific format of the route
-    :param route_source_by_machine:
-        Whether to use the app vertex or machine vertices in the routing table
-        for the first entry.  Do not use if source_vertex is a MachineVertex,
-        as otherwise errors will occur!
-    :type bool or None
     :param targets:
         Targets for each chip.  When present for a chip, the route links and
         cores are added to each entry in the targets.
     :type targets: dict(tuple(int,int),_Targets) or None
+    :param bool use_source_for_targets:
+        If true, targets for the given source_vertex will be requested;
+        If false all targets for matching chips will be used.
     """
     x, y = route.chip
 
@@ -260,26 +381,24 @@ def _convert_a_route(
 
     if targets is not None and (x, y) in targets:
         chip_targets = targets[x, y]
-        for (source, additional_cores) in chip_targets.cores_by_source:
+        if use_source_for_targets:
+            cores_by_source = [
+                (source_vertex,
+                 chip_targets.get_cores_for_source(source_vertex))]
+        else:
+            cores_by_source = chip_targets.cores_by_source
+        for (source, additional_cores) in cores_by_source:
             entry = MulticastRoutingTableByPartitionEntry(
                 link_ids, processor_ids + additional_cores, incoming_processor,
                 incoming_link)
             routing_tables.add_path_entry(entry, x, y, source, partition_id)
-
     else:
         entry = MulticastRoutingTableByPartitionEntry(
             link_ids, processor_ids, incoming_processor, incoming_link)
-        if route_source_by_machine is None or not route_source_by_machine:
-            routing_tables.add_path_entry(
-                entry, x, y, source_vertex, partition_id)
-        else:
-            for m_vertex in source_vertex.splitter.get_out_going_vertices(
-                    partition_id):
-                routing_tables.add_path_entry(
-                    entry, x, y, m_vertex, partition_id)
+        routing_tables.add_path_entry(
+            entry, x, y, source_vertex, partition_id)
 
     for next_hop, next_incoming_link in next_hops:
-        # On the next hop, we can set route_source_by_machine to False
         _convert_a_route(
             routing_tables, source_vertex, partition_id, None,
-            next_incoming_link, next_hop, False, targets)
+            next_incoming_link, next_hop, targets, use_source_for_targets)
