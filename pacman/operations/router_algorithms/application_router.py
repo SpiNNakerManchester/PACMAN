@@ -103,7 +103,7 @@ def route_application_graph(machine, app_graph, placements):
         self_connected = False
         self_chips = set()
 
-        for edge in _edges_by_distance(partition, placements, machine):
+        for edge in partition.edges:
             # Store the target vertex
             target = edge.post_vertex
 
@@ -332,16 +332,6 @@ def _in_group(item, group):
     if group is None:
         return False
     return item in group
-
-
-def _edges_by_distance(partition, placements, machine):
-    pre_xy = placements.get_placement_of_vertex(
-        next(iter(partition.pre_vertex.machine_vertices))).chip
-    return sorted(
-        partition.edges,
-        key=lambda edge: machine.get_vector_length(
-            pre_xy, placements.get_placement_of_vertex(
-                next(iter(edge.post_vertex.machine_vertices))).chip))
 
 
 def _convert_a_route(
