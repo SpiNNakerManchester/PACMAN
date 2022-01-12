@@ -48,6 +48,7 @@ class _PacmanDataModel(object):
         "_routing_infos",
         "_runtime_graph",
         "_runtime_machine_graph",
+        "_tags"
     ]
 
     def __new__(cls):
@@ -75,6 +76,7 @@ class _PacmanDataModel(object):
         self._runtime_graph = None
         self._runtime_machine_graph = None
         self._routing_infos = None
+        self._tags = None
         self._soft_reset()
 
     def _soft_reset(self):
@@ -339,3 +341,18 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._routing_infos is None:
             raise cls._exception("routing_infos")
         return cls.__pacman_data._routing_infos
+
+    # tags
+
+    @classmethod
+    def get_tags(cls):
+        """
+        The Tags object of known
+
+        :rtype: ~pacman.model.tags.Tags
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the tags is currently unavailable
+        """
+        if cls.__pacman_data._tags is None:
+            raise cls._exception("tags")
+        return cls.__pacman_data._tags

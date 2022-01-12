@@ -21,6 +21,7 @@ from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.machine import MachineGraph
 from pacman.model.placements import Placements
 from pacman.model.routing_info import RoutingInfo
+from pacman.model.tags import Tags
 from pacman.exceptions import PacmanConfigurationException
 from .pacman_data_view import PacmanDataView, _PacmanDataModel
 
@@ -153,3 +154,13 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         if not isinstance(routing_infos, RoutingInfo):
             raise TypeError("routing_infos should be a RoutingInfo")
         self.__pacman_data._routing_infos = routing_infos
+
+    def set_tags(self, tags):
+        """
+        Set the tags
+
+        :param Tags tags:
+        """
+        if not isinstance(tags, Tags):
+            raise TypeError("tags should be a Tags")
+        self.__pacman_data._tags = tags

@@ -21,6 +21,7 @@ from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.machine import (MachineGraph, SimpleMachineVertex)
 from pacman.model.placements import Placements
 from pacman.model.routing_info import RoutingInfo
+from pacman.model.tags import Tags
 from pacman_test_objects import SimpleTestVertex
 
 
@@ -165,3 +166,14 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(info, PacmanDataView.get_routing_infos())
         with self.assertRaises(TypeError):
             writer.set_routing_infos("Bacon")
+
+    def test_tags(self):
+        writer = PacmanDataWriter.setup()
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_tags()
+        tags = Tags()
+        writer.set_tags(tags)
+        a = PacmanDataView.get_tags()
+        self.assertEqual(tags, PacmanDataView.get_tags())
+        with self.assertRaises(TypeError):
+            writer.set_tags("Bacon")
