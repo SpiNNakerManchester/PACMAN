@@ -67,12 +67,6 @@ def route_application_graph(machine, app_graph, placements):
     """
     routing_tables = MulticastRoutingTableByPartition()
 
-    # Keep track of all chips in each application vertex.  This allows routes
-    # between vertices to be filtered so that they only include chips outside
-    # of those containing the application vertex.
-    outgoing_chips = dict()
-    all_chips = dict()
-
     progress = ProgressBar(app_graph.n_outgoing_edge_partitions, "Routing")
 
     # Now go through the app edges and route app vertex by app vertex
@@ -83,11 +77,10 @@ def route_application_graph(machine, app_graph, placements):
         # Pick a place within the source that we can route from.  Note that
         # this might not end up being the actual source in the end.
         source_chip, source_chips = _get_outgoing_chips(
-            outgoing_chips, partition.pre_vertex, partition.identifier,
-            placements)
+            partition.pre_vertex, partition.identifier, placements)
 
         # Get all source chips
-        all_source_chips = _get_all_chips(all_chips, source, placements)
+        all_source_chips = _get_all_chips(source, placements)
 
         # Keep track of the source edge chips
         source_edge_chips = set()
@@ -111,7 +104,7 @@ def route_application_graph(machine, app_graph, placements):
             if source != target:
 
                 # Find all chips that are in the target
-                target_chips = _get_all_chips(all_chips, target, placements)
+                target_chips = _get_all_chips(target, placements)
 
                 # Pick one to actually use as a target
                 target_chip = _find_target_chip(target_chips, routes)
@@ -206,29 +199,19 @@ def _find_target_chip(target_chips, routes):
     return chip
 
 
-def _get_outgoing_chips(outgoing_chips, app_vertex, partition_id, placements):
+def _get_outgoing_chips(app_vertex, partition_id, placements):
     # TODO: Deal with virtual chips
-    if app_vertex in outgoing_chips:
-        return outgoing_chips[app_vertex]
     vertex_chips = defaultdict(list)
     for m_vertex in app_vertex.splitter.get_out_going_vertices(partition_id):
         place = placements.get_placement_of_vertex(m_vertex)
         vertex_chips[place.chip].append(place)
     first_chip = next(iter(vertex_chips.keys()))
-    data = (first_chip, vertex_chips)
-    outgoing_chips[app_vertex] = data
-    return data
+    return (first_chip, vertex_chips)
 
 
-def _get_all_chips(all_chips, app_vertex, placements):
-    if app_vertex in all_chips:
-        return all_chips[app_vertex]
-    vertex_chips = set()
-    for m_vertex in app_vertex.machine_vertices:
-        place = placements.get_placement_of_vertex(m_vertex)
-        vertex_chips.add(place.chip)
-    all_chips[app_vertex] = vertex_chips
-    return vertex_chips
+def _get_all_chips(app_vertex, placements):
+    return {placements.get_placement_of_vertex(m_vertex).chip
+            for m_vertex in app_vertex.machine_vertices}
 
 
 def _route_to_all_chips(first_chip, chips, machine, routes):
