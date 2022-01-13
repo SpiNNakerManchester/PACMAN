@@ -34,41 +34,61 @@ def place_application_graph(
     # Keep placements
     placements = Placements(system_placements)
 
+    # Keep track of how many times we had to retry placing (usually due to
+    # odd chip space being left)
+    retries = 0
+
     # Go through the application graph by application vertex
-    progress = ProgressBar(app_graph.n_vertices, "Placing Graph")
+    progress = ProgressBar(app_graph.n_vertices, "Placing Vertices")
     for app_vertex in progress.over(app_graph.vertices):
 
-        # Always start each application vertex with a new chip
-        next_chip, space = spaces.get_next_chip_and_space()
+        # Try placements from the next chip, but try again if fails
+        placed = False
+        while not placed:
+            try:
 
-        same_chip_groups = app_vertex.splitter.get_same_chip_groups()
+                # Always start each application vertex with a new chip
+                next_chip, space = spaces.get_next_chip_and_space()
 
-        # Go through the groups
-        for vertices, sdram in same_chip_groups:
-            vertices_to_place = list()
-            for vertex in vertices:
-                if not placements.is_vertex_placed(vertex):
-                    vertices_to_place.append(vertex)
-            sdram = sdram.get_total_sdram(plan_n_timesteps)
-            n_cores = len(vertices_to_place)
+                same_chip_groups = app_vertex.splitter.get_same_chip_groups()
 
-            if _do_constraints(vertices_to_place, placements):
-                continue
+                # Go through the groups
+                for vertices, sdram in same_chip_groups:
+                    vertices_to_place = list()
+                    for vertex in vertices:
+                        if not placements.is_vertex_placed(vertex):
+                            vertices_to_place.append(vertex)
+                    sdram = sdram.get_total_sdram(plan_n_timesteps)
+                    n_cores = len(vertices_to_place)
 
-            # If we can't use the next chip, use the next one after
-            if not next_chip.is_space(n_cores, sdram):
-                next_chip = spaces.get_next_chip(space)
+                    if _do_constraints(vertices_to_place, placements):
+                        continue
 
-            # If we can't place now, it is an error
-            if not next_chip.is_space(n_cores, sdram):
-                raise PacmanPlaceException(
-                    f"{n_cores} cores is too many, or SDRAM of {sdram}"
-                    " is too much for a single chip")
+                    # If we can't use the next chip, use the next one after
+                    if not next_chip.is_space(n_cores, sdram):
+                        next_chip = spaces.get_next_chip(space)
 
-            # Otherwise place
-            _place_on_chip(placements, vertices_to_place, sdram, next_chip)
+                    # If we can't place now, it is an error
+                    if not next_chip.is_space(n_cores, sdram):
+                        raise PacmanPlaceException(
+                            f"{n_cores} cores is too many, or SDRAM of {sdram}"
+                            " is too much for a single chip")
+
+                    # Otherwise place
+                    _place_on_chip(
+                        placements, vertices_to_place, sdram, next_chip)
+                placed = True
+            except _SpaceExceededException:
+                retries += 1
+
+    if retries > 0:
+        print(f"Warning: Retried {retries} times")
 
     return placements
+
+
+class _SpaceExceededException(Exception):
+    pass
 
 
 def _do_constraints(vertices, placements):
@@ -82,6 +102,9 @@ def _do_constraints(vertices, placements):
                     (y is not None and constraint.y != y)):
                 raise PacmanConfigurationException(
                     "Multiple conflicting constraints!")
+            if constraint.p is not None:
+                raise PacmanConfigurationException(
+                    "This placer cannot handle core constraints")
             x = constraint.x
             y = constraint.y
     if x is not None or y is not None:
@@ -162,7 +185,7 @@ class _Spaces(object):
 
     def get_next_chip(self, space):
         if not space:
-            raise PacmanPlaceException(
+            raise _SpaceExceededException(
                 "No more chips to place on in this space; "
                 f"{self.n_chips_used} of {self.__machine.n_chips} used")
         next_x, next_y = space.pop(last=False)
