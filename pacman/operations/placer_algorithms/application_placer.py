@@ -19,7 +19,7 @@ from pacman.exceptions import (
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from spinn_utilities.ordered_set import OrderedSet
-from .radial_placer import generate_radial_chips
+from spinn_utilities.progress_bar import ProgressBar
 
 
 def place_application_graph(
@@ -35,7 +35,8 @@ def place_application_graph(
     placements = Placements(system_placements)
 
     # Go through the application graph by application vertex
-    for app_vertex in app_graph.vertices:
+    progress = ProgressBar(app_graph.n_vertices, "Placing Graph")
+    for app_vertex in progress.over(app_graph.vertices):
 
         # Always start each application vertex with a new chip
         next_chip, space = spaces.get_next_chip_and_space()
@@ -56,17 +57,13 @@ def place_application_graph(
 
             # If we can't use the next chip, use the next one after
             if not next_chip.is_space(n_cores, sdram):
-                try:
-                    next_chip = spaces.get_next_chip(space)
-                except StopIteration:
-                    raise PacmanPlaceException(
-                        "Not enough space to place graph")
+                next_chip = spaces.get_next_chip(space)
 
             # If we can't place now, it is an error
             if not next_chip.is_space(n_cores, sdram):
                 raise PacmanPlaceException(
                     f"{n_cores} cores is too many, or SDRAM of {sdram}"
-                    " is too much")
+                    " is too much for a single chip")
 
             # Otherwise place
             _place_on_chip(placements, vertices_to_place, sdram, next_chip)
@@ -139,7 +136,7 @@ class _Spaces(object):
     def __init__(self, machine, system_placements):
         self.__machine = machine
         self.__system_placements = system_placements
-        self.__chips = iter(generate_radial_chips(machine))
+        self.__chips = iter(_chip_order(machine))
         self.__next_chip = next(self.__chips)
         self.__used_chips = set()
 
@@ -159,16 +156,26 @@ class _Spaces(object):
                     self.__usable_from_chip(chip))
 
         except StopIteration:
-            raise PacmanPlaceException("No more chips to place on")
+            raise PacmanPlaceException(
+                f"No more chips to place on; {self.n_chips_used} of "
+                f"{self.__machine.n_chips} used")
 
     def get_next_chip(self, space):
-        next_x, next_y = space.pop()
+        if not space:
+            raise PacmanPlaceException(
+                "No more chips to place on in this space; "
+                f"{self.n_chips_used} of {self.__machine.n_chips} used")
+        next_x, next_y = space.pop(last=False)
         self.__used_chips.add((next_x, next_y))
         chip = self.__machine.get_chip_at(next_x, next_y)
         space.update(self.__usable_from_chip(chip))
         n_cores_used = self.__system_placements.n_placements_on_chip(
             chip.x, chip.y)
         return _ChipWithSpace(chip, n_cores_used)
+
+    @property
+    def n_chips_used(self):
+        return len(self.__used_chips)
 
     def __usable_from_chip(self, chip):
         chips = OrderedSet()
@@ -177,3 +184,10 @@ class _Spaces(object):
             if chip_coords not in self.__used_chips:
                 chips.add(chip_coords)
         return chips
+
+
+def _chip_order(machine):
+    for x in range(machine.max_chip_x + 1):
+        for y in range(machine.max_chip_y + 1):
+            if machine.is_chip_at(x, y):
+                yield((x, y))
