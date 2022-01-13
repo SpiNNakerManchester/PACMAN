@@ -214,25 +214,6 @@ def _get_all_chips(app_vertex, placements):
             for m_vertex in app_vertex.machine_vertices}
 
 
-def _route_to_all_chips(first_chip, chips, machine, routes):
-    # Keep a queue of chip to visit, parent route, link from parent
-    chips_to_explore = deque([(first_chip, None, None)])
-    visited = set()
-    while chips_to_explore:
-        chip, parent_route, direction = chips_to_explore.popleft()
-        if chip in visited:
-            continue
-        visited.add(chip)
-        if chip not in routes:
-            routes[chip] = RoutingTree(chip)
-        if parent_route is not None:
-            parent_route.append_child(direction, routes[chip])
-        for link in range(6):
-            next_chip = machine.xy_over_link(chip[0], chip[1], link)
-            if next_chip in chips and next_chip not in visited:
-                chips_to_explore.append((next_chip, routes[chip], link))
-
-
 def _route_to_target_chips(first_chip, chips, machine, routes, targets):
     # Keep a queue of chip to visit, list of (parent chip, link from parent)
     chips_to_explore = deque([(first_chip, list())])
