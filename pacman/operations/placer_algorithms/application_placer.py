@@ -52,6 +52,8 @@ def place_application_graph(
 
                 same_chip_groups = app_vertex.splitter.get_same_chip_groups()
 
+                placements_to_make = list()
+
                 # Go through the groups
                 for vertices, sdram in same_chip_groups:
                     vertices_to_place = list()
@@ -74,9 +76,13 @@ def place_application_graph(
                             f"{n_cores} cores is too many, or SDRAM of {sdram}"
                             " is too much for a single chip")
 
-                    # Otherwise place
-                    _place_on_chip(
-                        placements, vertices_to_place, sdram, next_chip)
+                    # Otherwise store placements to be made
+                    _store_on_chip(
+                        placements_to_make, vertices_to_place, sdram,
+                        next_chip)
+
+                # Now make the placements having confirmed all can be done
+                placements.add_placements(placements_to_make)
                 placed = True
             except _SpaceExceededException:
                 retries += 1
@@ -116,10 +122,10 @@ def _do_constraints(vertices, placements):
     return False
 
 
-def _place_on_chip(placements, vertices, sdram, chip):
+def _store_on_chip(placements_to_make, vertices, sdram, chip):
     for vertex in vertices:
         core = chip.use_next_core()
-        placements.add_placement(Placement(vertex, chip.x, chip.y, core))
+        placements_to_make.append(Placement(vertex, chip.x, chip.y, core))
     chip.use_sdram(sdram)
 
 
