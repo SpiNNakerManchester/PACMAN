@@ -116,6 +116,14 @@ class Placements(object):
         except KeyError as e:
             raise PacmanProcessorNotOccupiedError((x, y, p)) from e
 
+    def is_vertex_placed(self, vertex):
+        """ Determine if a vertex has been placed
+
+        :param MachineVertex vertex: The vertex to determine the status of
+        :rtype: bool
+        """
+        return vertex in self._machine_vertices
+
     def get_placement_of_vertex(self, vertex):
         """ Return the placement information for a vertex
 

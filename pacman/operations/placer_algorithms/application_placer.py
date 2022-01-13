@@ -44,10 +44,14 @@ def place_application_graph(
 
         # Go through the groups
         for vertices, sdram in same_chip_groups:
+            vertices_to_place = list()
+            for vertex in vertices:
+                if not placements.is_vertex_placed(vertex):
+                    vertices_to_place.append(vertex)
             sdram = sdram.get_total_sdram(plan_n_timesteps)
-            n_cores = len(vertices)
+            n_cores = len(vertices_to_place)
 
-            if _do_constraints(vertices, placements):
+            if _do_constraints(vertices_to_place, placements):
                 continue
 
             # If we can't use the next chip, use the next one after
@@ -65,7 +69,7 @@ def place_application_graph(
                     " is too much")
 
             # Otherwise place
-            _place_on_chip(placements, vertices, sdram, next_chip)
+            _place_on_chip(placements, vertices_to_place, sdram, next_chip)
 
     return placements
 
