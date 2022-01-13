@@ -22,7 +22,6 @@ from pacman.model.resources import ResourceContainer, ConstantSDRAM
 from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
 from pacman.config_setup import unittest_setup
 from pacman.model.placements.placements import Placements
-from pacman.operations.placer_algorithms.radial_placer import generate_radial_chips
 
 
 class TestSplitter(AbstractSplitterCommon):
