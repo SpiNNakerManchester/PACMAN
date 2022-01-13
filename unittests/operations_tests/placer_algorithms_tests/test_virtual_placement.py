@@ -38,7 +38,8 @@ def test_virtual_placement(placer):
     graph.add_vertex(virtual_vertex)
     writer.set_runtime_machine_graph(graph)
     malloc_based_chip_id_allocator()
-    n_keys_map = DictBasedMachinePartitionNKeysMap()
+    writer.set_machine_partition_n_keys_map(
+        DictBasedMachinePartitionNKeysMap())
 
     if placer == "ConnectiveBasedPlacer":
         placements = connective_based_placer(None)
@@ -47,7 +48,7 @@ def test_virtual_placement(placer):
     elif placer == "RadialPlacer":
         placements = radial_placer(None)
     elif placer == "SpreaderPlacer":
-        placements = spreader_placer(n_keys_map, None)
+        placements = spreader_placer(None)
     else:
         raise NotImplementedError(placer)
 

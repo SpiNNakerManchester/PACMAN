@@ -34,6 +34,7 @@ class TestSameChipConstraint(unittest.TestCase):
         unittest_setup()
 
     def _do_test(self, placer):
+        writer = PacmanDataWriter.mock()
         graph = MachineGraph("Test")
 
         vertices = [
@@ -63,9 +64,10 @@ class TestSameChipConstraint(unittest.TestCase):
                     app_edge=None)
                 sdram_edges.append(sdram_edge)
                 graph.add_edge(sdram_edge, "Test")
-        n_keys_map = DictBasedMachinePartitionNKeysMap()
+        writer.set_runtime_machine_graph(graph)
+        writer.set_machine_partition_n_keys_map(
+            DictBasedMachinePartitionNKeysMap())
 
-        PacmanDataWriter.mock().set_runtime_machine_graph(graph)
         if placer == "ConnectiveBasedPlacer":
             placements = connective_based_placer(None)
         elif placer == "OneToOnePlacer":
@@ -73,7 +75,7 @@ class TestSameChipConstraint(unittest.TestCase):
         elif placer == "RadialPlacer":
             placements = radial_placer(None)
         elif placer == "SpreaderPlacer":
-            placements = spreader_placer(n_keys_map, None)
+            placements = spreader_placer(None)
         else:
             raise NotImplementedError(placer)
         for edge in sdram_edges:

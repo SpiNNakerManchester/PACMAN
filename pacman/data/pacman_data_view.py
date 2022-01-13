@@ -19,6 +19,8 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.exceptions import DataLocked
 from spinn_machine.data import MachineDataView
 from pacman.exceptions import PacmanNotPlacedError
+from pacman.model.routing_info import (
+    DictBasedMachinePartitionNKeysMap)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -364,6 +366,10 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_machine_partition_n_keys_map(cls):
         if cls.__pacman_data._machine_partition_n_keys_map is None:
-            raise cls._exception("machine_partition_n_keys_map")
+            if cls.get_status() == Data_Status.MOCKED:
+                cls.__pacman_data._machine_partition_n_keys_map = \
+                    DictBasedMachinePartitionNKeysMap()
+            else:
+                raise cls._exception("machine_partition_n_keys_map")
         return cls.__pacman_data._machine_partition_n_keys_map
 

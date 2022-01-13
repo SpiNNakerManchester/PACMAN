@@ -72,8 +72,9 @@ def test_virtual_vertices_spreader():
     malloc_based_chip_id_allocator()
 
     writer.set_runtime_machine_graph(machine_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
     # Do placements
-    placements = spreader_placer(n_keys_map, plan_n_timesteps=1000)
+    placements = spreader_placer(plan_n_timesteps=1000)
 
     # The virtual vertex should be on a virtual chip
     placement = placements.get_placement_of_vertex(virtual_vertex)
@@ -95,6 +96,7 @@ def test_one_to_one():
     """ Test normal 1-1 placement
     """
     unittest_setup()
+    writer = PacmanDataWriter.mock()
 
     # Create a graph
     machine_graph = MachineGraph("Test")
@@ -138,9 +140,11 @@ def test_one_to_one():
         too_many_vertices.append(vertex)
         last_vertex = vertex
 
+    writer.set_runtime_machine_graph(machine_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
+
     # Do placements
-    PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
-    placements = spreader_placer(n_keys_map, plan_n_timesteps=1000)
+    placements = spreader_placer(plan_n_timesteps=1000)
 
     # The 1-1 connected vertices should be on the same chip
     for chain in one_to_one_chains:
@@ -181,9 +185,11 @@ def test_sdram_links():
                 identifier="SDRAM", pre_vertex=vertex, label="bacon"))
         edge = SDRAMMachineEdge(vertex, last_vertex, "bacon", app_edge=None)
         machine_graph.add_edge(edge, "SDRAM")
-    n_keys_map = DictBasedMachinePartitionNKeysMap()
 
+    writer = PacmanDataWriter.mock()
+    writer.set_runtime_machine_graph(machine_graph)
+    writer.set_machine_partition_n_keys_map(
+        DictBasedMachinePartitionNKeysMap())
     # Do placements
-    PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
     with pytest.raises(PacmanException):
-        spreader_placer(n_keys_map, plan_n_timesteps=1000)
+        spreader_placer(plan_n_timesteps=1000)

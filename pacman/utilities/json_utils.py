@@ -375,7 +375,9 @@ def placement_from_json(json_dict, graph=None):
         vertex, int(json_dict["x"]), int(json_dict["y"]), int(json_dict["p"]))
 
 
-def partition_to_n_keys_map_to_json(partition_to_n_keys_map):
+def partition_to_n_keys_map_to_json():
+    partition_to_n_keys_map = \
+        PacmanDataView.get_machine_partition_n_keys_map()
     json_list = []
     for partition in partition_to_n_keys_map:
         json_dict = OrderedDict()

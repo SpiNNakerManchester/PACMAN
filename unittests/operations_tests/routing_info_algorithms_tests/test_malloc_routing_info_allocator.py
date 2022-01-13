@@ -37,7 +37,7 @@ class MyTestCase(unittest.TestCase):
         unittest_setup()
 
     def test_allocate_fixed_key_and_mask(self):
-        allocator = _MallocBasedRoutingInfoAllocator(None)
+        allocator = _MallocBasedRoutingInfoAllocator()
         allocator._allocate_fixed_keys_and_masks(
             [BaseKeyAndMask(0x800, 0xFFFFF800)], None)
         error = ("Allocation has not resulted in the expected free space"
@@ -59,7 +59,7 @@ class MyTestCase(unittest.TestCase):
                   "mask =", hex(key_and_mask.mask))
 
     def test_allocate_fixed_mask(self):
-        allocator = _MallocBasedRoutingInfoAllocator(None)
+        allocator = _MallocBasedRoutingInfoAllocator()
         self._print_keys_and_masks(allocator._allocate_keys_and_masks(
             0xFFFFFF00, None, 20))
         error = ("Allocation has not resulted in the expected free space"
@@ -72,7 +72,7 @@ class MyTestCase(unittest.TestCase):
                          error)
 
     def test_allocate_n_keys(self):
-        allocator = _MallocBasedRoutingInfoAllocator(None)
+        allocator = _MallocBasedRoutingInfoAllocator()
         self._print_keys_and_masks(allocator._allocate_keys_and_masks(
             None, None, 20))
         error = ("Allocation has not resulted in the expected free space"
@@ -88,7 +88,7 @@ class MyTestCase(unittest.TestCase):
         fixed_masks = [None, None, 0xFFFFFF00, 0xFFFFF800]
         n_keys = [200, 20, 20, 256]
 
-        allocator = _MallocBasedRoutingInfoAllocator(None)
+        allocator = _MallocBasedRoutingInfoAllocator()
 
         allocator._allocate_fixed_keys_and_masks(
             [BaseKeyAndMask(0x800, 0xFFFFF800)], None)
@@ -175,8 +175,11 @@ class MyTestCase(unittest.TestCase):
         partition2.add_constraint(ShareKeyConstraint([partition3]))
         partition3.add_constraint(ShareKeyConstraint([partition1]))
 
-        PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
-        results = malloc_based_routing_info_allocator(n_keys_map)
+        writer = PacmanDataWriter.mock()
+        writer.set_runtime_machine_graph(machine_graph)
+        writer.set_machine_partition_n_keys_map(n_keys_map)
+
+        results = malloc_based_routing_info_allocator()
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -209,9 +212,12 @@ class MyTestCase(unittest.TestCase):
         partition.add_constraint(FixedKeyAndMaskConstraint(
             [BaseKeyAndMask(base_key=25, mask=0xFFFFFFF)]))
 
-        PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
+        writer = PacmanDataWriter.mock()
+        writer.set_runtime_machine_graph(machine_graph)
+        writer.set_machine_partition_n_keys_map(n_keys_map)
+
         with self.assertRaises(PacmanRouteInfoAllocationException):
-            malloc_based_routing_info_allocator(n_keys_map)
+            malloc_based_routing_info_allocator()
 
     def test_share_key_with_fixed_key_on_new_partitions_other_order(self):
         machine_graph, n_keys_map, v1, v2, _v3, _v4, e1, e2, e3, e4 = \
@@ -225,8 +231,10 @@ class MyTestCase(unittest.TestCase):
         partition.add_constraint(FixedKeyAndMaskConstraint(
             [BaseKeyAndMask(base_key=25, mask=0xFFFFFFF)]))
 
-        PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
-        results = malloc_based_routing_info_allocator(n_keys_map)
+        writer = PacmanDataWriter.mock()
+        writer.set_runtime_machine_graph(machine_graph)
+        writer.set_machine_partition_n_keys_map(n_keys_map)
+        results = malloc_based_routing_info_allocator()
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -254,8 +262,11 @@ class MyTestCase(unittest.TestCase):
         other_partition.add_constraint(FixedKeyAndMaskConstraint(
             [BaseKeyAndMask(base_key=25, mask=0xFFFFFFF)]))
 
-        PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
-        results = malloc_based_routing_info_allocator(n_keys_map)
+        writer = PacmanDataWriter.mock()
+        writer.set_runtime_machine_graph(machine_graph)
+        writer.set_machine_partition_n_keys_map(n_keys_map)
+
+        results = malloc_based_routing_info_allocator()
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -281,8 +292,11 @@ class MyTestCase(unittest.TestCase):
             get_outgoing_edge_partition_starting_at_vertex(v1, "part2")
         partition.add_constraint(ShareKeyConstraint([other_partition]))
 
-        PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
-        results = malloc_based_routing_info_allocator(n_keys_map)
+        writer = PacmanDataWriter.mock()
+        writer.set_runtime_machine_graph(machine_graph)
+        writer.set_machine_partition_n_keys_map(n_keys_map)
+
+        results = malloc_based_routing_info_allocator()
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -307,8 +321,11 @@ class MyTestCase(unittest.TestCase):
             get_outgoing_edge_partition_starting_at_vertex(v2, "part2")
         partition.add_constraint(ShareKeyConstraint([other_partition]))
 
-        PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
-        results = malloc_based_routing_info_allocator(n_keys_map)
+        writer = PacmanDataWriter.mock()
+        writer.set_runtime_machine_graph(machine_graph)
+        writer.set_machine_partition_n_keys_map(n_keys_map)
+
+        results = malloc_based_routing_info_allocator()
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -327,8 +344,11 @@ class MyTestCase(unittest.TestCase):
         machine_graph, n_keys_map, v1, _v2, _v3, _v4, e1, e2, e3, e4 = \
             self._integration_setup()
 
-        PacmanDataWriter.mock().set_runtime_machine_graph(machine_graph)
-        results = malloc_based_routing_info_allocator(n_keys_map)
+        writer = PacmanDataWriter.mock()
+        writer.set_runtime_machine_graph(machine_graph)
+        writer.set_machine_partition_n_keys_map(n_keys_map)
+
+        results = malloc_based_routing_info_allocator()
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(

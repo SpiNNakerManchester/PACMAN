@@ -34,17 +34,15 @@ from .utils import get_possible_masks
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def malloc_based_routing_info_allocator(n_keys_map):
+def malloc_based_routing_info_allocator():
     """
     A Routing Info Allocation Allocator algorithm that keeps track of\
         free keys and attempts to allocate them as requested.
 
-    :param MachineGraph machine_graph:
-    :param AbstractMachinePartitionNKeysMap n_keys_map:
     :rtype: RoutingInfo
     :raises PacmanRouteInfoAllocationException:
     """
-    allocator = _MallocBasedRoutingInfoAllocator(n_keys_map)
+    allocator = _MallocBasedRoutingInfoAllocator()
     return allocator.run()
 
 
@@ -53,11 +51,10 @@ class _MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         free keys and attempts to allocate them as requested.
     """
 
-    __slots__ = ["_n_keys_map"]
+    __slots__ = []
 
-    def __init__(self, n_keys_map):
+    def __init__(self):
         super().__init__(0, 2 ** 32)
-        self._n_keys_map = n_keys_map
 
     def run(self):
         """
@@ -119,8 +116,9 @@ class _MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         :param ConstraintGroup group:
         :rtype: int
         """
+        n_keys_map = PacmanDataView.get_machine_partition_n_keys_map()
         return max(
-            self._n_keys_map.n_keys_for_partition(partition)
+            n_keys_map.n_keys_for_partition(partition)
             for partition in group)
 
     def _allocate_other_groups(self, group, routing_infos, continuous):

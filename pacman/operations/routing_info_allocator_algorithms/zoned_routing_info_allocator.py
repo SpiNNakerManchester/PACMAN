@@ -102,11 +102,8 @@ class ZonedRoutingInfoAllocator(object):
     ]
     # pylint: disable=attribute-defined-outside-init
 
-    def __call__(self, n_keys_map, flexible):
+    def __call__(self, flexible):
         """
-        :param AbstractMachinePartitionNKeysMap n_keys_map:
-            A map between the edges and the number of keys required by the
-            edges
         :param bool flexible: Determines if flexible can be use.
             If False, global settings will be attempted
         :return: The routing information
@@ -117,7 +114,7 @@ class ZonedRoutingInfoAllocator(object):
         # check that this algorithm supports the constraints put onto the
         # partitions
         self.__machine_graph = PacmanDataView.get_runtime_machine_graph()
-        self.__n_keys_map = n_keys_map
+        self.__n_keys_map = PacmanDataView.get_machine_partition_n_keys_map()
         self.__n_bits_atoms_and_mac = 0
         self.__n_bits_machine = 0
         self.__n_bits_atoms = 0
@@ -334,14 +331,11 @@ class ZonedRoutingInfoAllocator(object):
         return int(math.ceil(math.log(size, 2)))
 
 
-def flexible_allocate(n_keys_map):
+def flexible_allocate():
     """
     Allocated with fixed bits for the Application/Partition index but
     with the size of the atom and machine bit changing
 
-    :param AbstractMachinePartitionNKeysMap n_keys_map:
-        A map between the edges and the number of keys required by the
-        edges
     :rtype: tuple(RoutingInfo,
         dict((ApplicationVertex, str), BaseKeyAndMask))
     :raise PacmanRouteInfoAllocationException:
@@ -351,14 +345,11 @@ def flexible_allocate(n_keys_map):
 
     allocator = ZonedRoutingInfoAllocator()
 
-    return allocator(n_keys_map, True)
+    return allocator(True)
 
 
-def global_allocate(n_keys_map):
+def global_allocate():
     """
-    :param AbstractMachinePartitionNKeysMap n_keys_map:
-        A map between the edges and the number of keys required by the
-        edges
     :rtype: tuple(RoutingInfo,
         dict((ApplicationVertex, str), BaseKeyAndMask))
     :raise PacmanRouteInfoAllocationException:
@@ -368,4 +359,4 @@ def global_allocate(n_keys_map):
 
     allocator = ZonedRoutingInfoAllocator()
 
-    return allocator(n_keys_map, False)
+    return allocator(False)

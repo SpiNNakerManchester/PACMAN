@@ -226,13 +226,15 @@ def check_keys_for_application_partition_pairs(
 
 def test_global_allocator():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
 
     # Allocate something and check it does the right thing
     app_graph, mac_graph, n_keys_map = create_graphs1(False)
-    PacmanDataWriter.mock().set_runtime_machine_graph(mac_graph)
+    writer.set_runtime_machine_graph(mac_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
 
     # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
-    routing_info = global_allocate(n_keys_map)
+    routing_info = global_allocate()
 
     # Last 8 for buts
     mask = 0xFFFFFF00
@@ -248,11 +250,13 @@ def test_flexible_allocator_no_fixed():
     unittest_setup()
 
     # Allocate something and check it does the right thing
+    writer = PacmanDataWriter.mock()
     app_graph, mac_graph, n_keys_map = create_graphs1(False)
-    PacmanDataWriter.mock().set_runtime_machine_graph(mac_graph)
+    writer.set_runtime_machine_graph(mac_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
 
     # The number of bits is 7 + 11 = 20, so it shouldn't fail
-    routing_info = flexible_allocate(n_keys_map)
+    routing_info = flexible_allocate()
 
     # all but the bottom 11 bits should be the same
     app_mask = 0xFFFFF800
@@ -262,30 +266,36 @@ def test_flexible_allocator_no_fixed():
 
 def test_fixed_only():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph, mac_graph, n_keys_map = create_graphs_only_fixed()
-    PacmanDataWriter.mock().set_runtime_machine_graph(mac_graph)
-    flexible_allocate(n_keys_map)
-    routing_info = global_allocate(n_keys_map)
+    writer.set_runtime_machine_graph(mac_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
+    flexible_allocate()
+    routing_info = global_allocate()
     assert len(list(routing_info)) == 2
 
 
 def test_no_edge():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph, mac_graph, n_keys_map = create_graphs_no_edge()
-    PacmanDataWriter.mock().set_runtime_machine_graph(mac_graph)
-    flexible_allocate(n_keys_map)
-    routing_info = global_allocate(n_keys_map)
+    writer.set_runtime_machine_graph(mac_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
+    flexible_allocate()
+    routing_info = global_allocate()
     assert len(list(routing_info)) == 0
 
 
 def test_flexible_allocator_with_fixed():
     unittest_setup()
     # Allocate something and check it does the right thing
+    writer = PacmanDataWriter.mock()
     app_graph, mac_graph, n_keys_map = create_graphs1(True)
-    PacmanDataWriter.mock().set_runtime_machine_graph(mac_graph)
+    writer.set_runtime_machine_graph(mac_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
 
     # The number of bits is 7 + 11 = 20, so it shouldn't fail
-    routing_info = flexible_allocate(n_keys_map)
+    routing_info = flexible_allocate()
 
     # all but the bottom 11 bits should be the same
     app_mask = 0xFFFFF800
@@ -343,11 +353,13 @@ def create_big(with_fixed):
 
 def test_big_flexible_no_fixed():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph, mac_graph, n_keys_map = create_big(False)
-    PacmanDataWriter.mock().set_runtime_machine_graph(mac_graph)
+    writer.set_runtime_machine_graph(mac_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = flexible_allocate(n_keys_map)
+    routing_info = flexible_allocate()
 
     # The number of bits is 1 + 21 = 22, so it shouldn't fail
     # all but the bottom 21 bits should be the same
@@ -358,9 +370,11 @@ def test_big_flexible_no_fixed():
 
 def test_big_global_no_fixed():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph, mac_graph, n_keys_map = create_big(False)
-    PacmanDataWriter.mock().set_runtime_machine_graph(mac_graph)
-    routing_info = global_allocate(n_keys_map)
+    writer.set_runtime_machine_graph(mac_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
+    routing_info = global_allocate()
 
     # 1 for app 11 for machine so where possible use 20 for atoms
     mask = 0xFFF00000
@@ -377,11 +391,13 @@ def test_big_global_no_fixed():
 
 def test_big_flexible_fixed():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph, mac_graph, n_keys_map = create_big(True)
-    PacmanDataWriter.mock().set_runtime_machine_graph(mac_graph)
+    writer.set_runtime_machine_graph(mac_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = flexible_allocate(n_keys_map)
+    routing_info = flexible_allocate()
 
     # all but the bottom 18 bits should be the same
     app_mask = 0xFFFC0000
@@ -391,9 +407,11 @@ def test_big_flexible_fixed():
 
 def test_big_global_fixed():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph, mac_graph, n_keys_map = create_big(True)
-    PacmanDataWriter.mock().set_runtime_machine_graph(mac_graph)
-    routing_info = global_allocate(n_keys_map)
+    writer.set_runtime_machine_graph(mac_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
+    routing_info = global_allocate()
 
     # 7 bit atoms is 7 as it ignore the retina
     mask = 0xFFFFFF80
@@ -410,10 +428,12 @@ def test_big_global_fixed():
 
 def test_no_app_level_flexible():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph, mac_graph, n_keys_map = create_app_less()
-    PacmanDataWriter.mock().set_runtime_machine_graph(mac_graph)
+    writer.set_runtime_machine_graph(mac_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = flexible_allocate(n_keys_map)
+    routing_info = flexible_allocate()
 
     # all but the bottom 8 bits should be the same
     app_mask = 0xFFFFFF00
@@ -423,10 +443,12 @@ def test_no_app_level_flexible():
 
 def test_no_app_level_global():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph, mac_graph, n_keys_map = create_app_less()
-    PacmanDataWriter.mock().set_runtime_machine_graph(mac_graph)
+    writer.set_runtime_machine_graph(mac_graph)
+    writer.set_machine_partition_n_keys_map(n_keys_map)
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = global_allocate(n_keys_map)
+    routing_info = global_allocate()
     # Last 8 for masks
     mask = 0xFFFFFF00
     check_masks_all_the_same(routing_info,  mask)
