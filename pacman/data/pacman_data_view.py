@@ -44,6 +44,7 @@ class _PacmanDataModel(object):
         # Data values cached
         "_graph",
         "_machine_graph",
+        "_machine_partition_n_keys_map",
         "_placements",
         "_routing_infos",
         "_runtime_graph",
@@ -76,6 +77,7 @@ class _PacmanDataModel(object):
         self._runtime_graph = None
         self._runtime_machine_graph = None
         self._routing_infos = None
+        self._machine_partition_n_keys_map = None
         self._tags = None
         self._soft_reset()
 
@@ -356,3 +358,12 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._tags is None:
             raise cls._exception("tags")
         return cls.__pacman_data._tags
+
+    # MachinePartitionNKeysMap
+
+    @classmethod
+    def get_machine_partition_n_keys_map(cls):
+        if cls.__pacman_data._machine_partition_n_keys_map is None:
+            raise cls._exception("machine_partition_n_keys_map")
+        return cls.__pacman_data._machine_partition_n_keys_map
+

@@ -18,9 +18,11 @@ from spinn_utilities.exceptions import (DataLocked, DataNotYetAvialable)
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
-from pacman.model.graphs.machine import (MachineGraph, SimpleMachineVertex)
+from pacman.model.graphs.machine import (
+    MachineGraph, MulticastEdgePartition, SimpleMachineVertex)
 from pacman.model.placements import Placements
-from pacman.model.routing_info import RoutingInfo
+from pacman.model.routing_info import (
+    DictBasedMachinePartitionNKeysMap, RoutingInfo)
 from pacman.model.tags import Tags
 from pacman_test_objects import SimpleTestVertex
 
@@ -176,3 +178,18 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(tags, PacmanDataView.get_tags())
         with self.assertRaises(TypeError):
             writer.set_tags("Bacon")
+
+    def test_machine_partition_n_keys_map(self):
+        pmap = DictBasedMachinePartitionNKeysMap()
+        p1 = MulticastEdgePartition(None, "foo")
+        p2 = MulticastEdgePartition(None, "bar")
+        pmap.set_n_keys_for_partition(p1, 1)
+        pmap.set_n_keys_for_partition(p2, 2)
+        writer = PacmanDataWriter.setup()
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_machine_partition_n_keys_map()
+        writer.set_machine_partition_n_keys_map(pmap)
+        self.assertEqual(
+            pmap, PacmanDataView.get_machine_partition_n_keys_map())
+        with self.assertRaises(TypeError):
+            writer.set_machine_partition_n_keys_map("Bacon")
