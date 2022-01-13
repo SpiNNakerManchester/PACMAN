@@ -372,4 +372,3 @@ class PacmanDataView(MachineDataView):
             else:
                 raise cls._exception("machine_partition_n_keys_map")
         return cls.__pacman_data._machine_partition_n_keys_map
-
