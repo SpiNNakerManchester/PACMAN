@@ -28,6 +28,7 @@ from pacman.model.resources import ResourceContainer, ConstantSDRAM
 from collections import defaultdict
 import math
 from spinn_utilities.timer import Timer
+from spinn_utilities.config_holder import set_config
 
 
 class TestSplitter(AbstractSplitterCommon):
@@ -189,14 +190,26 @@ def _find_targets(
     x, y = placements.get_placement_of_vertex(source_vertex).chip
     to_follow.append((x, y, _get_entry(
         routing_tables, x, y, source_vertex, partition_id)))
+    visited = set()
     while to_follow:
         x, y, next_to_follow = to_follow.pop()
+        if not machine.is_chip_at(x, y):
+            raise Exception(
+                f"Route goes through {x}, {y} but that doesn't exist!")
+        if (x, y) in visited:
+            raise Exception(
+                f"Potential loop found when going through {x}, {y}")
+        visited.add((x, y))
         for p in next_to_follow.processor_ids:
             if (x, y, p) in found_targets:
                 raise Exception(
                     f"Potential Loop found when adding routes at {x}, {y}")
             found_targets.add((x, y, p))
         for link in next_to_follow.link_ids:
+            if not machine.is_link_at(x, y, link):
+                raise Exception(
+                    f"Route uses link {x}, {y}, {link} but that doesn't"
+                    " exist!")
             next_x, next_y = machine.xy_over_link(x, y, link)
             to_follow.append((next_x, next_y, _get_entry(
                     routing_tables, next_x, next_y, source_vertex,
@@ -339,3 +352,56 @@ def test_application_router_multi_self_split():
     placements = place_application_graph(machine, app_graph, 100, Placements())
     routing_tables = _route_and_time(machine, app_graph, placements)
     _check_edges(routing_tables, machine, placements, app_graph)
+
+
+def test_application_router_multi_down_chips_and_links():
+    unittest_setup()
+    app_graph = ApplicationGraph("Test")
+    for i in range(10):
+        _make_vertices(app_graph, 1000, 50, f"app_vertex_{i}")
+    for source in app_graph.vertices:
+        for target in app_graph.vertices:
+            app_graph.add_edge(ApplicationEdge(source, target), "Test")
+
+    machine = virtual_machine(8, 8)
+    placements = place_application_graph(machine, app_graph, 100, Placements())
+    routing_tables = _route_and_time(machine, app_graph, placements)
+
+    # Pick a few of the chips and links used and take them out
+    chosen_entries = list()
+    count = 2
+    for x, y in routing_tables.get_routers():
+        if len(chosen_entries) >= 10:
+            break
+
+        if count != 0:
+            count -= 1
+        else:
+            entries = routing_tables.get_entries_for_router(x, y)
+            count = 11 - len(chosen_entries)
+            for entry in entries.values():
+                if count != 0:
+                    count -= 1
+                else:
+                    chosen_entries.append((x, y, entry))
+                    break
+            count = 2
+
+    down_links = ""
+    down_chips = ""
+    for i, (x, y, entry) in enumerate(chosen_entries):
+        if entry.link_ids:
+            link = list(entry.link_ids)[i % len(entry.link_ids)]
+            down_links += f"{x},{y},{link}:"
+        else:
+            down_chips += f"{x},{y}:"
+
+    print("Down chips:", down_chips[:-1].split(":"))
+    print("Down links:", down_links[:-1].split(":"))
+    set_config("Machine", "down_chips", down_chips[:-1])
+    set_config("Machine", "down_links", down_links[:-1])
+    machine_down = virtual_machine(8, 8)
+    placements = place_application_graph(
+        machine_down, app_graph, 100, Placements())
+    routing_tables = _route_and_time(machine_down, app_graph, placements)
+    _check_edges(routing_tables, machine_down, placements, app_graph)

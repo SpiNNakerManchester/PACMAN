@@ -244,11 +244,19 @@ def _route_to_target_chips(first_chip, chips, machine, routes, targets):
             path = list()
 
         for link in range(6):
-            next_chip = machine.xy_over_link(chip[0], chip[1], link)
-            if next_chip in chips and next_chip not in visited:
-                new_path = list(path)
-                new_path.append((chip, link))
-                chips_to_explore.append((next_chip, new_path))
+            x, y = chip
+            if machine.is_link_at(x, y, link):
+                next_chip = machine.xy_over_link(x, y, link)
+                if _is_open_chip(next_chip, chips, visited, machine):
+                    new_path = list(path)
+                    new_path.append((chip, link))
+                    chips_to_explore.append((next_chip, new_path))
+
+
+def _is_open_chip(chip, chips, visited, machine):
+    x, y = chip
+    is_in_range = chips is None or chip in chips
+    return is_in_range and chip not in visited and machine.is_chip_at(x, y)
 
 
 def _route_pre_to_post(
@@ -257,6 +265,9 @@ def _route_pre_to_post(
     # Find a route from source to target
     vector = machine.get_vector(source_xy, dest_xy)
     nodes = longest_dimension_first(vector, source_xy, machine)
+
+    # Route around broken links and chips
+    nodes = _path_without_errors(source_xy, nodes, machine)
 
     # Start from the end and move backwards until we find a chip
     # in the source group, or a already in the route
@@ -290,6 +301,71 @@ def _route_pre_to_post(
         source_route = dest_route
 
     return route_pre, route_post
+
+
+def _path_without_errors(source_xy, nodes, machine):
+    c_xy = source_xy
+    pos = 0
+    new_nodes = list()
+    while pos < len(nodes):
+
+        # While the route is working, move forwards and copy
+        while (pos < len(nodes) and _is_ok(c_xy, nodes[pos], machine)):
+            new_nodes.append(nodes[pos])
+            c_xy = _xy(nodes[pos])
+            pos += 1
+
+        # While the route is broken, find the next working bit
+        next_pos = pos
+        n_xy = c_xy
+        while (next_pos < len(nodes) and not _is_ok(
+                n_xy, nodes[next_pos], machine)):
+            n_xy = _xy(nodes[next_pos])
+            next_pos += 1
+
+        # If there is a broken bit, fix it
+        if next_pos != pos:
+            new_nodes.extend(_find_path(c_xy, n_xy, machine))
+        c_xy = n_xy
+        pos = next_pos
+    return new_nodes
+
+
+def _is_ok(xy, node, mac):
+    c_x, c_y = xy
+    direction, (n_x, n_y) = node
+    if mac.is_link_at(c_x, c_y, direction) and mac.is_chip_at(n_x, n_y):
+        return True
+    return False
+
+
+def _xy(node):
+    _, (x, y) = node
+    return (x, y)
+
+
+def _find_path(source_xy, target_xy, machine):
+    chips_to_explore = deque([(source_xy, list())])
+    visited = set()
+    while chips_to_explore:
+        chip, path = chips_to_explore.popleft()
+        if chip in visited:
+            continue
+        visited.add(chip)
+
+        # If we have reached a target, add the path to the routes
+        if chip == target_xy:
+            return path
+
+        for link in range(6):
+            x, y = chip
+            if machine.is_link_at(x, y, link):
+                next_chip = machine.xy_over_link(x, y, link)
+                if _is_open_chip(next_chip, None, visited, machine):
+                    new_path = list(path)
+                    new_path.append((link, next_chip))
+                    chips_to_explore.append((next_chip, new_path))
+    raise Exception(f"No path from {source_xy} to {target_xy}")
 
 
 def _in_group(item, group):
