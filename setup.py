@@ -75,9 +75,6 @@ setup(
     install_requires=[
         'SpiNNUtilities == 1!6.0.1',
         'SpiNNMachine == 1!6.0.1',
-        "numpy > 1.13, < 1.20; python_version == '3.6'",
-        "numpy > 1.13, < 1.21; python_version == '3.7'",
-        "numpy; python_version >= '3.8'",
         'lxml',
         "jsonschema < 4.4; python_version == '3.6'",
         "jsonschema; python_version >= '3.7'",
