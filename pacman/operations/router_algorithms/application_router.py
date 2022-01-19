@@ -425,10 +425,50 @@ def _convert_a_route(
                 entry = MulticastRoutingTableByPartitionEntry(
                     link_ids, processor_ids + additional_cores,
                     incoming_processor, incoming_link)
-                routing_tables.add_path_entry(
-                    entry, x, y, source, partition_id)
+                _add_routing_entry(
+                    first_route, routing_tables, entry, x, y, source,
+                    partition_id)
         else:
             entry = MulticastRoutingTableByPartitionEntry(
                 link_ids, processor_ids, incoming_processor, incoming_link)
-            routing_tables.add_path_entry(
-                entry, x, y, source_vertex, partition_id)
+            _add_routing_entry(
+                first_route, routing_tables, entry, x, y, source_vertex,
+                partition_id)
+
+
+def _add_routing_entry(
+        first_route, routing_tables, entry, x, y, source, partition_id):
+    try:
+        routing_tables.add_path_entry(entry, x, y, source, partition_id)
+    except Exception as e:
+        print(f"Error adding route: {e}")
+        _print_path(first_route)
+        raise e
+
+
+def _print_path(first_route):
+    first_string = f"{first_route.chip}"
+    first_prefix = " " * len(first_string)
+    to_process = [first_prefix, None, first_route]
+    last_is_leaf = False
+    line = first_string
+    while to_process:
+        prefix, link, route = to_process.pop()
+
+        if last_is_leaf:
+            line += prefix
+
+        to_add = ""
+        if link is not None:
+            to_add += f"-> {link} -> "
+        to_add += f"{route.chip}"
+        line += to_add
+        prefix += " " * len(to_add)
+
+        if not route.children:
+            # This is a leaf
+            last_is_leaf = True
+            print(line)
+        else:
+            for direction, next_route in route.children:
+                to_process.append(prefix, direction, next_route)
