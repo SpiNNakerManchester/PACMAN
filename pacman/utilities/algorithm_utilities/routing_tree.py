@@ -105,6 +105,10 @@ class RoutingTree(object):
         """
         self._children.remove(child)
 
+    @property
+    def is_leaf(self):
+        return not self._children
+
     def __iter__(self):
         """Iterate over this node and then all its children, recursively and in
         no specific order. This iterator iterates over the child *objects*

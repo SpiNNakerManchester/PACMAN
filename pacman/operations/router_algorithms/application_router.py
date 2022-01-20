@@ -447,11 +447,9 @@ def _add_routing_entry(
 
 
 def _print_path(first_route):
-    first_string = f"{first_route.chip}"
-    first_prefix = " " * len(first_string)
-    to_process = [first_prefix, None, first_route]
+    to_process = [("", None, first_route)]
     last_is_leaf = False
-    line = first_string
+    line = ""
     while to_process:
         prefix, link, route = to_process.pop()
 
@@ -460,15 +458,17 @@ def _print_path(first_route):
 
         to_add = ""
         if link is not None:
-            to_add += f"-> {link} -> "
+            to_add += f" -> {link} -> "
         to_add += f"{route.chip}"
         line += to_add
         prefix += " " * len(to_add)
 
-        if not route.children:
+        if route.is_leaf:
             # This is a leaf
             last_is_leaf = True
             print(line)
+            line = ""
         else:
+            last_is_leaf = False
             for direction, next_route in route.children:
-                to_process.append(prefix, direction, next_route)
+                to_process.append((prefix, direction, next_route))
