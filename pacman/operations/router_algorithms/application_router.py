@@ -113,7 +113,8 @@ def route_application_graph(machine, app_graph, placements):
                 # or target chips in it
                 source_edge_chip, target_edge_chip = _route_pre_to_post(
                     source_chip, target_chip, routes, machine,
-                    "Source to Target", all_source_chips, target_chips)
+                    f"Source to Target ({target.label})", all_source_chips,
+                    target_chips)
 
                 # Add all the targets for the route
                 target_vertices = \
