@@ -268,10 +268,11 @@ def _route_pre_to_post(
     nodes_direct = longest_dimension_first(vector, source_xy, machine)
 
     # Route around broken links and chips
-    nodes = _path_without_errors(source_xy, nodes_direct, machine)
+    nodes_fixed = _path_without_errors(source_xy, nodes_direct, machine)
 
     # Start from the end and move backwards until we find a chip
     # in the source group, or a already in the route
+    nodes = nodes_fixed
     route_pre = source_xy
     for i, (_direction, (x, y)) in reversed(list(enumerate(nodes))):
         if _in_group((x, y), source_group) or (x, y) in routes:
@@ -298,6 +299,9 @@ def _route_pre_to_post(
     for direction, dest_node in nodes:
         if dest_node in routes:
             _print_path(routes[source_xy])
+            print(f"Direct path from {source_xy} to {dest_xy}: {nodes_direct}")
+            print(f"Avoiding down chips: {nodes_fixed}")
+            print(f"Trimmed path is from {route_pre} to {route_post}: {nodes}")
             raise Exception(
                 f"Somehow node {dest_node} already in routes with label"
                 f" {routes[dest_node].label}")
