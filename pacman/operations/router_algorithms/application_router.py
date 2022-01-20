@@ -230,9 +230,8 @@ def _route_to_target_chips(first_chip, chips, machine, routes, targets):
             path = list()
 
         # If we have reached a target, add the path to the routes
-        if chip in targets:
-            if chip not in routes:
-                routes[chip] = RoutingTree(chip)
+        elif chip in targets:
+            routes[chip] = RoutingTree(chip)
             last_route = routes[chip]
             for parent, link in reversed(path):
                 if parent not in routes:
