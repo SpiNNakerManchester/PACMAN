@@ -265,10 +265,10 @@ def _route_pre_to_post(
         target_group=None):
     # Find a route from source to target
     vector = machine.get_vector(source_xy, dest_xy)
-    nodes = longest_dimension_first(vector, source_xy, machine)
+    nodes_direct = longest_dimension_first(vector, source_xy, machine)
 
     # Route around broken links and chips
-    nodes = _path_without_errors(source_xy, nodes, machine)
+    nodes = _path_without_errors(source_xy, nodes_direct, machine)
 
     # Start from the end and move backwards until we find a chip
     # in the source group, or a already in the route
@@ -296,6 +296,11 @@ def _route_pre_to_post(
     # Convert nodes to routes and add to existing routes
     source_route = routes[route_pre]
     for direction, dest_node in nodes:
+        if dest_node in routes:
+            _print_path(routes[source_xy])
+            raise Exception(
+                f"Somehow node {dest_node} already in routes with label"
+                f" {routes[dest_node].label}")
         dest_route = RoutingTree(dest_node, label)
         routes[dest_node] = dest_route
         source_route.append_child((direction, dest_route))
