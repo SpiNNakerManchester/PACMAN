@@ -113,7 +113,7 @@ def route_application_graph(machine, app_graph, placements):
                 # or target chips in it
                 source_edge_chip, target_edge_chip = _route_pre_to_post(
                     source_chip, target_chip, routes, machine,
-                    all_source_chips, target_chips)
+                    "Source to Target", all_source_chips, target_chips)
 
                 # Add all the targets for the route
                 target_vertices = \
@@ -129,7 +129,7 @@ def route_application_graph(machine, app_graph, placements):
                 # Route from target edge chip to all the targets
                 _route_to_target_chips(
                     target_edge_chip, target_chips, machine, routes,
-                    real_target_chips)
+                    real_target_chips, "Target to Targets")
 
                 # If the start of the route is still part of the source vertex
                 # chips, add it
@@ -171,7 +171,8 @@ def route_application_graph(machine, app_graph, placements):
                 source_routes = dict()
                 _route_to_target_chips(
                     chip, all_source_chips, machine, source_routes,
-                    source_edge_chips.union(self_chips))
+                    source_edge_chips.union(self_chips),
+                    "Sources to Source (self)")
                 for plce in source_chips[chip]:
                     _convert_a_route(
                         routing_tables, plce.vertex, partition.identifier,
@@ -182,7 +183,7 @@ def route_application_graph(machine, app_graph, placements):
                 source_routes = dict()
                 _route_to_target_chips(
                     chip, all_source_chips, machine, source_routes,
-                    source_edge_chips)
+                    source_edge_chips, "Sources to source")
                 for plce in source_chips[chip]:
                     _convert_a_route(
                         routing_tables, plce.vertex, partition.identifier,
@@ -214,7 +215,7 @@ def _get_all_chips(app_vertex, placements):
             for m_vertex in app_vertex.machine_vertices}
 
 
-def _route_to_target_chips(first_chip, chips, machine, routes, targets):
+def _route_to_target_chips(first_chip, chips, machine, routes, targets, label):
     # Keep a queue of chip to visit, list of (parent chip, link from parent)
     chips_to_explore = deque([(first_chip, list())])
     visited = set()
@@ -231,11 +232,11 @@ def _route_to_target_chips(first_chip, chips, machine, routes, targets):
 
         # If we have reached a target, add the path to the routes
         elif chip in targets:
-            routes[chip] = RoutingTree(chip)
+            routes[chip] = RoutingTree(chip, label)
             last_route = routes[chip]
             for parent, link in reversed(path):
                 if parent not in routes:
-                    routes[parent] = RoutingTree(parent)
+                    routes[parent] = RoutingTree(parent, label)
                 routes[parent].append_child((link, last_route))
                 last_route = routes[parent]
 
@@ -259,7 +260,7 @@ def _is_open_chip(chip, chips, visited, machine):
 
 
 def _route_pre_to_post(
-        source_xy, dest_xy, routes, machine, source_group=None,
+        source_xy, dest_xy, routes, machine, label, source_group=None,
         target_group=None):
     # Find a route from source to target
     vector = machine.get_vector(source_xy, dest_xy)
@@ -279,7 +280,7 @@ def _route_pre_to_post(
 
     # If we found one not in the route, create a new entry for it
     if route_pre not in routes:
-        routes[route_pre] = RoutingTree(route_pre)
+        routes[route_pre] = RoutingTree(route_pre, label)
 
     # Start from the start and move forwards until we find a chip in
     # the target group
@@ -294,7 +295,7 @@ def _route_pre_to_post(
     # Convert nodes to routes and add to existing routes
     source_route = routes[route_pre]
     for direction, dest_node in nodes:
-        dest_route = RoutingTree(dest_node)
+        dest_route = RoutingTree(dest_node, label)
         routes[dest_node] = dest_route
         source_route.append_child((direction, dest_route))
         source_route = dest_route
@@ -458,7 +459,7 @@ def _print_path(first_route):
         to_add = ""
         if link is not None:
             to_add += f" -> {link} -> "
-        to_add += f"{route.chip}"
+        to_add += f"{route.chip} ({route.label})"
         line += to_add
         prefix += " " * len(to_add)
 
