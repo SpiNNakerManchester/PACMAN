@@ -12,23 +12,26 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spinn_utilities.timer import Timer
+from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationGraph, ApplicationEdge)
 from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
 from pacman.operations.router_algorithms.application_router import (
-    route_application_graph)
+    route_application_graph, _path_without_errors)
+from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
+    longest_dimension_first)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placements
 from pacman.model.resources import ResourceContainer, ConstantSDRAM
+
 from collections import defaultdict
 import math
-from spinn_utilities.timer import Timer
-from spinn_utilities.config_holder import set_config
 
 
 class TestSplitter(AbstractSplitterCommon):
@@ -405,3 +408,50 @@ def test_application_router_multi_down_chips_and_links():
         machine_down, app_graph, 100, Placements())
     routing_tables = _route_and_time(machine_down, app_graph, placements)
     _check_edges(routing_tables, machine_down, placements, app_graph)
+
+
+def _check_path(source, nodes_fixed, machine, target):
+    c_x, c_y = source
+    seen = set()
+    for direction, (n_x, n_y) in nodes_fixed:
+        if (c_x, c_y) in seen:
+            raise Exception(f"Loop detected at {c_x}, {c_y}: {nodes_fixed}")
+        if not machine.is_chip_at(c_x, c_y):
+            raise Exception(
+                f"Route through down chip {c_x}, {c_y}: {nodes_fixed}")
+        if not machine.is_link_at(c_x, c_y, direction):
+            raise Exception(
+                f"Route through down link {c_x}, {c_y}, {direction}:"
+                f" {nodes_fixed}")
+        if not machine.xy_over_link(c_x, c_y, direction) == (n_x, n_y):
+            raise Exception(
+                f"Invalid route from {c_x}, {c_y}, {direction} to {n_x}, {n_y}"
+                f": {nodes_fixed}")
+        seen.add((c_x, c_y))
+        c_x, c_y = n_x, n_y
+
+    if (c_x, c_y) != target:
+        raise Exception(f"Route doesn't end at (5, 5): {nodes_fixed}")
+
+
+def test_route_around():
+    unittest_setup()
+    # Take out all the chips around 3,3 except one then make a path that goes
+    # through it
+    #      3,4 4,4
+    #  2,3 3,3 4,3
+    #  2,2 3,2
+    set_config("Machine", "down_chips", "2,3:3,2:3,4:4,4:4,3")
+    machine = virtual_machine(8, 8)
+    vector = machine.get_vector((0, 0), (6, 6))
+    nodes = longest_dimension_first(vector, (0, 0), machine)
+    nodes_fixed = _path_without_errors((0, 0), nodes, machine)
+    _check_path((0, 0), nodes_fixed, machine, (6, 6))
+
+    vector = machine.get_vector((2, 2), (6, 6))
+    nodes = longest_dimension_first(vector, (2, 2), machine)
+    nodes_fixed = _path_without_errors((2, 2), nodes, machine)
+    _check_path((2, 2), nodes_fixed, machine, (6, 6))
+
+    print(nodes)
+    print(nodes_fixed)

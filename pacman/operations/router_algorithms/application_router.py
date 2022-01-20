@@ -338,7 +338,22 @@ def _path_without_errors(source_xy, nodes, machine):
             new_nodes.extend(_find_path(c_xy, n_xy, machine))
         c_xy = n_xy
         pos = next_pos
-    return new_nodes
+    return _path_without_loops(source_xy, new_nodes)
+
+
+def _path_without_loops(start_xy, nodes):
+    seen_nodes = {start_xy: 0}
+    i = 0
+    while i < len(nodes):
+        _, nxt = nodes[i]
+        if nxt in seen_nodes:
+            last_seen = seen_nodes[nxt]
+            del nodes[last_seen:i + 1]
+            i = last_seen
+        else:
+            i += 1
+            seen_nodes[nxt] = i
+    return nodes
 
 
 def _is_ok(xy, node, mac):
