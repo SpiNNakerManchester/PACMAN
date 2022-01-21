@@ -599,7 +599,7 @@ class ResourceTracker(object):
             if tag is None:
                 return board_address in self._boards_with_ip_tags
             else:
-                tag in self._tags_by_board[board_address]
+                return tag in self._tags_by_board[board_address]
 
     def _is_ip_tag_available(self, board_address, ip_tag):
         """ Check if an IP tag is available given the constraints
