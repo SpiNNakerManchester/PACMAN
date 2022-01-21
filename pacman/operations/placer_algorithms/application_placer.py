@@ -47,10 +47,14 @@ def place_application_graph(
         while not placed:
             try:
 
+                same_chip_groups = app_vertex.splitter.get_same_chip_groups()
+
+                if not same_chip_groups:
+                    placed = True
+                    break
+
                 # Always start each application vertex with a new chip
                 next_chip, space = spaces.get_next_chip_and_space()
-
-                same_chip_groups = app_vertex.splitter.get_same_chip_groups()
 
                 placements_to_make = list()
 

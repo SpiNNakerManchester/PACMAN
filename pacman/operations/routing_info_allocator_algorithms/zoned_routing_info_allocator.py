@@ -211,6 +211,8 @@ class ZonedRoutingInfoAllocator(object):
             splitter = partition.pre_vertex.splitter
             machine_vertices = splitter.get_out_going_vertices(
                 partition.identifier)
+            if not machine_vertices:
+                continue
             for machine_vertex in machine_vertices:
                 max_keys = 0
                 if ((partition.identifier, machine_vertex) not in
@@ -293,6 +295,8 @@ class ZonedRoutingInfoAllocator(object):
             splitter = partition.pre_vertex.splitter
             machine_vertices = list(splitter.get_out_going_vertices(
                 partition.identifier))
+            if not machine_vertices:
+                continue
             machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
             n_bits_atoms = self.__atom_bits_per_app_part[partition]
             if self.__flexible:

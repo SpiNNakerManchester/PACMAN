@@ -79,6 +79,10 @@ def route_application_graph(machine, app_graph, placements):
         source_chip, source_chips = _get_outgoing_chips(
             partition.pre_vertex, partition.identifier, placements)
 
+        # No source chips?  Nothing to route then!
+        if source_chip is None:
+            continue
+
         # Get all source chips
         all_source_chips = _get_all_chips(source, placements)
 
@@ -207,6 +211,8 @@ def _get_outgoing_chips(app_vertex, partition_id, placements):
     for m_vertex in app_vertex.splitter.get_out_going_vertices(partition_id):
         place = placements.get_placement_of_vertex(m_vertex)
         vertex_chips[place.chip].append(place)
+    if not vertex_chips:
+        return None, None
     first_chip = next(iter(vertex_chips.keys()))
     return (first_chip, vertex_chips)
 
