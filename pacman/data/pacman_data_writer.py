@@ -22,6 +22,7 @@ from pacman.model.graphs.machine import MachineGraph
 from pacman.model.placements import Placements
 from pacman.model.routing_info import (
     DictBasedMachinePartitionNKeysMap, RoutingInfo)
+from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.model.tags import Tags
 from pacman.exceptions import PacmanConfigurationException
 from .pacman_data_view import PacmanDataView, _PacmanDataModel
@@ -180,3 +181,14 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
                 " DictBasedMachinePartitionNKeysMap")
         self.__pacman_data._machine_partition_n_keys_map = \
             machine_partition_n_keys_map
+
+    def set_router_tables(self, router_tables):
+        """
+        Sets the router_tables value
+
+        :param MulticastRoutingTables router_tables: new value
+        """
+        if not isinstance(router_tables, MulticastRoutingTables):
+            raise TypeError(
+                "router_tables should be a MulticastRoutingTables")
+        self.__pacman_data._router_tables = router_tables

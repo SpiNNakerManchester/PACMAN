@@ -23,6 +23,7 @@ from pacman.model.graphs.machine import (
 from pacman.model.placements import Placements
 from pacman.model.routing_info import (
     DictBasedMachinePartitionNKeysMap, RoutingInfo)
+from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.model.tags import Tags
 from pacman_test_objects import SimpleTestVertex
 
@@ -193,3 +194,14 @@ class TestSimulatorData(unittest.TestCase):
             pmap, PacmanDataView.get_machine_partition_n_keys_map())
         with self.assertRaises(TypeError):
             writer.set_machine_partition_n_keys_map("Bacon")
+
+    def test_router_tables(self):
+        table = MulticastRoutingTables()
+        writer = PacmanDataWriter.setup()
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_router_tables()
+        writer.set_router_tables(table)
+        self.assertEqual(table, PacmanDataView.get_router_tables())
+        with self.assertRaises(TypeError):
+            writer.set_router_tables("Bacon")
+
