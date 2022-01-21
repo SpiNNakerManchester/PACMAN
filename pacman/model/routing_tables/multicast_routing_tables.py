@@ -124,7 +124,7 @@ def from_json(j_router):
             with gzip.open(j_router) as j_file:
                 j_router = json.load(j_file)
         else:
-            with open(j_router) as j_file:
+            with open(j_router, encoding="utf-8") as j_file:
                 j_router = json.load(j_file)
 
     tables = MulticastRoutingTables()
