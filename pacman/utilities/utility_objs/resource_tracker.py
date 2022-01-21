@@ -373,10 +373,10 @@ class ResourceTracker(object):
         if board_address not in self._tracked_ethernet_chips:
             try:
                 eth_chip = self._untracked_ethernet_chips.pop(board_address)
-            except KeyError:
+            except KeyError as original:
                 raise PacmanInvalidParameterException(
                     "board_address", str(board_address),
-                    "Unrecognised board address")
+                    "Unrecognised board address") from original
             for (x, y) in self._machine.get_existing_xys_on_board(eth_chip):
                 self._track_chip(x, y)
                 # track_chip updates tracked_ethernet_chips
