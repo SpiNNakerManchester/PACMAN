@@ -17,11 +17,13 @@ import random
 import unittest
 from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
+from pacman.exceptions import PacmanAlreadyPlacedError
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.resources import ResourceContainer
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
-from pacman.executor import PACMANAlgorithmExecutor
+from pacman.operations.placer_algorithms import (
+    connective_based_placer, one_to_one_placer, radial_placer, spreader_placer)
 
 
 class TestSameChipConstraint(unittest.TestCase):
@@ -54,20 +56,17 @@ class TestSameChipConstraint(unittest.TestCase):
 
         n_keys_map = DictBasedMachinePartitionNKeysMap()
 
-        inputs = {
-            "MemoryExtendedMachine": machine,
-            "MemoryMachine": machine,
-            "MemoryMachineGraph": graph,
-            "PlanNTimeSteps": None,
-            "MemoryMachinePartitionNKeysMap": n_keys_map
-        }
-        algorithms = [placer]
-        xml_paths = []
-        executor = PACMANAlgorithmExecutor(
-            algorithms, [], inputs, [], [], [], xml_paths)
-        executor.execute_mapping()
+        if placer == "ConnectiveBasedPlacer":
+            placements = connective_based_placer(graph, machine, None)
+        elif placer == "OneToOnePlacer":
+            placements = one_to_one_placer(graph, machine, None)
+        elif placer == "RadialPlacer":
+            placements = radial_placer(graph, machine, None)
+        elif placer == "SpreaderPlacer":
+            placements = spreader_placer(graph, machine, n_keys_map, None)
+        else:
+            raise NotImplementedError(placer)
 
-        placements = executor.get_item("MemoryPlacements")
         for same in same_vertices:
             print("{0.vertex.label}, {0.x}, {0.y}, {0.p}: {1}".format(
                 placements.get_placement_of_vertex(same),
@@ -83,6 +82,13 @@ class TestSameChipConstraint(unittest.TestCase):
                         other_placement.x == placement.x and
                         other_placement.y == placement.y,
                         "Vertex was not placed on the same chip as requested")
+
+    def test_connective_based(self):
+        try:
+            self._do_test("ConnectiveBasedPlacer")
+        except PacmanAlreadyPlacedError:
+            raise unittest.SkipTest(
+                "https://github.com/SpiNNakerManchester/PACMAN/issues/406")
 
     def test_one_to_one(self):
         self._do_test("OneToOnePlacer")

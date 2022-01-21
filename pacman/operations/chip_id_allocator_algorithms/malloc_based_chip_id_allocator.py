@@ -41,7 +41,20 @@ class NoSpiNNakerLink(PacmanConfigurationException):
                 vertex.spinnaker_link_id, vertex.board_address))
 
 
-class MallocBasedChipIdAllocator(object):
+def malloc_based_chip_id_allocator(machine, graph):
+    """
+    :param ~spinn_machine.Machine machine:
+    :param graph:
+    :type graph: Graph
+    :rtype: ~spinn_machine.Machine
+    :raises PacmanConfigurationException:
+        If a virtual chip is in an impossible position.
+    """
+    allocator = _MallocBasedChipIdAllocator()
+    return allocator._run(machine, graph)
+
+
+class _MallocBasedChipIdAllocator(object):
     """ A Chip ID Allocation Allocator algorithm that keeps track of\
         chip IDs and attempts to allocate them as requested
     """
@@ -52,11 +65,10 @@ class MallocBasedChipIdAllocator(object):
     ]
 
     def __init__(self):
-
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()
 
-    def __call__(self, machine, graph=None):
+    def _run(self, machine, graph=None):
         """
         :param ~spinn_machine.Machine machine:
         :param graph:
@@ -113,7 +125,7 @@ class MallocBasedChipIdAllocator(object):
             return self._virtual_chips[link_data]
 
         # Allocate a new ID and cache it for later
-        (chip_id_x, chip_id_y) = machine.get_unused_xy()
+        chip_id_x, chip_id_y = machine.get_unused_xy()
         machine_algorithm_utilities.create_virtual_chip(
             machine, link_data, chip_id_x, chip_id_y)
         self._virtual_chips[link_data] = (chip_id_x, chip_id_y)

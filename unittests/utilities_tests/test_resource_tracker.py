@@ -18,9 +18,9 @@ from spinn_machine import (
     virtual_machine, Chip, Router, SDRAM, machine_from_chips)
 from pacman.config_setup import unittest_setup
 from pacman.model.resources import (
-    ResourceContainer, ConstantSDRAM, PreAllocatedResourceContainer,
-    CoreResource, SpecificCoreResource)
-from pacman.exceptions import PacmanValueError
+    ResourceContainer, ConstantSDRAM, PreAllocatedResourceContainer)
+from pacman.exceptions import (
+    PacmanInvalidParameterException, PacmanValueError)
 from pacman.utilities.utility_objs import ResourceTracker
 
 
@@ -32,33 +32,33 @@ class TestResourceTracker(unittest.TestCase):
     def test_n_cores_available(self):
         machine = virtual_machine(
             width=2, height=2, n_cpus_per_chip=18)
-        chip = machine.get_chip_at(0, 0)
-        preallocated_resources = PreAllocatedResourceContainer(
-            specific_core_resources=[
-                SpecificCoreResource(chip=chip, cores=[1])],
-            core_resources=[
-                CoreResource(chip=chip, n_cores=2)])
+        preallocated_resources = PreAllocatedResourceContainer()
+        preallocated_resources.add_cores_all(2)
+        preallocated_resources.add_cores_ethernet(3)
         tracker = ResourceTracker(
             machine, plan_n_timesteps=None,
             preallocated_resources=preallocated_resources)
 
-        # Should be 14 cores = 18 - 1 monitor - 1 specific core - 2 other cores
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), None), 14)
+        # Should be 15 cores = 18 - 1 Monitor -3 ethernet -2 all cores
+        self.assertEqual(tracker._get_core_tracker(0, 0).n_cores_available, 12)
 
-        # Should be 0 since the core is already pre allocated
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), 1), 0)
+        # Should be 15 cores = 18 -2 other cores
+        self.assertEqual(tracker._get_core_tracker(0, 1).n_cores_available, 15)
 
-        # Should be 1 since the core is not pre allocated
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), 2), 1)
+        # Should be True since the core is not pre allocated
+        self.assertTrue(tracker._get_core_tracker(0, 0).is_core_available(2))
 
-        # Should be 0 since the core is monitor
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), 0), 0)
+        # Should be False since the core is monitor
+        self.assertFalse(tracker._get_core_tracker(0, 0).is_core_available(0))
 
         # Allocate a core
-        tracker._allocate_core(chip, (0, 0), 2)
+        tracker._get_core_tracker(0, 0).allocate(2)
 
-        # Should be 13 cores as one now allocated
-        self.assertEqual(tracker._n_cores_available(chip, (0, 0), None), 13)
+        # Should be 11 cores as one now allocated
+        self.assertEqual(tracker._get_core_tracker(0, 0).n_cores_available, 11)
+
+        with self.assertRaises(PacmanInvalidParameterException):
+            tracker._get_core_tracker(2, 2)
 
     def test_deallocation_of_resources(self):
         machine = virtual_machine(
@@ -77,17 +77,24 @@ class TestResourceTracker(unittest.TestCase):
         if (0, 0) in tracker._core_tracker:
             raise Exception("shouldnt exist")
 
+        tracker._get_core_tracker(1, 1)
+
+        # verify core tracker not empty
+        if (1, 1) not in tracker._core_tracker:
+            raise Exception("should exist")
+
         # verify sdram tracker
-        if tracker._sdram_tracker[0, 0] != chip_sdram:
+        # 0, 0 in _sdram_tracker due to the get_core_tracker(0, 0) call
+        if tracker._sdram_tracker[1, 1] != chip_sdram:
             raise Exception("incorrect sdram of {}".format(
-                tracker._sdram_tracker[0, 0]))
+                tracker._sdram_tracker[1, 1]))
 
         # allocate some res
         chip_x, chip_y, processor_id, ip_tags, reverse_ip_tags = \
             tracker.allocate_resources(resources, [(0, 0)])
 
         # verify chips used is updated
-        cores = list(tracker._core_tracker[(0, 0)])
+        cores = list(tracker._core_tracker[(0, 0)]._cores)
         self.assertEqual(len(cores), chip_0.n_user_processors - 1)
 
         # verify sdram used is updated
@@ -102,13 +109,12 @@ class TestResourceTracker(unittest.TestCase):
             chip_x, chip_y, processor_id, resources, ip_tags, reverse_ip_tags)
 
         # verify chips used is updated
-        if ((0, 0) in tracker._core_tracker and
-                len(tracker._core_tracker[(0, 0)]) !=
-                chip_0.n_user_processors):
+        if tracker._core_tracker[(0, 0)].n_cores_available != \
+                chip_0.n_user_processors:
             raise Exception("shouldn't exist or should be right size")
 
-        if (0, 0) in tracker._chips_used:
-            raise Exception("shouldnt exist")
+        # if (0, 0) in tracker._chips_used:
+        #   raise Exception("shouldnt exist")
 
         # verify sdram tracker
         if tracker._sdram_tracker[0, 0] != chip_sdram:

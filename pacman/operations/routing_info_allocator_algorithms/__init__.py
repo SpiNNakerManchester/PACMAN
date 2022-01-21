@@ -15,10 +15,5 @@
 
 from .zoned_routing_info_allocator import (
     ZonedRoutingInfoAllocator)
-from pacman.operations.routing_info_allocator_algorithms.\
-    malloc_based_routing_allocator.malloc_based_routing_info_allocator \
-    import (
-        MallocBasedRoutingInfoAllocator)
 
-__all__ = ['MallocBasedRoutingInfoAllocator',
-           'ZonedRoutingInfoAllocator']
+__all__ = ['ZonedRoutingInfoAllocator']
