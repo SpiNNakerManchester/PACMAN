@@ -17,6 +17,8 @@ import unittest
 from spinn_utilities.config_holder import set_config
 from spinn_machine import MulticastRoutingEntry
 from pacman.config_setup import unittest_setup
+from pacman.data import PacmanDataView
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.operations.router_compressors.routing_compression_checker import (
@@ -30,7 +32,7 @@ from pacman.operations.router_compressors.ordered_covering_router_compressor \
 class TestCompressor(unittest.TestCase):
 
     def setUp(self):
-        self.original_tables = MulticastRoutingTables()
+        original_tables = MulticastRoutingTables()
         original_table = UnCompressedMulticastRoutingTable(x=0, y=0)
         original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0000, 0b1111, [1, 2], [], False))
@@ -48,34 +50,35 @@ class TestCompressor(unittest.TestCase):
             MulticastRoutingEntry(0b1100, 0b1111, [1, 2], [], False))
         original_table.add_multicast_routing_entry(
             MulticastRoutingEntry(0b0010, 0b1011, [4, 5], [], False))
-        self.original_tables.add_routing_table(original_table)
+        original_tables.add_routing_table(original_table)
         unittest_setup()
         set_config(
             "Mapping", "router_table_compress_as_far_as_possible", True)
+        PacmanDataWriter.mock().set_router_tables(original_tables)
 
     def check_compression(self, compressed_tables):
-        for original in self.original_tables:
+        for original in PacmanDataView.get_router_tables():
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)
             assert compressed.number_of_entries < original.number_of_entries
             compare_tables(original, original)
 
     def test_pair_compressor(self):
-        compressed_tables = pair_compressor(self.original_tables)
+        compressed_tables = pair_compressor()
         self.check_compression(compressed_tables)
 
     def test_checked_unordered_pair_compressor(self):
         compressed_tables = pair_compressor(
-            self.original_tables, ordered=False, accept_overflow=False)
+            ordered=False, accept_overflow=False)
         self.check_compression(compressed_tables)
 
     def test_unordered_pair_compressor(self):
         compressed_tables = pair_compressor(
-            self.original_tables, ordered=False, accept_overflow=True)
+            ordered=False, accept_overflow=True)
         self.check_compression(compressed_tables)
 
     def test_ordered_covering_compressor(self):
-        compressed_tables = ordered_covering_compressor(self.original_tables)
+        compressed_tables = ordered_covering_compressor()
         self.check_compression(compressed_tables)
 
 

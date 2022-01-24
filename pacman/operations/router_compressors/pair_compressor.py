@@ -19,11 +19,9 @@ from .abstract_compressor import AbstractCompressor
 from .entry import Entry
 
 
-def pair_compressor(
-        router_tables, ordered=True, accept_overflow=False, verify=False):
+def pair_compressor(ordered=True, accept_overflow=False, verify=False):
     """
 
-    :param MulticastRoutingTables router_tables:
     :param bool accept_overflow:
         A flag which should only be used in testing to stop raising an
         exception if result is too big
@@ -31,7 +29,7 @@ def pair_compressor(
     :rtype: MulticastRoutingTables
     """
     compressor = _PairCompressor(ordered, accept_overflow)
-    compressed = compressor._run(router_tables)
+    compressed = compressor._run()
     # TODO currenly normal pari compressor does not verify lengths
     if verify:
         verify_lengths(compressed)

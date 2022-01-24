@@ -17,6 +17,7 @@ import json
 import time
 from spinn_utilities.config_holder import set_config
 from spinn_machine import Machine
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
 from pacman.model.routing_tables.multicast_routing_tables import (to_json)
 from pacman.model.routing_tables import (MulticastRoutingTables)
@@ -32,7 +33,6 @@ unittest_setup()
 # original_tables = from_json("routing_table_15_25.json")
 original_tables = from_json("malloc_hard_routing_tables.json.gz")
 # original_tables = from_json("routing_tables_speader_big.json.gz")
-
 SPLIT = False
 if SPLIT:
     bad = MulticastRoutingTables()
@@ -59,20 +59,22 @@ PAIR = True
 # Hack to stop it throwing a wobly for too many entries
 Machine.ROUTER_ENTRIES = 50000
 set_config("Mapping", "router_table_compress_as_far_as_possible", True)
+PacmanDataWriter.mock().set_router_tables(original_tables)
 
 if MUNDY:
     start = time.time()
-    mundy_tables = ordered_covering_compressor(original_tables)
+    mundy_tables = ordered_covering_compressor()
 mundy_time = time.time()
 if PRE:
-    pre_tables = pair_compressor(original_tables, ordered=False)
+    pre_tables = pair_compressor(ordered=False)
 pre_time = time.time()
-if MUNDY and PRE:
-    both_tables = ordered_covering_compressor(pre_tables)
-both_time = time.time()
 if PAIR:
-    pair_tables = pair_compressor(original_tables)
+    pair_tables = pair_compressor()
 pair_time = time.time()
+if MUNDY and PRE:
+    PacmanDataWriter.mock().set_router_tables(pre_tables)
+    both_tables = ordered_covering_compressor()
+both_time = time.time()
 for original in original_tables:
     org_routes = set()
     for entry in original.multicast_routing_entries:

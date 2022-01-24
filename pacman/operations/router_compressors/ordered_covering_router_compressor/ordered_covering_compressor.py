@@ -21,18 +21,14 @@ from .ordered_covering import minimise
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def ordered_covering_compressor(router_tables):
+def ordered_covering_compressor():
     """
     Compressor from rig that has been tied into the main tool chain stack.
 
-    :param MulticastRoutingTables router_tables:
-    :param bool accept_overflow:
-        A flag which should only be used in testing to stop raising an
-        exception if result is too big
     :rtype: MulticastRoutingTables
     """
     compressor = _OrderedCoveringCompressor()
-    return compressor._run(router_tables)
+    return compressor._run()
 
 
 class _OrderedCoveringCompressor(AbstractCompressor):
