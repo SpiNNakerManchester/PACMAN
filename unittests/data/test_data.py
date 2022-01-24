@@ -204,5 +204,3 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(table, PacmanDataView.get_router_tables())
         with self.assertRaises(TypeError):
             writer.set_router_tables("Bacon")
-
-
