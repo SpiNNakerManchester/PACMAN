@@ -205,3 +205,4 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(TypeError):
             writer.set_router_tables("Bacon")
 
+
