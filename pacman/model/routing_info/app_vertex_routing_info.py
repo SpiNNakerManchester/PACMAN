@@ -14,8 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .vertex_routing_info import VertexRoutingInfo
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
-import math
+from spinn_machine.exceptions import SpinnMachineInvalidParameterException
 from spinn_utilities.overrides import overrides
+
+import math
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AppVertexRoutingInfo(VertexRoutingInfo):
@@ -67,9 +72,20 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                     (vertex, part_id), entry = entries[i]
                     r_info = routing_info.get_routing_info_from_pre_vertex(
                         vertex, part_id)
-                    yield MulticastRoutingEntry(
-                        r_info.first_key, mask, defaultable=entry.defaultable,
-                        spinnaker_route=entry.spinnaker_route)
+                    try:
+                        yield MulticastRoutingEntry(
+                            r_info.first_key, mask,
+                            defaultable=entry.defaultable,
+                            spinnaker_route=entry.spinnaker_route)
+                    except SpinnMachineInvalidParameterException as e:
+                        logger.error(
+                            "Error when adding routing table entry: "
+                            f" n_entries: {n_entries},"
+                            f" entries_to_go: {entries_to_go},"
+                            f" next_entries: {next_entries},"
+                            f" mask: {mask}, first_key: {r_info.first_key}")
+                        raise e
+
                     entries_to_go -= next_entries
                     i += next_entries
 
