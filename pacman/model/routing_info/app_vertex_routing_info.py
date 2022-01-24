@@ -62,7 +62,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
             else:
                 entries_to_go = n_entries - i
                 while entries_to_go > 0:
-                    next_entries = int(math.log2(entries_to_go))
+                    next_entries = 2 ** int(math.log2(entries_to_go))
                     mask = self.__group_mask(next_entries)
                     (vertex, part_id), entry = entries[i]
                     r_info = routing_info.get_routing_info_from_pre_vertex(
