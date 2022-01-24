@@ -83,7 +83,10 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                             f" n_entries: {n_entries},"
                             f" entries_to_go: {entries_to_go},"
                             f" next_entries: {next_entries},"
-                            f" mask: {mask}, first_key: {r_info.first_key}")
+                            f" mask: {mask}, first_key: {r_info.first_key},"
+                            f" machine mask: {self.__machine_mask},"
+                            f" n_bits_atoms: {self.__n_bits_atoms},"
+                            f" r_info mask: {r_info.first_mask}")
                         raise e
 
                     entries_to_go -= next_entries
