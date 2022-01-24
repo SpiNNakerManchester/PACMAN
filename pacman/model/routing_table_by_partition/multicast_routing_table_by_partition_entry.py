@@ -22,10 +22,12 @@ _INCOMING_LINK_MASK = 0x07000000
 _INCOMING_LINK_SHIFT = 24
 _INCOMING_PROC_MASK = 0xF8000000
 _INCOMING_PROC_SHIFT = 27
-_OUTGOING_LINKS_MASK = 0x00FC0000
-_OUTGOING_LINK_1 = 0x00040000
-_OUTGOING_PROCS_MASK = 0x0003FFFF
-_OUTGOING_PROC_1 = 0x00000001
+_OUTGOING_LINKS_MASK = 0x0000003F
+_OUTGOING_LINK_1 = 0x00000001
+_OUTGOING_PROCS_MASK = 0x00FFFFC0
+_OUTGOING_PROC_1 = 0x00000040
+_SPINNAKER_ROUTE_MASK = _OUTGOING_LINKS_MASK | _OUTGOING_PROCS_MASK
+_COMPARE_MASK = _INCOMING_LINK_MASK | _SPINNAKER_ROUTE_MASK
 _N_PROCS = 18
 _N_LINKS = 6
 
@@ -244,3 +246,11 @@ class MulticastRoutingTableByPartitionEntry(object):
             self.defaultable,
             ", ".join(map(str, self.link_ids)),
             ", ".join(map(str, self.processor_ids)))
+
+    def has_same_route(self, entry):
+        return ((self._links_and_procs & _COMPARE_MASK) ==
+                (entry._links_and_procs & _COMPARE_MASK))
+
+    @property
+    def spinnaker_route(self):
+        return self._links_and_procs & _SPINNAKER_ROUTE_MASK

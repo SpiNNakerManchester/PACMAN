@@ -53,7 +53,7 @@ class RoutingInfo(object):
         :raise PacmanAlreadyExistsException:
             If the partition is already in the set of edges
         """
-        key = (info.machine_vertex, info.partition_id)
+        key = (info.vertex, info.partition_id)
         if key in self._info_by_prevertex:
             raise PacmanAlreadyExistsException(
                 "Routing information", str(info))

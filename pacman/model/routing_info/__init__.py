@@ -20,7 +20,8 @@ from .dict_based_machine_partition_n_keys_map import (
     DictBasedMachinePartitionNKeysMap)
 from .routing_info import RoutingInfo
 from .machine_vertex_routing_info import MachineVertexRoutingInfo
+from .app_vertex_routing_info import AppVertexRoutingInfo
 
 __all__ = ["AbstractMachinePartitionNKeysMap", "BaseKeyAndMask",
            "DictBasedMachinePartitionNKeysMap", "MachineVertexRoutingInfo",
-           "RoutingInfo"]
+           "RoutingInfo", "AppVertexRoutingInfo"]

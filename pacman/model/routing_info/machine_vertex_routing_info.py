@@ -12,100 +12,37 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from .vertex_routing_info import VertexRoutingInfo
+from spinn_utilities.overrides import overrides
 
-import numpy
-from pacman.exceptions import PacmanConfigurationException
 
-
-class MachineVertexRoutingInfo(object):
+class MachineVertexRoutingInfo(VertexRoutingInfo):
     """ Associates a machine vertex and partition identifier to its routing
         information (keys and masks).
     """
 
     __slots__ = [
-        # The keys allocated to the machine partition
-        "__keys_and_masks",
-
-        # The partition identifier of the allocation
-        "__partition_id",
 
         # The machine vertex that the keys are allocated to
-        "__machine_vertex"
+        "__machine_vertex",
+
+        # The index of the machine vertex within the range of the application
+        # vertex
+        "__index"
     ]
 
-    def __init__(self, keys_and_masks, partition_id, machine_vertex):
+    def __init__(self, keys_and_masks, partition_id, machine_vertex, index):
         """
         :param iterable(BaseKeyAndMask) keys_and_masks:\
             The keys allocated to the machine partition
         :param str partition_id: The partition to set the keys for
         :param MachineVertex machine_vertex: The vertex to set the keys for
+        :param int index: The index of the machine vertex
         """
-        self.__keys_and_masks = keys_and_masks
-        self.__partition_id = partition_id
+        super(MachineVertexRoutingInfo, self).__init__(
+            keys_and_masks, partition_id)
         self.__machine_vertex = machine_vertex
-
-    def get_keys(self, n_keys=None):
-        """ Get the ordered list of individual keys allocated to the edge
-
-        :param int n_keys: Optional limit on the number of keys to return
-        :return: An array of keys
-        :rtype: ~numpy.ndarray
-        """
-
-        max_n_keys = sum(km.n_keys for km in self.__keys_and_masks)
-
-        if n_keys is None:
-            n_keys = max_n_keys
-        elif max_n_keys < n_keys:
-            raise PacmanConfigurationException(
-                "You asked for {} keys, but the routing info can only "
-                "provide {} keys.".format(n_keys, max_n_keys))
-
-        key_array = numpy.zeros(n_keys, dtype=">u4")
-        offset = 0
-        for key_and_mask in self.__keys_and_masks:
-            _, offset = key_and_mask.get_keys(
-                key_array=key_array, offset=offset, n_keys=(n_keys - offset))
-        return key_array
-
-    @property
-    def keys_and_masks(self):
-        """
-        :rtype: iterable(BaseKeyAndMask)
-        """
-        return self.__keys_and_masks
-
-    @property
-    def first_key_and_mask(self):
-        """ The first key and mask (or only one if there is only one)
-
-        :rtype: BaseKeyAndMask
-        """
-        return self.__keys_and_masks[0]
-
-    @property
-    def first_key(self):
-        """ The first key (or only one if there is only one)
-
-        :rtype: int
-        """
-        return self.__keys_and_masks[0].key
-
-    @property
-    def first_mask(self):
-        """ The first mask (or only one if there is only one)
-
-        :rtype: int
-        """
-        return self.__keys_and_masks[0].mask
-
-    @property
-    def partition_id(self):
-        """ The identifier of the partition
-
-        :rtype: str
-        """
-        return self.__partition_id
+        self.__index = index
 
     @property
     def machine_vertex(self):
@@ -115,6 +52,13 @@ class MachineVertexRoutingInfo(object):
         """
         return self.__machine_vertex
 
-    def __repr__(self):
-        return "vertex: {}. partition_id:{}, keys_and_masks:{}".format(
-            self.__machine_vertex, self.__partition_id, self.__keys_and_masks)
+    @property
+    @overrides(VertexRoutingInfo.vertex)
+    def vertex(self):
+        return self.__machine_vertex
+
+    @property
+    def index(self):
+        """ The index of the vertex
+        """
+        return self.__index

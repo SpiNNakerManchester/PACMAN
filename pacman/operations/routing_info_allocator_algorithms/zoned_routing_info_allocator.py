@@ -18,7 +18,8 @@ import math
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.routing_info import (
-    RoutingInfo, MachineVertexRoutingInfo, BaseKeyAndMask)
+    RoutingInfo, MachineVertexRoutingInfo, BaseKeyAndMask,
+    AppVertexRoutingInfo)
 from pacman.utilities.utility_calls import get_key_ranges
 from pacman.exceptions import PacmanRouteInfoAllocationException,\
     PacmanInvalidParameterException
@@ -322,7 +323,8 @@ class ZonedRoutingInfoAllocator(object):
                     key = key << n_bits_atoms
                     keys_and_masks = [BaseKeyAndMask(base_key=key, mask=mask)]
                 routing_infos.add_routing_info(MachineVertexRoutingInfo(
-                    keys_and_masks, partition.identifier, machine_vertex))
+                    keys_and_masks, partition.identifier, machine_vertex,
+                    machine_index))
 
             # Add application-level routing information
             key = (partition.identifier, partition.pre_vertex)
@@ -332,8 +334,10 @@ class ZonedRoutingInfoAllocator(object):
                 key = app_part_index << (n_bits_atoms + n_bits_machine)
                 mask = self.__mask(n_bits_atoms + n_bits_machine)
                 keys_and_masks = [BaseKeyAndMask(key, mask)]
-            routing_infos.add_routing_info(MachineVertexRoutingInfo(
-                keys_and_masks, partition.identifier, partition.pre_vertex))
+            routing_infos.add_routing_info(AppVertexRoutingInfo(
+                keys_and_masks, partition.identifier, partition.pre_vertex,
+                self.__mask(n_bits_atoms), n_bits_atoms,
+                len(machine_vertices) - 1))
             app_part_index += 1
 
         return routing_infos
