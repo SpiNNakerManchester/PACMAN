@@ -172,7 +172,7 @@ def check_masks_all_the_same(routing_info, mask):
     # for the maximum number of keys in total
     seen_keys = set()
     for r_info in routing_info:
-        if isinstance(r_info.machine_vertex, MachineVertex):
+        if isinstance(r_info.vertex, MachineVertex):
             assert(len(r_info.keys_and_masks) == 1)
             assert(r_info.first_mask == mask or
                    r_info.machine_vertex.label == "RETINA")
