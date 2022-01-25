@@ -92,7 +92,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                             r_info = routing_info.get_routing_info_from_pre_vertex(
                                 vertex, part_id)
                             logger.error(
-                                f"    Vertex: {vertex}, slice: {vertex.slice},"
+                                f"    Vertex: {vertex}, slice: {vertex.vertex_slice},"
                                 f" part: {part_id}, index: {r_info.index},"
                                 f" key: {r_info.first_key}, mask: {r_info.first_mask}")
                         raise e
