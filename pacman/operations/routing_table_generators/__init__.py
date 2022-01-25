@@ -15,7 +15,9 @@
 
 from .basic_routing_table_generator import basic_routing_table_generator
 from .zoned_routing_table_generator import ZonedRoutingTableGenerator
+from .merged_routing_table_generator import merged_routing_table_generator
 
 __all__ = [
-    "basic_routing_table_generator", "ZonedRoutingTableGenerator"
+    "basic_routing_table_generator", "ZonedRoutingTableGenerator",
+    "merged_routing_table_generator"
     ]
