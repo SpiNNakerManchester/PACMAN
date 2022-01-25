@@ -21,8 +21,8 @@ from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.operations.router_compressors.routing_compression_checker import (
     compare_tables)
-from pacman.operations.router_compressors.pair_compressor import (
-    pair_compressor)
+from pacman.operations.router_compressors import (
+    pair_compressor, range_compressor)
 from pacman.operations.router_compressors.ordered_covering_router_compressor \
     import ordered_covering_compressor
 
@@ -63,6 +63,13 @@ class TestCompressor(unittest.TestCase):
     def test_pair_compressor(self):
         compressed_tables = pair_compressor(self.original_tables)
         self.check_compression(compressed_tables)
+
+    def test_range_compressor_skipped(self):
+        compressed_tables, _ = range_compressor(self.original_tables)
+        for original in self.original_tables:
+            compressed = compressed_tables.get_routing_table_for_chip(
+                original.x, original.y)
+            self.assertEqual(original, compressed)
 
     def test_checked_unordered_pair_compressor(self):
         compressed_tables = pair_compressor(

@@ -86,6 +86,8 @@ class RangeCompressor(object):
         # Step 1 get the entries and make sure they are sorted by key
         self._entries = uncompressed.multicast_routing_entries
         self._entries.sort(key=lambda x: x.routing_entry_key)
+        if not self._validate():
+            return uncompressed
 
         # Step 2 Create the results Table
         self._compressed = CompressedMulticastRoutingTable(
@@ -109,6 +111,14 @@ class RangeCompressor(object):
         # return the results as a list
         return self._compressed
 
+    def _validate(self):
+        for i in range(len(self._entries)):
+            if self._get_endpoint(i) >= self._get_key(i+1):
+                logger.warning(
+                    "Unable to run range compressor because entries overlap")
+                return False
+        return True
+
     def _get_key(self, index):
         """
         Gets routing_entry_key for entry index with support for index overflow
@@ -119,7 +129,8 @@ class RangeCompressor(object):
         """
         if index == len(self._entries):
             return sys.maxsize
-        return self._entries[index].routing_entry_key
+        entry = self._entries[index]
+        return entry.routing_entry_key & entry.mask
 
     def _get_endpoint(self, index):
         """
@@ -134,8 +145,7 @@ class RangeCompressor(object):
             return 0
         entry = self._entries[index]
         # return the key plus the mask flipping ones and zeros
-        # 4294967295 = 2 * 32 - 1 = 0b11111111111111111111111111111111
-        return entry.routing_entry_key + 4294967295 - entry.mask
+        return (entry.routing_entry_key | ~entry.mask) & 0xFFFFFFFF
 
     def _merge_range(self, first, last):
         # With a range of 1 just use the existing
