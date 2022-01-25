@@ -230,7 +230,7 @@ def _from_csv_file(csvfile):
                 mask = int(row[2], base=16)
                 route = int(row[3], base=16)
                 table.add_multicast_routing_entry(
-                        MulticastRoutingEntry(key, mask, spinnaker_route=route))
+                    MulticastRoutingEntry(key, mask, spinnaker_route=route))
         except ValueError as ex:
             logger.warning(f"csv read error {ex}")
     return table
