@@ -207,4 +207,3 @@ class RangeCompressor(object):
     @staticmethod
     def cut_off(key, power):
         return key // power * power
-
