@@ -17,7 +17,6 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
-from pacman.model.graphs.application import ApplicationVertex
 
 
 def basic_routing_table_generator(
@@ -41,7 +40,7 @@ def basic_routing_table_generator(
     return routing_tables
 
 
-def __create_routing_table(x, y, partitions_in_table, routing_info):
+def __create_routing_table(x, y, partitions_in_table, routing_infos):
     """
     :param int x:
     :param int y:
@@ -53,58 +52,14 @@ def __create_routing_table(x, y, partitions_in_table, routing_info):
     :rtype: MulticastRoutingTable
     """
     table = UnCompressedMulticastRoutingTable(x, y)
-    iterator = _IteratorWithNext(partitions_in_table.items())
-    while iterator.has_next:
-        (vertex, part_id), entry = iterator.next
-        r_info = routing_info.get_routing_info_from_pre_vertex(vertex, part_id)
-        entries = [(vertex, part_id, entry, r_info)]
-        while __match(iterator, vertex, part_id, r_info, entry, routing_info):
-            (vertex, part_id), entry = iterator.next
-            r_info = routing_info.get_routing_info_from_pre_vertex(
-                vertex, part_id)
-            entries.append((vertex, part_id, entry, r_info))
-
-        # Now attempt to merge sources together as much as possible
-        for entry in __merged_keys_and_masks(entries, routing_info):
-            table.add_multicast_routing_entry(entry)
-
     for source_vertex, partition_id in partitions_in_table:
+        r_info = routing_infos.get_routing_info_from_pre_vertex(
+            source_vertex, partition_id)
         entry = partitions_in_table[source_vertex, partition_id]
-
+        for key_and_mask in r_info.keys_and_masks:
+            table.add_multicast_routing_entry(
+                __create_entry(key_and_mask, entry))
     return table
-
-
-def __match(iterator, vertex, part_id, r_info, entry, routing_info):
-    if not iterator.has_next:
-        return False
-    if isinstance(vertex, ApplicationVertex):
-        return False
-    (next_vertex, next_part_id), next_entry = iterator.peek
-    if isinstance(next_vertex, ApplicationVertex):
-        return False
-    if part_id != next_part_id:
-        return False
-    next_r_info = routing_info.get_routing_info_from_pre_vertex(
-        next_vertex, next_part_id)
-    if next_r_info.index != r_info.index + 1:
-        return False
-    app_src = vertex.app_vertex
-    next_app_src = next_vertex.app_vertex
-    return next_app_src == app_src and entry.has_same_route(next_entry)
-
-
-def __merged_keys_and_masks(entries, routing_info):
-    if not entries:
-        return
-    (vertex, part_id, entry, r_info) = entries[0]
-    if isinstance(vertex, ApplicationVertex) or len(entries) == 1:
-        yield MulticastRoutingEntry(
-            r_info.first_key, r_info.first_mask, defaultable=entry.defaultable,
-            spinnaker_route=entry.spinnaker_route)
-    else:
-        app_r_info = routing_info.get_routing_info_from_pre_vertex(
-            vertex.app_vertex, part_id)
-        yield from app_r_info.merge_machine_entries(entries)
 
 
 def __create_entry(key_and_mask, entry):
@@ -117,36 +72,3 @@ def __create_entry(key_and_mask, entry):
         routing_entry_key=key_and_mask.key_combo,
         defaultable=entry.defaultable, mask=key_and_mask.mask,
         link_ids=entry.link_ids, processor_ids=entry.processor_ids)
-
-
-class _IteratorWithNext(object):
-
-    def __init__(self, iterable):
-        self.__iterator = iter(iterable)
-        try:
-            self.__next = next(self.__iterator)
-            self.__has_next = True
-        except StopIteration:
-            self.__next = None
-            self.__has_next = False
-
-    @property
-    def peek(self):
-        return self.__next
-
-    @property
-    def has_next(self):
-        return self.__has_next
-
-    @property
-    def next(self):
-        if not self.__has_next:
-            raise StopIteration
-        nxt = self.__next
-        try:
-            self.__next = next(self.__iterator)
-            self.__has_next = True
-        except StopIteration:
-            self.__next = None
-            self.__has_next = False
-        return nxt
