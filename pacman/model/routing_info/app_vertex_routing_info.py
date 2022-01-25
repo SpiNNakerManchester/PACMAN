@@ -80,7 +80,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                     except SpinnMachineInvalidParameterException as e:
                         logger.error(
                             "Error when adding routing table entry: "
-                            f" n_entries: {n_entries},"
+                            f" i: {i}, n_entries: {n_entries},"
                             f" entries_to_go: {entries_to_go},"
                             f" next_entries: {next_entries},"
                             f" mask: {mask}, first_key: {r_info.first_key},"
@@ -88,7 +88,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                             f" n_bits_atoms: {self.__n_bits_atoms},"
                             f" r_info mask: {r_info.first_mask}")
                         logger.error("Entries being merged:")
-                        for (vertex, part_id) in entries:
+                        for (vertex, part_id), _ in entries:
                             r_info = routing_info.get_routing_info_from_pre_vertex(
                                 vertex, part_id)
                             logger.error(
