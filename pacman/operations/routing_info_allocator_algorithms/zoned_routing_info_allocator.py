@@ -214,8 +214,8 @@ class ZonedRoutingInfoAllocator(object):
                 partition.identifier)
             if not machine_vertices:
                 continue
+            max_keys = 0
             for machine_vertex in machine_vertices:
-                max_keys = 0
                 if ((partition.identifier, machine_vertex) not in
                         self.__fixed_partitions):
                     n_keys = machine_vertex.get_n_keys_for_partition(
