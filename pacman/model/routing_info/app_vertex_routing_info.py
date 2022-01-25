@@ -87,6 +87,14 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                             f" machine mask: {self.__machine_mask},"
                             f" n_bits_atoms: {self.__n_bits_atoms},"
                             f" r_info mask: {r_info.first_mask}")
+                        logger.error("Entries being merged:")
+                        for (vertex, part_id) in entries:
+                            r_info = routing_info.get_routing_info_from_pre_vertex(
+                                vertex, part_id)
+                            logger.error(
+                                f"    Vertex: {vertex}, slice: {vertex.slice},"
+                                f" part: {part_id}, index: {r_info.index},"
+                                f" key: {r_info.first_key}, mask: {r_info.first_mask}")
                         raise e
 
                     entries_to_go -= next_entries
