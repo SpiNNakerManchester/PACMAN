@@ -41,18 +41,14 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         self.__n_bits_atoms = n_bits_atoms
         self.__max_machine_index = max_machine_index
 
-    def merge_machine_entries(self, entries, routing_info):
+    def merge_machine_entries(self, entries):
         n_entries = len(entries)
-        (last_vertex, last_part_id), _ = entries[-1]
-        last_r_info = routing_info.get_routing_info_from_pre_vertex(
-            last_vertex, last_part_id)
+        (_, _, _, last_r_info) = entries[-1]
         is_last = last_r_info.index == self.__max_machine_index
         i = 0
         while i < n_entries:
             # The maximum number of next entries
-            (vertex, part_id), entry = entries[i]
-            r_info = routing_info.get_routing_info_from_pre_vertex(
-                vertex, part_id)
+            (vertex, part_id, entry, r_info) = entries[i]
             next_entries = self.__n_sequential_entries(r_info.index, n_entries)
 
             # If that is OK, we can just use them
@@ -69,9 +65,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                 while entries_to_go > 0:
                     next_entries = 2 ** int(math.log2(entries_to_go))
                     mask = self.__group_mask(next_entries)
-                    (vertex, part_id), entry = entries[i]
-                    r_info = routing_info.get_routing_info_from_pre_vertex(
-                        vertex, part_id)
+                    (vertex, part_id, entry, r_info) = entries[i]
                     try:
                         yield MulticastRoutingEntry(
                             r_info.first_key, mask,
@@ -88,9 +82,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                             f" n_bits_atoms: {self.__n_bits_atoms},"
                             f" r_info mask: {r_info.first_mask}")
                         logger.error("Entries being merged:")
-                        for (vertex, part_id), _ in entries:
-                            r_info = routing_info.get_routing_info_from_pre_vertex(
-                                vertex, part_id)
+                        for (vertex, part_id, entry, r_info) in entries:
                             logger.error(
                                 f"    Vertex: {vertex}, slice: {vertex.vertex_slice},"
                                 f" part: {part_id}, index: {r_info.index},"
