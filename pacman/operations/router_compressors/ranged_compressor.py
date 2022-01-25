@@ -110,43 +110,80 @@ class RangeCompressor(object):
         return self._compressed
 
     def _get_key(self, index):
-        if index < 0:
-            return 0
+        """
+        Gets routing_entry_key for entry index with support for index overflow
+
+        if index == len(self._entries):
+            return sys.maxsize
+        :param int index:
+        """
         if index == len(self._entries):
             return sys.maxsize
         return self._entries[index].routing_entry_key
 
+    def _get_endpoint(self, index):
+        """
+        Get the end of the range covered by entry index's key and mask
+
+        With support for index underflow
+
+        :param index:
+        :return:
+        """
+        if index < 0:
+            return 0
+        entry = self._entries[index]
+        # return the key plus the mask flipping ones and zeros
+        # 4294967295 = 2 * 32 - 1 = 0b11111111111111111111111111111111
+        return entry.routing_entry_key + 4294967295 - entry.mask
+
     def _merge_range(self, first, last):
+        # With a range of 1 just use the existing
         if first == last:
             self._compressed.add_multicast_routing_entry(self._entries[first])
             return
 
+        # Find the points the range must cover
+        first_point = self._get_key(first)
+        last_point = self._get_endpoint(last)
+        # Find the points the range may NOT go into
+        pre_point = self._get_endpoint(first-1)
+        post_point = self._get_key(last+1)
+
         # find the power big enough to include the first and last enrty
-        first_key = self._entries[first].routing_entry_key
-        last_key = self._entries[last].routing_entry_key
-        dif = last_key - first_key
+        dif = last_point - first_point
         power = self.next_power(dif)
 
-        low_cut = self.cut_off(first_key, power)
-        pre_key = self._get_key(first - 1)
-        while low_cut < pre_key and power > 1:
-            power //= 2
-            low_cut = self.cut_off(first_key, power)
-        post_key = self._get_key(last + 1)
+        # Find the start range cutoffs
+        low_cut = first_point // power * power
         high_cut = low_cut + power
-        while high_cut > post_key and power > 1:
-            power //= 2
-            low_cut = self.cut_off(first_key, power)
+
+        # If that does not cover all try one power higher
+        if high_cut < last_point:
+            power <<= 1
+            low_cut = first_point // power * power
             high_cut = low_cut + power
+
+        # The power is too big if it touches the entry before or after
+        while power > 1 and (low_cut < pre_point or high_cut > post_point):
+            power >>= 1
+            low_cut = first_point // power * power
+            high_cut = low_cut + power
+
+        # The range may now not cover all the index so reduce the indexes
         full_last = last
-        while high_cut <= last_key:
+        while high_cut <= last_point:
             last -= 1
-            last_key = self._get_key(last)
+            last_point = self._get_endpoint(last)
+
+        # make the new router entry
         new_mask = 2 ** 32 - power
         route = self._entries[first].spinnaker_route
         new_entry = MulticastRoutingEntry(
             low_cut, new_mask,  spinnaker_route=route)
         self._compressed.add_multicast_routing_entry(new_entry)
+
+        # Do any indexes skip from before
         if full_last != last:
             self._merge_range(last + 1, full_last)
 
@@ -160,3 +197,4 @@ class RangeCompressor(object):
     @staticmethod
     def cut_off(key, power):
         return key // power * power
+
