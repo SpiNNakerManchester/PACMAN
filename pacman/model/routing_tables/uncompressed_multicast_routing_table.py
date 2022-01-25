@@ -14,10 +14,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
+import csv
+import gzip
+import logging
+from spinn_utilities.log import FormatAdapter
+from spinn_machine import MulticastRoutingEntry
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanRoutingException)
 from pacman.model.routing_tables import AbstractMulticastRoutingTable
 from spinn_utilities.overrides import overrides
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
@@ -205,3 +212,34 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     @overrides(AbstractMulticastRoutingTable.__hash__)
     def __hash__(self):
         return id(self)
+
+
+def _from_csv_file(csvfile):
+    table_reader = csv.reader(csvfile)
+    table = UnCompressedMulticastRoutingTable(0, 0)
+    for row in table_reader:
+        try:
+            if len(row) == 3:
+                key = int(row[0], base=16)
+                mask = int(row[1], base=16)
+                route = int(row[2], base=16)
+                table.add_multicast_routing_entry(
+                    MulticastRoutingEntry(key, mask, spinnaker_route=route))
+            elif len(row) == 6:
+                key = int(row[1], base=16)
+                mask = int(row[2], base=16)
+                route = int(row[3], base=16)
+                table.add_multicast_routing_entry(
+                        MulticastRoutingEntry(key, mask, spinnaker_route=route))
+        except ValueError as ex:
+            logger.warning(f"csv read error {ex}")
+    return table
+
+
+def from_csv(file_name):
+    if file_name.endswith(".gz"):
+        with gzip.open(file_name, mode="rt", newline='') as csvfile:
+            return _from_csv_file(csvfile)
+    else:
+        with open(file_name, newline='') as csvfile:
+            return _from_csv_file(csvfile)
