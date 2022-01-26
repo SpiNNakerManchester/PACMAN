@@ -52,7 +52,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
             next_entries = self.__n_sequential_entries(r_info.index, n_entries)
 
             # If that is OK, we can just use them
-            if next_entries <= n_entries or is_last:
+            if next_entries <= (n_entries - i) or is_last:
                 mask = self.__group_mask(next_entries)
                 yield MulticastRoutingEntry(
                     r_info.first_key, mask, defaultable=entry.defaultable,
