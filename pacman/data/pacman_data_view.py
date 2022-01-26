@@ -306,6 +306,7 @@ class PacmanDataView(MachineDataView):
         """
         The placements if known
 
+        :rtype ~pacman.model.placements.Placements
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the placements is currently unavailable
         """
