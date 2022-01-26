@@ -30,7 +30,7 @@ class MulticastRoutingTables(object):
         # set that holds routing tables
         "_routing_tables",
         # dict of (x,y) -> routing table
-        "_routing_tables_by_chip"
+        "_routing_tables_by_chip",
         # maximum value for number_of_entries in all tables
         "_max_number_of_entries"
     ]
