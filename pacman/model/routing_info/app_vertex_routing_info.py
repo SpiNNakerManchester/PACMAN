@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .vertex_routing_info import VertexRoutingInfo
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
-from spinn_machine.exceptions import SpinnMachineInvalidParameterException
 from spinn_utilities.overrides import overrides
 
 import math
@@ -48,7 +47,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         i = 0
         while i < n_entries:
             # The maximum number of next entries
-            (vertex, part_id, entry, r_info) = entries[i]
+            (_, _, entry, r_info) = entries[i]
             next_entries = self.__n_sequential_entries(r_info.index, n_entries)
 
             # If that is OK, we can just use them
@@ -65,30 +64,11 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                 while entries_to_go > 0:
                     next_entries = 2 ** int(math.log2(entries_to_go))
                     mask = self.__group_mask(next_entries)
-                    (vertex, part_id, entry, r_info) = entries[i]
-                    try:
-                        yield MulticastRoutingEntry(
-                            r_info.first_key, mask,
-                            defaultable=entry.defaultable,
-                            spinnaker_route=entry.spinnaker_route)
-                    except SpinnMachineInvalidParameterException as e:
-                        logger.error(
-                            "Error when adding routing table entry: "
-                            f" i: {i}, n_entries: {n_entries},"
-                            f" entries_to_go: {entries_to_go},"
-                            f" next_entries: {next_entries},"
-                            f" mask: {mask}, first_key: {r_info.first_key},"
-                            f" machine mask: {self.__machine_mask},"
-                            f" n_bits_atoms: {self.__n_bits_atoms},"
-                            f" r_info mask: {r_info.first_mask}")
-                        logger.error("Entries being merged:")
-                        for (vertex, part_id, entry, r_info) in entries:
-                            logger.error(
-                                f"    Vertex: {vertex}, slice: {vertex.vertex_slice},"
-                                f" part: {part_id}, index: {r_info.index},"
-                                f" key: {r_info.first_key}, mask: {r_info.first_mask}")
-                        raise e
-
+                    (_, _, entry, r_info) = entries[i]
+                    yield MulticastRoutingEntry(
+                        r_info.first_key, mask,
+                        defaultable=entry.defaultable,
+                        spinnaker_route=entry.spinnaker_route)
                     entries_to_go -= next_entries
                     i += next_entries
 
