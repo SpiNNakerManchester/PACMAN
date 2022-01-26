@@ -15,6 +15,7 @@
 
 import logging
 import sys
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import Machine, MulticastRoutingEntry
@@ -38,7 +39,6 @@ def range_compressor(router_tables, accept_overflow=True):
         message = "Precompressing tables using Range Compressor"
     else:
         message = "Compressing tables using Range Compressor"
-    max_length = 0
     progress = ProgressBar(len(router_tables.routing_tables), message)
     compressor = RangeCompressor()
     compressed_tables = MulticastRoutingTables()
@@ -54,8 +54,8 @@ def range_compressor(router_tables, accept_overflow=True):
                     f"still has {new_table.number_of_entries} so will not fit")
         compressed_tables.add_routing_table(new_table)
     logger.info(f"Ranged compressor resulted with the largest table of size "
-                f"{max_length}")
-    return compressed_tables, max_length
+                f"{compressed_tables.max_number_of_entries}")
+    return compressed_tables
 
 
 class RangeCompressor(object):
@@ -81,7 +81,11 @@ class RangeCompressor(object):
         :return: Compressed routing table for the same chip
         :rtype: list(Entry)
         """
-        # TODO Verify that none of the masks have holes.
+        # Check you need to compress
+        if not get_config_bool(
+                "Mapping", "router_table_compress_as_far_as_possible"):
+            if uncompressed.number_of_entries < Machine.ROUTER_ENTRIES:
+                return uncompressed
 
         # Step 1 get the entries and make sure they are sorted by key
         self._entries = uncompressed.multicast_routing_entries

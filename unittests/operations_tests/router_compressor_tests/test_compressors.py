@@ -65,7 +65,7 @@ class TestCompressor(unittest.TestCase):
         self.check_compression(compressed_tables)
 
     def test_range_compressor_skipped(self):
-        compressed_tables, _ = range_compressor(self.original_tables)
+        compressed_tables = range_compressor(self.original_tables)
         for original in self.original_tables:
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)

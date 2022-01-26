@@ -48,7 +48,7 @@ class TestRangeCompressor(unittest.TestCase):
         table_path = os.path.join(path, "table2.csv.gz")
         table = from_csv(table_path)
         tables.add_routing_table(table)
-        compressed, max_size = range_compressor(tables)
+        compressed = range_compressor(tables)
         c_table = compressed.get_routing_table_for_chip(0, 0)
         compare_tables(table, c_table)
 
