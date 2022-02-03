@@ -159,8 +159,6 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(mg, PacmanDataView.get_runtime_machine_graph())
         self.assertEqual(mg, PacmanDataView.get_runtime_best_graph())
 
-
-
     def test_placements(self):
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
