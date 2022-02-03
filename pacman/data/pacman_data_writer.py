@@ -98,8 +98,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         # update graph label if needed
         if graph_label is None:
             graph_label = "Application_graph"
-        else:
-            graph_label = graph_label
 
         self.__pacman_data._graph = ApplicationGraph(label=graph_label)
         self.__pacman_data._machine_graph = MachineGraph(
