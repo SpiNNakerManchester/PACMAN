@@ -149,6 +149,17 @@ class TestSimulatorData(unittest.TestCase):
             m_vertices, set(PacmanDataView.get_runtime_machine_vertices()))
         self.assertSetEqual(
             m_vertices, set(PacmanDataView.get_runtime_machine_vertices2()))
+        self.assertEqual(PacmanDataView.get_runtime_graph(),
+                         PacmanDataView.get_runtime_best_graph())
+
+    def test_graph_mocked(self):
+        writer = PacmanDataWriter.mock()
+        mg = MachineGraph(label="my test")
+        writer.set_runtime_machine_graph(mg)
+        self.assertEqual(mg, PacmanDataView.get_runtime_machine_graph())
+        self.assertEqual(mg, PacmanDataView.get_runtime_best_graph())
+
+
 
     def test_placements(self):
         writer = PacmanDataWriter.setup()

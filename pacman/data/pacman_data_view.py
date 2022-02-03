@@ -16,7 +16,7 @@
 import logging
 from spinn_utilities.data.data_status import Data_Status
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.exceptions import DataLocked
+from spinn_utilities.exceptions import DataLocked, DataNotMocked
 from spinn_machine.data import MachineDataView
 from pacman.exceptions import PacmanNotPlacedError
 from pacman.model.routing_info import (
@@ -289,10 +289,8 @@ class PacmanDataView(MachineDataView):
             runtime_graph = cls.get_runtime_graph()
             if runtime_graph.n_vertices:
                 return runtime_graph
-        except Exception:
-            # In mocked there may only be a machine_graph
-            if cls.get_status() != Data_Status.MOCKED:
-                raise
+        except DataNotMocked:
+            return cls.get_runtime_machine_graph()
         runtime_machine_graph = cls.get_runtime_machine_graph()
         if runtime_machine_graph.n_vertices:
             return runtime_machine_graph
