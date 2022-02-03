@@ -89,3 +89,20 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     @overrides(VertexRoutingInfo.vertex)
     def vertex(self):
         return self.__app_vertex
+
+    @property
+    def machine_mask(self):
+        """ The mask that covers a specific machine vertex
+
+        :rtype: int
+        """
+
+        return self.__machine_mask
+
+    @property
+    def n_bits_atoms(self):
+        """ The number of bits for the atoms
+
+        :rtype: int
+        """
+        return self.__n_bits_atoms
