@@ -301,9 +301,7 @@ class ZonedRoutingInfoAllocator(object):
             machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
             n_bits_atoms = self.__atom_bits_per_app_part[partition]
             if self.__flexible:
-                n_bits_machine = min(
-                    self.__n_bits_atoms_and_mac - n_bits_atoms,
-                    self.__n_bits_machine)
+                n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
             else:
                 if n_bits_atoms <= self.__n_bits_atoms:
                     # Ok it fits use global sizes
