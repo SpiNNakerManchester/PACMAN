@@ -165,6 +165,15 @@ class Placements(object):
         """
         return iter(self._machine_vertices.values())
 
+    def placements_on_chip(self, x, y):
+        """ Get the placements on a specific chip
+
+        :param int x: The x-coordinate of the chip
+        :param int y: The y-coordinate of the chip
+        :rtype: iterable(Placement)
+        """
+        return self._placements[x, y].values()
+
     def __repr__(self):
         output = ""
         for placement in self._placements:
