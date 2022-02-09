@@ -16,5 +16,7 @@
 from .abstract_compressor import AbstractCompressor
 from .entry import Entry
 from .pair_compressor import pair_compressor
+from .ranged_compressor import range_compressor, RangeCompressor
 
-__all__ = ['AbstractCompressor', 'Entry', 'pair_compressor']
+__all__ = ['AbstractCompressor', 'Entry', 'pair_compressor',
+           'RangeCompressor', 'range_compressor']
