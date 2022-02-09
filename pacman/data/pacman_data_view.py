@@ -48,6 +48,7 @@ class _PacmanDataModel(object):
         "_machine_graph",
         "_machine_partition_n_keys_map",
         "_placements",
+        "_precompressed_router_tables",
         "_router_tables",
         "_routing_infos",
         "_runtime_graph",
@@ -77,6 +78,7 @@ class _PacmanDataModel(object):
         Clears out all data that should change after a reset and graaph change
         """
         self._placements = None
+        self._precompressed_router_tables = None
         self._router_tables = None
         self._runtime_graph = None
         self._runtime_machine_graph = None
@@ -381,3 +383,9 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._router_tables is None:
             raise cls._exception("router_tables")
         return cls.__pacman_data._router_tables
+
+    @classmethod
+    def get_precompressed_router_tables(cls):
+        if cls.__pacman_data._precompressed_router_tables is None:
+            raise cls._exception("precompressed_router_tables")
+        return cls.__pacman_data._precompressed_router_tables

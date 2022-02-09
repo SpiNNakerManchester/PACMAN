@@ -211,5 +211,20 @@ class TestSimulatorData(unittest.TestCase):
             PacmanDataView.get_router_tables()
         writer.set_router_tables(table)
         self.assertEqual(table, PacmanDataView.get_router_tables())
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_precompressed_router_tables()
         with self.assertRaises(TypeError):
             writer.set_router_tables("Bacon")
+
+    def test_precompressed_router_tables(self):
+        table = MulticastRoutingTables()
+        writer = PacmanDataWriter.setup()
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_precompressed_router_tables()
+        writer.set_precompressed_router_tables(table)
+        self.assertEqual(
+            table, PacmanDataView.get_precompressed_router_tables())
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_router_tables()
+        with self.assertRaises(TypeError):
+            writer.set_precompressed_router_tables()

@@ -190,3 +190,14 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             raise TypeError(
                 "router_tables should be a MulticastRoutingTables")
         self.__pacman_data._router_tables = router_tables
+
+    def set_precompressed_router_tables(self, router_tables):
+        """
+        Sets the router_tables value
+
+        :param MulticastRoutingTables router_tables: new value
+        """
+        if not isinstance(router_tables, MulticastRoutingTables):
+            raise TypeError(
+                "router_tables should be a MulticastRoutingTables")
+        self.__pacman_data._precompressed_router_tables = router_tables
