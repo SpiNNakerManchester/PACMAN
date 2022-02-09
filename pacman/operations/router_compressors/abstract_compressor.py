@@ -50,7 +50,7 @@ class AbstractCompressor(object):
         """
         :rtype: MulticastRoutingTables
         """
-        router_tables = PacmanDataView.get_router_tables()
+        router_tables = PacmanDataView.get_precompressed_router_tables()
         # create progress bar
         progress = ProgressBar(
             router_tables.routing_tables,

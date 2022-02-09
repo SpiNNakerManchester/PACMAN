@@ -19,6 +19,7 @@ from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import Machine, MulticastRoutingEntry
+from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import MinimisationFailedError
@@ -26,7 +27,7 @@ from pacman.exceptions import MinimisationFailedError
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def range_compressor(router_tables, accept_overflow=True):
+def range_compressor(accept_overflow=True):
     """
 
     :param MulticastRoutingTables router_tables:
@@ -39,6 +40,7 @@ def range_compressor(router_tables, accept_overflow=True):
         message = "Precompressing tables using Range Compressor"
     else:
         message = "Compressing tables using Range Compressor"
+    router_tables = PacmanDataView.get_router_tables()
     progress = ProgressBar(len(router_tables.routing_tables), message)
     compressor = RangeCompressor()
     compressed_tables = MulticastRoutingTables()
