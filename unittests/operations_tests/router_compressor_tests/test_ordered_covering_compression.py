@@ -37,7 +37,7 @@ class TestOrderedCoveringCompressor(unittest.TestCase):
         j_router = os.path.join(path,
                                 "many_to_one.json.gz")
         original_tables = from_json(j_router)
-        PacmanDataWriter.mock().set_precompressed_router_tables(
+        PacmanDataWriter.mock().set_precompressed(
             original_tables)
 
         compressed_tables = ordered_covering_compressor()

@@ -208,23 +208,23 @@ class TestSimulatorData(unittest.TestCase):
         table = MulticastRoutingTables()
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_uncompressed_router_tables()
-        writer.set_uncompressed_router_tables(table)
-        self.assertEqual(table, PacmanDataView.get_uncompressed_router_tables())
+            PacmanDataView.get_uncompressed()
+        writer.set_uncompressed(table)
+        self.assertEqual(table, PacmanDataView.get_uncompressed())
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_precompressed_router_tables()
+            PacmanDataView.get_precompressed()
         with self.assertRaises(TypeError):
-            writer.set_uncompressed_router_tables("Bacon")
+            writer.set_uncompressed("Bacon")
 
     def test_precompressed_router_tables(self):
         table = MulticastRoutingTables()
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_precompressed_router_tables()
-        writer.set_precompressed_router_tables(table)
+            PacmanDataView.get_precompressed()
+        writer.set_precompressed(table)
         self.assertEqual(
-            table, PacmanDataView.get_precompressed_router_tables())
+            table, PacmanDataView.get_precompressed())
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_uncompressed_router_tables()
+            PacmanDataView.get_uncompressed()
         with self.assertRaises(TypeError):
-            writer.set_precompressed_router_tables()
+            writer.set_precompressed()

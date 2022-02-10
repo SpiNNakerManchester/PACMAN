@@ -59,7 +59,7 @@ PAIR = True
 # Hack to stop it throwing a wobly for too many entries
 Machine.ROUTER_ENTRIES = 50000
 set_config("Mapping", "router_table_compress_as_far_as_possible", True)
-PacmanDataWriter.mock().set_uncompressed_router_tables(original_tables)
+PacmanDataWriter.mock().set_uncompressed(original_tables)
 
 if MUNDY:
     start = time.time()
@@ -72,7 +72,7 @@ if PAIR:
     pair_tables = pair_compressor()
 pair_time = time.time()
 if MUNDY and PRE:
-    PacmanDataWriter.mock().set_uncompressed_router_tables(pre_tables)
+    PacmanDataWriter.mock().set_uncompressed(pre_tables)
     both_tables = ordered_covering_compressor()
 both_time = time.time()
 for original in original_tables:

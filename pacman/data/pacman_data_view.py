@@ -48,12 +48,12 @@ class _PacmanDataModel(object):
         "_machine_graph",
         "_machine_partition_n_keys_map",
         "_placements",
-        "_precompressed_router_tables",
-        "_uncompressed_router_tables",
+        "_precompressed",
         "_routing_infos",
         "_runtime_graph",
         "_runtime_machine_graph",
-        "_tags"
+        "_tags",
+        "_uncompressed"
     ]
 
     def __new__(cls):
@@ -78,8 +78,8 @@ class _PacmanDataModel(object):
         Clears out all data that should change after a reset and graaph change
         """
         self._placements = None
-        self._precompressed_router_tables = None
-        self._uncompressed_router_tables = None
+        self._precompressed = None
+        self._uncompressed = None
         self._runtime_graph = None
         self._runtime_machine_graph = None
         self._routing_infos = None
@@ -379,13 +379,13 @@ class PacmanDataView(MachineDataView):
     # RoutingTables
 
     @classmethod
-    def get_uncompressed_router_tables(cls):
-        if cls.__pacman_data._uncompressed_router_tables is None:
+    def get_uncompressed(cls):
+        if cls.__pacman_data._uncompressed is None:
             raise cls._exception("router_tables")
-        return cls.__pacman_data._uncompressed_router_tables
+        return cls.__pacman_data._uncompressed
 
     @classmethod
-    def get_precompressed_router_tables(cls):
-        if cls.__pacman_data._precompressed_router_tables is None:
+    def get_precompressed(cls):
+        if cls.__pacman_data._precompressed is None:
             raise cls._exception("precompressed_router_tables")
-        return cls.__pacman_data._precompressed_router_tables
+        return cls.__pacman_data._precompressed
