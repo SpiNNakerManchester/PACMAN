@@ -36,7 +36,8 @@ class TestUnorderedPairCompressor(unittest.TestCase):
         path = os.path.dirname(os.path.abspath(class_file))
         j_router = os.path.join(path, "many_to_one.json.gz")
         original_tables = from_json(j_router)
-        PacmanDataWriter.mock().set_router_tables(original_tables)
+        PacmanDataWriter.mock().set_precompressed_router_tables(
+            original_tables)
 
         # Hack to stop it throwing a wobly for too many entries
         compressed_tables = pair_compressor(ordered=False)

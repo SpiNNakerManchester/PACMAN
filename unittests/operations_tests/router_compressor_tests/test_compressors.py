@@ -54,10 +54,12 @@ class TestCompressor(unittest.TestCase):
         unittest_setup()
         set_config(
             "Mapping", "router_table_compress_as_far_as_possible", True)
-        PacmanDataWriter.mock().set_router_tables(original_tables)
+        writer = PacmanDataWriter.mock()
+        writer.set_router_tables(original_tables)
+        writer.set_precompressed_router_tables(original_tables)
 
     def check_compression(self, compressed_tables):
-        for original in PacmanDataView.get_router_tables():
+        for original in PacmanDataView.get_precompressed_router_tables():
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)
             assert compressed.number_of_entries < original.number_of_entries
@@ -68,8 +70,8 @@ class TestCompressor(unittest.TestCase):
         self.check_compression(compressed_tables)
 
     def test_range_compressor_skipped(self):
-        compressed_tables = range_compressor(self.original_tables)
-        for original in self.original_tables:
+        compressed_tables = range_compressor()
+        for original in PacmanDataView.get_router_tables():
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)
             self.assertEqual(original, compressed)

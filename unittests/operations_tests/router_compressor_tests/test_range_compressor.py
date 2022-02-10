@@ -18,6 +18,7 @@ import sys
 import unittest
 from spinn_utilities.config_holder import set_config
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.model.routing_tables.uncompressed_multicast_routing_table import (
     from_csv)
@@ -48,7 +49,8 @@ class TestRangeCompressor(unittest.TestCase):
         table_path = os.path.join(path, "table2.csv.gz")
         table = from_csv(table_path)
         tables.add_routing_table(table)
-        compressed = range_compressor(tables)
+        PacmanDataWriter.mock().set_router_tables(tables)
+        compressed = range_compressor()
         c_table = compressed.get_routing_table_for_chip(0, 0)
         compare_tables(table, c_table)
 
