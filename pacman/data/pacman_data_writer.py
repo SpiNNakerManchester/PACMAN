@@ -180,7 +180,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         self.__pacman_data._machine_partition_n_keys_map = \
             machine_partition_n_keys_map
 
-    def set_router_tables(self, router_tables):
+    def set_uncompressed_router_tables(self, router_tables):
         """
         Sets the router_tables value
 
@@ -189,7 +189,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         if not isinstance(router_tables, MulticastRoutingTables):
             raise TypeError(
                 "router_tables should be a MulticastRoutingTables")
-        self.__pacman_data._router_tables = router_tables
+        self.__pacman_data._uncompressed_router_tables = router_tables
 
     def set_precompressed_router_tables(self, router_tables):
         """

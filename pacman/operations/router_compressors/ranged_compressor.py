@@ -40,7 +40,7 @@ def range_compressor(accept_overflow=True):
         message = "Precompressing tables using Range Compressor"
     else:
         message = "Compressing tables using Range Compressor"
-    router_tables = PacmanDataView.get_router_tables()
+    router_tables = PacmanDataView.get_uncompressed_router_tables()
     progress = ProgressBar(len(router_tables.routing_tables), message)
     compressor = RangeCompressor()
     compressed_tables = MulticastRoutingTables()

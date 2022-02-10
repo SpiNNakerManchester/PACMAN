@@ -49,7 +49,7 @@ class TestRangeCompressor(unittest.TestCase):
         table_path = os.path.join(path, "table2.csv.gz")
         table = from_csv(table_path)
         tables.add_routing_table(table)
-        PacmanDataWriter.mock().set_router_tables(tables)
+        PacmanDataWriter.mock().set_uncompressed_router_tables(tables)
         compressed = range_compressor()
         c_table = compressed.get_routing_table_for_chip(0, 0)
         compare_tables(table, c_table)
