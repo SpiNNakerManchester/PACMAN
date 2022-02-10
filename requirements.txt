@@ -13,9 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-numpy > 1.13, < 1.20; python_version == '3.6'
-numpy > 1.13, < 1.21; python_version == '3.7'
-numpy; python_version >= '3.8'
 future
 lxml
 jsonschema < 4.4; python_version == '3.6'

@@ -28,7 +28,9 @@ class MulticastRoutingTables(object):
 
     __slots__ = [
         # dict of (x,y) -> routing table
-        "_routing_tables_by_chip"
+        "_routing_tables_by_chip",
+        # maximum value for number_of_entries in all tables
+        "_max_number_of_entries"
     ]
 
     def __init__(self, routing_tables=None):
@@ -39,6 +41,7 @@ class MulticastRoutingTables(object):
             If any two routing tables are for the same chip
         """
         self._routing_tables_by_chip = dict()
+        self._max_number_of_entries = 0
 
         if routing_tables is not None:
             for routing_table in routing_tables:
@@ -59,6 +62,8 @@ class MulticastRoutingTables(object):
                 .format(routing_table.x, routing_table.y), str(routing_table))
         self._routing_tables_by_chip[(routing_table.x, routing_table.y)] = \
             routing_table
+        self._max_number_of_entries = max(
+            self._max_number_of_entries, routing_table.number_of_entries)
 
     @property
     def routing_tables(self):
@@ -69,6 +74,18 @@ class MulticastRoutingTables(object):
         :raise None: does not raise any known exceptions
         """
         return self._routing_tables_by_chip.values()
+
+    @property
+    def max_number_of_entries(self):
+        """
+        The maximumn number of multi-cast routing entries there are in any\
+            multicast routing table
+
+        Will return zero if there are no routing tables
+
+        :rtype: int
+        """
+        return self._max_number_of_entries
 
     def get_routing_table_for_chip(self, x, y):
         """ Get a routing table for a particular chip
@@ -114,7 +131,7 @@ def from_json(j_router):
             with gzip.open(j_router) as j_file:
                 j_router = json.load(j_file)
         else:
-            with open(j_router) as j_file:
+            with open(j_router, encoding="utf-8") as j_file:
                 j_router = json.load(j_file)
 
     tables = MulticastRoutingTables()

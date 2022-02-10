@@ -73,6 +73,7 @@ class _SpreaderPlacer(_OneToOnePlacer):
     # 5. chip and core)
     STEPS = 5
 
+    # pylint:disable=arguments-differ
     def _run(self, machine_graph, machine, n_keys_map, plan_n_timesteps):
         """
         :param MachineGraph machine_graph: the machine graph
