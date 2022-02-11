@@ -161,7 +161,8 @@ class _PairCompressor(AbstractCompressor):
         "_routes_count",
     ]
 
-    def __init__(self):
+    def __init__(self, ordered=True, accept_overflow=False):
+        super().__init__(ordered, accept_overflow)
         self._all_entries = None
         self._write_index = None
         self._max_index = None
