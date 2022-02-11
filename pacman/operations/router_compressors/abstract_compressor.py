@@ -44,6 +44,7 @@ class AbstractCompressor(object):
     def __init__(self, ordered=True, accept_overflow=False):
         self._ordered = ordered
         self._accept_overflow = accept_overflow
+        self._problems = ""
 
     def _run(self, router_tables):
         """
@@ -82,7 +83,6 @@ class AbstractCompressor(object):
         :raises MinimisationFailedError: on failure
         """
         compressed_tables = MulticastRoutingTables()
-        self._problems = ""
         if get_config_bool(
                 "Mapping", "router_table_compress_as_far_as_possible"):
             # Compress as much as possible
