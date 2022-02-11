@@ -144,6 +144,7 @@ class RoutingTree(object):
             # Determine the set of directions we must travel to reach the
             # children
             out_directions = set()
+            # pylint:disable=protected-access
             for child_direction, child in node._children:
                 # Note that if the direction is unspecified, we simply
                 # (silently) don't add a route for that child.

@@ -34,6 +34,7 @@ def fixed_route_router(machine, placements, destination_class):
     :raises PacmanAlreadyExistsException:
     """
     router = _FixedRouteRouter(machine, placements, destination_class)
+    # pylint:disable=protected-access
     return router._run()
 
 

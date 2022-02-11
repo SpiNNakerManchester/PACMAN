@@ -47,6 +47,7 @@ class Entry(object):
         :rtype: Entry
         """
         # Yes I know using _params is ugly but this is for speed
+        # pylint:disable=protected-access
         return Entry(
             mre._routing_entry_key, mre._mask, mre._defaultable,
             mre._spinnaker_route)

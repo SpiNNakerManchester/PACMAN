@@ -52,6 +52,7 @@ def malloc_based_chip_id_allocator(machine, graph):
         If a virtual chip is in an impossible position.
     """
     allocator = _MallocBasedChipIdAllocator()
+    # pylint:disable=protected-access
     return allocator._run(machine, graph)
 
 
