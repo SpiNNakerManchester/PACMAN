@@ -66,7 +66,6 @@ class _FixedRouteRouter(object):
         :raises PacmanRoutingException:
         :raises PacmanAlreadyExistsException:
         """
-        # pylint: disable=attribute-defined-outside-init
         progress = ProgressBar(
             len(self._machine.ethernet_connected_chips),
             "Generating fixed router routes")
