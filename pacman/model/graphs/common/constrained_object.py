@@ -79,7 +79,4 @@ class ConstrainedObject(object, metaclass=AbstractBase):
 
         :rtype: iterable(AbstractConstraint)
         """
-        try:
-            return self._constraints
-        except Exception:  # pylint: disable=broad-except
-            return OrderedSet()
+        return self._constraints
