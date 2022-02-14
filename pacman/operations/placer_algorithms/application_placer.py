@@ -135,11 +135,13 @@ def _store_on_chip(placements_to_make, vertices, sdram, chip):
 
 class _ChipWithSpace(object):
 
-    __slots__ = ["chip", "n_cores", "sdram"]
+    __slots__ = ["chip", "cores", "sdram"]
 
     def __init__(self, chip, used_processors, used_sdram):
         self.chip = chip
-        self.n_cores = chip.n_user_processors - used_processors
+        self.cores = set(p.processor_id for p in chip.processors
+                         if not p.is_monitor)
+        self.cores -= used_processors
         self.sdram = chip.sdram.size - used_sdram
 
     @property
@@ -151,14 +153,15 @@ class _ChipWithSpace(object):
         return self.chip.y
 
     def is_space(self, n_cores, sdram):
-        return self.n_cores >= n_cores and self.sdram >= sdram
+        return len(self.cores) >= n_cores and self.sdram >= sdram
 
     def use_sdram(self, sdram):
         self.sdram -= sdram
 
     def use_next_core(self):
-        self.n_cores -= 1
-        return self.chip.n_user_processors - self.n_cores
+        core = next(iter(self.cores))
+        self.cores.remove(core)
+        return core
 
 
 class _Spaces(object):
@@ -174,13 +177,13 @@ class _Spaces(object):
         self.__next_chip = next(self.__chips)
         self.__used_chips = set()
 
-    def __n_cores_and_sdram(self, x, y):
-        n_cores_used = self.__system_placements.n_placements_on_chip(x, y)
+    def __cores_and_sdram(self, x, y):
+        on_chip = self.__system_placements.placements_on_chip(x, y)
+        cores_used = {p.p for p in on_chip}
         sdram_used = sum(
             p.vertex.resources_required.sdram.get_total_sdram(
-                self.__plan_n_timesteps)
-            for p in self.__system_placements.placements_on_chip(x, y))
-        return n_cores_used, sdram_used
+                self.__plan_n_timesteps) for p in on_chip)
+        return cores_used, sdram_used
 
     def get_next_chip_and_space(self):
         try:
@@ -192,8 +195,8 @@ class _Spaces(object):
             # from the start chip but have not been used
             self.__used_chips.add(self.__next_chip)
             chip = self.__machine.get_chip_at(*self.__next_chip)
-            n_cores_used, sdram_used = self.__n_cores_and_sdram(chip.x, chip.y)
-            return (_ChipWithSpace(chip, n_cores_used, sdram_used),
+            cores_used, sdram_used = self.__cores_and_sdram(chip.x, chip.y)
+            return (_ChipWithSpace(chip, cores_used, sdram_used),
                     self.__usable_from_chip(chip))
 
         except StopIteration:
@@ -210,8 +213,8 @@ class _Spaces(object):
         self.__used_chips.add((next_x, next_y))
         chip = self.__machine.get_chip_at(next_x, next_y)
         space.update(self.__usable_from_chip(chip))
-        n_cores_used, sdram_used = self.__n_cores_and_sdram(chip.x, chip.y)
-        return _ChipWithSpace(chip, n_cores_used, sdram_used)
+        cores_used, sdram_used = self.__cores_and_sdram(chip.x, chip.y)
+        return _ChipWithSpace(chip, cores_used, sdram_used)
 
     @property
     def n_chips_used(self):
