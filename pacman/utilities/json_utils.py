@@ -51,7 +51,7 @@ def json_to_object(json_object):
             with gzip.open(json_object) as j_file:
                 return json.load(j_file)
         else:
-            with open(json_object) as j_file:
+            with open(json_object, encoding="utf-8") as j_file:
                 return json.load(j_file)
     return json_object
 

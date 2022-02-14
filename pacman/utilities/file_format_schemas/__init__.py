@@ -35,5 +35,5 @@ def validate(json_obj, schema_filename):
         If the JSON object isn't valid.
     """
     schema_file = os.path.join(os.path.dirname(__file__), schema_filename)
-    with open(schema_file, "r") as f:
+    with open(schema_file, "r", encoding="utf-8") as f:
         jsonschema.validate(json_obj, json.load(f))
