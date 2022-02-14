@@ -38,9 +38,7 @@ class ConstrainedObject(object, metaclass=AbstractBase):
             Any initial constraints
         """
 
-        # safety point for diamond inheritance
-        if not hasattr(self, '_constraints') or self._constraints is None:
-            self._constraints = OrderedSet()
+        self._constraints = OrderedSet()
 
         # add new constraints to the set
         self.add_constraints(constraints)
