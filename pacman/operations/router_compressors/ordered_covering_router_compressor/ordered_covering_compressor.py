@@ -32,6 +32,7 @@ def ordered_covering_compressor(router_tables):
     :rtype: MulticastRoutingTables
     """
     compressor = _OrderedCoveringCompressor()
+    # pylint:disable=protected-access
     return compressor._run(router_tables)
 
 
