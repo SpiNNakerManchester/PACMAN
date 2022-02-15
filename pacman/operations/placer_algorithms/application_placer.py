@@ -55,8 +55,13 @@ def place_application_graph(
                     placed = True
                     break
 
-                # Always start each application vertex with a new chip
-                next_chip, space = spaces.get_next_chip_and_space()
+                # Always start each application vertex with a new chip.  If
+                # this fails, it will be fatal i.e. out of space
+                try:
+                    next_chip, space = spaces.get_next_chip_and_space()
+                except PacmanPlaceException as e:
+                    _place_error(
+                        app_graph, placements, system_placements, e, retries)
 
                 placements_to_make = list()
 
@@ -72,17 +77,12 @@ def place_application_graph(
                     if _do_constraints(vertices_to_place, placements):
                         continue
 
-                    # If we can't use the next chip, use the next one after
-                    if not next_chip.is_space(n_cores, sdram):
+                    # Try to find a chip with space; this might result in a
+                    # SpaceExceededException
+                    while not next_chip.is_space(n_cores, sdram):
                         next_chip = spaces.get_next_chip(space)
 
-                    # If we can't place now, it is an error
-                    if not next_chip.is_space(n_cores, sdram):
-                        _place_error(
-                            app_graph, placements, system_placements, n_cores,
-                            sdram, retries)
-
-                    # Otherwise store placements to be made
+                    # If this worked, store placements to be made
                     _store_on_chip(
                         placements_to_make, vertices_to_place, sdram,
                         next_chip)
@@ -91,6 +91,10 @@ def place_application_graph(
                 placements.add_placements(placements_to_make)
                 placed = True
             except _SpaceExceededException:
+                # This might happen while exploring a space; this may not be
+                # fatal since the last space might have just been bound by
+                # existing placements, and there might be bigger spaces out
+                # there to use
                 retries += 1
 
     if retries > 0:
@@ -100,7 +104,7 @@ def place_application_graph(
 
 
 def _place_error(
-        app_graph, placements, system_placements, n_cores, sdram, retries):
+        app_graph, placements, system_placements, exception, retries):
     app_vertex_count = 0
     vertex_count = 0
     n_vertices = 0
@@ -142,7 +146,7 @@ def _place_error(
                 f.write("\n")
 
     raise PacmanPlaceException(
-        f"Could not place next {n_cores} with SDRAM {sdram}."
+        f" {exception}."
         f" Retried {retries} times."
         f" Report written to {report_file}.")
 
