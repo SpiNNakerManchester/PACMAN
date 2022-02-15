@@ -66,6 +66,7 @@ def place_application_graph(
                 placements_to_make = list()
 
                 # Go through the groups
+                last_chip_used = None
                 for vertices, sdram in same_chip_groups:
                     vertices_to_place = list()
                     for vertex in vertices:
@@ -80,9 +81,11 @@ def place_application_graph(
                     # Try to find a chip with space; this might result in a
                     # SpaceExceededException
                     while not next_chip.is_space(n_cores, sdram):
-                        next_chip = spaces.get_next_chip(space)
+                        next_chip = spaces.get_next_chip(space, last_chip_used)
+                        last_chip_used = None
 
                     # If this worked, store placements to be made
+                    last_chip_used = next_chip
                     _store_on_chip(
                         placements_to_make, vertices_to_place, sdram,
                         next_chip)
@@ -128,8 +131,8 @@ def _place_error(
 
     fd, report_file = mkstemp(suffix=".rpt")
     with fdopen(fd, 'w') as f:
-        f.write(f"{app_vertex_count} of {app_graph.n_vertices}"
-                " application vertices placed.\n")
+        f.write(f"Could not place {app_vertex_count} of {app_graph.n_vertices}"
+                " application vertices.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
                 " last app vertex\n\n")
         for x, y in placements.chips_with_placements:
@@ -258,7 +261,13 @@ class _Spaces(object):
                 f"No more chips to place on; {self.n_chips_used} of "
                 f"{self.__machine.n_chips} used")
 
-    def get_next_chip(self, space):
+    def get_next_chip(self, space, used_chip=None):
+        # If we are reporting a used chip, update with reachable chips
+        if used_chip is not None:
+            last_chip = self.__machine.get_chip_at(used_chip.x, used_chip.y)
+            space.update(self.__usable_from_chip(last_chip))
+
+        # If no space, error
         if not space:
             raise _SpaceExceededException(
                 "No more chips to place on in this space; "
@@ -266,7 +275,6 @@ class _Spaces(object):
         next_x, next_y = space.pop(last=False)
         self.__used_chips.add((next_x, next_y))
         chip = self.__machine.get_chip_at(next_x, next_y)
-        space.update(self.__usable_from_chip(chip))
         cores_used, sdram_used = self.__cores_and_sdram(chip.x, chip.y)
         return _ChipWithSpace(chip, cores_used, sdram_used)
 
