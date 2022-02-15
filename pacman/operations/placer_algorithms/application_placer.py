@@ -128,7 +128,7 @@ def _place_error(app_graph, placements, machine, n_cores, sdram):
                 " last app vertex\n\n")
         for x, y in machine.chip_coordinates:
             first = True
-            for placement in placements.get_placement_on_processor(x, y):
+            for placement in placements.placements_on_chip(x, y):
                 if first:
                     f.write(f"Chip ({x}, {y}):\n")
                     first = False
