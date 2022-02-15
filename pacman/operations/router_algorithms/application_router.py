@@ -226,6 +226,7 @@ def _route_to_target_chips(first_chip, chips, machine, routes, targets, label):
     # Keep a queue of chip to visit, list of (parent chip, link from parent)
     chips_to_explore = deque([(first_chip, list())])
     visited = set()
+    targets_to_visit = set(targets)
     while chips_to_explore:
         chip, path = chips_to_explore.popleft()
         if chip in visited:
@@ -241,6 +242,8 @@ def _route_to_target_chips(first_chip, chips, machine, routes, targets, label):
         elif chip in targets:
             routes[chip] = RoutingTree(chip, label)
             last_route = routes[chip]
+            if chip in targets_to_visit:
+                targets_to_visit.remove(chip)
             for parent, link in reversed(path):
                 if parent not in routes:
                     routes[parent] = RoutingTree(parent, label)
@@ -258,6 +261,10 @@ def _route_to_target_chips(first_chip, chips, machine, routes, targets, label):
                     new_path = list(path)
                     new_path.append((chip, link))
                     chips_to_explore.append((next_chip, new_path))
+    # Sanity check
+    if targets_to_visit:
+        raise Exception(
+            f"Failed to visit all targets {targets} from {first_chip}")
 
 
 def _is_open_chip(chip, chips, visited, machine):
