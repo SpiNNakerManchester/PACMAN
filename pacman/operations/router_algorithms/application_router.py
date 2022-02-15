@@ -229,6 +229,8 @@ def _route_to_target_chips(first_chip, chips, machine, routes, targets, label):
     targets_to_visit = set(targets)
     while chips_to_explore:
         chip, path = chips_to_explore.popleft()
+        if chip in targets_to_visit:
+            targets_to_visit.remove(chip)
         if chip in visited:
             continue
         visited.add(chip)
@@ -242,8 +244,6 @@ def _route_to_target_chips(first_chip, chips, machine, routes, targets, label):
         elif chip in targets:
             routes[chip] = RoutingTree(chip, label)
             last_route = routes[chip]
-            if chip in targets_to_visit:
-                targets_to_visit.remove(chip)
             for parent, link in reversed(path):
                 if parent not in routes:
                     routes[parent] = RoutingTree(parent, label)
