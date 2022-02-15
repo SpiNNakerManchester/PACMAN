@@ -16,21 +16,25 @@
 import unittest
 from collections import deque
 
-from pacman.model.graphs.machine import MulticastEdgePartition
+from spinn_utilities.config_holder import set_config
 from spinn_machine.virtual_machine import virtual_machine
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import (
-    MachineGraph, MachineEdge, SimpleMachineVertex)
-from pacman.operations.router_algorithms import NerRouteTrafficAware
+    MachineGraph, MachineEdge, MulticastEdgePartition, SimpleMachineVertex)
+from pacman.operations.router_algorithms import ner_route_traffic_aware
 from pacman.model.resources import ResourceContainer
 from pacman.model.placements import Placements, Placement
 
 
-class MyTestCase(unittest.TestCase):
+class TestNerRouteTrafficAware(unittest.TestCase):
+
+    def setUp(cls):
+        unittest_setup()
 
     def test_routing(self):
         graph = MachineGraph("Test")
-        machine = virtual_machine(
-            8, 8, down_chips=[(1, 2), (5, 4), (3, 3)])
+        set_config("Machine", "down_chips", "1,2:5,4:3,3")
+        machine = virtual_machine(8, 8)
         placements = Placements()
         vertices = list()
 
@@ -49,8 +53,7 @@ class MyTestCase(unittest.TestCase):
             for vertex_to in vertices:
                 graph.add_edge(MachineEdge(vertex, vertex_to), "Test")
 
-        router = NerRouteTrafficAware()
-        routing_paths = router.__call__(graph, machine, placements)
+        routing_paths = ner_route_traffic_aware(graph, machine, placements)
 
         for vertex in vertices:
             vertices_reached = set()

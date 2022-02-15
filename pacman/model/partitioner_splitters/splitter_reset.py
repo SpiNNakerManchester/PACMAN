@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2020-2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,17 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_input import AbstractInput
-from .all_of_input import AllOfInput
-from .one_of_input import OneOfInput
-from .output import Output
-from .single_input import SingleInput
-from .token import Token
-from .algorithm_decorator import (
-    AllOf, OneOf, algorithm, algorithms, get_algorithms, reset_algorithms,
-    scan_packages)
 
-__all__ = ["AbstractInput", "AllOfInput", "OneOfInput", "Output",
-           "SingleInput", "AllOf", "OneOf", "algorithm", "algorithms",
-           "get_algorithms", "reset_algorithms", "scan_packages",
-           "Token"]
+def splitter_reset(app_graph):
+    """ Performs resetting of splitters to indicate a new phase of operation
+    """
+    for vertex in app_graph.vertices:
+        if vertex.splitter is not None:
+            vertex.splitter.reset_called()

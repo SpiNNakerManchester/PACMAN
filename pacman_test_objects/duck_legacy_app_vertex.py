@@ -12,18 +12,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.model.graphs.application import ApplicationVertex
 
-from .placer_test_support import (
-    MachineVertex as T_MachineVertex, Vertex as T_AppVertex,
-    get_resources_used_by_atoms)
-from .simple_test_edge import SimpleTestEdge
-from .simple_test_partitioning_constraint import NewPartitionerConstraint
-from .simple_test_vertex import SimpleTestVertex
 
-__all__ = [
-    "get_resources_used_by_atoms",
-    "NewPartitionerConstraint",
-    "SimpleTestEdge",
-    "SimpleTestVertex",
-    "T_AppVertex",
-    "T_MachineVertex"]
+class DuckLegacyApplicationVertex(ApplicationVertex):
+    """
+    A mock vertex that is a LegacyPartitionerAPI by ducktyping the methods
+    """
+    def __init__(self, label="test"):
+        super().__init__(label=label)
+
+    def n_atoms(self):
+        pass
+
+    def get_resources_used_by_atoms(self, vertex_slice):
+        pass
+
+    def create_machine_vertex(
+            self, vertex_slice, resources_required, label=None,
+            constraints=None):
+        pass

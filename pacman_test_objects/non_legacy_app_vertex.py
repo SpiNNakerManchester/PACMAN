@@ -12,19 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.model.graphs.application import ApplicationVertex
 
-from .pair_compressor import PairCompressor
 
+class NonLegacyApplicationVertex(ApplicationVertex):
+    def __init__(self, label="test"):
+        super().__init__(label=label)
 
-class UnorderedPairCompressor(PairCompressor):
-    """
-    A version of the pair compressor that does not consider order or length
+    def n_atoms(self):
+        pass
 
-    The resulting entries are unordered,
-    which allows the use of a second follow on compressor.
-
-    The results are not checked for length so the results may be too big to be
-    used unless compressed again.
-    """
-    def __init__(self):
-        super().__init__(False)

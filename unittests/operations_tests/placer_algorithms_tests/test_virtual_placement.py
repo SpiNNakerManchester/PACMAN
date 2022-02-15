@@ -15,38 +15,39 @@
 
 import pytest
 from spinn_machine import virtual_machine
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import (
     MachineGraph, MachineSpiNNakerLinkVertex)
 from pacman.operations.chip_id_allocator_algorithms import (
-    MallocBasedChipIdAllocator)
+    malloc_based_chip_id_allocator)
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
-from pacman.executor import PACMANAlgorithmExecutor
+from pacman.operations.placer_algorithms import (
+    connective_based_placer, one_to_one_placer, radial_placer, spreader_placer)
 
 
 @pytest.mark.parametrize(
     "placer",
-    ["OneToOnePlacer", "RadialPlacer", "SpreaderPlacer"])
+    ["ConnectiveBasedPlacer", "OneToOnePlacer", "RadialPlacer",
+     "SpreaderPlacer"])
 def test_virtual_placement(placer):
+    unittest_setup()
     machine = virtual_machine(width=8, height=8)
     graph = MachineGraph("Test")
     virtual_vertex = MachineSpiNNakerLinkVertex(spinnaker_link_id=0)
     graph.add_vertex(virtual_vertex)
-    extended_machine = MallocBasedChipIdAllocator()(machine, graph)
+    extended_machine = malloc_based_chip_id_allocator(machine, graph)
     n_keys_map = DictBasedMachinePartitionNKeysMap()
 
-    inputs = {
-        "MemoryExtendedMachine": machine,
-        "MemoryMachine": machine,
-        "MemoryMachineGraph": graph,
-        "PlanNTimeSteps": 1000,
-        "MemoryMachinePartitionNKeysMap": n_keys_map
-    }
-    algorithms = [placer]
-    xml_paths = []
-    executor = PACMANAlgorithmExecutor(
-        algorithms, [], inputs, [], [], [], xml_paths)
-    executor.execute_mapping()
-    placements = executor.get_item("MemoryPlacements")
+    if placer == "ConnectiveBasedPlacer":
+        placements = connective_based_placer(graph, machine, None)
+    elif placer == "OneToOnePlacer":
+        placements = one_to_one_placer(graph, machine, None)
+    elif placer == "RadialPlacer":
+        placements = radial_placer(graph, machine, None)
+    elif placer == "SpreaderPlacer":
+        placements = spreader_placer(graph, machine, n_keys_map, None)
+    else:
+        raise NotImplementedError(placer)
 
     placement = placements.get_placement_of_vertex(virtual_vertex)
     chip = extended_machine.get_chip_at(placement.x, placement.y)

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.exceptions import PacmanConfigurationException
+from .constant_sdram import ConstantSDRAM
 
 
 class PreAllocatedResourceContainer(object):
@@ -21,107 +21,87 @@ class PreAllocatedResourceContainer(object):
     """
 
     __slots__ = [
-        # An iterable of SpecificSDRAMResource object that reflects the amount
-        # of SDRAM (in bytes) preallocated on a specific chip on the SpiNNaker
-        #  machine
-        "_specific_sdram_usage",
+        # Sdram to preallocate on all none ethernet Chips
+        "_sdram_all",
 
-        # An iterable of SpecificCoreResource objects that reflect the number
-        # of specific cores that have been preallocated on a chip.
-        "_specific_core_resources",
+        # sdram to preallocate for Ethernet Chips
+        # This includes the values from _sdram_all
+        "_sdram_ethernet",
 
-        # An iterable of CoreResource objects that reflect the number of
-        # cores that have been preallocated on a chip, but which don't care
-        # which core it uses.
-        "_core_resources",
+        # Number of cores to preallocate on all none ethernet chips
+        "_cores_all",
 
-        # An iterable of SpecificIPTagResource objects that reflect the IP tag
-        # details that have been preallocated on a board.
-        "_specific_iptag_resources",
+        # Number of cores to preallocate on ethernet chips
+        # This includes the cores in cores_all
+        "_cores_ethernet",
 
-        # An iterable of SpecificReverseIPTagResource objects that reflect the
-        # reverse IP tag details that have been preallocated on a board.
-        "_specific_reverse_iptag_resources",
-    ]
+        # iptag resources to be perallocated on all everynets
+        "_iptag_resources"]
 
-    def __init__(
-            self, specific_sdram_usage=None, specific_core_resources=None,
-            core_resources=None, specific_iptag_resources=None,
-            specific_reverse_iptag_resources=None):
+    def __init__(self):
+        self._sdram_all = ConstantSDRAM(0)
+        self._sdram_ethernet = ConstantSDRAM(0)
+        self._cores_all = 0
+        self._cores_ethernet = 0
+        self._iptag_resources = []
+
+    @property
+    def sdram_all(self):
+        return self._sdram_all
+
+    def add_sdram_all(self, extra):
         """
-        :param iterable(SpecificChipSDRAMResource) specific_sdram_usage:
-            iterable of SpecificSDRAMResource which states that specific chips
-            have missing SDRAM
-        :param iterable(SpecificCoreResource) specific_core_resources:
-            states which cores have been preallocated
-        :param iterable(CoreResource) core_resources:
-            states a number of cores have been preallocated but don't care
-            which ones they are
-        :param list(SpecificBoardTagResource) specific_iptag_resources:
-        :param list(SpecificReverseIPTagResource) \
-                specific_reverse_iptag_resources:
+        Add extra sdram to preallocate on all chips including ethernets
+
+        :param AbstractSDRAM extra: Additioanal sdram required
         """
-        # pylint: disable=too-many-arguments
-        self._specific_sdram_usage = specific_sdram_usage
-        self._specific_core_resources = specific_core_resources
-        self._core_resources = core_resources
-        self._specific_iptag_resources = specific_iptag_resources
-        self._specific_reverse_iptag_resources = \
-            specific_reverse_iptag_resources
-
-        # check for none resources
-        if self._specific_sdram_usage is None:
-            self._specific_sdram_usage = []
-        if self._specific_core_resources is None:
-            self._specific_core_resources = []
-        if self._core_resources is None:
-            self._core_resources = []
-        if self._specific_iptag_resources is None:
-            self._specific_iptag_resources = []
-        if self._specific_reverse_iptag_resources is None:
-            self._specific_reverse_iptag_resources = []
+        self._sdram_all += extra
+        self._sdram_ethernet += extra
 
     @property
-    def specific_sdram_usage(self):
-        return self._specific_sdram_usage
+    def sdram_ethernet(self):
+        return self._sdram_ethernet
 
-    @property
-    def specific_core_resources(self):
-        return self._specific_core_resources
-
-    @property
-    def core_resources(self):
-        return self._core_resources
-
-    @property
-    def specific_iptag_resources(self):
-        return self._specific_iptag_resources
-
-    @property
-    def specific_reverse_iptag_resources(self):
-        return self._specific_reverse_iptag_resources
-
-    def extend(self, other):
+    def add_sdram_ethernet(self, extra):
         """
-        :param PreAllocatedResourceContainer other:
+        Add extra sdram to preallocate on ethernet chips
+
+        :param AbstractSDRAM extra: Additioanal sdram required
         """
-        if not isinstance(other, PreAllocatedResourceContainer):
-            raise PacmanConfigurationException(
-                "Only another preallocated resource container can extend a "
-                "preallocated resource container")
+        self._sdram_ethernet += extra
 
-        # add specific SDRAM usage
-        self._specific_sdram_usage.extend(other.specific_sdram_usage)
+    @property
+    def cores_all(self):
+        return self._cores_all
 
-        # add specific cores
-        self._specific_core_resources.extend(other.specific_core_resources)
+    def add_cores_all(self, extra):
+        """
+        Add extra core requirement for all cores including ethernets
 
-        # add non-specific cores
-        self._core_resources.extend(other.core_resources)
+        :param int extra: number of extra cores
+        """
+        self._cores_all += extra
+        self._cores_ethernet += extra
 
-        # add IP tag resources
-        self._specific_iptag_resources.extend(other.specific_iptag_resources)
+    @property
+    def cores_ethernet(self):
+        return self._cores_ethernet
 
-        # add reverse IP tag resources
-        self._specific_reverse_iptag_resources.extend(
-            other.specific_reverse_iptag_resources)
+    def add_cores_ethernet(self, extra):
+        """
+        Add extra core requirement for all cores including ethernets
+
+        :param int extra: number of extra cores
+        """
+        self._cores_ethernet += extra
+
+    @property
+    def iptag_resources(self):
+        return self._iptag_resources
+
+    def add_iptag_resource(self, extra):
+        """
+        Adds an additional iptag resource to be reserved on all ethernet chips
+        :param IPtagResource extraa:
+        """
+        self._iptag_resources.append(extra)

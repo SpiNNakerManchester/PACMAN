@@ -21,7 +21,21 @@ from .ordered_covering import minimise
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class OrderedCoveringCompressor(AbstractCompressor):
+def ordered_covering_compressor(router_tables):
+    """
+    Compressor from rig that has been tied into the main tool chain stack.
+
+    :param MulticastRoutingTables router_tables:
+    :param bool accept_overflow:
+        A flag which should only be used in testing to stop raising an
+        exception if result is too big
+    :rtype: MulticastRoutingTables
+    """
+    compressor = _OrderedCoveringCompressor()
+    return compressor._run(router_tables)
+
+
+class _OrderedCoveringCompressor(AbstractCompressor):
     """ Compressor from rig that has been tied into the main tool chain stack.
     """
 
@@ -44,16 +58,5 @@ class OrderedCoveringCompressor(AbstractCompressor):
             entries.append(Entry.from_MulticastRoutingEntry(router_entry))
 
         # compress the router entries
-        compressed_router_table_entries = minimise(
-            entries, self._target_length)
+        compressed_router_table_entries = minimise(entries)
         return compressed_router_table_entries
-
-
-class MundyRouterCompressor(OrderedCoveringCompressor):
-    """ DEPRECATED use OrderedCoveringCompressor """
-    def __new__(cls, *args, **kwargs):
-        logger.warning(
-            "MundyRouterCompressor algorithm name is deprecated. "
-            "Please use OrderedCoveringCompressor instead. "
-            "Remove algorithms from your cfg to use defaults")
-        return super().__new__(cls, *args, **kwargs)

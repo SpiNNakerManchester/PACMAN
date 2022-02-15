@@ -14,11 +14,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.common import Slice
 
 
 class TestSlice(unittest.TestCase):
     """Tests that Slices expose the correct options and are immutable."""
+
+    def setUp(self):
+        unittest_setup()
+
     def test_basic(self):
         s = Slice(0, 10)
         assert s.n_atoms == 11  # 10 - 0 + 1

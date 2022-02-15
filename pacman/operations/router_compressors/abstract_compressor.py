@@ -19,8 +19,10 @@ based on https://github.com/project-rig/
 
 from abc import abstractmethod
 import logging
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_machine import Machine
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import MinimisationFailedError
@@ -30,86 +32,33 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class AbstractCompressor(object):
 
-    MAX_SUPPORTED_LENGTH = 1023
-
     __slots__ = [
-        # Max length below which the algorithm should stop compressing
-        "_target_length",
         # String of problems detected. Must be "" to finish
         "_problems",
         # Flag to say if the results can be order dependent
         "_ordered",
+        # Flag to say that results too large should be ignored
+        "_accept_overflow"
     ]
 
-    def __init__(self, ordered=True):
+    def __init__(self, ordered=True, accept_overflow=False):
         self._ordered = ordered
+        self._accept_overflow = accept_overflow
 
-    def __call__(self, router_tables, target_length=None):
+    def _run(self, router_tables):
         """
         :param MulticastRoutingTables router_tables:
-        :param int target_length:
+        :param bool accept_overflow:
+            A flag which should only be used in testing to stop raising an
+            exception if result is too big
         :rtype: MulticastRoutingTables
         """
-        if target_length is None:
-            self._target_length = 0  # Compress as much as you can
-        else:
-            self._target_length = target_length
         # create progress bar
         progress = ProgressBar(
             router_tables.routing_tables,
             "Compressing routing Tables using {}".format(
                 self.__class__.__name__))
         return self.compress_tables(router_tables, progress)
-
-    @staticmethod
-    def intersect(key_a, mask_a, key_b, mask_b):
-        """
-        Return if key-mask pairs intersect (i.e., would both match some of
-        the same keys).
-
-        For example, the key-mask pairs ``00XX`` and ``001X`` both match the
-        keys ``0010`` and ``0011`` (i.e., they do intersect)::
-
-            >>> intersect(0b0000, 0b1100, 0b0010, 0b1110)
-            True
-
-        But the key-mask pairs ``00XX`` and ``11XX`` do not match any of the
-        same keys (i.e., they do not intersect)::
-
-            >>> intersect(0b0000, 0b1100, 0b1100, 0b1100)
-            False
-
-        :param int key_a: The key of first key-mask pair
-        :param int mask_a: The mask of first key-mask pair
-        :param int key_b: The key of second key-mask pair
-        :param int mask_b: The mask of second key-mask pair
-        :return: True if the two key-mask pairs intersect otherwise False.
-        :rtype: bool
-        """
-        return (key_a & mask_b) == (key_b & mask_a)
-
-    def merge(self, entry1, entry2):
-        """ Merges two entries/triples into one that covers both
-
-        The assumption is that they both have the same known spinnaker_route
-
-        :param ~pacman.operations.router_compressors.Entry entry1:
-            Key, Mask, defaultable from the first entry
-        :param ~pacman.operations.router_compressors.Entry entry2:
-            Key, Mask, defaultable from the second entry
-        :return: Key, Mask, defaultable from merged entry
-        :rtype: tuple(int, int, bool)
-        """
-        any_ones = entry1.key | entry2.key
-        all_ones = entry1.key & entry2.key
-        all_selected = entry1.mask & entry2.mask
-
-        # Compute the new mask  and key
-        any_zeros = ~all_ones
-        new_xs = any_ones ^ any_zeros
-        mask = all_selected & new_xs  # Combine existing and new Xs
-        key = all_ones & mask
-        return key, mask, entry1.defaultable and entry2.defaultable
 
     @abstractmethod
     def compress_table(self, router_table):
@@ -134,8 +83,14 @@ class AbstractCompressor(object):
         """
         compressed_tables = MulticastRoutingTables()
         self._problems = ""
+        if get_config_bool(
+                "Mapping", "router_table_compress_as_far_as_possible"):
+            # Compress as much as possible
+            target_length = 0
+        else:
+            target_length = Machine.ROUTER_ENTRIES
         for table in progress.over(router_tables.routing_tables):
-            if table.number_of_entries < self._target_length:
+            if table.number_of_entries < target_length:
                 new_table = table
             else:
                 compressed_table = self.compress_table(table)
@@ -145,21 +100,17 @@ class AbstractCompressor(object):
                 for entry in compressed_table:
                     new_table.add_multicast_routing_entry(
                         entry.to_MulticastRoutingEntry())
-                if new_table.number_of_entries > self.MAX_SUPPORTED_LENGTH:
+                if new_table.number_of_entries > Machine.ROUTER_ENTRIES:
                     self._problems += "(x:{},y:{})={} ".format(
                         new_table.x, new_table.y, new_table.number_of_entries)
 
             compressed_tables.add_routing_table(new_table)
 
         if len(self._problems) > 0:
-            if self._ordered:
+            if self._ordered and not self._accept_overflow:
                 raise MinimisationFailedError(
                     "The routing table after compression will still not fit"
                     " within the machines router: {}".format(self._problems))
             else:
                 logger.warning(self._problems)
         return compressed_tables
-
-    @property
-    def ordered(self):
-        return self._ordered

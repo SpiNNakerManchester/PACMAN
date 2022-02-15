@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pytest
+from pacman.config_setup import unittest_setup
 from pacman.operations.routing_info_allocator_algorithms.\
     malloc_based_routing_allocator.utils import (
         get_possible_masks)
@@ -22,6 +23,7 @@ from pacman.operations.routing_info_allocator_algorithms.\
 def test_mask_generator():
     """ This checks behaviour, but with restricted bitfield sizes.
     """
+    unittest_setup()
     assert frozenset(get_possible_masks(2, 4, False)) == frozenset(
         {14, 13, 11, 7})
     assert frozenset(get_possible_masks(2, 4, True)) == frozenset(

@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import MulticastEdgePartition
 from pacman.model.resources import ResourceContainer
 from pacman.exceptions import (
@@ -27,6 +27,9 @@ from pacman.utilities.constants import FULL_MASK
 
 
 class TestRoutingInfo(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def test_routing_info(self):
         # mock to avoid having to create a graph for this test

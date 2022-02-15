@@ -19,7 +19,8 @@ import math
 import sys
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.placements import Placement, Placements
-from pacman.operations.placer_algorithms import OneToOnePlacer
+from pacman.operations.placer_algorithms.one_to_one_placer import (
+    _OneToOnePlacer)
 from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
     create_vertices_groups, get_same_chip_vertex_groups,
     create_requirement_collections)
@@ -28,7 +29,23 @@ from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
 
 
-class SpreaderPlacer(OneToOnePlacer):
+def spreader_placer(machine_graph, machine, n_keys_map, plan_n_timesteps):
+    """ Places vertices on as many chips as available with a effort to\
+        reduce the number of packets being received by the router in total.
+
+    :param MachineGraph machine_graph: the machine graph
+    :param ~spinn_machine.Machine machine: the SpiNNaker machine
+    :param AbstractMachinePartitionNKeysMap n_keys_map:
+        the n keys from partition map
+    :param int plan_n_timesteps: number of timesteps to plan for
+    :return: placements.
+    :rtype: Placements
+    """
+    placer = _SpreaderPlacer()
+    return placer._run(machine_graph, machine, n_keys_map, plan_n_timesteps)
+
+
+class _SpreaderPlacer(_OneToOnePlacer):
     """ Places vertices on as many chips as available with a effort to\
         reduce the number of packets being received by the router in total.
 
@@ -55,7 +72,8 @@ class SpreaderPlacer(OneToOnePlacer):
     # 4. chip and core)
     STEPS = 4
 
-    def __call__(self, machine_graph, machine, n_keys_map, plan_n_timesteps):
+    # pylint:disable=arguments-differ
+    def _run(self, machine_graph, machine, n_keys_map, plan_n_timesteps):
         """
         :param MachineGraph machine_graph: the machine graph
         :param ~spinn_machine.Machine machine: the SpiNNaker machine

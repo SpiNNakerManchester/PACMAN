@@ -13,19 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-from pacman.executor.algorithm_classes import PythonFunctionAlgorithm
+from .duck_legacy_app_vertex import DuckLegacyApplicationVertex
+from .mock_machine_vertex import MockMachineVertex
+from .non_legacy_app_vertex import NonLegacyApplicationVertex
+from .placer_test_support import get_resourced_machine_vertex
+from .simple_test_edge import SimpleTestEdge
+from .simple_test_partitioning_constraint import NewPartitionerConstraint
+from .simple_test_vertex import SimpleTestVertex
 
-
-class TestPythonFunctionAlgorithm(unittest.TestCase):
-    """
-    tests which test the application graph object
-    """
-
-    def test_python_module(self):
-        python_module = "Foo"
-        python_function = "bar"
-        alg = PythonFunctionAlgorithm("algorithm_id", [], [], [], [], [], [],
-                                      python_module, python_function)
-        self.assertEqual(python_module, alg._python_module)
-        self.assertEqual(python_function, alg._python_function)
+__all__ = [
+    "DuckLegacyApplicationVertex",
+    "get_resourced_machine_vertex",
+    "MockMachineVertex",
+    "NonLegacyApplicationVertex",
+    "NewPartitionerConstraint",
+    "SimpleTestEdge",
+    "SimpleTestVertex"]

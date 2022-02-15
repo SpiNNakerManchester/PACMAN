@@ -19,11 +19,10 @@ test for the resources model
 from enum import Enum
 import tempfile
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
-    IPtagResource, MultiRegionSDRAM, ReverseIPtagResource,
-    SpecificBoardIPtagResource, SpecificBoardReverseIPtagResource,
-    VariableSDRAM)
+    IPtagResource, MultiRegionSDRAM, ReverseIPtagResource, VariableSDRAM)
 
 
 class MockEnum(Enum):
@@ -35,6 +34,9 @@ class TestResourceModels(unittest.TestCase):
     """
     unit tests on the resources object
     """
+
+    def setUp(self):
+        unittest_setup()
 
     def test_sdram(self):
         """
@@ -173,33 +175,6 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(riptr.get_value(), [1, 2, 3])
         self.assertEqual(str(riptr),
                          "ReverseIPTagResource(port=1, sdp_port=2, tag=3)")
-
-        b = "4.3.2.1"
-
-        SpecificBoardIPtagResource(b, "1", 2, 3)  # Minimal args
-        iptr = SpecificBoardIPtagResource(b, "1.2.3.4", 2, 3, 4, 5)
-        self.assertEqual(iptr.board, b)
-        self.assertEqual(iptr.ip_address, "1.2.3.4")
-        self.assertEqual(iptr.port, 2)
-        self.assertEqual(iptr.strip_sdp, 3)
-        self.assertEqual(iptr.tag, 4)
-        self.assertEqual(iptr.traffic_identifier, 5)
-        self.assertEqual(iptr.get_value(), [b, '1.2.3.4', 2, 3, 4, 5])
-        self.assertEqual(str(iptr),
-                         "IPTagResource(board_address=" + b + ", "
-                         "ip_address=1.2.3.4, port=2, strip_sdp=3, tag=4, "
-                         "traffic_identifier=5)")
-
-        SpecificBoardReverseIPtagResource(b)  # Minimal args
-        riptr = SpecificBoardReverseIPtagResource(b, 1, 2, 3)
-        self.assertEqual(riptr.board, b)
-        self.assertEqual(riptr.port, 1)
-        self.assertEqual(riptr.sdp_port, 2)
-        self.assertEqual(riptr.tag, 3)
-        self.assertEqual(riptr.get_value(), [b, 1, 2, 3])
-        self.assertEqual(str(riptr),
-                         "ReverseIPTagResource(board=" + b + ", port=1, "
-                         "sdp_port=2, tag=3)")
 
 
 if __name__ == '__main__':

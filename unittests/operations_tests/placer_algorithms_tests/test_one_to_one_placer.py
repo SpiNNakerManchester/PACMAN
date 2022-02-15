@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import pytest
 from spinn_machine.virtual_machine import virtual_machine
+from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanException
 from pacman.model.graphs.machine import (
     MachineGraph, SimpleMachineVertex, MachineSpiNNakerLinkVertex, MachineEdge,
@@ -22,13 +23,15 @@ from pacman.model.graphs.machine import ConstantSDRAMMachinePartition
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.operations.chip_id_allocator_algorithms import (
-    MallocBasedChipIdAllocator)
-from pacman.operations.placer_algorithms import OneToOnePlacer
+    malloc_based_chip_id_allocator)
+from pacman.operations.placer_algorithms import one_to_one_placer
+from pacman_test_objects import MockMachineVertex
 
 
 def test_virtual_vertices_one_to_one():
     """ Test that the placer works with a virtual vertex
     """
+    unittest_setup()
 
     # Create a graph with a virtual vertex
     machine_graph = MachineGraph("Test")
@@ -59,10 +62,10 @@ def test_virtual_vertices_one_to_one():
 
     # Get and extend the machine for the virtual chip
     machine = virtual_machine(width=8, height=8)
-    extended_machine = MallocBasedChipIdAllocator()(machine, machine_graph)
+    extended_machine = malloc_based_chip_id_allocator(machine, machine_graph)
 
     # Do placements
-    placements = OneToOnePlacer()(
+    placements = one_to_one_placer(
         machine_graph, extended_machine, plan_n_timesteps=1000)
 
     # The virtual vertex should be on a virtual chip
@@ -83,6 +86,7 @@ def test_virtual_vertices_one_to_one():
 def test_one_to_one():
     """ Test normal 1-1 placement
     """
+    unittest_setup()
 
     # Create a graph
     machine_graph = MachineGraph("Test")
@@ -119,7 +123,7 @@ def test_one_to_one():
 
     # Do placements
     machine = virtual_machine(width=8, height=8)
-    placements = OneToOnePlacer()(
+    placements = one_to_one_placer(
         machine_graph, machine, plan_n_timesteps=1000)
 
     # The 1-1 connected vertices should be on the same chip
@@ -141,6 +145,7 @@ def test_one_to_one():
 def test_sdram_links():
     """ Test sdram edges which should explode
         """
+    unittest_setup()
 
     # Create a graph
     machine_graph = MachineGraph("Test")
@@ -148,9 +153,9 @@ def test_sdram_links():
     # Connect a set of vertices in a chain of length 3
     last_vertex = None
     for x in range(20):
-        vertex = SimpleMachineVertex(
+        vertex = MockMachineVertex(
             resources=ResourceContainer(),
-            label="Vertex_{}".format(x), sdram_cost=20)
+            label="Vertex_{}".format(x), sdram_requirement=20)
         machine_graph.add_vertex(vertex)
         last_vertex = vertex
 
@@ -164,4 +169,4 @@ def test_sdram_links():
     # Do placements
     machine = virtual_machine(width=8, height=8)
     with pytest.raises(PacmanException):
-        OneToOnePlacer()(machine_graph, machine, plan_n_timesteps=1000)
+        one_to_one_placer(machine_graph, machine, plan_n_timesteps=1000)

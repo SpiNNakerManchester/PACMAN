@@ -15,32 +15,28 @@
 
 import unittest
 from spinn_machine import virtual_machine
-from pacman.model.graphs.machine import MachineGraph
+from pacman.config_setup import unittest_setup
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from pacman.exceptions import PacmanValueError
 from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
-from pacman.operations.placer_algorithms import RadialPlacer
-from uinit_test_objects import (
-    get_resources_used_by_atoms, T_MachineVertex,)
+from pacman.operations.placer_algorithms import radial_placer
+from pacman_test_objects import (get_resourced_machine_vertex)
 
 
 class TestRadialPlacer(unittest.TestCase):
     def setUp(self):
-
+        unittest_setup()
         self.machine = virtual_machine(8, 8)
         self.mach_graph = MachineGraph("machine")
         self.vertices = list()
-        self.vertex1 = T_MachineVertex(
-            0, 1, get_resources_used_by_atoms(0, 1, []), "First vertex")
-        self.vertex2 = T_MachineVertex(
-            1, 5, get_resources_used_by_atoms(1, 5, []), "Second vertex")
-        self.vertex3 = T_MachineVertex(
-            5, 10, get_resources_used_by_atoms(5, 10, []), "Third vertex")
-        self.vertex4 = T_MachineVertex(
-            10, 100, get_resources_used_by_atoms(10, 100, []),
-            "Fourth vertex")
+        self.vertex1 = get_resourced_machine_vertex(0, 1, "First vertex")
+        self.vertex2 = get_resourced_machine_vertex(1, 5, "Second vertex")
+        self.vertex3 = get_resourced_machine_vertex(5, 10, "Third vertex")
+        self.vertex4 = get_resourced_machine_vertex(10, 100, "Fourth vertex")
         self.vertices.append(self.vertex1)
         self.mach_graph.add_vertex(self.vertex1)
         self.vertices.append(self.vertex2)
@@ -54,7 +50,7 @@ class TestRadialPlacer(unittest.TestCase):
         self.plan_n_timesteps = 100
 
     def test_simple(self):
-        placements = RadialPlacer()(self.mach_graph, self.machine, 100)
+        placements = radial_placer(self.mach_graph, self.machine, 100)
         self.assertEqual(len(self.vertices), len(placements))
 
     def test_place_vertex_too_big_with_vertex(self):
@@ -66,16 +62,16 @@ class TestRadialPlacer(unittest.TestCase):
             dtcm=DTCMResource(dtcm_requirement),
             sdram=ConstantSDRAM(sdram_requirement))
 
-        large_machine_vertex = T_MachineVertex(
-            0, 499, rc, "Second vertex")
+        large_machine_vertex = SimpleMachineVertex(
+            rc, vertex_slice=Slice(0, 499), label="Second vertex")
         self.mach_graph.add_vertex(large_machine_vertex)
         with self.assertRaises(PacmanValueError):
-            RadialPlacer()(self.mach_graph, self.machine, 100)
+            radial_placer(self.mach_graph, self.machine, 100)
 
     def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
         self.vertex2.add_constraint(ChipAndCoreConstraint(3, 5, 7))
         self.vertex3.add_constraint(RadialPlacementFromChipConstraint(2, 4))
-        placements = RadialPlacer()(self.mach_graph, self.machine, 100)
+        placements = radial_placer(self.mach_graph, self.machine, 100)
         for placement in placements.placements:
             if placement.vertex == self.vertex2:
                 self.assertEqual(placement.x, 3)
@@ -90,16 +86,14 @@ class TestRadialPlacer(unittest.TestCase):
         graph = MachineGraph("machine")
         cores = sum(chip.n_user_processors for chip in self.machine.chips)
         for i in range(cores):  # 50 atoms per each processor on 20 chips
-            graph.add_vertex(T_MachineVertex(
-                0, 50, get_resources_used_by_atoms(0, 50, []),
-                "vertex " + str(i)))
-        placements = RadialPlacer()(graph, self.machine, 100)
+            graph.add_vertex(get_resourced_machine_vertex(
+                0, 50, "vertex " + str(i)))
+        placements = radial_placer(graph, self.machine, 100)
         self.assertEqual(len(placements), cores)
         # One more vertex should be too many
-        graph.add_vertex(T_MachineVertex(
-            0, 50, get_resources_used_by_atoms(0, 50, []), "toomany"))
+        graph.add_vertex(get_resourced_machine_vertex(0, 50, "toomany"))
         with self.assertRaises(PacmanValueError):
-            RadialPlacer()(graph, self.machine, 100)
+            radial_placer(graph, self.machine, 100)
 
 
 if __name__ == '__main__':

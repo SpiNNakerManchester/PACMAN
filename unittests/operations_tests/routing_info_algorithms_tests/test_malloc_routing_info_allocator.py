@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint, ShareKeyConstraint)
@@ -22,16 +23,20 @@ from pacman.model.graphs.machine import (
 from pacman.model.graphs.machine import MulticastEdgePartition
 from pacman.model.resources import ResourceContainer
 from pacman.operations.routing_info_allocator_algorithms\
-    .malloc_based_routing_allocator import (
-        MallocBasedRoutingInfoAllocator)
+    .malloc_based_routing_allocator.malloc_based_routing_info_allocator\
+    import (_MallocBasedRoutingInfoAllocator,
+            malloc_based_routing_info_allocator)
 from pacman.model.routing_info import (
     BaseKeyAndMask, DictBasedMachinePartitionNKeysMap)
 
 
 class MyTestCase(unittest.TestCase):
 
+    def setUp(self):
+        unittest_setup()
+
     def test_allocate_fixed_key_and_mask(self):
-        allocator = MallocBasedRoutingInfoAllocator()
+        allocator = _MallocBasedRoutingInfoAllocator(None)
         allocator._allocate_fixed_keys_and_masks(
             [BaseKeyAndMask(0x800, 0xFFFFF800)], None)
         error = ("Allocation has not resulted in the expected free space"
@@ -53,7 +58,7 @@ class MyTestCase(unittest.TestCase):
                   "mask =", hex(key_and_mask.mask))
 
     def test_allocate_fixed_mask(self):
-        allocator = MallocBasedRoutingInfoAllocator()
+        allocator = _MallocBasedRoutingInfoAllocator(None)
         self._print_keys_and_masks(allocator._allocate_keys_and_masks(
             0xFFFFFF00, None, 20))
         error = ("Allocation has not resulted in the expected free space"
@@ -66,7 +71,7 @@ class MyTestCase(unittest.TestCase):
                          error)
 
     def test_allocate_n_keys(self):
-        allocator = MallocBasedRoutingInfoAllocator()
+        allocator = _MallocBasedRoutingInfoAllocator(None)
         self._print_keys_and_masks(allocator._allocate_keys_and_masks(
             None, None, 20))
         error = ("Allocation has not resulted in the expected free space"
@@ -82,7 +87,7 @@ class MyTestCase(unittest.TestCase):
         fixed_masks = [None, None, 0xFFFFFF00, 0xFFFFF800]
         n_keys = [200, 20, 20, 256]
 
-        allocator = MallocBasedRoutingInfoAllocator()
+        allocator = _MallocBasedRoutingInfoAllocator(None)
 
         allocator._allocate_fixed_keys_and_masks(
             [BaseKeyAndMask(0x800, 0xFFFFF800)], None)
@@ -169,8 +174,8 @@ class MyTestCase(unittest.TestCase):
         partition2.add_constraint(ShareKeyConstraint([partition3]))
         partition3.add_constraint(ShareKeyConstraint([partition1]))
 
-        allocator = MallocBasedRoutingInfoAllocator()
-        results = allocator(machine_graph, n_keys_map)
+        results = malloc_based_routing_info_allocator(
+            machine_graph, n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -203,9 +208,8 @@ class MyTestCase(unittest.TestCase):
         partition.add_constraint(FixedKeyAndMaskConstraint(
             [BaseKeyAndMask(base_key=25, mask=0xFFFFFFF)]))
 
-        allocator = MallocBasedRoutingInfoAllocator()
         with self.assertRaises(PacmanRouteInfoAllocationException):
-            allocator(machine_graph, n_keys_map)
+            malloc_based_routing_info_allocator(machine_graph, n_keys_map)
 
     def test_share_key_with_fixed_key_on_new_partitions_other_order(self):
         machine_graph, n_keys_map, v1, v2, _v3, _v4, e1, e2, e3, e4 = \
@@ -219,8 +223,8 @@ class MyTestCase(unittest.TestCase):
         partition.add_constraint(FixedKeyAndMaskConstraint(
             [BaseKeyAndMask(base_key=25, mask=0xFFFFFFF)]))
 
-        allocator = MallocBasedRoutingInfoAllocator()
-        results = allocator(machine_graph, n_keys_map)
+        results = malloc_based_routing_info_allocator(
+            machine_graph, n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -248,8 +252,8 @@ class MyTestCase(unittest.TestCase):
         other_partition.add_constraint(FixedKeyAndMaskConstraint(
             [BaseKeyAndMask(base_key=25, mask=0xFFFFFFF)]))
 
-        allocator = MallocBasedRoutingInfoAllocator()
-        results = allocator(machine_graph, n_keys_map)
+        results = malloc_based_routing_info_allocator(
+            machine_graph, n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -275,8 +279,8 @@ class MyTestCase(unittest.TestCase):
             get_outgoing_edge_partition_starting_at_vertex(v1, "part2")
         partition.add_constraint(ShareKeyConstraint([other_partition]))
 
-        allocator = MallocBasedRoutingInfoAllocator()
-        results = allocator(machine_graph, n_keys_map)
+        results = malloc_based_routing_info_allocator(
+            machine_graph, n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -301,8 +305,8 @@ class MyTestCase(unittest.TestCase):
             get_outgoing_edge_partition_starting_at_vertex(v2, "part2")
         partition.add_constraint(ShareKeyConstraint([other_partition]))
 
-        allocator = MallocBasedRoutingInfoAllocator()
-        results = allocator(machine_graph, n_keys_map)
+        results = malloc_based_routing_info_allocator(
+            machine_graph, n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(
@@ -321,8 +325,8 @@ class MyTestCase(unittest.TestCase):
         machine_graph, n_keys_map, v1, _v2, _v3, _v4, e1, e2, e3, e4 = \
             self._integration_setup()
 
-        allocator = MallocBasedRoutingInfoAllocator()
-        results = allocator(machine_graph, n_keys_map)
+        results = malloc_based_routing_info_allocator(
+            machine_graph, n_keys_map)
 
         key = results.get_first_key_from_partition(
             machine_graph.get_outgoing_edge_partition_starting_at_vertex(

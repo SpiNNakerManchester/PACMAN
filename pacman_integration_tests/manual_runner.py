@@ -15,16 +15,19 @@
 
 import json
 import time
+from spinn_utilities.config_holder import set_config
+from spinn_machine import Machine
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
 from pacman.model.routing_tables.multicast_routing_tables import (to_json)
 from pacman.model.routing_tables import (MulticastRoutingTables)
-from pacman.operations.algorithm_reports.routing_compression_checker_report \
-    import compare_tables
-from pacman.operations.router_compressors.mundys_router_compressor.\
-    routing_table_condenser import (
-        MundyRouterCompressor)
-from pacman.operations.router_compressors import (
-    AbstractCompressor, PairCompressor, UnorderedCompressor)
+from pacman.operations.router_compressors.routing_compression_checker import (
+    compare_tables)
+from pacman.operations.router_compressors.ordered_covering_router_compressor \
+    import ordered_covering_compressor
+from pacman.operations.router_compressors import pair_compressor
+from pacman.config_setup import unittest_setup
+
+unittest_setup()
 
 # original_tables = from_json("routing_table_15_25.json")
 original_tables = from_json("malloc_hard_routing_tables.json.gz")
@@ -50,32 +53,26 @@ if SPLIT:
         json.dump(json_obj, f)
     original_tables = bad
 
-MUNDY = False
-PRE = False
+MUNDY = True
+PRE = True
 PAIR = True
-CLASH = False
 # Hack to stop it throwing a wobly for too many entries
-AbstractCompressor.MAX_SUPPORTED_LENGTH = 50000
-mundy_compressor = MundyRouterCompressor()
-pre_compressor = UnorderedCompressor()
-pair_compressor = PairCompressor()
+Machine.ROUTER_ENTRIES = 50000
+set_config("Mapping", "router_table_compress_as_far_as_possible", True)
 
 if MUNDY:
     start = time.time()
-    mundy_tables = mundy_compressor(original_tables)
+    mundy_tables = ordered_covering_compressor(original_tables)
 mundy_time = time.time()
 if PRE:
-    pre_tables = pre_compressor(original_tables)
+    pre_tables = pair_compressor(original_tables, ordered=False)
 pre_time = time.time()
 if MUNDY and PRE:
-    both_tables = mundy_compressor(pre_tables)
+    both_tables = ordered_covering_compressor(pre_tables)
 both_time = time.time()
 if PAIR:
     pair_tables = pair_compressor(original_tables)
 pair_time = time.time()
-if CLASH:
-    clash_tables = None  # clash_compressor(original_tables)
-clash_time = time.time()
 for original in original_tables:
     org_routes = set()
     for entry in original.multicast_routing_entries:
@@ -104,12 +101,6 @@ for original in original_tables:
         for entry in pair.multicast_routing_entries:
             pair_routes.add(entry.spinnaker_route)
         compare_tables(original, pair)
-    if CLASH:
-        clash = clash_tables.get_routing_table_for_chip(original.x, original.y)
-        clash_routes = set()
-        for entry in clash.multicast_routing_entries:
-            clash_routes.add(entry.spinnaker_route)
-        compare_tables(original, clash)
 
     result = "x: {} y: {} Org:{} ".format(
         original.x, original.y, original.number_of_entries)
@@ -121,8 +112,6 @@ for original in original_tables:
             result += "both:{} ".format(both.number_of_entries)
     if PAIR:
         result += "pair:{} ".format(pair.number_of_entries)
-    if CLASH:
-        result += "clash:{} ".format(clash.number_of_entries)
     print(result)
 if MUNDY:
     print("Mundy time", mundy_time-start)
@@ -132,5 +121,3 @@ if MUNDY and PRE:
     print("Both time", both_time-pre_time)
 if PAIR:
     print("Pair time", pair_time - both_time)
-if CLASH:
-    print("Clash time", clash_time - pair_time)

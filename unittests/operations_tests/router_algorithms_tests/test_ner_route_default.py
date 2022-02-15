@@ -12,14 +12,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import (
     MachineGraph, MachineEdge, SimpleMachineVertex)
 from spinn_machine import virtual_machine
 from pacman.model.placements import Placement, Placements
-from pacman.operations.router_algorithms.ner_route import NerRoute
+from pacman.operations.router_algorithms.ner_route import ner_route
 
 
 def test_ner_route_default():
+    unittest_setup()
     graph = MachineGraph("Test")
     machine = virtual_machine(8, 8)
     placements = Placements()
@@ -34,8 +36,7 @@ def test_ner_route_default():
     graph.add_edge(edge, "Test")
     partition = graph.get_outgoing_partition_for_edge(edge)
 
-    router = NerRoute()
-    routes = router.__call__(graph, machine, placements)
+    routes = ner_route(graph, machine, placements)
 
     source_route = routes.get_entries_for_router(0, 0)[partition]
     assert(not source_route.defaultable)

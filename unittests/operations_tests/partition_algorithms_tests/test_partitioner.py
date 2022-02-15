@@ -17,8 +17,10 @@
 test for partitioning
 """
 import unittest
+from spinn_utilities.config_holder import set_config
+from pacman.config_setup import unittest_setup
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
-from pacman.operations.partition_algorithms import SplitterPartitioner
+from pacman.operations.partition_algorithms import splitter_partitioner
 from spinn_machine import (
     SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
@@ -29,7 +31,7 @@ from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
     SameAtomsAsVertexConstraint)
 from pacman.model.resources import PreAllocatedResourceContainer
-from uinit_test_objects import NewPartitionerConstraint, SimpleTestVertex
+from pacman_test_objects import NewPartitionerConstraint, SimpleTestVertex
 
 
 class TestPartitioner(unittest.TestCase):
@@ -37,9 +39,10 @@ class TestPartitioner(unittest.TestCase):
     test for partition-and-place partitioning algorithm
     """
 
-    def setup(self):
+    def setUp(self):
         """setup for all basic partitioner tests
         """
+        unittest_setup()
         self.vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1")
         self.vert1.splitter = SplitterSliceLegacy()
         self.vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2")
@@ -84,13 +87,11 @@ class TestPartitioner(unittest.TestCase):
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
         self.machine = machine_from_chips(chips)
-        self.bp = SplitterPartitioner()
 
     def test_partition_with_no_additional_constraints(self):
         """test a partitioning with a graph with no extra constraints
         """
-        self.setup()
-        graph, _ = self.bp(
+        graph, _ = splitter_partitioner(
             self.graph, self.machine, plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(len(list(graph.vertices)), 3)
@@ -104,10 +105,9 @@ class TestPartitioner(unittest.TestCase):
     def test_partition_with_no_additional_constraints_extra_edge(self):
         """test that the basic form with an extra edge works
         """
-        self.setup()
         self.graph.add_edge(
             ApplicationEdge(self.vert3, self.vert1), "TEST")
-        graph, _ = self.bp(
+        graph, _ = splitter_partitioner(
             self.graph, self.machine, plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(len(list(graph.vertices)), 3)
@@ -117,12 +117,11 @@ class TestPartitioner(unittest.TestCase):
         """
         test that partitioning 1 large vertex can make it into 2 small ones
         """
-        self.setup()
         large_vertex = SimpleTestVertex(300, "Large vertex")
         large_vertex.splitter = SplitterSliceLegacy()
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        graph, _ = self.bp(
+        graph, _ = splitter_partitioner(
             self.graph, self.machine, plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
@@ -133,13 +132,12 @@ class TestPartitioner(unittest.TestCase):
         test that partitioning 1 large vertex can make it into multiple small
         ones
         """
-        self.setup()
         large_vertex = SimpleTestVertex(500, "Large vertex")
         large_vertex.splitter = SplitterSliceLegacy()
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        graph, _ = self.bp(
+        graph, _ = splitter_partitioner(
             self.graph, self.machine, plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
@@ -149,13 +147,12 @@ class TestPartitioner(unittest.TestCase):
         """
         test that fixed partitioning causes correct number of vertices
         """
-        self.setup()
         large_vertex = SimpleTestVertex(1000, "Large vertex")
         large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
         large_vertex.splitter = SplitterSliceLegacy()
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        graph, _ = self.bp(
+        graph, _ = splitter_partitioner(
             self.graph, self.machine, plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(len(list(graph.vertices)), 100)
@@ -164,8 +161,6 @@ class TestPartitioner(unittest.TestCase):
         """
         test that partitioning will work when close to filling the machine
         """
-        self.setup()
-
         n_processors = 18
         (e, ne, n, w, _, _) = range(6)
 
@@ -199,7 +194,7 @@ class TestPartitioner(unittest.TestCase):
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(singular_vertex)
-        graph, _ = self.bp(
+        graph, _ = splitter_partitioner(
             self.graph, self.machine, plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
@@ -210,7 +205,6 @@ class TestPartitioner(unittest.TestCase):
         test that if there's not enough space, the test the partitioner will
         raise an error
         """
-        self.setup()
         n_processors = 18
         (e, ne, n, w, _, _) = range(6)
 
@@ -244,15 +238,14 @@ class TestPartitioner(unittest.TestCase):
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         with self.assertRaises(PacmanValueError):
-            self.bp(self.graph, self.machine, 3000,
-                    PreAllocatedResourceContainer())
+            splitter_partitioner(self.graph, self.machine, 3000,
+                                 PreAllocatedResourceContainer())
 
     def test_partition_with_less_sdram_than_default(self):
         """
         test that the partitioner works when its machine is slightly malformed
         in that it has less SDRAM available
         """
-        self.setup()
         n_processors = 18
         (e, ne, n, w, _, _) = range(6)
 
@@ -279,15 +272,14 @@ class TestPartitioner(unittest.TestCase):
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
         self.machine = machine_from_chips(chips)
-        self.bp(self.graph, self.machine, 3000,
-                PreAllocatedResourceContainer())
+        splitter_partitioner(self.graph, self.machine, 3000,
+                             PreAllocatedResourceContainer())
 
     def test_partition_with_more_sdram_than_default(self):
         """
         test that the partitioner works when its machine is slightly malformed
         in that it has more SDRAM available
         """
-        self.setup()
         n_processors = 18
         (e, ne, n, w, _, _) = range(6)
 
@@ -314,15 +306,14 @@ class TestPartitioner(unittest.TestCase):
                     chips.append(Chip(x, y, n_processors, r, _sdram, 0, 0))
 
         self.machine = machine_from_chips(chips)
-        self.bp(self.graph, self.machine, 3000,
-                PreAllocatedResourceContainer())
+        splitter_partitioner(self.graph, self.machine, 3000,
+                             PreAllocatedResourceContainer())
 
     def test_partition_with_unsupported_constraints(self):
         """
         test that when a vertex has a constraint that is unrecognised,
         it raises an error
         """
-        self.setup()
         constrained_vertex = SimpleTestVertex(13, "Constrained")
         constrained_vertex.add_constraint(
             NewPartitionerConstraint("Mock constraint"))
@@ -332,9 +323,8 @@ class TestPartitioner(unittest.TestCase):
     def test_partition_with_empty_graph(self):
         """test that the partitioner can work with an empty graph
         """
-        self.setup()
         self.graph = ApplicationGraph("foo")
-        graph, _ = self.bp(
+        graph, _ = splitter_partitioner(
             self.graph, self.machine, plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(len(list(graph.vertices)), 0)
@@ -345,13 +335,12 @@ class TestPartitioner(unittest.TestCase):
         constraints on a vertex that is split into one core
         """
         with self.assertRaises(NotImplementedError):
-            self.setup()
             constrained_vertex = SimpleTestVertex(5, "Constrained")
             constrained_vertex.add_constraint(
                 SameAtomsAsVertexConstraint(self.vert2))
             constrained_vertex.splitter_object = SplitterSliceLegacy()
             self.graph.add_vertex(constrained_vertex)
-            graph, _ = self.bp(
+            graph, _ = splitter_partitioner(
                 self.graph, self.machine, plan_n_time_steps=100,
                 pre_allocated_resources=PreAllocatedResourceContainer())
             self.assertEqual(len(list(graph.vertices)), 4)
@@ -363,7 +352,6 @@ class TestPartitioner(unittest.TestCase):
         constraints on a vertex which has to be split over many cores
         """
         with self.assertRaises(NotImplementedError):
-            self.setup()
             constrained_vertex = SimpleTestVertex(300, "Constrained")
             new_large_vertex = SimpleTestVertex(300, "Non constrained")
             constrained_vertex.add_constraint(
@@ -371,7 +359,7 @@ class TestPartitioner(unittest.TestCase):
             new_large_vertex.splitter_object = SplitterSliceLegacy()
             constrained_vertex.splitter_object = SplitterSliceLegacy()
             self.graph.add_vertices([new_large_vertex, constrained_vertex])
-            graph, _ = self.bp(
+            graph, _ = splitter_partitioner(
                 self.graph, self.machine, plan_n_time_steps=100,
                 pre_allocated_resources=PreAllocatedResourceContainer())
             self.assertEqual(len(list(graph.vertices)), 7)
@@ -383,7 +371,6 @@ class TestPartitioner(unittest.TestCase):
         the order of the vertices being added is different.
         """
         with self.assertRaises(NotImplementedError):
-            self.setup()
             constrained_vertex = SimpleTestVertex(300, "Constrained")
             new_large_vertex = SimpleTestVertex(300, "Non constrained")
             constrained_vertex.add_constraint(
@@ -391,7 +378,7 @@ class TestPartitioner(unittest.TestCase):
             constrained_vertex.splitter_object = SplitterSliceLegacy()
             new_large_vertex.splitter_object = SplitterSliceLegacy()
             self.graph.add_vertices([constrained_vertex, new_large_vertex])
-            graph, _ = self.bp(
+            graph, _ = splitter_partitioner(
                 self.graph, self.machine, plan_n_time_steps=100,
                 pre_allocated_resources=PreAllocatedResourceContainer())
             # split in 256 each, so 4 machine vertices
@@ -403,14 +390,12 @@ class TestPartitioner(unittest.TestCase):
         causes errors
         """
         with self.assertRaises(NotImplementedError):
-            self.setup()
             constrained_vertex = SimpleTestVertex(100, "Constrained")
             constrained_vertex.add_constraint(
                 SameAtomsAsVertexConstraint(self.vert2))
             constrained_vertex.splitter_object = SplitterSliceLegacy()
             self.graph.add_vertex(constrained_vertex)
-            partitioner = SplitterPartitioner()
-            self.assertRaises(PacmanPartitionException, partitioner,
+            self.assertRaises(PacmanPartitionException, splitter_partitioner,
                               self.graph, self.machine, 1000,
                               PreAllocatedResourceContainer())
 
@@ -430,8 +415,7 @@ class TestPartitioner(unittest.TestCase):
             vertex_3.splitter_object = SplitterSliceLegacy()
             graph.add_vertices([vertex_1, vertex_2, vertex_3])
             machine = virtual_machine(width=2, height=2)
-            partitioner = SplitterPartitioner()
-            partitioner(graph, machine, plan_n_time_steps=None)
+            splitter_partitioner(graph, machine, plan_n_time_steps=None)
             subvertices_1 = list(vertex_1.machine_vertices)
             subvertices_2 = list(vertex_2.machine_vertices)
             subvertices_3 = list(vertex_3.machine_vertices)
@@ -439,15 +423,13 @@ class TestPartitioner(unittest.TestCase):
             self.assertEqual(len(subvertices_2), len(subvertices_3))
 
     def test_partitioning_with_2_massive_pops(self):
-        self.setup()
         constrained_vertex = SimpleTestVertex(16000, "Constrained")
         constrained_vertex.splitter = SplitterSliceLegacy()
         self.graph.add_vertex(constrained_vertex)
         constrained_vertex = SimpleTestVertex(16000, "Constrained")
         constrained_vertex.splitter = SplitterSliceLegacy()
         self.graph.add_vertex(constrained_vertex)
-        partitioner = SplitterPartitioner()
-        partitioner(
+        splitter_partitioner(
             self.graph, self.machine, 3000, PreAllocatedResourceContainer())
 
     def test_partition_with_fixed_atom_constraints(self):
@@ -456,12 +438,12 @@ class TestPartitioner(unittest.TestCase):
         """
 
         # Create a 2x2 machine with 10 cores per chip (so 40 cores),
-        # but 1MB off 2MB per chip (so 19MB per chip)
+        # but 1 off 2 per chip (so 19 per chip)
         n_cores_per_chip = 10
         sdram_per_chip = (n_cores_per_chip * 2) - 1
+        set_config("Machine", "max_sdram_allowed_per_chip", sdram_per_chip)
         machine = virtual_machine(
-            width=2, height=2, n_cpus_per_chip=n_cores_per_chip,
-            sdram_per_chip=sdram_per_chip)
+            width=2, height=2, n_cpus_per_chip=n_cores_per_chip)
 
         # Create a vertex where each atom requires 1MB (default) of SDRAM
         # but which can't be subdivided lower than 2 atoms per core.
@@ -476,8 +458,7 @@ class TestPartitioner(unittest.TestCase):
 
         # Do the partitioning - this should result in an error
         with self.assertRaises(PacmanException):
-            partitioner = SplitterPartitioner()
-            partitioner(app_graph, machine, 3000)
+            splitter_partitioner(app_graph, machine, 3000)
 
     def test_partition_with_fixed_atom_constraints_at_limit(self):
         """
@@ -486,25 +467,21 @@ class TestPartitioner(unittest.TestCase):
         """
 
         # Create a 2x2 machine with 1 core per chip (so 4 cores),
-        # and 8MB SDRAM per chip
         n_cores_per_chip = 2  # remember 1 is the monitor
-        sdram_per_chip = 8
         machine = virtual_machine(
-            width=2, height=2, n_cpus_per_chip=n_cores_per_chip,
-            sdram_per_chip=sdram_per_chip)
+            width=2, height=2, n_cpus_per_chip=n_cores_per_chip)
 
         # Create a vertex which will need to be split perfectly into 4 cores
         # to work and which max atoms per core must be ignored
         vertex = SimpleTestVertex(
-            sdram_per_chip * 2, max_atoms_per_core=sdram_per_chip,
-            constraints=[FixedVertexAtomsConstraint(sdram_per_chip // 2)])
+            16, max_atoms_per_core=8,
+            constraints=[FixedVertexAtomsConstraint(4)])
         vertex.splitter = SplitterSliceLegacy()
         app_graph = ApplicationGraph("Test")
         app_graph.add_vertex(vertex)
 
         # Do the partitioning - this should just work
-        partitioner = SplitterPartitioner()
-        machine_graph, _ = partitioner(app_graph, machine, 3000)
+        machine_graph, _ = splitter_partitioner(app_graph, machine, 3000)
         self.assertEqual(4, len(machine_graph.vertices))
 
 
