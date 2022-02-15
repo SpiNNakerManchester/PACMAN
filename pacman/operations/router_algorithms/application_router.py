@@ -264,7 +264,8 @@ def _route_to_target_chips(first_chip, chips, machine, routes, targets, label):
     # Sanity check
     if targets_to_visit:
         raise Exception(
-            f"Failed to visit all targets {targets} from {first_chip}")
+            f"Failed to visit all targets {targets} from {first_chip}: "
+            f" Not visited {targets_to_visit}")
 
 
 def _is_open_chip(chip, chips, visited, machine):
