@@ -21,6 +21,7 @@ from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 from tempfile import mkstemp
+from os import fdopen
 
 
 def place_application_graph(
@@ -119,8 +120,8 @@ def _place_error(app_graph, placements, machine, n_cores, sdram):
         if not app_vertex_placed and not found_placed_cores:
             app_vertex_count += 1
 
-    f, report_file = mkstemp(suffix=".rpt")
-    with f:
+    fd, report_file = mkstemp(suffix=".rpt")
+    with fdopen(fd, 'w') as f:
         f.write(f"{app_vertex_count} of {app_graph.n_vertices}"
                 " application vertices placed.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
