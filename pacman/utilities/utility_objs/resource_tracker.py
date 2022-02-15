@@ -373,10 +373,10 @@ class ResourceTracker(object):
         if board_address not in self._tracked_ethernet_chips:
             try:
                 eth_chip = self._untracked_ethernet_chips.pop(board_address)
-            except KeyError:
+            except KeyError as original:
                 raise PacmanInvalidParameterException(
                     "board_address", str(board_address),
-                    "Unrecognised board address")
+                    "Unrecognised board address") from original
             for (x, y) in self._machine.get_existing_xys_on_board(eth_chip):
                 self._track_chip(x, y)
                 # track_chip updates tracked_ethernet_chips
@@ -599,7 +599,7 @@ class ResourceTracker(object):
             if tag is None:
                 return board_address in self._boards_with_ip_tags
             else:
-                tag in self._tags_by_board[board_address]
+                return tag in self._tags_by_board[board_address]
 
     def _is_ip_tag_available(self, board_address, ip_tag):
         """ Check if an IP tag is available given the constraints
@@ -876,7 +876,7 @@ class ResourceTracker(object):
             self._listen_port_reverse_ip_tag[board_address, tag] = port
 
     def allocate_constrained_resources(
-            self, resources, constraints, chips=None, vertices=None):
+            self, resources, constraints, chips=None):
         """ Attempts to use the given resources of the machine, constrained\
             by the given placement constraints.
 
@@ -887,7 +887,6 @@ class ResourceTracker(object):
             The optional list of (x, y) tuples of chip coordinates of chips
             that can be used. Note that any chips passed in previously will
             be ignored
-        :param vertices: the vertices related to these resources.
         :return:
             The x and y coordinates of the used chip, the processor_id,
             and the IP tag and reverse IP tag allocation tuples
