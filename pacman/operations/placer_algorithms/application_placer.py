@@ -20,6 +20,7 @@ from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
+from tempfile import mkstemp
 
 
 def place_application_graph(
@@ -76,9 +77,8 @@ def place_application_graph(
 
                     # If we can't place now, it is an error
                     if not next_chip.is_space(n_cores, sdram):
-                        raise PacmanPlaceException(
-                            f"{n_cores} cores is too many, or SDRAM of {sdram}"
-                            " is too much for a single chip")
+                        _place_error(
+                            app_graph, placements, machine, n_cores, sdram)
 
                     # Otherwise store placements to be made
                     _store_on_chip(
@@ -95,6 +95,50 @@ def place_application_graph(
         print(f"Warning: Retried {retries} times")
 
     return placements
+
+
+def _place_error(app_graph, placements, machine, n_cores, sdram):
+    app_vertex_count = 0
+    vertex_count = 0
+    n_vertices = 0
+    for app_vertex in app_graph.vertices:
+        same_chip_groups = app_vertex.splitter.get_same_chip_groups()
+        app_vertex_placed = True
+        found_placed_cores = False
+        for vertices, _sdram in same_chip_groups:
+            if placements.is_vertex_placed(vertices[0]):
+                found_placed_cores = True
+            elif found_placed_cores:
+                vertex_count += len(vertices)
+                n_vertices = len(same_chip_groups)
+                app_vertex_placed = False
+                break
+            else:
+                app_vertex_placed = False
+                break
+        if not app_vertex_placed and not found_placed_cores:
+            app_vertex_count += 1
+
+    f, report_file = mkstemp(suffix=".rpt")
+    with f:
+        f.write(f"{app_vertex_count} of {app_graph.n_vertices}"
+                " application vertices placed.\n")
+        f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
+                " last app vertex\n\n")
+        for x, y in machine.chip_coordinates:
+            first = True
+            for placement in placements.get_placement_on_processor(x, y):
+                if first:
+                    f.write(f"Chip ({x}, {y}):\n")
+                    first = False
+                f.write(f"    Processor {placement.p}:"
+                        f" Vertex {placement.vertex}\n")
+            if not first:
+                f.write("\n")
+
+    raise PacmanPlaceException(
+        f"Could not place next {n_cores} with SDRAM {sdram}."
+        f" Report written to {report_file}.")
 
 
 class _SpaceExceededException(Exception):
