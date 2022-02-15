@@ -174,6 +174,14 @@ class Placements(object):
         """
         return self._placements[x, y].values()
 
+    @property
+    def chips_with_placements(self):
+        """ Get the chips with placements on them
+
+        :rtype: iterable(tuple(int,int))
+        """
+        return self._placements.keys()
+
     def __repr__(self):
         output = ""
         for placement in self._placements:

@@ -79,7 +79,8 @@ def place_application_graph(
                     # If we can't place now, it is an error
                     if not next_chip.is_space(n_cores, sdram):
                         _place_error(
-                            app_graph, placements, machine, n_cores, sdram)
+                            app_graph, placements, system_placements, n_cores,
+                            sdram, retries)
 
                     # Otherwise store placements to be made
                     _store_on_chip(
@@ -98,7 +99,8 @@ def place_application_graph(
     return placements
 
 
-def _place_error(app_graph, placements, machine, n_cores, sdram):
+def _place_error(
+        app_graph, placements, system_placements, n_cores, sdram, retries):
     app_vertex_count = 0
     vertex_count = 0
     n_vertices = 0
@@ -126,9 +128,11 @@ def _place_error(app_graph, placements, machine, n_cores, sdram):
                 " application vertices placed.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
                 " last app vertex\n\n")
-        for x, y in machine.chip_coordinates:
+        for x, y in placements.chips_with_placements:
             first = True
             for placement in placements.placements_on_chip(x, y):
+                if system_placements.is_vertex_placed(placement.vertex):
+                    continue
                 if first:
                     f.write(f"Chip ({x}, {y}):\n")
                     first = False
@@ -139,6 +143,7 @@ def _place_error(app_graph, placements, machine, n_cores, sdram):
 
     raise PacmanPlaceException(
         f"Could not place next {n_cores} with SDRAM {sdram}."
+        f" Retried {retries} times."
         f" Report written to {report_file}.")
 
 
