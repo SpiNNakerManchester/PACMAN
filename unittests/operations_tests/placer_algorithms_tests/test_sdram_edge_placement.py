@@ -67,15 +67,16 @@ class TestSameChipConstraint(unittest.TestCase):
         writer.set_runtime_machine_graph(graph)
         writer.set_machine_partition_n_keys_map(
             DictBasedMachinePartitionNKeysMap())
+        writer.set_plan_n_timesteps(None)
 
         if placer == "ConnectiveBasedPlacer":
-            placements = connective_based_placer(None)
+            placements = connective_based_placer()
         elif placer == "OneToOnePlacer":
-            placements = one_to_one_placer(None)
+            placements = one_to_one_placer()
         elif placer == "RadialPlacer":
-            placements = radial_placer(None)
+            placements = radial_placer()
         elif placer == "SpreaderPlacer":
-            placements = spreader_placer(None)
+            placements = spreader_placer()
         else:
             raise NotImplementedError(placer)
         for edge in sdram_edges:

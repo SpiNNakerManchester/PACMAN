@@ -18,6 +18,7 @@ from spinn_utilities.exceptions import (DataLocked, DataNotYetAvialable)
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
+from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.machine import (
     MachineGraph, MulticastEdgePartition, SimpleMachineVertex)
 from pacman.model.placements import Placements
@@ -228,3 +229,12 @@ class TestSimulatorData(unittest.TestCase):
             PacmanDataView.get_uncompressed()
         with self.assertRaises(TypeError):
             writer.set_precompressed()
+
+    def test_plan_n_timesteps(self):
+        writer = PacmanDataWriter.setup()
+        writer.set_plan_n_timesteps(1234)
+        self.assertEqual(1234, PacmanDataView.get_plan_n_timestep())
+        with self.assertRaises(TypeError):
+            writer.set_plan_n_timesteps("Bacon")
+        with self.assertRaises(PacmanConfigurationException):
+            writer.set_plan_n_timesteps(-1)

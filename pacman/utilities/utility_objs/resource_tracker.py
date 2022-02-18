@@ -50,8 +50,10 @@ class ResourceTracker(object):
         # Values received by the init
         # The machine object
         "_machine",
+
         # the number of timesteps that should be planned for
         "_plan_n_timesteps",
+
         # Resources to be removed from each chip
         "_preallocated_resources",
 
@@ -119,11 +121,9 @@ class ResourceTracker(object):
         "are only {} bytes of SDRAM available on the chip at this time. "
         "Please fix and try again")
 
-    def __init__(self, plan_n_timesteps, chips=None,
-                 preallocated_resources=None):
+    def __init__(self, chips=None, preallocated_resources=None):
         """
-        :param int plan_n_timesteps: number of timesteps to plan for
-        :param chips: If specified, this list of chips will be used instead
+         :param chips: If specified, this list of chips will be used instead
             of the list from the machine. Note that the order will be
             maintained, so this can be used either to reduce the set of chips
             used, or to re-order the chips. Note also that on deallocation,
@@ -147,7 +147,7 @@ class ResourceTracker(object):
         self._machine = PacmanDataView.get_machine()
 
         # The number of timesteps that should be planned for.
-        self._plan_n_timesteps = plan_n_timesteps
+        self._plan_n_timesteps = PacmanDataView.get_plan_n_timestep()
 
         # tracker for chips used
         self._chips_used = set()

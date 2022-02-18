@@ -43,18 +43,17 @@ def _conflict(x, y, post_x, post_y):
     return False
 
 
-def one_to_one_placer(plan_n_timesteps):
+def one_to_one_placer():
     """ Placer that puts vertices which are directly connected to only its\
         destination on the same chip
 
-    :param int plan_n_timesteps: number of timesteps to plan for
     :return: A set of placements
     :rtype: Placements
     :raise PacmanPlaceException:
         If something goes wrong with the placement
     """
     placer = _OneToOnePlacer()
-    return placer._run(plan_n_timesteps)
+    return placer._run()
 
 
 class _OneToOnePlacer(_RadialPlacer):
@@ -64,9 +63,8 @@ class _OneToOnePlacer(_RadialPlacer):
 
     __slots__ = []
 
-    def _run(self, plan_n_timesteps):
+    def _run(self):
         """
-        :param int plan_n_timesteps: number of timesteps to plan for
         :return: A set of placements
         :rtype: Placements
         :raise PacmanPlaceException:
@@ -98,7 +96,7 @@ class _OneToOnePlacer(_RadialPlacer):
 
         return self._do_allocation(
             one_to_one_groups, same_chip_vertex_groups,
-            plan_n_timesteps, machine_graph, progress)
+            machine_graph, progress)
 
     @staticmethod
     def _find_one_to_one_vertices(vertex, graph):
@@ -157,7 +155,7 @@ class _OneToOnePlacer(_RadialPlacer):
 
     def _do_allocation(
             self, one_to_one_groups, same_chip_vertex_groups,
-            plan_n_timesteps, machine_graph, progress):
+            machine_graph, progress):
         """
         :param list(set(MachineVertex)) one_to_one_groups:
             Groups of vertexes that would be nice on same chip
@@ -165,7 +163,6 @@ class _OneToOnePlacer(_RadialPlacer):
             Mapping of Vertex to the Vertex that must be on the same Chip
         :type same_chip_vertex_groups:
             dict(MachineVertex, collection(MachineVertex))
-        :param int plan_n_timesteps: number of timesteps to plan for
         :param MachineGraph machine_graph: The machine_graph to place
         :param ~spinn_utilities.progress_bar.ProgressBar progress:
         :rtype: Placements
@@ -173,8 +170,7 @@ class _OneToOnePlacer(_RadialPlacer):
 
         placements = Placements()
 
-        resource_tracker = ResourceTracker(
-            plan_n_timesteps, self._generate_radial_chips())
+        resource_tracker = ResourceTracker(self._generate_radial_chips())
         all_vertices_placed = set()
 
         # RadialPlacementFromChipConstraint won't work here

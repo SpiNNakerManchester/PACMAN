@@ -28,19 +28,18 @@ _BOARD_PORTS = range(17896, 18000)
 _Task = namedtuple("_Task", "constraint, board, tag, vertex, placement")
 
 
-def basic_tag_allocator(plan_n_timesteps):
+def basic_tag_allocator():
     """
     Basic tag allocator that goes though the boards available and applies\
         the IP tags and reverse IP tags as needed.
 
-    :param int plan_n_timesteps: number of timesteps to plan for
     :return: list of IP Tags, list of Reverse IP Tags,
         tag allocation holder
     :rtype: tuple(list(~spinn_machine.tags.IPTag),
         list(~spinn_machine.tags.ReverseIPTag), Tags)
     """
     placements = PacmanDataView.get_placements()
-    resource_tracker = ResourceTracker(plan_n_timesteps)
+    resource_tracker = ResourceTracker()
 
     # Keep track of ports allocated to reverse IP tags and tags that still
     # need a port to be allocated

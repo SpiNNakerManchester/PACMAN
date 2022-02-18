@@ -73,8 +73,9 @@ def test_virtual_vertices_spreader():
 
     writer.set_runtime_machine_graph(machine_graph)
     writer.set_machine_partition_n_keys_map(n_keys_map)
+    writer.set_plan_n_timesteps(1000)
     # Do placements
-    placements = spreader_placer(plan_n_timesteps=1000)
+    placements = spreader_placer()
 
     # The virtual vertex should be on a virtual chip
     placement = placements.get_placement_of_vertex(virtual_vertex)
@@ -142,9 +143,10 @@ def test_one_to_one():
 
     writer.set_runtime_machine_graph(machine_graph)
     writer.set_machine_partition_n_keys_map(n_keys_map)
+    writer.set_plan_n_timesteps(1000)
 
     # Do placements
-    placements = spreader_placer(plan_n_timesteps=1000)
+    placements = spreader_placer()
 
     # The 1-1 connected vertices should be on the same chip
     for chain in one_to_one_chains:
@@ -190,6 +192,7 @@ def test_sdram_links():
     writer.set_runtime_machine_graph(machine_graph)
     writer.set_machine_partition_n_keys_map(
         DictBasedMachinePartitionNKeysMap())
+    writer.set_plan_n_timesteps(1000)
     # Do placements
     with pytest.raises(PacmanException):
-        spreader_placer(plan_n_timesteps=1000)
+        spreader_placer()

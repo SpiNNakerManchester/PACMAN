@@ -31,13 +31,14 @@ class TestResourceTracker(unittest.TestCase):
         unittest_setup()
 
     def test_n_cores_available(self):
-        PacmanDataWriter.mock().set_machine(virtual_machine(
+        writer = PacmanDataWriter.mock()
+        writer.set_machine(virtual_machine(
             width=2, height=2, n_cpus_per_chip=18))
+        writer.set_plan_n_timesteps(None)
         preallocated_resources = PreAllocatedResourceContainer()
         preallocated_resources.add_cores_all(2)
         preallocated_resources.add_cores_ethernet(3)
         tracker = ResourceTracker(
-            plan_n_timesteps=None,
             preallocated_resources=preallocated_resources)
 
         # Should be 15 cores = 18 - 1 Monitor -3 ethernet -2 all cores
@@ -64,12 +65,13 @@ class TestResourceTracker(unittest.TestCase):
     def test_deallocation_of_resources(self):
         machine = virtual_machine(
             width=2, height=2, n_cpus_per_chip=18)
-        PacmanDataWriter.mock().set_machine(machine)
+        writer = PacmanDataWriter.mock()
+        writer.set_machine(machine)
+        writer.set_plan_n_timesteps(None)
         chip_sdram = machine.get_chip_at(1, 1).sdram.size
         res_sdram = 12345
 
-        tracker = ResourceTracker(
-            plan_n_timesteps=None, preallocated_resources=None)
+        tracker = ResourceTracker(preallocated_resources=None)
 
         sdram_res = ConstantSDRAM(res_sdram)
         resources = ResourceContainer(sdram=sdram_res)
@@ -130,8 +132,10 @@ class TestResourceTracker(unittest.TestCase):
             0, 0, 1, router, sdram, 0, 0, "127.0.0.1",
             virtual=False, tag_ids=[1])
         machine = machine_from_chips([empty_chip])
-        PacmanDataWriter.mock().set_machine(machine)
-        resource_tracker = ResourceTracker(plan_n_timesteps=None)
+        writer = PacmanDataWriter.mock()
+        writer.set_machine(machine)
+        writer.set_plan_n_timesteps(None)
+        resource_tracker = ResourceTracker()
         with self.assertRaises(PacmanValueError):
             resource_tracker.allocate_resources(
                 ResourceContainer(sdram=ConstantSDRAM(1024)))

@@ -30,23 +30,21 @@ from pacman.model.constraints.placer_constraints import (
     SameChipAsConstraint, ChipAndCoreConstraint)
 
 
-def spreader_placer(plan_n_timesteps):
+def spreader_placer():
     """ Places vertices on as many chips as available with a effort to\
         reduce the number of packets being received by the router in total.
 
-    :param int plan_n_timesteps: number of timesteps to plan for
     :return: placements.
     :rtype: Placements
     """
     placer = _SpreaderPlacer()
-    return placer._run(plan_n_timesteps)
+    return placer._run()
 
 
 class _SpreaderPlacer(_OneToOnePlacer):
     """ Places vertices on as many chips as available with a effort to\
         reduce the number of packets being received by the router in total.
 
-    :param int plan_n_timesteps: number of timesteps to plan for
     :return: placements.
     :rtype: Placements
     """
@@ -65,9 +63,8 @@ class _SpreaderPlacer(_OneToOnePlacer):
     # 4. chip and core)
     STEPS = 4
 
-    def _run(self, plan_n_timesteps):
+    def _run(self):
         """
-        :param int plan_n_timesteps: number of timesteps to plan for
         :return: placements.
         :rtype: Placements
         """
@@ -101,8 +98,7 @@ class _SpreaderPlacer(_OneToOnePlacer):
         # sort chips so that they are radial from a given point and other
         # init data structs
         chips_in_order = self._determine_chip_list()
-        resource_tracker = ResourceTracker(
-            plan_n_timesteps, chips=chips_in_order)
+        resource_tracker = ResourceTracker(chips=chips_in_order)
         placements = Placements()
         placed_vertices = set()
         cost_per_chip = defaultdict(int)

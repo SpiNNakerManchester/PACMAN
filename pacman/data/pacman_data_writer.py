@@ -201,3 +201,18 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             raise TypeError(
                 "router_tables should be a MulticastRoutingTables")
         self.__pacman_data._precompressed = router_tables
+
+    def set_plan_n_timesteps(self, plan_n_timesteps):
+        """
+        Sets the plan_n_timestep. Use None for run
+
+        :param plan_n_timesteps:
+        :type plan_n_timesteps: int or None
+        """
+        if not plan_n_timesteps is None:
+            if not isinstance(plan_n_timesteps, int):
+                raise TypeError("plan_n_timesteps should be an int")
+            if plan_n_timesteps < 0:
+                raise PacmanConfigurationException(
+                    f"plan_n_timesteps {plan_n_timesteps} must not be negative")
+        self.__pacman_data._plan_n_timesteps = plan_n_timesteps

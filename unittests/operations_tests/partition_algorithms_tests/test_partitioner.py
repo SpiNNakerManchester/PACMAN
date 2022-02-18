@@ -64,9 +64,10 @@ class TestPartitioner(unittest.TestCase):
     def test_partition_with_no_additional_constraints(self):
         """test a partitioning with a graph with no extra constraints
         """
-        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
+        writer = PacmanDataWriter.mock()
+        writer._set_runtime_graph(self.graph)
+        writer.set_plan_n_timesteps(100)
         graph, _ = splitter_partitioner(
-            plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(len(list(graph.vertices)), 3)
         vert_sizes = []
@@ -81,9 +82,10 @@ class TestPartitioner(unittest.TestCase):
         """
         self.graph.add_edge(
             ApplicationEdge(self.vert3, self.vert1), "TEST")
-        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
+        writer = PacmanDataWriter.mock()
+        writer._set_runtime_graph(self.graph)
+        writer.set_plan_n_timesteps(100)
         graph, _ = splitter_partitioner(
-            plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(len(list(graph.vertices)), 3)
         self.assertEqual(len(list(graph.edges)), 4)
@@ -96,9 +98,10 @@ class TestPartitioner(unittest.TestCase):
         large_vertex.splitter = SplitterSliceLegacy()
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
+        writer = PacmanDataWriter.mock()
+        writer._set_runtime_graph(self.graph)
+        writer.set_plan_n_timesteps(100)
         graph, _ = splitter_partitioner(
-            plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.assertGreater(len(list(graph.vertices)), 1)
@@ -113,9 +116,10 @@ class TestPartitioner(unittest.TestCase):
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
+        writer = PacmanDataWriter.mock()
+        writer._set_runtime_graph(self.graph)
+        writer.set_plan_n_timesteps(100)
         graph, _ = splitter_partitioner(
-            plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         self.assertGreater(len(list(graph.vertices)), 1)
@@ -129,9 +133,10 @@ class TestPartitioner(unittest.TestCase):
         large_vertex.splitter = SplitterSliceLegacy()
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
-        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
+        writer = PacmanDataWriter.mock()
+        writer._set_runtime_graph(self.graph)
+        writer.set_plan_n_timesteps(100)
         graph, _ = splitter_partitioner(
-            plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(len(list(graph.vertices)), 100)
 
@@ -172,9 +177,10 @@ class TestPartitioner(unittest.TestCase):
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(singular_vertex)
-        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
+        writer = PacmanDataWriter.mock()
+        writer._set_runtime_graph(self.graph)
+        writer.set_plan_n_timesteps(100)
         graph, _ = splitter_partitioner(
-            plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(singular_vertex._model_based_max_atoms_per_core, 1)
         self.assertEqual(len(list(graph.vertices)), n_neurons)
@@ -218,8 +224,9 @@ class TestPartitioner(unittest.TestCase):
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
         writer._set_runtime_graph(self.graph)
+        writer.set_plan_n_timesteps(3000)
         with self.assertRaises(PacmanValueError):
-            splitter_partitioner(3000, PreAllocatedResourceContainer())
+            splitter_partitioner(PreAllocatedResourceContainer())
 
     def test_partition_with_less_sdram_than_default(self):
         """
@@ -254,7 +261,8 @@ class TestPartitioner(unittest.TestCase):
 
         writer.set_machine(machine_from_chips(chips))
         writer._set_runtime_graph(self.graph)
-        splitter_partitioner(3000, PreAllocatedResourceContainer())
+        writer.set_plan_n_timesteps(3000)
+        splitter_partitioner(PreAllocatedResourceContainer())
 
     def test_partition_with_more_sdram_than_default(self):
         """
@@ -289,7 +297,8 @@ class TestPartitioner(unittest.TestCase):
 
         writer.set_machine(machine_from_chips(chips))
         writer._set_runtime_graph(self.graph)
-        splitter_partitioner(3000, PreAllocatedResourceContainer())
+        writer.set_plan_n_timesteps(3000)
+        splitter_partitioner(PreAllocatedResourceContainer())
 
     def test_partition_with_unsupported_constraints(self):
         """
@@ -306,9 +315,10 @@ class TestPartitioner(unittest.TestCase):
         """test that the partitioner can work with an empty graph
         """
         self.graph = ApplicationGraph("foo")
-        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
+        writer = PacmanDataWriter.mock()
+        writer._set_runtime_graph(self.graph)
+        writer.set_plan_n_timesteps(100)
         graph, _ = splitter_partitioner(
-            plan_n_time_steps=100,
             pre_allocated_resources=PreAllocatedResourceContainer())
         self.assertEqual(len(list(graph.vertices)), 0)
 
@@ -323,8 +333,10 @@ class TestPartitioner(unittest.TestCase):
                 SameAtomsAsVertexConstraint(self.vert2))
             constrained_vertex.splitter_object = SplitterSliceLegacy()
             self.graph.add_vertex(constrained_vertex)
+            writer = PacmanDataWriter.mock()
+            writer._set_runtime_graph(self.graph)
+            writer.set_plan_n_timesteps(100)
             graph, _ = splitter_partitioner(
-                plan_n_time_steps=100,
                 pre_allocated_resources=PreAllocatedResourceContainer())
             self.assertEqual(len(list(graph.vertices)), 4)
 
@@ -342,9 +354,10 @@ class TestPartitioner(unittest.TestCase):
             new_large_vertex.splitter_object = SplitterSliceLegacy()
             constrained_vertex.splitter_object = SplitterSliceLegacy()
             self.graph.add_vertices([new_large_vertex, constrained_vertex])
-            PacmanDataWriter.mock()._set_runtime_graph(self.graph)
+            writer = PacmanDataWriter.mock()
+            writer._set_runtime_graph(self.graph)
+            writer.set_plan_n_timesteps(100)
             graph, _ = splitter_partitioner(
-                plan_n_time_steps=100,
                 pre_allocated_resources=PreAllocatedResourceContainer())
             self.assertEqual(len(list(graph.vertices)), 7)
 
@@ -362,9 +375,10 @@ class TestPartitioner(unittest.TestCase):
             constrained_vertex.splitter_object = SplitterSliceLegacy()
             new_large_vertex.splitter_object = SplitterSliceLegacy()
             self.graph.add_vertices([constrained_vertex, new_large_vertex])
-            PacmanDataWriter.mock()._set_runtime_graph(self.graph)
+            writer = PacmanDataWriter.mock()
+            writer._set_runtime_graph(self.graph)
+            writer.set_plan_n_timesteps(100)
             graph, _ = splitter_partitioner(
-                plan_n_time_steps=100,
                 pre_allocated_resources=PreAllocatedResourceContainer())
             # split in 256 each, so 4 machine vertices
             self.assertEqual(len(list(graph.vertices)), 7)
@@ -384,8 +398,10 @@ class TestPartitioner(unittest.TestCase):
             vertex_2.splitter_object = SplitterSliceLegacy()
             vertex_3.splitter_object = SplitterSliceLegacy()
             graph.add_vertices([vertex_1, vertex_2, vertex_3])
-            PacmanDataWriter.mock()._set_runtime_graph(graph)
-            splitter_partitioner(plan_n_time_steps=None)
+            writer = PacmanDataWriter.mock()
+            writer._set_runtime_graph(graph)
+            writer.set_plan_n_timesteps(None)
+            splitter_partitioner()
             subvertices_1 = list(vertex_1.machine_vertices)
             subvertices_2 = list(vertex_2.machine_vertices)
             subvertices_3 = list(vertex_3.machine_vertices)
@@ -399,8 +415,10 @@ class TestPartitioner(unittest.TestCase):
         constrained_vertex = SimpleTestVertex(16000, "Constrained")
         constrained_vertex.splitter = SplitterSliceLegacy()
         self.graph.add_vertex(constrained_vertex)
-        PacmanDataWriter.mock()._set_runtime_graph(self.graph)
-        splitter_partitioner(3000, PreAllocatedResourceContainer())
+        writer = PacmanDataWriter.mock()
+        writer._set_runtime_graph(self.graph)
+        writer.set_plan_n_timesteps(3000)
+        splitter_partitioner(PreAllocatedResourceContainer())
 
     def test_partition_with_fixed_atom_constraints(self):
         """
@@ -428,8 +446,9 @@ class TestPartitioner(unittest.TestCase):
 
         # Do the partitioning - this should result in an error
         writer._set_runtime_graph(app_graph)
+        writer.set_plan_n_timesteps(3000)
         with self.assertRaises(PacmanException):
-            splitter_partitioner(3000)
+            splitter_partitioner()
 
     def test_partition_with_fixed_atom_constraints_at_limit(self):
         """
@@ -454,7 +473,8 @@ class TestPartitioner(unittest.TestCase):
 
         # Do the partitioning - this should just work
         writer._set_runtime_graph(app_graph)
-        machine_graph, _ = splitter_partitioner(3000)
+        writer.set_plan_n_timesteps(3000)
+        machine_graph, _ = splitter_partitioner()
         self.assertEqual(4, len(machine_graph.vertices))
 
 

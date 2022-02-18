@@ -40,6 +40,7 @@ def test_virtual_placement(placer):
     malloc_based_chip_id_allocator()
     writer.set_machine_partition_n_keys_map(
         DictBasedMachinePartitionNKeysMap())
+    writer.set_plan_n_timesteps(None)
 
     if placer == "ConnectiveBasedPlacer":
         placements = connective_based_placer(None)

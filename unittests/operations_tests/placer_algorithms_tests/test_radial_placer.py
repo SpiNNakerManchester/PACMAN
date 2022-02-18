@@ -50,8 +50,10 @@ class TestRadialPlacer(unittest.TestCase):
         self.plan_n_timesteps = 100
 
     def test_simple(self):
-        PacmanDataWriter.mock().set_runtime_machine_graph(self.mach_graph)
-        placements = radial_placer(100)
+        writer = PacmanDataWriter.mock()
+        writer.set_runtime_machine_graph(self.mach_graph)
+        writer.set_plan_n_timesteps(100)
+        placements = radial_placer()
         self.assertEqual(len(self.vertices), len(placements))
 
     def test_place_vertex_too_big_with_vertex(self):
@@ -69,14 +71,18 @@ class TestRadialPlacer(unittest.TestCase):
             rc, vertex_slice=Slice(0, 499), label="Second vertex")
         self.mach_graph.add_vertex(large_machine_vertex)
         writer.set_runtime_machine_graph(self.mach_graph)
+        writer.set_plan_n_timesteps(100)
         with self.assertRaises(PacmanValueError):
-            radial_placer(100)
+            radial_placer()
 
     def test_deal_with_constraint_placement_vertices_dont_have_vertex(self):
         self.vertex2.add_constraint(ChipAndCoreConstraint(3, 5, 7))
         self.vertex3.add_constraint(RadialPlacementFromChipConstraint(2, 4))
-        PacmanDataWriter.mock().set_runtime_machine_graph(self.mach_graph)
-        placements = radial_placer(100)
+        writer = PacmanDataWriter.mock()
+        writer.set_runtime_machine_graph(self.mach_graph)
+        writer.set_plan_n_timesteps(100)
+
+        placements = radial_placer()
         for placement in placements:
             if placement.vertex == self.vertex2:
                 self.assertEqual(placement.x, 3)
@@ -96,12 +102,13 @@ class TestRadialPlacer(unittest.TestCase):
             graph.add_vertex(get_resourced_machine_vertex(
                 0, 50, "vertex " + str(i)))
         writer.set_runtime_machine_graph(graph)
-        placements = radial_placer(100)
+        writer.set_plan_n_timesteps(100)
+        placements = radial_placer()
         self.assertEqual(len(placements), cores)
         # One more vertex should be too many
         graph.add_vertex(get_resourced_machine_vertex(0, 50, "toomany"))
         with self.assertRaises(PacmanValueError):
-            radial_placer(100)
+            radial_placer()
 
 
 if __name__ == '__main__':

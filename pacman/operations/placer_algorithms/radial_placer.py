@@ -30,18 +30,17 @@ from pacman.exceptions import PacmanPlaceException
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def radial_placer(plan_n_timesteps):
+def radial_placer():
     """ A placement algorithm that can place a machine graph onto a\
         machine choosing chips radiating in a circle from the boot chip
 
-        :param int plan_n_timesteps: number of timesteps to plan for
         :return: A set of placements
         :rtype: Placements
         :raise PacmanPlaceException:
             If something goes wrong with the placement
     """
     placer = _RadialPlacer()
-    return placer._run(plan_n_timesteps)
+    return placer._run()
 
 
 class _RadialPlacer(object):
@@ -49,9 +48,8 @@ class _RadialPlacer(object):
         machine choosing chips radiating in a circle from the boot chip
     """
 
-    def _run(self, plan_n_timesteps):
+    def _run(self):
         """
-        :param int plan_n_timesteps: number of timesteps to plan for
         :return: A set of placements
         :rtype: Placements
         :raise PacmanPlaceException:
@@ -67,8 +65,7 @@ class _RadialPlacer(object):
         # Iterate over vertices and generate placements
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
-        resource_tracker = ResourceTracker(
-            plan_n_timesteps, self._generate_radial_chips())
+        resource_tracker = ResourceTracker(self._generate_radial_chips())
         vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         all_vertices_placed = set()
         for vertex in progress.over(vertices):

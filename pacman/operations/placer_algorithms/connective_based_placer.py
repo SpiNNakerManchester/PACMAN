@@ -29,7 +29,7 @@ from pacman.utilities.utility_objs import ResourceTracker
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def connective_based_placer(plan_n_timesteps):
+def connective_based_placer():
     """
     Runs a placer that considers connectivity
 
@@ -38,14 +38,13 @@ def connective_based_placer(plan_n_timesteps):
         and which will place things that are most connected closest to each\
         other
 
-    :param int plan_n_timesteps: number of timesteps to plan for
     :return: A set of placements
     :rtype: ~pacman.model.placements.Placements
     :raise PacmanPlaceException:
         If something goes wrong with the placement
     """
     placer = _ConnectiveBasedPlacer()
-    return placer._run(plan_n_timesteps)
+    return placer._run()
 
 
 class _ConnectiveBasedPlacer(_RadialPlacer):
@@ -57,9 +56,8 @@ class _ConnectiveBasedPlacer(_RadialPlacer):
 
     __slots__ = []
 
-    def _run(self, plan_n_timesteps):
+    def _run(self):
         """
-        :param int plan_n_timesteps: number of timesteps to plan for
         :return: A set of placements
         :rtype: ~pacman.model.placements.Placements
         :raise PacmanPlaceException:
@@ -84,8 +82,7 @@ class _ConnectiveBasedPlacer(_RadialPlacer):
         # Iterate over constrained vertices and generate placements
         progress = ProgressBar(
             machine_graph.n_vertices, "Placing graph vertices")
-        resource_tracker = ResourceTracker(
-            plan_n_timesteps, self._generate_radial_chips())
+        resource_tracker = ResourceTracker(self._generate_radial_chips())
         constrained = sort_vertices_by_known_constraints(constrained)
         vertices_on_same_chip = get_same_chip_vertex_groups(machine_graph)
         for vertex in progress.over(constrained, False):

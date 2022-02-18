@@ -48,6 +48,7 @@ class _PacmanDataModel(object):
         "_machine_graph",
         "_machine_partition_n_keys_map",
         "_placements",
+        "_plan_n_timesteps",
         "_precompressed",
         "_routing_infos",
         "_runtime_graph",
@@ -71,6 +72,8 @@ class _PacmanDataModel(object):
         """
         self._graph = None
         self._machine_graph = None
+        # set at the start of every run
+        self._plan_n_timesteps = None
         self._hard_reset()
 
     def _hard_reset(self):
@@ -368,6 +371,13 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_machine_partition_n_keys_map(cls):
+        """
+        Retreives the machine_partition_n_keys_map if it is available
+
+        :rtype: DictBasedMachinePartitionNKeysMap
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the map is currently unavailable
+        """
         if cls.__pacman_data._machine_partition_n_keys_map is None:
             if cls.get_status() == Data_Status.MOCKED:
                 cls.__pacman_data._machine_partition_n_keys_map = \
@@ -380,12 +390,38 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_uncompressed(cls):
+        """
+        :rtype: MulticastRoutingTables
+        :return: The original routing tables
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the tables is currently unavailable
+        """
         if cls.__pacman_data._uncompressed is None:
             raise cls._exception("router_tables")
         return cls.__pacman_data._uncompressed
 
     @classmethod
     def get_precompressed(cls):
+        """
+        :rtype: MulticastRoutingTables
+        :return: The routing tables after the range compressor
+            or if not to be run the original tables
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the tables is currently unavailable
+        """
         if cls.__pacman_data._precompressed is None:
             raise cls._exception("precompressed_router_tables")
         return cls.__pacman_data._precompressed
+
+    @classmethod
+    def get_plan_n_timestep(cls):
+        """
+        The number of timesets to plan for.
+
+        Use by partitioners and such but not to reserve data regions
+
+
+        :rtype: int or None
+        :return: The plan n timesteps for None if run forever
+        """
+        return cls.__pacman_data._plan_n_timesteps

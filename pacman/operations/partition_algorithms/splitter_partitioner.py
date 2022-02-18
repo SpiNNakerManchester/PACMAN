@@ -31,11 +31,8 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls as utils
 
 
-def splitter_partitioner(plan_n_time_steps, pre_allocated_resources=None):
+def splitter_partitioner(pre_allocated_resources=None):
     """
-     :param plan_n_time_steps:
-         the number of time steps to plan to run for
-     :type plan_n_time_steps: int or None
      :param pre_allocated_resources:
          res needed to be preallocated before making new machine vertices
      :type pre_allocated_resources: PreAllocatedResourceContainer or None
@@ -47,7 +44,7 @@ def splitter_partitioner(plan_n_time_steps, pre_allocated_resources=None):
          If something goes wrong with the partitioning
      """
     partitioner = _SplitterPartitioner()
-    return partitioner._run(plan_n_time_steps, pre_allocated_resources)
+    return partitioner._run(pre_allocated_resources)
 
 
 class _SplitterPartitioner(AbstractSplitterPartitioner):
@@ -79,11 +76,8 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
     __slots__ = []
 
     # inherited from AbstractPartitionAlgorithm
-    def _run(self, plan_n_time_steps, pre_allocated_resources=None):
+    def _run(self, pre_allocated_resources=None):
         """
-        :param plan_n_time_steps:
-            the number of time steps to plan to run for
-        :type plan_n_time_steps: int or None
         :param pre_allocated_resources:
             res needed to be preallocated before making new machine vertices
         :type pre_allocated_resources: PreAllocatedResourceContainer or None
@@ -100,9 +94,7 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
 
         # get the setup objects
         (machine_graph, resource_tracker, vertices, progress) = (
-            self.__setup_objects(
-                app_graph, plan_n_time_steps, pre_allocated_resources))
-
+            self.__setup_objects(app_graph, pre_allocated_resources))
         self.__set_max_atoms_to_splitters(app_graph)
 
         # Partition one vertex at a time
@@ -177,14 +169,11 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
                 vertex.splitter.set_max_atoms_per_core(
                     constraint.size, True)
 
-    def __setup_objects(
-            self, app_graph, plan_n_time_steps,
-            pre_allocated_resources):
+    def __setup_objects(self, app_graph, pre_allocated_resources):
         """ sets up the machine_graph, resource_tracker, vertices, \
             progress bar.
 
         :param ApplicationGraph app_graph: app graph
-        :param int plan_n_time_steps: the number of time steps to run for.
         :param pre_allocated_resources: pre allocated res from other systems.
         :type PreAllocatedResourceContainer or None
         :return: (machine graph, res tracker, verts, progress bar)
@@ -197,7 +186,7 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
             application_graph=app_graph)
 
         resource_tracker = ResourceTracker(
-            plan_n_time_steps, preallocated_resources=pre_allocated_resources)
+            preallocated_resources=pre_allocated_resources)
 
         # sort out vertex's by placement constraints
         vertices = sort_vertices_by_known_constraints(app_graph.vertices)
