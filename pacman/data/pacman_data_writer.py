@@ -209,10 +209,11 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         :param plan_n_timesteps:
         :type plan_n_timesteps: int or None
         """
-        if not plan_n_timesteps is None:
+        if plan_n_timesteps is not None:
             if not isinstance(plan_n_timesteps, int):
                 raise TypeError("plan_n_timesteps should be an int")
             if plan_n_timesteps < 0:
                 raise PacmanConfigurationException(
-                    f"plan_n_timesteps {plan_n_timesteps} must not be negative")
+                    f"plan_n_timesteps {plan_n_timesteps} "
+                    f"must not be negative")
         self.__pacman_data._plan_n_timesteps = plan_n_timesteps
