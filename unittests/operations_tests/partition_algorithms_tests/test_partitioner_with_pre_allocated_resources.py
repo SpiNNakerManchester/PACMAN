@@ -48,11 +48,10 @@ class TestPartitionerWithPreAllocatedResources(object):
         pre_allocated_res = PreAllocatedResourceContainer()
 
         writer = PacmanDataWriter.mock()
-        writer._set_runtime_graph(self.graph)
+        writer._set_runtime_graph(graph)
         writer.set_plan_n_timesteps(None)
         # run partitioner that should go boom
         try:
-            splitter_partitioner(plan_n_time_steps=None,
-                                 pre_allocated_resources=pre_allocated_res)
+            splitter_partitioner(pre_allocated_resources=pre_allocated_res)
         except Exception as e:
             raise Exception("should have blown up here") from e
