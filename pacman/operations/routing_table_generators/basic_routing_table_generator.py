@@ -20,17 +20,18 @@ from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 
 
-def basic_routing_table_generator(routing_table_by_partitions):
+def basic_routing_table_generator():
     """
      An basic algorithm that can produce routing tables
 
-    :param MulticastRoutingTableByPartition routing_table_by_partitions:
     :rtype: MulticastRoutingTables
     """
     machine = PacmanDataView.get_machine()
     routing_infos = PacmanDataView.get_routing_infos()
     progress = ProgressBar(machine.n_chips, "Generating routing tables")
     routing_tables = MulticastRoutingTables()
+    routing_table_by_partitions = \
+        PacmanDataView.get_routing_table_by_partition()
     for chip in progress.over(machine.chips):
         partitions_in_table = routing_table_by_partitions.\
             get_entries_for_router(chip.x, chip.y)

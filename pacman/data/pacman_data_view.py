@@ -51,6 +51,7 @@ class _PacmanDataModel(object):
         "_plan_n_timesteps",
         "_precompressed",
         "_routing_infos",
+        "_routing_table_by_partition",
         "_runtime_graph",
         "_runtime_machine_graph",
         "_tags",
@@ -78,7 +79,7 @@ class _PacmanDataModel(object):
 
     def _hard_reset(self):
         """
-        Clears out all data that should change after a reset and graaph change
+        Clears out all data that should change after a reset and graph change
         """
         self._placements = None
         self._precompressed = None
@@ -86,6 +87,7 @@ class _PacmanDataModel(object):
         self._runtime_graph = None
         self._runtime_machine_graph = None
         self._routing_infos = None
+        self._routing_table_by_partition = None
         self._machine_partition_n_keys_map = None
         self._tags = None
         self._soft_reset()
@@ -425,3 +427,16 @@ class PacmanDataView(MachineDataView):
         :return: The plan n timesteps for None if run forever
         """
         return cls.__pacman_data._plan_n_timesteps
+
+    @classmethod
+    def get_routing_table_by_partition(cls):
+        """
+        The MulticastRoutingTableByPartition if it has been set
+
+        :rtype: MulticastRoutingTableByPartition
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the tables is currently unavailable
+        """
+        if cls.__pacman_data._routing_table_by_partition is None:
+            raise cls._exception("routing_table_by_partition")
+        return cls.__pacman_data._routing_table_by_partition

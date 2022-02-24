@@ -22,6 +22,8 @@ from pacman.model.graphs.machine import MachineGraph
 from pacman.model.placements import Placements
 from pacman.model.routing_info import (
     DictBasedMachinePartitionNKeysMap, RoutingInfo)
+from pacman.model.routing_table_by_partition import (
+    MulticastRoutingTableByPartition)
 from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.model.tags import Tags
 from pacman.exceptions import PacmanConfigurationException
@@ -204,7 +206,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_plan_n_timesteps(self, plan_n_timesteps):
         """
-        Sets the plan_n_timestep. Use None for run
+        Sets the plan_n_timestep. Use None for run forever
 
         :param plan_n_timesteps:
         :type plan_n_timesteps: int or None
@@ -217,3 +219,17 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
                     f"plan_n_timesteps {plan_n_timesteps} "
                     f"must not be negative")
         self.__pacman_data._plan_n_timesteps = plan_n_timesteps
+
+    def set_routing_table_by_partition(self, routing_table_by_partition):
+        """
+        Sets the _routing_table_by_partition
+
+        :param MulticastRoutingTableByPartition routing_table_by_partition:
+        """
+        if not isinstance(
+                routing_table_by_partition, MulticastRoutingTableByPartition):
+            raise TypeError(
+                "routing_table_by_partition should be a "
+                "MulticastRoutingTableByPartition")
+        self.__pacman_data._routing_table_by_partition = \
+            routing_table_by_partition
