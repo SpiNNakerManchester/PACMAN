@@ -123,7 +123,7 @@ class ResourceTracker(object):
 
     def __init__(self, chips=None, preallocated_resources=None):
         """
-         :param chips: If specified, this list of chips will be used instead
+        :param chips: If specified, this list of chips will be used instead
             of the list from the machine. Note that the order will be
             maintained, so this can be used either to reduce the set of chips
             used, or to re-order the chips. Note also that on deallocation,
