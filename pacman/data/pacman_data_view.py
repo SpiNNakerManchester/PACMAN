@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -158,7 +158,7 @@ class PacmanDataView(MachineDataView):
 
         Previously known as asb._original_machine_graph.
 
-       Changes to this graph will only affect the next run
+        Changes to this graph will only affect the next run
 
         :rtype: MachineGraph
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -246,11 +246,17 @@ class PacmanDataView(MachineDataView):
             This method can still exists without a machine_graph
 
         :rtype: int
+        :raises SpiNNUtilsException:
+            If the runtime_machine_graph is currently unavailable, or if this method
+            is used except during run
         """
         return cls.get_runtime_machine_graph().n_vertices
 
     @classmethod
     def get_runtime_n_machine_vertices2(cls):
+        """
+        Gets the number of machine vertices via the application graph
+        """
         return sum(len(vertex.machine_vertices)
                    for vertex in cls.get_runtime_graph().vertices)
 
@@ -263,11 +269,19 @@ class PacmanDataView(MachineDataView):
             This method can still exists without a machine_graph
 
         :rtype: iterator(MachineVertex)
+        :raises SpiNNUtilsException:
+            If the runtime_machine_graph is currently unavailable, or
+            if this method is used except during run
         """
         return cls.get_runtime_machine_graph().vertices
 
     @classmethod
     def get_runtime_machine_vertices2(cls):
+        """
+        Gets the Machine vertioces viua the application graph
+
+        :return:
+        """
         for app_vertex in cls.get_runtime_graph().vertices:
             yield from app_vertex.machine_vertices
 

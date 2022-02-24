@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from spinn_utilities.data.data_status import Data_Status
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_machine.data.machine_data_writer import MachineDataWriter
@@ -86,9 +87,27 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         return self.__pacman_data._machine_graph
 
     def get_runtime_graph(self):
+        """
+        The runtime level graph
+
+        Previously known as asb._graph.
+
+        This removes the safety check so ASB can access the graph anytime
+
+        :rtype: ApplicationGraph
+        """
         return self.__pacman_data._runtime_graph
 
     def get_runtime_machine_graph(self):
+        """
+        The runtime machine graph
+
+        Previously known as asb._machine_graph.
+
+        This removes the safety check so ASB can access the graph anytime
+
+        :rtype: MachineGraph
+        """
         return self.__pacman_data._runtime_machine_graph
 
     def create_graphs(self, graph_label):
@@ -108,8 +127,10 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def clone_graphs(self):
         """
-        Clones the user/ original grapgs and creates runtime ones
+        Clones the user/ original graphs and creates runtime ones
 
+        :raises PacmanConfigurationException: if both Application and Machine
+        level have vertices
         """
         if self.__pacman_data._graph.n_vertices:
             if self.__pacman_data._machine_graph.n_vertices:
@@ -124,7 +145,11 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
     def _set_runtime_graph(self, graph):
         """
         Only used in unittests
+
+        :raises NotImplementedError: If used outside of unittests
         """
+        if self.get_status() != Data_Status.MOCKED:
+            raise NotImplementedError("Only valid in Mocked state!")
         self.__pacman_data._runtime_graph = graph
 
     def set_runtime_machine_graph(self, runtime_machine_graph):
@@ -132,6 +157,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         Set the runtime machine graph
 
         :param MachineGraph runtime_machine_graph:
+        :raises TypeError: if the runtime_machine_graph is not a MachineGraph
         """
         if not isinstance(runtime_machine_graph, MachineGraph):
             raise TypeError("runtime_machine_graph should be a MachineGraph")
@@ -142,6 +168,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         Set the placements
 
         :param Placements placements:
+        :raises TypeError: if the placements is not a Placements
         """
         if not isinstance(placements, Placements):
             raise TypeError("placements should be a Placements")
@@ -152,6 +179,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         Set the routing_infos
 
         :param RoutingInfo routing_infos:
+        :raises TypeError: if the routing_infos is not a RoutingInfo
         """
         if not isinstance(routing_infos, RoutingInfo):
             raise TypeError("routing_infos should be a RoutingInfo")
@@ -162,6 +190,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         Set the tags
 
         :param Tags tags:
+        :raises TypeError: if the tags is not a Tags
         """
         if not isinstance(tags, Tags):
             raise TypeError("tags should be a Tags")
@@ -173,6 +202,8 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
         :param DictBasedMachinePartitionNKeysMap machine_partition_n_keys_map:
             new value
+        :raises TypeError: if the machine_partition_n_keys_map is not a
+        DictBasedMachinePartitionNKeysMap
         """
         if not isinstance(machine_partition_n_keys_map,
                           DictBasedMachinePartitionNKeysMap):
@@ -187,6 +218,8 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         Sets the uncompressed router_tables value
 
         :param MulticastRoutingTables router_tables: new value
+        :raises TypeError:
+        if the router_tables is not a MulticastRoutingTables
         """
         if not isinstance(router_tables, MulticastRoutingTables):
             raise TypeError(
@@ -198,6 +231,8 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         Sets the precompressed router_tables value
 
         :param MulticastRoutingTables router_tables: new value
+        :raises TypeError:
+        if the router_tables is not a MulticastRoutingTables
         """
         if not isinstance(router_tables, MulticastRoutingTables):
             raise TypeError(
@@ -210,6 +245,8 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
         :param plan_n_timesteps:
         :type plan_n_timesteps: int or None
+        :raises TypeError: if the plan_n_timesteps are not an int or None
+        :raises PacmanConfigurationException: On a megative plan_n_timesteps
         """
         if plan_n_timesteps is not None:
             if not isinstance(plan_n_timesteps, int):
@@ -225,6 +262,8 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         Sets the _routing_table_by_partition
 
         :param MulticastRoutingTableByPartition routing_table_by_partition:
+        raises TypeError: if routing_table_by_partition is no a
+        MulticastRoutingTableByPartition
         """
         if not isinstance(
                 routing_table_by_partition, MulticastRoutingTableByPartition):
