@@ -245,7 +245,7 @@ class TestSimulatorData(unittest.TestCase):
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_routing_table_by_partition()
-        table =  MulticastRoutingTableByPartition()
+        table = MulticastRoutingTableByPartition()
         writer.set_routing_table_by_partition(table)
         self.assertEqual(
             table, PacmanDataView.get_routing_table_by_partition())
