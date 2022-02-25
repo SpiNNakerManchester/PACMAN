@@ -41,7 +41,7 @@ class TestSimulatorData(unittest.TestCase):
         # Use manual_check to verify this without dependency
         PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_graph()
+            PacmanDataView.has_application_vertices()
 
     def test_mock(self):
         PacmanDataWriter.mock()
@@ -51,9 +51,9 @@ class TestSimulatorData(unittest.TestCase):
     def test_graphs(self):
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_graph()
+            PacmanDataView.has_application_vertices()
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_machine_graph()
+            PacmanDataView.has_machine_vertices()
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_runtime_graph()
         with self.assertRaises(DataNotYetAvialable):
@@ -82,15 +82,10 @@ class TestSimulatorData(unittest.TestCase):
         # the writer still has access to the user graphs
         writer.get_graph()
         writer.get_machine_graph()
-        # The view does not while in run mode
-        with self.assertRaises(DataLocked):
-            PacmanDataView.get_graph()
-        with self.assertRaises(DataLocked):
-            PacmanDataView.get_machine_graph()
 
         writer.finish_run()
-        PacmanDataView.get_graph()
-        PacmanDataView.get_machine_graph()
+        PacmanDataView.has_application_vertices()
+        PacmanDataView.has_machine_vertices()
         PacmanDataView.get_runtime_graph()
         PacmanDataView.get_runtime_machine_graph()
         # the writer still has access to the runtime graphs
@@ -103,15 +98,10 @@ class TestSimulatorData(unittest.TestCase):
         # the writer still has access to the user graphs
         writer.get_graph()
         writer.get_machine_graph()
-        # The view does not while in stopping mode
-        with self.assertRaises(DataLocked):
-            PacmanDataView.get_graph()
-        with self.assertRaises(DataLocked):
-            PacmanDataView.get_machine_graph()
 
         writer.shut_down()
-        PacmanDataView.get_graph()
-        PacmanDataView.get_machine_graph()
+        #PacmanDataView.get_graph()
+        #PacmanDataView.get_machine_graph()
         with self.assertRaises(DataLocked):
             PacmanDataView.get_runtime_graph()
         with self.assertRaises(DataLocked):

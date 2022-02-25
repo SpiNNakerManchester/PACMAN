@@ -124,6 +124,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         self.__pacman_data._machine_graph = MachineGraph(
             label=graph_label,
             application_graph=self.__pacman_data._graph)
+        self.__pacman_data._vertices_or_edges_added = False
 
     def clone_graphs(self):
         """

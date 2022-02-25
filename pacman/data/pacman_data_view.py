@@ -18,7 +18,8 @@ from spinn_utilities.data.data_status import Data_Status
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.exceptions import DataLocked, DataNotMocked
 from spinn_machine.data import MachineDataView
-from pacman.exceptions import PacmanNotPlacedError
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanNotPlacedError)
 from pacman.model.routing_info import (
     DictBasedMachinePartitionNKeysMap)
 
@@ -55,7 +56,8 @@ class _PacmanDataModel(object):
         "_runtime_graph",
         "_runtime_machine_graph",
         "_tags",
-        "_uncompressed"
+        "_uncompressed",
+        "_vertices_or_edges_added"
     ]
 
     def __new__(cls):
@@ -73,6 +75,7 @@ class _PacmanDataModel(object):
         """
         self._graph = None
         self._machine_graph = None
+        self._vertices_or_edges_added = None
         # set at the start of every run
         self._plan_n_timesteps = None
         self._hard_reset()
@@ -130,6 +133,80 @@ class PacmanDataView(MachineDataView):
     # graph methods
 
     @classmethod
+    def has_application_vertices(cls):
+        """
+        Reports if the user level graph has application vertices.
+
+        Semantic sugar for get_graph().n_vertices
+
+        As this method returns False if neither graph has vertices the better
+        check if the application level is to be used is has_machine_vertices
+
+        :return: True if and only if the Application Graph has vertices.
+        :rtype: bool
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        return cls.__pacman_data._graph.n_vertices > 0
+
+    @classmethod
+    def get_edges_ending_at_vertex(cls, vertex):
+        """ Get all the edges that end at the given vertex in the user graph
+
+        Semantic sugar for get_graph().get_edges_ending_at_vertex
+
+        :param AbstractVertex vertex:
+            The vertex at which the edges to get end
+        :rtype: iterable(AbstractEdge)
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        return cls.__pacman_data.get_edges_ending_at_vertex(vertex)
+
+    @classmethod
+    def add_vertex(cls, vertex):
+        """
+        Adds an Application vertex to the user graph
+
+        Semantic sugar for get_graph().add_vertex
+
+        :param ~pacman.model.graphs.application.ApplicationVertex vertex:
+            The vertex to add to the graph
+        :raises PacmanConfigurationException:
+            when both graphs contain vertices
+        :raises PacmanConfigurationException:
+            If there is an attempt to add the same vertex more than once
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        if cls.has_machine_vertices:
+            raise PacmanConfigurationException(
+                "Cannot add vertices to both the machine and application"
+                " graphs")
+        cls.__pacman_data._graph.add_vertex(vertex)
+        cls.__pacman_data._vertices_or_edges_added = True
+
+    @classmethod
+    def iterate_vertices(cls):
+        """ The vertices in the user application graph.
+
+        Semantic sugar for get_graph().vertices
+
+        :rtype: iterable(AbstractVertex)
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        return cls.__pacman_data._graph.vertices
+
+    @classmethod
     def get_graph(cls):
         """
         The user level application graph
@@ -150,6 +227,23 @@ class PacmanDataView(MachineDataView):
         if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
             raise DataLocked("graph", cls.get_status())
         return cls.__pacman_data._graph
+
+    @classmethod
+    def has_machine_vertices(cls):
+        """
+        Reports if the user level graph has machine vertices.
+
+         .. note::
+            If this method returns True has_application vertices is
+            guaranteed to return False. Both will be False if not vertices set
+        :return: True if and only if the Application Graph has vertices.
+        :rtype: bool
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._machine_graph is None:
+            raise cls._exception("machine_graph")
+        return cls.__pacman_data._machine_graph.n_vertices > 0
 
     @classmethod
     def get_machine_graph(cls):
