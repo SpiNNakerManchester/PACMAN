@@ -165,7 +165,7 @@ class PacmanDataView(MachineDataView):
         """
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
-        return cls.__pacman_data.get_edges_ending_at_vertex(vertex)
+        return cls.__pacman_data._graph.get_edges_ending_at_vertex(vertex)
 
     @classmethod
     def add_vertex(cls, vertex):
@@ -183,13 +183,48 @@ class PacmanDataView(MachineDataView):
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
         """
+        # TODO we want a safety check for CommandSender
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
-        if cls.has_machine_vertices:
+        if cls.has_machine_vertices():
             raise PacmanConfigurationException(
                 "Cannot add vertices to both the machine and application"
                 " graphs")
+        if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
+            raise DataLocked("graph", cls.get_status())
         cls.__pacman_data._graph.add_vertex(vertex)
+        cls.__pacman_data._vertices_or_edges_added = True
+
+    @classmethod
+    def add_edge(cls, edge, outgoing_edge_partition_name):
+        """
+        Adds an Application edge to the user graph
+
+        Semantic sugar for get_graph().add_edge
+
+        :param AbstractEdge edge: The edge to add
+        :param str outgoing_edge_partition_name:
+            The name of the edge partition to add the edge to; each edge
+            partition is the partition of edges that start at the same vertex
+        # :rtype: AbstractEdgePartition
+        :raises PacmanConfigurationException:
+            when both graphs contain vertices
+        :raises PacmanInvalidParameterException:
+            If the edge is not of a valid type or if edges have already been
+            added to this partition that start at a different vertex to this
+            one
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        if cls.has_machine_vertices():
+            raise PacmanConfigurationException(
+                "Cannot add edges / vertices to both the machine and "
+                "application graphs")
+        if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
+            raise DataLocked("graph", cls.get_status())
+        cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
         cls.__pacman_data._vertices_or_edges_added = True
 
     @classmethod
@@ -207,26 +242,18 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._graph.vertices
 
     @classmethod
-    def get_graph(cls):
-        """
-        The user level application graph
+    def iterate_partitions(cls):
+        """ The partitions in the user application graph.
 
-        This is the version of the graph which is created by the user / script
-        Previously known as asb._original_application_graph.
+        Semantic sugar for get_graph().outgoing_edge_partitions
 
-        Changes to this graph will only affect the next run
-
-        :rtype: ApplicationGraph
+        :rtype: iterable(ApplicationEdgePartition)
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the graph is currently unavailable, or if this method
-            is used during run
+            If the graph is currently unavailable
         """
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
-        # The writer overrides this method without this safety
-        if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
-            raise DataLocked("graph", cls.get_status())
-        return cls.__pacman_data._graph
+        return cls.__pacman_data._graph.outgoing_edge_partitions
 
     @classmethod
     def has_machine_vertices(cls):
@@ -246,25 +273,93 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._machine_graph.n_vertices > 0
 
     @classmethod
-    def get_machine_graph(cls):
+    def add_machine_vertex(cls, vertex):
         """
-        The user level machine graph
+        Adds a Machine vertex to the user graph
 
-        Previously known as asb._original_machine_graph.
+        Semantic sugar for get_Machine_graph().add_vertex
 
-        Changes to this graph will only affect the next run
-
-        :rtype: MachineGraph
+        :param ~pacman.model.graphs.mqchine.MachineVertex vertex:
+            The vertex to add to the graph
+        :raises PacmanConfigurationException:
+            when both graphs contain vertices
+        :raises PacmanConfigurationException:
+            If there is an attempt to add the same vertex more than once
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the machine_graph is currently unavailable, or if this method
-            is used during run
+            If the graph is currently unavailable
+        """
+        # TODO we want a safety check for CommandSender
+        if cls.__pacman_data._machine_graph is None:
+            raise cls._exception("machine_graph")
+        if cls.has_application_vertices():
+            raise PacmanConfigurationException(
+                "Cannot add vertices to both the machine and application"
+                " graphs")
+        if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
+            raise DataLocked("graph", cls.get_status())
+        cls.__pacman_data._machine_graph.add_vertex(vertex)
+        cls.__pacman_data._vertices_or_edges_added = True
+
+    @classmethod
+    def add_machine_edge(cls, edge, outgoing_edge_partition_name):
+        """
+        Adds an Machine edge to the user graph
+
+        Semantic sugar for get_machine_graph().add_edge
+
+        :param AbstractEdge edge: The edge to add
+        :param str outgoing_edge_partition_name:
+            The name of the edge partition to add the edge to; each edge
+            partition is the partition of edges that start at the same vertex
+        # :rtype: AbstractEdgePartition
+        :raises PacmanConfigurationException:
+            when both graphs contain vertices
+        :raises PacmanInvalidParameterException:
+            If the edge is not of a valid type or if edges have already been
+            added to this partition that start at a different vertex to this
+            one
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
         """
         if cls.__pacman_data._machine_graph is None:
             raise cls._exception("machine_graph")
-        # The writer overrides this method without this safety
+        if cls.has_application_vertices():
+            raise PacmanConfigurationException(
+                "Cannot add vertices to both the machine and application"
+                " graphs")
         if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
-            raise DataLocked("machine_graph", cls.get_status())
-        return cls.__pacman_data._machine_graph
+            raise DataLocked("graph", cls.get_status())
+        cls.__pacman_data._machine_graph.add_edge(
+            edge, outgoing_edge_partition_name)
+        cls.__pacman_data._vertices_or_edges_added = True
+
+    @classmethod
+    def iterate_machine_vertices(cls):
+        """ The vertices in the user machine graph.
+
+        Semantic sugar for get_graph().vertices
+
+        :rtype: iterable(AbstractVertex)
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._machine_graph is None:
+            raise cls._exception("machine_graph")
+        return cls.__pacman_data._machine_graph.vertices
+
+    @classmethod
+    def iterate_machine_partitions(cls):
+        """ The partitions in the user machine graph.
+
+        Semantic sugar for get_machine_graph().outgoing_edge_partitions
+
+        :rtype: iterable(ApplicationEdgePartition)
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._machine_graph is None:
+            raise cls._exception("machine_graph")
+        return cls.__pacman_data._machine_graph.outgoing_edge_partitions
 
     @classmethod
     def get_runtime_graph(cls):
