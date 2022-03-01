@@ -19,6 +19,7 @@ from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import (
     MachineGraph, MulticastEdgePartition, SimpleMachineVertex)
 from pacman.model.placements import Placements
@@ -100,8 +101,6 @@ class TestSimulatorData(unittest.TestCase):
         writer.get_machine_graph()
 
         writer.shut_down()
-        #PacmanDataView.get_graph()
-        #PacmanDataView.get_machine_graph()
         with self.assertRaises(DataLocked):
             PacmanDataView.get_runtime_graph()
         with self.assertRaises(DataLocked):
@@ -144,6 +143,63 @@ class TestSimulatorData(unittest.TestCase):
             m_vertices, set(PacmanDataView.get_runtime_machine_vertices2()))
         self.assertEqual(PacmanDataView.get_runtime_graph(),
                          PacmanDataView.get_runtime_best_graph())
+
+    def test_graph_functions(self):
+        writer = PacmanDataWriter.setup()
+        app1 = SimpleTestVertex(12, "app1")
+        app2 = SimpleTestVertex(23, "app21")
+        app3 = SimpleTestVertex(33, "app3")
+        edge12 = ApplicationEdge(app1, app2)
+        edge32 = ApplicationEdge(app3, app2)
+        edge13 = ApplicationEdge(app1, app3)
+        edge11 = ApplicationEdge(app1, app1)
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.has_application_vertices()
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_edges_ending_at_vertex(app1)
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.add_vertex(app1)
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.add_edge(edge12, "foo")
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.iterate_vertices()
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.iterate_partitions()
+
+        writer.create_graphs("test")
+        self.assertFalse(PacmanDataView.has_application_vertices())
+        PacmanDataView.add_vertex(app1)
+        PacmanDataView.add_vertex(app2)
+        PacmanDataView.add_vertex(app3)
+        PacmanDataView.add_edge(edge12, "foo")
+        PacmanDataView.add_edge(edge13, "foo")
+        PacmanDataView.add_edge(edge11, "foo")
+        PacmanDataView.add_edge(edge32, "bar")
+
+        self.assertTrue(PacmanDataView.has_application_vertices())
+        a = PacmanDataView.get_edges_ending_at_vertex(app2)
+        self.assertSetEqual(
+            set([edge12, edge32]),
+            set(PacmanDataView.get_edges_ending_at_vertex(app2)))
+        self.assertSetEqual(
+            set([app1, app2, app3]),
+            set(PacmanDataView.iterate_vertices()))
+        partitions = set(PacmanDataView.iterate_partitions())
+        self.assertEqual(2, len(partitions))
+
+        writer.start_run()
+        with self.assertRaises(DataLocked):
+            PacmanDataView.add_vertex(app1)
+        with self.assertRaises(DataLocked):
+            PacmanDataView.add_edge(edge12, "foo")
+        PacmanDataView.has_application_vertices()
+        PacmanDataView.iterate_vertices()
+
+        writer.finish_run()
+        app4 = SimpleTestVertex(44, "app4")
+        edge14 = ApplicationEdge(app1, app4)
+        PacmanDataView.add_vertex(app4)
+        PacmanDataView.add_edge(edge14, "other")
 
     def test_graph_mocked(self):
         writer = PacmanDataWriter.mock()
