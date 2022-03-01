@@ -643,3 +643,9 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._routing_table_by_partition is None:
             raise cls._exception("routing_table_by_partition")
         return cls.__pacman_data._routing_table_by_partition
+
+    @classmethod
+    def get_and_reset_vertices_or_edges_added(cls):
+        answer = cls.__pacman_data._vertices_or_edges_added
+        cls.__pacman_data._vertices_or_edges_added = False
+        return answer
