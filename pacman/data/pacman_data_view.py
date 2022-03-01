@@ -436,8 +436,8 @@ class PacmanDataView(MachineDataView):
 
         :rtype: int
         :raises SpiNNUtilsException:
-            If the runtime_machine_graph is currently unavailable, or if this method
-            is used except during run
+            If the runtime_machine_graph is currently unavailable,
+            or if this method is used except during run
         """
         return cls.get_runtime_machine_graph().n_vertices
 
