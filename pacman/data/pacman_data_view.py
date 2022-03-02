@@ -46,6 +46,7 @@ class _PacmanDataModel(object):
     __slots__ = [
         # Data values cached
         "_graph",
+        "_info_changed",
         "_machine_graph",
         "_machine_partition_n_keys_map",
         "_placements",
@@ -57,7 +58,6 @@ class _PacmanDataModel(object):
         "_runtime_machine_graph",
         "_tags",
         "_uncompressed",
-        "_vertices_or_edges_added"
     ]
 
     def __new__(cls):
@@ -75,7 +75,6 @@ class _PacmanDataModel(object):
         """
         self._graph = None
         self._machine_graph = None
-        self._vertices_or_edges_added = None
         # set at the start of every run
         self._plan_n_timesteps = None
         self._hard_reset()
@@ -84,6 +83,8 @@ class _PacmanDataModel(object):
         """
         Clears out all data that should change after a reset and graph change
         """
+        # After a hard reset consider the info_changed
+        self._info_changed = True
         self._placements = None
         self._precompressed = None
         self._uncompressed = None
@@ -193,7 +194,7 @@ class PacmanDataView(MachineDataView):
         if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
             raise DataLocked("graph", cls.get_status())
         cls.__pacman_data._graph.add_vertex(vertex)
-        cls.__pacman_data._vertices_or_edges_added = True
+        cls.__pacman_data._info_changed = True
 
     @classmethod
     def add_edge(cls, edge, outgoing_edge_partition_name):
@@ -225,7 +226,7 @@ class PacmanDataView(MachineDataView):
         if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
             raise DataLocked("graph", cls.get_status())
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
-        cls.__pacman_data._vertices_or_edges_added = True
+        cls.__pacman_data._info_changed = True
 
     @classmethod
     def iterate_vertices(cls):
@@ -298,7 +299,7 @@ class PacmanDataView(MachineDataView):
         if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
             raise DataLocked("graph", cls.get_status())
         cls.__pacman_data._machine_graph.add_vertex(vertex)
-        cls.__pacman_data._vertices_or_edges_added = True
+        cls.__pacman_data._info_changed = True
 
     @classmethod
     def add_machine_edge(cls, edge, outgoing_edge_partition_name):
@@ -331,7 +332,7 @@ class PacmanDataView(MachineDataView):
             raise DataLocked("graph", cls.get_status())
         cls.__pacman_data._machine_graph.add_edge(
             edge, outgoing_edge_partition_name)
-        cls.__pacman_data._vertices_or_edges_added = True
+        cls.__pacman_data._info_changed = True
 
     @classmethod
     def iterate_machine_vertices(cls):
@@ -644,8 +645,3 @@ class PacmanDataView(MachineDataView):
             raise cls._exception("routing_table_by_partition")
         return cls.__pacman_data._routing_table_by_partition
 
-    @classmethod
-    def get_and_reset_vertices_or_edges_added(cls):
-        answer = cls.__pacman_data._vertices_or_edges_added
-        cls.__pacman_data._vertices_or_edges_added = False
-        return answer
