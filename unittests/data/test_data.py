@@ -68,16 +68,8 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_runtime_machine_graph()
 
-        writer.clone_graphs()
-        with self.assertRaises(DataLocked):
-            PacmanDataView.get_runtime_graph()
-        with self.assertRaises(DataLocked):
-            PacmanDataView.get_runtime_machine_graph()
-        # the writer still has access to the runtime graphs
-        writer.get_runtime_graph()
-        writer.get_runtime_machine_graph()
-
         writer.start_run()
+        writer.clone_graphs()
         PacmanDataView.get_runtime_graph()
         PacmanDataView.get_runtime_machine_graph()
         # the writer still has access to the user graphs
@@ -99,15 +91,6 @@ class TestSimulatorData(unittest.TestCase):
         # the writer still has access to the user graphs
         writer.get_graph()
         writer.get_machine_graph()
-
-        writer.shut_down()
-        with self.assertRaises(DataLocked):
-            PacmanDataView.get_runtime_graph()
-        with self.assertRaises(DataLocked):
-            PacmanDataView.get_runtime_machine_graph()
-        # the writer still has access to the runtime graphs
-        writer.get_runtime_graph()
-        writer.get_runtime_machine_graph()
 
     def test_graph_support(self):
         writer = PacmanDataWriter.setup()

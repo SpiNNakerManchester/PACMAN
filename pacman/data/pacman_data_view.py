@@ -14,9 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from spinn_utilities.data.data_status import Data_Status
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.exceptions import DataLocked, DataNotMocked
+from spinn_utilities.exceptions import DataNotMocked
 from spinn_machine.data import MachineDataView
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanNotPlacedError)
@@ -191,8 +190,7 @@ class PacmanDataView(MachineDataView):
             raise PacmanConfigurationException(
                 "Cannot add vertices to both the machine and application"
                 " graphs")
-        if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
-            raise DataLocked("graph", cls.get_status())
+        cls._check_user_write()
         cls.__pacman_data._graph.add_vertex(vertex)
         cls.__pacman_data._info_changed = True
 
@@ -223,8 +221,7 @@ class PacmanDataView(MachineDataView):
             raise PacmanConfigurationException(
                 "Cannot add edges / vertices to both the machine and "
                 "application graphs")
-        if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
-            raise DataLocked("graph", cls.get_status())
+        cls._check_user_write()
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
         cls.__pacman_data._info_changed = True
 
@@ -296,8 +293,7 @@ class PacmanDataView(MachineDataView):
             raise PacmanConfigurationException(
                 "Cannot add vertices to both the machine and application"
                 " graphs")
-        if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
-            raise DataLocked("graph", cls.get_status())
+        cls._check_user_write()
         cls.__pacman_data._machine_graph.add_vertex(vertex)
         cls.__pacman_data._info_changed = True
 
@@ -328,8 +324,7 @@ class PacmanDataView(MachineDataView):
             raise PacmanConfigurationException(
                 "Cannot add vertices to both the machine and application"
                 " graphs")
-        if cls.get_status() in [Data_Status.IN_RUN, Data_Status.STOPPING]:
-            raise DataLocked("graph", cls.get_status())
+        cls._check_user_write()
         cls.__pacman_data._machine_graph.add_edge(
             edge, outgoing_edge_partition_name)
         cls.__pacman_data._info_changed = True
@@ -385,14 +380,6 @@ class PacmanDataView(MachineDataView):
         """
         if cls.__pacman_data._runtime_graph is None:
             raise cls._exception("runtime_graph")
-        if cls.get_status() not in [
-                Data_Status.IN_RUN, Data_Status.MOCKED, Data_Status.STOPPING]:
-            if cls.get_status() == Data_Status.FINISHED:
-                logger.warning(
-                    "The runtime_graph is from the previous run and "
-                    "may change during the next run")
-            else:
-                raise DataLocked("runtime_graph", cls.get_status())
         return cls.__pacman_data._runtime_graph
 
     @classmethod
@@ -417,14 +404,6 @@ class PacmanDataView(MachineDataView):
         """
         if cls.__pacman_data._runtime_machine_graph is None:
             raise cls._exception("runtime_machine_graph")
-        if cls.get_status() not in [
-                Data_Status.IN_RUN, Data_Status.MOCKED, Data_Status.STOPPING]:
-            if cls.get_status() == Data_Status.FINISHED:
-                logger.warning(
-                    "The runtime_machine_graph is from the previous run and "
-                    "may change during the next run")
-            else:
-                raise DataLocked("runtime_machine_graph", cls.get_status())
         return cls.__pacman_data._runtime_machine_graph
 
     @classmethod
@@ -585,7 +564,7 @@ class PacmanDataView(MachineDataView):
             If the map is currently unavailable
         """
         if cls.__pacman_data._machine_partition_n_keys_map is None:
-            if cls.get_status() == Data_Status.MOCKED:
+            if cls._is_mocked():
                 cls.__pacman_data._machine_partition_n_keys_map = \
                     DictBasedMachinePartitionNKeysMap()
             else:

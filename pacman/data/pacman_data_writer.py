@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from spinn_utilities.data.data_status import Data_Status
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_machine.data.machine_data_writer import MachineDataWriter
@@ -148,7 +147,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
         :raises NotImplementedError: If used outside of unittests
         """
-        if self.get_status() != Data_Status.MOCKED:
+        if not self._is_mocked():
             raise NotImplementedError("Only valid in Mocked state!")
         self.__pacman_data._runtime_graph = graph
 
