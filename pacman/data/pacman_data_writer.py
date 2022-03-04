@@ -53,12 +53,14 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         MachineDataWriter._setup(self)
         self.__pacman_data._clear()
 
-    def hard_reset(self):
-        MachineDataWriter.hard_reset(self)
+    @overrides(MachineDataWriter._hard_reset)
+    def _hard_reset(self):
+        MachineDataWriter._hard_reset(self)
         self.__pacman_data._hard_reset()
 
-    def soft_reset(self):
-        MachineDataWriter.soft_reset(self)
+    @overrides(MachineDataWriter._soft_reset)
+    def _soft_reset(self):
+        MachineDataWriter._soft_reset(self)
         self.__pacman_data._soft_reset()
 
     def get_graph(self):
