@@ -13,6 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .malloc_based_routing_info_allocator import (
-    MallocBasedRoutingInfoAllocator)
+    malloc_based_routing_info_allocator)
 
-__all__ = ["MallocBasedRoutingInfoAllocator"]
+__all__ = ["malloc_based_routing_info_allocator"]

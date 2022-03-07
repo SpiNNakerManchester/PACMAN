@@ -39,7 +39,6 @@ class CoreTracker(object):
         :param preallocated_resources:
         :type preallocated_resources: PreAllocatedResourceContainer or None
         """
-        global _real_chips_with_n_cores_available
         self._cores = OrderedSet()
         for processor in chip.processors:
             if not processor.is_monitor:
@@ -75,7 +74,6 @@ class CoreTracker(object):
         return self._n_cores > 0
 
     def allocate(self, p):
-        global _real_chips_with_n_cores_available
         if p is None:
             p = self._cores.pop()
         else:

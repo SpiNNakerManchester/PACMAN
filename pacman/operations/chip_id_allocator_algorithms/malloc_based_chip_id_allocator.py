@@ -41,7 +41,20 @@ class NoSpiNNakerLink(PacmanConfigurationException):
                 vertex.spinnaker_link_id, vertex.board_address))
 
 
-class MallocBasedChipIdAllocator(object):
+def malloc_based_chip_id_allocator(machine, graph):
+    """
+    :param ~spinn_machine.Machine machine:
+    :param graph:
+    :type graph: Graph
+    :rtype: ~spinn_machine.Machine
+    :raises PacmanConfigurationException:
+        If a virtual chip is in an impossible position.
+    """
+    allocator = _MallocBasedChipIdAllocator()
+    return allocator._run(machine, graph)
+
+
+class _MallocBasedChipIdAllocator(object):
     """ A Chip ID Allocation Allocator algorithm that keeps track of\
         chip IDs and attempts to allocate them as requested
     """
@@ -60,7 +73,7 @@ class MallocBasedChipIdAllocator(object):
         # Start allocating and -2, -2 and go down
         self.__next_id = -2
 
-    def __call__(self, machine, machine_graph):
+    def _run(self, machine, machine_graph):
         """
         :param ~spinn_machine.Machine machine:
         :param MachineGraph graph:

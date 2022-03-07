@@ -659,41 +659,29 @@ def _ner_route(machine_graph, machine, placements, vector_to_nodes):
     return routing_tables
 
 
-class NerRoute(object):
-    """ Performs routing using rig algorithm
+def ner_route(machine_graph, machine, placements):
+    """ basic ner router
+
+    :param MachineGraph machine_graph: the machine graph
+    :param ~spinn_machine.Machine machine: spinnaker machine
+    :param Placements placements: the placements
+    :return: a routing table by partition
+    :rtype: MulticastRoutingTableByPartition
     """
-
-    __slots__ = []
-
-    def __call__(self, machine_graph, machine, placements):
-        """ basic ner router
-
-        :param MachineGraph machine_graph: the machine graph
-        :param ~spinn_machine.Machine machine: spinnaker machine
-        :param Placements placements: the placements
-        :return: a routing table by partition
-        :rtype: MulticastRoutingTableByPartition
-        """
-        return _ner_route(
-            machine_graph, machine, placements, _longest_dimension_first)
+    return _ner_route(
+        machine_graph, machine, placements, _longest_dimension_first)
 
 
-class NerRouteTrafficAware(object):
-    """ Performs routing with traffic awareness
+def ner_route_traffic_aware(machine_graph, machine, placements):
+    """ traffic-aware ner router
+
+    :param MachineGraph machine_graph: the machine graph
+    :param ~spinn_machine.Machine machine: spinnaker machine
+    :param Placements placements: the placements
+    :return: a routing table by partition
+    :rtype: MulticastRoutingTableByPartition
     """
-
-    __slots__ = []
-
-    def __call__(self, machine_graph, machine, placements):
-        """ traffic-aware ner router
-
-        :param MachineGraph machine_graph: the machine graph
-        :param ~spinn_machine.Machine machine: spinnaker machine
-        :param Placements placements: the placements
-        :return: a routing table by partition
-        :rtype: MulticastRoutingTableByPartition
-        """
-        traffic = defaultdict(lambda: 0)
-        return _ner_route(
-            machine_graph, machine, placements,
-            functools.partial(_least_busy_dimension_first, traffic))
+    traffic = defaultdict(lambda: 0)
+    return _ner_route(
+        machine_graph, machine, placements,
+        functools.partial(_least_busy_dimension_first, traffic))
