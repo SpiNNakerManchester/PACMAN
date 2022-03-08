@@ -45,7 +45,6 @@ class _PacmanDataModel(object):
     __slots__ = [
         # Data values cached
         "_graph",
-        "_info_changed",
         "_machine_graph",
         "_machine_partition_n_keys_map",
         "_placements",
@@ -57,6 +56,7 @@ class _PacmanDataModel(object):
         "_runtime_machine_graph",
         "_tags",
         "_uncompressed",
+        "_vertices_or_edges_added",
     ]
 
     def __new__(cls):
@@ -76,14 +76,13 @@ class _PacmanDataModel(object):
         self._machine_graph = None
         # set at the start of every run
         self._plan_n_timesteps = None
+        self._vertices_or_edges_added = False
         self._hard_reset()
 
     def _hard_reset(self):
         """
         Clears out all data that should change after a reset and graph change
         """
-        # After a hard reset consider the info_changed
-        self._info_changed = True
         self._placements = None
         self._precompressed = None
         self._uncompressed = None
@@ -192,7 +191,7 @@ class PacmanDataView(MachineDataView):
                 " graphs")
         cls._check_user_write()
         cls.__pacman_data._graph.add_vertex(vertex)
-        cls.__pacman_data._info_changed = True
+        cls.__pacman_data._vertices_or_edges_added = True
 
     @classmethod
     def add_edge(cls, edge, outgoing_edge_partition_name):
@@ -223,7 +222,7 @@ class PacmanDataView(MachineDataView):
                 "application graphs")
         cls._check_user_write()
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
-        cls.__pacman_data._info_changed = True
+        cls.__pacman_data._vertices_or_edges_added = True
 
     @classmethod
     def iterate_vertices(cls):
@@ -295,7 +294,7 @@ class PacmanDataView(MachineDataView):
                 " graphs")
         cls._check_user_write()
         cls.__pacman_data._machine_graph.add_vertex(vertex)
-        cls.__pacman_data._info_changed = True
+        cls.__pacman_data._vertices_or_edges_added = True
 
     @classmethod
     def add_machine_edge(cls, edge, outgoing_edge_partition_name):
@@ -327,7 +326,7 @@ class PacmanDataView(MachineDataView):
         cls._check_user_write()
         cls.__pacman_data._machine_graph.add_edge(
             edge, outgoing_edge_partition_name)
-        cls.__pacman_data._info_changed = True
+        cls.__pacman_data._vertices_or_edges_added = True
 
     @classmethod
     def iterate_machine_vertices(cls):
@@ -486,6 +485,15 @@ class PacmanDataView(MachineDataView):
             return runtime_machine_graph
         # both empty for return the application level
         return cls.get_runtime_graph()
+
+    @classmethod
+    def get_vertices_or_edges_added(cls):
+        """
+        Detects if any vertex of edge has been added
+
+        :rtype: bool
+        """
+        return cls.__pacman_data._vertices_or_edges_added
 
     # placements
 

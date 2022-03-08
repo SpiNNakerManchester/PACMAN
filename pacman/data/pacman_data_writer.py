@@ -63,6 +63,11 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         MachineDataWriter._soft_reset(self)
         self.__pacman_data._soft_reset()
 
+    @overrides(MachineDataWriter.finish_run)
+    def finish_run(self):
+        MachineDataWriter.finish_run(self)
+        self.__pacman_data._vertices_or_edges_added = False
+
     def get_graph(self):
         """
         The user level application graph
@@ -163,18 +168,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         if not isinstance(runtime_machine_graph, MachineGraph):
             raise TypeError("runtime_machine_graph should be a MachineGraph")
         self.__pacman_data._runtime_machine_graph = runtime_machine_graph
-
-    def get_and_reset_info_changed(self):
-        """
-        Detects if any of the information has changed
-
-        Any data change that should trigger a full rerun
-
-        :return:
-        """
-        answer = self.__pacman_data._info_changed
-        self.__pacman_data._info_changed = False
-        return answer
 
     def set_placements(self, placements):
         """
