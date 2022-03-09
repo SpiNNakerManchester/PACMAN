@@ -189,7 +189,7 @@ class PacmanDataView(MachineDataView):
             raise PacmanConfigurationException(
                 "Cannot add vertices to both the machine and application"
                 " graphs")
-        cls.check_user_write()
+        cls.check_user_can_act()
         cls.__pacman_data._graph.add_vertex(vertex)
         cls.__pacman_data._vertices_or_edges_added = True
 
@@ -220,7 +220,7 @@ class PacmanDataView(MachineDataView):
             raise PacmanConfigurationException(
                 "Cannot add edges / vertices to both the machine and "
                 "application graphs")
-        cls.check_user_write()
+        cls.check_user_can_act()
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
         cls.__pacman_data._vertices_or_edges_added = True
 
@@ -292,7 +292,7 @@ class PacmanDataView(MachineDataView):
             raise PacmanConfigurationException(
                 "Cannot add vertices to both the machine and application"
                 " graphs")
-        cls.check_user_write()
+        cls.check_user_can_act()
         cls.__pacman_data._machine_graph.add_vertex(vertex)
         cls.__pacman_data._vertices_or_edges_added = True
 
@@ -323,7 +323,7 @@ class PacmanDataView(MachineDataView):
             raise PacmanConfigurationException(
                 "Cannot add vertices to both the machine and application"
                 " graphs")
-        cls.check_user_write()
+        cls.check_user_can_act()
         cls.__pacman_data._machine_graph.add_edge(
             edge, outgoing_edge_partition_name)
         cls.__pacman_data._vertices_or_edges_added = True
