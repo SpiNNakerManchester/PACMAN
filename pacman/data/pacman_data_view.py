@@ -631,4 +631,3 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._routing_table_by_partition is None:
             raise cls._exception("routing_table_by_partition")
         return cls.__pacman_data._routing_table_by_partition
-

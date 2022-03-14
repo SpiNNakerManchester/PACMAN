@@ -161,7 +161,6 @@ class TestSimulatorData(unittest.TestCase):
         PacmanDataView.add_edge(edge32, "bar")
 
         self.assertTrue(PacmanDataView.has_application_vertices())
-        a = PacmanDataView.get_edges_ending_at_vertex(app2)
         self.assertSetEqual(
             set([edge12, edge32]),
             set(PacmanDataView.get_edges_ending_at_vertex(app2)))
