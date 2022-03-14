@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from spinn_utilities.exceptions import (DataLocked, DataNotYetAvialable)
+from spinn_utilities.exceptions import (
+    DataNotYetAvialable, SimulatorRunningException)
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
@@ -171,9 +172,9 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(2, len(partitions))
 
         writer.start_run()
-        with self.assertRaises(DataLocked):
+        with self.assertRaises(SimulatorRunningException):
             PacmanDataView.add_vertex(app1)
-        with self.assertRaises(DataLocked):
+        with self.assertRaises(SimulatorRunningException):
             PacmanDataView.add_edge(edge12, "foo")
         PacmanDataView.has_application_vertices()
         PacmanDataView.iterate_vertices()
