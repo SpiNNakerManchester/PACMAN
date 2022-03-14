@@ -204,7 +204,7 @@ class PacmanDataView(MachineDataView):
         :param str outgoing_edge_partition_name:
             The name of the edge partition to add the edge to; each edge
             partition is the partition of edges that start at the same vertex
-        # :rtype: AbstractEdgePartition
+        :rtype: AbstractEdgePartition
         :raises PacmanConfigurationException:
             when both graphs contain vertices
         :raises PacmanInvalidParameterException:
