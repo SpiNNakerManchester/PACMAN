@@ -369,8 +369,8 @@ class PacmanDataView(MachineDataView):
         supported.
 
          .. note::
-            The graph returned by this method may be immutable depending on
-            when it is called
+            This method is likely to be removed by another PR.
+            If not it will be replaced with add and iterate methods.
 
         :rtype: ApplicationGraph
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -393,8 +393,8 @@ class PacmanDataView(MachineDataView):
         supported.
 
          .. note::
-            The graph returned by this method may be immutable depending on
-            when it is called
+            This method is likely to be removed by another PR.
+            If not it will be replaced with add and iterate methods.
 
         :rtype: MachineGraph
         :raises SpiNNUtilsException:
