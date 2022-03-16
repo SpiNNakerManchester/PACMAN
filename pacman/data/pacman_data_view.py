@@ -166,6 +166,9 @@ class PacmanDataView(MachineDataView):
             If there is an attempt to add the same vertex more than once
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
@@ -197,6 +200,9 @@ class PacmanDataView(MachineDataView):
             one
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
@@ -212,7 +218,8 @@ class PacmanDataView(MachineDataView):
     def iterate_vertices(cls):
         """ The vertices in the user application graph.
 
-        Semantic sugar for get_graph().vertices
+        Semantic sugar for get_graph().vertices except that the result is an
+        iterable and not a list
 
         :rtype: iterable(AbstractVertex)
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -220,7 +227,21 @@ class PacmanDataView(MachineDataView):
         """
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
-        return cls.__pacman_data._graph.vertices
+        return iter(cls.__pacman_data._graph.vertices)
+
+    @classmethod
+    def get_n_vertices(cls):
+        """ The number of vertices in the user application graph.
+
+        Semantic sugar for get_graph().n_vertices
+
+        :rtype: int
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        return cls.__pacman_data._graph.n_vertices
 
     @classmethod
     def iterate_partitions(cls):
@@ -237,6 +258,20 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._graph.outgoing_edge_partitions
 
     @classmethod
+    def get_n_partitions(cls):
+        """ The partitions in the user application graph.
+
+        Semantic sugar for get_graph().n_outgoing_edge_partitions
+
+        :rtype: int
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        return cls.__pacman_data._graph.n_outgoing_edge_partitions
+
+    @classmethod
     def has_machine_vertices(cls):
         """
         Reports if the user level graph has machine vertices.
@@ -244,6 +279,7 @@ class PacmanDataView(MachineDataView):
          .. note::
             If this method returns True has_application vertices is
             guaranteed to return False. Both will be False if not vertices set
+
         :return: True if and only if the Application Graph has vertices.
         :rtype: bool
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -268,6 +304,9 @@ class PacmanDataView(MachineDataView):
             If there is an attempt to add the same vertex more than once
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         if cls.__pacman_data._machine_graph is None:
             raise cls._exception("machine_graph")
@@ -299,6 +338,9 @@ class PacmanDataView(MachineDataView):
             one
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         if cls.__pacman_data._machine_graph is None:
             raise cls._exception("machine_graph")
@@ -315,7 +357,8 @@ class PacmanDataView(MachineDataView):
     def iterate_machine_vertices(cls):
         """ The vertices in the user machine graph.
 
-        Semantic sugar for get_graph().vertices
+        Semantic sugar for get_machine_graph().vertices except that the result
+        is an iterable and not a list
 
         :rtype: iterable(AbstractVertex)
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -323,13 +366,29 @@ class PacmanDataView(MachineDataView):
         """
         if cls.__pacman_data._machine_graph is None:
             raise cls._exception("machine_graph")
-        return cls.__pacman_data._machine_graph.vertices
+        return iter(cls.__pacman_data._machine_graph.vertices)
+
+    @classmethod
+    def get_n_machine_vertices(cls):
+        """ The nuber of vertices in the user machine graph.
+
+        Semantic sugar for get_machine_graph().n_vertices
+
+        :rtype: int
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._machine_graph is None:
+            raise cls._exception("machine_graph")
+        return cls.__pacman_data._machine_graph.n_vertices
+
 
     @classmethod
     def iterate_machine_partitions(cls):
         """ The partitions in the user machine graph.
 
         Semantic sugar for get_machine_graph().outgoing_edge_partitions
+        except that the result is an iterable and not a list
 
         :rtype: iterable(ApplicationEdgePartition)
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -337,7 +396,21 @@ class PacmanDataView(MachineDataView):
         """
         if cls.__pacman_data._machine_graph is None:
             raise cls._exception("machine_graph")
-        return cls.__pacman_data._machine_graph.outgoing_edge_partitions
+        return iter(cls.__pacman_data._machine_graph.outgoing_edge_partitions)
+
+    @classmethod
+    def get_n_machine_partitions(cls):
+        """ The partitions in the user machine graph.
+
+        Semantic sugar for get_machine_graph().n_outgoing_edge_partitions
+
+        :rtype: int
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._machine_graph is None:
+            raise cls._exception("machine_graph")
+        return cls.__pacman_data._machine_graph.n_outgoing_edge_partitions
 
     @classmethod
     def get_runtime_graph(cls):

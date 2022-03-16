@@ -37,7 +37,10 @@ REPORTS_DIRNAME = "reports"
 
 class PacmanDataWriter(MachineDataWriter, PacmanDataView):
     """
-    Writer class for the Fec Data
+    See UtilsDataWriter
+
+    This class is designed to only be used directly within the PACMAN
+    repository unittests as all methods are available to subclasses
 
     """
     __pacman_data = _PacmanDataModel()
@@ -67,30 +70,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
     def finish_run(self):
         MachineDataWriter.finish_run(self)
         self.__pacman_data._vertices_or_edges_added = False
-
-    def get_graph(self):
-        """
-        The user level application graph
-
-        This removes the safety check so ASB can access the graph during run
-
-        :rtype: ApplicationGraph
-        """
-        return self.__pacman_data._graph
-
-    def get_machine_graph(self):
-        """
-        The user level machine graph
-
-        Previously known as asb._original_machine_graph.
-
-        Changes to this graph will only affect the next run
-
-        This removes the safety check so ASB can access the graph during run
-
-        :rtype: MachineGraph
-        """
-        return self.__pacman_data._machine_graph
 
     def get_runtime_graph(self):
         """
