@@ -382,7 +382,6 @@ class PacmanDataView(MachineDataView):
             raise cls._exception("machine_graph")
         return cls.__pacman_data._machine_graph.n_vertices
 
-
     @classmethod
     def iterate_machine_partitions(cls):
         """ The partitions in the user machine graph.
