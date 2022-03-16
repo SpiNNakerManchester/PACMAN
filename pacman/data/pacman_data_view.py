@@ -449,8 +449,8 @@ class PacmanDataView(MachineDataView):
         supported.
 
          .. note::
-            The graph returned by this method may be immutable depending on
-            when it is called
+            This method is likely to be removed by another PR.
+            If not it will be replaced with add and iterate methods.
 
         :rtype: ApplicationGraph or MachineGraph
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -472,7 +472,11 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_vertices_or_edges_added(cls):
         """
-        Detects if any vertex of edge has been added
+        Detects if any vertex of edge has been added since the last run
+
+        If this methods returns True a hard reset is guranteed to be needed.
+        However as there are other reasons to require a hard reset a
+        False does not imply one is not needed.
 
         :rtype: bool
         """
@@ -567,6 +571,8 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_uncompressed(cls):
         """
+        Get the uncompressed routing tables.
+
         :rtype: MulticastRoutingTables
         :return: The original routing tables
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -579,6 +585,11 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_precompressed(cls):
         """
+        Get the pre compressed routing tables.
+
+        This may be the same object as the uncompressed ones if
+        precompression is skip or determined not needed.
+
         :rtype: MulticastRoutingTables
         :return: The routing tables after the range compressor
             or if not to be run the original tables
@@ -595,7 +606,6 @@ class PacmanDataView(MachineDataView):
         The number of timesets to plan for.
 
         Use by partitioners and such but not to reserve data regions
-
 
         :rtype: int or None
         :return: The plan n timesteps for None if run forever
