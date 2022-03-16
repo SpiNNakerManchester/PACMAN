@@ -103,27 +103,12 @@ class _PacmanDataModel(object):
 
 class PacmanDataView(MachineDataView):
     """
-    A read only view of the data available at Pacman level
+    Adds the extra Methods to the View for pacman level.
 
-    The objects accessed this way should not be changed or added to.
-    Changing or adding to any object accessed if unsupported as bypasses any
-    check or updates done in the writer(s).
-    Objects returned could be changed to immutable versions without notice!
+    See UtilsDataView for a more detailed description.
 
-    The get methods will return either the value if known or a None.
-    This is the faster way to access the data but lacks the safety.
-
-    The property methods will either return a valid value or
-    raise an Exception if the data is currently not available.
-    These are typically semantic sugar around the get methods.
-
-    The has methods will return True is the value is known and False if not.
-    Semantically the are the same as checking if the get returns a None.
-    They may be faster if the object needs to be generated on the fly or
-    protected to be made immutable.
-
-    While how and where the underpinning DataModel(s) store data can change
-    without notice, methods in this class can be considered a supported API
+    This class is designed to only be used directly within the PACMAN
+    repository as all methods are available to subclasses
     """
 
     __pacman_data = _PacmanDataModel()
@@ -182,7 +167,6 @@ class PacmanDataView(MachineDataView):
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
         """
-        # TODO we want a safety check for CommandSender
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
         if cls.has_machine_vertices():
@@ -285,7 +269,6 @@ class PacmanDataView(MachineDataView):
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
         """
-        # TODO we want a safety check for CommandSender
         if cls.__pacman_data._machine_graph is None:
             raise cls._exception("machine_graph")
         if cls.has_application_vertices():
