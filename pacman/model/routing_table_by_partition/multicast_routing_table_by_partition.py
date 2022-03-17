@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
 
 
 class MulticastRoutingTableByPartition(object):
@@ -26,7 +25,7 @@ class MulticastRoutingTableByPartition(object):
     ]
 
     def __init__(self):
-        self._router_to_entries_map = OrderedDict()
+        self._router_to_entries_map = dict()
 
     def add_path_entry(self, entry, router_x, router_y, partition):
         """ Adds a multicast routing path entry
@@ -41,7 +40,7 @@ class MulticastRoutingTableByPartition(object):
         # update router_to_entries_map
         key = (router_x, router_y)
         if key not in self._router_to_entries_map:
-            self._router_to_entries_map[key] = OrderedDict()
+            self._router_to_entries_map[key] = dict()
 
         if partition not in self._router_to_entries_map[key]:
             self._router_to_entries_map[key][partition] = entry
