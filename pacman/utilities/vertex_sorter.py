@@ -16,6 +16,7 @@
 from collections import defaultdict
 import sys
 
+
 class ConstraintOrder(object):
     """ A constraint order definition for sorting.
     """

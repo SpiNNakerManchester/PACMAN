@@ -80,7 +80,7 @@ class MachineGraph(Graph):
             # Must be false as there is no App_graph
             self._application_level_used = False
         self._multicast_partitions = defaultdict(
-            lambda:defaultdict(set))
+            lambda: defaultdict(set))
         self._edge_partitions = OrderedSet()
         self._fixed_route_edge_partitions_by_pre_vertex = (
             defaultdict(OrderedSet))
