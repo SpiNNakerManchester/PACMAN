@@ -75,7 +75,7 @@ def place_application_graph(
                     sdram = sdram.get_total_sdram(plan_n_timesteps)
                     n_cores = len(vertices_to_place)
 
-                    if _do_constraints(vertices_to_place, placements):
+                    if _do_constraints(vertices_to_place, placements, machine):
                         continue
 
                     # Try to find a chip with space; this might result in a
@@ -158,7 +158,7 @@ class _SpaceExceededException(Exception):
     pass
 
 
-def _do_constraints(vertices, placements):
+def _do_constraints(vertices, placements, machine):
     x = None
     y = None
     for vertex in vertices:
@@ -175,7 +175,15 @@ def _do_constraints(vertices, placements):
             x = constraint.x
             y = constraint.y
     if x is not None or y is not None:
-        next_core = placements.n_placements_on_chip(x, y) + 1
+        chip = machine.get_chip_at(x, y)
+        if chip is None:
+            raise PacmanConfigurationException(
+                f"Constrained to chip {x, y} but no such chip")
+        on_chip = placements.placements_on_chip(x, y)
+        cores_used = {p.p for p in on_chip}
+        cores = set(p.processor_id for p in chip.processors
+                    if not p.is_monitor) - cores_used
+        next_core = next(iter(cores))
         for vertex in vertices:
             placements.add_placement(Placement(vertex, x, y, next_core))
             next_core += 1
