@@ -58,16 +58,15 @@ class _MallocBasedRoutingInfoAllocator(ElementAllocatorAlgorithm):
         super().__init__(0, 2 ** 32)
         self._n_keys_map = n_keys_map
 
-    def run(self, machine_graph):
+    def run(self, graph):
         """
-        :param MachineGraph machine_graph:
-        :param AbstractMachinePartitionNKeysMap n_keys_map:
+        :param ApplicationGraph graph:
         :rtype: RoutingInfo
         :raises PacmanRouteInfoAllocationException:
         """
         # check that this algorithm supports the constraints
         check_algorithm_can_support_constraints(
-            constrained_vertices=machine_graph.outgoing_edge_partitions,
+            constrained_vertices=graph.outgoing_edge_partitions,
             supported_constraints=[
                 FixedMaskConstraint,
                 FixedKeyAndMaskConstraint,
