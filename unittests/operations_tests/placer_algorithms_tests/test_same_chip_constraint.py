@@ -17,13 +17,13 @@ import random
 import unittest
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
-from pacman.exceptions import PacmanAlreadyPlacedError
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.resources import ResourceContainer
 from pacman.model.constraints.placer_constraints import SameChipAsConstraint
 from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
 from pacman.operations.placer_algorithms import (
     connective_based_placer, one_to_one_placer, radial_placer, spreader_placer)
+from pacman.exceptions import PacmanInvalidParameterException
 
 
 class TestSameChipConstraint(unittest.TestCase):
@@ -87,11 +87,8 @@ class TestSameChipConstraint(unittest.TestCase):
                         "Vertex was not placed on the same chip as requested")
 
     def test_connective_based(self):
-        try:
+        with self.assertRaises(PacmanInvalidParameterException):
             self._do_test("ConnectiveBasedPlacer")
-        except PacmanAlreadyPlacedError:
-            raise unittest.SkipTest(
-                "https://github.com/SpiNNakerManchester/PACMAN/issues/406")
 
     def test_one_to_one(self):
         self._do_test("OneToOnePlacer")
