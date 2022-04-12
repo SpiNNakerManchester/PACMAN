@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 future
-lxml
 jsonschema < 4.4; python_version == '3.6'
 jsonschema; python_version >= '3.7'
 sortedcollections
