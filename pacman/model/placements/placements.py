@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
 from pacman.exceptions import (
     PacmanAlreadyPlacedError, PacmanNotPlacedError,
     PacmanProcessorAlreadyOccupiedError, PacmanProcessorNotOccupiedError)
@@ -41,8 +40,8 @@ class Placements(object):
         :raise PacmanProcessorAlreadyOccupiedError:
             If two placements are made to the same processor.
         """
-        self._placements = OrderedDict()
-        self._machine_vertices = OrderedDict()
+        self._placements = dict()
+        self._machine_vertices = dict()
         if placements is not None:
             self.add_placements(placements)
 

@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
 from pacman.exceptions import (PacmanConfigurationException)
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
@@ -158,7 +157,7 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
         :return: vertices in list with new ordering
         :rtype: iterable(ApplicationVertex)
         """
-        dependent_vertices = OrderedDict()
+        dependent_vertices = dict()
         other_vertices = set()
         for vertex in vertices:
             if isinstance(vertex.splitter, AbstractDependentSplitter):
