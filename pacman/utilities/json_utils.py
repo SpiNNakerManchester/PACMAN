@@ -16,7 +16,6 @@
 Miscellaneous minor functions for converting between JSON and Python objects.
 """
 
-from collections import OrderedDict
 import json
 import gzip
 from pacman.data import PacmanDataView
@@ -79,7 +78,7 @@ def constraint_to_json(constraint):
     :return: A dict describing the constraint
     :rtype: dict
     """
-    json_dict = OrderedDict()
+    json_dict = dict()
     try:
         json_dict["class"] = constraint.__class__.__name__
         if isinstance(constraint, BoardConstraint):
@@ -168,7 +167,7 @@ def constraints_from_json(json_list, graph):
 
 def key_mask_to_json(key_mask):
     try:
-        json_object = OrderedDict()
+        json_object = dict()
         json_object["key"] = key_mask.key
         json_object["mask"] = key_mask.mask
     except Exception as ex:  # pylint: disable=broad-except
@@ -195,7 +194,7 @@ def key_masks_from_json(json_list):
 
 
 def resource_container_to_json(container):
-    json_dict = OrderedDict()
+    json_dict = dict()
     try:
         json_dict["dtcm"] = container.dtcm.get_value()
         json_dict["cpu_cycles"] = container.cpu_cycles.get_value()
@@ -222,7 +221,7 @@ def resource_container_from_json(json_dict):
 
 
 def iptag_resource_to_json(iptag):
-    json_dict = OrderedDict()
+    json_dict = dict()
     try:
         json_dict["ip_address"] = iptag.ip_address
         if iptag.port is not None:
@@ -259,7 +258,7 @@ def iptag_resources_from_json(json_list):
 
 
 def vertex_to_json(vertex):
-    json_dict = OrderedDict()
+    json_dict = dict()
     try:
         json_dict["class"] = vertex.__class__.__name__
         json_dict["label"] = vertex.label
@@ -290,7 +289,7 @@ def vertex_add_contstraints_from_json(json_dict, graph):
 
 
 def edge_to_json(edge):
-    json_dict = OrderedDict()
+    json_dict = dict()
     try:
         json_dict["pre_vertex"] = edge.pre_vertex.label
         json_dict["post_vertex"] = edge.post_vertex.label
@@ -313,7 +312,7 @@ def edge_from_json(json_dict, graph=None):
 
 def graph_to_json(graph):
     #  TODO Appplication vertex info needed for ZonedRoutingInfoAllocator
-    json_dict = OrderedDict()
+    json_dict = dict()
     try:
         if graph.label is not None:
             json_dict["label"] = graph.label
@@ -351,7 +350,7 @@ def vertex_lookup(label, graph=None):
 
 
 def placement_to_json(placement):
-    json_dict = OrderedDict()
+    json_dict = dict()
     try:
         json_dict["vertex_label"] = placement.vertex.label
         json_dict["x"] = placement.x
@@ -380,7 +379,7 @@ def partition_to_n_keys_map_to_json():
         PacmanDataView.get_machine_partition_n_keys_map()
     json_list = []
     for partition in partition_to_n_keys_map:
-        json_dict = OrderedDict()
+        json_dict = dict()
         try:
             json_dict["pre_vertex_label"] = partition.pre_vertex.label
             json_dict["identifier"] = partition.identifier

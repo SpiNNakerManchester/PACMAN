@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
@@ -89,7 +89,7 @@ class ZonedRoutingTableGenerator(object):
         :rtype: MulticastRoutingTable
         """
         table = UnCompressedMulticastRoutingTable(chip.x, chip.y)
-        partitions_by_app_vertex = DefaultOrderedDict(set)
+        partitions_by_app_vertex = defaultdict(set)
         for partition in partitions_in_table:
             partitions_by_app_vertex[partition.pre_vertex.app_vertex].add(
                 partition)

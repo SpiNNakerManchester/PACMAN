@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 import sys
-from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 
 
 class ConstraintOrder(object):
@@ -91,7 +91,7 @@ class VertexSorter(object):
             The order in which the constraints are to be sorted
         """
         # Group constraints based on the class
-        self._constraints = DefaultOrderedDict(list)
+        self._constraints = defaultdict(list)
         for c in constraint_order:
             self._constraints[c.constraint_class].append(
                 (c.relative_order, c.required_optional_properties))

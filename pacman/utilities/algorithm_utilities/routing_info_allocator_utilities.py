@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
 import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
@@ -81,7 +80,7 @@ def get_mulitcast_edge_groups(machine_graph):
     """
 
     # mapping between partition and shared key group it is in
-    partition_groups = OrderedDict()
+    partition_groups = dict()
 
     # process each partition one by one in a bubble sort kinda way
     for vertex in machine_graph.vertices:
