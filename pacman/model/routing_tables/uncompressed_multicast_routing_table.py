@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
 import csv
 import gzip
 import logging
@@ -70,7 +69,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         self._y = y
         self._number_of_defaulted_routing_entries = 0
         self._multicast_routing_entries = list()
-        self._entries_by_key_mask = OrderedDict()
+        self._entries_by_key_mask = dict()
         self._entries_by_key = dict()
 
         if multicast_routing_entries is not None:

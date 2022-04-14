@@ -13,10 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
+from collections import defaultdict
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
-from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
@@ -72,11 +71,11 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         self._vertices = []
         self._vertex_by_label = dict()
         self._unlabelled_vertex_count = 0
-        self._outgoing_edge_partitions_by_name = OrderedDict()
-        self._outgoing_edges = DefaultOrderedDict(OrderedSet)
-        self._incoming_edges = DefaultOrderedDict(OrderedSet)
-        self._incoming_edges_by_partition_name = DefaultOrderedDict(list)
-        self._outgoing_edge_partition_by_edge = OrderedDict()
+        self._outgoing_edge_partitions_by_name = dict()
+        self._outgoing_edges = defaultdict(OrderedSet)
+        self._incoming_edges = defaultdict(OrderedSet)
+        self._incoming_edges_by_partition_name = defaultdict(list)
+        self._outgoing_edge_partition_by_edge = dict()
         self._label = label
 
     @property

@@ -15,7 +15,6 @@
 
 import json
 import gzip
-from collections import OrderedDict
 from pacman.exceptions import PacmanAlreadyExistsException
 from .uncompressed_multicast_routing_table import \
     UnCompressedMulticastRoutingTable
@@ -119,12 +118,12 @@ class MulticastRoutingTables(object):
 def to_json(router_table):
     json_list = []
     for routing_table in router_table:
-        json_routing_table = OrderedDict()
+        json_routing_table = dict()
         json_routing_table["x"] = routing_table.x
         json_routing_table["y"] = routing_table.y
         entries = []
         for entry in routing_table.multicast_routing_entries:
-            json_entry = OrderedDict()
+            json_entry = dict()
             json_entry["key"] = entry.routing_entry_key
             json_entry["mask"] = entry.mask
             json_entry["defaultable"] = entry.defaultable
