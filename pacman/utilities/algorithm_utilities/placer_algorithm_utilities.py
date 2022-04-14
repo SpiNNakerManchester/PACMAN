@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import functools
-from collections import OrderedDict
 
 from pacman.model.resources import ResourceContainer, ConstantSDRAM
 from spinn_utilities.ordered_set import OrderedSet
@@ -75,7 +74,7 @@ def get_same_chip_vertex_groups(graph):
         get_vertices_on_same_chip, graph=graph))
     # Dict of vertex to set of vertices on same chip (repeated lists expected)
     # A empty set value indicates a set that is too big.
-    same_chip_vertices = OrderedDict()
+    same_chip_vertices = dict()
     for group in groups:
         for vertex in group:
             same_chip_vertices[vertex] = group
