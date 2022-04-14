@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
 import logging
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanRoutingException
@@ -62,7 +61,7 @@ def codify_table(table, length=32):
     :param int length:
     :rtype: dict(str, ~spinn_machine.MulticastRoutingEntry)
     """
-    code_dict = OrderedDict()
+    code_dict = dict()
     for route in table.multicast_routing_entries:
         code_dict[codify(route, length)] = route
     return code_dict

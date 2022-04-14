@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from .application_edge_partition import ApplicationEdgePartition
-from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
@@ -40,7 +40,7 @@ class ApplicationGraph(Graph):
         """
         super().__init__(ApplicationVertex, ApplicationEdge, label)
         self._outgoing_edge_partitions_by_pre_vertex = \
-            DefaultOrderedDict(OrderedSet)
+            defaultdict(OrderedSet)
 
     def forget_machine_graph(self):
         """ Forget the whole mapping from this graph to an application graph.

@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
-from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from pacman.model.graphs import Graph
@@ -79,21 +79,21 @@ class MachineGraph(Graph):
         else:
             # Must be false as there is no App_graph
             self._application_level_used = False
-        self._multicast_partitions = DefaultOrderedDict(
-            lambda: DefaultOrderedDict(set))
+        self._multicast_partitions = defaultdict(
+            lambda: defaultdict(set))
         self._edge_partitions = OrderedSet()
         self._fixed_route_edge_partitions_by_pre_vertex = (
-            DefaultOrderedDict(OrderedSet))
+            defaultdict(OrderedSet))
         self._multicast_edge_partitions_by_pre_vertex = (
-            DefaultOrderedDict(OrderedSet))
+            defaultdict(OrderedSet))
         self._sdram_edge_partitions_by_pre_vertex = (
-            DefaultOrderedDict(OrderedSet))
+            defaultdict(OrderedSet))
         self._fixed_route_edge_partitions_by_post_vertex = (
-            DefaultOrderedDict(OrderedSet))
+            defaultdict(OrderedSet))
         self._multicast_edge_partitions_by_post_vertex = (
-            DefaultOrderedDict(OrderedSet))
+            defaultdict(OrderedSet))
         self._sdram_edge_partitions_by_post_vertex = (
-            DefaultOrderedDict(OrderedSet))
+            defaultdict(OrderedSet))
 
     @overrides(Graph.add_edge)
     def add_edge(self, edge, outgoing_edge_partition_name):
