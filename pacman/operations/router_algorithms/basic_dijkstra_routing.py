@@ -103,7 +103,7 @@ class _BasicDijkstraRouting(object):
             The machine through which the routes are to be found
         :param bool use_progress_bar: whether to show a progress bar
         :return: The discovered routes
-        :rtype: MulticastRoutingTables
+        :rtype: MulticastRoutingTableByPartition
         :raise PacmanRoutingException:
             If something goes wrong with the routing
         """
