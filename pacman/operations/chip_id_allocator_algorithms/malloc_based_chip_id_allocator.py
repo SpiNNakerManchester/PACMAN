@@ -20,8 +20,7 @@ from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import (
     AbstractFPGA, AbstractSpiNNakerLink, AbstractVirtual)
-from pacman.utilities.algorithm_utilities import (
-    machine_algorithm_utilities, ElementAllocatorAlgorithm)
+from pacman.utilities.algorithm_utilities import machine_algorithm_utilities
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _LOWER_16_BITS = 0xFFFF
@@ -52,7 +51,7 @@ def malloc_based_chip_id_allocator():
     allocator.allocate_chip_ids()
 
 
-class _MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
+class _MallocBasedChipIdAllocator(object):
     """ A Chip ID Allocation Allocator algorithm that keeps track of\
         chip IDs and attempts to allocate them as requested
     """
@@ -63,8 +62,6 @@ class _MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
     ]
 
     def __init__(self):
-        super().__init__(0, 2 ** 32)
-
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()
 
@@ -79,11 +76,6 @@ class _MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
         progress = ProgressBar(
             graph.n_vertices + machine.n_chips,
             "Allocating virtual identifiers")
-
-        # allocate standard IDs for real chips
-        for x, y in progress.over(machine.chip_coordinates, False):
-            expected_chip_id = (x << 8) + y
-            self._allocate_elements(expected_chip_id, 1)
 
         # allocate IDs for virtual chips
         for vertex in progress.over(graph.vertices):
@@ -117,19 +109,8 @@ class _MallocBasedChipIdAllocator(ElementAllocatorAlgorithm):
             return self._virtual_chips[link_data]
 
         # Allocate a new ID and cache it for later
-        chip_id_x, chip_id_y = self._allocate_id()
+        chip_id_x, chip_id_y = machine.get_unused_xy()
         machine_algorithm_utilities.create_virtual_chip(
             machine, link_data, chip_id_x, chip_id_y)
         self._virtual_chips[link_data] = (chip_id_x, chip_id_y)
         return chip_id_x, chip_id_y
-
-    def _allocate_id(self):
-        """ Allocate a chip ID from the free space
-        """
-
-        # can always assume there's at least one element in the free space,
-        # otherwise it will have already been deleted already.
-        free_space_chunk = self._free_space_tracker[0]
-        chip_id = free_space_chunk.start_address
-        self._allocate_elements(chip_id, 1)
-        return (chip_id >> 8), (chip_id & _LOWER_16_BITS)
