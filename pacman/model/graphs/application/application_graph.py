@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from .application_edge_partition import ApplicationEdgePartition
-from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
@@ -41,8 +41,7 @@ class ApplicationGraph(Graph):
         :type label: str or None
         """
         super().__init__(ApplicationVertex, ApplicationEdge, label)
-        self._outgoing_edge_partitions_by_pre_vertex = \
-            DefaultOrderedDict(OrderedSet)
+        self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
         self._n_outgoing_edge_partitions = 0
 
     def forget_machine_graph(self):

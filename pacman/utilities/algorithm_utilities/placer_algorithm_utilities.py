@@ -19,7 +19,7 @@ from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
     RadialPlacementFromChipConstraint)
 from pacman.utilities import VertexSorter, ConstraintOrder
-from collections import OrderedDict
+from collections import dict
 
 
 def sort_vertices_by_known_constraints(vertices):
@@ -45,7 +45,7 @@ def get_same_chip_vertex_groups(machine_graph):
     :param MachineGraph machine_graph: The graph containing the vertices
     :rtype: dict(MachineVertex, set(MachineVertex))
     """
-    same_chip = OrderedDict()
+    same_chip = dict()
     couples = list()
     for vertex in machine_graph.vertices:
         for constraint in vertex.constraints:

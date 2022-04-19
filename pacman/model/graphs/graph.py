@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
-from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
@@ -59,7 +59,7 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         self._vertices = []
         self._vertex_by_label = dict()
         self._unlabelled_vertex_count = 0
-        self._incoming_edges = DefaultOrderedDict(OrderedSet)
+        self._incoming_edges = defaultdict(OrderedSet)
         self._label = label
 
     @property

@@ -109,7 +109,9 @@ class _RadialPlacer(object):
             If something goes wrong with the placement
         """
         # check that the algorithm can handle the constraints
-        self._check_constraints(machine_graph.vertices)
+        self._check_constraints(
+            machine_graph.vertices,
+            additional_placement_constraints={SameChipAsConstraint})
 
         placements = Placements()
         vertices = sort_vertices_by_known_constraints(machine_graph.vertices)
@@ -142,11 +144,10 @@ class _RadialPlacer(object):
 
     def _check_constraints(
             self, vertices, additional_placement_constraints=None):
-        placement_constraints = {
-            RadialPlacementFromChipConstraint, SameChipAsConstraint
-        }
         if additional_placement_constraints is not None:
-            placement_constraints.update(additional_placement_constraints)
+            placement_constraints = additional_placement_constraints
+        else:
+            placement_constraints = {}
         ResourceTracker.check_constraints(
             vertices, additional_placement_constraints=placement_constraints)
 

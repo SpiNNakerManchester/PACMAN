@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
-from spinn_utilities.default_ordered_dict import DefaultOrderedDict
+from collections import defaultdict
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
@@ -38,8 +37,8 @@ class AbstractMultiplePartition(AbstractEdgePartition):
             identifier=identifier,
             allowed_edge_types=allowed_edge_types, constraints=constraints,
             label=label, traffic_weight=traffic_weight, class_name=class_name)
-        self._pre_vertices = OrderedDict()
-        self._destinations = DefaultOrderedDict(OrderedSet)
+        self._pre_vertices = dict()
+        self._destinations = defaultdict(OrderedSet)
 
         # hard code dict of lists so that only these are acceptable.
         for pre_vertex in pre_vertices:

@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
-from spinn_utilities.default_ordered_dict import DefaultOrderedDict
+from collections import defaultdict
 from pacman.exceptions import (
     PacmanAlreadyPlacedError, PacmanNotPlacedError,
     PacmanProcessorAlreadyOccupiedError, PacmanProcessorNotOccupiedError)
@@ -42,8 +41,8 @@ class Placements(object):
         :raise PacmanProcessorAlreadyOccupiedError:
             If two placements are made to the same processor.
         """
-        self._placements = DefaultOrderedDict(OrderedDict)
-        self._machine_vertices = OrderedDict()
+        self._placements = defaultdict(dict)
+        self._machine_vertices = dict()
         if placements is not None:
             self.add_placements(placements)
 

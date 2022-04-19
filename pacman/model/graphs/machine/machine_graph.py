@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 from .machine_vertex import MachineVertex
 from .machine_edge import MachineEdge
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
-from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs import Graph
 from pacman.model.graphs.common import EdgeTrafficType
@@ -72,13 +72,13 @@ class MachineGraph(Graph):
             # Must be false as there is no App_graph
             self._application_level_used = False
         self._fixed_route_edge_partitions_by_pre_vertex = (
-            DefaultOrderedDict(OrderedSet))
+            defaultdict(OrderedSet))
         self._multicast_edge_partitions_by_pre_vertex = (
-            DefaultOrderedDict(OrderedSet))
+            defaultdict(OrderedSet))
         self._sdram_edge_partitions_by_pre_vertex = (
-            DefaultOrderedDict(OrderedSet))
+            defaultdict(OrderedSet))
         self._sdram_edge_partitions_by_post_vertex = (
-            DefaultOrderedDict(OrderedSet))
+            defaultdict(OrderedSet))
         self._n_outgoing_edge_partitions = 0
 
     @overrides(Graph.add_edge)
