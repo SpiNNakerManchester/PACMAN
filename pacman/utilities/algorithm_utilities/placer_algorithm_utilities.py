@@ -19,7 +19,6 @@ from pacman.model.constraints.placer_constraints import (
     ChipAndCoreConstraint, SameChipAsConstraint, BoardConstraint,
     RadialPlacementFromChipConstraint)
 from pacman.utilities import VertexSorter, ConstraintOrder
-from collections import dict
 
 
 def sort_vertices_by_known_constraints(vertices):
