@@ -18,10 +18,7 @@ from pacman.config_setup import unittest_setup
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
     ResourceContainer)
-from pacman.utilities import file_format_schemas
 from pacman.utilities.json_utils import (
-    edge_to_json, edge_from_json,
-    graph_to_json, graph_from_json,
     resource_container_to_json, resource_container_from_json,
     vertex_to_json, vertex_from_json)
 from pacman.model.graphs.machine import SimpleMachineVertex
@@ -80,27 +77,6 @@ class TestJsonUtils(unittest.TestCase):
         j_object2 = json.loads(j_str)
         back = vertex_from_json(j_object2)
         self._compare_vertex(there, back)
-
-    def edge_there_and_back(self, there):
-        j_object = edge_to_json(there)
-        j_str = json.dumps(j_object)
-        j_object2 = json.loads(j_str)
-        back = edge_from_json(j_object2)
-        self.assertEqual(there.label, back.label)
-        self._compare_vertex(there.pre_vertex, back.pre_vertex)
-        self._compare_vertex(there.post_vertex, back.post_vertex)
-        self.assertEqual(there.traffic_type, back.traffic_type)
-        self.assertEqual(there.traffic_weight, back.traffic_weight)
-
-    def graph_there_and_back(self, there):
-        j_object = graph_to_json(there)
-        print(j_object)
-        file_format_schemas.validate(j_object, MACHINE_GRAPH_FILENAME)
-        back = graph_from_json(j_object)
-        self.assertEqual(there.n_vertices, back.n_vertices)
-        for vertex in there.vertices:
-            b_vertex = back.vertex_by_label(vertex.label)
-            self._compare_vertex(vertex, b_vertex)
 
     # ------------------------------------------------------------------
     # Test cases
