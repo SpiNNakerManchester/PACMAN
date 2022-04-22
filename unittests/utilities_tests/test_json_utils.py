@@ -15,27 +15,16 @@
 import unittest
 import json
 from pacman.config_setup import unittest_setup
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
-    FixedMaskConstraint)
-from pacman.model.constraints.placer_constraints import (
-    BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
-    SameChipAsConstraint)
-from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
     ResourceContainer)
-from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities import file_format_schemas
 from pacman.utilities.json_utils import (
-    constraint_to_json, constraint_from_json,
     edge_to_json, edge_from_json,
     graph_to_json, graph_from_json,
     resource_container_to_json, resource_container_from_json,
     vertex_to_json, vertex_from_json)
-from pacman.model.graphs.machine import (
-    MachineEdge, MachineGraph, SimpleMachineVertex)
+from pacman.model.graphs.machine import SimpleMachineVertex
 
 MACHINE_GRAPH_FILENAME = "machine_graph.json"
 
@@ -78,13 +67,6 @@ class TestJsonUtils(unittest.TestCase):
     # Composite JSON round-trip testing schemes
     # ------------------------------------------------------------------
 
-    def constraint_there_and_back(self, there):
-        j_object = constraint_to_json(there)
-        j_str = json.dumps(j_object)
-        j_object2 = json.loads(j_str)
-        back = constraint_from_json(j_object2)
-        self._compare_constraint(there, back)
-
     def resource_there_and_back(self, there):
         j_object = resource_container_to_json(there)
         j_str = json.dumps(j_object)
@@ -124,50 +106,6 @@ class TestJsonUtils(unittest.TestCase):
     # Test cases
     # ------------------------------------------------------------------
 
-    def test_board_constraint(self):
-        c1 = BoardConstraint("1.2.3.4")
-        self.constraint_there_and_back(c1)
-
-    def test_chip_and_core_constraint(self):
-        c1 = ChipAndCoreConstraint(1, 2)
-        self.constraint_there_and_back(c1)
-        c2 = ChipAndCoreConstraint(1, 2, 3)
-        self.constraint_there_and_back(c2)
-
-    def test_radial_placement_from_chip_constraint(self):
-        c1 = RadialPlacementFromChipConstraint(1, 2)
-        self.constraint_there_and_back(c1)
-
-    def test_same_chip_as_constraint(self):
-        v1 = SimpleMachineVertex(None, "v1")
-        c1 = SameChipAsConstraint(v1)
-        self.constraint_there_and_back(c1)
-
-    def test_max_vertex_atoms_constraint(self):
-        c1 = MaxVertexAtomsConstraint(5)
-        self.constraint_there_and_back(c1)
-
-    def test_fixed_vertex_atoms_constraint(self):
-        c1 = FixedVertexAtomsConstraint(5)
-        self.constraint_there_and_back(c1)
-
-    def test_contiguous_key_range_constraint(self):
-        c1 = ContiguousKeyRangeContraint()
-        self.constraint_there_and_back(c1)
-
-    def test_fixed_key_and_mask_constraint(self):
-        c1 = FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(0xFF0, 0xFF8)])
-        self.constraint_there_and_back(c1)
-        km = BaseKeyAndMask(0xFF0, 0xFF8)
-        km2 = BaseKeyAndMask(0xFE0, 0xFF8)
-        c2 = FixedKeyAndMaskConstraint([km, km2])
-        self.constraint_there_and_back(c2)
-
-    def test_fixed_mask_constraint(self):
-        c1 = FixedMaskConstraint(0xFF0)
-        self.constraint_there_and_back(c1)
-
     def test_tags_resources(self):
         t1 = IPtagResource("1", 2, True)  # Minimal args
         r1 = ResourceContainer(iptags=[t1])
@@ -192,30 +130,3 @@ class TestJsonUtils(unittest.TestCase):
             "127.0.0.1", port=None, strip_sdp=True)]),
             label="Vertex")
         self.vertex_there_and_back(s1)
-
-    def test_vertex2(self):
-        """Like test_vertex, but with constraints."""
-        c1 = ContiguousKeyRangeContraint()
-        c2 = BoardConstraint("1.2.3.4")
-        s1 = SimpleMachineVertex(ResourceContainer(iptags=[IPtagResource(
-            "127.0.0.1", port=None, strip_sdp=True)]),
-            label="Vertex", constraints=[c1, c2])
-        self.vertex_there_and_back(s1)
-
-    def test_same_chip_as_constraint_plus(self):
-        v1 = SimpleMachineVertex(None, "v1")
-        c1 = SameChipAsConstraint(v1)
-        self.constraint_there_and_back(c1)
-
-    def test_edge(self):
-        v1 = SimpleMachineVertex(None, "One")
-        v2 = SimpleMachineVertex(None, "Two")
-        e1 = MachineEdge(v1, v2)
-        self.edge_there_and_back(e1)
-
-    def test_new_empty_graph(self):
-        """
-        test that the creation of a empty machine graph works
-        """
-        m1 = MachineGraph("foo")
-        self.graph_there_and_back(m1)

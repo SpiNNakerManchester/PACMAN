@@ -12,6 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spinn_utilities.ordered_set import OrderedSet
+from pacman.model.graphs.application.application_vertex import ApplicationVertex
 """Neighbour Exploring Routing (NER) algorithm from J. Navaridas et al.
 
 Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast routing,
@@ -35,7 +37,7 @@ from pacman.model.routing_table_by_partition import (
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     route_has_dead_links, avoid_dead_links, convert_a_route,
     longest_dimension_first, nodes_to_trees, vertex_xy, targets_by_chip,
-    least_busy_dimension_first)
+    least_busy_dimension_first, get_app_partitions)
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 
 
@@ -159,10 +161,10 @@ def _do_route(source_xy, post_vertexes, machine, placements,
     return root
 
 
-def _ner_route(machine_graph, machine, placements, vector_to_nodes):
+def _ner_route(graph, machine, placements, vector_to_nodes):
     """ Performs routing using rig algorithm
 
-    :param MachineGraph machine_graph:
+    :param ApplicationGraph graph:
     :param ~spinn_machine.Machine machine:
     :param Placements placements:
     :return:
@@ -170,24 +172,44 @@ def _ner_route(machine_graph, machine, placements, vector_to_nodes):
     """
     routing_tables = MulticastRoutingTableByPartition()
 
-    progress_bar = ProgressBar(len(machine_graph.vertices), "Routing")
+    partitions = get_app_partitions(graph)
 
-    for source_vertex in progress_bar.over(machine_graph.vertices):
-        # handle the vertex edges
-        for partition in machine_graph.\
-                get_multicast_edge_partitions_starting_at_vertex(
-                    source_vertex):
-            post_vertexes = list(
-                e.post_vertex for e in partition.edges)
-            source_xy = vertex_xy(source_vertex, placements, machine)
+    progress_bar = ProgressBar(len(partitions), "Routing")
+
+    for partition in progress_bar.over(partitions):
+
+        source = partition.pre_vertex
+        post_vertices_by_source = defaultdict(OrderedSet)
+        for edge in partition.edges:
+            splitter = edge.post_vertex.splitter
+            target_vertices = splitter.get_source_specific_in_coming_vertices(
+                source, partition.identifier)
+            for tgt, srcs in target_vertices:
+                for src in srcs:
+                    if isinstance(src, ApplicationVertex):
+                        for s in src.splitter.get_out_going_vertices(
+                                partition.identifier):
+                            post_vertices_by_source[s].add(tgt)
+
+        outgoing = OrderedSet(source.splitter.get_out_going_vertices(
+            partition.identifier))
+        for in_part in source.splitter.get_internal_multicast_partitions():
+            if in_part.identifier == partition.identifier:
+                outgoing.add(in_part.pre_vertex)
+                for edge in in_part.edges:
+                    post_vertices_by_source[in_part.pre_vertex].add(
+                        edge.post_vertex)
+
+        for m_vertex in outgoing:
+            post_vertexes = post_vertices_by_source[m_vertex]
+            source_xy = vertex_xy(m_vertex, placements, machine)
             routing_tree = _do_route(
                 source_xy, post_vertexes, machine, placements,
                 vector_to_nodes)
             targets = targets_by_chip(post_vertexes, placements, machine)
-            incoming_processor = placements.get_placement_of_vertex(
-                partition.pre_vertex).p
+            incoming_processor = placements.get_placement_of_vertex(m_vertex).p
             convert_a_route(
-                routing_tables, partition.pre_vertex, partition.identifier,
+                routing_tables, m_vertex, partition.identifier,
                 incoming_processor, None, routing_tree, targets)
 
     progress_bar.end()
@@ -195,23 +217,23 @@ def _ner_route(machine_graph, machine, placements, vector_to_nodes):
     return routing_tables
 
 
-def ner_route(machine_graph, machine, placements):
+def ner_route(machine, graph, placements):
     """ basic ner router
 
-    :param MachineGraph machine_graph: the machine graph
+    :param ApplicationGraph graph: the graph
     :param ~spinn_machine.Machine machine: spinnaker machine
     :param Placements placements: the placements
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition
     """
     return _ner_route(
-        machine_graph, machine, placements, longest_dimension_first)
+        graph, machine, placements, longest_dimension_first)
 
 
-def ner_route_traffic_aware(machine_graph, machine, placements):
+def ner_route_traffic_aware(machine, graph, placements):
     """ traffic-aware ner router
 
-    :param MachineGraph machine_graph: the machine graph
+    :param ApplicationGraph graph: the graph
     :param ~spinn_machine.Machine machine: spinnaker machine
     :param Placements placements: the placements
     :return: a routing table by partition
@@ -219,5 +241,5 @@ def ner_route_traffic_aware(machine_graph, machine, placements):
     """
     traffic = defaultdict(lambda: 0)
     return _ner_route(
-        machine_graph, machine, placements,
+        graph, machine, placements,
         functools.partial(least_busy_dimension_first, traffic))
