@@ -16,7 +16,6 @@
 import unittest
 from pacman.config_setup import unittest_setup
 from pacman.model.routing_info import BaseKeyAndMask
-from pacman.utilities.utility_objs import Field
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint)
 

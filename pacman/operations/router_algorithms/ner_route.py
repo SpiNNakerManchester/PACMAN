@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from spinn_utilities.ordered_set import OrderedSet
-from pacman.model.graphs.application.application_vertex import ApplicationVertex
 """Neighbour Exploring Routing (NER) algorithm from J. Navaridas et al.
 
 Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast routing,
@@ -32,12 +30,14 @@ import functools
 from collections import defaultdict
 
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     route_has_dead_links, avoid_dead_links, convert_a_route,
     longest_dimension_first, nodes_to_trees, vertex_xy, targets_by_chip,
     least_busy_dimension_first, get_app_partitions)
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 
 
