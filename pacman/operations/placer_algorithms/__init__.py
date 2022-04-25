@@ -12,12 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from .radial_placer import radial_placer
-from .one_to_one_placer import one_to_one_placer
-from .spreader_placer import spreader_placer
-from .connective_based_placer import connective_based_placer
 from .application_placer import place_application_graph
 
-__all__ = ['radial_placer', 'one_to_one_placer', "spreader_placer",
-           'connective_based_placer', 'place_application_graph']
+__all__ = ['place_application_graph']

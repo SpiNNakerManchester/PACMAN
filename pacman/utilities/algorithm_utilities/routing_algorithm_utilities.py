@@ -18,9 +18,37 @@ from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartitionEntry)
 from pacman.model.graphs import (
     AbstractFPGA, AbstractSpiNNakerLink, AbstractVirtual)
+from pacman.model.graphs.application import ApplicationEdgePartition
 from collections import deque, defaultdict
 import heapq
 import itertools
+
+
+def get_app_partitions(app_graph):
+    """ Find all application partitions, including self-connected ones from
+        internal multicast partitions
+
+    :param ApplicationGraph app_graph: The application graph to consider
+    :return: list of partitions; note where there are only internal multicast
+        partitions, the partition will have no edges.  Caller should use
+        vertex.splitter.get_internal_multicast_partitions for details.
+    :rtype: list(ApplicationEdgePartition)
+    """
+
+    # Find all partitions that need to be dealt with
+    partitions = list(app_graph.outgoing_edge_partitions)
+    sources = set(p.pre_vertex for p in partitions)
+
+    # Convert internal partitions to self-connected partitions
+    for v in app_graph.vertices:
+        internal_partitions = v.splitter.get_internal_multicast_partitions()
+        if v not in sources and internal_partitions:
+            part_ids = set(p.identifier for p in internal_partitions)
+            for identifier in part_ids:
+                # Add a partition with no edges to identify this as internal
+                app_part = ApplicationEdgePartition(identifier, v)
+                partitions.append(app_part)
+    return partitions
 
 
 def route_has_dead_links(root, machine):

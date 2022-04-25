@@ -1,4 +1,4 @@
-# Copyright (c) 2021 The University of Manchester
+# Copyright (c) 2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,12 +17,17 @@ from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationGraph, ApplicationEdge)
+from pacman.model.graphs.machine import MulticastEdgePartition, MachineEdge
 from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
 from pacman.operations.router_algorithms.application_router import (
     route_application_graph, _path_without_errors)
+from pacman.operations.router_algorithms.basic_dijkstra_routing import (
+    basic_dijkstra_routing)
+from pacman.operations.router_algorithms.ner_route import (
+    ner_route, ner_route_traffic_aware)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
-    longest_dimension_first)
+    longest_dimension_first, get_app_partitions)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.config_setup import unittest_setup
@@ -32,6 +37,13 @@ from pacman.model.resources import ResourceContainer, ConstantSDRAM
 
 from collections import defaultdict
 import math
+import pytest
+
+
+@pytest.fixture(params=[route_application_graph, basic_dijkstra_routing,
+                        ner_route, ner_route_traffic_aware])
+def algorithm(request):
+    return request.param
 
 
 class TestSplitter(AbstractSplitterCommon):
@@ -71,17 +83,21 @@ class TestSplitter(AbstractSplitterCommon):
 class TestMultiInputSplitter(AbstractSplitterCommon):
 
     def __init__(self, n_incoming_machine_vertices,
-                 n_outgoing_machine_vertices, n_groups):
+                 n_outgoing_machine_vertices, n_groups,
+                 internal_multicast=False):
         AbstractSplitterCommon.__init__(self)
         self.__n_incoming_machine_vertices = n_incoming_machine_vertices
         self.__n_outgoing_machine_vertices = n_outgoing_machine_vertices
         self.__n_groups = n_groups
+        self.__internal_multicast = internal_multicast
         self.__same_chip_groups = list()
         self.__incoming_machine_vertices = [
             list() for _ in range(n_incoming_machine_vertices)]
         self.__outgoing_machine_vertices = list()
+        self.__internal_multicast_partitions = list()
 
     def create_machine_vertices(self, chip_counter):
+        last_incoming = None
         for i in range(self.__n_groups):
             incoming = [
                 SimpleMachineVertex(
@@ -101,6 +117,15 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
             for j in range(self.__n_incoming_machine_vertices):
                 self._governed_app_vertex.remember_machine_vertex(incoming[j])
                 self.__incoming_machine_vertices[j].append(incoming[j])
+            if self.__internal_multicast:
+                if last_incoming is not None:
+                    for this_in in incoming:
+                        in_part = MulticastEdgePartition(this_in, "internal")
+                        self.__internal_multicast_partitions.append(in_part)
+                        for last_in in last_incoming:
+                            in_part.add_edge(
+                                MachineEdge(this_in, last_in), None)
+                last_incoming = incoming
 
     def get_out_going_slices(self):
         return None
@@ -134,6 +159,9 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
     def machine_vertices_for_recording(self, variable_to_record):
         return []
 
+    def get_internal_multicast_partitions(self):
+        return self.__internal_multicast_partitions
+
     def reset_called(self):
         pass
 
@@ -160,21 +188,25 @@ def _make_vertices(app_graph, n_atoms, n_machine_vertices, label):
 
 
 def _make_vertices_split(
-        app_graph, n_atoms, n_incoming, n_outgoing, n_groups, label):
+        app_graph, n_atoms, n_incoming, n_outgoing, n_groups, label,
+        internal_multicast=False):
     vertex = TestAppVertex(n_atoms, label)
-    vertex.splitter = TestMultiInputSplitter(n_incoming, n_outgoing, n_groups)
+    vertex.splitter = TestMultiInputSplitter(
+        n_incoming, n_outgoing, n_groups, internal_multicast)
     app_graph.add_vertex(vertex)
     vertex.splitter.create_machine_vertices(None)
     return vertex
 
 
-def _get_entry(routing_tables, x, y, source_vertex, partition_id):
+def _get_entry(routing_tables, x, y, source_vertex, partition_id, allow_none):
     app_entry = routing_tables.get_entry_on_coords_for_edge(
         source_vertex.app_vertex, partition_id, x, y)
     entry = routing_tables.get_entry_on_coords_for_edge(
         source_vertex, partition_id, x, y)
 
     if entry is None and app_entry is None:
+        if allow_none:
+            return None
         raise Exception(
             f"No entry found on {x}, {y} for {source_vertex}, {partition_id}")
     if entry is not None and app_entry is not None:
@@ -191,8 +223,11 @@ def _find_targets(
     found_targets = set()
     to_follow = list()
     x, y = placements.get_placement_of_vertex(source_vertex).chip
-    to_follow.append((x, y, _get_entry(
-        routing_tables, x, y, source_vertex, partition_id)))
+    first_entry = _get_entry(
+        routing_tables, x, y, source_vertex, partition_id, True)
+    if first_entry is None:
+        return found_targets
+    to_follow.append((x, y, first_entry))
     visited = set()
     while to_follow:
         x, y, next_to_follow = to_follow.pop()
@@ -216,12 +251,12 @@ def _find_targets(
             next_x, next_y = machine.xy_over_link(x, y, link)
             to_follow.append((next_x, next_y, _get_entry(
                     routing_tables, next_x, next_y, source_vertex,
-                    partition_id)))
+                    partition_id, False)))
     return found_targets
 
 
 def _check_edges(routing_tables, machine, placements, app_graph):
-    for part in app_graph.outgoing_edge_partitions:
+    for part in get_app_partitions(app_graph):
 
         # Find the required targets
         required_targets = defaultdict(set)
@@ -239,23 +274,32 @@ def _check_edges(routing_tables, machine, placements, app_graph):
                     else:
                         required_targets[src].add(place.location)
 
-        for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
-                part.identifier):
+        splitter = part.pre_vertex.splitter
+        outgoing = set(splitter.get_out_going_vertices(part.identifier))
+        for in_part in splitter.get_internal_multicast_partitions():
+            if in_part.identifier == part.identifier:
+                outgoing.add(in_part.pre_vertex)
+                for edge in in_part.edges:
+                    place = placements.get_placement_of_vertex(
+                        edge.post_vertex)
+                    required_targets[in_part.pre_vertex].add(place.location)
+
+        for m_vertex in outgoing:
             actual_targets = _find_targets(
                 routing_tables, machine, placements, m_vertex,
                 part.identifier)
             assert(not actual_targets.difference(required_targets[m_vertex]))
 
 
-def _route_and_time(machine, app_graph, placements):
+def _route_and_time(machine, app_graph, placements, algorithm):
     timer = Timer()
     with timer:
-        result = route_application_graph(machine, app_graph, placements)
+        result = algorithm(machine, app_graph, placements)
     print(f"Routing took {timer.measured_interval}")
     return result
 
 
-def test_application_router_simple():
+def test_simple(algorithm):
     unittest_setup()
     app_graph = ApplicationGraph("Test")
     source_vertex = _make_vertices(app_graph, 1000, 50, "source")
@@ -264,11 +308,11 @@ def test_application_router_simple():
 
     machine = virtual_machine(8, 8)
     placements = place_application_graph(machine, app_graph, 100, Placements())
-    routing_tables = _route_and_time(machine, app_graph, placements)
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_application_router_self():
+def test_self(algorithm):
     unittest_setup()
     app_graph = ApplicationGraph("Test")
     source_vertex = _make_vertices(app_graph, 1000, 50, "self")
@@ -276,11 +320,11 @@ def test_application_router_self():
 
     machine = virtual_machine(8, 8)
     placements = place_application_graph(machine, app_graph, 100, Placements())
-    routing_tables = _route_and_time(machine, app_graph, placements)
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_application_router_simple_self():
+def test_simple_self(algorithm):
     unittest_setup()
     app_graph = ApplicationGraph("Test")
     source_vertex = _make_vertices(app_graph, 1000, 50, "source")
@@ -291,11 +335,11 @@ def test_application_router_simple_self():
 
     machine = virtual_machine(8, 8)
     placements = place_application_graph(machine, app_graph, 100, Placements())
-    routing_tables = _route_and_time(machine, app_graph, placements)
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_application_router_multi():
+def test_multi(algorithm):
     unittest_setup()
     app_graph = ApplicationGraph("Test")
     for i in range(10):
@@ -307,11 +351,11 @@ def test_application_router_multi():
 
     machine = virtual_machine(8, 8)
     placements = place_application_graph(machine, app_graph, 100, Placements())
-    routing_tables = _route_and_time(machine, app_graph, placements)
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_application_router_multi_self():
+def test_multi_self(algorithm):
     unittest_setup()
     app_graph = ApplicationGraph("Test")
     for i in range(10):
@@ -322,11 +366,11 @@ def test_application_router_multi_self():
 
     machine = virtual_machine(8, 8)
     placements = place_application_graph(machine, app_graph, 100, Placements())
-    routing_tables = _route_and_time(machine, app_graph, placements)
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_application_router_multi_split():
+def test_multi_split(algorithm):
     unittest_setup()
     app_graph = ApplicationGraph("Test")
     for i in range(10):
@@ -338,11 +382,11 @@ def test_application_router_multi_split():
 
     machine = virtual_machine(24, 24)
     placements = place_application_graph(machine, app_graph, 100, Placements())
-    routing_tables = _route_and_time(machine, app_graph, placements)
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_application_router_multi_self_split():
+def test_multi_self_split(algorithm):
     unittest_setup()
     app_graph = ApplicationGraph("Test")
     for i in range(10):
@@ -353,11 +397,11 @@ def test_application_router_multi_self_split():
 
     machine = virtual_machine(24, 24)
     placements = place_application_graph(machine, app_graph, 100, Placements())
-    routing_tables = _route_and_time(machine, app_graph, placements)
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_application_router_multi_down_chips_and_links():
+def test_multi_down_chips_and_links(algorithm):
     unittest_setup()
     app_graph = ApplicationGraph("Test")
     for i in range(10):
@@ -368,7 +412,7 @@ def test_application_router_multi_down_chips_and_links():
 
     machine = virtual_machine(8, 8)
     placements = place_application_graph(machine, app_graph, 100, Placements())
-    routing_tables = _route_and_time(machine, app_graph, placements)
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
 
     # Pick a few of the chips and links used and take them out
     chosen_entries = list()
@@ -395,7 +439,10 @@ def test_application_router_multi_down_chips_and_links():
     for i, (x, y, entry) in enumerate(chosen_entries):
         if entry.link_ids:
             link = list(entry.link_ids)[i % len(entry.link_ids)]
+            t_x, t_y = machine.xy_over_link(x, y, link)
+            t_l = (link + 3) % 6
             down_links += f"{x},{y},{link}:"
+            down_links += f"{t_x},{t_y},{t_l}:"
         else:
             down_chips += f"{x},{y}:"
 
@@ -406,8 +453,40 @@ def test_application_router_multi_down_chips_and_links():
     machine_down = virtual_machine(8, 8)
     placements = place_application_graph(
         machine_down, app_graph, 100, Placements())
-    routing_tables = _route_and_time(machine_down, app_graph, placements)
+    routing_tables = _route_and_time(
+        machine_down, app_graph, placements, algorithm)
     _check_edges(routing_tables, machine_down, placements, app_graph)
+
+
+def test_internal_only(algorithm):
+    unittest_setup()
+    app_graph = ApplicationGraph("Test")
+    _make_vertices_split(
+        app_graph, 1000, 3, 2, 2, "app_vertex",
+        internal_multicast=True)
+
+    machine = virtual_machine(24, 24)
+    placements = place_application_graph(machine, app_graph, 100, Placements())
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
+    _check_edges(routing_tables, machine, placements, app_graph)
+
+
+def test_internal_and_split(algorithm):
+    unittest_setup()
+    app_graph = ApplicationGraph("Test")
+    for i in range(10):
+        _make_vertices_split(
+            app_graph, 1000, 3, 2, 50, f"app_vertex_{i}",
+            internal_multicast=True)
+    for source in app_graph.vertices:
+        for target in app_graph.vertices:
+            if source != target:
+                app_graph.add_edge(ApplicationEdge(source, target), "Test")
+
+    machine = virtual_machine(24, 24)
+    placements = place_application_graph(machine, app_graph, 100, Placements())
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
+    _check_edges(routing_tables, machine, placements, app_graph)
 
 
 def _check_path(source, nodes_fixed, machine, target):

@@ -83,7 +83,7 @@ def _make_vertices(app_graph, n_atoms, n_groups, n_machine_vertices, label):
     return vertex
 
 
-def test_application_router():
+def test_application_placer():
     app_graph = ApplicationGraph("Test")
     unittest_setup()
     for i in range(56):

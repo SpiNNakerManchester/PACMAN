@@ -14,8 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.model.placements import Placements, Placement
+from pacman.model.graphs import AbstractVirtual
 from pacman.exceptions import (
     PacmanPlaceException, PacmanConfigurationException)
+from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
+    ChipWithSpace)
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from spinn_utilities.ordered_set import OrderedSet
@@ -43,6 +46,10 @@ def place_application_graph(
     # Go through the application graph by application vertex
     progress = ProgressBar(app_graph.n_vertices, "Placing Vertices")
     for app_vertex in progress.over(app_graph.vertices):
+
+        # No need to place a virtual vertex
+        if isinstance(app_vertex, AbstractVirtual):
+            pass
 
         # Try placements from the next chip, but try again if fails
         placed = False
@@ -168,10 +175,8 @@ def _do_constraints(vertices, placements, machine):
             if ((x is not None and constraint.x != x) or
                     (y is not None and constraint.y != y)):
                 raise PacmanConfigurationException(
-                    "Multiple conflicting constraints!")
-            if constraint.p is not None:
-                raise PacmanConfigurationException(
-                    "This placer cannot handle core constraints")
+                    f"Multiple conflicting constraints: Vertices {vertices}"
+                    " are on the same chip, but constraints say different")
             x = constraint.x
             y = constraint.y
     if x is not None or y is not None:
@@ -183,10 +188,25 @@ def _do_constraints(vertices, placements, machine):
         cores_used = {p.p for p in on_chip}
         cores = set(p.processor_id for p in chip.processors
                     if not p.is_monitor) - cores_used
-        next_core = next(iter(cores))
+        next_cores = iter(cores)
         for vertex in vertices:
+            next_core = None
+            constraints = locate_constraints_of_type(
+                vertex.constraints, ChipAndCoreConstraint)
+            for constraint in constraints:
+                if constraint.p is not None:
+                    if next_core is not None and next_core != constraint.p:
+                        raise PacmanConfigurationException(
+                            f"Vertex {vertex} constrained to more than one"
+                            " core")
+                    next_core = constraint.p
+            if next_core is not None and next_core not in next_cores:
+                raise PacmanConfigurationException(
+                    f"Core {next_core} on {x}, {y} not available to place"
+                    f" {vertex} on")
+            if next_core is None:
+                next_core = next(next_cores)
             placements.add_placement(Placement(vertex, x, y, next_core))
-            next_core += 1
         return True
     return False
 
@@ -196,37 +216,6 @@ def _store_on_chip(placements_to_make, vertices, sdram, chip):
         core = chip.use_next_core()
         placements_to_make.append(Placement(vertex, chip.x, chip.y, core))
     chip.use_sdram(sdram)
-
-
-class _ChipWithSpace(object):
-
-    __slots__ = ["chip", "cores", "sdram"]
-
-    def __init__(self, chip, used_processors, used_sdram):
-        self.chip = chip
-        self.cores = set(p.processor_id for p in chip.processors
-                         if not p.is_monitor)
-        self.cores -= used_processors
-        self.sdram = chip.sdram.size - used_sdram
-
-    @property
-    def x(self):
-        return self.chip.x
-
-    @property
-    def y(self):
-        return self.chip.y
-
-    def is_space(self, n_cores, sdram):
-        return len(self.cores) >= n_cores and self.sdram >= sdram
-
-    def use_sdram(self, sdram):
-        self.sdram -= sdram
-
-    def use_next_core(self):
-        core = next(iter(self.cores))
-        self.cores.remove(core)
-        return core
 
 
 class _Spaces(object):
@@ -261,7 +250,7 @@ class _Spaces(object):
             self.__used_chips.add(self.__next_chip)
             chip = self.__machine.get_chip_at(*self.__next_chip)
             cores_used, sdram_used = self.__cores_and_sdram(chip.x, chip.y)
-            return (_ChipWithSpace(chip, cores_used, sdram_used),
+            return (ChipWithSpace(chip, cores_used, sdram_used),
                     self.__usable_from_chip(chip))
 
         except StopIteration:
@@ -284,7 +273,7 @@ class _Spaces(object):
         self.__used_chips.add((next_x, next_y))
         chip = self.__machine.get_chip_at(next_x, next_y)
         cores_used, sdram_used = self.__cores_and_sdram(chip.x, chip.y)
-        return _ChipWithSpace(chip, cores_used, sdram_used)
+        return ChipWithSpace(chip, cores_used, sdram_used)
 
     @property
     def n_chips_used(self):

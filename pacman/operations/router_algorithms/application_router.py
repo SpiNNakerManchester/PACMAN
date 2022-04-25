@@ -15,7 +15,7 @@
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
-    longest_dimension_first)
+    longest_dimension_first, get_app_partitions)
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 from pacman.model.graphs.application import ApplicationVertex
 from collections import deque, defaultdict
@@ -67,10 +67,11 @@ def route_application_graph(machine, app_graph, placements):
     """
     routing_tables = MulticastRoutingTableByPartition()
 
-    progress = ProgressBar(app_graph.n_outgoing_edge_partitions, "Routing")
+    partitions = get_app_partitions(app_graph)
 
     # Now go through the app edges and route app vertex by app vertex
-    for partition in progress.over(app_graph.outgoing_edge_partitions):
+    progress = ProgressBar(len(partitions), "Routing")
+    for partition in progress.over(partitions):
         # Store the source vertex of the partition
         source = partition.pre_vertex
 
@@ -156,6 +157,19 @@ def route_application_graph(machine, app_graph, placements):
                         place.p, srcs, partition.identifier)
                     self_chips.add(place.chip)
 
+        # Deal with internal multicast partitions
+        internal = source.splitter.get_internal_multicast_partitions()
+        if internal:
+            self_connected = True
+            for in_part in internal:
+                src = in_part.pre_vertex
+                for edge in in_part.edges:
+                    tgt = edge.post_vertex
+                    place = placements.get_placement_of_vertex(tgt)
+                    targets[place.chip].add_machine_sources_for_core(
+                        place.p, [src], in_part.identifier)
+                    self_chips.add(place.chip)
+
         # Make the real routes from source edges to targets
         for source_edge_chip in source_edge_chips:
             # Make sure that we add the machine sources on the source edge chip
@@ -211,6 +225,10 @@ def _get_outgoing_chips(app_vertex, partition_id, placements):
     for m_vertex in app_vertex.splitter.get_out_going_vertices(partition_id):
         place = placements.get_placement_of_vertex(m_vertex)
         vertex_chips[place.chip].append(place)
+    for in_part in app_vertex.splitter.get_internal_multicast_partitions():
+        if in_part.identifier == partition_id:
+            place = placements.get_placement_of_vertex(in_part.pre_vertex)
+            vertex_chips[place.chip].append(place)
     if not vertex_chips:
         return None, None
     first_chip = next(iter(vertex_chips.keys()))
