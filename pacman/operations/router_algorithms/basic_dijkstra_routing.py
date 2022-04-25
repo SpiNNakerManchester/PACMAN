@@ -116,7 +116,7 @@ class _BasicDijkstraRouting(object):
         progress = ProgressBar(
             placements.n_placements, "Creating routing entries")
 
-        for placement in progress.over(placements):
+        for placement in progress.over(placements.placements):
             self._route(placement, nodes_info, tables)
         return self._routing_paths
 

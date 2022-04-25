@@ -363,7 +363,7 @@ def placement_to_json(placement):
 
 def placements_to_json():
     json_list = []
-    for placement in PacmanDataView.get_placements():
+    for placement in PacmanDataView.iterate_placemements():
         json_list.append(placement_to_json(placement))
     return json_list
 

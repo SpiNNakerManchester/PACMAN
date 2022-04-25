@@ -38,7 +38,6 @@ def basic_tag_allocator():
     :rtype: tuple(list(~spinn_machine.tags.IPTag),
         list(~spinn_machine.tags.ReverseIPTag), Tags)
     """
-    placements = PacmanDataView.get_placements()
     resource_tracker = ResourceTracker()
 
     # Keep track of ports allocated to reverse IP tags and tags that still
@@ -47,9 +46,9 @@ def basic_tag_allocator():
     tags_to_allocate_ports = list()
 
     # Check that the algorithm can handle the constraints
-    progress = ProgressBar(placements.n_placements, "Discovering tags")
+    progress = ProgressBar(PacmanDataView.get_n_placements(), "Discovering tags")
     placements_with_tags = list()
-    for placement in progress.over(placements):
+    for placement in progress.over(PacmanDataView.iterate_placemements()):
         __gather_placements_with_tags(placement, placements_with_tags)
 
     # Go through and allocate the IP tags and constrained reverse IP tags

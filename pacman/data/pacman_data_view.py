@@ -570,6 +570,25 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._placements
 
     @classmethod
+    def iterate_placemements(cls):
+        """
+        Iterates over the Placement objects
+
+        Semantic sugar for get_placement_placements
+
+        :return:
+        """
+        if cls.__pacman_data._placements is None:
+            raise cls._exception("placements")
+        return cls.__pacman_data._placements.placements
+
+    @classmethod
+    def get_n_placements(cls):
+        if cls.__pacman_data._placements is None:
+            raise cls._exception("placements")
+        return cls.__pacman_data._placements.n_placements
+
+    @classmethod
     def get_placement_of_vertex(cls, vertex):
         """ Return the placement information for a vertex
 
