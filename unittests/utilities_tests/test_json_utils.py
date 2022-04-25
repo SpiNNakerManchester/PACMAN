@@ -23,8 +23,6 @@ from pacman.utilities.json_utils import (
     vertex_to_json, vertex_from_json)
 from pacman.model.graphs.machine import SimpleMachineVertex
 
-MACHINE_GRAPH_FILENAME = "machine_graph.json"
-
 
 class TestJsonUtils(unittest.TestCase):
     # ------------------------------------------------------------------
