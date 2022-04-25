@@ -95,7 +95,7 @@ class TestConnectivePlacer(unittest.TestCase):
         writer.set_plan_n_timesteps(100)
         placements = connective_based_placer()
 
-        for placement in placements:
+        for placement in placements.placements:
             if placement.vertex == self.vertex2:
                 self.assertEqual(placement.x, 3)
                 self.assertEqual(placement.y, 5)
