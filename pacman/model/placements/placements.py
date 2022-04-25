@@ -160,10 +160,5 @@ class Placements(object):
             output += placement.__repr__()
         return output
 
-    def __iter__(self):
-        """ An iterator for the placements object within
-        """
-        return iter(self._placements)
-
     def __len__(self):
         return len(self._placements)
