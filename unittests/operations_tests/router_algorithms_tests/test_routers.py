@@ -40,9 +40,12 @@ import math
 import pytest
 
 
-@pytest.fixture(params=[route_application_graph, basic_dijkstra_routing,
-                        ner_route, ner_route_traffic_aware])
-def algorithm(request):
+@pytest.fixture(params=[
+    (route_application_graph, 10, 50),
+    (basic_dijkstra_routing, 10, 10),
+    (ner_route, 10, 50),
+    (ner_route_traffic_aware, 10, 50)])
+def params(request):
     return request.param
 
 
@@ -211,7 +214,7 @@ def _get_entry(routing_tables, x, y, source_vertex, partition_id, allow_none):
             f"No entry found on {x}, {y} for {source_vertex}, {partition_id}")
     if entry is not None and app_entry is not None:
         raise Exception(
-            f"Multiple entries found on {x}, {y} for"
+            f"App-entry and non-app-entry found on {x}, {y} for"
             f" {source_vertex}, {partition_id}: {app_entry}: {entry}")
     if app_entry is not None:
         return app_entry
@@ -299,11 +302,12 @@ def _route_and_time(machine, app_graph, placements, algorithm):
     return result
 
 
-def test_simple(algorithm):
+def test_simple(params):
+    algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
     app_graph = ApplicationGraph("Test")
-    source_vertex = _make_vertices(app_graph, 1000, 50, "source")
-    target_vertex = _make_vertices(app_graph, 1000, 50, "target")
+    source_vertex = _make_vertices(app_graph, 1000, n_m_vertices, "source")
+    target_vertex = _make_vertices(app_graph, 1000, n_m_vertices, "target")
     app_graph.add_edge(ApplicationEdge(source_vertex, target_vertex), "Test")
 
     machine = virtual_machine(8, 8)
@@ -312,10 +316,11 @@ def test_simple(algorithm):
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_self(algorithm):
+def test_self(params):
+    algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
     app_graph = ApplicationGraph("Test")
-    source_vertex = _make_vertices(app_graph, 1000, 50, "self")
+    source_vertex = _make_vertices(app_graph, 1000, n_m_vertices, "self")
     app_graph.add_edge(ApplicationEdge(source_vertex, source_vertex), "Test")
 
     machine = virtual_machine(8, 8)
@@ -324,11 +329,12 @@ def test_self(algorithm):
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_simple_self(algorithm):
+def test_simple_self(params):
+    algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
     app_graph = ApplicationGraph("Test")
-    source_vertex = _make_vertices(app_graph, 1000, 50, "source")
-    target_vertex = _make_vertices(app_graph, 1000, 50, "target")
+    source_vertex = _make_vertices(app_graph, 1000, n_m_vertices, "source")
+    target_vertex = _make_vertices(app_graph, 1000, n_m_vertices, "target")
     app_graph.add_edge(ApplicationEdge(source_vertex, source_vertex), "Test")
     app_graph.add_edge(ApplicationEdge(target_vertex, target_vertex), "Test")
     app_graph.add_edge(ApplicationEdge(source_vertex, target_vertex), "Test")
@@ -339,11 +345,12 @@ def test_simple_self(algorithm):
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_multi(algorithm):
+def test_multi(params):
+    algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     app_graph = ApplicationGraph("Test")
-    for i in range(10):
-        _make_vertices(app_graph, 1000, 50, f"app_vertex_{i}")
+    for i in range(n_vertices):
+        _make_vertices(app_graph, 1000, n_m_vertices, f"app_vertex_{i}")
     for source in app_graph.vertices:
         for target in app_graph.vertices:
             if source != target:
@@ -355,11 +362,12 @@ def test_multi(algorithm):
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_multi_self(algorithm):
+def test_multi_self(params):
+    algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     app_graph = ApplicationGraph("Test")
-    for i in range(10):
-        _make_vertices(app_graph, 1000, 50, f"app_vertex_{i}")
+    for i in range(n_vertices):
+        _make_vertices(app_graph, 1000, n_m_vertices, f"app_vertex_{i}")
     for source in app_graph.vertices:
         for target in app_graph.vertices:
             app_graph.add_edge(ApplicationEdge(source, target), "Test")
@@ -370,11 +378,13 @@ def test_multi_self(algorithm):
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_multi_split(algorithm):
+def test_multi_split(params):
+    algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     app_graph = ApplicationGraph("Test")
-    for i in range(10):
-        _make_vertices_split(app_graph, 1000, 3, 2, 50, f"app_vertex_{i}")
+    for i in range(n_vertices):
+        _make_vertices_split(app_graph, 1000, 3, 2, n_m_vertices,
+                             f"app_vertex_{i}")
     for source in app_graph.vertices:
         for target in app_graph.vertices:
             if source != target:
@@ -386,11 +396,13 @@ def test_multi_split(algorithm):
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_multi_self_split(algorithm):
+def test_multi_self_split(params):
+    algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     app_graph = ApplicationGraph("Test")
-    for i in range(10):
-        _make_vertices_split(app_graph, 1000, 3, 2, 50, f"app_vertex_{i}")
+    for i in range(n_vertices):
+        _make_vertices_split(app_graph, 1000, 3, 2, n_m_vertices,
+                             f"app_vertex_{i}")
     for source in app_graph.vertices:
         for target in app_graph.vertices:
             app_graph.add_edge(ApplicationEdge(source, target), "Test")
@@ -401,11 +413,12 @@ def test_multi_self_split(algorithm):
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_multi_down_chips_and_links(algorithm):
+def test_multi_down_chips_and_links(params):
+    algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     app_graph = ApplicationGraph("Test")
-    for i in range(10):
-        _make_vertices(app_graph, 1000, 50, f"app_vertex_{i}")
+    for i in range(n_vertices):
+        _make_vertices(app_graph, 1000, n_m_vertices, f"app_vertex_{i}")
     for source in app_graph.vertices:
         for target in app_graph.vertices:
             app_graph.add_edge(ApplicationEdge(source, target), "Test")
@@ -458,7 +471,8 @@ def test_multi_down_chips_and_links(algorithm):
     _check_edges(routing_tables, machine_down, placements, app_graph)
 
 
-def test_internal_only(algorithm):
+def test_internal_only(params):
+    algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
     app_graph = ApplicationGraph("Test")
     _make_vertices_split(
@@ -471,12 +485,13 @@ def test_internal_only(algorithm):
     _check_edges(routing_tables, machine, placements, app_graph)
 
 
-def test_internal_and_split(algorithm):
+def test_internal_and_split(params):
+    algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     app_graph = ApplicationGraph("Test")
-    for i in range(10):
+    for i in range(n_vertices):
         _make_vertices_split(
-            app_graph, 1000, 3, 2, 50, f"app_vertex_{i}",
+            app_graph, 1000, 3, 2, n_m_vertices, f"app_vertex_{i}",
             internal_multicast=True)
     for source in app_graph.vertices:
         for target in app_graph.vertices:
