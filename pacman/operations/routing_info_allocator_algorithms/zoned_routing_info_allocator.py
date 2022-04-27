@@ -17,6 +17,7 @@ import logging
 import math
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.routing_info import (
     RoutingInfo, MachineVertexRoutingInfo, BaseKeyAndMask,
     AppVertexRoutingInfo)
@@ -78,8 +79,8 @@ class ZonedRoutingInfoAllocator(object):
     """
 
     __slots__ = [
-        # Passed in parameters
-        "__app_graph",
+        # A list of vertices and partitions to allocate
+        "__vertex_partitions",
         # For each App vertex / Partition name zone keep track of the number of
         # bites required for the mask for each machine vertex
         "__atom_bits_per_app_part",
@@ -101,10 +102,14 @@ class ZonedRoutingInfoAllocator(object):
     ]
     # pylint: disable=attribute-defined-outside-init
 
-    def __call__(self, app_graph, flexible):
+    def __call__(self, app_graph, extra_allocations, flexible):
         """
         :param ApplicationGraph app_graph:
             The graph to allocate the routing info for
+        :param list(tuple(ApplicationVertex,str)) extra_allocations:
+            Additional (vertex, partition identifier) pairs to allocate
+            keys to.  These might not appear in partitions in the graph
+            due to being added by the system.
         :param bool flexible: Determines if flexible can be use.
             If False, global settings will be attempted
         :return: The routing information
@@ -112,7 +117,10 @@ class ZonedRoutingInfoAllocator(object):
         :raise PacmanRouteInfoAllocationException:
             If something goes wrong with the allocation
         """
-        self.__app_graph = app_graph
+        self.__vertex_partitions = OrderedSet(
+            (p.pre_vertex, p.identifier)
+            for p in app_graph.outgoing_edge_partitions)
+        self.__vertex_partitions.update(extra_allocations)
 
         self.__n_bits_atoms_and_mac = 0
         self.__n_bits_machine = 0
@@ -142,28 +150,25 @@ class ZonedRoutingInfoAllocator(object):
 
         See :py:meth:`__add_fixed`
         """
-        partitions = self.__app_graph.outgoing_edge_partitions
-        for part in partitions:
-            pre = part.pre_vertex
+        for pre, identifier in self.__vertex_partitions:
             # Try the application vertex
             for constraint in pre.constraints:
                 if isinstance(constraint, FixedKeyAndMaskConstraint):
-                    if constraint.applies_to_partition(part.identifier):
+                    if constraint.applies_to_partition(identifier):
                         for vert in pre.splitter.get_out_going_vertices(
-                                part.identifier):
-                            self.__add_fixed(part.identifier, vert, constraint)
+                                identifier):
+                            self.__add_fixed(identifier, vert, constraint)
                         self.__add_fixed(
-                            part.identifier, part.pre_vertex, constraint)
+                            identifier, pre, constraint)
                 else:
                     self.__check_constraint_supported(constraint)
 
             # Try the machine vertices
-            for vert in pre.splitter.get_out_going_vertices(
-                    part.identifier):
+            for vert in pre.splitter.get_out_going_vertices(identifier):
                 for constraint in vert.constraints:
                     if isinstance(constraint, FixedKeyAndMaskConstraint):
-                        if constraint.applies_to_partition(part.identifier):
-                            self.__add_fixed(part.identifier, vert, constraint)
+                        if constraint.applies_to_partition(identifier):
+                            self.__add_fixed(identifier, vert, constraint)
                     else:
                         self.__check_constraint_supported(constraint)
 
@@ -204,22 +209,20 @@ class ZonedRoutingInfoAllocator(object):
         :raises PacmanRouteInfoAllocationException:
         """
         progress = ProgressBar(
-            self.__app_graph.n_outgoing_edge_partitions, "Calculating zones")
+            len(self.__vertex_partitions), "Calculating zones")
 
         # search for size of regions
-        partitions = self.__app_graph.outgoing_edge_partitions
-        for partition in progress.over(partitions):
-            splitter = partition.pre_vertex.splitter
-            machine_vertices = splitter.get_out_going_vertices(
-                partition.identifier)
+        for pre, identifier in progress.over(self.__vertex_partitions):
+            splitter = pre.splitter
+            machine_vertices = splitter.get_out_going_vertices(identifier)
             if not machine_vertices:
                 continue
             max_keys = 0
             for machine_vertex in machine_vertices:
-                if ((partition.identifier, machine_vertex) not in
+                if ((identifier, machine_vertex) not in
                         self.__fixed_partitions):
                     n_keys = machine_vertex.get_n_keys_for_partition(
-                        partition.identifier)
+                        identifier)
                     max_keys = max(max_keys, n_keys)
 
             if max_keys > 0:
@@ -230,9 +233,9 @@ class ZonedRoutingInfoAllocator(object):
                     self.__n_bits_machine, machine_bits)
                 self.__n_bits_atoms_and_mac = max(
                     self.__n_bits_atoms_and_mac, machine_bits + atom_bits)
-                self.__atom_bits_per_app_part[partition] = atom_bits
+                self.__atom_bits_per_app_part[pre, identifier] = atom_bits
             else:
-                self.__atom_bits_per_app_part[partition] = 0
+                self.__atom_bits_per_app_part[pre, identifier] = 0
 
     def __check_zones(self):
         # See if it could fit even before considerding fixed
@@ -284,22 +287,20 @@ class ZonedRoutingInfoAllocator(object):
 
     def __allocate(self):
         progress = ProgressBar(
-            self.__app_graph.n_outgoing_edge_partitions,
-            "Allocating routing keys")
+            len(self.__vertex_partitions), "Allocating routing keys")
         routing_infos = RoutingInfo()
-        partitions = self.__app_graph.outgoing_edge_partitions
         app_part_index = 0
-        for partition in progress.over(partitions):
+        for pre, identifier in progress.over(self.__vertex_partitions):
             while app_part_index in self.__fixed_used:
                 app_part_index += 1
             # Get a list of machine vertices ordered by pre-slice
-            splitter = partition.pre_vertex.splitter
+            splitter = pre.splitter
             machine_vertices = list(splitter.get_out_going_vertices(
-                partition.identifier))
+                identifier))
             if not machine_vertices:
                 continue
             machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
-            n_bits_atoms = self.__atom_bits_per_app_part[partition]
+            n_bits_atoms = self.__atom_bits_per_app_part[pre, identifier]
             if self.__flexible:
                 n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
             else:
@@ -312,7 +313,7 @@ class ZonedRoutingInfoAllocator(object):
                     n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
 
             for machine_index, machine_vertex in enumerate(machine_vertices):
-                key = (partition.identifier, machine_vertex)
+                key = (identifier, machine_vertex)
                 if key in self.__fixed_partitions:
                     # Ignore zone calculations and just use fixed
                     keys_and_masks = self.__fixed_partitions[key]
@@ -323,11 +324,11 @@ class ZonedRoutingInfoAllocator(object):
                     key = key << n_bits_atoms
                     keys_and_masks = [BaseKeyAndMask(base_key=key, mask=mask)]
                 routing_infos.add_routing_info(MachineVertexRoutingInfo(
-                    keys_and_masks, partition.identifier, machine_vertex,
+                    keys_and_masks, identifier, machine_vertex,
                     machine_index))
 
             # Add application-level routing information
-            key = (partition.identifier, partition.pre_vertex)
+            key = (identifier, pre)
             if key in self.__fixed_partitions:
                 keys_and_masks = self.__fixed_partitions[key]
             else:
@@ -335,7 +336,7 @@ class ZonedRoutingInfoAllocator(object):
                 mask = self.__mask(n_bits_atoms + n_bits_machine)
                 keys_and_masks = [BaseKeyAndMask(key, mask)]
             routing_infos.add_routing_info(AppVertexRoutingInfo(
-                keys_and_masks, partition.identifier, partition.pre_vertex,
+                keys_and_masks, identifier, pre,
                 self.__mask(n_bits_atoms), n_bits_atoms,
                 len(machine_vertices) - 1))
             app_part_index += 1
@@ -361,13 +362,17 @@ class ZonedRoutingInfoAllocator(object):
         return int(math.ceil(math.log(size, 2)))
 
 
-def flexible_allocate(app_graph):
+def flexible_allocate(app_graph, extra_allocations):
     """
     Allocated with fixed bits for the Application/Partition index but
     with the size of the atom and machine bit changing
 
     :param ApplicationGraph app_graph:
         The graph to allocate the routing info for
+    :param list(tuple(ApplicationVertex,str)) extra_allocations:
+        Additional (vertex, partition identifier) pairs to allocate
+        keys to.  These might not appear in partitions in the graph
+        due to being added by the system.
     :rtype: tuple(RoutingInfo,
         dict((ApplicationVertex, str), BaseKeyAndMask))
     :raise PacmanRouteInfoAllocationException:
@@ -377,13 +382,17 @@ def flexible_allocate(app_graph):
 
     allocator = ZonedRoutingInfoAllocator()
 
-    return allocator(app_graph, True)
+    return allocator(app_graph, extra_allocations, True)
 
 
-def global_allocate(app_graph):
+def global_allocate(app_graph, extra_allocations):
     """
     :param ApplicationGraph app_graph:
         The graph to allocate the routing info for
+    :param list(tuple(ApplicationVertex,str)) extra_allocations:
+        Additional (vertex, partition identifier) pairs to allocate
+        keys to.  These might not appear in partitions in the graph
+        due to being added by the system.
     :rtype: tuple(RoutingInfo,
         dict((ApplicationVertex, str), BaseKeyAndMask))
     :raise PacmanRouteInfoAllocationException:
@@ -393,4 +402,4 @@ def global_allocate(app_graph):
 
     allocator = ZonedRoutingInfoAllocator()
 
-    return allocator(app_graph, False)
+    return allocator(app_graph, extra_allocations, False)
