@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
-from collections import OrderedDict
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.constraints.partitioner_constraints import (
@@ -85,7 +84,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         :return: dict of vertex as key, edge types as list in value
         :rtype: dict(MachineVertex, EdgeType)
         """
-        result = OrderedDict()
+        result = dict()
         for vertex in self._governed_app_vertex.machine_vertices:
             result[vertex] = edge_types
         return result

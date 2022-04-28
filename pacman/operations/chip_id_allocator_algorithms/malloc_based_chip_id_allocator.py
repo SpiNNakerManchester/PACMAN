@@ -66,7 +66,6 @@ class _MallocBasedChipIdAllocator(object):
     ]
 
     def __init__(self):
-
         # we only want one virtual chip per 'link'
         self._virtual_chips = dict()
 

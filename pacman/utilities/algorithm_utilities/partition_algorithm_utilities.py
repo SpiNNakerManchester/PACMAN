@@ -16,7 +16,6 @@
 """
 
 import math
-from collections import OrderedDict
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.utilities import utility_calls as utils
 from pacman.exceptions import (
@@ -84,7 +83,7 @@ def get_same_size_vertex_groups(vertices):
 
     # Dict of vertex to list of vertices with same size
     # (repeated lists expected)
-    same_size_vertices = OrderedDict()
+    same_size_vertices = dict()
 
     for vertex in vertices:
 
