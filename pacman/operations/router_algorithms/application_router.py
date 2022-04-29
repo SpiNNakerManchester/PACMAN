@@ -112,7 +112,8 @@ def route_application_graph(machine, app_graph, placements):
                 target_chips = _get_all_chips(target, placements)
 
                 # Pick one to actually use as a target
-                target_chip = _find_target_chip(target_chips, routes)
+                target_chip = _find_target_chip(
+                    target_chips, routes, source_chips)
 
                 # Make a route between source and target, without any source
                 # or target chips in it
@@ -129,7 +130,12 @@ def route_application_graph(machine, app_graph, placements):
                 for tgt, srcs in target_vertices:
                     # TODO: Deal with virtual vertices
                     place = placements.get_placement_of_vertex(tgt)
-                    targets[place.chip].add_sources_for_core(place.p, srcs)
+                    if place.chip in source_chips:
+                        targets[place.chip].add_machine_sources_for_core(
+                            place.p, srcs, partition.identifier)
+                    else:
+                        targets[place.chip].add_sources_for_core(place.p, srcs)
+
                     real_target_chips.add(place.chip)
 
                 # Route from target edge chip to all the targets
@@ -212,7 +218,10 @@ def route_application_graph(machine, app_graph, placements):
     return routing_tables
 
 
-def _find_target_chip(target_chips, routes):
+def _find_target_chip(target_chips, routes, source_chips):
+    for chip in target_chips:
+        if chip in source_chips:
+            return chip
     for chip in target_chips:
         if chip in routes:
             return chip

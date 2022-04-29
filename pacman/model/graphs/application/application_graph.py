@@ -44,21 +44,6 @@ class ApplicationGraph(Graph):
         self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
         self._n_outgoing_edge_partitions = 0
 
-    def forget_machine_graph(self):
-        """ Forget the whole mapping from this graph to an application graph.
-        """
-        for v in self.vertices:
-            v.forget_machine_vertices()
-        for e in self.edges:
-            e.forget_machine_edges()
-
-    def forget_machine_edges(self):
-        """ Ensure that all application edges in this graph forget what
-            machine edges they map to. The mapping of vertices is unaffected.
-        """
-        for e in self.edges:
-            e.forget_machine_edges()
-
     @overrides(Graph.new_edge_partition)
     def new_edge_partition(self, name, edge):
         return ApplicationEdgePartition(

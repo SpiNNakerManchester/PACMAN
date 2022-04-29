@@ -57,6 +57,9 @@ def __create_routing_table(x, y, partitions_in_table, routing_info):
     while iterator.has_next:
         (vertex, part_id), entry = iterator.next
         r_info = routing_info.get_routing_info_from_pre_vertex(vertex, part_id)
+        if r_info is None:
+            raise Exception(
+                f"Missing Routing information for {vertex}, {part_id}")
         entries = [(vertex, part_id, entry, r_info)]
         while __match(iterator, vertex, part_id, r_info, entry, routing_info):
             (vertex, part_id), entry = iterator.next
