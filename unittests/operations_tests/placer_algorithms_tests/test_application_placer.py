@@ -87,7 +87,7 @@ def test_application_placer():
     app_graph = ApplicationGraph("Test")
     unittest_setup()
     for i in range(56):
-        _make_vertices(app_graph, 1000, 5, 16, f"app_vertex_{i}")
+        _make_vertices(app_graph, 1000, 14, 5, f"app_vertex_{i}")
 
     machine = virtual_machine(24, 12)
     place_application_graph(machine, app_graph, 100, Placements())
