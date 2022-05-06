@@ -67,7 +67,6 @@ def place_application_graph(
             try:
 
                 same_chip_groups = app_vertex.splitter.get_same_chip_groups()
-                print(f"Attempting to place {len(same_chip_groups)} groups")
 
                 if not same_chip_groups:
                     placed = True
@@ -76,8 +75,6 @@ def place_application_graph(
                 # Start a new space
                 try:
                     next_chip, space = spaces.get_next_chip_and_space()
-                    print("Space starts at ",
-                          (next_chip.chip.x, next_chip.chip.y))
                 except PacmanPlaceException as e:
                     _place_error(
                         app_graph, placements, system_placements, e, retries,
@@ -115,7 +112,6 @@ def place_application_graph(
                 # Now make the placements having confirmed all can be done
                 placements.add_placements(placements_to_make)
                 placed = True
-                print("Used chips ", chips_attempted)
                 colour = next_colour()
                 board_colours.update(
                     {(x, y): colour for x, y in chips_attempted})
@@ -125,8 +121,6 @@ def place_application_graph(
                 # existing placements, and there might be bigger spaces out
                 # there to use
                 retries += 1
-                print(f"Skipping {len(chips_attempted)} chips ",
-                      chips_attempted)
                 board_colours.update(
                     {(x, y): UNUSED_COLOUR for x, y in chips_attempted})
                 chips_attempted.clear()
