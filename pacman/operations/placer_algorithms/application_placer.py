@@ -25,6 +25,14 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 from tempfile import mkstemp
 from os import fdopen
+import numpy
+
+UNUSED_COLOUR = (0.5, 0.5, 0.5, 1.0)
+
+
+def next_colour():
+    return tuple(numpy.concatenate(
+        (numpy.random.choice(range(256), size=3) / 256, [1.0])))
 
 
 def place_application_graph(
@@ -38,6 +46,7 @@ def place_application_graph(
 
     # Keep placements
     placements = Placements(system_placements)
+    board_colours = dict()
 
     # Keep track of how many times we had to retry placing (usually due to
     # odd chip space being left)
@@ -54,9 +63,11 @@ def place_application_graph(
         # Try placements from the next chip, but try again if fails
         placed = False
         while not placed:
+            chips_attempted = list()
             try:
 
                 same_chip_groups = app_vertex.splitter.get_same_chip_groups()
+                print(f"Attempting to place {len(same_chip_groups)} groups")
 
                 if not same_chip_groups:
                     placed = True
@@ -65,9 +76,12 @@ def place_application_graph(
                 # Start a new space
                 try:
                     next_chip, space = spaces.get_next_chip_and_space()
+                    print("Space starts at ",
+                          (next_chip.chip.x, next_chip.chip.y))
                 except PacmanPlaceException as e:
                     _place_error(
-                        app_graph, placements, system_placements, e, retries)
+                        app_graph, placements, system_placements, e, retries,
+                        machine, board_colours)
 
                 placements_to_make = list()
 
@@ -92,6 +106,8 @@ def place_application_graph(
 
                     # If this worked, store placements to be made
                     last_chip_used = next_chip
+                    chips_attempted.append(
+                        (next_chip.chip.x, next_chip.chip.y))
                     _store_on_chip(
                         placements_to_make, vertices_to_place, sdram,
                         next_chip)
@@ -99,21 +115,34 @@ def place_application_graph(
                 # Now make the placements having confirmed all can be done
                 placements.add_placements(placements_to_make)
                 placed = True
+                print("Used chips ", chips_attempted)
+                colour = next_colour()
+                board_colours.update(
+                    {(x, y): colour for x, y in chips_attempted})
             except _SpaceExceededException:
                 # This might happen while exploring a space; this may not be
                 # fatal since the last space might have just been bound by
                 # existing placements, and there might be bigger spaces out
                 # there to use
                 retries += 1
+                print(f"Skipping {len(chips_attempted)} chips ",
+                      chips_attempted)
+                board_colours.update(
+                    {(x, y): UNUSED_COLOUR for x, y in chips_attempted})
+                chips_attempted.clear()
 
     if retries > 0:
         print(f"Warning: Retried {retries} times")
+
+    # _fd, report_file = mkstemp(suffix=".png")
+    # _draw_placements(machine, report_file, board_colours)
 
     return placements
 
 
 def _place_error(
-        app_graph, placements, system_placements, exception, retries):
+        app_graph, placements, system_placements, exception, retries,
+        machine, board_colours):
     app_vertex_count = 0
     vertex_count = 0
     n_vertices = 0
@@ -154,10 +183,36 @@ def _place_error(
             if not first:
                 f.write("\n")
 
+    # _draw_placements(machine, report_file + ".png", board_colours)
+
     raise PacmanPlaceException(
         f" {exception}."
         f" Retried {retries} times."
         f" Report written to {report_file}.")
+
+
+# This is useful debug code, BUT it uses SpiNNer for drawing, which needs
+# Graphical tools; hence it is currently commented out
+# def _draw_placements(machine, report_file, board_colours):
+#     from spinner.scripts.contexts import PNGContextManager
+#     from spinner.diagrams.machine_map import (
+#         get_machine_map_aspect_ratio, draw_machine_map)
+#     from spinner import board
+#     import math
+#
+#     include_boards = [
+#         (chip.x, chip.y) for chip in machine.ethernet_connected_chips]
+#     w = math.ceil(machine.width / 12)
+#     h = math.ceil(machine.height / 12)
+#     aspect_ratio = get_machine_map_aspect_ratio(w, h)
+#     image_width = 10000
+#     image_height = int(image_width * aspect_ratio)
+#     output_filename = report_file
+#     hex_boards = board.create_torus(w, h)
+#     with PNGContextManager(
+#             output_filename, image_width, image_height) as ctx:
+#         draw_machine_map(ctx, image_width, image_height, w, h, hex_boards,
+#                          dict(), board_colours, include_boards)
 
 
 class _SpaceExceededException(Exception):
@@ -254,7 +309,7 @@ class _Spaces(object):
 
             # Start a new space by finding all the chips that can be reached
             # from the start chip but have not been used
-            return (self.__last_chip, OrderedSet())
+            return (self.__last_chip, _Space(self.__last_chip.chip))
 
         except StopIteration:
             raise PacmanPlaceException(
@@ -273,7 +328,7 @@ class _Spaces(object):
             raise _SpaceExceededException(
                 "No more chips to place on in this space; "
                 f"{self.n_chips_used} of {self.__machine.n_chips} used")
-        next_x, next_y = space.pop(last=False)
+        next_x, next_y = space.pop()
         self.__used_chips.add((next_x, next_y))
         chip = self.__machine.get_chip_at(next_x, next_y)
         cores_used, sdram_used = self.__cores_and_sdram(chip.x, chip.y)
@@ -289,8 +344,51 @@ class _Spaces(object):
         for link in chip.router.links:
             chip_coords = (link.destination_x, link.destination_y)
             if chip_coords not in self.__used_chips:
-                chips.add(chip_coords)
+                chips.add(self.__machine.get_chip_at(*chip_coords))
         return chips
+
+
+class _Space(object):
+    __slots__ = ["__same_board_chips", "__remaining_chips",
+                 "__board_x", "__board_y"]
+
+    def __init__(self, chip):
+        self.__board_x = chip.nearest_ethernet_x
+        self.__board_y = chip.nearest_ethernet_y
+        self.__same_board_chips = OrderedSet()
+        self.__remaining_chips = OrderedSet()
+
+    def __len__(self):
+        return len(self.__same_board_chips) + len(self.__remaining_chips)
+
+    def __on_same_board(self, chip):
+        return (chip.nearest_ethernet_x == self.__board_x and
+                chip.nearest_ethernet_y == self.__board_y)
+
+    def pop(self):
+        if self.__same_board_chips:
+            next_chip = self.__same_board_chips.pop(last=False)
+            return next_chip.x, next_chip.y
+        if self.__remaining_chips:
+            next_chip = self.__remaining_chips.pop(last=False)
+            self.__board_x = next_chip.nearest_ethernet_x
+            self.__board_y = next_chip.nearest_ethernet_y
+            to_remove = list()
+            for chip in self.__remaining_chips:
+                if self.__on_same_board(chip):
+                    to_remove.append(chip)
+                    self.__same_board_chips.add(chip)
+            for chip in to_remove:
+                self.__remaining_chips.remove(chip)
+            return next_chip.x, next_chip.y
+        raise StopIteration
+
+    def update(self, chips):
+        for chip in chips:
+            if self.__on_same_board(chip):
+                self.__same_board_chips.add(chip)
+            else:
+                self.__remaining_chips.add(chip)
 
 
 def _chip_order(machine):
