@@ -13,9 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.overrides import overrides
-from pacman.model.graphs import (
-    AbstractEdgePartition, AbstractSingleSourcePartition)
+from pacman.model.graphs import AbstractSingleSourcePartition
 from .application_edge import ApplicationEdge
 
 
@@ -27,29 +25,11 @@ class ApplicationEdgePartition(AbstractSingleSourcePartition):
 
     __slots__ = ()
 
-    def __init__(
-            self, identifier, pre_vertex, constraints=None, label=None,
-            traffic_weight=1):
+    def __init__(self, identifier, pre_vertex):
         """
         :param str identifier: The identifier of the partition
         :param ApplicationVertex pre_vertex: The source of this partition
-        :param list(AbstractConstraint) constraints: Any initial constraints
-        :param str label: An optional label of the partition
-        :param int traffic_weight:
-            The weight of traffic going down this partition
-        :param traffic_type: the traffic type acceptable here.
         """
         super().__init__(
             pre_vertex=pre_vertex, identifier=identifier,
-            allowed_edge_types=ApplicationEdge, constraints=constraints,
-            label=label, traffic_weight=traffic_weight,
-            class_name="ApplicationEdgePartition")
-
-    @overrides(AbstractEdgePartition.clone_without_edges)
-    def clone_without_edges(self):
-        """
-        :rtype: ApplicationEdgePartition
-        """
-        return ApplicationEdgePartition(
-            self._identifier, self._pre_vertex, self._constraints,
-            self._label, self._traffic_weight)
+            allowed_edge_types=ApplicationEdge)

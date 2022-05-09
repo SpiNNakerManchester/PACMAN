@@ -136,7 +136,7 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
                 outgoing_edge_partition_name, edge)
             self.add_outgoing_edge_partition(partition)
         self._register_edge(edge, partition)
-        partition.add_edge(edge, id(self))
+        partition.add_edge(edge)
         return partition
 
     def _register_edge(self, edge, partition):
