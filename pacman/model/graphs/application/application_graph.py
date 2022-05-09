@@ -65,8 +65,6 @@ class ApplicationGraph(Graph):
             raise PacmanAlreadyExistsException(
                 str(ApplicationEdgePartition), key)
 
-        edge_partition.register_graph_code(id(self))
-
         self._outgoing_edge_partitions_by_pre_vertex[
             edge_partition.pre_vertex].add(edge_partition)
         for edge in edge_partition.edges:

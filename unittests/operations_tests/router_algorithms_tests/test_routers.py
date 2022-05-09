@@ -127,7 +127,7 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
                         self.__internal_multicast_partitions.append(in_part)
                         for last_in in last_incoming:
                             in_part.add_edge(
-                                MachineEdge(this_in, last_in), None)
+                                MachineEdge(this_in, last_in))
                 last_incoming = incoming
 
     def get_out_going_slices(self):

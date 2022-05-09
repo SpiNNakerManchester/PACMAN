@@ -30,13 +30,9 @@ class AbstractMultiplePartition(AbstractEdgePartition):
         "_destinations"
     ]
 
-    def __init__(
-            self, pre_vertices, identifier, allowed_edge_types, constraints,
-            label, traffic_weight, class_name):
+    def __init__(self, pre_vertices, identifier, allowed_edge_types):
         super().__init__(
-            identifier=identifier,
-            allowed_edge_types=allowed_edge_types, constraints=constraints,
-            label=label, traffic_weight=traffic_weight, class_name=class_name)
+            identifier=identifier, allowed_edge_types=allowed_edge_types)
         self._pre_vertices = dict()
         self._destinations = defaultdict(OrderedSet)
 
@@ -50,17 +46,18 @@ class AbstractMultiplePartition(AbstractEdgePartition):
                 "There were clones in your list of acceptable pre vertices")
 
     @overrides(AbstractEdgePartition.add_edge)
-    def add_edge(self, edge, graph_code):
+    def add_edge(self, edge):
         # safety checks
         if edge.pre_vertex not in self._pre_vertices.keys():
             raise Exception(
                 "The edge {} is not allowed in this outgoing partition".format(
                     edge))
 
+        super(AbstractMultiplePartition, self).add_edge(edge)
+
         # update
         self._pre_vertices[edge.pre_vertex].add(edge)
         self._destinations[edge.post_vertex].add(edge)
-        super().add_edge(edge, graph_code)
 
     @property
     @overrides(AbstractEdgePartition.pre_vertices)

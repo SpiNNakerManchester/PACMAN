@@ -12,8 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import MachineEdge
+from pacman.model.graphs import AbstractSupportsSDRAMEdges
+from pacman.exceptions import PacmanConfigurationException
 
 
 class SDRAMMachineEdge(MachineEdge):
@@ -25,10 +26,11 @@ class SDRAMMachineEdge(MachineEdge):
         "_sdram_base_address"
     ]
 
-    def __init__(self, pre_vertex, post_vertex, label, app_edge=None):
-        super().__init__(
-            pre_vertex, post_vertex, traffic_type=EdgeTrafficType.SDRAM,
-            label=label, traffic_weight=1, app_edge=app_edge)
+    def __init__(self, pre_vertex, post_vertex, label):
+        if not isinstance(pre_vertex, AbstractSupportsSDRAMEdges):
+            raise PacmanConfigurationException(
+                f"Pre-vertex {pre_vertex} doesn't support SDRAM edges")
+        super().__init__(pre_vertex, post_vertex, label=label)
         self._sdram_size = pre_vertex.sdram_requirement(self)
         self._sdram_base_address = None
 
@@ -45,7 +47,9 @@ class SDRAMMachineEdge(MachineEdge):
         self._sdram_base_address = new_value
 
     def __repr__(self):
-        return f"EdgramEdge {self.label} "
+        return (f"SDRAMMachineEdge(pre_vertex={self.pre_vertex},"
+                f" post_vertex={self.post_vertex}, label={self.label},"
+                f" sdram_size={self.sdram_size})")
 
     def __str__(self):
         return self.__repr__()
