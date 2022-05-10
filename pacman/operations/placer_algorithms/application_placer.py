@@ -17,8 +17,6 @@ from pacman.model.placements import Placements, Placement
 from pacman.model.graphs import AbstractVirtual
 from pacman.exceptions import (
     PacmanPlaceException, PacmanConfigurationException)
-from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
-    ChipWithSpace)
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from spinn_utilities.ordered_set import OrderedSet
@@ -297,8 +295,7 @@ class _Spaces(object):
                 chip = self.__machine.get_chip_at(*self.__next_chip)
                 cores_used, sdram_used = self.__cores_and_sdram(
                     chip.x, chip.y)
-                self.__last_chip = ChipWithSpace(
-                    chip, cores_used, sdram_used)
+                self.__last_chip = _ChipWithSpace(chip, cores_used, sdram_used)
                 self.__used_chips.add((chip.x, chip.y))
 
             # Start a new space by finding all the chips that can be reached
@@ -326,7 +323,7 @@ class _Spaces(object):
         self.__used_chips.add((next_x, next_y))
         chip = self.__machine.get_chip_at(next_x, next_y)
         cores_used, sdram_used = self.__cores_and_sdram(chip.x, chip.y)
-        self.__last_chip = ChipWithSpace(chip, cores_used, sdram_used)
+        self.__last_chip = _ChipWithSpace(chip, cores_used, sdram_used)
         return self.__last_chip
 
     @property
@@ -383,6 +380,39 @@ class _Space(object):
                 self.__same_board_chips.add(chip)
             else:
                 self.__remaining_chips.add(chip)
+
+
+class _ChipWithSpace(object):
+    """ A chip with space for placement
+    """
+
+    __slots__ = ["chip", "cores", "sdram"]
+
+    def __init__(self, chip, used_processors, used_sdram):
+        self.chip = chip
+        self.cores = set(p.processor_id for p in chip.processors
+                         if not p.is_monitor)
+        self.cores -= used_processors
+        self.sdram = chip.sdram.size - used_sdram
+
+    @property
+    def x(self):
+        return self.chip.x
+
+    @property
+    def y(self):
+        return self.chip.y
+
+    def is_space(self, n_cores, sdram):
+        return len(self.cores) >= n_cores and self.sdram >= sdram
+
+    def use_sdram(self, sdram):
+        self.sdram -= sdram
+
+    def use_next_core(self):
+        core = next(iter(self.cores))
+        self.cores.remove(core)
+        return core
 
 
 def _chip_order(machine):
