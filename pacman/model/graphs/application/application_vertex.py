@@ -164,3 +164,11 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         for constraint in self.constraints:
             if isinstance(constraint, MaxVertexAtomsConstraint):
                 return constraint.size
+
+    def reset(self):
+        """ Forget all machine vertices in the application vertex, and reset
+            the splitter (if any)
+        """
+        self._machine_vertices = OrderedSet()
+        if self._splitter is not None:
+            self._splitter.reset_called()

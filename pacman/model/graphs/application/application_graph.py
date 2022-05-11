@@ -110,3 +110,9 @@ class ApplicationGraph(Graph):
             for edge in outgoing_partition.edges:
                 new_graph.add_edge(edge, outgoing_partition.identifier)
         return new_graph
+
+    def reset(self):
+        """ Reset all the application vertices
+        """
+        for vertex in self.vertices:
+            vertex.reset()
