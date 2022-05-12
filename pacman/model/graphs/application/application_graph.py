@@ -120,10 +120,24 @@ class ApplicationGraph(object):
             added to this partition that start at a different vertex to this
             one
         """
+        if not isinstance(edge, ApplicationEdge):
+            raise PacmanInvalidParameterException(
+                "edge", edge.__class__,
+                "Edges in a graph must be ApplicationEdge")
+
+        if edge.pre_vertex.label not in self._vertex_by_label:
+            raise PacmanInvalidParameterException(
+                "Edge", str(edge.pre_vertex),
+                "Pre-vertex must be known in graph")
+        if edge.post_vertex.label not in self._vertex_by_label:
+            raise PacmanInvalidParameterException(
+                "Edge", str(edge.post_vertex),
+                "Post-vertex must be known in graph")
+        self._incoming_edges[edge.post_vertex].add(edge)
+
         # Add the edge to the partition
         partition = self._get_outgoing_edge_partition(
             edge.pre_vertex, outgoing_edge_partition_name)
-        self._register_edge(edge, partition)
         partition.add_edge(edge)
         return partition
 
@@ -148,38 +162,10 @@ class ApplicationGraph(object):
 
         partition = ApplicationEdgePartition(
             identifier=outgoing_edge_partition_name, pre_vertex=vertex)
-        self.add_outgoing_edge_partition(partition)
+        self._outgoing_edge_partitions_by_pre_vertex[vertex].add(partition)
+        self._n_outgoing_edge_partitions += 1
+
         return partition
-
-    def _register_edge(self, edge, partition):
-        """ Add an edge to the graph.
-
-        :param AbstractEdge edge: The edge to add
-        :param AbstractEdgePartition partition:
-            The name of the edge partition to add the edge to; each edge
-            partition is the partition of edges that start at the same vertex
-        :raises PacmanInvalidParameterException:
-            If the edge is not of a valid type or if edges have already been
-            added to this partition that start at a different vertex to this
-            one
-        """
-        # verify that the edge is one suitable for this graph
-        if not isinstance(edge, ApplicationEdge):
-            raise PacmanInvalidParameterException(
-                "edge", edge.__class__,
-                "Edges in a graph must be ApplicationEdge")
-
-        if edge.pre_vertex.label not in self._vertex_by_label:
-            raise PacmanInvalidParameterException(
-                "Edge", str(edge.pre_vertex),
-                "Pre-vertex must be known in graph")
-        if edge.post_vertex.label not in self._vertex_by_label:
-            raise PacmanInvalidParameterException(
-                "Edge", str(edge.post_vertex),
-                "Post-vertex must be known in graph")
-
-        # Add the edge to the indices
-        self._incoming_edges[edge.post_vertex].add(edge)
 
     def add_edges(self, edges, outgoing_edge_partition_name):
         """ Add a collection of edges to the graph.
@@ -195,28 +181,6 @@ class ApplicationGraph(object):
         """
         for e in edges:
             self.add_edge(e, outgoing_edge_partition_name)
-
-    def add_outgoing_edge_partition(self, edge_partition):
-        # verify that this partition is suitable for this graph
-        if not isinstance(edge_partition, ApplicationEdgePartition):
-            raise PacmanInvalidParameterException(
-                "outgoing_edge_partition", edge_partition.__class__,
-                "Partitions of this graph must be an ApplicationEdgePartition")
-
-        # check this partition doesn't already exist
-        key = (edge_partition.pre_vertex,
-               edge_partition.identifier)
-        if edge_partition in self._outgoing_edge_partitions_by_pre_vertex[
-                edge_partition.pre_vertex]:
-            raise PacmanAlreadyExistsException(
-                str(ApplicationEdgePartition), key)
-
-        self._outgoing_edge_partitions_by_pre_vertex[
-            edge_partition.pre_vertex].add(edge_partition)
-        for edge in edge_partition.edges:
-            self._register_edge(edge, edge_partition)
-
-        self._n_outgoing_edge_partitions += 1
 
     @property
     def vertices(self):

@@ -50,8 +50,3 @@ class ApplicationGraphView(ApplicationGraph):
     def add_vertex(self, vertex):
         raise PacmanConfigurationException(
             "Please add vertices via simulator not directly to this graph")
-
-    @overrides(ApplicationGraph.add_outgoing_edge_partition)
-    def add_outgoing_edge_partition(self, edge_partition):
-        raise PacmanConfigurationException(
-            "Please add partitions via simulator not directly to this graph")

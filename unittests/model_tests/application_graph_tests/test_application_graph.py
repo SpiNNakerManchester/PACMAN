@@ -62,8 +62,6 @@ class TestApplicationGraphModel(unittest.TestCase):
             third.add_edge("mock", "mock")
         with self.assertRaises(PacmanConfigurationException):
             third.add_vertex("mock")
-        with self.assertRaises(PacmanConfigurationException):
-            third.add_outgoing_edge_partition("mock")
 
 
 if __name__ == '__main__':
