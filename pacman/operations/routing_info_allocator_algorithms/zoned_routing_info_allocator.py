@@ -121,6 +121,10 @@ class ZonedRoutingInfoAllocator(object):
             (p.pre_vertex, p.identifier)
             for p in app_graph.outgoing_edge_partitions)
         self.__vertex_partitions.update(extra_allocations)
+        self.__vertex_partitions.update(
+            (v, p.identifier)
+            for v in app_graph.vertices
+            for p in v.splitter.get_internal_multicast_partitions())
 
         self.__n_bits_atoms_and_mac = 0
         self.__n_bits_machine = 0
