@@ -48,6 +48,7 @@ def connective_based_placer(machine_graph, machine, plan_n_timesteps):
         If something goes wrong with the placement
     """
     placer = _ConnectiveBasedPlacer()
+    # pylint:disable=protected-access
     return placer._run(machine_graph, machine, plan_n_timesteps)
 
 

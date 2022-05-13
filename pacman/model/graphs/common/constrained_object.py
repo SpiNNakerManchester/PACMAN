@@ -38,9 +38,7 @@ class ConstrainedObject(object, metaclass=AbstractBase):
             Any initial constraints
         """
 
-        # safety point for diamond inheritance
-        if not hasattr(self, '_constraints') or self._constraints is None:
-            self._constraints = OrderedSet()
+        self._constraints = OrderedSet()
 
         # add new constraints to the set
         self.add_constraints(constraints)
@@ -60,11 +58,7 @@ class ConstrainedObject(object, metaclass=AbstractBase):
                 "constraint", constraint,
                 "Must be a " + _get_class_name(AbstractConstraint))
 
-        try:
-            self._constraints.add(constraint)
-        except Exception:  # pylint: disable=broad-except
-            self._constraints = OrderedSet()
-            self._constraints.add(constraint)
+        self._constraints.add(constraint)
 
     def add_constraints(self, constraints):
         """ Add an iterable of constraints to the collection of constraints
@@ -83,7 +77,4 @@ class ConstrainedObject(object, metaclass=AbstractBase):
 
         :rtype: iterable(AbstractConstraint)
         """
-        try:
-            return self._constraints
-        except Exception:  # pylint: disable=broad-except
-            return OrderedSet()
+        return self._constraints

@@ -137,6 +137,7 @@ def get_mulitcast_edge_groups(machine_graph):
         # If constraints found, put the group in the appropriate constraint
         # group
         if constraints:
+            # pylint:disable=protected-access
             group._set_constraint(constraints[0])
             constraint_type = type(constraints[0])
             groups_by_type[constraint_type].append(group)
