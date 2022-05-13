@@ -49,10 +49,9 @@ class TestKeyAllocatorConstraints(unittest.TestCase):
         c4 = FixedKeyAndMaskConstraint([
             km, BaseKeyAndMask(0xFE0, 0xFF8)])
         self.assertEqual(c1, c2)
-        self.assertIsNone(c1.key_list_function)
         self.assertEqual(c1.keys_and_masks, [km])
         r = ("FixedKeyAndMaskConstraint(keys_and_masks=[KeyAndMask:0xff0:"
-             "0xff8], key_list_function=None, partition=None)")
+             "0xff8], partition=None)")
         self.assertEqual(str(c1), r)
         d = {}
         d[c1] = 1

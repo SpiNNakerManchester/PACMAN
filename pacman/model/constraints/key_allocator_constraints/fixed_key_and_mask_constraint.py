@@ -90,8 +90,6 @@ class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
     def __eq__(self, other):
         if not isinstance(other, FixedKeyAndMaskConstraint):
             return False
-        if other.key_list_function != self._key_list_function:
-            return False
         if len(self._keys_and_masks) != len(other.keys_and_masks):
             return False
         return all(km in other.keys_and_masks for km in self._keys_and_masks)

@@ -62,7 +62,8 @@ class TestMacVertex(MachineVertex):
             self, label=None, constraints=None, app_vertex=None,
             vertex_slice=None, n_keys_required=None):
         super(TestMacVertex, self).__init__(
-            label, constraints, app_vertex, vertex_slice)
+            label=label, constraints=constraints, app_vertex=app_vertex,
+            vertex_slice=vertex_slice)
         self.__n_keys_required = n_keys_required
 
     def get_n_keys_for_partition(self, partition_id):
@@ -86,7 +87,7 @@ def create_graphs1(with_fixed):
     app_graph.add_vertices(app_vertices)
 
     # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = TestMacVertex()
+    out_mac_vertex = TestMacVertex(label="out_vertex")
     out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
     for app_index, app_vertex in enumerate(app_vertices):
@@ -100,24 +101,25 @@ def create_graphs1(with_fixed):
         for mac_index in range((app_index * 2 * 10) + 1):
 
             # Give the vertex up to (80 * 2) + 1 = 161 keys (8 bits)
-            mac_vertex = TestMacVertex(n_keys_required={
-                f"Part{i}": (mac_index * 2) + 1
-                for i in range((app_index * 10) + 1)})
+            mac_vertex = TestMacVertex(
+                label=f"Part{i}_vertex",
+                n_keys_required={f"Part{i}": (mac_index * 2) + 1
+                                 for i in range((app_index * 10) + 1)})
             app_vertex.remember_machine_vertex(mac_vertex)
 
-            if with_fixed:
-                if app_index == 2 and mac_index == 4:
-                    mac_vertex.add_constraint(FixedKeyAndMaskConstraint(
-                        [BaseKeyAndMask(0xFE00000, 0xFFFFFFC0)],
-                        partition="Part7"))
-                if app_index == 2 and mac_index == 0:
-                    mac_vertex.add_constraint(FixedKeyAndMaskConstraint(
-                        [BaseKeyAndMask(0x4c00000, 0xFFFFFFFE)],
-                        partition="Part1"))
-                if app_index == 3 and mac_index == 0:
-                    mac_vertex.add_constraint(FixedKeyAndMaskConstraint(
-                        [BaseKeyAndMask(0x3300000, 0xFFFFFFFF)],
-                        partition="Part1"))
+        if with_fixed:
+            if app_index == 2:
+                app_vertex.add_constraint(FixedKeyAndMaskConstraint(
+                    [BaseKeyAndMask(0xFE00000, 0xFFFFFFC0)],
+                    partition="Part7"))
+            if app_index == 2:
+                app_vertex.add_constraint(FixedKeyAndMaskConstraint(
+                    [BaseKeyAndMask(0x4c00000, 0xFFFFFFFE)],
+                    partition="Part1"))
+            if app_index == 3:
+                app_vertex.add_constraint(FixedKeyAndMaskConstraint(
+                    [BaseKeyAndMask(0x3300000, 0xFFFFFFFF)],
+                    partition="Part1"))
 
     return app_graph
 
@@ -131,19 +133,19 @@ def create_graphs_only_fixed():
     app_graph.add_vertex(app_vertex)
 
     # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = TestMacVertex()
+    out_mac_vertex = TestMacVertex(label="out_mac_vertex")
     out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
-    mac_vertex = TestMacVertex()
+    mac_vertex = TestMacVertex(label="mac_vertex")
     app_vertex.remember_machine_vertex(mac_vertex)
 
     app_graph.add_edge(ApplicationEdge(app_vertex, out_app_vertex), "Part0")
     app_graph.add_edge(ApplicationEdge(app_vertex, out_app_vertex), "Part1")
 
-    mac_vertex.add_constraint(FixedKeyAndMaskConstraint(
+    app_vertex.add_constraint(FixedKeyAndMaskConstraint(
                 [BaseKeyAndMask(0x4c00000, 0xFFFFFFFE)],
                 partition="Part0"))
-    mac_vertex.add_constraint(FixedKeyAndMaskConstraint(
+    app_vertex.add_constraint(FixedKeyAndMaskConstraint(
                 [BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)],
                 partition="Part1"))
 
@@ -297,16 +299,17 @@ def create_big(with_fixed):
     big_app_vertex.remember_machine_vertex(big_mac_vertex)
 
     # Create a single output vertex (which won't send)
-    out_mac_vertex = TestMacVertex()
+    out_mac_vertex = TestMacVertex(label="OutMacVertex")
     out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
     # Create a load of middle vertices and connect them up
-    for _ in range(2000):  # 2000 needs 11 bits
-        mid_mac_vertex = TestMacVertex(n_keys_required={"Test": 100})
+    for i in range(2000):  # 2000 needs 11 bits
+        mid_mac_vertex = TestMacVertex(label=f"MidMacVertex{i}",
+                                       n_keys_required={"Test": 100})
         mid_app_vertex.remember_machine_vertex(mid_mac_vertex)
 
     if with_fixed:
-        big_mac_vertex.add_constraint(FixedKeyAndMaskConstraint([
+        big_app_vertex.add_constraint(FixedKeyAndMaskConstraint([
             BaseKeyAndMask(0x0, 0x180000)]))
     return app_graph
 
