@@ -34,6 +34,7 @@ def fixed_route_router(machine, placements, destination_class):
     :raises PacmanAlreadyExistsException:
     """
     router = _FixedRouteRouter(machine, placements, destination_class)
+    # pylint:disable=protected-access
     return router._run()
 
 
@@ -65,7 +66,6 @@ class _FixedRouteRouter(object):
         :raises PacmanRoutingException:
         :raises PacmanAlreadyExistsException:
         """
-        # pylint: disable=attribute-defined-outside-init
         progress = ProgressBar(
             len(self._machine.ethernet_connected_chips),
             "Generating fixed router routes")

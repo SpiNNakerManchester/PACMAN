@@ -101,11 +101,11 @@ class MultiRegionSDRAM(VariableSDRAM):
         self._fixed_sdram = self._fixed_sdram + other.fixed
         self._per_timestep_sdram = \
             self._per_timestep_sdram + other.per_timestep
-        for region in other.__regions:
-            if region in self.__regions:
-                self.__regions[region] += other.__regions[region]
+        for region in other.regions:
+            if region in self.regions:
+                self.__regions[region] += other.regions[region]
             else:
-                self.__regions[region] = other.__regions[region]
+                self.__regions[region] = other.regions[region]
 
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps, indent="", preamble="", target=None):
