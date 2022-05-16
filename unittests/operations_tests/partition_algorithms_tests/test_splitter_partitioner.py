@@ -58,7 +58,6 @@ class TestSplitterPartitioner(unittest.TestCase):
     """
     test for SplitterPartitioner functions
     """
-    # pylint: disable=attribute-defined-outside-init
 
     def setUp(self):
         unittest_setup()

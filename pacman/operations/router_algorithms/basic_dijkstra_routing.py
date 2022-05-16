@@ -69,6 +69,9 @@ def basic_dijkstra_routing(
     """
     router = _BasicDijkstraRouting(bw_per_route_entry, max_bw)
     return router._run()
+    router = _BasicDijkstraRouting(machine, bw_per_route_entry, max_bw)
+    # pylint:disable=protected-access
+    return router._run(placements, machine_graph)
 
 
 class _BasicDijkstraRouting(object):

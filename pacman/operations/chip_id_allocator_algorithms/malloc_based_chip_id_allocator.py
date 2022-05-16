@@ -50,7 +50,6 @@ def malloc_based_chip_id_allocator():
     allocator = _MallocBasedChipIdAllocator()
     allocator.allocate_chip_ids()
 
-
 class _MallocBasedChipIdAllocator(object):
     """ A Chip ID Allocation Allocator algorithm that keeps track of\
         chip IDs and attempts to allocate them as requested

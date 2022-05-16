@@ -40,6 +40,7 @@ def radial_placer():
             If something goes wrong with the placement
     """
     placer = _RadialPlacer()
+    # pylint:disable=protected-access
     return placer._run()
 
 

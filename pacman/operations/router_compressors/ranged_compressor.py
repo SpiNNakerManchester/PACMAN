@@ -70,6 +70,10 @@ class RangeCompressor(object):
         "_entries"
     ]
 
+    def __init__(self):
+        self._compressed = None
+        self._entries = None
+
     def compress_table(self, uncompressed):
         """ Compresses all the entries for a single table.
 
@@ -110,7 +114,7 @@ class RangeCompressor(object):
                 first = i
                 route = entry.spinnaker_route
         # Merge the last range
-        self._merge_range(first, i)
+        self._merge_range(first, i)  # pylint:disable=undefined-loop-variable
 
         # return the results as a list
         return self._compressed

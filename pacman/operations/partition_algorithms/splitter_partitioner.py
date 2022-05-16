@@ -44,6 +44,7 @@ def splitter_partitioner(pre_allocated_resources=None):
          If something goes wrong with the partitioning
      """
     partitioner = _SplitterPartitioner()
+    # pylint:disable=protected-access
     return partitioner._run(pre_allocated_resources)
 
 

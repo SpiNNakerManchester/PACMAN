@@ -29,6 +29,7 @@ def pair_compressor(ordered=True, accept_overflow=False, verify=False):
     :rtype: MulticastRoutingTables
     """
     compressor = _PairCompressor(ordered, accept_overflow)
+    # pylint:disable=protected-access
     compressed = compressor._run()
     # TODO currenly normal pari compressor does not verify lengths
     if verify:
@@ -157,6 +158,17 @@ class _PairCompressor(AbstractCompressor):
         # Number of unique routes found so far
         "_routes_count",
     ]
+
+    def __init__(self, ordered=True, accept_overflow=False):
+        super().__init__(ordered, accept_overflow)
+        self._all_entries = None
+        self._write_index = None
+        self._max_index = None
+        self._previous_index = None
+        self._remaining_index = None
+        self._routes = None
+        self._routes_frequency = None
+        self._routes_count = None
 
     def _compare_routes(self, route_a, route_b):
         """

@@ -53,6 +53,7 @@ def one_to_one_placer():
         If something goes wrong with the placement
     """
     placer = _OneToOnePlacer()
+    # pylint:disable=protected-access
     return placer._run()
 
 

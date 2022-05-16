@@ -38,6 +38,7 @@ def spreader_placer():
     :rtype: Placements
     """
     placer = _SpreaderPlacer()
+    # pylint:disable=protected-access
     return placer._run()
 
 
