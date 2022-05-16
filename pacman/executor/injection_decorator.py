@@ -75,6 +75,7 @@ def provide_injectables(injectables):
     :param injectables: A dict of type to value
     :type injectables: dict(str, ...)
     """
+    # pylint:disable=global-statement
     global _injectables
     if _injectables is not None:
         raise InjectionException("Injectables have already been defined")
@@ -84,6 +85,7 @@ def provide_injectables(injectables):
 def clear_injectables():
     """ Clear the current set of injectables
     """
+    # pylint:disable=global-statement
     global _injectables
     _injectables = None
 
@@ -132,6 +134,7 @@ class injection_context(object):
         self._mine = injection_dictionary
 
     def __enter__(self):
+        # pylint:disable=global-statement
         global _injectables
         dicts = [self._mine]
         if _injectables is not None:
@@ -140,6 +143,7 @@ class injection_context(object):
         _injectables = _DictFacade(dicts)
 
     def __exit__(self, a, b, c):
+        # pylint:disable=global-statement
         global _injectables
         _injectables = self._old
         return False

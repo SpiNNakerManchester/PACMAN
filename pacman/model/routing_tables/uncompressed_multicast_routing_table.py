@@ -196,5 +196,5 @@ def from_csv(file_name):
         with gzip.open(file_name, mode="rt", newline='') as csvfile:
             return _from_csv_file(csvfile)
     else:
-        with open(file_name, newline='') as csvfile:
+        with open(file_name, newline='', encoding="utf-8") as csvfile:
             return _from_csv_file(csvfile)
