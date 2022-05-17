@@ -89,6 +89,9 @@ def __match(iterator, vertex, part_id, r_info, entry, routing_info):
         return False
     next_r_info = routing_info.get_routing_info_from_pre_vertex(
         next_vertex, next_part_id)
+    if next_r_info is None:
+        raise KeyError(
+            f"No routing info found for {next_vertex}, {next_part_id}")
     if next_r_info.index != r_info.index + 1:
         return False
     app_src = vertex.app_vertex
