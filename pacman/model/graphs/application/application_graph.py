@@ -20,6 +20,9 @@ from .application_edge_partition import ApplicationEdgePartition
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
+from pacman.model.graphs.machine import MachineEdge, MachineVertex
+from pacman.model.graphs.wrapper import (
+    WrapperApplicationEdge, WrapperApplicationVertex)
 
 
 class ApplicationGraph(object):
@@ -77,9 +80,12 @@ class ApplicationGraph(object):
             If there is an attempt to add the same vertex more than once
         """
         if not isinstance(vertex, ApplicationVertex):
-            raise PacmanInvalidParameterException(
-                "vertex", str(vertex.__class__),
-                "Vertices in a graph must be ApplicationVertex")
+            if isinstance(vertex, MachineVertex):
+                vertex = WrapperApplicationVertex(vertex)
+            else:
+                raise PacmanInvalidParameterException(
+                    "vertex", str(vertex.__class__),
+                    "Vertices in a graph must be ApplicationVertex")
         if not vertex.label:
             vertex.set_label(
                 vertex.__class__.__name__ + "_" + self._label_postfix())
@@ -121,9 +127,12 @@ class ApplicationGraph(object):
             one
         """
         if not isinstance(edge, ApplicationEdge):
-            raise PacmanInvalidParameterException(
-                "edge", edge.__class__,
-                "Edges in a graph must be ApplicationEdge")
+            if isinstance(edge, MachineEdge):
+                edge = WrapperApplicationEdge(edge)
+            else:
+                raise PacmanInvalidParameterException(
+                    "edge", edge.__class__,
+                    "Edges in a graph must be ApplicationEdge")
 
         if edge.pre_vertex.label not in self._vertex_by_label:
             raise PacmanInvalidParameterException(
