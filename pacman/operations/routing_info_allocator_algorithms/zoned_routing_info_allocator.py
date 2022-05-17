@@ -121,6 +121,10 @@ class ZonedRoutingInfoAllocator(object):
             (p.pre_vertex, p.identifier)
             for p in app_graph.outgoing_edge_partitions)
         self.__vertex_partitions.update(extra_allocations)
+        self.__vertex_partitions.update(
+            (v, p.identifier)
+            for v in app_graph.vertices
+            for p in v.splitter.get_internal_multicast_partitions())
 
         self.__n_bits_atoms_and_mac = 0
         self.__n_bits_machine = 0
@@ -163,15 +167,6 @@ class ZonedRoutingInfoAllocator(object):
                 else:
                     self.__check_constraint_supported(constraint)
 
-            # Try the machine vertices
-            for vert in pre.splitter.get_out_going_vertices(identifier):
-                for constraint in vert.constraints:
-                    if isinstance(constraint, FixedKeyAndMaskConstraint):
-                        if constraint.applies_to_partition(identifier):
-                            self.__add_fixed(identifier, vert, constraint)
-                    else:
-                        self.__check_constraint_supported(constraint)
-
     def __add_fixed(self, part_id, vertex, constraint):
         """
         Precomputes and caches FixedKeyAndMask for easier use later
@@ -188,7 +183,10 @@ class ZonedRoutingInfoAllocator(object):
         if (part_id, vertex) in self.__fixed_partitions:
             raise PacmanInvalidParameterException(
                 "constraint", constraint,
-                "Multiple FixedKeyConstraints apply to the same vertex")
+                "Multiple FixedKeyConstraints apply to the same vertex"
+                f" {vertex} and partition {part_id}:"
+                f" {constraint.keys_and_masks} and "
+                f" {self.__fixed_partitions[part_id, vertex]}")
         self.__fixed_partitions[part_id, vertex] = constraint.keys_and_masks
         for key_and_mask in constraint.keys_and_masks:
             # Go through the mask sets and save keys and n_keys
