@@ -16,8 +16,7 @@ import sys
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-    AbstractPartitionerConstraint)
+    MaxVertexAtomsConstraint, AbstractPartitionerConstraint)
 from pacman.utilities.utility_calls import (
     check_algorithm_can_support_constraints)
 
@@ -164,13 +163,11 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         """
         :raise PacmanInvalidParameterException:
             When partitioner constraints other than
-            :py:class:`MaxVertexAtomsConstraint` and
-            :py:class:`FixedVertexAtomsConstraint` are used.
+            :py:class:`MaxVertexAtomsConstraint` are used.
         """
         check_algorithm_can_support_constraints(
             constrained_vertices=[self._governed_app_vertex],
-            supported_constraints=[
-                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
+            supported_constraints=[MaxVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
     def split(self, resource_tracker, machine_graph):

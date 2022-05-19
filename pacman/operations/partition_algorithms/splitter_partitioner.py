@@ -15,7 +15,7 @@
 
 from pacman.exceptions import (PacmanConfigurationException)
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
+    MaxVertexAtomsConstraint)
 from pacman.model.graphs.machine import MachineGraph
 from pacman.model.partitioner_interfaces import (
     AbstractSplitterPartitioner, AbstractSlicesConnect)
@@ -184,10 +184,6 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
                     vertex.constraints, MaxVertexAtomsConstraint):
                 vertex.splitter.set_max_atoms_per_core(
                     constraint.size, False)
-            for constraint in utils.locate_constraints_of_type(
-                    vertex.constraints, FixedVertexAtomsConstraint):
-                vertex.splitter.set_max_atoms_per_core(
-                    constraint.size, True)
 
     def __setup_objects(
             self, app_graph, machine, plan_n_time_steps,

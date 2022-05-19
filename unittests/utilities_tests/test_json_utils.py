@@ -22,8 +22,7 @@ from pacman.model.constraints.placer_constraints import (
     BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
     SameChipAsConstraint)
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
-    FixedVertexAtomsConstraint)
+    MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint)
 from pacman.model.graphs.machine import MulticastEdgePartition
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
@@ -153,10 +152,6 @@ class TestJsonUtils(unittest.TestCase):
 
     def test_max_vertex_atoms_constraint(self):
         c1 = MaxVertexAtomsConstraint(5)
-        self.constraint_there_and_back(c1)
-
-    def test_fixed_vertex_atoms_constraint(self):
-        c1 = FixedVertexAtomsConstraint(5)
         self.constraint_there_and_back(c1)
 
     def test_contiguous_key_range_constraint(self):
