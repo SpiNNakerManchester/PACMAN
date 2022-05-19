@@ -30,10 +30,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         # the name of this splitter object, for human readability.
         "_splitter_name",
 
-        # the max atoms per core demanded by the tools. interpretation of
-        # this is at the splitter objects discretion.
-        "_max_atoms_per_core",
-
         # bool flag that says that the constraint is fixed or soft.
         "_is_fixed_atoms_per_core"
     ]
@@ -65,7 +61,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         if splitter_name is None:
             splitter_name = self.DEFAULT_SPLITTER_NAME
         self._splitter_name = splitter_name
-        self._max_atoms_per_core = sys.maxsize
         self._is_fixed_atoms_per_core = False
         self._governed_app_vertex = None
 

@@ -115,8 +115,6 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
                 app_graph, machine, plan_n_time_steps,
                 pre_allocated_resources))
 
-        self.__set_max_atoms_to_splitters(app_graph)
-
         # Partition one vertex at a time
         for vertex in progress.over(vertices):
             vertex.splitter.split(resource_tracker, machine_graph)
@@ -172,18 +170,6 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
             if vertex not in other_vertices:
                 self.__make_dependent_after(
                     vertices, dependent_vertices, vertex)
-
-    @staticmethod
-    def __set_max_atoms_to_splitters(app_graph):
-        """ get the constraints sorted out.
-
-        :param ApplicationGraph app_graph: the app graph
-        """
-        for vertex in app_graph.vertices:
-            for constraint in utils.locate_constraints_of_type(
-                    vertex.constraints, MaxVertexAtomsConstraint):
-                vertex.splitter.set_max_atoms_per_core(
-                    constraint.size, False)
 
     def __setup_objects(
             self, app_graph, machine, plan_n_time_steps,

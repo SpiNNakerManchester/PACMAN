@@ -188,9 +188,12 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
         :rtype: int
         """
+        max_atoms = sys.maxsize
         for constraint in self.constraints:
             if isinstance(constraint, MaxVertexAtomsConstraint):
-                return constraint.size
+                if constraint.size < max_atoms:
+                    max_atoms = constraint.size
+        return max_atoms
 
     def forget_machine_vertices(self):
         """ Arrange to forget all machine vertices that this application
