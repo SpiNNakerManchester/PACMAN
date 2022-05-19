@@ -17,11 +17,9 @@
 """
 
 from spinn_utilities.ordered_set import OrderedSet
-from pacman.utilities import utility_calls as utils
 from pacman.exceptions import PacmanPartitionException
 from pacman.model.constraints.partitioner_constraints import (
-    AbstractPartitionerConstraint, SameAtomsAsVertexConstraint,
-    MaxVertexAtomsConstraint)
+    AbstractPartitionerConstraint, SameAtomsAsVertexConstraint)
 
 
 VERTICES_NEED_TO_BE_SAME_SIZE_ERROR = (

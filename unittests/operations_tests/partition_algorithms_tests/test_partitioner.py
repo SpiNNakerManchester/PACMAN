@@ -17,7 +17,6 @@
 test for partitioning
 """
 import unittest
-from spinn_utilities.config_holder import set_config
 from pacman.config_setup import unittest_setup
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.operations.partition_algorithms import splitter_partitioner
