@@ -29,8 +29,6 @@ from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanException,
     PacmanValueError)
-from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint)
 from pacman_test_objects import NewPartitionerConstraint, SimpleTestVertex
 
 
@@ -145,8 +143,8 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that fixed partitioning causes correct number of vertices
         """
-        large_vertex = SimpleTestVertex(1000, "Large vertex")
-        large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
+        large_vertex = SimpleTestVertex(
+            1000, "Large vertex", max_atoms_per_core=10)
         large_vertex.splitter = SplitterSliceLegacy()
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
@@ -360,8 +358,7 @@ class TestBasicPartitioner(unittest.TestCase):
 
         # Create a vertex which will need to be split perfectly into 4 cores
         # to work and which max atoms per core must be ignored
-        vertex = SimpleTestVertex(
-            16, constraints=[MaxVertexAtomsConstraint(4)])
+        vertex = SimpleTestVertex(16, max_atoms_per_core=4)
         vertex.splitter = SplitterSliceLegacy()
         app_graph = ApplicationGraph("Test")
         app_graph.add_vertex(vertex)

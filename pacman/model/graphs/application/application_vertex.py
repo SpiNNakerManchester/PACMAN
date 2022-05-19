@@ -19,8 +19,6 @@ from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
-from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanInvalidParameterException)
@@ -40,7 +38,11 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         "_vertex_slices",
 
         # The splitter object associated with this app vertex
-        "_splitter"]
+        "_splitter",
+
+        # The maximun number of atoms for each core.
+        # Typically all but possibly the last core will have this number
+        "_max_atoms_per_core"]
 
     SETTING_SPLITTER_ERROR_MSG = (
         "The splitter object on {} has already been set, it cannot be "
@@ -68,9 +70,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         self._vertex_slices = None
         # Use setter as there is extra work to do
         self.splitter = splitter
-
-        # add a constraint for max partitioning
-        self.add_constraint(MaxVertexAtomsConstraint(max_atoms_per_core))
+        self._max_atoms_per_core = max_atoms_per_core
 
     def __str__(self):
         return self.label
@@ -184,16 +184,26 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
     def get_max_atoms_per_core(self):
         """ Gets the maximum number of atoms per core, which is either the\
             number of atoms required across the whole application vertex,\
-            or a lower value if a constraint lowers it.
+            or a lower value set.
 
         :rtype: int
         """
-        max_atoms = sys.maxsize
-        for constraint in self.constraints:
-            if isinstance(constraint, MaxVertexAtomsConstraint):
-                if constraint.size < max_atoms:
-                    max_atoms = constraint.size
-        return max_atoms
+        return self._max_atoms_per_core
+
+    def set_max_atoms_per_core(self, new_value, warn_higher=True):
+        """
+        Lowers if required the max_atoms_per_core.
+
+        :param int new_value: Value to set if not higher than previous
+        :param bool warn_higher: Set to false to avoid logging higher
+        """
+        if new_value <= self._max_atoms_per_core:
+            if warn_higher:
+                logger.warning(
+                    f"Ignoreing call to set max_atoms_per_core to {new_value} "
+                    f"as already {self._max_atoms_per_core}")
+        else:
+            self._max_atoms_per_core == new_value
 
     def forget_machine_vertices(self):
         """ Arrange to forget all machine vertices that this application

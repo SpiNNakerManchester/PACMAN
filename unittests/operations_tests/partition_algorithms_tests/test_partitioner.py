@@ -27,7 +27,7 @@ from pacman.exceptions import (
     PacmanPartitionException, PacmanInvalidParameterException,
     PacmanValueError)
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint)
+     SameAtomsAsVertexConstraint)
 from pacman.model.resources import PreAllocatedResourceContainer
 from pacman_test_objects import NewPartitionerConstraint, SimpleTestVertex
 
@@ -145,8 +145,8 @@ class TestPartitioner(unittest.TestCase):
         """
         test that fixed partitioning causes correct number of vertices
         """
-        large_vertex = SimpleTestVertex(1000, "Large vertex")
-        large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
+        large_vertex = SimpleTestVertex(
+            1000, "Large vertex", max_atoms_per_core=10)
         large_vertex.splitter = SplitterSliceLegacy()
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)

@@ -91,6 +91,8 @@ class AbstractSplitterSlice(AbstractSplitterCommon, metaclass=AbstractBase):
         slice_resource_map = dict()
         n_atoms_placed = 0
         n_atoms = self._governed_app_vertex.n_atoms
+        a = self._governed_app_vertex
+        max_atoms = a.get_max_atoms_per_core()
         max_atoms = self._governed_app_vertex.get_max_atoms_per_core()
         while n_atoms_placed < n_atoms:
             lo_atom = n_atoms_placed

@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.exceptions import (PacmanConfigurationException)
-from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint)
 from pacman.model.graphs.machine import MachineGraph
 from pacman.model.partitioner_interfaces import (
     AbstractSplitterPartitioner, AbstractSlicesConnect)
