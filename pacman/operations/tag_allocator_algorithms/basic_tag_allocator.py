@@ -69,7 +69,7 @@ def basic_tag_allocator(machine, placements):
             alloc_chip, tag = __get_chip_and_tag(
                 reverse_iptag, eth_chip, tags_on_chip, machine, tags_available)
             port = __get_port(reverse_iptag, eth_chip, ports_available)
-            tags.add_ip_tag(
+            tags.add_reverse_ip_tag(
                 __create_reverse_tag(
                     eth_chip, placement, reverse_iptag, tag, port),
                 placement.vertex)
