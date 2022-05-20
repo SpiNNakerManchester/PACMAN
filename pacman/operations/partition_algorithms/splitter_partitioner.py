@@ -24,7 +24,6 @@ from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
 from pacman.utilities.utility_objs import ResourceTracker
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.utilities import utility_calls as utils
 
 
 def splitter_partitioner(
