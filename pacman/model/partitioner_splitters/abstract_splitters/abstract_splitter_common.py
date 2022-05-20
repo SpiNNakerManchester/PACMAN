@@ -82,51 +82,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
             result[vertex] = edge_types
         return result
 
-    def set_max_atoms_per_core(self, max_atoms_per_core, is_fixed_atoms):
-        """ sets max atoms per core for this splitter object
-
-        :param int max_atoms_per_core: max atoms per core for this splitter.
-        :param bool is_fixed_atoms: is this a hard constraint or soft.
-        :raises PacmanConfigurationException:
-            If the new setting clash with a previous setting
-        """
-        if self._is_fixed_atoms_per_core:
-            # Already fixed so
-            if is_fixed_atoms:
-                # as new also fixed they must be the same
-                if max_atoms_per_core != self._max_atoms_per_core:
-                    raise PacmanConfigurationException(
-                        self.FIX_ATOMS_RESET.format(
-                            max_atoms_per_core, self._max_atoms_per_core))
-                else:
-                    return  # No change
-            else:
-                # as new a max make sure it is not lower than current fixed
-                if max_atoms_per_core < self._max_atoms_per_core:
-                    raise PacmanConfigurationException(
-                        self.MAX_BELOW_FIXED.format(
-                            max_atoms_per_core, self._max_atoms_per_core))
-                else:
-                    return  # OK to ignore the max above the fixed
-        else:
-            # Currently on a max so
-            if is_fixed_atoms:
-                # As new is fixed max sure it is not higher than max
-                if max_atoms_per_core > self._max_atoms_per_core:
-                    raise PacmanConfigurationException(
-                        self.FIXED_ABOVE_MAX.format(
-                            max_atoms_per_core, self._max_atoms_per_core))
-                else:  # Set the new fixed
-                    self._max_atoms_per_core = max_atoms_per_core
-                    self._is_fixed_atoms_per_core = True
-            else:
-                # Both max so only change if new max if lower
-                if max_atoms_per_core < self._max_atoms_per_core:
-                    # Set the new max but leave fixed false
-                    self._max_atoms_per_core = max_atoms_per_core
-                else:
-                    return  # Ok to Ignore a higher or same max
-
     @property
     def governed_app_vertex(self):
         """
