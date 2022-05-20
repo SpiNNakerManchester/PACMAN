@@ -190,20 +190,15 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """
         return self._max_atoms_per_core
 
-    def set_max_atoms_per_core(self, new_value, warn_higher=True):
+    def set_max_atoms_per_core(self, new_value):
         """
-        Lowers if required the max_atoms_per_core.
+        Set the max_atoms_per_core.
+
+        Can be used to raise the number of atoms.
 
         :param int new_value: Value to set if not higher than previous
-        :param bool warn_higher: Set to false to avoid logging higher
         """
-        if new_value <= self._max_atoms_per_core:
-            if warn_higher:
-                logger.warning(
-                    f"Ignoreing call to set max_atoms_per_core to {new_value} "
-                    f"as already {self._max_atoms_per_core}")
-        else:
-            self._max_atoms_per_core == new_value
+        self._max_atoms_per_core = new_value
 
     def forget_machine_vertices(self):
         """ Arrange to forget all machine vertices that this application
