@@ -33,6 +33,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 __temp_dir = None
 
 REPORTS_DIRNAME = "reports"
+# pylint: disable=protected-access
 
 
 class PacmanDataWriter(MachineDataWriter, PacmanDataView):
@@ -71,7 +72,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         MachineDataWriter.finish_run(self)
         self.__pacman_data._vertices_or_edges_added = False
 
-    def get_runtime_graph(self):
+    def get_runtime_graph(self):  # pylint: disable=arguments-differ
         """
         The runtime level graph
 
@@ -83,7 +84,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         return self.__pacman_data._runtime_graph
 
-    def get_runtime_machine_graph(self):
+    def get_runtime_machine_graph(self):  # pylint: disable=arguments-differ
         """
         The runtime machine graph
 

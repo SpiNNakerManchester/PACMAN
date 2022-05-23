@@ -23,6 +23,7 @@ from pacman.model.routing_info import (
     DictBasedMachinePartitionNKeysMap)
 
 logger = FormatAdapter(logging.getLogger(__name__))
+# pylint: disable=protected-access
 
 
 class _PacmanDataModel(object):
