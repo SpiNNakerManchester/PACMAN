@@ -31,7 +31,7 @@ class RoutingTree(object):
 
     Each instance represents a single hop in a route and recursively refers to
     following steps.
-    """  # noqa W605
+    """
 
     # A *lot* of instances of this data structure are created and so its memory
     # consumption is a sensitive matter. The following optimisations have been
