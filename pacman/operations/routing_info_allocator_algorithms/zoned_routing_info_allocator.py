@@ -99,7 +99,6 @@ class ZonedRoutingInfoAllocator(object):
         # Set of app_part indexes used by fixed
         "__fixed_used"
     ]
-    # pylint: disable=attribute-defined-outside-init
 
     def __call__(self, machine_graph, n_keys_map, flexible):
         """
