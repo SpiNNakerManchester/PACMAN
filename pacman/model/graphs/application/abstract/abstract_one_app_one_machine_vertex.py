@@ -57,3 +57,9 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
     @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
         return self._machine_vertex.vertex_slice.n_atoms
+
+    @overrides(ApplicationVertex.reset)
+    def reset(self):
+        # Override, as we don't want to clear the machine vertices here!
+        if self._splitter is not None:
+            self._splitter.reset_called()
