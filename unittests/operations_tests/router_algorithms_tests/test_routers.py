@@ -550,7 +550,6 @@ def test_spinnaker_link(params):
         app_graph.add_edge(ApplicationEdge(app_vertex, out_device), "Test")
 
     machine = virtual_machine(8, 8)
-    # machine = malloc_based_chip_id_allocator(machine, app_graph)
     placements = place_application_graph(machine, app_graph, 100, Placements())
     routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
     _check_edges(routing_tables, machine, placements, app_graph)
@@ -575,7 +574,6 @@ def test_fpga_link(params):
         app_graph.add_edge(ApplicationEdge(app_vertex, out_device), "Test")
 
     machine = virtual_machine(8, 8)
-    # machine = malloc_based_chip_id_allocator(machine, app_graph)
     placements = place_application_graph(machine, app_graph, 100, Placements())
     routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
     _check_edges(routing_tables, machine, placements, app_graph)
