@@ -17,7 +17,7 @@ from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationGraph, ApplicationEdge,
-    ApplicationSpiNNakerLinkVertex)
+    ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex)
 from pacman.model.graphs.machine import MulticastEdgePartition, MachineEdge
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman.utilities.utility_objs import ChipCounter
@@ -43,7 +43,6 @@ from pacman.model.graphs import AbstractFPGA, AbstractSpiNNakerLink
 from collections import defaultdict
 import math
 import pytest
-from pacman.model.graphs.application.application_fpga_vertex import ApplicationFPGAVertex
 
 
 @pytest.fixture(params=[
