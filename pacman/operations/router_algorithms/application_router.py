@@ -15,7 +15,8 @@
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
-    longest_dimension_first, get_app_partitions)
+    longest_dimension_first, get_app_partitions, vertex_xy,
+    vertex_chip_and_route)
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 from pacman.model.graphs.application import ApplicationVertex
 from collections import deque, defaultdict
@@ -25,41 +26,78 @@ from spinn_utilities.progress_bar import ProgressBar
 class _Targets(object):
     """ A set of targets to be added to a route on a chip
     """
-    __slots__ = ["__cores_by_source"]
+    __slots__ = ["__targets_by_source"]
 
     def __init__(self):
-        self.__cores_by_source = defaultdict(list)
+        self.__targets_by_source = defaultdict(lambda: (list(), list()))
 
     def ensure_source(self, source_vertex):
-        if source_vertex not in self.__cores_by_source:
-            self.__cores_by_source[source_vertex] = list()
+        """ Ensure that a source exists, even if it targets nothing
 
-    def add_sources_for_core(self, core, source_vertices):
-        """ Add a set of vertices that target a given core
+        :param source_vertex: The vertex to ensure exists
+        :type source_vertex: ApplicationVertex or MachineVertex
+        """
+        if source_vertex not in self.__targets_by_source:
+            self.__targets_by_source[source_vertex] = (list(), list())
+
+    def add_sources_for_target(self, core, link, source_vertices):
+        """ Add a set of vertices that target a given core or link
+
+        :param core: The core to target with the sources or None if no core
+        :type core: int or None
+        :param link: The link to target with the sources or None if no link
+        :type link: int or None
+        :param source_vertices: A list of sources which target something here
+        :type source_vertices: list(ApplicationVertex or MachineVertex)
         """
         for vertex in source_vertices:
-            self.__cores_by_source[vertex].append(core)
+            if core is not None:
+                self.__targets_by_source[vertex][0].append(core)
+            if link is not None:
+                self.__targets_by_source[vertex][1].append(link)
 
-    def add_machine_sources_for_core(
-            self, core, source_vertices, partition_id):
+    def add_machine_targets_for_core(
+            self, core, link, source_vertices, partition_id):
+        """ Add a set of machine vertices that target a given core or link
+
+        :param core: The core to target with the sources or None if no core
+        :type core: int or None
+        :param link: The link to target with the sources or None if no link
+        :type link: int or None
+        :param source_vertices: A list of sources which target something here
+        :type source_vertices: list(ApplicationVertex or MachineVertex)
+        :param str partition_id: The partition of the sources
+        """
         for vertex in source_vertices:
             if isinstance(vertex, ApplicationVertex):
                 for m_vertex in vertex.splitter.get_out_going_vertices(
                         partition_id):
-                    self.__cores_by_source[m_vertex].append(core)
+                    if core is not None:
+                        self.__targets_by_source[m_vertex][0].append(core)
+                    if link is not None:
+                        self.__targets_by_source[m_vertex][1].append(link)
             else:
-                self.__cores_by_source[vertex].append(core)
+                if core is not None:
+                    self.__targets_by_source[vertex][0].append(core)
+                if link is not None:
+                    self.__targets_by_source[vertex][1].append(link)
 
     @property
-    def cores_by_source(self):
-        """ Get a list of (source, list of cores) for the targets
-        """
-        return self.__cores_by_source.items()
+    def targets_by_source(self):
+        """ Get a list of (source, (list of cores, list of links)) to target
 
-    def get_cores_for_source(self, vertex):
-        """ Get the cores for a specific source
+        :rtype: tuple(MachineVertex or ApplicationVertex,
+                      tuple(list(int), list(int)))
         """
-        return self.__cores_by_source[vertex]
+        return self.__targets_by_source.items()
+
+    def get_targets_for_source(self, vertex):
+        """ Get the cores and links for a specific source
+
+        :return: tuple(list of cores, list of links)
+        :rtype: tuple(list(int), list(int))
+        """
+        return vertex, self.__targets_by_source[vertex]
 
 
 def route_application_graph(machine, app_graph, placements):
@@ -78,14 +116,14 @@ def route_application_graph(machine, app_graph, placements):
         # Pick a place within the source that we can route from.  Note that
         # this might not end up being the actual source in the end.
         source_chip, source_chips = _get_outgoing_chips(
-            partition.pre_vertex, partition.identifier, placements)
+            partition.pre_vertex, partition.identifier, placements, machine)
 
         # No source chips?  Nothing to route then!
         if source_chip is None:
             continue
 
         # Get all source chips
-        all_source_chips = _get_all_chips(source, placements)
+        all_source_chips = _get_all_chips(source, placements, machine)
 
         # Keep track of the source edge chips
         source_edge_chips = set()
@@ -109,7 +147,7 @@ def route_application_graph(machine, app_graph, placements):
             if source != target:
 
                 # Find all chips that are in the target
-                target_chips = _get_all_chips(target, placements)
+                target_chips = _get_all_chips(target, placements, machine)
 
                 # Pick one to actually use as a target
                 target_chip = _find_target_chip(
@@ -128,15 +166,15 @@ def route_application_graph(machine, app_graph, placements):
                         source, partition.identifier)
                 real_target_chips = set()
                 for tgt, srcs in target_vertices:
-                    # TODO: Deal with virtual vertices
-                    place = placements.get_placement_of_vertex(tgt)
-                    if place.chip in source_chips:
-                        targets[place.chip].add_machine_sources_for_core(
-                            place.p, srcs, partition.identifier)
+                    xy, (_vertex, core, link) = vertex_chip_and_route(
+                        tgt, placements, machine)
+                    if xy in source_chips:
+                        targets[xy].add_machine_targets_for_core(
+                            core, link, srcs, partition.identifier)
                     else:
-                        targets[place.chip].add_sources_for_core(place.p, srcs)
+                        targets[xy].add_sources_for_target(core, link, srcs)
 
-                    real_target_chips.add(place.chip)
+                    real_target_chips.add(xy)
 
                 # Route from target edge chip to all the targets
                 _route_to_target_chips(
@@ -157,11 +195,11 @@ def route_application_graph(machine, app_graph, placements):
                     source.splitter.get_source_specific_in_coming_vertices(
                         source, partition.identifier)
                 for tgt, srcs in target_vertices:
-                    # TODO: Deal with virtual vertices
-                    place = placements.get_placement_of_vertex(tgt)
-                    targets[place.chip].add_machine_sources_for_core(
-                        place.p, srcs, partition.identifier)
-                    self_chips.add(place.chip)
+                    xy, (_vertex, core, link) = vertex_chip_and_route(
+                        tgt, placements, machine)
+                    targets[xy].add_machine_targets_for_core(
+                        core, link, srcs, partition.identifier)
+                    self_chips.add(xy)
 
         # Deal with internal multicast partitions
         internal = source.splitter.get_internal_multicast_partitions()
@@ -171,10 +209,11 @@ def route_application_graph(machine, app_graph, placements):
                 src = in_part.pre_vertex
                 for edge in in_part.edges:
                     tgt = edge.post_vertex
-                    place = placements.get_placement_of_vertex(tgt)
-                    targets[place.chip].add_machine_sources_for_core(
-                        place.p, [src], in_part.identifier)
-                    self_chips.add(place.chip)
+                    xy, (_vertex, core, link) = vertex_chip_and_route(
+                        tgt, placements, machine)
+                    targets[xy].add_machine_targets_for_core(
+                        core, link, [src], in_part.identifier)
+                    self_chips.add(xy)
 
         # Make the real routes from source edges to targets
         for source_edge_chip in source_edge_chips:
@@ -182,8 +221,8 @@ def route_application_graph(machine, app_graph, placements):
             if source_edge_chip not in targets:
                 edge_targets = _Targets()
                 for source_chip in source_chips:
-                    for place in source_chips[source_chip]:
-                        edge_targets.ensure_source(place.vertex)
+                    for vertex, _p, _l in source_chips[source_chip]:
+                        edge_targets.ensure_source(vertex)
                 targets[source_edge_chip] = edge_targets
 
             _convert_a_route(
@@ -198,10 +237,10 @@ def route_application_graph(machine, app_graph, placements):
                     chip, all_source_chips, machine, source_routes,
                     source_edge_chips.union(self_chips),
                     "Sources to Source (self)")
-                for plce in source_chips[chip]:
+                for vertex, processor, link in source_chips[chip]:
                     _convert_a_route(
-                        routing_tables, plce.vertex, partition.identifier,
-                        plce.p, None, source_routes[chip], targets=targets,
+                        routing_tables, vertex, partition.identifier,
+                        processor, link, source_routes[chip], targets=targets,
                         use_source_for_targets=True)
         else:
             for chip in source_chips:
@@ -209,10 +248,10 @@ def route_application_graph(machine, app_graph, placements):
                 _route_to_target_chips(
                     chip, all_source_chips, machine, source_routes,
                     source_edge_chips, "Sources to source")
-                for plce in source_chips[chip]:
+                for vertex, processor, link in source_chips[chip]:
                     _convert_a_route(
-                        routing_tables, plce.vertex, partition.identifier,
-                        plce.p, None, source_routes[chip])
+                        routing_tables, vertex, partition.identifier,
+                        processor, link, source_routes[chip])
 
     # Return the routing tables
     return routing_tables
@@ -228,24 +267,24 @@ def _find_target_chip(target_chips, routes, source_chips):
     return chip
 
 
-def _get_outgoing_chips(app_vertex, partition_id, placements):
-    # TODO: Deal with virtual chips
+def _get_outgoing_chips(app_vertex, partition_id, placements, machine):
     vertex_chips = defaultdict(list)
     for m_vertex in app_vertex.splitter.get_out_going_vertices(partition_id):
-        place = placements.get_placement_of_vertex(m_vertex)
-        vertex_chips[place.chip].append(place)
+        xy, route = vertex_chip_and_route(m_vertex, placements, machine)
+        vertex_chips[xy].append(route)
     for in_part in app_vertex.splitter.get_internal_multicast_partitions():
         if in_part.identifier == partition_id:
-            place = placements.get_placement_of_vertex(in_part.pre_vertex)
-            vertex_chips[place.chip].append(place)
+            xy, route = vertex_chip_and_route(
+                in_part.pre_vertex, placements, machine)
+            vertex_chips[xy].append(route)
     if not vertex_chips:
         return None, None
     first_chip = next(iter(vertex_chips.keys()))
     return (first_chip, vertex_chips)
 
 
-def _get_all_chips(app_vertex, placements):
-    return {placements.get_placement_of_vertex(m_vertex).chip
+def _get_all_chips(app_vertex, placements, machine):
+    return {vertex_xy(m_vertex, placements, machine)
             for m_vertex in app_vertex.machine_vertices}
 
 
@@ -482,14 +521,13 @@ def _convert_a_route(
         if targets is not None and (x, y) in targets:
             chip_targets = targets[x, y]
             if use_source_for_targets:
-                cores_by_source = [
-                    (source_vertex,
-                     chip_targets.get_cores_for_source(source_vertex))]
+                targets_by_source = [
+                    chip_targets.get_targets_for_source(source_vertex)]
             else:
-                cores_by_source = chip_targets.cores_by_source
-            for (source, additional_cores) in cores_by_source:
+                targets_by_source = chip_targets.targets_by_source
+            for (source, (add_cores, add_links)) in targets_by_source:
                 entry = MulticastRoutingTableByPartitionEntry(
-                    link_ids, processor_ids + additional_cores,
+                    link_ids + add_links, processor_ids + add_cores,
                     incoming_processor, incoming_link)
                 _add_routing_entry(
                     first_route, routing_tables, entry, x, y, source,

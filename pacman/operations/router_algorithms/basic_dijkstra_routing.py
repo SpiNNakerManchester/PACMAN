@@ -23,7 +23,7 @@ from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
-    get_app_partitions)
+    get_app_partitions, vertex_chip_and_route)
 from pacman.model.graphs.application import ApplicationVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -140,12 +140,13 @@ class _BasicDijkstraRouting(object):
         :param ApplicationGraph graph:
         :param dict(tuple(int,int),_NodeInfo) node_info:
         :param dict(tuple(int,int),_DijkstraInfo) tables:
+        :param Machine machine:
         """
         # pylint: disable=too-many-arguments
         source = partition.pre_vertex
 
-        # Destination cores by source machine vertices
-        destinations = defaultdict(OrderedSet)
+        # Destination (xy, core, link) by source machine vertices
+        destinations = defaultdict(lambda: defaultdict(lambda: (set(), set())))
         dest_chips = defaultdict(set)
 
         for edge in partition.edges:
@@ -155,16 +156,23 @@ class _BasicDijkstraRouting(object):
                     source, partition.identifier)
 
             for tgt, srcs in target_vertices:
-                place = placements.get_placement_of_vertex(tgt)
+                xy, (m_vertex, core, link) = vertex_chip_and_route(
+                    tgt, placements, self._machine)
                 for src in srcs:
                     if isinstance(src, ApplicationVertex):
                         for s in src.splitter.get_out_going_vertices(
                                 partition.identifier):
-                            destinations[s].add(place)
-                            dest_chips[s].add(place.chip)
+                            if core is not None:
+                                destinations[s][xy][0].add(core)
+                            if link is not None:
+                                destinations[s][xy][1].add(link)
+                            dest_chips[s].add(xy)
                     else:
-                        destinations[src].add(place)
-                        dest_chips[src].add(place.chip)
+                        if core is not None:
+                            destinations[src][xy][0].add(core)
+                        if link is not None:
+                            destinations[src][xy][1].add(link)
+                        dest_chips[src].add(xy)
 
         outgoing = OrderedSet(source.splitter.get_out_going_vertices(
             partition.identifier))
@@ -172,25 +180,31 @@ class _BasicDijkstraRouting(object):
             if in_part.identifier == partition.identifier:
                 outgoing.add(in_part.pre_vertex)
                 for edge in in_part.edges:
-                    place = placements.get_placement_of_vertex(
-                        edge.post_vertex)
-                    destinations[in_part.pre_vertex].add(place)
-                    dest_chips[in_part.pre_vertex].add(place.chip)
+                    xy, (_tgt, core, link) = vertex_chip_and_route(
+                        edge.post_vertex, placements, self._machine)
+                    if core is not None:
+                        destinations[in_part.pre_vertex][xy][0].add(core)
+                    if link is not None:
+                        destinations[in_part.pre_vertex][xy][1].add(link)
+                    dest_chips[in_part.pre_vertex].add(xy)
 
         for m_vertex in outgoing:
-            place = placements.get_placement_of_vertex(m_vertex)
+            source_xy, (m_vertex, core, link) = vertex_chip_and_route(
+                m_vertex, placements, self._machine)
             if dest_chips[m_vertex]:
                 self._update_all_weights(node_info)
                 self._reset_tables(tables)
-                tables[place.x, place.y].activated = True
-                tables[place.x, place.y].cost = 0
+                tables[source_xy].activated = True
+                tables[source_xy].cost = 0
+                x, y = source_xy
                 self._propagate_costs_until_reached_destinations(
-                    tables, node_info, dest_chips[m_vertex], place.x, place.y)
+                    tables, node_info, dest_chips[m_vertex], x, y)
 
-            for dest_placement in destinations[m_vertex]:
+            for xy in destinations[m_vertex]:
+                dest_cores, dest_links = destinations[m_vertex][xy]
                 self._retrace_back_to_source(
-                    dest_placement, tables, node_info, place.p, m_vertex,
-                    partition.identifier)
+                    xy, dest_cores, dest_links, tables, node_info, core, link,
+                    m_vertex, partition.identifier)
 
     def _initiate_node_info(self):
         """ Set up a dictionary which contains data for each chip in the\
@@ -365,14 +379,15 @@ class _BasicDijkstraRouting(object):
                 .format(neighbour.destination_x, neighbour.destination_y))
 
     def _retrace_back_to_source(
-            self, dest, tables, nodes_info, source_processor,
-            pre_vertex, partition_id):
+            self, dest_xy, dest_cores, dest_links, tables, nodes_info,
+            source_processor, source_link, pre_vertex, partition_id):
         """
         :param Placement dest: Destination placement
         :param dict(tuple(int,int),_DijkstraInfo) tables:
         :param MachineEdge edge:
         :param dict(tuple(int,int),_NodeInfo) nodes_info:
         :param int source_processor:
+        :param int source_link:
         :return: the next coordinates to look into
         :rtype: tuple(int, int)
         :raise PacmanRoutingException:
@@ -382,19 +397,12 @@ class _BasicDijkstraRouting(object):
             goes to a node that's not considered in the weighted search.
         """
         # Set the tracking node to the destination to begin with
-        x, y = dest.x, dest.y
-        routing_entry_route_processors = []
-
-        # if the processor is None, don't add to router path entry
-        if dest.p is not None:
-            routing_entry_route_processors.append(dest.p)
-        routing_entry_route_links = None
+        x, y = dest_xy
 
         entry = MulticastRoutingTableByPartitionEntry(
-            out_going_links=routing_entry_route_links,
-            outgoing_processors=routing_entry_route_processors)
+            dest_links, dest_cores)
         self._routing_paths.add_path_entry(
-            entry, dest.x, dest.y, pre_vertex, partition_id)
+            entry, x, y, pre_vertex, partition_id)
         prev_entry = entry
 
         while tables[x, y].cost != 0:
@@ -421,7 +429,10 @@ class _BasicDijkstraRouting(object):
                     " did not find a preceding node! Consider increasing "
                     "acceptable discrepancy between sought traceback cost"
                     " and actual cost at node. Terminating...")
-        prev_entry.incoming_processor = source_processor
+        if source_processor is not None:
+            prev_entry.incoming_processor = source_processor
+        if source_link is not None:
+            prev_entry.incoming_link = source_link
         return x, y
 
     def _create_routing_entry(

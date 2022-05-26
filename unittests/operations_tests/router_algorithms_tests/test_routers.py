@@ -16,8 +16,11 @@ from spinn_utilities.timer import Timer
 from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
 from pacman.model.graphs.application import (
-    ApplicationVertex, ApplicationGraph, ApplicationEdge)
+    ApplicationVertex, ApplicationGraph, ApplicationEdge,
+    ApplicationSpiNNakerLinkVertex)
 from pacman.model.graphs.machine import MulticastEdgePartition, MachineEdge
+from pacman.model.partitioner_splitters import SplitterFixedLegacy
+from pacman.utilities.utility_objs import ChipCounter
 from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
 from pacman.operations.router_algorithms.application_router import (
@@ -27,17 +30,20 @@ from pacman.operations.router_algorithms.basic_dijkstra_routing import (
 from pacman.operations.router_algorithms.ner_route import (
     ner_route, ner_route_traffic_aware)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
-    longest_dimension_first, get_app_partitions)
+    longest_dimension_first, get_app_partitions, vertex_xy,
+    vertex_chip_and_route)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placements
 from pacman.model.resources import ResourceContainer, ConstantSDRAM
+from pacman.model.graphs import AbstractFPGA, AbstractSpiNNakerLink
 
 from collections import defaultdict
 import math
 import pytest
+from pacman.model.graphs.application.application_fpga_vertex import ApplicationFPGAVertex
 
 
 @pytest.fixture(params=[
@@ -222,10 +228,11 @@ def _get_entry(routing_tables, x, y, source_vertex, partition_id, allow_none):
 
 
 def _find_targets(
-        routing_tables, machine, placements, source_vertex, partition_id):
+        routing_tables, machine, placements, expected_virtual, source_vertex,
+        partition_id):
     found_targets = set()
     to_follow = list()
-    x, y = placements.get_placement_of_vertex(source_vertex).chip
+    x, y = vertex_xy(source_vertex, placements, machine)
     first_entry = _get_entry(
         routing_tables, x, y, source_vertex, partition_id, True)
     if first_entry is None:
@@ -245,17 +252,34 @@ def _find_targets(
             if (x, y, p) in found_targets:
                 raise Exception(
                     f"Potential Loop found when adding routes at {x}, {y}")
-            found_targets.add((x, y, p))
+            found_targets.add(((x, y), p, None))
         for link in next_to_follow.link_ids:
-            if not machine.is_link_at(x, y, link):
-                raise Exception(
-                    f"Route uses link {x}, {y}, {link} but that doesn't"
-                    " exist!")
-            next_x, next_y = machine.xy_over_link(x, y, link)
-            to_follow.append((next_x, next_y, _get_entry(
-                    routing_tables, next_x, next_y, source_vertex,
-                    partition_id, False)))
+            if (x, y, link) in expected_virtual:
+                found_targets.add(((x, y), None, link))
+            else:
+                if not machine.is_link_at(x, y, link):
+                    raise Exception(
+                        f"Route from {source_vertex}, {partition_id} uses link"
+                        f" {x}, {y}, {link} but that doesn't exist!")
+                next_x, next_y = machine.xy_over_link(x, y, link)
+                to_follow.append((next_x, next_y, _get_entry(
+                        routing_tables, next_x, next_y, source_vertex,
+                        partition_id, False)))
     return found_targets
+
+
+def _add_virtual(expected_virtual, vertex, machine):
+    link_data = None
+    if isinstance(vertex, AbstractFPGA):
+        link_data = machine.get_fpga_link_with_id(
+            vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
+    elif isinstance(vertex, AbstractSpiNNakerLink):
+        link_data = machine.get_spinnaker_link_with_id(
+            vertex.spinnaker_link_id, vertex.board_address)
+    if link_data is not None:
+        expected_virtual.add((
+            link_data.connected_chip_x, link_data.connected_chip_y,
+            link_data.connected_link))
 
 
 def _check_edges(routing_tables, machine, placements, app_graph):
@@ -263,19 +287,22 @@ def _check_edges(routing_tables, machine, placements, app_graph):
 
         # Find the required targets
         required_targets = defaultdict(set)
+        expected_virtual = set()
         for edge in part.edges:
             post = edge.post_vertex
             targets = post.splitter.get_source_specific_in_coming_vertices(
                     edge.pre_vertex, part.identifier)
             for tgt, srcs in targets:
-                place = placements.get_placement_of_vertex(tgt)
+                _add_virtual(expected_virtual, tgt, machine)
+                xy, (m_vertex, core, link) = vertex_chip_and_route(
+                    tgt, placements, machine)
                 for src in srcs:
                     if isinstance(src, ApplicationVertex):
                         for m_vertex in src.splitter.get_out_going_vertices(
                                 part.identifier):
-                            required_targets[m_vertex].add(place.location)
+                            required_targets[m_vertex].add((xy, core, link))
                     else:
-                        required_targets[src].add(place.location)
+                        required_targets[src].add((xy, core, link))
 
         splitter = part.pre_vertex.splitter
         outgoing = set(splitter.get_out_going_vertices(part.identifier))
@@ -283,14 +310,15 @@ def _check_edges(routing_tables, machine, placements, app_graph):
             if in_part.identifier == part.identifier:
                 outgoing.add(in_part.pre_vertex)
                 for edge in in_part.edges:
-                    place = placements.get_placement_of_vertex(
-                        edge.post_vertex)
-                    required_targets[in_part.pre_vertex].add(place.location)
+                    xy, (m_vertex, core, link) = vertex_chip_and_route(
+                        edge.post_vertex, placements, machine)
+                    required_targets[in_part.pre_vertex].add((xy, core, link))
+                    _add_virtual(expected_virtual, edge.post_vertex, machine)
 
         for m_vertex in outgoing:
             actual_targets = _find_targets(
-                routing_tables, machine, placements, m_vertex,
-                part.identifier)
+                routing_tables, machine, placements, expected_virtual,
+                m_vertex, part.identifier)
             assert(not actual_targets.difference(required_targets[m_vertex]))
 
 
@@ -499,6 +527,56 @@ def test_internal_and_split(params):
                 app_graph.add_edge(ApplicationEdge(source, target), "Test")
 
     machine = virtual_machine(24, 24)
+    placements = place_application_graph(machine, app_graph, 100, Placements())
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
+    _check_edges(routing_tables, machine, placements, app_graph)
+
+
+def test_spinnaker_link(params):
+    algorithm, n_vertices, n_m_vertices = params
+    unittest_setup()
+    app_graph = ApplicationGraph("Test")
+    in_device = ApplicationSpiNNakerLinkVertex(100, 0)
+    in_device.splitter = SplitterFixedLegacy()
+    in_device.splitter.create_machine_vertices(ChipCounter())
+    app_graph.add_vertex(in_device)
+    out_device = ApplicationSpiNNakerLinkVertex(100, 0)
+    out_device.splitter = SplitterFixedLegacy()
+    out_device.splitter.create_machine_vertices(ChipCounter())
+    app_graph.add_vertex(out_device)
+    for i in range(n_vertices):
+        app_vertex = _make_vertices(
+            app_graph, 1000, n_m_vertices, f"app_vertex_{i}")
+        app_graph.add_edge(ApplicationEdge(in_device, app_vertex), "Test")
+        app_graph.add_edge(ApplicationEdge(app_vertex, out_device), "Test")
+
+    machine = virtual_machine(8, 8)
+    # machine = malloc_based_chip_id_allocator(machine, app_graph)
+    placements = place_application_graph(machine, app_graph, 100, Placements())
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
+    _check_edges(routing_tables, machine, placements, app_graph)
+
+
+def test_fpga_link(params):
+    algorithm, n_vertices, n_m_vertices = params
+    unittest_setup()
+    app_graph = ApplicationGraph("Test")
+    in_device = ApplicationFPGAVertex(100, 0, 0)
+    in_device.splitter = SplitterFixedLegacy()
+    in_device.splitter.create_machine_vertices(ChipCounter())
+    app_graph.add_vertex(in_device)
+    out_device = ApplicationFPGAVertex(100, 0, 1)
+    out_device.splitter = SplitterFixedLegacy()
+    out_device.splitter.create_machine_vertices(ChipCounter())
+    app_graph.add_vertex(out_device)
+    for i in range(n_vertices):
+        app_vertex = _make_vertices(
+            app_graph, 1000, n_m_vertices, f"app_vertex_{i}")
+        app_graph.add_edge(ApplicationEdge(in_device, app_vertex), "Test")
+        app_graph.add_edge(ApplicationEdge(app_vertex, out_device), "Test")
+
+    machine = virtual_machine(8, 8)
+    # machine = malloc_based_chip_id_allocator(machine, app_graph)
     placements = place_application_graph(machine, app_graph, 100, Placements())
     routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
     _check_edges(routing_tables, machine, placements, app_graph)

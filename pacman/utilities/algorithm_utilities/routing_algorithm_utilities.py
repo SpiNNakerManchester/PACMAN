@@ -555,6 +555,32 @@ def vertex_xy(vertex, placements, machine):
     return link_data.connected_chip_x, link_data.connected_chip_y
 
 
+def vertex_chip_and_route(vertex, placements, machine):
+    """ Get the non-virtual chip coordinates, the vertex, and processor and/or
+        link to follow to get to the vertex
+
+    :param MachineVertex vertex:
+    :param Placements placements:
+    :param ~spinn_machine.Machine machine:
+    :return: tuple(tuple(chip x, chip y),
+                   tuple(vertex, processor or None, link or None))
+    :rtype: tuple(tuple(int, int),
+                  tuple(MachineVertex, int or None, int or None))
+    """
+    if not isinstance(vertex, AbstractVirtual):
+        placement = placements.get_placement_of_vertex(vertex)
+        return (placement.x, placement.y), (vertex, placement.p, None)
+    link_data = None
+    if isinstance(vertex, AbstractFPGA):
+        link_data = machine.get_fpga_link_with_id(
+            vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
+    elif isinstance(vertex, AbstractSpiNNakerLink):
+        link_data = machine.get_spinnaker_link_with_id(
+            vertex.spinnaker_link_id, vertex.board_address)
+    return ((link_data.connected_chip_x, link_data.connected_chip_y),
+            (vertex, None, link_data.connected_link))
+
+
 def route_to_endpoint(vertex, machine):
     """
     :param MachineVertex vertex:

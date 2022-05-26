@@ -52,10 +52,6 @@ def place_application_graph(
     for app_vertex in progress.over(app_graph.vertices):
         spaces.restore_chips()
 
-        # No need to place a virtual vertex
-        if isinstance(app_vertex, AbstractVirtual):
-            pass
-
         # Try placements from the next chip, but try again if fails
         placed = False
         while not placed:
@@ -84,6 +80,9 @@ def place_application_graph(
                 for vertices, sdram in same_chip_groups:
                     vertices_to_place = list()
                     for vertex in vertices:
+                        # No need to place virtual vertices
+                        if isinstance(vertex, AbstractVirtual):
+                            continue
                         if not placements.is_vertex_placed(vertex):
                             vertices_to_place.append(vertex)
                     sdram = sdram.get_total_sdram(plan_n_timesteps)
@@ -319,11 +318,15 @@ class _Spaces(object):
     def __get_next_chip(self):
         while self.__restored_chips:
             chip = self.__restored_chips.pop(last=False)
-            if chip not in self.__used_chips:
+            if chip not in self.__used_chips and not self.__is_virtual(chip):
                 return chip
-        while self.__next_chip in self.__used_chips:
+        while (self.__next_chip in self.__used_chips or
+                self.__is_virtual(self.__next_chip)):
             self.__next_chip = next(self.__chips)
         return self.__next_chip
+
+    def __is_virtual(self, xy):
+        return self.__machine.get_chip_at(*xy).virtual
 
     def get_next_chip(self, space, used_chip):
         # If we are reporting a used chip, update with reachable chips
@@ -354,7 +357,10 @@ class _Spaces(object):
         for link in chip.router.links:
             chip_coords = (link.destination_x, link.destination_y)
             if chip_coords not in self.__used_chips:
-                chips.add(self.__machine.get_chip_at(*chip_coords))
+                chip = self.__machine.get_chip_at(*chip_coords)
+                # Don't place on virtual chips
+                if not chip.virtual:
+                    chips.add(chip)
         return chips
 
     def save_chips(self, chips):
