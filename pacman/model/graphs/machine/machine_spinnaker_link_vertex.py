@@ -36,6 +36,7 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
             vertex_slice=vertex_slice)
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address
+
     @property
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
