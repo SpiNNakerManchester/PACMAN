@@ -150,15 +150,6 @@ class AbstractSplitterSlice(AbstractSplitterCommon, metaclass=AbstractBase):
                 used_resources, resources_available,
                 resource_tracker.plan_n_time_steps)
 
-            if self._is_fixed_atoms_per_core and ratio > 1.0:
-                raise PacmanPartitionException(
-                    self.NO_MORE_RESOURCE_AVAILABLE_ERROR.format(
-                        self._governed_app_vertex, lo_atom - 1,
-                        used_resources.sdram.get_total_sdram(
-                            resource_tracker.plan_n_timesteps),
-                        resources_available.sdram.get_total_sdram(
-                            resource_tracker.plan_n_timesteps)))
-
             while ratio > 1.0 and hi_atom >= lo_atom:
                 # Scale the resources available by the ratio
                 old_n_atoms = (hi_atom - lo_atom) + 1

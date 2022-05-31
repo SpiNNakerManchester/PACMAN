@@ -29,8 +29,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         # the name of this splitter object, for human readability.
         "_splitter_name",
 
-        # bool flag that says that the constraint is fixed or soft.
-        "_is_fixed_atoms_per_core"
     ]
 
     SETTING_SPLITTER_ERROR_MSG = (
@@ -60,7 +58,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         if splitter_name is None:
             splitter_name = self.DEFAULT_SPLITTER_NAME
         self._splitter_name = splitter_name
-        self._is_fixed_atoms_per_core = False
         self._governed_app_vertex = None
 
     def __str__(self):
