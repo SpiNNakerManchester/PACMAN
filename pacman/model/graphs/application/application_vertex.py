@@ -194,9 +194,9 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """
         Set the max_atoms_per_core.
 
-        Can be used to raise the number of atoms.
+        Can be used to raise or lower the maximum number of atoms.
 
-        :param int new_value: Value to set if not higher than previous
+        :param int new_value: Value to set
         """
         self._max_atoms_per_core = new_value
 
