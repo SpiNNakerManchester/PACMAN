@@ -392,8 +392,7 @@ class AbstractSplitterSlice(AbstractSplitterCommon, metaclass=AbstractBase):
 
         return (
             [Slice(lo, min(lo + per_core - 1, n_atoms))
-             for lo in range(0, n_atoms, per_core)],
-            self._is_fixed_atoms_per_core)
+             for lo in range(0, n_atoms, per_core)], False)
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):
