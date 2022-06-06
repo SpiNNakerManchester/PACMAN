@@ -26,8 +26,7 @@ from pacman.model.constraints.placer_constraints import (
     BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
     SameChipAsConstraint)
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, SameAtomsAsVertexConstraint,
-    FixedVertexAtomsConstraint)
+    SameAtomsAsVertexConstraint)
 from pacman.model.resources import (
     CPUCyclesPerTickResource, DTCMResource, IPtagResource, ResourceContainer,
     VariableSDRAM)
@@ -59,7 +58,6 @@ def json_to_object(json_object):
 _LOCATION_CONSTRAINTS = (
     ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
 _VERTEX_CONSTRAINTS = (SameChipAsConstraint, SameAtomsAsVertexConstraint)
-_SIZE_CONSTRAINTS = (FixedVertexAtomsConstraint, MaxVertexAtomsConstraint)
 
 
 def constraint_to_json(constraint):
@@ -91,8 +89,6 @@ def constraint_to_json(constraint):
                     json_dict["p"] = constraint.p
         elif isinstance(constraint, _VERTEX_CONSTRAINTS):
             json_dict["vertex"] = constraint.vertex.label
-        elif isinstance(constraint, _SIZE_CONSTRAINTS):
-            json_dict["size"] = constraint.size
         elif isinstance(constraint, FixedKeyAndMaskConstraint):
             json_dict["keys_and_masks"] = key_masks_to_json(
                 constraint.keys_and_masks)
@@ -136,10 +132,6 @@ def constraint_from_json(json_dict, graph=None):
             key_masks_from_json(json_dict["keys_and_masks"]))
     if json_dict["class"] == "FixedMaskConstraint":
         return FixedMaskConstraint(json_dict["mask"])
-    if json_dict["class"] == "FixedVertexAtomsConstraint":
-        return FixedVertexAtomsConstraint(json_dict["size"])
-    if json_dict["class"] == "MaxVertexAtomsConstraint":
-        return MaxVertexAtomsConstraint(json_dict["size"])
     if json_dict["class"] == "RadialPlacementFromChipConstraint":
         return RadialPlacementFromChipConstraint(
             json_dict["x"], json_dict["y"])

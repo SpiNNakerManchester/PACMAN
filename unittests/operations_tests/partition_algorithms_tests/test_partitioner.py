@@ -17,7 +17,6 @@
 test for partitioning
 """
 import unittest
-from spinn_utilities.config_holder import set_config
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
@@ -26,10 +25,9 @@ from spinn_machine import (
     SDRAM, Link, Router, Chip, machine_from_chips, virtual_machine)
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.exceptions import (
-    PacmanException, PacmanInvalidParameterException, PacmanValueError)
+    PacmanInvalidParameterException, PacmanValueError)
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-    SameAtomsAsVertexConstraint)
+     SameAtomsAsVertexConstraint)
 from pacman.model.resources import PreAllocatedResourceContainer
 from pacman_test_objects import NewPartitionerConstraint, SimpleTestVertex
 
@@ -128,8 +126,8 @@ class TestPartitioner(unittest.TestCase):
         """
         test that fixed partitioning causes correct number of vertices
         """
-        large_vertex = SimpleTestVertex(1000, "Large vertex")
-        large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
+        large_vertex = SimpleTestVertex(
+            1000, "Large vertex", max_atoms_per_core=10)
         large_vertex.splitter = SplitterSliceLegacy()
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
@@ -419,64 +417,6 @@ class TestPartitioner(unittest.TestCase):
         writer._set_runtime_graph(self.graph)
         writer.set_plan_n_timesteps(3000)
         splitter_partitioner(PreAllocatedResourceContainer())
-
-    def test_partition_with_fixed_atom_constraints(self):
-        """
-        test a partitioning with a graph with fixed atom constraint
-        """
-        writer = PacmanDataWriter.mock()
-        # Create a 2x2 machine with 10 cores per chip (so 40 cores),
-        # but 1 off 2 per chip (so 19 per chip)
-        n_cores_per_chip = 10
-        sdram_per_chip = (n_cores_per_chip * 2) - 1
-        set_config("Machine", "max_sdram_allowed_per_chip", sdram_per_chip)
-        machine = virtual_machine(
-            width=2, height=2, n_cpus_per_chip=n_cores_per_chip)
-        writer.set_machine(machine)
-        # Create a vertex where each atom requires 1MB (default) of SDRAM
-        # but which can't be subdivided lower than 2 atoms per core.
-        # The vertex has 1 atom per MB of SDRAM, and so would fit but will
-        # be disallowed by the fixed atoms per core constraint
-        vertex = SimpleTestVertex(
-            sdram_per_chip * machine.n_chips,
-            max_atoms_per_core=2, constraints=[FixedVertexAtomsConstraint(2)])
-        vertex.splitter = SplitterSliceLegacy()
-        app_graph = ApplicationGraph("Test")
-        app_graph.add_vertex(vertex)
-
-        # Do the partitioning - this should result in an error
-        writer._set_runtime_graph(app_graph)
-        writer.set_plan_n_timesteps(3000)
-        with self.assertRaises(PacmanException):
-            splitter_partitioner()
-
-    def test_partition_with_fixed_atom_constraints_at_limit(self):
-        """
-        test a partitioning with a graph with fixed atom constraint which\
-        should fit but is close to the limit
-        """
-        writer = PacmanDataWriter.mock()
-        # Create a 2x2 machine with 1 core per chip (so 4 cores),
-        n_cores_per_chip = 2  # remember 1 is the monitor
-        machine = virtual_machine(
-            width=2, height=2, n_cpus_per_chip=n_cores_per_chip)
-        writer.set_machine(machine)
-
-        # Create a vertex which will need to be split perfectly into 4 cores
-        # to work and which max atoms per core must be ignored
-        vertex = SimpleTestVertex(
-            16, max_atoms_per_core=8,
-            constraints=[FixedVertexAtomsConstraint(4)])
-        vertex.splitter = SplitterSliceLegacy()
-        app_graph = ApplicationGraph("Test")
-        app_graph.add_vertex(vertex)
-
-        # Do the partitioning - this should just work
-        writer._set_runtime_graph(app_graph)
-        writer.set_plan_n_timesteps(3000)
-        machine_graph, _ = splitter_partitioner()
-        self.assertEqual(4, len(machine_graph.vertices))
-
 
 if __name__ == '__main__':
     unittest.main()

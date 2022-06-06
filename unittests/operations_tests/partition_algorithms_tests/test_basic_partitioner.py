@@ -30,8 +30,6 @@ from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanException,
     PacmanValueError)
-from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 from pacman_test_objects import NewPartitionerConstraint, SimpleTestVertex
 
 
@@ -135,8 +133,8 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that fixed partitioning causes correct number of vertices
         """
-        large_vertex = SimpleTestVertex(1000, "Large vertex")
-        large_vertex.add_constraint(MaxVertexAtomsConstraint(10))
+        large_vertex = SimpleTestVertex(
+            1000, "Large vertex", max_atoms_per_core=10)
         large_vertex.splitter = SplitterSliceLegacy()
         self.graph = ApplicationGraph("Graph with large vertex")
         self.graph.add_vertex(large_vertex)
@@ -352,8 +350,7 @@ class TestBasicPartitioner(unittest.TestCase):
         # The vertex has 1 atom per MB of SDRAM, and so would fit but will
         # be disallowed by the fixed atoms per core constraint
         vertex = SimpleTestVertex(
-            sdram_per_chip * machine.n_chips,
-            max_atoms_per_core=2, constraints=[FixedVertexAtomsConstraint(2)])
+            sdram_per_chip * machine.n_chips, max_atoms_per_core=2)
         vertex.splitter = SplitterSliceLegacy()
         app_graph = ApplicationGraph("Test")
         app_graph.add_vertex(vertex)
@@ -364,7 +361,7 @@ class TestBasicPartitioner(unittest.TestCase):
         with self.assertRaises(PacmanValueError):
             splitter_partitioner()
 
-    def test_partition_with_fixed_atom_constraints_at_limit(self):
+    def test_partition_with_max_atom_constraints_at_limit(self):
         """
         test a partitioning with a graph with fixed atom constraint which\
         should fit but is close to the limit
@@ -378,8 +375,7 @@ class TestBasicPartitioner(unittest.TestCase):
 
         # Create a vertex which will need to be split perfectly into 4 cores
         # to work and which max atoms per core must be ignored
-        vertex = SimpleTestVertex(
-            16, constraints=[FixedVertexAtomsConstraint(4)])
+        vertex = SimpleTestVertex(16, max_atoms_per_core=4)
         vertex.splitter = SplitterSliceLegacy()
         app_graph = ApplicationGraph("Test")
         app_graph.add_vertex(vertex)
