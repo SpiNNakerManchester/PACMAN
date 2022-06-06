@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.exceptions import PacmanInvalidParameterException
 import logging
 
@@ -46,17 +47,31 @@ class MulticastRoutingTableByPartition(object):
 
         # update router_to_entries_map
         key = (router_x, router_y)
-        if key not in self._router_to_entries_map:
-            self._router_to_entries_map[key] = dict()
+        entries = self._router_to_entries_map.get(key)
+        if entries is None:
+            entries = dict()
+            self._router_to_entries_map[key] = entries
+
+        if isinstance(source_vertex, ApplicationVertex):
+            for m_vert in source_vertex.machine_vertices:
+                if (m_vert, partition_id) in entries:
+                    raise PacmanInvalidParameterException(
+                        "source_vertex", source_vertex,
+                        f"Route for Machine vertex {m_vert}, "
+                        f"partition {partition_id} already in table")
+        else:
+            if (source_vertex.app_vertex, partition_id) in entries:
+                raise PacmanInvalidParameterException(
+                    "source_vertex", source_vertex,
+                    f"Route for Application vertex {source_vertex.app_vertex}"
+                    f" partition {partition_id} already in table")
 
         source_key = (source_vertex, partition_id)
-        if source_key not in self._router_to_entries_map[key]:
-            self._router_to_entries_map[key][source_key] = entry
+        if source_key not in entries:
+            entries[source_key] = entry
         else:
             try:
-                self._router_to_entries_map[key][source_key] = \
-                    entry.merge_entry(
-                        self._router_to_entries_map[key][source_key])
+                entries[source_key] = entry.merge_entry(entries[source_key])
             except PacmanInvalidParameterException as e:
                 log.error(f"Error merging entries on {key} for {source_key}")
                 raise e

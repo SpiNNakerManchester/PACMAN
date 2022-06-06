@@ -40,7 +40,8 @@ class _Targets(object):
         if source_vertex not in self.__targets_by_source:
             self.__targets_by_source[source_vertex] = (list(), list())
 
-    def add_sources_for_target(self, core, link, source_vertices):
+    def add_sources_for_target(
+            self, core, link, source_vertices, partition_id):
         """ Add a set of vertices that target a given core or link
 
         :param core: The core to target with the sources or None if no core
@@ -49,14 +50,20 @@ class _Targets(object):
         :type link: int or None
         :param source_vertices: A list of sources which target something here
         :type source_vertices: list(ApplicationVertex or MachineVertex)
+        :param str partition_id: The partition of the sources
         """
         for vertex in source_vertices:
-            if core is not None:
-                self.__targets_by_source[vertex][0].append(core)
-            if link is not None:
-                self.__targets_by_source[vertex][1].append(link)
+            if isinstance(vertex, ApplicationVertex):
+                if self.__is_m_vertex(vertex, partition_id):
+                    self.__add_m_vertices(vertex, partition_id, core, link)
+                else:
+                    self.__add_source(vertex, core, link)
+            else:
+                if vertex.app_vertex in self.__targets_by_source:
+                    self.__replace_app_vertex(vertex.app_vertex, partition_id)
+                self.__add_source(vertex, core, link)
 
-    def add_machine_targets_for_core(
+    def add_machine_sources_for_target(
             self, core, link, source_vertices, partition_id):
         """ Add a set of machine vertices that target a given core or link
 
@@ -70,17 +77,36 @@ class _Targets(object):
         """
         for vertex in source_vertices:
             if isinstance(vertex, ApplicationVertex):
-                for m_vertex in vertex.splitter.get_out_going_vertices(
-                        partition_id):
-                    if core is not None:
-                        self.__targets_by_source[m_vertex][0].append(core)
-                    if link is not None:
-                        self.__targets_by_source[m_vertex][1].append(link)
+                if vertex in self.__targets_by_source:
+                    self.__replace_app_vertex(vertex, partition_id)
+                self.__add_m_vertices(vertex, partition_id, core, link)
             else:
-                if core is not None:
-                    self.__targets_by_source[vertex][0].append(core)
-                if link is not None:
-                    self.__targets_by_source[vertex][1].append(link)
+                if vertex.app_vertex in self.__targets_by_source:
+                    self.__replace_app_vertex(vertex.app_vertex, partition_id)
+                self.__add_source(vertex, core, link)
+
+    def __is_m_vertex(self, vertex, partition_id):
+        for m_vert in vertex.splitter.get_out_going_vertices(partition_id):
+            if m_vert in self.__targets_by_source:
+                return True
+        return False
+
+    def __replace_app_vertex(self, vertex, partition_id):
+        cores = self.__targets_by_source[vertex][0]
+        links = self.__targets_by_source[vertex][1]
+        del self.__targets_by_source[vertex]
+        for m_vertex in vertex.splitter.get_out_going_vertices(partition_id):
+            self.__targets_by_source[m_vertex] = (cores, links)
+
+    def __add_m_vertices(self, vertex, partition_id, core, link):
+        for m_vertex in vertex.splitter.get_out_going_vertices(partition_id):
+            self.__add_source(m_vertex, core, link)
+
+    def __add_source(self, source, core, link):
+        if core is not None:
+            self.__targets_by_source[source][0].append(core)
+        if link is not None:
+            self.__targets_by_source[source][1].append(link)
 
     @property
     def targets_by_source(self):
@@ -169,10 +195,11 @@ def route_application_graph(machine, app_graph, placements):
                     xy, (_vertex, core, link) = vertex_chip_and_route(
                         tgt, placements, machine)
                     if xy in source_chips:
-                        targets[xy].add_machine_targets_for_core(
+                        targets[xy].add_machine_sources_for_target(
                             core, link, srcs, partition.identifier)
                     else:
-                        targets[xy].add_sources_for_target(core, link, srcs)
+                        targets[xy].add_sources_for_target(
+                            core, link, srcs, partition.identifier)
 
                     real_target_chips.add(xy)
 
@@ -197,7 +224,7 @@ def route_application_graph(machine, app_graph, placements):
                 for tgt, srcs in target_vertices:
                     xy, (_vertex, core, link) = vertex_chip_and_route(
                         tgt, placements, machine)
-                    targets[xy].add_machine_targets_for_core(
+                    targets[xy].add_machine_sources_for_target(
                         core, link, srcs, partition.identifier)
                     self_chips.add(xy)
 
@@ -211,7 +238,7 @@ def route_application_graph(machine, app_graph, placements):
                     tgt = edge.post_vertex
                     xy, (_vertex, core, link) = vertex_chip_and_route(
                         tgt, placements, machine)
-                    targets[xy].add_machine_targets_for_core(
+                    targets[xy].add_machine_sources_for_target(
                         core, link, [src], in_part.identifier)
                     self_chips.add(xy)
 
