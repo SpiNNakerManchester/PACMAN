@@ -91,9 +91,10 @@ class AbstractSplitterSlice(AbstractSplitterCommon, metaclass=AbstractBase):
         slice_resource_map = dict()
         n_atoms_placed = 0
         n_atoms = self._governed_app_vertex.n_atoms
+        max_atoms = self._governed_app_vertex.get_max_atoms_per_core()
         while n_atoms_placed < n_atoms:
             lo_atom = n_atoms_placed
-            hi_atom = lo_atom + self._max_atoms_per_core - 1
+            hi_atom = lo_atom + max_atoms - 1
             if hi_atom >= n_atoms:
                 hi_atom = n_atoms - 1
 
@@ -148,15 +149,6 @@ class AbstractSplitterSlice(AbstractSplitterCommon, metaclass=AbstractBase):
             ratio = self._find_max_ratio(
                 used_resources, resources_available,
                 resource_tracker.plan_n_time_steps)
-
-            if self._is_fixed_atoms_per_core and ratio > 1.0:
-                raise PacmanPartitionException(
-                    self.NO_MORE_RESOURCE_AVAILABLE_ERROR.format(
-                        self._governed_app_vertex, lo_atom - 1,
-                        used_resources.sdram.get_total_sdram(
-                            resource_tracker.plan_n_timesteps),
-                        resources_available.sdram.get_total_sdram(
-                            resource_tracker.plan_n_timesteps)))
 
             while ratio > 1.0 and hi_atom >= lo_atom:
                 # Scale the resources available by the ratio
@@ -245,9 +237,10 @@ class AbstractSplitterSlice(AbstractSplitterCommon, metaclass=AbstractBase):
         # Keep searching while the ratio is still in range,
         # the next hi_atom value is still less than the number of atoms,
         # and the number of atoms is less than the constrained number of atoms
+        max_atoms = self._governed_app_vertex.get_max_atoms_per_core()
         while ((ratio < 1.0) and (
                 hi_atom + 1 < self._governed_app_vertex.n_atoms) and
-               (hi_atom - lo_atom + 2 < self._max_atoms_per_core)):
+               (hi_atom - lo_atom + 2 < max_atoms)):
 
             # Update the hi_atom, keeping track of the last hi_atom which
             # resulted in a ratio < 1.0
@@ -395,11 +388,11 @@ class AbstractSplitterSlice(AbstractSplitterCommon, metaclass=AbstractBase):
 
         """
         n_atoms = self._governed_app_vertex.n_atoms
-        per_core = self._max_atoms_per_core
+        per_core = self._governed_app_vertex.get_max_atoms_per_core()
+
         return (
             [Slice(lo, min(lo + per_core - 1, n_atoms))
-             for lo in range(0, n_atoms, per_core)],
-            self._is_fixed_atoms_per_core)
+             for lo in range(0, n_atoms, per_core)], False)
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):

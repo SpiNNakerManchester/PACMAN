@@ -17,8 +17,10 @@ import numpy
 import unittest
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint)
+from pacman.model.routing_info import BaseKeyAndMask
+from pacman.model.constraints.key_allocator_constraints import (
+    FixedKeyAndMaskConstraint)
+
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex, MachineGraph
@@ -54,38 +56,23 @@ class TestApplicationGraphModel(unittest.TestCase):
         """
         test initialisation of a vertex with a max size constraint
         """
-        constraint = MaxVertexAtomsConstraint(2)
+        constraint = FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(0xFF0, 0xFF8)])
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         vert.add_constraint(constraint)
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
         assert constraint in vert.constraints
 
-    def test_create_new_vertex_add_constraint(self):
-        """
-        test creating a vertex and then adding constraints individually
-        """
-        constraint1 = MaxVertexAtomsConstraint(2)
-        constraint2 = MaxVertexAtomsConstraint(3)
-        constr = list()
-        constr.append(constraint1)
-        constr.append(constraint2)
-        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
-        vert.add_constraint(constraint2)
-        vert.add_constraint(constraint1)
-        self.assertEqual(vert.n_atoms, 10)
-        self.assertEqual(len(vert.constraints), 3)
-        self.assertEqual(vert.label, "New AbstractConstrainedVertex")
-        for constraint in constr:
-            if constraint not in vert.constraints:
-                raise Exception("dont exist where should")
-
     def test_create_new_vertex_add_constraints(self):
         """
         test that creating a vertex and then adding constraints in a list
         """
-        constraint1 = MaxVertexAtomsConstraint(2)
-        constraint2 = MaxVertexAtomsConstraint(3)
+        constraint1 = FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(0xFF0, 0xFF8)])
+        # Ignore that these two dont make sense together
+        constraint2 = FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(0xFF0, 0xFF7)])
         constr = list()
         constr.append(constraint1)
         constr.append(constraint2)
@@ -93,7 +80,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert.add_constraints(constr)
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
-        self.assertEqual(len(vert.constraints), 3)
+        self.assertEqual(len(vert.constraints), 2)
         for constraint in constr:
             self.assertIn(constraint, vert.constraints)
 
@@ -103,7 +90,8 @@ class TestApplicationGraphModel(unittest.TestCase):
         vertex actually works and generates a vertex
         with the same constraints mapped over
         """
-        constraint1 = MaxVertexAtomsConstraint(2)
+        constraint1 = FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(0xFF0, 0xFF8)])
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         subv_from_vert = vert.create_machine_vertex(
             Slice(0, 9),
@@ -139,8 +127,11 @@ class TestApplicationGraphModel(unittest.TestCase):
         test that a vertex created from a vertex with
         constraints can have more constraints added to it.
         """
-        constraint1 = MaxVertexAtomsConstraint(2)
-        constraint2 = MaxVertexAtomsConstraint(3)
+        constraint1 = FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(0xFF0, 0xFF8)])
+        # Ignore that these two dont make sense together
+        constraint2 = FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(0xFF0, 0xFF7)])
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         vert.add_constraint(constraint1)
         subv_from_vert = vert.create_machine_vertex(
