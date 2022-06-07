@@ -70,7 +70,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
                 resources_required=self._resources_required, label=None,
                 constraints=None))
         if not isinstance(app_vertex, LegacyPartitionerAPI):
-            for abstractmethod in LegacyPartitionerAPI._abstract_methods():
+            for abstractmethod in LegacyPartitionerAPI.abstract_methods():
                 check = getattr(app_vertex, abstractmethod, None)
                 if not check:
                     raise PacmanConfigurationException(

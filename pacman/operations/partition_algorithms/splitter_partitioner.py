@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.exceptions import (PacmanConfigurationException)
-from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 from pacman.model.graphs.machine import MachineGraph
 from pacman.model.partitioner_interfaces import (
     AbstractSplitterPartitioner, AbstractSlicesConnect,
@@ -27,7 +25,6 @@ from pacman.utilities.algorithm_utilities.placer_algorithm_utilities import (
 from pacman.utilities.utility_objs import ResourceTracker
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.utilities import utility_calls as utils
 
 
 def splitter_partitioner(
@@ -51,6 +48,7 @@ def splitter_partitioner(
          If something goes wrong with the partitioning
      """
     partitioner = _SplitterPartitioner()
+    # pylint:disable=protected-access
     return partitioner._run(
         app_graph, machine, plan_n_time_steps, pre_allocated_resources)
 
@@ -115,8 +113,6 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
                 app_graph, machine, plan_n_time_steps,
                 pre_allocated_resources))
 
-        self.__set_max_atoms_to_splitters(app_graph)
-
         # Partition one vertex at a time
         for vertex in progress.over(vertices):
             vertex.splitter.split(resource_tracker, machine_graph)
@@ -172,22 +168,6 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
             if vertex not in other_vertices:
                 self.__make_dependent_after(
                     vertices, dependent_vertices, vertex)
-
-    @staticmethod
-    def __set_max_atoms_to_splitters(app_graph):
-        """ get the constraints sorted out.
-
-        :param ApplicationGraph app_graph: the app graph
-        """
-        for vertex in app_graph.vertices:
-            for constraint in utils.locate_constraints_of_type(
-                    vertex.constraints, MaxVertexAtomsConstraint):
-                vertex.splitter.set_max_atoms_per_core(
-                    constraint.size, False)
-            for constraint in utils.locate_constraints_of_type(
-                    vertex.constraints, FixedVertexAtomsConstraint):
-                vertex.splitter.set_max_atoms_per_core(
-                    constraint.size, True)
 
     def __setup_objects(
             self, app_graph, machine, plan_n_time_steps,

@@ -65,7 +65,7 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
         """
 
     @staticmethod
-    def _abstract_methods():
+    def abstract_methods():
         """ Exposes the abstract methods and properties defined in this class.
 
         :rtype frozenset(str)

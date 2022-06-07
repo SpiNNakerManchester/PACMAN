@@ -43,6 +43,7 @@ def spreader_placer(machine_graph, machine, n_keys_map, plan_n_timesteps):
     :rtype: Placements
     """
     placer = _SpreaderPlacer()
+    # pylint:disable=protected-access
     return placer._run(machine_graph, machine, n_keys_map, plan_n_timesteps)
 
 
