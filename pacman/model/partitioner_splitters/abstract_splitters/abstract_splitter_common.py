@@ -208,11 +208,3 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         :rtype: list(AbstractSDRAMPartition)
         """
         return []
-
-    @property
-    def max_atoms_per_core(self):
-        """ Get the maximum number of atoms per core on this vertex
-
-        :rtype: int
-        """
-        return self._max_atoms_per_core
