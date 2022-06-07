@@ -29,7 +29,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class SplitterFixedLegacy(AbstractSplitterCommon):
 
-    __slots__ = ["__slices", "__vertex_map", "__max_atoms"]
+    __slots__ = ["__slices", "__vertex_map"]
 
     NOT_API_WARNING = (
         "Your vertex is deprecated. Please add a Splitter or "
@@ -51,7 +51,6 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
         super().__init__(splitter_name)
         self.__vertex_map = None
         self.__slices = None
-        self.__max_atoms = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -93,31 +92,12 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
     def get_in_coming_slices(self):
         return self.__fixed_slices, True
 
-    @overrides(AbstractSplitterCommon.set_max_atoms_per_core)
-    def set_max_atoms_per_core(self, max_atoms_per_core, is_fixed_atoms):
-        n_atoms = self._governed_app_vertex.atoms_shape
-
-        if self.__max_atoms is None:
-            self.__max_atoms = list(n_atoms)
-        if isinstance(max_atoms_per_core, int):
-            for i in range(len(self.__max_atoms)):
-                self.__max_atoms[i] = min(
-                    self.__max_atoms[i], max_atoms_per_core)
-        else:
-            if len(max_atoms_per_core) != len(n_atoms):
-                raise PacmanConfigurationException(
-                    "The length of max_atoms_per_core does not match the "
-                    " number of dimensions")
-            for i in range(len(self.__max_atoms)):
-                self.__max_atoms[i] = min(
-                    self.__max_atoms[i], max_atoms_per_core[i])
-
     @property
     def __fixed_slices(self):
         if self.__slices is None:
             n_atoms = self._governed_app_vertex.atoms_shape
             self.__slices = get_multidimensional_slices(
-                n_atoms, self.__max_atoms)
+                n_atoms, self._governed_app_vertex.get_max_atoms_per_core())
         return self.__slices
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
