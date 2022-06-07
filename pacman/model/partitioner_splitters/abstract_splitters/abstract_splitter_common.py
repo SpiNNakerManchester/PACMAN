@@ -12,11 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import sys
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
     AbstractPartitionerConstraint)
 from pacman.utilities.utility_calls import (
     check_algorithm_can_support_constraints)
@@ -31,12 +29,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         # the name of this splitter object, for human readability.
         "_splitter_name",
 
-        # the max atoms per core demanded by the tools. interpretation of
-        # this is at the splitter objects discretion.
-        "_max_atoms_per_core",
-
-        # bool flag that says that the constraint is fixed or soft.
-        "_is_fixed_atoms_per_core"
     ]
 
     FIX_ATOMS_RESET = (
@@ -60,8 +52,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         if splitter_name is None:
             splitter_name = self.DEFAULT_SPLITTER_NAME
         self._splitter_name = splitter_name
-        self._max_atoms_per_core = sys.maxsize
-        self._is_fixed_atoms_per_core = False
         self._governed_app_vertex = None
 
     def __str__(self):
@@ -71,51 +61,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     def __repr__(self):
         return self.__str__()
-
-    def set_max_atoms_per_core(self, max_atoms_per_core, is_fixed_atoms):
-        """ sets max atoms per core for this splitter object
-
-        :param int max_atoms_per_core: max atoms per core for this splitter.
-        :param bool is_fixed_atoms: is this a hard constraint or soft.
-        :raises PacmanConfigurationException:
-            If the new setting clash with a previous setting
-        """
-        if self._is_fixed_atoms_per_core:
-            # Already fixed so
-            if is_fixed_atoms:
-                # as new also fixed they must be the same
-                if max_atoms_per_core != self._max_atoms_per_core:
-                    raise PacmanConfigurationException(
-                        self.FIX_ATOMS_RESET.format(
-                            max_atoms_per_core, self._max_atoms_per_core))
-                else:
-                    return  # No change
-            else:
-                # as new a max make sure it is not lower than current fixed
-                if max_atoms_per_core < self._max_atoms_per_core:
-                    raise PacmanConfigurationException(
-                        self.MAX_BELOW_FIXED.format(
-                            max_atoms_per_core, self._max_atoms_per_core))
-                else:
-                    return  # OK to ignore the max above the fixed
-        else:
-            # Currently on a max so
-            if is_fixed_atoms:
-                # As new is fixed max sure it is not higher than max
-                if max_atoms_per_core > self._max_atoms_per_core:
-                    raise PacmanConfigurationException(
-                        self.FIXED_ABOVE_MAX.format(
-                            max_atoms_per_core, self._max_atoms_per_core))
-                else:  # Set the new fixed
-                    self._max_atoms_per_core = max_atoms_per_core
-                    self._is_fixed_atoms_per_core = True
-            else:
-                # Both max so only change if new max if lower
-                if max_atoms_per_core < self._max_atoms_per_core:
-                    # Set the new max but leave fixed false
-                    self._max_atoms_per_core = max_atoms_per_core
-                else:
-                    return  # Ok to Ignore a higher or same max
 
     @property
     def governed_app_vertex(self):
@@ -145,14 +90,11 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
     def check_supported_constraints(self):
         """
         :raise PacmanInvalidParameterException:
-            When partitioner constraints other than
-            :py:class:`MaxVertexAtomsConstraint` and
-            :py:class:`FixedVertexAtomsConstraint` are used.
+            When partitioner constraints are used.
         """
         check_algorithm_can_support_constraints(
             constrained_vertices=[self._governed_app_vertex],
-            supported_constraints=[
-                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
+            supported_constraints=[],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
     @abstractmethod

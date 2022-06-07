@@ -13,11 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint)
 from pacman.model.partitioner_interfaces import AbstractSplitterPartitioner
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.utilities import utility_calls as utils
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 
@@ -60,27 +57,9 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
         vertices = app_graph.vertices
         progress = ProgressBar(len(vertices), "Partitioning Graph")
 
-        self.__set_max_atoms_to_splitters(app_graph)
-
         # Partition one vertex at a time
         chip_counter = ChipCounter(plan_n_time_steps)
         for vertex in progress.over(vertices):
             vertex.splitter.create_machine_vertices(chip_counter)
 
         return chip_counter.n_chips
-
-    @staticmethod
-    def __set_max_atoms_to_splitters(app_graph):
-        """ get the constraints sorted out.
-
-        :param ApplicationGraph app_graph: the app graph
-        """
-        for vertex in app_graph.vertices:
-            for constraint in utils.locate_constraints_of_type(
-                    vertex.constraints, MaxVertexAtomsConstraint):
-                vertex.splitter.set_max_atoms_per_core(
-                    constraint.size, False)
-            for constraint in utils.locate_constraints_of_type(
-                    vertex.constraints, FixedVertexAtomsConstraint):
-                vertex.splitter.set_max_atoms_per_core(
-                    constraint.size, True)
