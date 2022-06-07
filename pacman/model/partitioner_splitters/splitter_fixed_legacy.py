@@ -87,7 +87,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
     def __fixed_slices(self):
         if self.__slices is None:
             n_atoms = self._governed_app_vertex.n_atoms
-            per_core = self._max_atoms_per_core
+            per_core = self._governed_app_vertex.get_max_atoms_per_core()
             self.__slices = [Slice(i, min(i + per_core - 1, n_atoms - 1))
                              for i in range(0, n_atoms, per_core)]
         return self.__slices
