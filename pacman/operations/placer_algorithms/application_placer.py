@@ -21,12 +21,13 @@ from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
 from tempfile import mkstemp
 from os import fdopen
 import numpy
 import logging
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 UNUSED_COLOUR = (0.5, 0.5, 0.5, 1.0)
 
@@ -211,21 +212,19 @@ class _SpaceExceededException(Exception):
 def _do_constraints(vertices, sdram, placements, machine, next_chip):
     x = None
     y = None
+    constrained = False
     for vertex in vertices:
         constraints = locate_constraints_of_type(
             vertex.constraints, ChipAndCoreConstraint)
         for constraint in constraints:
-            if ((x is not None and constraint.x != x) or
-                    (y is not None and constraint.y != y)):
+            if constrained and (constraint.x != x or constraint.y != y):
                 raise PacmanConfigurationException(
                     f"Multiple conflicting constraints: Vertices {vertices}"
                     " are on the same chip, but constraints say different")
             x = constraint.x
             y = constraint.y
-    if x is not None or y is not None:
-        if x is None or y is None:
-            raise PacmanConfigurationException(
-                f"Both x ({x}) and y ({y}) should be specified in constraint")
+            constrained = True
+    if constrained:
         chip = machine.get_chip_at(x, y)
         if chip is None:
             raise PacmanConfigurationException(
