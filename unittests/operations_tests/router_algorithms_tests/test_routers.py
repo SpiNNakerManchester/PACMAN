@@ -36,7 +36,7 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.placements import Placements
+from pacman.model.placements import Placements, Placement
 from pacman.model.resources import ResourceContainer, ConstantSDRAM
 from pacman.model.graphs import AbstractFPGA, AbstractSpiNNakerLink
 
@@ -177,6 +177,48 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
         return self.__same_chip_groups
 
 
+class TestOneToOneSplitter(AbstractSplitterCommon):
+
+    def __init__(self, n_machine_vertices):
+        AbstractSplitterCommon.__init__(self)
+        self.__n_machine_vertices = n_machine_vertices
+
+    def create_machine_vertices(self, chip_counter):
+        m_vertices = [
+            SimpleMachineVertex(
+                ResourceContainer(), app_vertex=self._governed_app_vertex,
+                label=f"{self._governed_app_vertex.label}_{i}")
+            for i in range(self.__n_machine_vertices)]
+        for m_vertex in m_vertices:
+            self._governed_app_vertex.remember_machine_vertex(m_vertex)
+
+    def get_out_going_slices(self):
+        return None
+
+    def get_in_coming_slices(self):
+        return None
+
+    def get_out_going_vertices(self, partition_id):
+        return self._governed_app_vertex.machine_vertices
+
+    def get_in_coming_vertices(self, partition_id):
+        return self._governed_app_vertex.machine_vertices
+
+    def machine_vertices_for_recording(self, variable_to_record):
+        return []
+
+    def reset_called(self):
+        pass
+
+    def get_source_specific_in_coming_vertices(
+            self, source_vertex, partition_id):
+        return [
+            (target, [source])
+            for source, target in zip(
+                source_vertex.splitter.get_out_going_vertices(partition_id),
+                self._governed_app_vertex.machine_vertices)]
+
+
 class TestAppVertex(ApplicationVertex):
     def __init__(self, n_atoms, label):
         super(TestAppVertex, self).__init__(label)
@@ -190,6 +232,14 @@ class TestAppVertex(ApplicationVertex):
 def _make_vertices(app_graph, n_atoms, n_machine_vertices, label):
     vertex = TestAppVertex(n_atoms, label)
     vertex.splitter = TestSplitter(n_machine_vertices)
+    app_graph.add_vertex(vertex)
+    vertex.splitter.create_machine_vertices(None)
+    return vertex
+
+
+def _make_one_to_one_vertices(app_graph, n_atoms, n_machine_vertices, label):
+    vertex = TestAppVertex(n_atoms, label)
+    vertex.splitter = TestOneToOneSplitter(n_machine_vertices)
     app_graph.add_vertex(vertex)
     vertex.splitter.create_machine_vertices(None)
     return vertex
@@ -575,6 +625,42 @@ def test_fpga_link(params):
 
     machine = virtual_machine(8, 8)
     placements = place_application_graph(machine, app_graph, 100, Placements())
+    routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
+    _check_edges(routing_tables, machine, placements, app_graph)
+
+
+def test_odd_case(params):
+    algorithm, _n_vertices, _n_m_vertices = params
+    unittest_setup()
+    app_graph = ApplicationGraph("Test")
+    # source_vertex = _make_vertices(app_graph, 1, 1, "source_vertex")
+    target_vertex = _make_vertices(app_graph, 200, 20, "app_vertex")
+    delay_vertex = _make_one_to_one_vertices(app_graph, 200, 20, "delay_vtx")
+    #app_graph.add_edge(ApplicationEdge(source_vertex, target_vertex), "Test")
+    app_graph.add_edge(ApplicationEdge(target_vertex, target_vertex), "Test")
+    app_graph.add_edge(ApplicationEdge(target_vertex, delay_vertex), "Test")
+    app_graph.add_edge(ApplicationEdge(delay_vertex, target_vertex), "Test")
+
+    machine = virtual_machine(8, 8)
+    placements = Placements()
+    cores = [(x, y, p) for x, y in [(0, 3), (1, 3)] for p in range(3, 18)]
+    core_iter = iter(cores)
+    for m_vertex in delay_vertex.machine_vertices:
+        x, y, p = next(core_iter)
+        placements.add_placement(Placement(m_vertex, x, y, p))
+    #placements.add_placement(
+    #    Placement(next(iter(source_vertex.machine_vertices)), 0, 3, 2))
+    cores = [(0, 0, 3)]
+    cores.extend(
+        [(x, y, p)
+        for x, y in [(1, 0), (1, 1), (0, 1), (2, 0), (2, 1), (2, 2),
+                     (1, 2), (0, 2), (3, 0), (3, 1), (3, 2)]
+        for p in range(2, 4)])
+    core_iter = iter(cores)
+    for m_vertex in target_vertex.machine_vertices:
+        x, y, p = next(core_iter)
+        placements.add_placement(Placement(m_vertex, x, y, p))
+
     routing_tables = _route_and_time(machine, app_graph, placements, algorithm)
     _check_edges(routing_tables, machine, placements, app_graph)
 

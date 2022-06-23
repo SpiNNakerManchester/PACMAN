@@ -254,7 +254,8 @@ def route_application_graph(machine, app_graph, placements):
 
             _convert_a_route(
                 routing_tables, source, partition.identifier, None, None,
-                routes[source_edge_chip], targets=targets)
+                routes[source_edge_chip], targets=targets,
+                ensure_all_source=True)
 
         # Now make the routes from actual sources to source edges
         if self_connected:
@@ -509,7 +510,7 @@ def _in_group(item, group):
 def _convert_a_route(
         routing_tables, source_vertex, partition_id, first_incoming_processor,
         first_incoming_link, first_route, targets=None,
-        use_source_for_targets=False):
+        use_source_for_targets=False, ensure_all_source=False):
     """ Convert the algorithm specific partition_route back to SpiNNaker and
         adds it to the routing_tables.
 
@@ -529,6 +530,9 @@ def _convert_a_route(
     :param bool use_source_for_targets:
         If true, targets for the given source_vertex will be requested;
         If false all targets for matching chips will be used.
+    :param bool ensure_all_source:
+        If true, ensures that all machine vertices of the source app vertex
+        are covered in routes that continue forward
     """
 
     to_process = [(first_incoming_processor, first_incoming_link, first_route)]
@@ -538,7 +542,9 @@ def _convert_a_route(
 
         processor_ids = list()
         link_ids = list()
+        has_child = False
         for (route, next_hop) in route.children:
+            has_child = True
             if route is not None:
                 link_ids.append(route)
                 next_incoming_link = (route + 3) % 6
@@ -552,13 +558,34 @@ def _convert_a_route(
                     chip_targets.get_targets_for_source(source_vertex)]
             else:
                 targets_by_source = chip_targets.targets_by_source
+
+            # We must ensure that all machine vertices of an app vertex
+            # are covered!
+            machine_vertex_sources = set()
+            app_vertex_source = False
             for (source, (add_cores, add_links)) in targets_by_source:
+                if isinstance(source, ApplicationVertex):
+                    app_vertex_source = True
+                else:
+                    machine_vertex_sources.add(source)
                 entry = MulticastRoutingTableByPartitionEntry(
                     link_ids + add_links, processor_ids + add_cores,
                     incoming_processor, incoming_link)
                 _add_routing_entry(
                     first_route, routing_tables, entry, x, y, source,
                     partition_id)
+
+            # Now check the coverage of Application and machine vertices
+            if ensure_all_source and not app_vertex_source:
+                for m_vert in source_vertex.splitter.get_out_going_vertices(
+                        partition_id):
+                    if m_vert not in machine_vertex_sources:
+                        entry = MulticastRoutingTableByPartitionEntry(
+                            link_ids, processor_ids, incoming_processor,
+                            incoming_link)
+                        _add_routing_entry(
+                            first_route, routing_tables, entry, x, y, m_vert,
+                            partition_id)
         else:
             entry = MulticastRoutingTableByPartitionEntry(
                 link_ids, processor_ids, incoming_processor, incoming_link)
