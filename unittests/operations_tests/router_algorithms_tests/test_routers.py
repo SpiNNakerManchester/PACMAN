@@ -633,10 +633,8 @@ def test_odd_case(params):
     algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
     app_graph = ApplicationGraph("Test")
-    # source_vertex = _make_vertices(app_graph, 1, 1, "source_vertex")
     target_vertex = _make_vertices(app_graph, 200, 20, "app_vertex")
     delay_vertex = _make_one_to_one_vertices(app_graph, 200, 20, "delay_vtx")
-    #app_graph.add_edge(ApplicationEdge(source_vertex, target_vertex), "Test")
     app_graph.add_edge(ApplicationEdge(target_vertex, target_vertex), "Test")
     app_graph.add_edge(ApplicationEdge(target_vertex, delay_vertex), "Test")
     app_graph.add_edge(ApplicationEdge(delay_vertex, target_vertex), "Test")
@@ -648,14 +646,12 @@ def test_odd_case(params):
     for m_vertex in delay_vertex.machine_vertices:
         x, y, p = next(core_iter)
         placements.add_placement(Placement(m_vertex, x, y, p))
-    #placements.add_placement(
-    #    Placement(next(iter(source_vertex.machine_vertices)), 0, 3, 2))
     cores = [(0, 0, 3)]
     cores.extend(
         [(x, y, p)
-        for x, y in [(1, 0), (1, 1), (0, 1), (2, 0), (2, 1), (2, 2),
-                     (1, 2), (0, 2), (3, 0), (3, 1), (3, 2)]
-        for p in range(2, 4)])
+         for x, y in [(1, 0), (1, 1), (0, 1), (2, 0), (2, 1), (2, 2),
+                      (1, 2), (0, 2), (3, 0), (3, 1), (3, 2)]
+         for p in range(2, 4)])
     core_iter = iter(cores)
     for m_vertex in target_vertex.machine_vertices:
         x, y, p = next(core_iter)

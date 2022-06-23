@@ -542,9 +542,7 @@ def _convert_a_route(
 
         processor_ids = list()
         link_ids = list()
-        has_child = False
         for (route, next_hop) in route.children:
-            has_child = True
             if route is not None:
                 link_ids.append(route)
                 next_incoming_link = (route + 3) % 6
