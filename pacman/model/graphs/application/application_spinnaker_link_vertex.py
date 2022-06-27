@@ -33,7 +33,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
     def __init__(
             self, n_atoms, spinnaker_link_id, board_address=None, label=None,
             constraints=None, n_machine_vertices=1,
-            incoming=True, outgoing=False):
+            incoming=True, outgoing=True):
         super().__init__(label=label, constraints=constraints)
         self._n_atoms = self.round_n_atoms(n_atoms)
         self._spinnaker_link_id = spinnaker_link_id
