@@ -134,7 +134,7 @@ def place_application_graph(
 def _place_error(
         app_graph, placements, system_placements, exception,
         machine, board_colours):
-    app_vertex_count = 0
+    unplaceable = list()
     vertex_count = 0
     n_vertices = 0
     for app_vertex in app_graph.vertices:
@@ -152,12 +152,12 @@ def _place_error(
             else:
                 app_vertex_placed = False
                 break
-        if not app_vertex_placed and not found_placed_cores:
-            app_vertex_count += 1
+        if not app_vertex_placed:
+            unplaceable.append(app_vertex)
 
     fd, report_file = mkstemp(suffix=".rpt")
     with fdopen(fd, 'w') as f:
-        f.write(f"Could not place {app_vertex_count} of {app_graph.n_vertices}"
+        f.write(f"Could not place {len(unplaceable)} of {app_graph.n_vertices}"
                 " application vertices.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
                 " last app vertex\n\n")
@@ -173,6 +173,19 @@ def _place_error(
                         f" Vertex {placement.vertex}\n")
             if not first:
                 f.write("\n")
+        f.write("\n")
+        f.write("Not placed:\n")
+        for app_vertex in unplaceable:
+            f.write(f"Vertex: {app_vertex}\n")
+            for vertices, sdram in same_chip_groups:
+                f.write(f"    Group of {len(vertices)} vertices uses {sdram} "
+                        "bytes of SDRAM:\n")
+                for vertex in vertices:
+                    f.write(f"        Vertex {vertex}")
+                    if placements.is_vertex_placed(vertex):
+                        plce = placements.get_placement_of_vertex(vertex)
+                        f.write(f" (placed at {plce.x}, {plce.y}, {plce.p})")
+                    f.write("\n")
 
     # _draw_placements(machine, report_file + ".png", board_colours)
 
