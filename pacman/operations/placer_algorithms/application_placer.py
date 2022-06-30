@@ -71,7 +71,7 @@ def place_application_graph(
                 except PacmanPlaceException as e:
                     _place_error(
                         app_graph, placements, system_placements, e,
-                        machine, board_colours)
+                        plan_n_timesteps, machine, board_colours)
                 logger.debug(f"Starting placement from {next_chip}")
 
                 placements_to_make = list()
@@ -132,7 +132,7 @@ def place_application_graph(
 
 
 def _place_error(
-        app_graph, placements, system_placements, exception,
+        app_graph, placements, system_placements, exception, plan_n_timesteps,
         machine, board_colours):
     unplaceable = list()
     vertex_count = 0
@@ -179,7 +179,8 @@ def _place_error(
             f.write(f"Vertex: {app_vertex}\n")
             same_chip_groups = app_vertex.splitter.get_same_chip_groups()
             for vertices, sdram in same_chip_groups:
-                f.write(f"    Group of {len(vertices)} vertices uses {sdram} "
+                f.write(f"    Group of {len(vertices)} vertices uses "
+                        f"{sdram.get_total_sdram(plan_n_timesteps)} "
                         "bytes of SDRAM:\n")
                 for vertex in vertices:
                     f.write(f"        Vertex {vertex}")
@@ -187,6 +188,13 @@ def _place_error(
                         plce = placements.get_placement_of_vertex(vertex)
                         f.write(f" (placed at {plce.x}, {plce.y}, {plce.p})")
                     f.write("\n")
+
+        f.write("\n")
+        f.write("Unused chips:\n")
+        for x, y in machine.chip_coordinates:
+            if placements.n_placements_on_chip(x, y) == 0:
+                chip = machine.get_chip_at(x, y)
+                f.write(f"    {x}, {y} ({chip.n_user_processors} cores)")
 
     # _draw_placements(machine, report_file + ".png", board_colours)
 
