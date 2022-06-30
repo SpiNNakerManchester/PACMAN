@@ -177,6 +177,7 @@ def _place_error(
         f.write("Not placed:\n")
         for app_vertex in unplaceable:
             f.write(f"Vertex: {app_vertex}\n")
+            same_chip_groups = app_vertex.splitter.get_same_chip_groups()
             for vertices, sdram in same_chip_groups:
                 f.write(f"    Group of {len(vertices)} vertices uses {sdram} "
                         "bytes of SDRAM:\n")
