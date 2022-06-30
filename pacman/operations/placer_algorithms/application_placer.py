@@ -192,9 +192,11 @@ def _place_error(
         f.write("\n")
         f.write("Unused chips:\n")
         for x, y in machine.chip_coordinates:
-            if placements.n_placements_on_chip(x, y) == 0:
-                chip = machine.get_chip_at(x, y)
-                f.write(f"    {x}, {y} ({chip.n_user_processors} cores)")
+            n_placed = placements.n_placements_on_chip(x, y)
+            system_placed = system_placements.n_placements_on_chip(x, y)
+            if n_placed - system_placed == 0:
+                n_procs = machine.get_chip_at(x, y).n_user_processors
+                f.write(f"    {x}, {y} ({n_procs - system_placed} free cores)")
 
     # _draw_placements(machine, report_file + ".png", board_colours)
 
