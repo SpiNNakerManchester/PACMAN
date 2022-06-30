@@ -317,15 +317,11 @@ class _Spaces(object):
     def __get_next_chip(self):
         while self.__restored_chips:
             chip = self.__restored_chips.pop(last=False)
-            if chip not in self.__used_chips and not self.__is_virtual(chip):
+            if chip not in self.__used_chips:
                 return chip
-        while (self.__next_chip in self.__used_chips or
-                self.__is_virtual(self.__next_chip)):
+        while (self.__next_chip in self.__used_chips):
             self.__next_chip = next(self.__chips)
         return self.__next_chip
-
-    def __is_virtual(self, xy):
-        return self.__machine.get_chip_at(*xy).virtual
 
     def get_next_chip(self, space, used_chip):
         # If we are reporting a used chip, update with reachable chips
