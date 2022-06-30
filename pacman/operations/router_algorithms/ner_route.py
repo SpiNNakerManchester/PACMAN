@@ -79,7 +79,7 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
         if len(route) / 3 > n_nodes_radius:
             # This implementation scans potential neighbours in an expanding
             # radius; this is ~3x faster per iteration than the one below.
-            for candidate in machine.concentric_chips(radius, destination):
+            for candidate in machine.concentric_xys(radius, destination):
                 if candidate in route:
                     neighbour = candidate
                     break
