@@ -29,12 +29,12 @@ import logging
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-UNUSED_COLOUR = (0.5, 0.5, 0.5, 1.0)
+# UNUSED_COLOUR = (0.5, 0.5, 0.5, 1.0)
 
 
-def next_colour():
-    return tuple(numpy.concatenate(
-        (numpy.random.choice(range(256), size=3) / 256, [1.0])))
+# def next_colour():
+#    return tuple(numpy.concatenate(
+#        (numpy.random.choice(range(256), size=3) / 256, [1.0])))
 
 
 def place_application_graph(
@@ -45,7 +45,7 @@ def place_application_graph(
 
     # Track the placements and  space
     placements = Placements(system_placements)
-    board_colours = dict()
+    # board_colours = dict()
     spaces = _Spaces(machine, placements, plan_n_timesteps)
 
     # Go through the application graph by application vertex
@@ -70,8 +70,9 @@ def place_application_graph(
                     next_chip_space, space = spaces.get_next_chip_and_space()
                 except PacmanPlaceException as e:
                     _place_error(
-                        app_graph, placements, system_placements, e,
-                        machine, board_colours)
+                        app_graph, placements, system_placements, e
+                        )
+                        # machine, board_colours)
                 logger.debug(f"Starting placement from {next_chip_space}")
 
                 placements_to_make = list()
@@ -111,17 +112,17 @@ def place_application_graph(
                 # Now make the placements having confirmed all can be done
                 placements.add_placements(placements_to_make)
                 placed = True
-                colour = next_colour()
-                board_colours.update(
-                    {(x, y): colour for x, y in chips_attempted})
+                # colour = next_colour()
+                # board_colours.update(
+                #     {(x, y): colour for x, y in chips_attempted})
                 logger.debug(f"Used {chips_attempted}")
             except _SpaceExceededException:
                 # This might happen while exploring a space; this may not be
                 # fatal since the last space might have just been bound by
                 # existing placements, and there might be bigger spaces out
                 # there to use
-                board_colours.update(
-                    {(x, y): UNUSED_COLOUR for x, y in chips_attempted})
+                # board_colours.update(
+                # {(x, y): UNUSED_COLOUR for x, y in chips_attempted})
                 logger.debug(f"Failed, saving {chips_attempted}")
                 spaces.save_chips(chips_attempted)
                 chips_attempted.clear()
@@ -133,8 +134,9 @@ def place_application_graph(
 
 
 def _place_error(
-        app_graph, placements, system_placements, exception,
-        machine, board_colours):
+        app_graph, placements, system_placements, exception
+        ):
+        # ,machine, board_colours):
     app_vertex_count = 0
     vertex_count = 0
     n_vertices = 0
@@ -348,7 +350,7 @@ class _Spaces(object):
     def get_next_chip_space(self, space, last_chip_space):
         """
 
-        :param space:
+        :param _Space space:
         :param _ChipWithSpace last_chip_space:
         :rtype: _ChipWithSpace
         """
