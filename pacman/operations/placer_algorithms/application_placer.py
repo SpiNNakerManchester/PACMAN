@@ -103,8 +103,7 @@ def place_application_graph(
 
                     # If this worked, store placements to be made
                     last_chip_space = next_chip_space
-                    chips_attempted.append(
-                        (next_chip_space.chip.x, next_chip_space.chip.y))
+                    chips_attempted.append(next_chip_space.chip)
                     _store_on_chip(
                         placements_to_make, vertices_to_place, sdram,
                         next_chip_space)
@@ -113,6 +112,7 @@ def place_application_graph(
                 placements.add_placements(placements_to_make)
                 placed = True
                 # colour = next_colour()
+                # TODO chips_attempted is now set(Chip)
                 # board_colours.update(
                 #     {(x, y): colour for x, y in chips_attempted})
                 logger.debug(f"Used {chips_attempted}")
@@ -307,8 +307,14 @@ class _Spaces(object):
         self.__saved_chips = OrderedSet()
         self.__restored_chips = OrderedSet()
 
-    def __cores_and_sdram(self, x, y):
-        on_chip = self.__placements.placements_on_chip(x, y)
+    def __cores_and_sdram(self, chip):
+        """
+
+        :param Chip chip:
+        :rtype: (int, int)
+        :return:
+        """
+        on_chip = self.__placements.placements_on_chip(chip.x, chip.y)
         cores_used = {p.p for p in on_chip}
         sdram_used = sum(
             p.vertex.resources_required.sdram.get_total_sdram(
@@ -322,12 +328,10 @@ class _Spaces(object):
         """
         try:
             if self.__last_chip_space is None:
-                next_chip = self.__get_next_chip()
-                chip = self.__machine.get_chip_at(*next_chip)
-                cores_used, sdram_used = self.__cores_and_sdram(
-                    chip.x, chip.y)
+                chip = self.__get_next_chip()
+                cores_used, sdram_used = self.__cores_and_sdram(chip)
                 self.__last_chip_space = _ChipWithSpace(chip, cores_used, sdram_used)
-                self.__used_chips.add((chip.x, chip.y))
+                self.__used_chips.add(chip)
 
             # Start a new space by finding all the chips that can be reached
             # from the start chip but have not been used
@@ -339,6 +343,10 @@ class _Spaces(object):
                 f"{self.__machine.n_chips} used")
 
     def __get_next_chip(self):
+        """
+
+        :rtype: Chip
+        """
         while self.__restored_chips:
             chip = self.__restored_chips.pop(last=False)
             if chip not in self.__used_chips:
@@ -365,30 +373,42 @@ class _Spaces(object):
             raise _SpaceExceededException(
                 "No more chips to place on in this space; "
                 f"{self.n_chips_used} of {self.__machine.n_chips} used")
-        next_x, next_y = space.pop()
-        self.__used_chips.add((next_x, next_y))
-        self.__restored_chips.discard((next_x, next_y))
-        chip = self.__machine.get_chip_at(next_x, next_y)
-        cores_used, sdram_used = self.__cores_and_sdram(chip.x, chip.y)
+        chip = space.pop()
+        self.__used_chips.add(chip)
+        self.__restored_chips.discard(chip)
+        cores_used, sdram_used = self.__cores_and_sdram(chip)
         self.__last_chip_space = _ChipWithSpace(chip, cores_used, sdram_used)
         return self.__last_chip_space
 
     @property
     def n_chips_used(self):
+        """
+
+        :rtype: int
+        :return:
+        """
         return len(self.__used_chips)
 
     def __usable_from_chip(self, chip):
+        """
+
+        :param Chip chip:
+        :rtype set(Chip)
+        """
         chips = OrderedSet()
         for link in chip.router.links:
             chip_coords = (link.destination_x, link.destination_y)
-            if chip_coords not in self.__used_chips:
-                chip = self.__machine.get_chip_at(*chip_coords)
+            target_chip = self.__machine.get_chip_at(*chip_coords)
+            if target_chip not in self.__used_chips:
                 # Don't place on virtual chips
-                if not chip.virtual:
-                    chips.add(chip)
+                if not target_chip.virtual:
+                    chips.add(target_chip)
         return chips
 
     def save_chips(self, chips):
+        """
+        :param iter(Chip) chips:
+        """
         self.__saved_chips.update(chips)
 
     def restore_chips(self):
@@ -416,9 +436,13 @@ class _Space(object):
                 chip.nearest_ethernet_y == self.__board_y)
 
     def pop(self):
+        """
+
+        :type: Chip
+        :return:
+        """
         if self.__same_board_chips:
-            next_chip = self.__same_board_chips.pop(last=False)
-            return next_chip.x, next_chip.y
+            return self.__same_board_chips.pop(last=False)
         if self.__remaining_chips:
             next_chip = self.__remaining_chips.pop(last=False)
             self.__board_x = next_chip.nearest_ethernet_x
@@ -430,10 +454,14 @@ class _Space(object):
                     self.__same_board_chips.add(chip)
             for chip in to_remove:
                 self.__remaining_chips.remove(chip)
-            return next_chip.x, next_chip.y
+            return next_chip
         raise StopIteration
 
     def update(self, chips):
+        """
+
+        :param iter(Chip) chips:
+        """
         for chip in chips:
             if self.__on_same_board(chip):
                 self.__same_board_chips.add(chip)
@@ -478,7 +506,13 @@ class _ChipWithSpace(object):
 
 
 def _chip_order(machine):
+    """
+
+    :param machine:
+    :rtype: Chip
+    """
     for x in range(machine.max_chip_x + 1):
         for y in range(machine.max_chip_y + 1):
-            if machine.is_chip_at(x, y):
-                yield((x, y))
+            chip = machine.get_chip_at(x, y)
+            if chip:
+                yield chip
