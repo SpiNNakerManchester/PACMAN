@@ -70,9 +70,9 @@ def place_application_graph(
                     next_chip_space, space = spaces.get_next_chip_and_space()
                 except PacmanPlaceException as e:
                     _place_error(
-                        app_graph, placements, system_placements, e
-                        )
-                        # machine, board_colours)
+                        app_graph, placements, system_placements, e,
+                        # plan_n_timesteps, machine, board_colours)
+                        plan_n_timesteps, machine)
                 logger.debug(f"Starting placement from {next_chip_space}")
 
                 placements_to_make = list()
@@ -134,10 +134,9 @@ def place_application_graph(
 
 
 def _place_error(
-        app_graph, placements, system_placements, exception
-        ):
-        # ,machine, board_colours):
-    app_vertex_count = 0
+        app_graph, placements, system_placements, exception, plan_n_timesteps,
+        machine): #, board_colours):
+    unplaceable = list()
     vertex_count = 0
     n_vertices = 0
     for app_vertex in app_graph.vertices:
@@ -155,12 +154,12 @@ def _place_error(
             else:
                 app_vertex_placed = False
                 break
-        if not app_vertex_placed and not found_placed_cores:
-            app_vertex_count += 1
+        if not app_vertex_placed:
+            unplaceable.append(app_vertex)
 
     fd, report_file = mkstemp(suffix=".rpt")
     with fdopen(fd, 'w') as f:
-        f.write(f"Could not place {app_vertex_count} of {app_graph.n_vertices}"
+        f.write(f"Could not place {len(unplaceable)} of {app_graph.n_vertices}"
                 " application vertices.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
                 " last app vertex\n\n")
@@ -176,6 +175,31 @@ def _place_error(
                         f" Vertex {placement.vertex}\n")
             if not first:
                 f.write("\n")
+        f.write("\n")
+        f.write("Not placed:\n")
+        for app_vertex in unplaceable:
+            f.write(f"Vertex: {app_vertex}\n")
+            same_chip_groups = app_vertex.splitter.get_same_chip_groups()
+            for vertices, sdram in same_chip_groups:
+                f.write(f"    Group of {len(vertices)} vertices uses "
+                        f"{sdram.get_total_sdram(plan_n_timesteps)} "
+                        "bytes of SDRAM:\n")
+                for vertex in vertices:
+                    f.write(f"        Vertex {vertex}")
+                    if placements.is_vertex_placed(vertex):
+                        plce = placements.get_placement_of_vertex(vertex)
+                        f.write(f" (placed at {plce.x}, {plce.y}, {plce.p})")
+                    f.write("\n")
+
+        f.write("\n")
+        f.write("Unused chips:\n")
+        for x, y in machine.chip_coordinates:
+            n_placed = placements.n_placements_on_chip(x, y)
+            system_placed = system_placements.n_placements_on_chip(x, y)
+            if n_placed - system_placed == 0:
+                n_procs = machine.get_chip_at(x, y).n_user_processors
+                f.write(f"    {x}, {y} ({n_procs - system_placed}"
+                        " free cores)\n")
 
     # _draw_placements(machine, report_file + ".png", board_colours)
 
