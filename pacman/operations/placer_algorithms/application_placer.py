@@ -24,7 +24,6 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from tempfile import mkstemp
 from os import fdopen
-import numpy
 import logging
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -135,7 +134,7 @@ def place_application_graph(
 
 def _place_error(
         app_graph, placements, system_placements, exception, plan_n_timesteps,
-        machine): #, board_colours):
+        machine):  # , board_colours):
     unplaceable = list()
     vertex_count = 0
     n_vertices = 0
@@ -354,12 +353,14 @@ class _Spaces(object):
             if self.__last_chip_space is None:
                 chip = self.__get_next_chip()
                 cores_used, sdram_used = self.__cores_and_sdram(chip)
-                self.__last_chip_space = _ChipWithSpace(chip, cores_used, sdram_used)
+                self.__last_chip_space = _ChipWithSpace(
+                    chip, cores_used, sdram_used)
                 self.__used_chips.add(chip)
 
             # Start a new space by finding all the chips that can be reached
             # from the start chip but have not been used
-            return (self.__last_chip_space, _Space(self.__last_chip_space.chip))
+            return (self.__last_chip_space,
+                    _Space(self.__last_chip_space.chip))
 
         except StopIteration:
             raise PacmanPlaceException(
@@ -388,7 +389,7 @@ class _Spaces(object):
         """
         # If we are reporting a used chip, update with reachable chips
         if last_chip_space is not None:
-            last_chip = self.__machine.get_chip_at(last_chip_space.x, last_chip_space.y)
+            last_chip = last_chip_space.chip
             space.update(self.__usable_from_chip(last_chip))
 
         # If no space, error
