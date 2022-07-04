@@ -28,6 +28,13 @@ def get_app_partitions(app_graph):
     """ Find all application partitions, including self-connected ones from
         internal multicast partitions
 
+    Note that where a vertex splitter indicates that it has internal
+        partitions but is not the source of an external partition, a "fake"
+        empty application partition is added.  This allows the calling
+        algorithm to loop over the returned list and look at the set of
+        edges and internal partitions to get a complete picture of all
+        targets for each source machine vertex at once.
+
     :param ApplicationGraph app_graph: The application graph to consider
     :return: list of partitions; note where there are only internal multicast
         partitions, the partition will have no edges.  Caller should use
@@ -555,8 +562,8 @@ def vertex_xy(vertex, placements, machine):
     return link_data.connected_chip_x, link_data.connected_chip_y
 
 
-def vertex_chip_and_route(vertex, placements, machine):
-    """ Get the non-virtual chip coordinates, the vertex, and processor and/or
+def vertex_xy_and_route(vertex, placements, machine):
+    """ Get the non-virtual chip coordinates, the vertex, and processor or
         link to follow to get to the vertex
 
     :param MachineVertex vertex:
@@ -564,8 +571,8 @@ def vertex_chip_and_route(vertex, placements, machine):
     :param ~spinn_machine.Machine machine:
     :return: tuple(tuple(chip x, chip y),
                    tuple(vertex, processor or None, link or None))
-    :rtype: tuple(tuple(int, int),
-                  tuple(MachineVertex, int or None, int or None))
+    :rtype: tuple(tuple(int, int), tuple(MachineVertex, int,  None)) or
+        tuple(tuple(int, int), tuple(MachineVertex, None, int))
     """
     if not isinstance(vertex, AbstractVirtual):
         placement = placements.get_placement_of_vertex(vertex)
