@@ -352,9 +352,9 @@ def _route_to_xys(first_xy, all_xys, machine, routes, targets, label):
 
     :param tuple(int, int) first_xy:
     :param list(tuple(int, int)) all_xys:
-    :param machine: 
-    :param routes: 
-    :param targets: 
+    :param machine:
+    :param routes:
+    :param targets:
     :param label:
     """
     # Keep a queue of xy to visit, list of (parent xy, link from parent)
@@ -421,7 +421,7 @@ def _route_pre_to_post(
 
     :param tuple(int, int) source_xy:
     :param tuple(int, int) dest_xy:
-    :param routes: 
+    :param routes:
     :param machine:
     :param str label:
     :param set(tuple(int, int)) all_source_xy:
