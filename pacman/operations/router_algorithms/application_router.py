@@ -288,9 +288,9 @@ def route_application_graph(machine, app_graph, placements):
 
 def _find_target_xy(target_xys, routes, source_mappings):
     """
-    
+
     :param set(tuple(int, int)) target_xys:
-    :param routes: 
+    :param routes:
     :param dict(tuple(int, int), list) outgoing_mappings:
     :return:
     :rtype: tuple(int, int)
@@ -306,18 +306,18 @@ def _find_target_xy(target_xys, routes, source_mappings):
 
 def _get_outgoing_mapping(app_vertex, partition_id, placements, machine):
     """
-    Gets a Mapping from xy sources to a list of (vertex, the vertex, 
+    Gets a Mapping from xy sources to a list of (vertex, the vertex,
         processor and link to follow to get to the vertex
- 
+
     For each tuple in the list either processor or link will be None
-    
+
     :param app_vertex:
     :param partition_id:
     :param placements:
     :param machine:
     :rtype: dict(tuple(int, int),
-        list(tuple(MachineVertex, int,  None) or 
-             tuple(MachineVertex, None, int))) 
+        list(tuple(MachineVertex, int,  None) or
+             tuple(MachineVertex, None, int)))
     """
     outgoing_mapping = defaultdict(list)
     for m_vertex in app_vertex.splitter.get_out_going_vertices(partition_id):
@@ -346,16 +346,16 @@ def _get_all_xys(app_vertex, placements, machine):
     return {vertex_xy(m_vertex, placements, machine)
             for m_vertex in app_vertex.machine_vertices}
 
+
 def _route_to_xys(first_xy, all_xys, machine, routes, targets, label):
     """
-    
+
     :param tuple(int, int) first_xy:
     :param list(tuple(int, int)) all_xys:
     :param machine: 
     :param routes: 
     :param targets: 
-    :param label: 
-    :return: 
+    :param label:
     """
     # Keep a queue of xy to visit, list of (parent xy, link from parent)
     xys_to_explore = deque([(first_xy, list())])
@@ -418,11 +418,11 @@ def _route_pre_to_post(
         source_xy, dest_xy, routes, machine, label, all_source_xy,
         target_xys):
     """
-    
+
     :param tuple(int, int) source_xy:
     :param tuple(int, int) dest_xy:
     :param routes: 
-    :param machine: 
+    :param machine:
     :param str label:
     :param set(tuple(int, int)) all_source_xy:
     :param  set(tuple(int, int)) target_xys:
@@ -480,10 +480,10 @@ def _route_pre_to_post(
 
 def _path_without_errors(source_xy, nodes, machine):
     """
-    
+
     :param tuple(int, int) source_xy:
     :param  list(tuple(int,tuple(int, int))) nodes:
-    :param machine: 
+    :param machine:
     :rtype: list(tuple(int,int))
     """
     c_xy = source_xy
@@ -544,8 +544,9 @@ def _is_ok(xy, node, machine):
     """
     c_x, c_y = xy
     direction, (n_x, n_y) = node
-    if machine.is_link_at(c_x, c_y, direction) and machine.is_chip_at(n_x, n_y):
-        return True
+    if machine.is_link_at(c_x, c_y, direction):
+        if machine.is_chip_at(n_x, n_y):
+            return True
     return False
 
 
