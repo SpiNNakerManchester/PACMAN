@@ -386,7 +386,7 @@ def longest_dimension_first(vector, start, machine):
         coordinate).
     :param ~spinn_machine.Machine machine:
     :return:
-    :rtype: list(tuple(int,int))
+    :rtype: list(tuple(int,tuple(int, int)))
     """
     return vector_to_nodes(
         sorted(enumerate(vector), key=(lambda x: abs(x[1])), reverse=True),
@@ -569,8 +569,9 @@ def vertex_xy_and_route(vertex, placements, machine):
     :param MachineVertex vertex:
     :param Placements placements:
     :param ~spinn_machine.Machine machine:
-    :return: tuple(tuple(chip x, chip y),
-                   tuple(vertex, processor or None, link or None))
+    :return: the xy corridinates of the target vertex mapped to a tuple of
+        the vertex, core and link.
+        One of core or link is provided the other is None
     :rtype: tuple(tuple(int, int), tuple(MachineVertex, int,  None)) or
         tuple(tuple(int, int), tuple(MachineVertex, None, int))
     """
