@@ -36,7 +36,7 @@ from pacman.model.routing_table_by_partition import (
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     route_has_dead_links, avoid_dead_links, convert_a_route,
     longest_dimension_first, nodes_to_trees, vertex_xy, targets_by_chip,
-    least_busy_dimension_first, get_app_partitions, vertex_chip_and_route)
+    least_busy_dimension_first, get_app_partitions, vertex_xy_and_route)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 
@@ -202,7 +202,7 @@ def _ner_route(graph, machine, placements, vector_to_nodes):
 
         for m_vertex in outgoing:
             post_vertexes = post_vertices_by_source[m_vertex]
-            source_xy, (m_vertex, core, link) = vertex_chip_and_route(
+            source_xy, (m_vertex, core, link) = vertex_xy_and_route(
                 m_vertex, placements, machine)
             routing_tree = _do_route(
                 source_xy, post_vertexes, machine, placements,

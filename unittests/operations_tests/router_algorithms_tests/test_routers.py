@@ -31,7 +31,7 @@ from pacman.operations.router_algorithms.ner_route import (
     ner_route, ner_route_traffic_aware)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     longest_dimension_first, get_app_partitions, vertex_xy,
-    vertex_chip_and_route)
+    vertex_xy_and_route)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.config_setup import unittest_setup
@@ -343,7 +343,7 @@ def _check_edges(routing_tables, machine, placements, app_graph):
                     edge.pre_vertex, part.identifier)
             for tgt, srcs in targets:
                 _add_virtual(expected_virtual, tgt, machine)
-                xy, (m_vertex, core, link) = vertex_chip_and_route(
+                xy, (m_vertex, core, link) = vertex_xy_and_route(
                     tgt, placements, machine)
                 for src in srcs:
                     if isinstance(src, ApplicationVertex):
@@ -359,7 +359,7 @@ def _check_edges(routing_tables, machine, placements, app_graph):
             if in_part.identifier == part.identifier:
                 outgoing.add(in_part.pre_vertex)
                 for edge in in_part.edges:
-                    xy, (m_vertex, core, link) = vertex_chip_and_route(
+                    xy, (m_vertex, core, link) = vertex_xy_and_route(
                         edge.post_vertex, placements, machine)
                     required_targets[in_part.pre_vertex].add((xy, core, link))
                     _add_virtual(expected_virtual, edge.post_vertex, machine)

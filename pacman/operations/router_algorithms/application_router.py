@@ -16,7 +16,7 @@ from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     longest_dimension_first, get_app_partitions, vertex_xy,
-    vertex_chip_and_route)
+    vertex_xy_and_route)
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 from pacman.model.graphs.application import ApplicationVertex
 from collections import deque, defaultdict
@@ -24,7 +24,7 @@ from spinn_utilities.progress_bar import ProgressBar
 
 
 class _Targets(object):
-    """ A set of targets to be added to a route on a chip
+    """ A set of targets to be added to a route on a chip(xy)
     """
     __slots__ = ["__targets_by_source"]
 
@@ -141,29 +141,30 @@ def route_application_graph(machine, app_graph, placements):
 
         # Pick a place within the source that we can route from.  Note that
         # this might not end up being the actual source in the end.
-        source_chip, source_chips = _get_outgoing_chips(
-            partition.pre_vertex, partition.identifier, placements, machine)
+        source_mappings = _get_outgoing_mapping(
+            source, partition.identifier, placements, machine)
 
-        # No source chips?  Nothing to route then!
-        if source_chip is None:
+        # No source mappings?  Nothing to route then!
+        if not source_mappings:
             continue
 
-        # Get all source chips
-        all_source_chips = _get_all_chips(source, placements, machine)
+        source_xy = next(iter(source_mappings.keys()))
+        # Get all source chips coordinates
+        all_source_xys = _get_all_xys(source, placements, machine)
 
         # Keep track of the source edge chips
-        source_edge_chips = set()
+        source_edge_xys = set()
 
-        # Keep track of which chips we have visited with routes for this
+        # Keep track of which chips (xys) we have visited with routes for this
         # partition to ensure no looping
         routes = dict()
 
-        # Keep track of cores or links to target on specific chips
+        # Keep track of cores or links to target on specific chips (xys)
         targets = defaultdict(_Targets)
 
         # Remember if we see a self-connection
         self_connected = False
-        self_chips = set()
+        self_xys = set()
 
         for edge in partition.edges:
             # Store the target vertex
@@ -172,46 +173,46 @@ def route_application_graph(machine, app_graph, placements):
             # If not self-connected
             if source != target:
 
-                # Find all chips that are in the target
-                target_chips = _get_all_chips(target, placements, machine)
+                # Find all coordinates for chips (xy) that are in the target
+                target_xys = _get_all_xys(target, placements, machine)
 
                 # Pick one to actually use as a target
-                target_chip = _find_target_chip(
-                    target_chips, routes, source_chips)
+                target_xy = _find_target_xy(
+                    target_xys, routes, source_mappings)
 
                 # Make a route between source and target, without any source
                 # or target chips in it
-                source_edge_chip, target_edge_chip = _route_pre_to_post(
-                    source_chip, target_chip, routes, machine,
-                    f"Source to Target ({target.label})", all_source_chips,
-                    target_chips)
+                source_edge_xy, target_edge_xy = _route_pre_to_post(
+                    source_xy, target_xy, routes, machine,
+                    f"Source to Target ({target.label})", all_source_xys,
+                    target_xys)
 
                 # Add all the targets for the route
                 target_vertices = \
                     target.splitter.get_source_specific_in_coming_vertices(
                         source, partition.identifier)
-                real_target_chips = set()
+                real_target_xys = set()
                 for tgt, srcs in target_vertices:
-                    xy, (_vertex, core, link) = vertex_chip_and_route(
+                    xy, (_vertex, core, link) = vertex_xy_and_route(
                         tgt, placements, machine)
-                    if xy in source_chips:
+                    if xy in source_mappings:
                         targets[xy].add_machine_sources_for_target(
                             core, link, srcs, partition.identifier)
                     else:
                         targets[xy].add_sources_for_target(
                             core, link, srcs, partition.identifier)
 
-                    real_target_chips.add(xy)
+                    real_target_xys.add(xy)
 
                 # Route from target edge chip to all the targets
-                _route_to_target_chips(
-                    target_edge_chip, target_chips, machine, routes,
-                    real_target_chips, "Target to Targets")
+                _route_to_xys(
+                    target_edge_xy, target_xys, machine, routes,
+                    real_target_xys, "Target to Targets")
 
                 # If the start of the route is still part of the source vertex
                 # chips, add it
-                if source_edge_chip in source_chips:
-                    source_edge_chips.add(source_edge_chip)
+                if source_edge_xy in source_mappings:
+                    source_edge_xys.add(source_edge_xy)
 
             # If self-connected
             else:
@@ -222,11 +223,11 @@ def route_application_graph(machine, app_graph, placements):
                     source.splitter.get_source_specific_in_coming_vertices(
                         source, partition.identifier)
                 for tgt, srcs in target_vertices:
-                    xy, (_vertex, core, link) = vertex_chip_and_route(
+                    xy, (_vertex, core, link) = vertex_xy_and_route(
                         tgt, placements, machine)
                     targets[xy].add_machine_sources_for_target(
                         core, link, srcs, partition.identifier)
-                    self_chips.add(xy)
+                    self_xys.add(xy)
 
         # Deal with internal multicast partitions
         internal = source.splitter.get_internal_multicast_partitions()
@@ -236,108 +237,147 @@ def route_application_graph(machine, app_graph, placements):
                 src = in_part.pre_vertex
                 for edge in in_part.edges:
                     tgt = edge.post_vertex
-                    xy, (_vertex, core, link) = vertex_chip_and_route(
+                    xy, (_vertex, core, link) = vertex_xy_and_route(
                         tgt, placements, machine)
                     targets[xy].add_machine_sources_for_target(
                         core, link, [src], in_part.identifier)
-                    self_chips.add(xy)
+                    self_xys.add(xy)
 
         # Make the real routes from source edges to targets
-        for source_edge_chip in source_edge_chips:
+        for source_edge_xy in source_edge_xys:
             # Make sure that we add the machine sources on the source edge chip
-            if source_edge_chip not in targets:
+            if source_edge_xy not in targets:
                 edge_targets = _Targets()
-                for source_chip in source_chips:
-                    for vertex, _p, _l in source_chips[source_chip]:
+                for source_xy in source_mappings:
+                    for vertex, _p, _l in source_mappings[source_xy]:
                         edge_targets.ensure_source(vertex)
-                targets[source_edge_chip] = edge_targets
+                targets[source_edge_xy] = edge_targets
 
             _convert_a_route(
                 routing_tables, source, partition.identifier, None, None,
-                routes[source_edge_chip], targets=targets,
+                routes[source_edge_xy], targets=targets,
                 ensure_all_source=True)
 
         # Now make the routes from actual sources to source edges
         if self_connected:
-            for chip in source_chips:
+            for xy in source_mappings:
                 source_routes = dict()
-                _route_to_target_chips(
-                    chip, all_source_chips, machine, source_routes,
-                    source_edge_chips.union(self_chips),
+                _route_to_xys(
+                    xy, all_source_xys, machine, source_routes,
+                    source_edge_xys.union(self_xys),
                     "Sources to Source (self)")
-                for vertex, processor, link in source_chips[chip]:
+                for vertex, processor, link in source_mappings[xy]:
                     _convert_a_route(
                         routing_tables, vertex, partition.identifier,
-                        processor, link, source_routes[chip], targets=targets,
+                        processor, link, source_routes[xy], targets=targets,
                         use_source_for_targets=True)
         else:
-            for chip in source_chips:
+            for xy in source_mappings:
                 source_routes = dict()
-                _route_to_target_chips(
-                    chip, all_source_chips, machine, source_routes,
-                    source_edge_chips, "Sources to source")
-                for vertex, processor, link in source_chips[chip]:
+                _route_to_xys(
+                    xy, all_source_xys, machine, source_routes,
+                    source_edge_xys, "Sources to source")
+                for vertex, processor, link in source_mappings[xy]:
                     _convert_a_route(
                         routing_tables, vertex, partition.identifier,
-                        processor, link, source_routes[chip])
+                        processor, link, source_routes[xy])
 
     # Return the routing tables
     return routing_tables
 
 
-def _find_target_chip(target_chips, routes, source_chips):
-    for chip in target_chips:
-        if chip in source_chips:
-            return chip
-    for chip in target_chips:
-        if chip in routes:
-            return chip
-    return chip
+def _find_target_xy(target_xys, routes, source_mappings):
+    """
+
+    :param set(tuple(int, int)) target_xys:
+    :param routes:
+    :param dict(tuple(int, int), list) outgoing_mappings:
+    :return:
+    :rtype: tuple(int, int)
+    """
+    for xy in target_xys:
+        if xy in source_mappings:
+            return xy
+    for xy in target_xys:
+        if xy in routes:
+            return xy
+    return xy
 
 
-def _get_outgoing_chips(app_vertex, partition_id, placements, machine):
-    vertex_chips = defaultdict(list)
+def _get_outgoing_mapping(app_vertex, partition_id, placements, machine):
+    """
+    Gets a Mapping from xy sources to a list of (vertex, the vertex,
+        processor and link to follow to get to the vertex
+
+    For each tuple in the list either processor or link will be None
+
+    :param app_vertex:
+    :param partition_id:
+    :param placements:
+    :param machine:
+    :rtype: dict(tuple(int, int),
+        list(tuple(MachineVertex, int,  None) or
+             tuple(MachineVertex, None, int)))
+    """
+    outgoing_mapping = defaultdict(list)
     for m_vertex in app_vertex.splitter.get_out_going_vertices(partition_id):
-        xy, route = vertex_chip_and_route(m_vertex, placements, machine)
-        vertex_chips[xy].append(route)
+        xy, route = vertex_xy_and_route(m_vertex, placements, machine)
+        outgoing_mapping[xy].append(route)
     for in_part in app_vertex.splitter.get_internal_multicast_partitions():
         if in_part.identifier == partition_id:
-            xy, route = vertex_chip_and_route(
+            xy, route = vertex_xy_and_route(
                 in_part.pre_vertex, placements, machine)
-            vertex_chips[xy].append(route)
-    if not vertex_chips:
+            outgoing_mapping[xy].append(route)
+    if not outgoing_mapping:
         return None, None
-    first_chip = next(iter(vertex_chips.keys()))
-    return (first_chip, vertex_chips)
+    return outgoing_mapping
 
 
-def _get_all_chips(app_vertex, placements, machine):
+def _get_all_xys(app_vertex, placements, machine):
+    """
+    Gets the list of all the xy coordinates the vertexes machine vertices
+        are placed on
+
+    :param app_vertex:
+    :param placements:
+    :param machine:
+    :rtype: set(tuple(int, int))
+    """
     return {vertex_xy(m_vertex, placements, machine)
             for m_vertex in app_vertex.machine_vertices}
 
 
-def _route_to_target_chips(first_chip, chips, machine, routes, targets, label):
-    # Keep a queue of chip to visit, list of (parent chip, link from parent)
-    chips_to_explore = deque([(first_chip, list())])
+def _route_to_xys(first_xy, all_xys, machine, routes, targets, label):
+    """
+
+    :param tuple(int, int) first_xy:
+    :param list(tuple(int, int)) all_xys:
+    :param machine:
+    :param routes:
+    :param targets:
+    :param label:
+    """
+    # Keep a queue of xy to visit, list of (parent xy, link from parent)
+    xys_to_explore = deque([(first_xy, list())])
     visited = set()
     targets_to_visit = set(targets)
-    while chips_to_explore:
-        chip, path = chips_to_explore.popleft()
-        if chip in targets_to_visit:
-            targets_to_visit.remove(chip)
-        if chip in visited:
+    while xys_to_explore:
+        xy, path = xys_to_explore.popleft()
+        if xy in targets_to_visit:
+            targets_to_visit.remove(xy)
+        if xy in visited:
             continue
-        visited.add(chip)
+        visited.add(xy)
 
-        # If we have reached a chip that has already been routed to,
+        # If we have reached a xy that has already been routed to,
         # cut the path off here
-        if chip in routes:
+        if xy in routes:
             path = list()
 
         # If we have reached a target, add the path to the routes
-        elif chip in targets:
-            routes[chip] = RoutingTree(chip, label)
-            last_route = routes[chip]
+        elif xy in targets:
+            routes[xy] = RoutingTree(xy, label)
+            last_route = routes[xy]
             for parent, link in reversed(path):
                 if parent not in routes:
                     routes[parent] = RoutingTree(parent, label)
@@ -348,29 +388,47 @@ def _route_to_target_chips(first_chip, chips, machine, routes, targets, label):
             path = list()
 
         for link in range(6):
-            x, y = chip
+            x, y = xy
             if machine.is_link_at(x, y, link):
-                next_chip = machine.xy_over_link(x, y, link)
-                if _is_open_chip(next_chip, chips, visited, machine):
+                next_xy = machine.xy_over_link(x, y, link)
+                if _is_open_chip(next_xy, all_xys, visited, machine):
                     new_path = list(path)
-                    new_path.append((chip, link))
-                    chips_to_explore.append((next_chip, new_path))
+                    new_path.append((xy, link))
+                    xys_to_explore.append((next_xy, new_path))
     # Sanity check
     if targets_to_visit:
         raise Exception(
-            f"Failed to visit all targets {targets} from {first_chip}: "
+            f"Failed to visit all targets {targets} from {first_xy}: "
             f" Not visited {targets_to_visit}")
 
 
-def _is_open_chip(chip, chips, visited, machine):
-    x, y = chip
-    is_in_range = chips is None or chip in chips
-    return is_in_range and chip not in visited and machine.is_chip_at(x, y)
+def _is_open_chip(xy, xys, visited, machine):
+    """
+
+    :param tuple(int, int) xy:
+    :param list(tuple(int, int) xys: List of legal xys
+    :param set(tuple(int, int) visited:
+    :param machine:
+    :return: True if the cooridnates point to an existing Chip not yet visited
+    """
+    return xy in xys and xy not in visited and machine.is_chip_at(*xy)
 
 
 def _route_pre_to_post(
-        source_xy, dest_xy, routes, machine, label, source_group=None,
-        target_group=None):
+        source_xy, dest_xy, routes, machine, label, all_source_xy,
+        target_xys):
+    """
+
+    :param tuple(int, int) source_xy:
+    :param tuple(int, int) dest_xy:
+    :param routes:
+    :param machine:
+    :param str label:
+    :param set(tuple(int, int)) all_source_xy:
+    :param  set(tuple(int, int)) target_xys:
+    :return: the pre and post xy coordinates
+    :rtype: tuple(tuple(int,int), tuple(int, int))
+    """
     # Find a route from source to target
     vector = machine.get_vector(source_xy, dest_xy)
     nodes_direct = longest_dimension_first(vector, source_xy, machine)
@@ -383,7 +441,7 @@ def _route_pre_to_post(
     nodes = nodes_fixed
     route_pre = source_xy
     for i, (_direction, (x, y)) in reversed(list(enumerate(nodes))):
-        if _in_group((x, y), source_group) or (x, y) in routes:
+        if _in_group((x, y), all_source_xy) or (x, y) in routes:
             nodes = nodes[i + 1:]
             route_pre = (x, y)
             break
@@ -395,12 +453,11 @@ def _route_pre_to_post(
     # Start from the start and move forwards until we find a chip in
     # the target group
     route_post = dest_xy
-    if target_group is not None:
-        for i, (_direction, (x, y)) in enumerate(nodes):
-            if (x, y) in target_group:
-                nodes = nodes[:i + 1]
-                route_post = (x, y)
-                break
+    for i, (_direction, (x, y)) in enumerate(nodes):
+        if (x, y) in target_xys:
+            nodes = nodes[:i + 1]
+            route_post = (x, y)
+            break
 
     # Convert nodes to routes and add to existing routes
     source_route = routes[route_pre]
@@ -422,6 +479,13 @@ def _route_pre_to_post(
 
 
 def _path_without_errors(source_xy, nodes, machine):
+    """
+
+    :param tuple(int, int) source_xy:
+    :param  list(tuple(int,tuple(int, int))) nodes:
+    :param machine:
+    :rtype: list(tuple(int,int))
+    """
     c_xy = source_xy
     pos = 0
     new_nodes = list()
@@ -450,6 +514,12 @@ def _path_without_errors(source_xy, nodes, machine):
 
 
 def _path_without_loops(start_xy, nodes):
+    """
+
+    :param tuple(int, int) start_xy:
+    :param list(tuple(int,int)) nodes:
+    :rtype: list(tuple(int,int))
+    """
     seen_nodes = {start_xy: 0}
     i = 0
     while i < len(nodes):
@@ -464,11 +534,19 @@ def _path_without_loops(start_xy, nodes):
     return nodes
 
 
-def _is_ok(xy, node, mac):
+def _is_ok(xy, node, machine):
+    """
+
+    :param tuple(int, int) xy:
+    :param tuple(int,tuple(int, int)) node:
+    :param machine:
+    :return:
+    """
     c_x, c_y = xy
     direction, (n_x, n_y) = node
-    if mac.is_link_at(c_x, c_y, direction) and mac.is_chip_at(n_x, n_y):
-        return True
+    if machine.is_link_at(c_x, c_y, direction):
+        if machine.is_chip_at(n_x, n_y):
+            return True
     return False
 
 
@@ -478,26 +556,26 @@ def _xy(node):
 
 
 def _find_path(source_xy, target_xy, machine):
-    chips_to_explore = deque([(source_xy, list())])
+    xys_to_explore = deque([(source_xy, list())])
     visited = set()
-    while chips_to_explore:
-        chip, path = chips_to_explore.popleft()
-        if chip in visited:
+    while xys_to_explore:
+        xy, path = xys_to_explore.popleft()
+        if xy in visited:
             continue
-        visited.add(chip)
+        visited.add(xy)
 
         # If we have reached a target, add the path to the routes
-        if chip == target_xy:
+        if xy == target_xy:
             return path
 
         for link in range(6):
-            x, y = chip
+            x, y = xy
             if machine.is_link_at(x, y, link):
-                next_chip = machine.xy_over_link(x, y, link)
-                if _is_open_chip(next_chip, None, visited, machine):
+                next_xy = machine.xy_over_link(x, y, link)
+                if _is_open_chip(next_xy, [next_xy], visited, machine):
                     new_path = list(path)
-                    new_path.append((link, next_chip))
-                    chips_to_explore.append((next_chip, new_path))
+                    new_path.append((link, next_xy))
+                    xys_to_explore.append((next_xy, new_path))
     raise Exception(f"No path from {source_xy} to {target_xy}")
 
 

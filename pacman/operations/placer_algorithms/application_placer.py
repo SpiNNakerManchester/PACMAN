@@ -24,17 +24,16 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from tempfile import mkstemp
 from os import fdopen
-import numpy
 import logging
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-UNUSED_COLOUR = (0.5, 0.5, 0.5, 1.0)
+# UNUSED_COLOUR = (0.5, 0.5, 0.5, 1.0)
 
 
-def next_colour():
-    return tuple(numpy.concatenate(
-        (numpy.random.choice(range(256), size=3) / 256, [1.0])))
+# def next_colour():
+#    return tuple(numpy.concatenate(
+#        (numpy.random.choice(range(256), size=3) / 256, [1.0])))
 
 
 def place_application_graph(
@@ -45,7 +44,7 @@ def place_application_graph(
 
     # Track the placements and  space
     placements = Placements(system_placements)
-    board_colours = dict()
+    # board_colours = dict()
     spaces = _Spaces(machine, placements, plan_n_timesteps)
 
     # Go through the application graph by application vertex
@@ -67,17 +66,18 @@ def place_application_graph(
 
                 # Start a new space
                 try:
-                    next_chip, space = spaces.get_next_chip_and_space()
+                    next_chip_space, space = spaces.get_next_chip_and_space()
                 except PacmanPlaceException as e:
                     _place_error(
                         app_graph, placements, system_placements, e,
-                        plan_n_timesteps, machine, board_colours)
-                logger.debug(f"Starting placement from {next_chip}")
+                        # plan_n_timesteps, machine, board_colours)
+                        plan_n_timesteps, machine)
+                logger.debug(f"Starting placement from {next_chip_space}")
 
                 placements_to_make = list()
 
                 # Go through the groups
-                last_chip_used = None
+                last_chip_space = None
                 for vertices, sdram in same_chip_groups:
                     vertices_to_place = list()
                     for vertex in vertices:
@@ -90,37 +90,38 @@ def place_application_graph(
                     n_cores = len(vertices_to_place)
 
                     if _do_constraints(vertices_to_place, sdram, placements,
-                                       machine, next_chip):
+                                       machine, next_chip_space):
                         continue
 
                     # Try to find a chip with space; this might result in a
                     # SpaceExceededException
-                    while not next_chip.is_space(n_cores, sdram):
-                        next_chip = spaces.get_next_chip(space, last_chip_used)
-                        last_chip_used = None
+                    while not next_chip_space.is_space(n_cores, sdram):
+                        next_chip_space = spaces.get_next_chip_space(
+                            space, last_chip_space)
+                        last_chip_space = None
 
                     # If this worked, store placements to be made
-                    last_chip_used = next_chip
-                    chips_attempted.append(
-                        (next_chip.chip.x, next_chip.chip.y))
+                    last_chip_space = next_chip_space
+                    chips_attempted.append(next_chip_space.chip)
                     _store_on_chip(
                         placements_to_make, vertices_to_place, sdram,
-                        next_chip)
+                        next_chip_space)
 
                 # Now make the placements having confirmed all can be done
                 placements.add_placements(placements_to_make)
                 placed = True
-                colour = next_colour()
-                board_colours.update(
-                    {(x, y): colour for x, y in chips_attempted})
+                # colour = next_colour()
+                # TODO chips_attempted is now set(Chip)
+                # board_colours.update(
+                #     {(x, y): colour for x, y in chips_attempted})
                 logger.debug(f"Used {chips_attempted}")
             except _SpaceExceededException:
                 # This might happen while exploring a space; this may not be
                 # fatal since the last space might have just been bound by
                 # existing placements, and there might be bigger spaces out
                 # there to use
-                board_colours.update(
-                    {(x, y): UNUSED_COLOUR for x, y in chips_attempted})
+                # board_colours.update(
+                # {(x, y): UNUSED_COLOUR for x, y in chips_attempted})
                 logger.debug(f"Failed, saving {chips_attempted}")
                 spaces.save_chips(chips_attempted)
                 chips_attempted.clear()
@@ -133,7 +134,7 @@ def place_application_graph(
 
 def _place_error(
         app_graph, placements, system_placements, exception, plan_n_timesteps,
-        machine, board_colours):
+        machine):  # , board_colours):
     unplaceable = list()
     vertex_count = 0
     n_vertices = 0
@@ -234,7 +235,16 @@ class _SpaceExceededException(Exception):
     pass
 
 
-def _do_constraints(vertices, sdram, placements, machine, next_chip):
+def _do_constraints(vertices, sdram, placements, machine, next_chip_space):
+    """
+
+    :param vertices:
+    :param sdram:
+    :param placements:
+    :param machine:
+    :param _ChipWithSpace next_chip_space:
+    :return:
+    """
     x = None
     y = None
     constrained = False
@@ -281,25 +291,33 @@ def _do_constraints(vertices, sdram, placements, machine, next_chip):
                     raise PacmanConfigurationException(
                         f"No more cores available on {x}, {y}: {on_chip}")
             placements.add_placement(Placement(vertex, x, y, next_core))
-            if next_chip.x == x and next_chip.y == y:
-                next_chip.cores.remove(next_core)
-                next_chip.use_sdram(sdram)
+            if next_chip_space.x == x and next_chip_space.y == y:
+                next_chip_space.cores.remove(next_core)
+                next_chip_space.use_sdram(sdram)
         return True
     return False
 
 
-def _store_on_chip(placements_to_make, vertices, sdram, chip):
+def _store_on_chip(placements_to_make, vertices, sdram, next_chip_space):
+    """
+
+    :param placements_to_make:
+    :param vertices:
+    :param sdram:
+    :param _ChipWithSpace next_chip_space:
+    """
     for vertex in vertices:
-        core = chip.use_next_core()
-        placements_to_make.append(Placement(vertex, chip.x, chip.y, core))
-    chip.use_sdram(sdram)
+        core = next_chip_space.use_next_core()
+        placements_to_make.append(Placement(
+            vertex, next_chip_space.x, next_chip_space.y, core))
+    next_chip_space.use_sdram(sdram)
 
 
 class _Spaces(object):
 
     __slots__ = ["__machine", "__chips", "__next_chip", "__used_chips",
                  "__system_placements", "__placements", "__plan_n_timesteps",
-                 "__last_chip", "__saved_chips", "__restored_chips"]
+                 "__last_chip_space", "__saved_chips", "__restored_chips"]
 
     def __init__(self, machine, placements, plan_n_timesteps):
         self.__machine = machine
@@ -308,12 +326,18 @@ class _Spaces(object):
         self.__chips = iter(_chip_order(machine))
         self.__next_chip = next(self.__chips)
         self.__used_chips = set()
-        self.__last_chip = None
+        self.__last_chip_space = None
         self.__saved_chips = OrderedSet()
         self.__restored_chips = OrderedSet()
 
-    def __cores_and_sdram(self, x, y):
-        on_chip = self.__placements.placements_on_chip(x, y)
+    def __cores_and_sdram(self, chip):
+        """
+
+        :param Chip chip:
+        :rtype: (int, int)
+        :return:
+        """
+        on_chip = self.__placements.placements_on_chip(chip.x, chip.y)
         cores_used = {p.p for p in on_chip}
         sdram_used = sum(
             p.vertex.resources_required.sdram.get_total_sdram(
@@ -321,18 +345,22 @@ class _Spaces(object):
         return cores_used, sdram_used
 
     def get_next_chip_and_space(self):
+        """
+
+        :rtype: (_ChipWithSpace, _Space)
+        """
         try:
-            if self.__last_chip is None:
-                next_chip = self.__get_next_chip()
-                chip = self.__machine.get_chip_at(*next_chip)
-                cores_used, sdram_used = self.__cores_and_sdram(
-                    chip.x, chip.y)
-                self.__last_chip = _ChipWithSpace(chip, cores_used, sdram_used)
-                self.__used_chips.add((chip.x, chip.y))
+            if self.__last_chip_space is None:
+                chip = self.__get_next_chip()
+                cores_used, sdram_used = self.__cores_and_sdram(chip)
+                self.__last_chip_space = _ChipWithSpace(
+                    chip, cores_used, sdram_used)
+                self.__used_chips.add(chip)
 
             # Start a new space by finding all the chips that can be reached
             # from the start chip but have not been used
-            return (self.__last_chip, _Space(self.__last_chip.chip))
+            return (self.__last_chip_space,
+                    _Space(self.__last_chip_space.chip))
 
         except StopIteration:
             raise PacmanPlaceException(
@@ -340,54 +368,72 @@ class _Spaces(object):
                 f"{self.__machine.n_chips} used")
 
     def __get_next_chip(self):
+        """
+
+        :rtype: Chip
+        """
         while self.__restored_chips:
             chip = self.__restored_chips.pop(last=False)
-            if chip not in self.__used_chips and not self.__is_virtual(chip):
+            if chip not in self.__used_chips:
                 return chip
-        while (self.__next_chip in self.__used_chips or
-                self.__is_virtual(self.__next_chip)):
+        while (self.__next_chip in self.__used_chips):
             self.__next_chip = next(self.__chips)
         return self.__next_chip
 
-    def __is_virtual(self, xy):
-        return self.__machine.get_chip_at(*xy).virtual
+    def get_next_chip_space(self, space, last_chip_space):
+        """
 
-    def get_next_chip(self, space, used_chip):
+        :param _Space space:
+        :param _ChipWithSpace last_chip_space:
+        :rtype: _ChipWithSpace
+        """
         # If we are reporting a used chip, update with reachable chips
-        if used_chip is not None:
-            last_chip = self.__machine.get_chip_at(used_chip.x, used_chip.y)
+        if last_chip_space is not None:
+            last_chip = last_chip_space.chip
             space.update(self.__usable_from_chip(last_chip))
 
         # If no space, error
         if not space:
-            self.__last_chip = None
+            self.__last_chip_space = None
             raise _SpaceExceededException(
                 "No more chips to place on in this space; "
                 f"{self.n_chips_used} of {self.__machine.n_chips} used")
-        next_x, next_y = space.pop()
-        self.__used_chips.add((next_x, next_y))
-        self.__restored_chips.discard((next_x, next_y))
-        chip = self.__machine.get_chip_at(next_x, next_y)
-        cores_used, sdram_used = self.__cores_and_sdram(chip.x, chip.y)
-        self.__last_chip = _ChipWithSpace(chip, cores_used, sdram_used)
-        return self.__last_chip
+        chip = space.pop()
+        self.__used_chips.add(chip)
+        self.__restored_chips.discard(chip)
+        cores_used, sdram_used = self.__cores_and_sdram(chip)
+        self.__last_chip_space = _ChipWithSpace(chip, cores_used, sdram_used)
+        return self.__last_chip_space
 
     @property
     def n_chips_used(self):
+        """
+
+        :rtype: int
+        :return:
+        """
         return len(self.__used_chips)
 
     def __usable_from_chip(self, chip):
+        """
+
+        :param Chip chip:
+        :rtype set(Chip)
+        """
         chips = OrderedSet()
         for link in chip.router.links:
             chip_coords = (link.destination_x, link.destination_y)
-            if chip_coords not in self.__used_chips:
-                chip = self.__machine.get_chip_at(*chip_coords)
+            target_chip = self.__machine.get_chip_at(*chip_coords)
+            if target_chip not in self.__used_chips:
                 # Don't place on virtual chips
-                if not chip.virtual:
-                    chips.add(chip)
+                if not target_chip.virtual:
+                    chips.add(target_chip)
         return chips
 
     def save_chips(self, chips):
+        """
+        :param iter(Chip) chips:
+        """
         self.__saved_chips.update(chips)
 
     def restore_chips(self):
@@ -415,9 +461,13 @@ class _Space(object):
                 chip.nearest_ethernet_y == self.__board_y)
 
     def pop(self):
+        """
+
+        :type: Chip
+        :return:
+        """
         if self.__same_board_chips:
-            next_chip = self.__same_board_chips.pop(last=False)
-            return next_chip.x, next_chip.y
+            return self.__same_board_chips.pop(last=False)
         if self.__remaining_chips:
             next_chip = self.__remaining_chips.pop(last=False)
             self.__board_x = next_chip.nearest_ethernet_x
@@ -429,10 +479,14 @@ class _Space(object):
                     self.__same_board_chips.add(chip)
             for chip in to_remove:
                 self.__remaining_chips.remove(chip)
-            return next_chip.x, next_chip.y
+            return next_chip
         raise StopIteration
 
     def update(self, chips):
+        """
+
+        :param iter(Chip) chips:
+        """
         for chip in chips:
             if self.__on_same_board(chip):
                 self.__same_board_chips.add(chip)
@@ -477,7 +531,13 @@ class _ChipWithSpace(object):
 
 
 def _chip_order(machine):
+    """
+
+    :param machine:
+    :rtype: Chip
+    """
     for x in range(machine.max_chip_x + 1):
         for y in range(machine.max_chip_y + 1):
-            if machine.is_chip_at(x, y):
-                yield((x, y))
+            chip = machine.get_chip_at(x, y)
+            if chip:
+                yield chip

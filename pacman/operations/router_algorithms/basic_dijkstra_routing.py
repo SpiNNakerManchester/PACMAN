@@ -23,7 +23,7 @@ from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
-    get_app_partitions, vertex_chip_and_route)
+    get_app_partitions, vertex_xy_and_route)
 from pacman.model.graphs.application import ApplicationVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -156,7 +156,7 @@ class _BasicDijkstraRouting(object):
                     source, partition.identifier)
 
             for tgt, srcs in target_vertices:
-                xy, (m_vertex, core, link) = vertex_chip_and_route(
+                xy, (m_vertex, core, link) = vertex_xy_and_route(
                     tgt, placements, self._machine)
                 for src in srcs:
                     if isinstance(src, ApplicationVertex):
@@ -180,7 +180,7 @@ class _BasicDijkstraRouting(object):
             if in_part.identifier == partition.identifier:
                 outgoing.add(in_part.pre_vertex)
                 for edge in in_part.edges:
-                    xy, (_tgt, core, link) = vertex_chip_and_route(
+                    xy, (_tgt, core, link) = vertex_xy_and_route(
                         edge.post_vertex, placements, self._machine)
                     if core is not None:
                         destinations[in_part.pre_vertex][xy][0].add(core)
@@ -189,7 +189,7 @@ class _BasicDijkstraRouting(object):
                     dest_chips[in_part.pre_vertex].add(xy)
 
         for m_vertex in outgoing:
-            source_xy, (m_vertex, core, link) = vertex_chip_and_route(
+            source_xy, (m_vertex, core, link) = vertex_xy_and_route(
                 m_vertex, placements, self._machine)
             if dest_chips[m_vertex]:
                 self._update_all_weights(node_info)
