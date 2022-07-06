@@ -13,10 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanInvalidParameterException
 import logging
 
-log = logging.getLogger(__name__)
+log = FormatAdapter(logging.getLogger(__name__))
 
 _INCOMING_LINK_MASK = 0x07000000
 _INCOMING_LINK_SHIFT = 24
@@ -232,7 +233,7 @@ class MulticastRoutingTableByPartitionEntry(object):
                     f"Cannot merge {other} and {self}: both incoming processor"
                     " and link are set")
         except PacmanInvalidParameterException as e:
-            log.error(f"Error merging entry {other} into {self}")
+            log.error("Error merging entry {} into {}", other, self)
             raise e
 
         # Set the value directly as faster
