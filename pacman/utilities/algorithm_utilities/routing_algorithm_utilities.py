@@ -25,8 +25,14 @@ import itertools
 
 
 def get_app_partitions(app_graph):
-    """ Find all application partitions, including self-connected ones from
-        internal multicast partitions
+    """ Find all application partitions.
+
+        Note that where a vertex splitter indicates that it has internal
+        partitions but is not the source of an external partition, a "fake"
+        empty application partition is added.  This allows the calling
+        algorithm to loop over the returned list and look at the set of
+        edges *and* internal partitions to get a complete picture of *all*
+        targets for each source machine vertex at once.
 
     :param ApplicationGraph app_graph: The application graph to consider
     :return: list of partitions; note where there are only internal multicast
