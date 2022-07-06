@@ -28,7 +28,7 @@ class RoutingInfo(object):
         "_info_by_prevertex"
     ]
 
-    def __init__(self, items=None):
+    def __init__(self):
         """
         :param items: The routing info items to add
         :type items: iterable(MachineVertexRoutingInfo) or None
@@ -39,10 +39,6 @@ class RoutingInfo(object):
         # Partition information indexed by edge pre vertex and partition ID
         # name
         self._info_by_prevertex = dict()
-
-        if items is not None:
-            for item in items:
-                self.add_routing_info(item)
 
     def add_routing_info(self, info):
         """ Add a routing information item
