@@ -47,7 +47,7 @@ class RoutingInfo(object):
     def add_routing_info(self, info):
         """ Add a routing information item
 
-        :param MachineVertexRoutingInfo info:
+        :param VertexRoutingInfo info:
             The routing information item to add
         :rtype: None
         :raise PacmanAlreadyExistsException:
