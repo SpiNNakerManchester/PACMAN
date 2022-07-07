@@ -90,6 +90,14 @@ class Placement(object):
         """
         return (self._x, self._y, self._p)
 
+    @property
+    def xy(self):
+        """ The (x,y) tuple that represents the chip of this placement.
+
+        :rtype: tuple(int,int)
+        """
+        return (self._x, self._y)
+
     def __eq__(self, other):
         if not isinstance(other, Placement):
             return False
