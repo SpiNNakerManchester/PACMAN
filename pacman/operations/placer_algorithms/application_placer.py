@@ -32,7 +32,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 def place_application_graph(
         machine, app_graph, plan_n_timesteps, system_placements,
-        report_folder):
+        report_folder=None):
     """ Perform placement of an application graph on the machine.
         NOTE: app_graph must have been partitioned
     """
@@ -65,8 +65,7 @@ def place_application_graph(
                 except PacmanPlaceException as e:
                     _place_error(
                         app_graph, placements, system_placements, e,
-                        # plan_n_timesteps, machine, board_colours)
-                        plan_n_timesteps, machine)
+                        plan_n_timesteps, machine, report_folder)
                 logger.debug(f"Starting placement from {next_chip_space}")
 
                 placements_to_make = list()
@@ -115,7 +114,8 @@ def place_application_graph(
                 spaces.save_chips(chips_attempted)
                 chips_attempted.clear()
 
-    if get_config_bool("Reports", "draw_placements"):
+    if (get_config_bool("Reports", "draw_placements") and
+            report_folder is not None):
         report_file = os.path.join(report_folder, "placements.png")
         _draw_placements(machine, report_file, placements, system_placements)
 
@@ -190,7 +190,8 @@ def _place_error(
                 f.write(f"    {x}, {y} ({n_procs - system_placed}"
                         " free cores)\n")
 
-    if get_config_bool("Reports", "draw_placements_on_error"):
+    if (get_config_bool("Reports", "draw_placements_on_error") and
+            report_folder is not None):
         report_file = os.path.join(report_folder, "placements_error.png")
         _draw_placements(machine, report_file, placements, system_placements)
 
