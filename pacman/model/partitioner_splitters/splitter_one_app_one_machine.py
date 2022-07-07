@@ -17,7 +17,6 @@ import logging
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.model.graphs.application.abstract import (
@@ -51,29 +50,25 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
         super().set_governed_app_vertex(app_vertex)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
-        machine_vertex = self._governed_app_vertex.machine_vertex
-        resource_tracker.allocate_constrained_resources(
-            machine_vertex.resources_required, machine_vertex.constraints)
-        machine_graph.add_vertex(machine_vertex)
-        return machine_vertex
+    def create_machine_vertices(self, chip_counter):
+        chip_counter.add_core(
+            self._governed_app_vertex.machine_vertex.resources_required)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        return [self._governed_app_vertex.machine_vertex.vertex_slice], True
+        return [self._governed_app_vertex.machine_vertex.vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
-        return [self._governed_app_vertex.machine_vertex.vertex_slice], True
+        return [self._governed_app_vertex.machine_vertex.vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, edge, outgoing_edge_partition):
-        return {self._governed_app_vertex.machine_vertex: [MachineEdge]}
+    def get_out_going_vertices(self, partition_id):
+        return [self._governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(
-            self, edge, outgoing_edge_partition, src_machine_vertex):
-        return {self._governed_app_vertex.machine_vertex: [MachineEdge]}
+    def get_in_coming_vertices(self, partition_id):
+        return [self._governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):

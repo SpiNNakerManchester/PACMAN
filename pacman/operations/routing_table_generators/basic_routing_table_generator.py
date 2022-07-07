@@ -26,36 +26,35 @@ def basic_routing_table_generator():
 
     :rtype: MulticastRoutingTables
     """
-    machine = PacmanDataView.get_machine()
     routing_infos = PacmanDataView.get_routing_infos()
-    progress = ProgressBar(machine.n_chips, "Generating routing tables")
+    routing_table_by_partitions = PacmanDataView.get_routing_table_by_partition()
+    progress = ProgressBar(
+        routing_table_by_partitions.n_routers, "Generating routing tables")
     routing_tables = MulticastRoutingTables()
-    routing_table_by_partitions = \
-        PacmanDataView.get_routing_table_by_partition()
-    for chip in progress.over(machine.chips):
-        partitions_in_table = routing_table_by_partitions.\
-            get_entries_for_router(chip.x, chip.y)
-        if partitions_in_table:
-            routing_tables.add_routing_table(__create_routing_table(
-                chip, partitions_in_table, routing_infos))
+    for x, y in progress.over(routing_table_by_partitions.get_routers()):
+        parts = routing_table_by_partitions.get_entries_for_router(x, y)
+        routing_tables.add_routing_table(__create_routing_table(
+            x, y, parts, routing_infos))
 
     return routing_tables
 
 
-def __create_routing_table(chip, partitions_in_table, routing_infos):
+def __create_routing_table(x, y, partitions_in_table, routing_infos):
     """
-    :param ~spinn_machine.Chip chip:
+    :param int x:
+    :param int y:
     :param partitions_in_table:
     :type partitions_in_table:
-        dict(AbstractSingleSourcePartition,
+        dict(((ApplicationVertex or MachineVertex), str),
         MulticastRoutingTableByPartitionEntry)
     :param RoutingInfo routing_infos:
     :rtype: MulticastRoutingTable
     """
-    table = UnCompressedMulticastRoutingTable(chip.x, chip.y)
-    for partition in partitions_in_table:
-        r_info = routing_infos.get_routing_info_from_partition(partition)
-        entry = partitions_in_table[partition]
+    table = UnCompressedMulticastRoutingTable(x, y)
+    for source_vertex, partition_id in partitions_in_table:
+        r_info = routing_infos.get_routing_info_from_pre_vertex(
+            source_vertex, partition_id)
+        entry = partitions_in_table[source_vertex, partition_id]
         for key_and_mask in r_info.keys_and_masks:
             table.add_multicast_routing_entry(
                 __create_entry(key_and_mask, entry))

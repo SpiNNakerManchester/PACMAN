@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import AbstractBase
 
 
 class AbstractSplitterPartitioner(object, metaclass=AbstractBase):
@@ -22,30 +22,3 @@ class AbstractSplitterPartitioner(object, metaclass=AbstractBase):
     This makes sure that the methods the superclass expects to be there are
     not removed.
     """
-
-    @abstractmethod
-    def create_machine_edge(
-            self, src_machine_vertex, dest_machine_vertex,
-            common_edge_type, app_edge, machine_graph,
-            app_outgoing_edge_partition, resource_tracker):
-        """ Create the machine edge (if needed) and add it to the graph.
-
-        Some implementations of this method are able to detect that the
-        requested edge is not actually needed so never create or add it.
-
-        :param ~pacman.model.graphs.machine.MachineVertex src_machine_vertex:
-            Src machine vertex of a edge
-        :param ~pacman.model.graphs.machine.MachineVertex dest_machine_vertex:
-            Dest machine vertex of a edge
-        :param ~pacman.model.graphs.machine.MachineEdge common_edge_type:
-            The edge type to build
-        :param ~pacman.model.graphs.application.ApplicationEdge app_edge:
-            The app edge this machine edge is to be associated with.
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            Machine graph to add edge to.
-        :param app_outgoing_edge_partition: Partition
-        :type app_outgoing_edge_partition:
-            ~pacman.model.graphs.OutgoingEdgePartition
-        :param ~pacman.utilities.utility_objs.ResourceTracker resource_tracker:
-            The resource tracker.
-        """

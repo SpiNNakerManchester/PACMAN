@@ -16,212 +16,201 @@ from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.operations.routing_info_allocator_algorithms.\
     zoned_routing_info_allocator import (flexible_allocate, global_allocate)
-from pacman.model.graphs.application.application_graph import ApplicationGraph
-from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.graphs.machine.machine_graph import MachineGraph
-from pacman.model.routing_info import DictBasedMachinePartitionNKeysMap
-from pacman.model.graphs.machine.machine_edge import MachineEdge
+from pacman.model.graphs.application import (
+    ApplicationGraph, ApplicationEdge, ApplicationVertex)
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.model.partitioner_splitters.abstract_splitters import (
+    AbstractSplitterCommon)
 from pacman.model.constraints.key_allocator_constraints \
     import FixedKeyAndMaskConstraint
-from pacman_test_objects import SimpleTestVertex
+
+
+class TestSplitter(AbstractSplitterCommon):
+
+    def create_machine_vertices(self, chip_counter):
+        return 1
+
+    def get_out_going_vertices(self, partition_id):
+        return self._governed_app_vertex.machine_vertices
+
+    def get_in_coming_vertices(self, partition_id):
+        return self._governed_app_vertex.machine_vertices
+
+    def machine_vertices_for_recording(self, variable_to_record):
+        return list(self._governed_app_vertex.machine_vertices)
+
+    def get_out_going_slices(self):
+        return [m.slice for m in self._governed_app_vertex.machine_vertices]
+
+    def get_in_coming_slices(self):
+        return [m.slice for m in self._governed_app_vertex.machine_vertices]
+
+    def reset_called(self):
+        pass
+
+
+class TestAppVertex(ApplicationVertex):
+
+    @property
+    def n_atoms(self):
+        return 10
+
+
+class TestMacVertex(MachineVertex):
+
+    def __init__(
+            self, label=None, constraints=None, app_vertex=None,
+            vertex_slice=None, n_keys_required=None):
+        super(TestMacVertex, self).__init__(
+            label=label, constraints=constraints, app_vertex=app_vertex,
+            vertex_slice=vertex_slice)
+        self.__n_keys_required = n_keys_required
+
+    def get_n_keys_for_partition(self, partition_id):
+        return self.__n_keys_required[partition_id]
+
+    @property
+    def resources_required(self):
+        # Not needed for test
+        return None
 
 
 def create_graphs1(with_fixed):
     app_graph = ApplicationGraph("Test")
     # An output vertex to aim things at (to make keys required)
-    out_app_vertex = SimpleTestVertex(1)
+    out_app_vertex = TestAppVertex(splitter=TestSplitter())
     app_graph.add_vertex(out_app_vertex)
     # Create 5 application vertices (3 bits)
     app_vertices = list()
     for app_index in range(5):
-        app_vertices.append(SimpleTestVertex(1))
+        app_vertices.append(TestAppVertex(splitter=TestSplitter()))
     app_graph.add_vertices(app_vertices)
 
-    mac_graph = MachineGraph("Test", app_graph)
-    n_keys_map = DictBasedMachinePartitionNKeysMap()
-
     # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = out_app_vertex.create_machine_vertex(None, None)
-    mac_graph.add_vertex(out_mac_vertex)
+    out_mac_vertex = TestMacVertex(label="out_vertex")
+    out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
-    # Create 5 application vertices (3 bits)
     for app_index, app_vertex in enumerate(app_vertices):
 
-        # For each, create up to (5 x 4) + 1 = 21 machine vertices (5 bits)
-        for mac_index in range((app_index * 4) + 1):
-            mac_vertex = app_vertex.create_machine_vertex(None, None)
-            mac_graph.add_vertex(mac_vertex)
+        # Create up to (10 * 4) + 1 = 41 partitions (6 bits)
+        for i in range((app_index * 10) + 1):
+            app_graph.add_edge(
+                ApplicationEdge(app_vertex, out_app_vertex), f"Part{i}")
 
-            # For each machine vertex create up to
-            # (20 x 2) + 1 = 81(!) partitions (6 bits)
-            for mac_edge_index in range((mac_index * 2) + 1):
-                mac_edge = MachineEdge(mac_vertex, out_mac_vertex)
-                part_name = "Part{}".format(mac_edge_index)
-                mac_graph.add_edge(mac_edge, part_name)
+        # For each, create up to (40 * 2) + 1 = 81 machine vertices (7 bits)
+        for mac_index in range((app_index * 2 * 10) + 1):
 
-                # Give the partition up to (40 x 4) + 1 = 161 keys (8 bits)
-                p = mac_graph.get_outgoing_edge_partition_starting_at_vertex(
-                    mac_vertex, part_name)
-                if with_fixed:
-                    if (app_index == 2 and mac_index == 4 and
-                            part_name == "Part7"):
-                        p.add_constraint(FixedKeyAndMaskConstraint(
-                            [BaseKeyAndMask(0xFE00000, 0xFFFFFFC0)]))
-                    if (app_index == 2 and mac_index == 0 and
-                            part_name == "Part1"):
-                        p.add_constraint(FixedKeyAndMaskConstraint(
-                            [BaseKeyAndMask(0x4c00000, 0xFFFFFFFE)]))
-                    if (app_index == 2 and mac_index == 0 and
-                            part_name == "Part1"):
-                        p.add_constraint(FixedKeyAndMaskConstraint(
-                            [BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)]))
-                    if (app_index == 3 and mac_index == 0 and
-                            part_name == "Part1"):
-                        p.add_constraint(FixedKeyAndMaskConstraint(
-                            [BaseKeyAndMask(0x3300000, 0xFFFFFFFF)]))
-                    if (app_index == 3 and mac_index == 0 and
-                            part_name == "Part1"):
-                        p.add_constraint(FixedKeyAndMaskConstraint(
-                            [BaseKeyAndMask(0x3300001, 0)]))
-                n_keys_map.set_n_keys_for_partition(
-                    p, (mac_edge_index * 4) + 1)
+            # Give the vertex up to (80 * 2) + 1 = 161 keys (8 bits)
+            mac_vertex = TestMacVertex(
+                label=f"Part{i}_vertex",
+                n_keys_required={f"Part{i}": (mac_index * 2) + 1
+                                 for i in range((app_index * 10) + 1)})
+            app_vertex.remember_machine_vertex(mac_vertex)
 
-    return app_graph, mac_graph, n_keys_map
+        if with_fixed:
+            if app_index == 2:
+                app_vertex.add_constraint(FixedKeyAndMaskConstraint(
+                    [BaseKeyAndMask(0xFE00000, 0xFFFFFFC0)],
+                    partition="Part7"))
+            if app_index == 2:
+                app_vertex.add_constraint(FixedKeyAndMaskConstraint(
+                    [BaseKeyAndMask(0x4c00000, 0xFFFFFFFE)],
+                    partition="Part1"))
+            if app_index == 3:
+                app_vertex.add_constraint(FixedKeyAndMaskConstraint(
+                    [BaseKeyAndMask(0x3300000, 0xFFFFFFFF)],
+                    partition="Part1"))
+
+    return app_graph
 
 
 def create_graphs_only_fixed():
     app_graph = ApplicationGraph("Test")
     # An output vertex to aim things at (to make keys required)
-    out_app_vertex = SimpleTestVertex(1)
+    out_app_vertex = TestAppVertex(splitter=TestSplitter())
     app_graph.add_vertex(out_app_vertex)
-    # Create 5 application vertices (3 bits)
-    app_vertex = SimpleTestVertex(1)
+    app_vertex = TestAppVertex(splitter=TestSplitter())
     app_graph.add_vertex(app_vertex)
 
-    mac_graph = MachineGraph("Test", app_graph)
-    n_keys_map = DictBasedMachinePartitionNKeysMap()
-
     # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = out_app_vertex.create_machine_vertex(None, None)
-    mac_graph.add_vertex(out_mac_vertex)
+    out_mac_vertex = TestMacVertex(label="out_mac_vertex")
+    out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
-    mac_vertex = app_vertex.create_machine_vertex(None, None)
-    mac_graph.add_vertex(mac_vertex)
-    for mac_edge_index in range(2):
-        mac_edge = MachineEdge(mac_vertex, out_mac_vertex)
-        part_name = "Part{}".format(mac_edge_index)
-        mac_graph.add_edge(mac_edge, part_name)
-        p = mac_graph.get_outgoing_edge_partition_starting_at_vertex(
-            mac_vertex, part_name)
-        if (mac_edge_index == 0):
-            p.add_constraint(FixedKeyAndMaskConstraint(
-                [BaseKeyAndMask(0x4c00000, 0xFFFFFFFE)]))
-        if (mac_edge_index == 1):
-            p.add_constraint(FixedKeyAndMaskConstraint(
-                [BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)]))
-        n_keys_map.set_n_keys_for_partition(
-                p, (mac_edge_index * 4) + 1)
+    mac_vertex = TestMacVertex(label="mac_vertex")
+    app_vertex.remember_machine_vertex(mac_vertex)
 
-    return app_graph, mac_graph, n_keys_map
+    app_graph.add_edge(ApplicationEdge(app_vertex, out_app_vertex), "Part0")
+    app_graph.add_edge(ApplicationEdge(app_vertex, out_app_vertex), "Part1")
+
+    app_vertex.add_constraint(FixedKeyAndMaskConstraint(
+                [BaseKeyAndMask(0x4c00000, 0xFFFFFFFE)],
+                partition="Part0"))
+    app_vertex.add_constraint(FixedKeyAndMaskConstraint(
+                [BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)],
+                partition="Part1"))
+
+    return app_graph
 
 
 def create_graphs_no_edge():
     app_graph = ApplicationGraph("Test")
-    # An output vertex to aim things at (to make keys required)
-    out_app_vertex = SimpleTestVertex(1)
+    out_app_vertex = TestAppVertex(splitter=TestSplitter())
     app_graph.add_vertex(out_app_vertex)
-    # Create 5 application vertices (3 bits)
-    app_vertex = SimpleTestVertex(1)
+    app_vertex = TestAppVertex(splitter=TestSplitter())
     app_graph.add_vertex(app_vertex)
 
-    mac_graph = MachineGraph("Test", app_graph)
-    n_keys_map = DictBasedMachinePartitionNKeysMap()
-
     # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = out_app_vertex.create_machine_vertex(None, None)
-    mac_graph.add_vertex(out_mac_vertex)
+    out_mac_vertex = TestMacVertex()
+    out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
-    mac_vertex = app_vertex.create_machine_vertex(None, None)
-    mac_graph.add_vertex(mac_vertex)
+    mac_vertex = TestMacVertex()
+    app_vertex.remember_machine_vertex(mac_vertex)
 
-    return app_graph, mac_graph, n_keys_map
-
-
-def create_app_less():
-    app_graph = ApplicationGraph("Test")
-
-    mac_graph = MachineGraph("Test", app_graph)
-    n_keys_map = DictBasedMachinePartitionNKeysMap()
-
-    # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = SimpleMachineVertex(None, None)
-    mac_graph.add_vertex(out_mac_vertex)
-
-    # Create 5 application vertices (3 bits)
-    for app_index in range(5):
-
-        # For each, create up to (5 x 4) + 1 = 21 machine vertices (5 bits)
-        for mac_index in range((app_index * 4) + 1):
-            mac_vertex = SimpleMachineVertex(None, None)
-            mac_graph.add_vertex(mac_vertex)
-
-            # For each machine vertex create up to
-            # (20 x 2) + 1 = 81(!) partitions (6 bits)
-            for mac_edge_index in range((mac_index * 2) + 1):
-                mac_edge = MachineEdge(mac_vertex, out_mac_vertex)
-                part_name = "Part{}".format(mac_edge_index)
-                mac_graph.add_edge(mac_edge, part_name)
-
-                # Give the partition up to (40 x 4) + 1 = 161 keys (8 bits)
-                p = mac_graph.get_outgoing_edge_partition_starting_at_vertex(
-                    mac_vertex, part_name)
-                n_keys_map.set_n_keys_for_partition(
-                    p, (mac_edge_index * 4) + 1)
-
-    return app_graph, mac_graph, n_keys_map
+    return app_graph
 
 
 def check_masks_all_the_same(routing_info, mask):
     # Check the mask is the same for all, and allows for the space required
-    # for the maximum number of keys in total (bottom 8 bits)
+    # for the maximum number of keys in total
     seen_keys = set()
     for r_info in routing_info:
-        assert(len(r_info.keys_and_masks) == 1)
-        if r_info.first_mask != mask:
-            label = r_info.partition.pre_vertex.label
-            assert(label == "RETINA")
-        assert(r_info.first_key not in seen_keys)
-        seen_keys.add(r_info.first_key)
+        if isinstance(r_info.vertex, MachineVertex):
+            assert(len(r_info.keys_and_masks) == 1)
+            assert(r_info.first_mask == mask or
+                   r_info.machine_vertex.label == "RETINA")
+            assert(r_info.first_key not in seen_keys)
+            seen_keys.add(r_info.first_key)
 
 
-def check_fixed(p, key):
-    for constraint in p.constraints:
+def check_fixed(m_vertex, part_id, key):
+    for constraint in m_vertex.constraints:
         if isinstance(constraint, FixedKeyAndMaskConstraint):
-            assert key == constraint.keys_and_masks[0].key
-            return True
+            if constraint.applies_to_partition(part_id):
+                assert key == constraint.keys_and_masks[0].key
+                return True
     return False
 
 
 def check_keys_for_application_partition_pairs(
-        app_graph, m_graph, routing_info, app_mask):
+        app_graph, routing_info, app_mask):
     # Check the key for each application vertex/ parition pair is the same
     # The bits that should be the same are all but the bottom 12
-    mapped_base = dict()
-    for app_vertex in app_graph.vertices:
-        for m_vertex in app_vertex.machine_vertices:
-            for p in m_graph.get_multicast_edge_partitions_starting_at_vertex(
-                    m_vertex):
-                key = routing_info.get_first_key_from_partition(p)
-                if check_fixed(p, key):
-                    continue
-                if (app_vertex, p.identifier) in mapped_base:
-                    mapped_key = mapped_base[(app_vertex, p.identifier)]
-                    assert((mapped_key & app_mask) == (key & app_mask))
-                else:
-                    mapped_base[(app_vertex, p.identifier)] = key
-                if key != 0:
-                    assert((key & app_mask) != 0)
+    for part in app_graph.outgoing_edge_partitions:
+        mapped_key = None
+        for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
+                part.identifier):
+            key = routing_info.get_first_key_from_pre_vertex(
+                m_vertex, part.identifier)
+            if check_fixed(m_vertex, part.identifier, key):
+                continue
+
+            if mapped_key is not None:
+                assert((mapped_key & app_mask) == (key & app_mask))
+            else:
+                mapped_key = key
+            if key != 0:
+                assert((key & app_mask) != 0)
 
 
 def test_global_allocator():
@@ -229,21 +218,20 @@ def test_global_allocator():
     writer = PacmanDataWriter.mock()
 
     # Allocate something and check it does the right thing
-    app_graph, mac_graph, n_keys_map = create_graphs1(False)
-    writer.set_runtime_machine_graph(mac_graph)
-    writer.set_machine_partition_n_keys_map(n_keys_map)
+    app_graph = create_graphs1(False)
+    writer._set_runtime_graph(app_graph)
 
     # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
-    routing_info = global_allocate()
+    routing_info = global_allocate([])
 
-    # Last 8 for buts
+    # Last 8 for atom id
     mask = 0xFFFFFF00
     check_masks_all_the_same(routing_info,  mask)
 
-    # all but the bottom 13 bits should be the same
-    app_mask = 0xFFFFE000
+    # all but the bottom 8 + 7 = 15 bits should be the same
+    app_mask = 0xFFFF8000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
+        app_graph, routing_info, app_mask)
 
 
 def test_flexible_allocator_no_fixed():
@@ -251,38 +239,35 @@ def test_flexible_allocator_no_fixed():
 
     # Allocate something and check it does the right thing
     writer = PacmanDataWriter.mock()
-    app_graph, mac_graph, n_keys_map = create_graphs1(False)
-    writer.set_runtime_machine_graph(mac_graph)
-    writer.set_machine_partition_n_keys_map(n_keys_map)
+    app_graph = create_graphs1(False)
+    writer._set_runtime_graph(app_graph)
 
-    # The number of bits is 7 + 11 = 20, so it shouldn't fail
-    routing_info = flexible_allocate()
+    # The number of bits is 8 + 7 + 6 = 21, so it shouldn't fail
+    routing_info = flexible_allocate([])
 
-    # all but the bottom 11 bits should be the same
-    app_mask = 0xFFFFF800
+    # all but the bottom 8 + 7 = 15 bits should be the same
+    app_mask = 0xFFFF8000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
+        app_graph, routing_info, app_mask)
 
 
 def test_fixed_only():
     unittest_setup()
     writer = PacmanDataWriter.mock()
-    app_graph, mac_graph, n_keys_map = create_graphs_only_fixed()
-    writer.set_runtime_machine_graph(mac_graph)
-    writer.set_machine_partition_n_keys_map(n_keys_map)
-    flexible_allocate()
-    routing_info = global_allocate()
-    assert len(list(routing_info)) == 2
+    app_graph = create_graphs_only_fixed()
+    writer._set_runtime_graph(app_graph)
+    flexible_allocate([])
+    routing_info = global_allocate([])
+    assert len(list(routing_info)) == 4
 
 
 def test_no_edge():
     unittest_setup()
     writer = PacmanDataWriter.mock()
-    app_graph, mac_graph, n_keys_map = create_graphs_no_edge()
-    writer.set_runtime_machine_graph(mac_graph)
-    writer.set_machine_partition_n_keys_map(n_keys_map)
-    flexible_allocate()
-    routing_info = global_allocate()
+    app_graph = create_graphs_no_edge()
+    writer._set_runtime_graph(app_graph)
+    flexible_allocate([])
+    routing_info = global_allocate([])
     assert len(list(routing_info)) == 0
 
 
@@ -290,91 +275,78 @@ def test_flexible_allocator_with_fixed():
     unittest_setup()
     # Allocate something and check it does the right thing
     writer = PacmanDataWriter.mock()
-    app_graph, mac_graph, n_keys_map = create_graphs1(True)
-    writer.set_runtime_machine_graph(mac_graph)
-    writer.set_machine_partition_n_keys_map(n_keys_map)
+    app_graph = create_graphs1(True)
+    writer._set_runtime_graph(app_graph)
 
-    # The number of bits is 7 + 11 = 20, so it shouldn't fail
-    routing_info = flexible_allocate()
+    # The number of bits is 6 + 7 + 8 = 21, so it shouldn't fail
+    routing_info = flexible_allocate([])
 
-    # all but the bottom 11 bits should be the same
-    app_mask = 0xFFFFF800
+    # all but the bottom 8 + 7 = 15 bits should be the same
+    app_mask = 0xFFFF8000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
+        app_graph, routing_info, app_mask)
 
 
 def create_big(with_fixed):
     # This test shows how easy it is to trip up the allocator with a retina
     app_graph = ApplicationGraph("Test")
     # Create a single "big" vertex
-    big_app_vertex = SimpleTestVertex(1, label="Retina")
+    big_app_vertex = TestAppVertex(label="Retina", splitter=TestSplitter())
     app_graph.add_vertex(big_app_vertex)
     # Create a single output vertex (which won't send)
-    out_app_vertex = SimpleTestVertex(1, label="Destination")
+    out_app_vertex = TestAppVertex(
+        label="Destination", splitter=TestSplitter())
     app_graph.add_vertex(out_app_vertex)
     # Create a load of middle vertex
-    mid_app_vertex = SimpleTestVertex(1, "Population")
+    mid_app_vertex = TestAppVertex(label="Population", splitter=TestSplitter())
     app_graph.add_vertex(mid_app_vertex)
 
-    mac_graph = MachineGraph("Test", app_graph)
-    n_keys_map = DictBasedMachinePartitionNKeysMap()
+    app_graph.add_edge(ApplicationEdge(big_app_vertex, mid_app_vertex), "Test")
+    app_graph.add_edge(ApplicationEdge(mid_app_vertex, out_app_vertex), "Test")
 
     # Create a single big machine vertex
-    big_mac_vertex = big_app_vertex.create_machine_vertex(
-        None, None, label="RETINA")
-    mac_graph.add_vertex(big_mac_vertex)
+    big_mac_vertex = TestMacVertex(
+        label="RETINA", n_keys_required={"Test": 1024 * 768 * 2})
+    big_app_vertex.remember_machine_vertex(big_mac_vertex)
 
     # Create a single output vertex (which won't send)
-    out_mac_vertex = out_app_vertex.create_machine_vertex(None, None)
-    mac_graph.add_vertex(out_mac_vertex)
+    out_mac_vertex = TestMacVertex(label="OutMacVertex")
+    out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
     # Create a load of middle vertices and connect them up
-    for _ in range(2000):  # 2000 needs 11 bits
-        mid_mac_vertex = mid_app_vertex.create_machine_vertex(None, None)
-        mac_graph.add_vertex(mid_mac_vertex)
-        edge = MachineEdge(big_mac_vertex, mid_mac_vertex)
-        mac_graph.add_edge(edge, "Test")
-        edge_2 = MachineEdge(mid_mac_vertex, out_mac_vertex)
-        mac_graph.add_edge(edge_2, "Test")
-        mid_part = mac_graph.get_outgoing_edge_partition_starting_at_vertex(
-            mid_mac_vertex, "Test")
-        n_keys_map.set_n_keys_for_partition(mid_part, 100)
+    for i in range(2000):  # 2000 needs 11 bits
+        mid_mac_vertex = TestMacVertex(label=f"MidMacVertex{i}",
+                                       n_keys_required={"Test": 100})
+        mid_app_vertex.remember_machine_vertex(mid_mac_vertex)
 
-    big_mac_part = mac_graph.get_outgoing_edge_partition_starting_at_vertex(
-        big_mac_vertex, "Test")
     if with_fixed:
-        big_mac_part.add_constraint(FixedKeyAndMaskConstraint([
+        big_app_vertex.add_constraint(FixedKeyAndMaskConstraint([
             BaseKeyAndMask(0x0, 0x180000)]))
-    # Make the "retina" need 21 bits, so total is now 21 + 11 = 32 bits,
-    # but the application vertices need some bits too
-    n_keys_map.set_n_keys_for_partition(big_mac_part, 1024 * 768 * 2)
-    return app_graph, mac_graph, n_keys_map
+    return app_graph
 
 
 def test_big_flexible_no_fixed():
     unittest_setup()
     writer = PacmanDataWriter.mock()
-    app_graph, mac_graph, n_keys_map = create_big(False)
-    writer.set_runtime_machine_graph(mac_graph)
-    writer.set_machine_partition_n_keys_map(n_keys_map)
+    app_graph = create_big(False)
+    writer._set_runtime_graph(app_graph)
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = flexible_allocate()
+    routing_info = flexible_allocate([])
 
     # The number of bits is 1 + 21 = 22, so it shouldn't fail
     # all but the bottom 21 bits should be the same
     app_mask = 0xFFE00000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
+        app_graph, routing_info, app_mask)
 
 
 def test_big_global_no_fixed():
     unittest_setup()
     writer = PacmanDataWriter.mock()
-    app_graph, mac_graph, n_keys_map = create_big(False)
-    writer.set_runtime_machine_graph(mac_graph)
-    writer.set_machine_partition_n_keys_map(n_keys_map)
-    routing_info = global_allocate()
+    app_graph = create_big(False)
+    writer._set_runtime_graph(app_graph)
+    routing_info = global_allocate([])
 
     # 1 for app 11 for machine so where possible use 20 for atoms
     mask = 0xFFF00000
@@ -386,32 +358,30 @@ def test_big_global_no_fixed():
     # all but the top 1 bits should be the same
     app_mask = 0x80000000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
+        app_graph, routing_info, app_mask)
 
 
 def test_big_flexible_fixed():
     unittest_setup()
     writer = PacmanDataWriter.mock()
-    app_graph, mac_graph, n_keys_map = create_big(True)
-    writer.set_runtime_machine_graph(mac_graph)
-    writer.set_machine_partition_n_keys_map(n_keys_map)
+    app_graph = create_big(True)
+    writer._set_runtime_graph(app_graph)
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = flexible_allocate()
+    routing_info = flexible_allocate([])
 
     # all but the bottom 18 bits should be the same
     app_mask = 0xFFFC0000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
+        app_graph, routing_info, app_mask)
 
 
 def test_big_global_fixed():
     unittest_setup()
     writer = PacmanDataWriter.mock()
-    app_graph, mac_graph, n_keys_map = create_big(True)
-    writer.set_runtime_machine_graph(mac_graph)
-    writer.set_machine_partition_n_keys_map(n_keys_map)
-    routing_info = global_allocate()
+    app_graph = create_big(True)
+    writer._set_runtime_graph(app_graph)
+    routing_info = global_allocate([])
 
     # 7 bit atoms is 7 as it ignore the retina
     mask = 0xFFFFFF80
@@ -423,37 +393,4 @@ def test_big_global_fixed():
     # all but the top 1 bits should be the same
     app_mask = 0xFFFC0000
     check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
-
-
-def test_no_app_level_flexible():
-    unittest_setup()
-    writer = PacmanDataWriter.mock()
-    app_graph, mac_graph, n_keys_map = create_app_less()
-    writer.set_runtime_machine_graph(mac_graph)
-    writer.set_machine_partition_n_keys_map(n_keys_map)
-    # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = flexible_allocate()
-
-    # all but the bottom 8 bits should be the same
-    app_mask = 0xFFFFFF00
-    check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
-
-
-def test_no_app_level_global():
-    unittest_setup()
-    writer = PacmanDataWriter.mock()
-    app_graph, mac_graph, n_keys_map = create_app_less()
-    writer.set_runtime_machine_graph(mac_graph)
-    writer.set_machine_partition_n_keys_map(n_keys_map)
-    # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = global_allocate()
-    # Last 8 for masks
-    mask = 0xFFFFFF00
-    check_masks_all_the_same(routing_info,  mask)
-
-    # all but the bottom 8 bits should be the same
-    app_mask = 0xFFFFFF00
-    check_keys_for_application_partition_pairs(
-        app_graph, mac_graph, routing_info, app_mask)
+        app_graph, routing_info, app_mask)

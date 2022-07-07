@@ -46,7 +46,6 @@ class _PacmanDataModel(object):
     __slots__ = [
         # Data values cached
         "_graph",
-        "_machine_graph",
         "_machine_partition_n_keys_map",
         "_placements",
         "_plan_n_timesteps",
@@ -54,7 +53,6 @@ class _PacmanDataModel(object):
         "_routing_infos",
         "_routing_table_by_partition",
         "_runtime_graph",
-        "_runtime_machine_graph",
         "_tags",
         "_uncompressed",
         "_vertices_or_edges_added",
@@ -74,7 +72,6 @@ class _PacmanDataModel(object):
         Clears out all data
         """
         self._graph = None
-        self._machine_graph = None
         # set at the start of every run
         self._plan_n_timesteps = None
         self._vertices_or_edges_added = False
@@ -88,7 +85,6 @@ class _PacmanDataModel(object):
         self._precompressed = None
         self._uncompressed = None
         self._runtime_graph = None
-        self._runtime_machine_graph = None
         self._routing_infos = None
         self._routing_table_by_partition = None
         self._machine_partition_n_keys_map = None
@@ -173,10 +169,6 @@ class PacmanDataView(MachineDataView):
         """
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
-        if cls.has_machine_vertices():
-            raise PacmanConfigurationException(
-                "Cannot add vertices to both the machine and application"
-                " graphs")
         cls.check_user_can_act()
         cls.__pacman_data._graph.add_vertex(vertex)
         cls.__pacman_data._vertices_or_edges_added = True
@@ -207,10 +199,6 @@ class PacmanDataView(MachineDataView):
         """
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
-        if cls.has_machine_vertices():
-            raise PacmanConfigurationException(
-                "Cannot add edges / vertices to both the machine and "
-                "application graphs")
         cls.check_user_can_act()
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
         cls.__pacman_data._vertices_or_edges_added = True
@@ -272,145 +260,6 @@ class PacmanDataView(MachineDataView):
             raise cls._exception("graph")
         return cls.__pacman_data._graph.n_outgoing_edge_partitions
 
-    @classmethod
-    def has_machine_vertices(cls):
-        """
-        Reports if the user level graph has machine vertices.
-
-         .. note::
-            If this method returns True has_application vertices is
-            guaranteed to return False. Both will be False if not vertices set
-
-        :return: True if and only if the Application Graph has vertices.
-        :rtype: bool
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the graph is currently unavailable
-        """
-        if cls.__pacman_data._machine_graph is None:
-            raise cls._exception("machine_graph")
-        return cls.__pacman_data._machine_graph.n_vertices > 0
-
-    @classmethod
-    def add_machine_vertex(cls, vertex):
-        """
-        Adds a Machine vertex to the user graph
-
-        Semantic sugar for get_Machine_graph().add_vertex
-
-        :param ~pacman.model.graphs.mqchine.MachineVertex vertex:
-            The vertex to add to the graph
-        :raises PacmanConfigurationException:
-            when both graphs contain vertices
-        :raises PacmanConfigurationException:
-            If there is an attempt to add the same vertex more than once
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the graph is currently unavailable
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
-        """
-        if cls.__pacman_data._machine_graph is None:
-            raise cls._exception("machine_graph")
-        if cls.has_application_vertices():
-            raise PacmanConfigurationException(
-                "Cannot add vertices to both the machine and application"
-                " graphs")
-        cls.check_user_can_act()
-        cls.__pacman_data._machine_graph.add_vertex(vertex)
-        cls.__pacman_data._vertices_or_edges_added = True
-
-    @classmethod
-    def add_machine_edge(cls, edge, outgoing_edge_partition_name):
-        """
-        Adds an Machine edge to the user graph
-
-        Semantic sugar for get_machine_graph().add_edge
-
-        :param AbstractEdge edge: The edge to add
-        :param str outgoing_edge_partition_name:
-            The name of the edge partition to add the edge to; each edge
-            partition is the partition of edges that start at the same vertex
-        :rtype: AbstractEdgePartition
-        :raises PacmanConfigurationException:
-            when both graphs contain vertices
-        :raises PacmanInvalidParameterException:
-            If the edge is not of a valid type or if edges have already been
-            added to this partition that start at a different vertex to this
-            one
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the graph is currently unavailable
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
-        """
-        if cls.__pacman_data._machine_graph is None:
-            raise cls._exception("machine_graph")
-        if cls.has_application_vertices():
-            raise PacmanConfigurationException(
-                "Cannot add vertices to both the machine and application"
-                " graphs")
-        cls.check_user_can_act()
-        cls.__pacman_data._machine_graph.add_edge(
-            edge, outgoing_edge_partition_name)
-        cls.__pacman_data._vertices_or_edges_added = True
-
-    @classmethod
-    def iterate_machine_vertices(cls):
-        """ The vertices in the user machine graph.
-
-        Semantic sugar for get_machine_graph().vertices except that the result
-        is an iterable and not a list
-
-        :rtype: iterable(AbstractVertex)
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the graph is currently unavailable
-        """
-        if cls.__pacman_data._machine_graph is None:
-            raise cls._exception("machine_graph")
-        return iter(cls.__pacman_data._machine_graph.vertices)
-
-    @classmethod
-    def get_n_machine_vertices(cls):
-        """ The nuber of vertices in the user machine graph.
-
-        Semantic sugar for get_machine_graph().n_vertices
-
-        :rtype: int
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the graph is currently unavailable
-        """
-        if cls.__pacman_data._machine_graph is None:
-            raise cls._exception("machine_graph")
-        return cls.__pacman_data._machine_graph.n_vertices
-
-    @classmethod
-    def iterate_machine_partitions(cls):
-        """ The partitions in the user machine graph.
-
-        Semantic sugar for get_machine_graph().outgoing_edge_partitions
-        except that the result is an iterable and not a list
-
-        :rtype: iterable(ApplicationEdgePartition)
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the graph is currently unavailable
-        """
-        if cls.__pacman_data._machine_graph is None:
-            raise cls._exception("machine_graph")
-        return iter(cls.__pacman_data._machine_graph.outgoing_edge_partitions)
-
-    @classmethod
-    def get_n_machine_partitions(cls):
-        """ The partitions in the user machine graph.
-
-        Semantic sugar for get_machine_graph().n_outgoing_edge_partitions
-
-        :rtype: int
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the graph is currently unavailable
-        """
-        if cls.__pacman_data._machine_graph is None:
-            raise cls._exception("machine_graph")
-        return cls.__pacman_data._machine_graph.n_outgoing_edge_partitions
 
     @classmethod
     def get_runtime_graph(cls):
@@ -437,70 +286,18 @@ class PacmanDataView(MachineDataView):
             raise cls._exception("runtime_graph")
         return cls.__pacman_data._runtime_graph
 
-    @classmethod
-    def get_runtime_machine_graph(cls):
-        """
-        The runtime machine graph
-
-        This is the run time version of the graph which is created by the
-        simulator to add system vertices.
-
-        Changes to this graph by anything except the insert algorithms is not
-        supported.
-
-         .. note::
-            This method is likely to be removed by another PR.
-            If not it will be replaced with add and iterate methods.
-
-        :rtype: MachineGraph
-        :raises SpiNNUtilsException:
-            If the runtime_graph is currently unavailable, or if this method
-            is used except during run
-        """
-        if cls.__pacman_data._runtime_machine_graph is None:
-            raise cls._exception("runtime_machine_graph")
-        return cls.__pacman_data._runtime_machine_graph
 
     @classmethod
     def get_runtime_n_machine_vertices(cls):
-        """
-        The number of machine vertices in the runtime graph(s)
-
-         .. note::
-            This method can still exists without a machine_graph
-
-        :rtype: int
-        :raises SpiNNUtilsException:
-            If the runtime_machine_graph is currently unavailable,
-            or if this method is used except during run
-        """
-        return cls.get_runtime_machine_graph().n_vertices
-
-    @classmethod
-    def get_runtime_n_machine_vertices2(cls):
         """
         Gets the number of machine vertices via the application graph
         """
         return sum(len(vertex.machine_vertices)
                    for vertex in cls.get_runtime_graph().vertices)
 
+
     @classmethod
     def get_runtime_machine_vertices(cls):
-        """
-        The machine vertices in the runtime graph(s)
-
-         .. note::
-            This method can still exists without a machine_graph
-
-        :rtype: iterator(MachineVertex)
-        :raises SpiNNUtilsException:
-            If the runtime_machine_graph is currently unavailable, or
-            if this method is used except during run
-        """
-        return cls.get_runtime_machine_graph().vertices
-
-    @classmethod
-    def get_runtime_machine_vertices2(cls):
         """
         Gets the Machine vertioces viua the application graph
 
@@ -509,38 +306,6 @@ class PacmanDataView(MachineDataView):
         for app_vertex in cls.get_runtime_graph().vertices:
             yield from app_vertex.machine_vertices
 
-    @classmethod
-    def get_runtime_best_graph(cls):
-        """
-        The runtime application graph unless it is empty and the
-        machine graph one is not
-
-        This is the run time version of the graph which is created by the
-        simulator to add system vertices.
-
-        Changes to this graph by anything except the insert algorithms is not
-        supported.
-
-         .. note::
-            This method is likely to be removed by another PR.
-            If not it will be replaced with add and iterate methods.
-
-        :rtype: ApplicationGraph or MachineGraph
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the runtime_graph is currently unavailable, or if this method
-            is used except during run
-        """
-        try:
-            runtime_graph = cls.get_runtime_graph()
-            if runtime_graph.n_vertices:
-                return runtime_graph
-        except DataNotMocked:
-            return cls.get_runtime_machine_graph()
-        runtime_machine_graph = cls.get_runtime_machine_graph()
-        if runtime_machine_graph.n_vertices:
-            return runtime_machine_graph
-        # both empty for return the application level
-        return cls.get_runtime_graph()
 
     @classmethod
     def get_vertices_or_edges_added(cls):

@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,29 +15,32 @@
 
 import numpy
 from pacman.exceptions import PacmanConfigurationException
+from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 
 
-class PartitionRoutingInfo(object):
-    """ Associates a partition to its routing information (keys and masks).
+class VertexRoutingInfo(metaclass=AbstractBase):
+    """ Associates a partition identifier to its routing information
+        (keys and masks).
     """
 
     __slots__ = [
         # The keys allocated to the machine partition
-        "_keys_and_masks",
+        "__keys_and_masks",
 
-        # The partition to set the number of keys for
-        "_partition"
+        # The partition identifier of the allocation
+        "__partition_id"
     ]
 
-    def __init__(self, keys_and_masks, partition):
+    def __init__(self, keys_and_masks, partition_id):
         """
         :param iterable(BaseKeyAndMask) keys_and_masks:\
             The keys allocated to the machine partition
-        :param AbstractSingleSourcePartition partition:\
-            The partition to set the number of keys for
+        :param str partition_id: The partition to set the keys for
+        :param MachineVertex machine_vertex: The vertex to set the keys for
+        :param int index: The index of the machine vertex
         """
-        self._keys_and_masks = keys_and_masks
-        self._partition = partition
+        self.__keys_and_masks = keys_and_masks
+        self.__partition_id = partition_id
 
     def get_keys(self, n_keys=None):
         """ Get the ordered list of individual keys allocated to the edge
@@ -47,7 +50,7 @@ class PartitionRoutingInfo(object):
         :rtype: ~numpy.ndarray
         """
 
-        max_n_keys = sum(km.n_keys for km in self._keys_and_masks)
+        max_n_keys = sum(km.n_keys for km in self.__keys_and_masks)
 
         if n_keys is None:
             n_keys = max_n_keys
@@ -58,7 +61,7 @@ class PartitionRoutingInfo(object):
 
         key_array = numpy.zeros(n_keys, dtype=">u4")
         offset = 0
-        for key_and_mask in self._keys_and_masks:
+        for key_and_mask in self.__keys_and_masks:
             _, offset = key_and_mask.get_keys(
                 key_array=key_array, offset=offset, n_keys=(n_keys - offset))
         return key_array
@@ -68,7 +71,7 @@ class PartitionRoutingInfo(object):
         """
         :rtype: iterable(BaseKeyAndMask)
         """
-        return self._keys_and_masks
+        return self.__keys_and_masks
 
     @property
     def first_key_and_mask(self):
@@ -76,7 +79,7 @@ class PartitionRoutingInfo(object):
 
         :rtype: BaseKeyAndMask
         """
-        return self._keys_and_masks[0]
+        return self.__keys_and_masks[0]
 
     @property
     def first_key(self):
@@ -84,7 +87,7 @@ class PartitionRoutingInfo(object):
 
         :rtype: int
         """
-        return self._keys_and_masks[0].key
+        return self.__keys_and_masks[0].key
 
     @property
     def first_mask(self):
@@ -92,15 +95,19 @@ class PartitionRoutingInfo(object):
 
         :rtype: int
         """
-        return self._keys_and_masks[0].mask
+        return self.__keys_and_masks[0].mask
 
     @property
-    def partition(self):
-        """
-        :rtype: AbstractSingleSourcePartition
-        """
-        return self._partition
+    def partition_id(self):
+        """ The identifier of the partition
 
-    def __repr__(self):
-        return "partition:{}, keys_and_masks:{}".format(
-            self._partition, self._keys_and_masks)
+        :rtype: str
+        """
+        return self.__partition_id
+
+    @abstractproperty
+    def vertex(self):
+        """ The vertex of the information
+
+        :rtype: ApplicationVertex or MachineVertex
+        """

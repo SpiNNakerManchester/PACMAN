@@ -76,11 +76,10 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """
         return self._vertex_slice
 
-    def get_n_keys_for_partition(self, _partition):
+    def get_n_keys_for_partition(self, partition_id):
         """ Get the number of keys required by the given partition of edges.
 
-        :param ~pacman.model.graphs.OutgoingEdgePartition _partition:
-            An partition that comes out of this vertex
+        :param str partition_id: The identifier of the partition
         :return: The number of keys required
         :rtype: int
         """

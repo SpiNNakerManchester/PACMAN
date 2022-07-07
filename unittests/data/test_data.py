@@ -22,7 +22,7 @@ from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import (
-    MachineGraph, MulticastEdgePartition, SimpleMachineVertex)
+    MulticastEdgePartition, SimpleMachineVertex)
 from pacman.model.placements import Placements
 from pacman.model.routing_info import (
     DictBasedMachinePartitionNKeysMap, RoutingInfo)
@@ -55,70 +55,25 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.has_application_vertices()
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.has_machine_vertices()
-        with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_runtime_graph()
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_runtime_machine_graph()
 
         writer.create_graphs("bacon")
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_runtime_graph()
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_runtime_machine_graph()
 
         writer.start_run()
         writer.clone_graphs()
         PacmanDataView.get_runtime_graph()
-        PacmanDataView.get_runtime_machine_graph()
 
         writer.finish_run()
         PacmanDataView.has_application_vertices()
-        PacmanDataView.has_machine_vertices()
         PacmanDataView.get_runtime_graph()
-        PacmanDataView.get_runtime_machine_graph()
         # the writer still has access to the runtime graphs
         writer.get_runtime_graph()
-        writer.get_runtime_machine_graph()
 
         writer.stopping()
         PacmanDataView.get_runtime_graph()
-        PacmanDataView.get_runtime_machine_graph()
 
-    def test_graph_support(self):
-        writer = PacmanDataWriter.setup()
-        writer.create_graphs("test")
-        writer.start_run()
-        writer.clone_graphs()
-        app1 = SimpleTestVertex(12, "app1")
-        app2 = SimpleTestVertex(23, "app21")
-        app3 = SimpleTestVertex(33, "app3")
-        PacmanDataView.get_runtime_graph().add_vertices([app1, app2, app3])
-        mach11 = SimpleMachineVertex("mach11",  app_vertex=app1)
-        mach12 = SimpleMachineVertex("mach12",  app_vertex=app1)
-        mach13 = SimpleMachineVertex("mach13",  app_vertex=app1)
-        mach21 = SimpleMachineVertex("mach21",  app_vertex=app2)
-        mach22 = SimpleMachineVertex("mach22",  app_vertex=app2)
-        mach31 = SimpleMachineVertex("mach31",  app_vertex=app3)
-        mg = MachineGraph(
-            label="my test",
-            application_graph=PacmanDataView.get_runtime_graph())
-        m_vertices = set([mach11, mach12, mach13, mach21, mach22, mach31])
-        mg.add_vertices(m_vertices)
-        writer.set_runtime_machine_graph(mg)
-        self.assertEqual(
-            6, PacmanDataView.get_runtime_machine_graph().n_vertices)
-        self.assertEqual(6, PacmanDataView.get_runtime_n_machine_vertices())
-        self.assertEqual(6, PacmanDataView.get_runtime_n_machine_vertices2())
-        self.assertSetEqual(
-            m_vertices,
-            set(PacmanDataView.get_runtime_machine_graph().vertices))
-        self.assertSetEqual(
-            m_vertices, set(PacmanDataView.get_runtime_machine_vertices()))
-        self.assertSetEqual(
-            m_vertices, set(PacmanDataView.get_runtime_machine_vertices2()))
-        self.assertEqual(PacmanDataView.get_runtime_graph(),
-                         PacmanDataView.get_runtime_best_graph())
 
     def test_graph_functions(self):
         writer = PacmanDataWriter.setup()
@@ -188,13 +143,6 @@ class TestSimulatorData(unittest.TestCase):
             set(PacmanDataView.iterate_vertices()))
         self.assertEqual(4, PacmanDataView.get_n_vertices())
         PacmanDataView.add_edge(edge14, "other")
-
-    def test_graph_mocked(self):
-        writer = PacmanDataWriter.mock()
-        mg = MachineGraph(label="my test")
-        writer.set_runtime_machine_graph(mg)
-        self.assertEqual(mg, PacmanDataView.get_runtime_machine_graph())
-        self.assertEqual(mg, PacmanDataView.get_runtime_best_graph())
 
     def test_placements(self):
         writer = PacmanDataWriter.setup()

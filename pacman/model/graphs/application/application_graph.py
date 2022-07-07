@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@ class ApplicationGraph(Graph):
     __slots__ = [
         # The sets of edge partitions by pre-vertex
         "_outgoing_edge_partitions_by_pre_vertex",
+        # The total number of outgoing edge partitions
+        "_n_outgoing_edge_partitions"
     ]
 
     def __init__(self, label):
@@ -39,23 +41,8 @@ class ApplicationGraph(Graph):
         :type label: str or None
         """
         super().__init__(ApplicationVertex, ApplicationEdge, label)
-        self._outgoing_edge_partitions_by_pre_vertex = \
-            defaultdict(OrderedSet)
-
-    def forget_machine_graph(self):
-        """ Forget the whole mapping from this graph to an application graph.
-        """
-        for v in self.vertices:
-            v.forget_machine_vertices()
-        for e in self.edges:
-            e.forget_machine_edges()
-
-    def forget_machine_edges(self):
-        """ Ensure that all application edges in this graph forget what
-            machine edges they map to. The mapping of vertices is unaffected.
-        """
-        for e in self.edges:
-            e.forget_machine_edges()
+        self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
+        self._n_outgoing_edge_partitions = 0
 
     @overrides(Graph.new_edge_partition)
     def new_edge_partition(self, name, edge):
@@ -73,31 +60,30 @@ class ApplicationGraph(Graph):
         # check this partition doesn't already exist
         key = (edge_partition.pre_vertex,
                edge_partition.identifier)
-        if key in self._outgoing_edge_partitions_by_name:
+        if edge_partition in self._outgoing_edge_partitions_by_pre_vertex[
+                edge_partition.pre_vertex]:
             raise PacmanAlreadyExistsException(
                 str(ApplicationEdgePartition), key)
 
-        edge_partition.register_graph_code(id(self))
-
         self._outgoing_edge_partitions_by_pre_vertex[
             edge_partition.pre_vertex].add(edge_partition)
-        self._outgoing_edge_partitions_by_name[key] = edge_partition
         for edge in edge_partition.edges:
             self._register_edge(edge, edge_partition)
+
+        self._n_outgoing_edge_partitions += 1
 
     @property
     @overrides(Graph.outgoing_edge_partitions)
     def outgoing_edge_partitions(self):
-        # This is based on the assumption that an Application partition is
-        # always SingleSourced
-        return self._outgoing_edge_partitions_by_name.values()
+        for partitions in \
+                self._outgoing_edge_partitions_by_pre_vertex.values():
+            for partition in partitions:
+                yield partition
 
     @property
     @overrides(Graph.n_outgoing_edge_partitions)
     def n_outgoing_edge_partitions(self):
-        # This is based on the assumption that an Application partition is
-        # always SingleSourced
-        return len(self._outgoing_edge_partitions_by_name)
+        return self._n_outgoing_edge_partitions
 
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
         """ Get all the edge partitions that start at the given vertex.
@@ -124,3 +110,9 @@ class ApplicationGraph(Graph):
             for edge in outgoing_partition.edges:
                 new_graph.add_edge(edge, outgoing_partition.identifier)
         return new_graph
+
+    def reset(self):
+        """ Reset all the application vertices
+        """
+        for vertex in self.vertices:
+            vertex.reset()

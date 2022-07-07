@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 from pacman.exceptions import (
     PacmanAlreadyPlacedError, PacmanNotPlacedError,
     PacmanProcessorAlreadyOccupiedError, PacmanProcessorNotOccupiedError)
@@ -23,8 +24,8 @@ class Placements(object):
     """
 
     __slots__ = [
-        # dict of [(x,y,p)] -> placement object. used for fast lookup of a
-        # vertex given a set of coordinates
+        # dict of [(x,y)] -> dict of p->placement object. used for fast lookup
+        # of a vertex given a set of coordinates
         "_placements",
 
         # dict of [machine_vertex] -> placement object. used for fast lookup of
@@ -40,7 +41,7 @@ class Placements(object):
         :raise PacmanProcessorAlreadyOccupiedError:
             If two placements are made to the same processor.
         """
-        self._placements = dict()
+        self._placements = defaultdict(dict)
         self._machine_vertices = dict()
         if placements is not None:
             self.add_placements(placements)
@@ -51,7 +52,7 @@ class Placements(object):
 
         :rtype: int
         """
-        return len(self._placements)
+        return len(self._machine_vertices)
 
     def add_placements(self, placements):
         """ Add some placements
@@ -70,13 +71,14 @@ class Placements(object):
         :raise PacmanProcessorAlreadyOccupiedError:
             If two placements are made to the same processor.
         """
-        placement_id = placement.location
-        if placement_id in self._placements:
-            raise PacmanProcessorAlreadyOccupiedError(placement_id)
+        x, y, p = placement.location
+        if (x, y) in self._placements:
+            if p in self._placements[(x, y)]:
+                raise PacmanProcessorAlreadyOccupiedError((x, y, p))
         if placement.vertex in self._machine_vertices:
             raise PacmanAlreadyPlacedError(placement.vertex)
 
-        self._placements[placement_id] = placement
+        self._placements[x, y][p] = placement
         self._machine_vertices[placement.vertex] = placement
 
     def get_vertex_on_processor(self, x, y, p):
@@ -91,11 +93,10 @@ class Placements(object):
         :raise PacmanProcessorNotOccupiedError:
             If the processor is not occupied
         """
-        placement_id = (x, y, p)
         try:
-            return self._placements[placement_id].vertex
+            return self._placements[x, y][p].vertex
         except KeyError as e:
-            raise PacmanProcessorNotOccupiedError(placement_id) from e
+            raise PacmanProcessorNotOccupiedError((x, y, p)) from e
 
     def get_placement_on_processor(self, x, y, p):
         """ Return the placement on a specific processor or raises an exception
@@ -109,11 +110,18 @@ class Placements(object):
         :raise PacmanProcessorNotOccupiedError:
             If the processor is not occupied
         """
-        placement_id = (x, y, p)
         try:
-            return self._placements[placement_id]
+            return self._placements[x, y][p]
         except KeyError as e:
-            raise PacmanProcessorNotOccupiedError(placement_id) from e
+            raise PacmanProcessorNotOccupiedError((x, y, p)) from e
+
+    def is_vertex_placed(self, vertex):
+        """ Determine if a vertex has been placed
+
+        :param MachineVertex vertex: The vertex to determine the status of
+        :rtype: bool
+        """
+        return vertex in self._machine_vertices
 
     def get_placement_of_vertex(self, vertex):
         """ Return the placement information for a vertex
@@ -128,14 +136,6 @@ class Placements(object):
         except KeyError as e:
             raise PacmanNotPlacedError(vertex) from e
 
-    def get_placed_processors(self):
-        """ Return an iterable of processors with assigned vertices.
-
-        :return: Iterable of (x, y, p) tuples
-        :rtype: iterable(tuple(int, int, int))
-        """
-        return iter(self._placements.keys())
-
     def is_processor_occupied(self, x, y, p):
         """ Determine if a processor has a vertex on it
 
@@ -144,7 +144,16 @@ class Placements(object):
         :param int p: Index of processor.
         :return bool: Whether the processor has an assigned vertex.
         """
-        return (x, y, p) in self._placements
+        return (x, y) in self._placements and p in self._placements[x, y]
+
+    def n_placements_on_chip(self, x, y):
+        """ The number of placements on the given chip
+        :param int x: x coordinate of chip.
+        :param int y: y coordinate of chip.
+        """
+        if (x, y) not in self._placements:
+            return 0
+        return len(self._placements[x, y])
 
     @property
     def placements(self):
@@ -152,7 +161,24 @@ class Placements(object):
         :return: iterable of placements
         :rtype: iterable(Placement)
         """
-        return self._placements.values()
+        return iter(self._machine_vertices.values())
+
+    def placements_on_chip(self, x, y):
+        """ Get the placements on a specific chip
+
+        :param int x: The x-coordinate of the chip
+        :param int y: The y-coordinate of the chip
+        :rtype: iterable(Placement)
+        """
+        return self._placements[x, y].values()
+
+    @property
+    def chips_with_placements(self):
+        """ Get the chips with placements on them
+
+        :rtype: iterable(tuple(int,int))
+        """
+        return self._placements.keys()
 
     def __repr__(self):
         output = ""
@@ -160,5 +186,10 @@ class Placements(object):
             output += placement.__repr__()
         return output
 
+    def __iter__(self):
+        """ An iterator for the placements object within
+        """
+        return iter(self._machine_vertices.values())
+
     def __len__(self):
-        return len(self._placements)
+        return len(self._machine_vertices)

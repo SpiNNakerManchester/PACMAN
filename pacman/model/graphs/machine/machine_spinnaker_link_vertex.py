@@ -18,7 +18,6 @@ from pacman.model.resources import ResourceContainer
 from .machine_vertex import MachineVertex
 from pacman.model.graphs import (
     AbstractVirtual, AbstractSpiNNakerLink)
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 
 
 class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
@@ -27,9 +26,7 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
 
     __slots__ = [
         "_spinnaker_link_id",
-        "_board_address",
-        "_virtual_chip_x",
-        "_virtual_chip_y"]
+        "_board_address"]
 
     def __init__(
             self, spinnaker_link_id, board_address=None, label=None,
@@ -39,8 +36,6 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
             vertex_slice=vertex_slice)
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address
-        self._virtual_chip_x = None
-        self._virtual_chip_y = None
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -56,25 +51,3 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
     @overrides(AbstractVirtual.board_address)
     def board_address(self):
         return self._board_address
-
-    @property
-    @overrides(AbstractVirtual.virtual_chip_x)
-    def virtual_chip_x(self):
-        return self._virtual_chip_x
-
-    @property
-    @overrides(AbstractVirtual.virtual_chip_y)
-    def virtual_chip_y(self):
-        return self._virtual_chip_y
-
-    @overrides(AbstractVirtual.set_virtual_chip_coordinates)
-    def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
-        if virtual_chip_x is not None and virtual_chip_y is not None:
-            self._virtual_chip_x = virtual_chip_x
-            self._virtual_chip_y = virtual_chip_y
-            self.add_constraint(ChipAndCoreConstraint(
-                self._virtual_chip_x, self._virtual_chip_y))
-            if (self._app_vertex is not None and
-                    self._app_vertex.virtual_chip_x is None and
-                    self._app_vertex.virtual_chip_y is None):
-                self._app_vertex.set_virtual_chip_coordinates()

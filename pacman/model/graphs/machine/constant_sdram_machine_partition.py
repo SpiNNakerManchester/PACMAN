@@ -18,7 +18,6 @@ from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
     PacmanConfigurationException, PartitionMissingEdgesException,
     SDRAMEdgeSizeException)
-from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import SDRAMMachineEdge
 
 
@@ -37,21 +36,14 @@ class ConstantSDRAMMachinePartition(
 
     MISSING_EDGE_ERROR_MESSAGE = "Partition {} has no edges"
 
-    def __init__(self, identifier, pre_vertex, label):
+    def __init__(self, identifier, pre_vertex):
         super().__init__(
-            pre_vertex, identifier, allowed_edge_types=SDRAMMachineEdge,
-            constraints=None, label=label, traffic_weight=1,
-            class_name="ConstantSDRAMMachinePartition")
+            pre_vertex, identifier, allowed_edge_types=SDRAMMachineEdge)
         self._sdram_size = None
         self._sdram_base_address = None
 
-    @property
-    @overrides(AbstractSDRAMPartition.traffic_type)
-    def traffic_type(self):
-        return EdgeTrafficType.SDRAM
-
     @overrides(AbstractSingleSourcePartition.add_edge)
-    def add_edge(self, edge, graph_code):
+    def add_edge(self, edge):
         if self._sdram_size is None:
             self._sdram_size = edge.sdram_size
         elif self._sdram_size != edge.sdram_size:
@@ -59,7 +51,7 @@ class ConstantSDRAMMachinePartition(
                 "The edges within the constant sdram partition {} have "
                 "inconsistent memory size requests.".format(self))
         if self._sdram_base_address is None:
-            super().add_edge(edge, graph_code)
+            super().add_edge(edge)
         else:
             raise PacmanConfigurationException(
                 "Illegal attempt to add an edge after sdram_base_address set")
@@ -96,11 +88,3 @@ class ConstantSDRAMMachinePartition(
         if len(self._edges) == 0:
             return 0
         return self._edges.peek().sdram_size
-
-    @overrides(AbstractSingleSourcePartition.clone_without_edges)
-    def clone_without_edges(self):
-        """
-        :rtype: ConstantSDRAMMachinePartition
-        """
-        return ConstantSDRAMMachinePartition(
-            self._identifier, self._pre_vertex, self._label)

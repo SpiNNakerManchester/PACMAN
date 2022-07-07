@@ -18,7 +18,6 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_machine.data.machine_data_writer import MachineDataWriter
 from pacman.model.graphs.application import ApplicationGraph
-from pacman.model.graphs.machine import MachineGraph
 from pacman.model.placements import Placements
 from pacman.model.routing_info import (
     DictBasedMachinePartitionNKeysMap, RoutingInfo)
@@ -84,18 +83,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         return self.__pacman_data._runtime_graph
 
-    def get_runtime_machine_graph(self):  # pylint: disable=arguments-differ
-        """
-        The runtime machine graph
-
-        Previously known as asb._machine_graph.
-
-        This removes the safety check so ASB can access the graph anytime
-
-        :rtype: MachineGraph
-        """
-        return self.__pacman_data._runtime_machine_graph
-
     def create_graphs(self, graph_label):
         """
         Creates the user/ original graphs based on the label
@@ -107,9 +94,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             graph_label = "Application_graph"
 
         self.__pacman_data._graph = ApplicationGraph(label=graph_label)
-        self.__pacman_data._machine_graph = MachineGraph(
-            label=graph_label,
-            application_graph=self.__pacman_data._graph)
 
     def clone_graphs(self):
         """
@@ -118,15 +102,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         :raises PacmanConfigurationException: if both Application and Machine
         level have vertices
         """
-        if self.__pacman_data._graph.n_vertices:
-            if self.__pacman_data._machine_graph.n_vertices:
-                raise PacmanConfigurationException(
-                    "Illegal state where both original_application and "
-                    "original machine graph have vertices in them")
-
         self.__pacman_data._runtime_graph = self.__pacman_data._graph.clone()
-        self.__pacman_data._runtime_machine_graph = \
-            self.__pacman_data._machine_graph.clone()
 
     def _set_runtime_graph(self, graph):
         """
@@ -137,17 +113,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         if not self._is_mocked():
             raise NotImplementedError("Only valid in Mocked state!")
         self.__pacman_data._runtime_graph = graph
-
-    def set_runtime_machine_graph(self, runtime_machine_graph):
-        """
-        Set the runtime machine graph
-
-        :param MachineGraph runtime_machine_graph:
-        :raises TypeError: if the runtime_machine_graph is not a MachineGraph
-        """
-        if not isinstance(runtime_machine_graph, MachineGraph):
-            raise TypeError("runtime_machine_graph should be a MachineGraph")
-        self.__pacman_data._runtime_machine_graph = runtime_machine_graph
 
     def set_placements(self, placements):
         """
