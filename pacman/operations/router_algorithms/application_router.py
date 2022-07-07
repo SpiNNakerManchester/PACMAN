@@ -328,8 +328,6 @@ def _get_outgoing_mapping(app_vertex, partition_id, placements, machine):
             xy, route = vertex_xy_and_route(
                 in_part.pre_vertex, placements, machine)
             outgoing_mapping[xy].append(route)
-    if not outgoing_mapping:
-        return None, None
     return outgoing_mapping
 
 
