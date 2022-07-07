@@ -18,20 +18,10 @@ Miscellaneous minor functions for converting between JSON and Python objects.
 
 import json
 import gzip
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint, FixedKeyAndMaskConstraint,
-    FixedMaskConstraint)
-from pacman.model.constraints.placer_constraints import (
-    BoardConstraint, ChipAndCoreConstraint, RadialPlacementFromChipConstraint,
-    SameChipAsConstraint)
-from pacman.model.constraints.partitioner_constraints import (
-    SameAtomsAsVertexConstraint)
 from pacman.model.resources import (
     CPUCyclesPerTickResource, DTCMResource, IPtagResource, ResourceContainer,
     VariableSDRAM)
-from pacman.model.routing_info import BaseKeyAndMask
-from pacman.model.graphs.machine import (
-    MachineEdge, MachineGraph, SimpleMachineVertex)
+from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements.placement import Placement
 
 
@@ -54,108 +44,6 @@ def json_to_object(json_object):
     return json_object
 
 
-_LOCATION_CONSTRAINTS = (
-    ChipAndCoreConstraint, RadialPlacementFromChipConstraint)
-_VERTEX_CONSTRAINTS = (SameChipAsConstraint, SameAtomsAsVertexConstraint)
-
-
-def constraint_to_json(constraint):
-    """ Converts a constraint to JSON.
-
-    .. note::
-
-        Vertexes are represented by just their label.
-
-        If an unexpected constraint is received, the str() and repr() values
-        are saved
-
-        If an Exception occurs, that is caught and added to the JSON object.
-
-    :param AbstractConstraint constraint: The constraint to describe
-    :return: A dict describing the constraint
-    :rtype: dict
-    """
-    json_dict = dict()
-    try:
-        json_dict["class"] = constraint.__class__.__name__
-        if isinstance(constraint, BoardConstraint):
-            json_dict["board_address"] = constraint.board_address
-        elif isinstance(constraint, _LOCATION_CONSTRAINTS):
-            json_dict["x"] = constraint.x
-            json_dict["y"] = constraint.y
-            if isinstance(constraint, ChipAndCoreConstraint):
-                if constraint.p is not None:
-                    json_dict["p"] = constraint.p
-        elif isinstance(constraint, _VERTEX_CONSTRAINTS):
-            json_dict["vertex"] = constraint.vertex.label
-        elif isinstance(constraint, FixedKeyAndMaskConstraint):
-            json_dict["keys_and_masks"] = key_masks_to_json(
-                constraint.keys_and_masks)
-            if constraint.key_list_function:
-                json_dict["key_list_function"] = str(
-                    constraint.key_list_function)
-        elif isinstance(constraint, FixedMaskConstraint):
-            json_dict["mask"] = constraint.mask
-        elif isinstance(constraint, ContiguousKeyRangeContraint):
-            # No extra parameters
-            pass
-        else:
-            # Oops an unexpected class
-            # Classes Not covered include
-            # FixedKeyFieldConstraint
-            # FlexiKeyFieldConstraint
-            # ShareKeyConstraint
-            json_dict["str"] = str(constraint)
-            json_dict["repr"] = repr(constraint)
-    except Exception as ex:  # pylint: disable=broad-except
-        json_dict["exception"] = str(ex)
-    return json_dict
-
-
-def constraint_from_json(json_dict, graph=None):
-    if json_dict["class"] == "BoardConstraint":
-        return BoardConstraint(json_dict["board_address"])
-    if json_dict["class"] == "ChipAndCoreConstraint":
-        if "p" in json_dict:
-            p = json_dict["p"]
-        else:
-            p = None
-        return ChipAndCoreConstraint(json_dict["x"], json_dict["y"], p)
-    if json_dict["class"] == "ContiguousKeyRangeContraint":
-        return ContiguousKeyRangeContraint()
-    if json_dict["class"] == "FixedKeyAndMaskConstraint":
-        if "key_list_function" in json_dict:
-            raise NotImplementedError(
-                "key_list_function {}".format(json_dict["key_list_function"]))
-        return FixedKeyAndMaskConstraint(
-            key_masks_from_json(json_dict["keys_and_masks"]))
-    if json_dict["class"] == "FixedMaskConstraint":
-        return FixedMaskConstraint(json_dict["mask"])
-    if json_dict["class"] == "RadialPlacementFromChipConstraint":
-        return RadialPlacementFromChipConstraint(
-            json_dict["x"], json_dict["y"])
-    if json_dict["class"] == "SameChipAsConstraint":
-        return SameChipAsConstraint(vertex_lookup(json_dict["vertex"], graph))
-    if json_dict["class"] == "SameAtomsAsVertexConstraint":
-        return SameAtomsAsVertexConstraint(
-            vertex_lookup(json_dict["vertex"], graph))
-    raise NotImplementedError("constraint {}".format(json_dict["class"]))
-
-
-def constraints_to_json(constraints):
-    json_list = []
-    for constraint in constraints:
-        json_list.append(constraint_to_json(constraint))
-    return json_list
-
-
-def constraints_from_json(json_list, graph):
-    constraints = []
-    for sub in json_list:
-        constraints.append(constraint_from_json(sub, graph))
-    return constraints
-
-
 def key_mask_to_json(key_mask):
     try:
         json_object = dict()
@@ -164,24 +52,6 @@ def key_mask_to_json(key_mask):
     except Exception as ex:  # pylint: disable=broad-except
         json_object["exception"] = str(ex)
     return json_object
-
-
-def key_mask_from_json(json_dict):
-    return BaseKeyAndMask(json_dict["key"], json_dict["mask"])
-
-
-def key_masks_to_json(key_masks):
-    json_list = []
-    for key_mask in key_masks:
-        json_list.append(key_mask_to_json(key_mask))
-    return json_list
-
-
-def key_masks_from_json(json_list):
-    key_masks = []
-    for sub in json_list:
-        key_masks.append(key_mask_from_json(sub))
-    return key_masks
 
 
 def resource_container_to_json(container):
@@ -253,7 +123,6 @@ def vertex_to_json(vertex):
     try:
         json_dict["class"] = vertex.__class__.__name__
         json_dict["label"] = vertex.label
-        json_dict["constraints"] = constraints_to_json(vertex.constraints)
         if vertex.resources_required is not None:
             json_dict["resources"] = resource_container_to_json(
                 vertex.resources_required)
@@ -263,75 +132,8 @@ def vertex_to_json(vertex):
 
 
 def vertex_from_json(json_dict, convert_constraints=True):
-    if convert_constraints:
-        constraints = constraints_from_json(
-            json_dict["constraints"], graph=None)
-    else:
-        constraints = []
     resources = resource_container_from_json(json_dict.get("resources"))
-    return SimpleMachineVertex(
-        resources, label=json_dict["label"], constraints=constraints)
-
-
-def vertex_add_contstraints_from_json(json_dict, graph):
-    vertex = vertex_lookup(json_dict["label"], graph)
-    constraints = constraints_from_json(json_dict["constraints"], graph)
-    vertex.add_constraints(constraints)
-
-
-def edge_to_json(edge):
-    json_dict = dict()
-    try:
-        json_dict["pre_vertex"] = edge.pre_vertex.label
-        json_dict["post_vertex"] = edge.post_vertex.label
-        json_dict["traffic_type"] = int(edge.traffic_type)
-        if edge.label is not None:
-            json_dict["label"] = edge.label
-        json_dict["traffic_weight"] = edge.traffic_weight
-    except Exception as ex:  # pylint: disable=broad-except
-        json_dict["exception"] = str(ex)
-    return json_dict
-
-
-def edge_from_json(json_dict, graph=None):
-    label = json_dict.get("label")
-    return MachineEdge(
-        vertex_lookup(json_dict["pre_vertex"], graph),
-        vertex_lookup(json_dict["post_vertex"], graph),
-        json_dict["traffic_type"], label, json_dict["traffic_weight"])
-
-
-def graph_to_json(graph):
-    #  TODO Appplication vertex info needed for ZonedRoutingInfoAllocator
-    json_dict = dict()
-    try:
-        if graph.label is not None:
-            json_dict["label"] = graph.label
-        json_list = []
-        for vertex in graph.vertices:
-            json_list.append(vertex_to_json(vertex))
-        json_dict["vertices"] = json_list
-        json_list = []
-        for edge in graph.edges:
-            json_list.append(edge_to_json(edge))
-        json_dict["edges"] = json_list
-    except Exception as ex:  # pylint: disable=broad-except
-        json_dict["exception"] = str(ex)
-    return json_dict
-
-
-def graph_from_json(json_dict):
-    json_dict = json_to_object(json_dict)
-    graph = MachineGraph(json_dict.get("label"))
-    for j_vertex in json_dict["vertices"]:
-        graph.add_vertex(vertex_from_json(j_vertex, convert_constraints=False))
-    # Only do constraints when we have all the vertexes to link to
-    for j_vertex in json_dict["vertices"]:
-        vertex_add_contstraints_from_json(j_vertex, graph)
-    for j_edge in json_dict["edges"]:
-        edge = edge_from_json(j_edge, graph)
-        graph.add_edge(edge, "JSON_MOCK")
-    return graph
+    return SimpleMachineVertex(resources, label=json_dict["label"])
 
 
 def vertex_lookup(label, graph=None):

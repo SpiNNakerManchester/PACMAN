@@ -12,10 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 """ Collection of functions which together validate routes.
 """
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 import logging
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
@@ -23,9 +22,12 @@ from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
-from pacman.model.graphs.common import EdgeTrafficType
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.constants import FULL_MASK
+from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
+    get_app_partitions)
+
 
 logger = FormatAdapter(logging.getLogger(__name__))
 range_masks = {FULL_MASK - ((2 ** i) - 1) for i in range(33)}
@@ -36,13 +38,13 @@ PlacementTuple = namedtuple('PlacementTuple', 'x y p')
 _Failure = namedtuple('_Failure', 'router_x router_y keys source_mask')
 
 
-def validate_routes(machine_graph, placements, routing_infos,
+def validate_routes(graph, placements, routing_infos,
                     routing_tables, machine):
     """ Go though the placements given and check that the routing entries\
         within the routing tables support reach the correction destinations\
         as well as not producing any cycles.
 
-    :param MachineGraph machine_graph: the graph
+    :param ApplicationGraph graph: the graph
     :param Placements placements: the placements container
     :param RoutingInfo routing_infos: the routing info container
     :param MulticastRoutingTables routing_tables:
@@ -52,55 +54,60 @@ def validate_routes(machine_graph, placements, routing_infos,
         found by the search on a given router, or a cycle is detected
     """
 
-    def traffic_multicast(edge):
-        return edge.traffic_type == EdgeTrafficType.MULTICAST
+    # Find all partitions that need to be dealt with
+    partitions = get_app_partitions(graph)
 
-    progress = ProgressBar(
-        placements.placements,
-        "Verifying the routes from each core travel to the correct locations")
-    for placement in progress.over(placements.placements):
+    # Now go through the app edges and route app vertex by app vertex
+    progress = ProgressBar(len(partitions), "Checking Routes")
+    for partition in progress.over(partitions):
+        source = partition.pre_vertex
+
+        # Destination cores by source machine vertices
+        destinations = defaultdict(OrderedSet)
+
+        for edge in partition.edges:
+            target = edge.post_vertex
+            target_vertices = \
+                target.splitter.get_source_specific_in_coming_vertices(
+                    source, partition.identifier)
+
+            for tgt, srcs in target_vertices:
+                place = placements.get_placement_of_vertex(tgt)
+                for src in srcs:
+                    if isinstance(src, ApplicationVertex):
+                        for s in src.splitter.get_out_going_vertices(
+                                partition.identifier):
+                            destinations[s].add(PlacementTuple(
+                                x=place.x, y=place.y, p=place.p))
+                    else:
+                        destinations[src].add(PlacementTuple(
+                            x=place.x, y=place.y, p=place.p))
+
+        outgoing = OrderedSet(source.splitter.get_out_going_vertices(
+            partition.identifier))
+        internal = source.splitter.get_internal_multicast_partitions()
+        for in_part in internal:
+            if in_part.partition_id == partition.identifier:
+                outgoing.add(in_part.pre_vertex)
+                for edge in in_part.edges:
+                    place = placements.get_placement_of_vertex(
+                        edge.post_vertex)
+                    destinations[in_part.pre_vertex].add(PlacementTuple(
+                        x=place.x, y=place.y, p=place.p))
 
         # locate all placements to which this placement/vertex will
         # communicate with for a given key_and_mask and search its
         # determined destinations
-
-        # gather keys and masks per partition
-        partitions = machine_graph.\
-            get_multicast_edge_partitions_starting_at_vertex(placement.vertex)
-
-        n_atoms = placement.vertex.vertex_slice.n_atoms
-
-        for partition in partitions:
-            r_info = routing_infos.get_routing_info_from_partition(
-                partition)
-            is_continuous = _check_if_partition_has_continuous_keys(partition)
-            if not is_continuous:
-                logger.warning(
-                    "Due to the none continuous nature of the keys in this "
-                    "partition {}, we cannot check all atoms will be routed "
-                    "correctly, but will check the base key instead",
-                    partition)
-
-            destination_placements = OrderedSet()
-
-            # filter for just multicast edges, we don't check other types of
-            # edges here.
-            out_going_edges = filter(traffic_multicast, partition.edges)
-
-            # for every outgoing edge, locate its destination and store it.
-            for outgoing_edge in out_going_edges:
-                dest_placement = placements.get_placement_of_vertex(
-                    outgoing_edge.post_vertex)
-                destination_placements.add(
-                    PlacementTuple(x=dest_placement.x,
-                                   y=dest_placement.y,
-                                   p=dest_placement.p))
+        for m_vertex in outgoing:
+            placement = placements.get_placement_of_vertex(m_vertex)
+            r_info = routing_infos.get_routing_info_from_pre_vertex(
+                m_vertex, partition.identifier)
 
             # search for these destinations
             for key_and_mask in r_info.keys_and_masks:
                 _search_route(
-                    placement, destination_placements, key_and_mask,
-                    routing_tables, machine, n_atoms, is_continuous)
+                    placement, destinations[m_vertex], key_and_mask,
+                    routing_tables, machine, m_vertex.vertex_slice.n_atoms)
 
 
 def _check_if_partition_has_continuous_keys(partition):
@@ -115,13 +122,13 @@ def _check_if_partition_has_continuous_keys(partition):
 
 
 def _search_route(source_placement, dest_placements, key_and_mask,
-                  routing_tables, machine, n_atoms, is_continuous):
+                  routing_tables, machine, n_atoms):
     """ Locate if the routing tables work for the source to desks as\
         defined
 
     :param Placement source_placement:
         the placement from which the search started
-    :param iterable(PlacementTuple) dest_placements:
+    :param iterable(Placement) dest_placements:
         the placements to which this trace should visit only once
     :param BaseKeyAndMask key_and_mask:
         the key and mask associated with this set of edges
@@ -143,9 +150,8 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     failed_to_cover_all_keys_routers = list()
 
     _start_trace_via_routing_tables(
-        source_placement, key_and_mask, located_destinations,
-        routing_tables, machine, n_atoms, is_continuous,
-        failed_to_cover_all_keys_routers)
+        source_placement, key_and_mask, located_destinations, routing_tables,
+        machine, n_atoms, failed_to_cover_all_keys_routers)
 
     # start removing from located_destinations and check if destinations not
     #  reached
@@ -209,7 +215,7 @@ def _search_route(source_placement, dest_placements, key_and_mask,
 
 def _start_trace_via_routing_tables(
         source_placement, key_and_mask, reached_placements, routing_tables,
-        machine, n_atoms, is_continuous, failed_to_cover_all_keys_routers):
+        machine, n_atoms, failed_to_cover_all_keys_routers):
     """ Start the trace, by using the source placement's router and tracing\
         from the route.
 
@@ -221,7 +227,6 @@ def _start_trace_via_routing_tables(
     :param MulticastRoutingTables routing_tables:
     :param ~spinn_machine.Machine machine:
     :param int n_atoms: the number of atoms going through this path
-    :param bool is_continuous: if the keys and atoms mapping is continuous
     :param list(_Failure) failed_to_cover_all_keys_routers:
         list of failed routers for all keys
     :rtype: None
@@ -238,7 +243,7 @@ def _start_trace_via_routing_tables(
     _recursive_trace_to_destinations(
         entry, current_router_table, source_placement.x,
         source_placement.y, key_and_mask, visited_routers,
-        reached_placements, machine, routing_tables, is_continuous, n_atoms,
+        reached_placements, machine, routing_tables, n_atoms,
         failed_to_cover_all_keys_routers)
 
 
@@ -262,7 +267,7 @@ def _check_all_keys_hit_entry(entry, n_atoms, base_key):
 # locates the next dest position to check
 def _recursive_trace_to_destinations(
         entry, current_router, chip_x, chip_y, key_and_mask, visited_routers,
-        reached_placements, machine, routing_tables, is_continuous, n_atoms,
+        reached_placements, machine, routing_tables, n_atoms,
         failed_to_cover_all_keys_routers):
     """ Recursively search though routing tables until no more entries are\
         registered with this key.
@@ -317,20 +322,18 @@ def _recursive_trace_to_destinations(
             entry = _locate_routing_entry(
                 next_router, key_and_mask.key, n_atoms)
 
-            if is_continuous:
-                bad_entries = _check_all_keys_hit_entry(
-                    entry, n_atoms, key_and_mask.key)
-                if bad_entries:
-                    failed_to_cover_all_keys_routers.append(
-                        _Failure(next_router.x, next_router.y,
-                                 bad_entries, key_and_mask.mask))
+            bad_entries = _check_all_keys_hit_entry(
+                entry, n_atoms, key_and_mask.key)
+            if bad_entries:
+                failed_to_cover_all_keys_routers.append(
+                    _Failure(next_router.x, next_router.y,
+                             bad_entries, key_and_mask.mask))
 
             # get next route value from the new router
             _recursive_trace_to_destinations(
                 entry, next_router, link.destination_x, link.destination_y,
                 key_and_mask, visited_routers, reached_placements, machine,
-                routing_tables, is_continuous, n_atoms,
-                failed_to_cover_all_keys_routers)
+                routing_tables, n_atoms, failed_to_cover_all_keys_routers)
 
     # only goes to a processor
     elif processor_values:

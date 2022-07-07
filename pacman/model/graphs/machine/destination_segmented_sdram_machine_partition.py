@@ -17,7 +17,6 @@ from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
     PacmanConfigurationException,  PartitionMissingEdgesException)
 from pacman.model.graphs import AbstractSingleSourcePartition
-from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
     AbstractSDRAMPartition, SDRAMMachineEdge)
 
@@ -32,18 +31,11 @@ class DestinationSegmentedSDRAMMachinePartition(
         "_sdram_base_address",
     ]
 
-    def __init__(self, identifier, pre_vertex, label):
+    def __init__(self, identifier, pre_vertex):
         super().__init__(
             pre_vertex=pre_vertex, identifier=identifier,
-            allowed_edge_types=SDRAMMachineEdge, constraints=None,
-            label=label, traffic_weight=1,
-            class_name="DestinationSegmentedSDRAMMachinePartition")
+            allowed_edge_types=SDRAMMachineEdge)
         self._sdram_base_address = None
-
-    @property
-    @overrides(AbstractSDRAMPartition.traffic_type)
-    def traffic_type(self):
-        return EdgeTrafficType.SDRAM
 
     @overrides(AbstractSDRAMPartition.total_sdram_requirements)
     def total_sdram_requirements(self):
@@ -64,12 +56,10 @@ class DestinationSegmentedSDRAMMachinePartition(
             new_value += edge.sdram_size
 
     @overrides(AbstractSingleSourcePartition.add_edge)
-    def add_edge(self, edge, graph_code):
+    def add_edge(self, edge):
         if self._sdram_base_address is not None:
             raise PacmanConfigurationException(
                 "Illegal attempt to add an edge after sdram_base_address set")
-
-        super().check_edge(edge)
 
         # safety check
         if self._pre_vertex != edge.pre_vertex:
@@ -78,7 +68,7 @@ class DestinationSegmentedSDRAMMachinePartition(
                 "1 pre-vertex")
 
         # add
-        super().add_edge(edge, graph_code)
+        super().add_edge(edge)
 
     @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
     def get_sdram_base_address_for(self, vertex):
@@ -97,11 +87,3 @@ class DestinationSegmentedSDRAMMachinePartition(
             if edge.post_vertex == vertex:
                 return edge.sdram_size
         return None
-
-    @overrides(AbstractSingleSourcePartition.clone_without_edges)
-    def clone_without_edges(self):
-        """
-        :rtype: DestinationSegmentedSDRAMMachinePartition
-        """
-        return DestinationSegmentedSDRAMMachinePartition(
-            self._identifier, self._pre_vertex, self._label)

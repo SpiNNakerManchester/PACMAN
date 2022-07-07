@@ -14,6 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .field import Field, SUPPORTED_TAGS
-from .resource_tracker import ResourceTracker
+from .chip_counter import ChipCounter
 
-__all__ = ["Field", "ResourceTracker", "SUPPORTED_TAGS"]
+__all__ = ["Field", "SUPPORTED_TAGS", "ChipCounter"]
