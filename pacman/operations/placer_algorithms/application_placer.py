@@ -211,6 +211,7 @@ def _next_colour():
 
 
 def _draw_placements(machine, report_file, placements, system_placements):
+    # pylint: disable=import-error
     from spinner.scripts.contexts import PNGContextManager
     from spinner.diagrams.machine_map import (
         get_machine_map_aspect_ratio, draw_machine_map)
