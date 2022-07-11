@@ -13,18 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+from tempfile import mkstemp
+from os import fdopen
+
+from spinn_utilities.ordered_set import OrderedSet
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
+
+from pacman.data import PacmanDataView
 from pacman.model.placements import Placements, Placement
 from pacman.model.graphs import AbstractVirtual
 from pacman.exceptions import (
     PacmanPlaceException, PacmanConfigurationException)
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
-from spinn_utilities.ordered_set import OrderedSet
-from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.log import FormatAdapter
-from tempfile import mkstemp
-from os import fdopen
-import logging
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -36,8 +39,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 #        (numpy.random.choice(range(256), size=3) / 256, [1.0])))
 
 
-def place_application_graph(
-        machine, app_graph, plan_n_timesteps, system_placements):
+def place_application_graph(system_placements):
     """ Perform placement of an application graph on the machine.
         NOTE: app_graph must have been partitioned
     """
@@ -45,6 +47,10 @@ def place_application_graph(
     # Track the placements and  space
     placements = Placements(system_placements)
     # board_colours = dict()
+
+    app_graph = PacmanDataView.get_runtime_graph()
+    machine = PacmanDataView.get_machine()
+    plan_n_timesteps = PacmanDataView.get_plan_n_timestep()
     spaces = _Spaces(machine, placements, plan_n_timesteps)
 
     # Go through the application graph by application vertex
