@@ -145,13 +145,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
             return False
         if self._x != other.x and self._y != other.y:
             return False
-        for key_mask in self._entries_by_key_mask:
-            if key_mask not in other._entries_by_key_mask:
-                return False
-            if (self._entries_by_key_mask[key_mask] !=
-                    other._entries_by_key_mask[key_mask]):
-                return False
-        return True
+        return self._entries_by_key_mask == other._entries_by_key_mask
 
     @overrides(AbstractMulticastRoutingTable.__ne__)
     def __ne__(self, other):

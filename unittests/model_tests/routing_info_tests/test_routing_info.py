@@ -34,7 +34,8 @@ class TestRoutingInfo(unittest.TestCase):
         key = 12345
         info = MachineVertexRoutingInfo(
             [BaseKeyAndMask(key, FULL_MASK)], "Test", pre_vertex, 0)
-        routing_info = RoutingInfo([info])
+        routing_info = RoutingInfo()
+        routing_info.add_routing_info(info)
 
         with self.assertRaises(PacmanAlreadyExistsException):
             routing_info.add_routing_info(info)

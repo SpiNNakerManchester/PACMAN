@@ -29,14 +29,15 @@ from pacman.exceptions import (
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 
+from spinn_utilities.ordered_set import OrderedSet
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
+from spinn_utilities.config_holder import get_config_bool
+import os
+import numpy
+import logging
+
 logger = FormatAdapter(logging.getLogger(__name__))
-
-# UNUSED_COLOUR = (0.5, 0.5, 0.5, 1.0)
-
-
-# def next_colour():
-#    return tuple(numpy.concatenate(
-#        (numpy.random.choice(range(256), size=3) / 256, [1.0])))
 
 
 def place_application_graph(system_placements):
@@ -76,7 +77,6 @@ def place_application_graph(system_placements):
                 except PacmanPlaceException as e:
                     _place_error(
                         app_graph, placements, system_placements, e,
-                        # plan_n_timesteps, machine, board_colours)
                         plan_n_timesteps, machine)
                 logger.debug(f"Starting placement from {next_chip_space}")
 
@@ -116,31 +116,25 @@ def place_application_graph(system_placements):
                 # Now make the placements having confirmed all can be done
                 placements.add_placements(placements_to_make)
                 placed = True
-                # colour = next_colour()
-                # TODO chips_attempted is now set(Chip)
-                # board_colours.update(
-                #     {(x, y): colour for x, y in chips_attempted})
                 logger.debug(f"Used {chips_attempted}")
             except _SpaceExceededException:
                 # This might happen while exploring a space; this may not be
                 # fatal since the last space might have just been bound by
                 # existing placements, and there might be bigger spaces out
                 # there to use
-                # board_colours.update(
-                # {(x, y): UNUSED_COLOUR for x, y in chips_attempted})
                 logger.debug(f"Failed, saving {chips_attempted}")
                 spaces.save_chips(chips_attempted)
                 chips_attempted.clear()
 
-    # _fd, report_file = mkstemp(suffix=".png")
-    # _draw_placements(machine, report_file, board_colours)
+    if get_config_bool("Reports", "draw_placements"):
+        _draw_placements(placements, system_placements)
 
     return placements
 
 
 def _place_error(
         app_graph, placements, system_placements, exception, plan_n_timesteps,
-        machine):  # , board_colours):
+        machine):
     unplaceable = list()
     vertex_count = 0
     n_vertices = 0
@@ -162,8 +156,9 @@ def _place_error(
         if not app_vertex_placed:
             unplaceable.append(app_vertex)
 
-    fd, report_file = mkstemp(suffix=".rpt")
-    with fdopen(fd, 'w') as f:
+    report_file = os.path.join(
+        PacmanDataView.get_report_dir_path(), "placements_error.txt")
+    with open(report_file, 'w') as f:
         f.write(f"Could not place {len(unplaceable)} of {app_graph.n_vertices}"
                 " application vertices.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
@@ -206,35 +201,73 @@ def _place_error(
                 f.write(f"    {x}, {y} ({n_procs - system_placed}"
                         " free cores)\n")
 
-    # _draw_placements(machine, report_file + ".png", board_colours)
+    if get_config_bool("Reports", "draw_placements_on_error"):
+        _draw_placements(placements, system_placements)
 
     raise PacmanPlaceException(
         f" {exception}."
         f" Report written to {report_file}.")
 
 
-# This is useful debug code, BUT it uses SpiNNer for drawing, which needs
-# Graphical tools; hence it is currently commented out
-# def _draw_placements(machine, report_file, board_colours):
-#     from spinner.scripts.contexts import PNGContextManager
-#     from spinner.diagrams.machine_map import (
-#         get_machine_map_aspect_ratio, draw_machine_map)
-#     from spinner import board
-#     import math
-#
-#     include_boards = [
-#         (chip.x, chip.y) for chip in machine.ethernet_connected_chips]
-#     w = math.ceil(machine.width / 12)
-#     h = math.ceil(machine.height / 12)
-#     aspect_ratio = get_machine_map_aspect_ratio(w, h)
-#     image_width = 10000
-#     image_height = int(image_width * aspect_ratio)
-#     output_filename = report_file
-#     hex_boards = board.create_torus(w, h)
-#     with PNGContextManager(
-#             output_filename, image_width, image_height) as ctx:
-#         draw_machine_map(ctx, image_width, image_height, w, h, hex_boards,
-#                          dict(), board_colours, include_boards)
+def _next_colour():
+    """ Get the next (random) RGB colour to use for a vertex for placement
+        drawings
+
+    :rtype: tuple(int, int, int)
+    """
+    return tuple(numpy.concatenate(
+        (numpy.random.choice(range(256), size=3) / 256, [1.0])))
+
+
+def _draw_placements(placements, system_placements):
+    try:
+        # spinner as graphical library so
+        # pylint: disable=import-error
+        from spinner.scripts.contexts import PNGContextManager
+        from spinner.diagrams.machine_map import (
+            get_machine_map_aspect_ratio, draw_machine_map)
+        from spinner import board
+        from collections import defaultdict
+        import math
+    except ImportError:
+        logger.exception(
+            "Unable to draw placements as no spinner install found")
+        return
+
+    report_file = os.path.join(
+        PacmanDataView.get_report_dir_path(), "placements_error.png")
+
+    # Colour the boards by placements
+    unused = (0.5, 0.5, 0.5, 1.0)
+    vertex_colours = defaultdict(_next_colour)
+    board_colours = dict()
+    machine = PacmanDataView.get_machine()
+    for x, y in machine.chip_coordinates:
+        if (placements.n_placements_on_chip(x, y) ==
+                system_placements.n_placements_on_chip(x, y)):
+            board_colours[x, y] = unused
+        else:
+            vertex = None
+            for placement in placements.placements_on_chip(x, y):
+                if not system_placements.is_vertex_placed(placement.vertex):
+                    vertex = placement.vertex
+                    break
+            if vertex is not None:
+                board_colours[x, y] = vertex_colours[vertex.app_vertex]
+
+    include_boards = [
+        (chip.x, chip.y) for chip in machine.ethernet_connected_chips]
+    w = math.ceil(machine.width / 12)
+    h = math.ceil(machine.height / 12)
+    aspect_ratio = get_machine_map_aspect_ratio(w, h)
+    image_width = 10000
+    image_height = int(image_width * aspect_ratio)
+    output_filename = report_file
+    hex_boards = board.create_torus(w, h)
+    with PNGContextManager(
+            output_filename, image_width, image_height) as ctx:
+        draw_machine_map(ctx, image_width, image_height, w, h, hex_boards,
+                         dict(), board_colours, include_boards)
 
 
 class _SpaceExceededException(Exception):

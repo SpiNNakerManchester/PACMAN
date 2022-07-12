@@ -18,7 +18,7 @@ from pacman.exceptions import PacmanConfigurationException
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 
 
-class VertexRoutingInfo(metaclass=AbstractBase):
+class VertexRoutingInfo(object, metaclass=AbstractBase):
     """ Associates a partition identifier to its routing information
         (keys and masks).
     """
