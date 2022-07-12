@@ -87,8 +87,6 @@ def _make_vertices(writer, n_atoms, n_groups, n_machine_vertices, label):
 def test_application_placer():
     unittest_setup()
     writer = PacmanDataWriter.mock()
-    writer.create_graphs("Test")
-    writer.clone_graphs()
     for i in range(56):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
 
