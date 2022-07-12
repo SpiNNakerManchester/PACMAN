@@ -12,12 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.machine import AbstractMachineEdgePartition
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
     PacmanConfigurationException, PartitionMissingEdgesException)
 from pacman.model.graphs import AbstractMultiplePartition
-from pacman.model.graphs.common import EdgeTrafficType
 from pacman.model.graphs.machine import (
     AbstractSDRAMPartition, SDRAMMachineEdge)
 
@@ -31,7 +29,7 @@ class SourceSegmentedSDRAMMachinePartition(
         "_sdram_base_address",
     ]
 
-    def __init__(self, identifier, label, pre_vertices):
+    def __init__(self, identifier, pre_vertices):
         """
         :param str identifier: The identifier of the partition
         :param str label: A label of the partition
@@ -39,16 +37,8 @@ class SourceSegmentedSDRAMMachinePartition(
             The vertices that an edge in this partition may originate at
         """
         super().__init__(
-            pre_vertices, identifier,
-            allowed_edge_types=SDRAMMachineEdge, constraints=None,
-            label=label, traffic_weight=1,
-            class_name="SourceSegmentedSDRAMMachinePartition")
+            pre_vertices, identifier, allowed_edge_types=SDRAMMachineEdge)
         self._sdram_base_address = None
-
-    @property
-    @overrides(AbstractMachineEdgePartition.traffic_type)
-    def traffic_type(self):
-        return EdgeTrafficType.SDRAM
 
     def total_sdram_requirements(self):
         """
@@ -64,20 +54,19 @@ class SourceSegmentedSDRAMMachinePartition(
         return self._sdram_base_address
 
     @overrides(AbstractMultiplePartition.add_edge)
-    def add_edge(self, edge, graph_code):
+    def add_edge(self, edge):
         # add
-        super().check_edge(edge)
-        super().add_edge(edge, graph_code)
+        super().add_edge(edge)
 
         # check
         if len(self._destinations.keys()) != 1:
             raise PacmanConfigurationException(
                 "The {} can only support 1 destination vertex".format(
-                    self._class_name))
+                    self.__class__.__name__))
         if len(self._pre_vertices[edge.pre_vertex]) != 1:
             raise PacmanConfigurationException(
                 "The {} only supports 1 edge from a given pre vertex.".format(
-                    self._class_name))
+                    self.__class__.__name__))
 
         if self._sdram_base_address is not None:
             raise PacmanConfigurationException(
@@ -115,11 +104,3 @@ class SourceSegmentedSDRAMMachinePartition(
                     return edge.sdram_size
         else:
             return self.total_sdram_requirements()
-
-    @overrides(AbstractMultiplePartition.clone_without_edges)
-    def clone_without_edges(self):
-        """
-        :rtype: SourceSegmentedSDRAMMachinePartition
-        """
-        return SourceSegmentedSDRAMMachinePartition(
-            self._identifier, self._label, self._pre_vertices)

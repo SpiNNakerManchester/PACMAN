@@ -18,8 +18,7 @@ import gzip
 import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_machine import MulticastRoutingEntry
-from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanRoutingException)
+from pacman.exceptions import PacmanAlreadyExistsException
 from pacman.model.routing_tables import AbstractMulticastRoutingTable
 from spinn_utilities.overrides import overrides
 
@@ -37,19 +36,13 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         # The y-coordinate of the chip for which this is the routing tables
         "_y",
 
-        # An iterable of routing entries to add to the table
-        "_multicast_routing_entries",
-
         # dict of multicast routing entries.
         # (key, mask) -> multicast_routing_entry
         "_entries_by_key_mask",
 
         # counter of how many entries in their multicast routing table are
         # defaultable
-        "_number_of_defaulted_routing_entries",
-
-        #  dict of multicast routing entries. (key) -> entry
-        "_entries_by_key"
+        "_number_of_defaulted_routing_entries"
     ]
 
     def __init__(self, x, y, multicast_routing_entries=None):
@@ -68,9 +61,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         self._x = x
         self._y = y
         self._number_of_defaulted_routing_entries = 0
-        self._multicast_routing_entries = list()
         self._entries_by_key_mask = dict()
-        self._entries_by_key = dict()
 
         if multicast_routing_entries is not None:
             for multicast_routing_entry in multicast_routing_entries:
@@ -94,10 +85,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
             raise PacmanAlreadyExistsException(
                 "Multicast_routing_entry", str(multicast_routing_entry))
 
-        self._entries_by_key_mask[tuple_key] =\
-            multicast_routing_entry
-        self._entries_by_key[routing_entry_key] = multicast_routing_entry
-        self._multicast_routing_entries.append(multicast_routing_entry)
+        self._entries_by_key_mask[tuple_key] = multicast_routing_entry
 
         # update default routed counter if required
         if multicast_routing_entry.defaultable:
@@ -129,7 +117,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
         :raise None: does not raise any known exceptions
         """
-        return self._multicast_routing_entries
+        return self._entries_by_key_mask.values()
 
     @property
     @overrides(AbstractMulticastRoutingTable.number_of_entries)
@@ -139,7 +127,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
 
         :rtype: int
         """
-        return len(self._multicast_routing_entries)
+        return len(self._entries_by_key_mask)
 
     @property
     @overrides(AbstractMulticastRoutingTable.number_of_defaultable_entries)
@@ -151,51 +139,13 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         """
         return self._number_of_defaulted_routing_entries
 
-    def get_entry_by_routing_entry_key(self, routing_entry_key):
-        """ Get the routing entry associated with the specified key \
-            or ``None`` if the routing table does not match the key
-
-        :param int routing_entry_key: the routing key to be searched
-        :return: the routing entry associated with the routing key_combo or
-            ``None`` if no such entry exists
-        :rtype: ~spinn_machine.MulticastRoutingEntry or None
-        """
-        if routing_entry_key in self._entries_by_key:
-            return self._entries_by_key[routing_entry_key]
-        return None
-
-    def get_multicast_routing_entry_by_routing_entry_key(
-            self, routing_entry_key, mask):
-        """ Get the routing entry associated with the specified key_combo-mask\
-            combination or ``None`` if the routing table does not match the\
-            key_combo
-
-        :param int routing_entry_key: the routing key to be searched
-        :param int mask: the routing mask to be searched
-        :return: the routing entry associated with the routing key_combo or
-            ``None`` if no such entry exists
-        :rtype: ~spinn_machine.MulticastRoutingEntry or None
-        """
-        if (routing_entry_key & mask) != routing_entry_key:
-            raise PacmanRoutingException(
-                "The key {} is changed when masked with the mask {}."
-                " This is determined to be an error in the tool chain. Please "
-                "correct this and try again.".format(routing_entry_key, mask))
-
-        tuple_key = (routing_entry_key, mask)
-        if tuple_key in self._entries_by_key_mask:
-            return self._entries_by_key_mask[
-                tuple_key]
-        return None
-
     @overrides(AbstractMulticastRoutingTable.__eq__)
     def __eq__(self, other):
         if not isinstance(other, UnCompressedMulticastRoutingTable):
             return False
         if self._x != other.x and self._y != other.y:
             return False
-        return self._multicast_routing_entries == \
-            other.multicast_routing_entries
+        return self._entries_by_key_mask == other._entries_by_key_mask
 
     @overrides(AbstractMulticastRoutingTable.__ne__)
     def __ne__(self, other):
@@ -204,7 +154,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     @overrides(AbstractMulticastRoutingTable.__repr__)
     def __repr__(self):
         entry_string = ""
-        for entry in self._multicast_routing_entries:
+        for entry in self.multicast_routing_entries:
             entry_string += "{}\n".format(entry)
         return "{}:{}\n\n{}".format(self._x, self._y, entry_string)
 

@@ -38,10 +38,10 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
         """
         super().__init__(label, constraints, n_atoms)
         self._machine_vertex = machine_vertex
+        super().remember_machine_vertex(machine_vertex)
 
     @overrides(ApplicationVertex.remember_machine_vertex)
     def remember_machine_vertex(self, machine_vertex):
-        super().remember_machine_vertex(machine_vertex)
         assert (machine_vertex == self._machine_vertex)
 
     @property
@@ -57,3 +57,9 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
     @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
         return self._machine_vertex.vertex_slice.n_atoms
+
+    @overrides(ApplicationVertex.reset)
+    def reset(self):
+        # Override, as we don't want to clear the machine vertices here!
+        if self._splitter is not None:
+            self._splitter.reset_called()

@@ -16,18 +16,18 @@
 import unittest
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.partitioner_splitters import SplitterSliceLegacy
+from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman_test_objects import (
     DuckLegacyApplicationVertex, NonLegacyApplicationVertex, SimpleTestVertex)
 
 
-class TestSplitterSliceLegacy(unittest.TestCase):
+class TestSplitterFixedLegacy(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
 
     def test_api(self):
-        splitter = SplitterSliceLegacy("foo")
+        splitter = SplitterFixedLegacy("foo")
         a = str(splitter)
         self.assertIsNotNone(a)
         v1 = SimpleTestVertex(1, "v1")
@@ -40,12 +40,12 @@ class TestSplitterSliceLegacy(unittest.TestCase):
             splitter.set_governed_app_vertex(v2)
 
     def test_not_api(self):
-        splitter = SplitterSliceLegacy("foo")
+        splitter = SplitterFixedLegacy("foo")
         v1 = NonLegacyApplicationVertex("v1")
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v1)
 
     def test_legacy(self):
-        splitter = SplitterSliceLegacy("foo")
+        splitter = SplitterFixedLegacy("foo")
         v1 = DuckLegacyApplicationVertex("v1")
         splitter.set_governed_app_vertex(v1)

@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .constrained_object import ConstrainedObject
-from .edge_traffic_type import EdgeTrafficType
 from .slice import Slice
 
-__all__ = ["ConstrainedObject", "EdgeTrafficType", "Slice"]
+__all__ = ["ConstrainedObject", "Slice"]

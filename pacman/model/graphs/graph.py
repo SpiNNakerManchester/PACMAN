@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,9 +19,6 @@ from spinn_utilities.abstract_base import (
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
-from .abstract_edge_partition import AbstractEdgePartition
-from .abstract_edge import AbstractEdge
-from .abstract_vertex import AbstractVertex
 from pacman.model.graphs.common import ConstrainedObject
 
 
@@ -36,17 +33,8 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         "_allowed_edge_types",
         # The vertices of the graph
         "_vertices",
-        # The outgoing edge partitions of the graph by
-        # (edge.pre_vertex, outgoing_edge_partition_name)
-        "_outgoing_edge_partitions_by_name",
-        # The outgoing edges by pre-vertex
-        "_outgoing_edges",
         # The incoming edges by post-vertex
         "_incoming_edges",
-        # map between incoming edges and edge.post_vertex, edge_partition_name
-        "_incoming_edges_by_partition_name",
-        # the outgoing partitions by edge
-        "_outgoing_edge_partition_by_edge",
         # The label of the graph
         "_label",
         # map between labels and vertex
@@ -71,11 +59,7 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         self._vertices = []
         self._vertex_by_label = dict()
         self._unlabelled_vertex_count = 0
-        self._outgoing_edge_partitions_by_name = dict()
-        self._outgoing_edges = defaultdict(OrderedSet)
         self._incoming_edges = defaultdict(OrderedSet)
-        self._incoming_edges_by_partition_name = defaultdict(list)
-        self._outgoing_edge_partition_by_edge = dict()
         self._label = label
 
     @property
@@ -152,7 +136,7 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
                 outgoing_edge_partition_name, edge)
             self.add_outgoing_edge_partition(partition)
         self._register_edge(edge, partition)
-        partition.add_edge(edge, id(self))
+        partition.add_edge(edge)
         return partition
 
     def _register_edge(self, edge, partition):
@@ -184,13 +168,7 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
                 "Post-vertex must be known in graph")
 
         # Add the edge to the indices
-        self._outgoing_edges[edge.pre_vertex].add(edge)
-        self._incoming_edges_by_partition_name[
-            edge.post_vertex, partition.identifier].append(edge)
         self._incoming_edges[edge.post_vertex].add(edge)
-        if edge in self._outgoing_edge_partition_by_edge:
-            raise PacmanAlreadyExistsException("edge", edge)
-        self._outgoing_edge_partition_by_edge[edge] = partition
 
     @abstractmethod
     def new_edge_partition(self, name, edge):
@@ -280,14 +258,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         :rtype: int
         """
 
-    def get_outgoing_partition_for_edge(self, edge):
-        """ Gets the partition this edge is associated with.
-
-        :param AbstractEdge edge: the edge to find associated partition
-        :rtype: AbstractEdgePartition
-        """
-        return self._outgoing_edge_partition_by_edge[edge]
-
     def get_edges_starting_at_vertex(self, vertex):
         """ Get all the edges that start at the given vertex.
 
@@ -295,7 +265,10 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
             The vertex at which the edges to get start
         :rtype: iterable(AbstractEdge)
         """
-        return self._outgoing_edges[vertex]
+        parts = self.get_outgoing_edge_partitions_starting_at_vertex(vertex)
+        for partition in parts:
+            for edge in partition.edges:
+                yield edge
 
     def get_edges_ending_at_vertex(self, vertex):
         """ Get all the edges that end at the given vertex.
@@ -307,20 +280,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         if vertex not in self._incoming_edges:
             return []
         return self._incoming_edges[vertex]
-
-    def get_edges_ending_at_vertex_with_partition_name(
-            self, vertex, partition_name):
-        """ Get all the edges that end at the given vertex, and reside in the\
-            correct partition ID.
-
-        :param AbstractVertex vertex: The vertex at which the edges to get end
-        :param str partition_name: the label for the partition
-        :return: iterable(AbstractEdge)
-        """
-        key = (vertex, partition_name)
-        if key not in self._incoming_edges_by_partition_name:
-            return []
-        return self._incoming_edges_by_partition_name[key]
 
     @abstractmethod
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
@@ -343,21 +302,10 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         :return: the named edge partition, or None if no such partition exists
         :rtype: AbstractEdgePartition or None
         """
-        return self._outgoing_edge_partitions_by_name.get(
-            (vertex, outgoing_edge_partition_name), None)
-
-    def __contains__(self, value):
-        """ Determines if a value is an object that is in the graph.
-
-        :param value: The object to see if it is in the graph
-        :type value: AbstractVertex or AbstractEdge or AbstractEdgePartition
-        :return: True if the value is in the graph, False otherwise
-        :rtype: bool
-        """
-        if isinstance(value, AbstractEdgePartition):
-            return value in self._outgoing_edge_partitions_by_name.values()
-        elif isinstance(value, AbstractEdge):
-            return value in self._outgoing_edge_partition_by_edge
-        elif isinstance(value, AbstractVertex):
-            return value in self._vertices
-        return False
+        # In general, very few partitions start at a given vertex, so iteration
+        # isn't going to be as onerous as it looks
+        parts = self.get_outgoing_edge_partitions_starting_at_vertex(vertex)
+        for partition in parts:
+            if partition.identifier == outgoing_edge_partition_name:
+                return partition
+        return None

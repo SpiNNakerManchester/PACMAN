@@ -13,11 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
-from pacman.model.graphs.machine import AbstractMachineEdgePartition
 
 
-class AbstractSDRAMPartition(
-        AbstractMachineEdgePartition, metaclass=AbstractBase):
+class AbstractSDRAMPartition(object, metaclass=AbstractBase):
     """ An edge partition that contains SDRAM edges.
     """
 

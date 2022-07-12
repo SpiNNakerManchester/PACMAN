@@ -21,7 +21,6 @@ import unittest
 testmodules = [
     'model_tests.graph_mapper_tests.test_graph_mapping',
     'model_tests.graph_mapper_tests.test_slice',
-    'model_tests.machine_graph_tests.test_machine_graph_model',
     'model_tests.application_graph_tests.test_application_edge',
     'model_tests.application_graph_tests.test_application_graph',
     'model_tests.application_graph_tests.test_application_vertex',
