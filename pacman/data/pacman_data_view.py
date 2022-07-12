@@ -120,9 +120,6 @@ class PacmanDataView(MachineDataView):
 
         Semantic sugar for get_graph().n_vertices
 
-        As this method returns False if neither graph has vertices the better
-        check if the application level is to be used is has_machine_vertices
-
         :return: True if and only if the Application Graph has vertices.
         :rtype: bool
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -262,6 +259,22 @@ class PacmanDataView(MachineDataView):
 
 
     @classmethod
+    def get_outgoing_edge_partitions_starting_at_vertex(cls, vertex):
+        """ Get all the edge partitions that start at the given vertex.
+
+        Semantic sugar for get_graph().
+        get_outgoing_edge_partitions_starting_at_vertex
+
+        :param AbstractVertex vertex:
+            The vertex at which the edge partitions to find starts
+        :rtype: iterable(AbstractEdgePartition)
+        """
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        return cls.__pacman_data._graph.\
+            get_outgoing_edge_partitions_starting_at_vertex(vertex)
+
+    @classmethod
     def get_runtime_graph(cls):
         """
         The runtime application graph
@@ -285,7 +298,6 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._runtime_graph is None:
             raise cls._exception("runtime_graph")
         return cls.__pacman_data._runtime_graph
-
 
     @classmethod
     def get_runtime_n_machine_vertices(cls):
