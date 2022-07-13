@@ -20,7 +20,7 @@ from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ResourceContainer, ConstantSDRAM
-from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.config_setup import unittest_setup
 from pacman.model.placements.placements import Placements
 

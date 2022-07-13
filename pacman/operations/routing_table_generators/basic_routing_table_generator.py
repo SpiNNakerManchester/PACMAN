@@ -27,7 +27,8 @@ def basic_routing_table_generator():
     :rtype: MulticastRoutingTables
     """
     routing_infos = PacmanDataView.get_routing_infos()
-    routing_table_by_partitions = PacmanDataView.get_routing_table_by_partition()
+    routing_table_by_partitions = (
+        PacmanDataView.get_routing_table_by_partition())
     progress = ProgressBar(
         routing_table_by_partitions.n_routers, "Generating routing tables")
     routing_tables = MulticastRoutingTables()
