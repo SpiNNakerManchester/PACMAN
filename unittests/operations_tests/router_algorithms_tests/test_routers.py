@@ -520,6 +520,7 @@ def test_multi_down_chips_and_links(params):
 
     down_links = ""
     down_chips = ""
+    machine = PacmanDataView.get_machine()
     for i, (x, y, entry) in enumerate(chosen_entries):
         if entry.link_ids:
             link = list(entry.link_ids)[i % len(entry.link_ids)]
@@ -590,7 +591,6 @@ def test_spinnaker_link(params):
         writer.add_edge(ApplicationEdge(in_device, app_vertex), "Test")
         writer.add_edge(ApplicationEdge(app_vertex, out_device), "Test")
 
-    writer.set_machine(virtual_machine(24, 24))
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -614,7 +614,6 @@ def test_fpga_link(params):
         writer.add_edge(ApplicationEdge(in_device, app_vertex), "Test")
         writer.add_edge(ApplicationEdge(app_vertex, out_device), "Test")
 
-    writer.set_machine(virtual_machine(24, 24))
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
