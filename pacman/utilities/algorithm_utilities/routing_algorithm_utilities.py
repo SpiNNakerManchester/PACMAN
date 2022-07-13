@@ -520,7 +520,7 @@ def most_direct_route(source, dest, machine):
     return root
 
 
-def targets_by_chip(vertices, machine):
+def get_targets_by_chip(vertices, machine):
     """ Get the target links and cores on the relevant chips
 
     :param list(MachineVertex) vertices: The vertices to target
