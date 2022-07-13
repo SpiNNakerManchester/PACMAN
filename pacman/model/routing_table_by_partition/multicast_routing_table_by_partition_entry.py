@@ -250,6 +250,7 @@ class MulticastRoutingTableByPartitionEntry(object):
             ", ".join(map(str, self.processor_ids)))
 
     def has_same_route(self, entry):
+        # pylint:disable=protected-access
         return ((self._links_and_procs & _COMPARE_MASK) ==
                 (entry._links_and_procs & _COMPARE_MASK))
 

@@ -74,7 +74,7 @@ class MulticastRoutingTableByPartition(object):
                 entries[source_key] = entry.merge_entry(entries[source_key])
             except PacmanInvalidParameterException as e:
                 log.error(
-                    "Error merging entries on {} for {}", key, source_key)
+                    "Error merging entries on %s for %s", key, source_key)
                 raise e
 
     def get_routers(self):
