@@ -68,7 +68,7 @@ class ApplicationGraph(Graph):
         self._outgoing_edge_partitions_by_pre_vertex[
             edge_partition.pre_vertex].add(edge_partition)
         for edge in edge_partition.edges:
-            self._register_edge(edge, edge_partition)
+            self._register_edge(edge)
 
         self._n_outgoing_edge_partitions += 1
 

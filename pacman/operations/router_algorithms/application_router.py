@@ -135,7 +135,6 @@ def route_application_graph():
 
     partitions = get_app_partitions()
     machine = PacmanDataView.get_machine()
-    placements = PacmanDataView.get_placements()
     # Now go through the app edges and route app vertex by app vertex
     progress = ProgressBar(len(partitions), "Routing")
     for partition in progress.over(partitions):
@@ -145,7 +144,7 @@ def route_application_graph():
         # Pick a place within the source that we can route from.  Note that
         # this might not end up being the actual source in the end.
         source_mappings = _get_outgoing_mapping(
-            source, partition.identifier, placements, machine)
+            source, partition.identifier)
 
         # No source mappings?  Nothing to route then!
         if not source_mappings:
@@ -153,7 +152,7 @@ def route_application_graph():
 
         source_xy = next(iter(source_mappings.keys()))
         # Get all source chips coordinates
-        all_source_xys = _get_all_xys(source, placements, machine)
+        all_source_xys = _get_all_xys(source)
 
         # Keep track of the source edge chips
         source_edge_xys = set()
@@ -177,7 +176,7 @@ def route_application_graph():
             if source != target:
 
                 # Find all coordinates for chips (xy) that are in the target
-                target_xys = _get_all_xys(target, placements, machine)
+                target_xys = _get_all_xys(target)
 
                 # Pick one to actually use as a target
                 target_xy = _find_target_xy(
@@ -304,7 +303,7 @@ def _find_target_xy(target_xys, routes, source_mappings):
     return xy
 
 
-def _get_outgoing_mapping(app_vertex, partition_id, placements, machine):
+def _get_outgoing_mapping(app_vertex, partition_id):
     """
     Gets a Mapping from xy sources to a list of (vertex, the vertex,
         processor and link to follow to get to the vertex
@@ -313,8 +312,6 @@ def _get_outgoing_mapping(app_vertex, partition_id, placements, machine):
 
     :param app_vertex:
     :param partition_id:
-    :param placements:
-    :param machine:
     :rtype: dict(tuple(int, int),
         list(tuple(MachineVertex, int,  None) or
              tuple(MachineVertex, None, int)))
@@ -330,14 +327,12 @@ def _get_outgoing_mapping(app_vertex, partition_id, placements, machine):
     return outgoing_mapping
 
 
-def _get_all_xys(app_vertex, placements, machine):
+def _get_all_xys(app_vertex):
     """
     Gets the list of all the xy coordinates the vertexes machine vertices
         are placed on
 
     :param app_vertex:
-    :param placements:
-    :param machine:
     :rtype: set(tuple(int, int))
     """
     return {vertex_xy(m_vertex)

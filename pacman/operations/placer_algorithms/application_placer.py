@@ -151,7 +151,7 @@ def _place_error(
 
     report_file = os.path.join(
         PacmanDataView.get_report_dir_path(), "placements_error.txt")
-    with open(report_file, 'w') as f:
+    with open(report_file, 'w', encoding="utf-8") as f:
         f.write(f"Could not place {len(unplaceable)} of {app_graph.n_vertices}"
                 " application vertices.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
@@ -320,6 +320,7 @@ def _do_constraints(vertices, sdram, placements, machine, next_chip_space):
                 try:
                     next_core = next(next_cores)
                 except StopIteration:
+                    # pylint: disable=raise-missing-from
                     raise PacmanConfigurationException(
                         f"No more cores available on {x}, {y}: {on_chip}")
             placements.add_placement(Placement(vertex, x, y, next_core))
@@ -395,7 +396,7 @@ class _Spaces(object):
                     _Space(self.__last_chip_space.chip))
 
         except StopIteration:
-            raise PacmanPlaceException(
+            raise PacmanPlaceException(  # pylint: disable=raise-missing-from
                 f"No more chips to place on; {self.n_chips_used} of "
                 f"{self.__machine.n_chips} used")
 

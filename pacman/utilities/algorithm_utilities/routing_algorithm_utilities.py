@@ -511,7 +511,7 @@ def most_direct_route(source, dest, machine):
     :param Machine machine: The machine on which to route
     """
     vector = machine.get_vector(source, dest)
-    nodes = longest_dimension_first(vector, source, machine)
+    nodes = longest_dimension_first(vector, source)
     route = dict()
     nodes_to_trees(nodes, source, route)
     root = route[source]

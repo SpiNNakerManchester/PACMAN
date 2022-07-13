@@ -213,6 +213,7 @@ class MulticastRoutingTableByPartitionEntry(object):
         :return: a merged MulticastRoutingTableByPartitionEntry
         :raises PacmanInvalidParameterException:
         """
+        # pylint:disable=protected-access
         if not isinstance(other, MulticastRoutingTableByPartitionEntry):
             raise PacmanInvalidParameterException(
                 "other", "type error",

@@ -132,7 +132,7 @@ def vertex_to_json(vertex):
     return json_dict
 
 
-def vertex_from_json(json_dict, convert_constraints=True):
+def vertex_from_json(json_dict):
     resources = resource_container_from_json(json_dict.get("resources"))
     return SimpleMachineVertex(resources, label=json_dict["label"])
 
