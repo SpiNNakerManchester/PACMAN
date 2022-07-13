@@ -21,8 +21,7 @@ from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationEdge
-from pacman.model.graphs.machine import (
-    MulticastEdgePartition, SimpleMachineVertex)
+from pacman.model.graphs.machine import MulticastEdgePartition
 from pacman.model.placements import Placements
 from pacman.model.routing_info import (
     DictBasedMachinePartitionNKeysMap, RoutingInfo)
@@ -73,7 +72,6 @@ class TestSimulatorData(unittest.TestCase):
 
         writer.stopping()
         PacmanDataView.get_runtime_graph()
-
 
     def test_graph_functions(self):
         writer = PacmanDataWriter.setup()

@@ -14,12 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from tempfile import mkstemp
-from os import fdopen
+import numpy
+import os
 
+from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.log import FormatAdapter
 
 from pacman.data import PacmanDataView
 from pacman.model.placements import Placements, Placement
@@ -28,14 +29,6 @@ from pacman.exceptions import (
     PacmanPlaceException, PacmanConfigurationException)
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
-
-from spinn_utilities.ordered_set import OrderedSet
-from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.log import FormatAdapter
-from spinn_utilities.config_holder import get_config_bool
-import os
-import numpy
-import logging
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

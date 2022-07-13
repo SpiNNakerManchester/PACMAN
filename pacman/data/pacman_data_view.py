@@ -280,7 +280,6 @@ class PacmanDataView(MachineDataView):
                 raise cls._exception("graph")
         return cls.__pacman_data._graph.n_outgoing_edge_partitions
 
-
     @classmethod
     def get_outgoing_edge_partitions_starting_at_vertex(cls, vertex):
         """ Get all the edge partitions that start at the given vertex.
@@ -323,7 +322,9 @@ class PacmanDataView(MachineDataView):
         """
         if cls.__pacman_data._runtime_graph is None:
             if cls._is_mocked():
-                cls.__pacman_data._runtime_graph = ApplicationGraph("Mocked")
+                if cls.__pacman_data._graph is None:
+                    raise cls._exception("graph")
+                cls.__pacman_data._runtime_graph = cls.__pacman_data._graph
             else:
                 raise cls._exception("runtime_graph")
         return cls.__pacman_data._runtime_graph
@@ -341,7 +342,6 @@ class PacmanDataView(MachineDataView):
         return sum(len(vertex.machine_vertices)
                    for vertex in cls.get_runtime_graph().vertices)
 
-
     @classmethod
     def get_runtime_machine_vertices(cls):
         """
@@ -356,7 +356,6 @@ class PacmanDataView(MachineDataView):
                 raise cls._exception("runtime_graph")
         for app_vertex in cls.get_runtime_graph().vertices:
             yield from app_vertex.machine_vertices
-
 
     @classmethod
     def get_vertices_or_edges_added(cls):
