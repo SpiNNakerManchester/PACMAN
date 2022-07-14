@@ -19,8 +19,7 @@ from spinn_utilities.overrides import overrides
 from spinn_machine.data.machine_data_writer import MachineDataWriter
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.placements import Placements
-from pacman.model.routing_info import (
-    DictBasedMachinePartitionNKeysMap, RoutingInfo)
+from pacman.model.routing_info import RoutingInfo
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition)
 from pacman.model.routing_tables import MulticastRoutingTables
@@ -146,23 +145,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         if not isinstance(tags, Tags):
             raise TypeError("tags should be a Tags")
         self.__pacman_data._tags = tags
-
-    def set_machine_partition_n_keys_map(self, machine_partition_n_keys_map):
-        """
-        Sets the machine_partition_n_keys_map value
-
-        :param DictBasedMachinePartitionNKeysMap machine_partition_n_keys_map:
-            new value
-        :raises TypeError: if the machine_partition_n_keys_map is not a
-        DictBasedMachinePartitionNKeysMap
-        """
-        if not isinstance(machine_partition_n_keys_map,
-                          DictBasedMachinePartitionNKeysMap):
-            raise TypeError(
-                "machine_partition_n_keys_map should be a"
-                " DictBasedMachinePartitionNKeysMap")
-        self.__pacman_data._machine_partition_n_keys_map = \
-            machine_partition_n_keys_map
 
     def set_uncompressed(self, router_tables):
         """

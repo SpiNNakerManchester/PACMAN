@@ -166,18 +166,3 @@ def placement_from_json(json_dict, graph=None):
     vertex = vertex_lookup(json_dict["vertex_label"], graph)
     return Placement(
         vertex, int(json_dict["x"]), int(json_dict["y"]), int(json_dict["p"]))
-
-
-def partition_to_n_keys_map_to_json(partition_to_n_keys_map):
-    json_list = []
-    for partition in partition_to_n_keys_map:
-        json_dict = dict()
-        try:
-            json_dict["pre_vertex_label"] = partition.pre_vertex.label
-            json_dict["identifier"] = partition.identifier
-            json_dict["n_keys"] = partition_to_n_keys_map.n_keys_for_partition(
-                partition)
-        except Exception as ex:  # pylint: disable=broad-except
-            json_dict["exception"] = str(ex)
-        json_list.append(json_dict)
-    return json_list

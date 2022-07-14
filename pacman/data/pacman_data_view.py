@@ -18,8 +18,6 @@ from spinn_utilities.log import FormatAdapter
 from spinn_machine.data import MachineDataView
 from pacman.exceptions import PacmanNotPlacedError
 from pacman.model.graphs.application import ApplicationGraph
-from pacman.model.routing_info import (
-    DictBasedMachinePartitionNKeysMap)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access
@@ -45,7 +43,6 @@ class _PacmanDataModel(object):
     __slots__ = [
         # Data values cached
         "_graph",
-        "_machine_partition_n_keys_map",
         "_placements",
         "_plan_n_timesteps",
         "_precompressed",
@@ -86,7 +83,6 @@ class _PacmanDataModel(object):
         self._runtime_graph = None
         self._routing_infos = None
         self._routing_table_by_partition = None
-        self._machine_partition_n_keys_map = None
         self._tags = None
         self._soft_reset()
 
@@ -453,25 +449,6 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._tags is None:
             raise cls._exception("tags")
         return cls.__pacman_data._tags
-
-    # MachinePartitionNKeysMap
-
-    @classmethod
-    def get_machine_partition_n_keys_map(cls):
-        """
-        Retreives the machine_partition_n_keys_map if it is available
-
-        :rtype: DictBasedMachinePartitionNKeysMap
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the map is currently unavailable
-        """
-        if cls.__pacman_data._machine_partition_n_keys_map is None:
-            if cls._is_mocked():
-                cls.__pacman_data._machine_partition_n_keys_map = \
-                    DictBasedMachinePartitionNKeysMap()
-            else:
-                raise cls._exception("machine_partition_n_keys_map")
-        return cls.__pacman_data._machine_partition_n_keys_map
 
     # RoutingTables
 
