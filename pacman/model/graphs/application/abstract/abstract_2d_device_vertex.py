@@ -12,7 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractproperty, abstractmethod)
 import math
 from pacman.exceptions import PacmanConfigurationException
 from pacman.utilities.utility_calls import get_n_bits
@@ -57,6 +58,11 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """ The height of the sub-rectangles to divide the input into
 
         :rtype: int
+        """
+
+    @abstractmethod
+    def set_constraints(self, partition):
+        """ set constraints for the vertex
         """
 
     def __is_power_of_2(self, v):

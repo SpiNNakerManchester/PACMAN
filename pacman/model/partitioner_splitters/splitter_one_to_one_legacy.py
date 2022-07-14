@@ -18,7 +18,6 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
@@ -52,7 +51,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         self._resources_required = None
 
     def __str__(self):
-        return self.STR_MESSAGE.format(self._governed_app_vertex)
+        return f"SplitterOneToOneLegacy for {self._governed_app_vertex}"
 
     def __repr__(self):
         return self.__str__()
@@ -69,6 +68,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
                 vertex_slice=self._vertex_slice,
                 resources_required=self._resources_required, label=None,
                 constraints=None))
+        self._governed_app_vertex.remember_machine_vertex(self._machine_vertex)
         if not isinstance(app_vertex, LegacyPartitionerAPI):
             for abstractmethod in LegacyPartitionerAPI.abstract_methods():
                 check = getattr(app_vertex, abstractmethod, None)
@@ -80,28 +80,24 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
                 logger.warning(self.NOT_API_WARNING)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
-        resource_tracker.allocate_constrained_resources(
-            self._resources_required, self._governed_app_vertex.constraints)
-        machine_graph.add_vertex(self._machine_vertex)
-        return self._machine_vertex
+    def create_machine_vertices(self, chip_counter):
+        chip_counter.add_core(self._resources_required)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        return [self._vertex_slice], True
+        return [self._vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
-        return [self._vertex_slice], True
+        return [self._vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, edge, outgoing_edge_partition):
-        return {self._machine_vertex: [MachineEdge]}
+    def get_out_going_vertices(self, partition_id):
+        return [self._machine_vertex]
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, edge, outgoing_edge_partition,
-                               src_machine_vertex):
-        return {self._machine_vertex: [MachineEdge]}
+    def get_in_coming_vertices(self, partition_id):
+        return [self._machine_vertex]
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):

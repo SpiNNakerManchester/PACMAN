@@ -90,7 +90,7 @@ class RangeCompressor(object):
                 return uncompressed
 
         # Step 1 get the entries and make sure they are sorted by key
-        self._entries = uncompressed.multicast_routing_entries
+        self._entries = list(uncompressed.multicast_routing_entries)
         self._entries.sort(key=lambda x: x.routing_entry_key)
         if not self._validate():
             return uncompressed

@@ -99,25 +99,26 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                 f"Unknown vertex type to splitter: {app_vertex}")
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
+    def create_machine_vertices(self, chip_counter):
         for vertex in self.__incoming_vertices:
-            machine_graph.add_vertex(vertex)
+            # machine_graph.add_vertex(vertex)
+            chip_counter.add_core(vertex.resources_required)
         if self.__outgoing_vertex is not None:
-            machine_graph.add_vertex(self.__outgoing_vertex)
+            # machine_graph.add_vertex(self.__outgoing_vertex)
+            chip_counter.add_core(self.__outgoing_vertex.resources_required)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
         if self.__outgoing_vertex is None:
             return []
-        return [self.__outgoing_slice], True
+        return [self.__outgoing_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        return self.__incoming_slices, True
+        return self.__incoming_slices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(
-            self, edge, outgoing_edge_partition, src_machine_vertex):
+    def get_in_coming_vertices(self, partition_id):
         # Note, the incoming vertex is how to get packets into this device,
         # so we want to direct it at the outgoing vertex!
         if self.__outgoing_vertex is None:
@@ -127,7 +128,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         return {self.__outgoing_vertex: [MachineEdge]}
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, edge, outgoing_edge_partition):
+    def get_out_going_vertices(self, partition_id):
         # Note, the outgoing vertex is how to get packets out of this device,
         # so we want to direct it at the incoming vertices!
         if not self.__incoming_vertices:

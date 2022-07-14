@@ -14,11 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .splitter_one_app_one_machine import SplitterOneAppOneMachine
-from .splitter_slice_legacy import SplitterSliceLegacy
 from .splitter_fixed_legacy import SplitterFixedLegacy
 from .splitter_one_to_one_legacy import SplitterOneToOneLegacy
 from .splitter_external_device import SplitterExternalDevice
 
 __all__ = ['SplitterOneAppOneMachine', 'SplitterOneToOneLegacy',
-           'SplitterSliceLegacy', 'SplitterFixedLegacy',
-           'SplitterExternalDevice']
+           'SplitterFixedLegacy', 'SplitterExternalDevice']

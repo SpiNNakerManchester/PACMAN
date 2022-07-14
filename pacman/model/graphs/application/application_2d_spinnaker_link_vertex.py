@@ -63,6 +63,10 @@ class Application2DSpiNNakerLinkVertex(
     def _sub_height(self):
         return self.__sub_height
 
+    @overrides(Abstract2DDeviceVertex.set_constraints)
+    def set_constraints(self, partition):
+        return None
+
     @property
     @overrides(ApplicationSpiNNakerLinkVertex.atoms_shape)
     def atoms_shape(self):

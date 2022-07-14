@@ -26,8 +26,6 @@ class MulticastRoutingTables(object):
     """
 
     __slots__ = [
-        # set that holds routing tables
-        "_routing_tables",
         # dict of (x,y) -> routing table
         "_routing_tables_by_chip",
         # maximum value for number_of_entries in all tables
@@ -41,7 +39,6 @@ class MulticastRoutingTables(object):
         :raise PacmanAlreadyExistsException:
             If any two routing tables are for the same chip
         """
-        self._routing_tables = set()
         self._routing_tables_by_chip = dict()
         self._max_number_of_entries = 0
 
@@ -57,12 +54,6 @@ class MulticastRoutingTables(object):
         :raise PacmanAlreadyExistsException:
             If a routing table already exists for the chip
         """
-        if routing_table in self._routing_tables:
-            raise PacmanAlreadyExistsException(
-                "The Routing table {} has already been added to the collection"
-                " before and therefore already exists".format(routing_table),
-                str(routing_table))
-
         if (routing_table.x, routing_table.y) in self._routing_tables_by_chip:
             raise PacmanAlreadyExistsException(
                 "The Routing table for chip {}:{} already exists in this "
@@ -70,7 +61,6 @@ class MulticastRoutingTables(object):
                 .format(routing_table.x, routing_table.y), str(routing_table))
         self._routing_tables_by_chip[(routing_table.x, routing_table.y)] = \
             routing_table
-        self._routing_tables.add(routing_table)
         self._max_number_of_entries = max(
             self._max_number_of_entries, routing_table.number_of_entries)
 
@@ -82,7 +72,7 @@ class MulticastRoutingTables(object):
         :rtype: iterable(MulticastRoutingTable)
         :raise None: does not raise any known exceptions
         """
-        return self._routing_tables
+        return self._routing_tables_by_chip.values()
 
     @property
     def max_number_of_entries(self):
@@ -112,7 +102,7 @@ class MulticastRoutingTables(object):
 
         :return: iterator of multicast_routing_table
         """
-        return iter(self._routing_tables)
+        return iter(self._routing_tables_by_chip.values())
 
 
 def to_json(router_table):

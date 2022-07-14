@@ -18,7 +18,6 @@ from pacman.model.resources import ResourceContainer
 from .machine_vertex import MachineVertex
 from pacman.model.graphs import (
     AbstractVirtual, AbstractSpiNNakerLink)
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 
 
 class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
@@ -46,8 +45,6 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address
         self._linked_chip_coordinates = linked_chip_coordinates
-        self._virtual_chip_x = None
-        self._virtual_chip_y = None
         self._outgoing_keys_and_masks = outgoing_keys_and_masks
         self._incoming = incoming
         self._outgoing = outgoing
@@ -71,24 +68,6 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
     @overrides(AbstractVirtual.linked_chip_coordinates)
     def linked_chip_coordinates(self):
         return self._linked_chip_coordinates
-
-    @property
-    @overrides(AbstractVirtual.virtual_chip_x)
-    def virtual_chip_x(self):
-        return self._virtual_chip_x
-
-    @property
-    @overrides(AbstractVirtual.virtual_chip_y)
-    def virtual_chip_y(self):
-        return self._virtual_chip_y
-
-    @overrides(AbstractVirtual.set_virtual_chip_coordinates)
-    def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
-        if virtual_chip_x is not None and virtual_chip_y is not None:
-            self._virtual_chip_x = virtual_chip_x
-            self._virtual_chip_y = virtual_chip_y
-            self.add_constraint(ChipAndCoreConstraint(
-                self._virtual_chip_x, self._virtual_chip_y))
 
     @overrides(AbstractVirtual.outgoing_keys_and_masks)
     def outgoing_keys_and_masks(self):

@@ -49,7 +49,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
         if splitter_name is None:
             splitter_name = self.SPLITTER_NAME
         super().__init__(splitter_name)
-        self.__vertex_map = None
+        # self.__vertex_map = None
         self.__slices = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
@@ -66,31 +66,30 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
                 logger.warning(self.NOT_API_WARNING)
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, edge, outgoing_edge_partition):
-        return self.__all_vertex_map
+    def get_out_going_vertices(self, partition_id):
+        return list(self._governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(
-            self, edge, outgoing_edge_partition, src_machine_vertex):
-        return self.__all_vertex_map
+    def get_in_coming_vertices(self, partition_id):
+        return list(self._governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
         return list(self._governed_app_vertex.machine_vertices)
 
-    @property
-    def __all_vertex_map(self):
-        if self.__vertex_map is None:
-            self.__vertex_map = self._get_map([MachineEdge])
-        return self.__vertex_map
+    # @property
+    # def __all_vertex_map(self):
+    #     if self.__vertex_map is None:
+    #         self.__vertex_map = self._get_map([MachineEdge])
+    #     return self.__vertex_map
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        return self.__fixed_slices, True
+        return self.__fixed_slices
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
-        return self.__fixed_slices, True
+        return self.__fixed_slices
 
     @property
     def __fixed_slices(self):
@@ -101,18 +100,18 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
         return self.__slices
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
+    def create_machine_vertices(self, chip_counter):
         app_vertex = self._governed_app_vertex
         remaining_constraints = get_remaining_constraints(app_vertex)
         for vertex_slice in self.__fixed_slices:
             resources = app_vertex.get_resources_used_by_atoms(vertex_slice)
-            resource_tracker.allocate_constrained_resources(
-                resources, remaining_constraints)
+            chip_counter.add_core(resources)
             label = f"MachineVertex for {vertex_slice} of {app_vertex.label}"
-            machine_graph.add_vertex(app_vertex.create_machine_vertex(
-                vertex_slice, resources, label, remaining_constraints))
+            machine_vertex = app_vertex.create_machine_vertex(
+                vertex_slice, resources, label, remaining_constraints)
+            app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):
         self.__slices = None
-        self.__vertex_map = None
+        # self.__vertex_map = None

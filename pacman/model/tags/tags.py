@@ -135,6 +135,16 @@ class Tags(object):
                 (reverse_ip_tag.board_address, reverse_ip_tag.port))
 
     @property
+    def ip_tags_vertices(self):
+        """ List the (IPTag, vertex) pairs stored
+
+        :rtype: iterable(tuple(IPTag, MachineVertex))
+        """
+        yield from [(tag, vert)
+                    for vert, tags in self._ip_tags_by_vertex.items()
+                    for tag in tags]
+
+    @property
     def ip_tags(self):
         """ The IP tags assigned
 

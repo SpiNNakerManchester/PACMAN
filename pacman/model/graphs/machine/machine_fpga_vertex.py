@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.model.graphs import AbstractFPGA, AbstractVirtual
 from pacman.model.resources import ResourceContainer
 from .machine_vertex import MachineVertex
@@ -29,8 +28,6 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         "_fpga_link_id",
         "_board_address",
         "_linked_chip_coordinates",
-        "_virtual_chip_x",
-        "_virtual_chip_y",
         "_outgoing_keys_and_masks",
         "_incoming",
         "_outgoing"]
@@ -48,8 +45,6 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         self._fpga_link_id = fpga_link_id
         self._board_address = board_address
         self._linked_chip_coordinates = linked_chip_coordinates
-        self._virtual_chip_x = None
-        self._virtual_chip_y = None
         self._outgoing_keys_and_masks = outgoing_keys_and_masks
         self._incoming = incoming
         self._outgoing = outgoing
@@ -78,24 +73,6 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
     @overrides(AbstractVirtual.linked_chip_coordinates)
     def linked_chip_coordinates(self):
         return self._linked_chip_coordinates
-
-    @property
-    @overrides(AbstractVirtual.virtual_chip_x)
-    def virtual_chip_x(self):
-        return self._virtual_chip_x
-
-    @property
-    @overrides(AbstractVirtual.virtual_chip_y)
-    def virtual_chip_y(self):
-        return self._virtual_chip_y
-
-    @overrides(AbstractVirtual.set_virtual_chip_coordinates)
-    def set_virtual_chip_coordinates(self, virtual_chip_x, virtual_chip_y):
-        if virtual_chip_x is not None and virtual_chip_y is not None:
-            self._virtual_chip_x = virtual_chip_x
-            self._virtual_chip_y = virtual_chip_y
-            self.add_constraint(ChipAndCoreConstraint(
-                self._virtual_chip_x, self._virtual_chip_y))
 
     @overrides(AbstractVirtual.outgoing_keys_and_masks)
     def outgoing_keys_and_masks(self):
