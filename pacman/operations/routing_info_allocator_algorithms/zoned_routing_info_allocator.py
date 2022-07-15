@@ -21,6 +21,8 @@ from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.routing_info import (
     RoutingInfo, MachineVertexRoutingInfo, BaseKeyAndMask,
     AppVertexRoutingInfo)
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.application.abstract import Abstract2DDeviceVertex
 from pacman.utilities.utility_calls import get_key_ranges
 from pacman.exceptions import PacmanRouteInfoAllocationException,\
@@ -139,11 +141,12 @@ class ZonedRoutingInfoAllocator(object):
         self.__all_fixed = True
 
         self.__find_fixed()
+        self.__calculate_zones()
+        self.__check_zones()
+
         if self.__all_fixed:
             return self.__allocate_all_fixed()
 
-        self.__calculate_zones()
-        self.__check_zones()
         return self.__allocate()
 
     def __check_constraint_supported(self, constraint):
@@ -322,10 +325,19 @@ class ZonedRoutingInfoAllocator(object):
         routing_infos = RoutingInfo()
         progress = ProgressBar(
             len(self.__fixed_partitions), "Allocating routing keys")
-        for partition, keys_and_masks in progress.over(
+        for (part_id, vertex), keys_and_masks in progress.over(
                 self.__fixed_partitions.items()):
-            routing_infos.add_partition_info(
-                PartitionRoutingInfo(keys_and_masks, partition))
+            if isinstance(vertex, ApplicationVertex):
+                n_bits_atoms = self.__atom_bits_per_app_part[vertex, part_id]
+                routing_infos.add_routing_info(
+                    AppVertexRoutingInfo(
+                        keys_and_masks, part_id, vertex,
+                        self.__mask(n_bits_atoms), n_bits_atoms,
+                        len(vertex.machine_vertices)-1))
+            elif isinstance(vertex, MachineVertex):
+                routing_infos.add_routing_info(
+                    MachineVertexRoutingInfo(
+                        keys_and_masks, part_id, vertex, vertex.index))
         return routing_infos
 
     def __allocate(self):
