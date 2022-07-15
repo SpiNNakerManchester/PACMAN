@@ -126,7 +126,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         # so we want to direct it at the outgoing vertex!
         if self.__outgoing_vertex is None:
             raise PacmanNotExistException(
-                f"The target device of {edge} doesn't support outgoing"
+                f"The target device of {self} doesn't support outgoing"
                 " traffic")
         return {self.__outgoing_vertex: [MachineEdge]}
 
@@ -136,7 +136,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         # so we want to direct it at the incoming vertices!
         if not self.__incoming_vertices:
             raise PacmanNotExistException(
-                f"The target device of {edge} doesn't support incoming"
+                f"The target device of {self} doesn't support incoming"
                 " traffic")
         return {v: [MachineEdge] for v in self.__incoming_vertices}
 
