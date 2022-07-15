@@ -19,7 +19,6 @@ from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationGraph, ApplicationEdge,
     ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex, FPGAConnection)
 from pacman.model.graphs.machine import MulticastEdgePartition, MachineEdge
-from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman.model.partitioner_splitters import SplitterExternalDevice
 from pacman.utilities.utility_objs import ChipCounter
 from pacman.operations.placer_algorithms.application_placer import (
