@@ -17,9 +17,10 @@ from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationGraph, ApplicationEdge,
-    ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex)
+    ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex, FPGAConnection)
 from pacman.model.graphs.machine import MulticastEdgePartition, MachineEdge
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
+from pacman.model.partitioner_splitters import SplitterExternalDevice
 from pacman.utilities.utility_objs import ChipCounter
 from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
@@ -586,11 +587,11 @@ def test_spinnaker_link(params):
     unittest_setup()
     app_graph = ApplicationGraph("Test")
     in_device = ApplicationSpiNNakerLinkVertex(100, 0)
-    in_device.splitter = SplitterFixedLegacy()
+    in_device.splitter = SplitterExternalDevice()
     in_device.splitter.create_machine_vertices(ChipCounter())
     app_graph.add_vertex(in_device)
     out_device = ApplicationSpiNNakerLinkVertex(100, 0)
-    out_device.splitter = SplitterFixedLegacy()
+    out_device.splitter = SplitterExternalDevice()
     out_device.splitter.create_machine_vertices(ChipCounter())
     app_graph.add_vertex(out_device)
     for i in range(n_vertices):
@@ -609,12 +610,15 @@ def test_fpga_link(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     app_graph = ApplicationGraph("Test")
-    in_device = ApplicationFPGAVertex(100, 0, 0)
-    in_device.splitter = SplitterFixedLegacy()
+    in_device = ApplicationFPGAVertex(
+        100, [FPGAConnection(0, 0, None, None)], None)
+    in_device.splitter = SplitterExternalDevice()
     in_device.splitter.create_machine_vertices(ChipCounter())
     app_graph.add_vertex(in_device)
-    out_device = ApplicationFPGAVertex(100, 0, 1)
-    out_device.splitter = SplitterFixedLegacy()
+    out_device = ApplicationFPGAVertex(
+        100, [FPGAConnection(0, 1, None, None)],
+        FPGAConnection(0, 1, None, None))
+    out_device.splitter = SplitterExternalDevice()
     out_device.splitter.create_machine_vertices(ChipCounter())
     app_graph.add_vertex(out_device)
     for i in range(n_vertices):
