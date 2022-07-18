@@ -98,8 +98,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         Clones the user/ original graphs and creates runtime ones
 
-        :raises PacmanConfigurationException: if both Application and Machine
-        level have vertices
         """
         self.__pacman_data._runtime_graph = self.__pacman_data._graph.clone()
 

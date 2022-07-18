@@ -442,7 +442,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_tags(cls):
         """
-        The Tags object of known
+        The Tags object if known
 
         :rtype: ~pacman.model.tags.Tags
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
