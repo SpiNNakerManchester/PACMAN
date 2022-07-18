@@ -40,7 +40,7 @@ class TestSimulatorData(unittest.TestCase):
         # Use manual_check to verify this without dependency
         PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.has_application_vertices()
+            PacmanDataView.get_n_vertices()
 
     def test_mock(self):
         PacmanDataWriter.mock()
@@ -50,7 +50,7 @@ class TestSimulatorData(unittest.TestCase):
     def test_graphs(self):
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.has_application_vertices()
+            PacmanDataView.get_n_vertices()
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_runtime_graph()
 
@@ -63,7 +63,7 @@ class TestSimulatorData(unittest.TestCase):
         PacmanDataView.get_runtime_graph()
 
         writer.finish_run()
-        PacmanDataView.has_application_vertices()
+        PacmanDataView.get_n_vertices()
         PacmanDataView.get_runtime_graph()
         # the writer still has access to the runtime graphs
         writer.get_runtime_graph()
@@ -81,7 +81,7 @@ class TestSimulatorData(unittest.TestCase):
         edge13 = ApplicationEdge(app1, app3)
         edge11 = ApplicationEdge(app1, app1)
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.has_application_vertices()
+            PacmanDataView.get_n_vertices()
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_edges_ending_at_vertex(app1)
         with self.assertRaises(DataNotYetAvialable):
@@ -96,7 +96,7 @@ class TestSimulatorData(unittest.TestCase):
             PacmanDataView.iterate_partitions()
 
         writer.create_graphs("test")
-        self.assertFalse(PacmanDataView.has_application_vertices())
+        self.assertFalse(PacmanDataView.get_n_vertices() == 1)
         PacmanDataView.add_vertex(app1)
         PacmanDataView.add_vertex(app2)
         PacmanDataView.add_vertex(app3)
@@ -105,7 +105,7 @@ class TestSimulatorData(unittest.TestCase):
         PacmanDataView.add_edge(edge11, "foo")
         PacmanDataView.add_edge(edge32, "bar")
 
-        self.assertTrue(PacmanDataView.has_application_vertices())
+        self.assertTrue(PacmanDataView.get_n_vertices() > 0)
         self.assertSetEqual(
             set([edge12, edge32]),
             set(PacmanDataView.get_edges_ending_at_vertex(app2)))
@@ -124,7 +124,7 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(SimulatorRunningException):
             PacmanDataView.add_edge(edge12, "foo")
         # The info methods do still work
-        self.assertTrue(PacmanDataView.has_application_vertices())
+        self.assertTrue(PacmanDataView.get_n_vertices() > 0)
         self.assertSetEqual(
             set([app1, app2, app3]),
             set(PacmanDataView.iterate_vertices()))
