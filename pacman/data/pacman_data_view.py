@@ -77,6 +77,8 @@ class _PacmanDataModel(object):
         """
         Clears out all data that should change after a reset and graph change
         """
+        if self._graph:
+            self._graph.reset()
         self._placements = None
         self._precompressed = None
         self._uncompressed = None
