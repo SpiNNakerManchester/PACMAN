@@ -48,7 +48,6 @@ class _PacmanDataModel(object):
         "_precompressed",
         "_routing_infos",
         "_routing_table_by_partition",
-        "_runtime_graph",
         "_tags",
         "_uncompressed",
         "_vertices_or_edges_added",
@@ -82,7 +81,6 @@ class _PacmanDataModel(object):
         self._placements = None
         self._precompressed = None
         self._uncompressed = None
-        self._runtime_graph = None
         self._routing_infos = None
         self._routing_table_by_partition = None
         self._tags = None
@@ -299,27 +297,27 @@ class PacmanDataView(MachineDataView):
             If the runtime_graph is currently unavailable, or if this method
             is used except during run
         """
-        if cls.__pacman_data._runtime_graph is None:
+        if cls.__pacman_data._graph is None:
             if cls._is_mocked():
                 if cls.__pacman_data._graph is None:
                     raise cls._exception("graph")
-                cls.__pacman_data._runtime_graph = cls.__pacman_data._graph
+                cls.__pacman_data._graph = cls.__pacman_data._graph
             else:
-                raise cls._exception("runtime_graph")
-        return cls.__pacman_data._runtime_graph
+                raise cls._exception("graph")
+        return cls.__pacman_data._graph
 
     @classmethod
     def get_runtime_n_machine_vertices(cls):
         """
         Gets the number of machine vertices via the application graph
         """
-        if cls.__pacman_data._runtime_graph is None:
+        if cls.__pacman_data._graph is None:
             if cls._is_mocked():
-                cls.__pacman_data._runtime_graph = ApplicationGraph("Mocked")
+                cls.__pacman_data._graph = ApplicationGraph("Mocked")
             else:
-                raise cls._exception("runtime_graph")
+                raise cls._exception("graph")
         return sum(len(vertex.machine_vertices)
-                   for vertex in cls.get_runtime_graph().vertices)
+                   for vertex in cls.get_graph().vertices)
 
     @classmethod
     def get_runtime_machine_vertices(cls):
@@ -328,12 +326,12 @@ class PacmanDataView(MachineDataView):
 
         :return:
         """
-        if cls.__pacman_data._runtime_graph is None:
+        if cls.__pacman_data._graph is None:
             if cls._is_mocked():
-                cls.__pacman_data._runtime_graph = ApplicationGraph("Mocked")
+                cls.__pacman_data._graph = ApplicationGraph("Mocked")
             else:
-                raise cls._exception("runtime_graph")
-        for app_vertex in cls.get_runtime_graph().vertices:
+                raise cls._exception("graph")
+        for app_vertex in cls.get_graph().vertices:
             yield from app_vertex.machine_vertices
 
     @classmethod

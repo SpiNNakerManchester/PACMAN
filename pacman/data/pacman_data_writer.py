@@ -80,7 +80,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
         :rtype: ApplicationGraph
         """
-        return self.__pacman_data._runtime_graph
+        return self.__pacman_data._graph
 
     def create_graphs(self, graph_label):
         """
@@ -94,13 +94,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
         self.__pacman_data._graph = ApplicationGraph(label=graph_label)
 
-    def clone_graphs(self):
-        """
-        Clones the user/ original graphs and creates runtime ones
-
-        """
-        self.__pacman_data._runtime_graph = self.__pacman_data._graph.clone()
-
     def _set_runtime_graph(self, graph):
         """
         Only used in unittests
@@ -109,7 +102,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         if not self._is_mocked():
             raise NotImplementedError("Only valid in Mocked state!")
-        self.__pacman_data._runtime_graph = graph
+        self.__pacman_data._graph = graph
 
     def set_placements(self, placements):
         """
