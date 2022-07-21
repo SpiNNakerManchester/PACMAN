@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.operations.routing_info_allocator_algorithms.\
     zoned_routing_info_allocator import (flexible_allocate, global_allocate)
 from pacman.model.graphs.application import (
@@ -214,12 +215,14 @@ def check_keys_for_application_partition_pairs(
 
 def test_global_allocator():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
 
     # Allocate something and check it does the right thing
     app_graph = create_graphs1(False)
+    writer._set_runtime_graph(app_graph)
 
-    # The number of bits is 6 + 7 + 8 = 21, so it shouldn't fail
-    routing_info = global_allocate(app_graph, [])
+    # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
+    routing_info = global_allocate([])
 
     # Last 8 for atom id
     mask = 0xFFFFFF00
@@ -235,10 +238,12 @@ def test_flexible_allocator_no_fixed():
     unittest_setup()
 
     # Allocate something and check it does the right thing
+    writer = PacmanDataWriter.mock()
     app_graph = create_graphs1(False)
+    writer._set_runtime_graph(app_graph)
 
     # The number of bits is 8 + 7 + 6 = 21, so it shouldn't fail
-    routing_info = flexible_allocate(app_graph, [])
+    routing_info = flexible_allocate([])
 
     # all but the bottom 8 + 7 = 15 bits should be the same
     app_mask = 0xFFFF8000
@@ -248,27 +253,33 @@ def test_flexible_allocator_no_fixed():
 
 def test_fixed_only():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph = create_graphs_only_fixed()
-    flexible_allocate(app_graph, [])
-    routing_info = global_allocate(app_graph, [])
+    writer._set_runtime_graph(app_graph)
+    flexible_allocate([])
+    routing_info = global_allocate([])
     assert len(list(routing_info)) == 4
 
 
 def test_no_edge():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph = create_graphs_no_edge()
-    flexible_allocate(app_graph, [])
-    routing_info = global_allocate(app_graph, [])
+    writer._set_runtime_graph(app_graph)
+    flexible_allocate([])
+    routing_info = global_allocate([])
     assert len(list(routing_info)) == 0
 
 
 def test_flexible_allocator_with_fixed():
     unittest_setup()
     # Allocate something and check it does the right thing
+    writer = PacmanDataWriter.mock()
     app_graph = create_graphs1(True)
+    writer._set_runtime_graph(app_graph)
 
     # The number of bits is 6 + 7 + 8 = 21, so it shouldn't fail
-    routing_info = flexible_allocate(app_graph, [])
+    routing_info = flexible_allocate([])
 
     # all but the bottom 8 + 7 = 15 bits should be the same
     app_mask = 0xFFFF8000
@@ -316,10 +327,12 @@ def create_big(with_fixed):
 
 def test_big_flexible_no_fixed():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph = create_big(False)
+    writer._set_runtime_graph(app_graph)
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = flexible_allocate(app_graph, [])
+    routing_info = flexible_allocate([])
 
     # The number of bits is 1 + 21 = 22, so it shouldn't fail
     # all but the bottom 21 bits should be the same
@@ -330,9 +343,10 @@ def test_big_flexible_no_fixed():
 
 def test_big_global_no_fixed():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph = create_big(False)
-    # Make the call, and it should fail
-    routing_info = global_allocate(app_graph, [])
+    writer._set_runtime_graph(app_graph)
+    routing_info = global_allocate([])
 
     # 1 for app 11 for machine so where possible use 20 for atoms
     mask = 0xFFF00000
@@ -349,10 +363,12 @@ def test_big_global_no_fixed():
 
 def test_big_flexible_fixed():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph = create_big(True)
+    writer._set_runtime_graph(app_graph)
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = flexible_allocate(app_graph, [])
+    routing_info = flexible_allocate([])
 
     # all but the bottom 18 bits should be the same
     app_mask = 0xFFFC0000
@@ -362,9 +378,10 @@ def test_big_flexible_fixed():
 
 def test_big_global_fixed():
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     app_graph = create_big(True)
-    # Make the call, and it should fail
-    routing_info = global_allocate(app_graph, [])
+    writer._set_runtime_graph(app_graph)
+    routing_info = global_allocate([])
 
     # 7 bit atoms is 7 as it ignore the retina
     mask = 0xFFFFFF80

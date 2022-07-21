@@ -13,17 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from pacman.data import PacmanDataView
 from pacman.model.partitioner_interfaces import AbstractSplitterPartitioner
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 
-def splitter_partitioner(app_graph, plan_n_time_steps):
+def splitter_partitioner():
     """
-     :param ApplicationGraph app_graph: The application_graph to partition
-     :param plan_n_time_steps:
-         the number of time steps to plan to run for
-     :type plan_n_time_steps: int or None
      :return:
          The number of chips needed to satisfy this partitioning.
      :rtype: int
@@ -32,7 +29,7 @@ def splitter_partitioner(app_graph, plan_n_time_steps):
      """
     partitioner = _SplitterPartitioner()
     # pylint:disable=protected-access
-    return partitioner._run(app_graph, plan_n_time_steps)
+    return partitioner._run()
 
 
 class _SplitterPartitioner(AbstractSplitterPartitioner):
@@ -43,22 +40,17 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
     __slots__ = []
 
     # inherited from AbstractPartitionAlgorithm
-    def _run(self, app_graph, plan_n_time_steps):
+    def _run(self):
         """
-        :param ApplicationGraph app_graph: The application_graph to partition
-        :param plan_n_time_steps: the number of time steps to plan to run for
-        :return:
-            the estimated number of chips needed to satisfy this partitioning.
         :rtype: int
         :raise PacmanPartitionException:
             If something goes wrong with the partitioning
         """
-
-        vertices = app_graph.vertices
+        vertices = PacmanDataView.get_runtime_graph().vertices
         progress = ProgressBar(len(vertices), "Partitioning Graph")
 
         # Partition one vertex at a time
-        chip_counter = ChipCounter(plan_n_time_steps)
+        chip_counter = ChipCounter()
         for vertex in progress.over(vertices):
             vertex.splitter.create_machine_vertices(chip_counter)
 

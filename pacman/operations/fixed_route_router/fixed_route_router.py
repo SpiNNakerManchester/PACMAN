@@ -15,16 +15,15 @@
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import FixedRouteEntry, Machine
+from pacman.data import PacmanDataView
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanRoutingException)
 
 
-def fixed_route_router(machine, placements, destination_class):
+def fixed_route_router(destination_class):
     """ Runs the fixed route generator for all boards on machine
 
-    :param ~spinn_machine.Machine machine: SpiNNMachine object
-    :param Placements placements: placements object
     :param destination_class: the destination class to route packets to
     :type destination_class: type or tuple(type,...)
     :return: router tables for fixed route paths
@@ -33,7 +32,7 @@ def fixed_route_router(machine, placements, destination_class):
     :raises PacmanRoutingException:
     :raises PacmanAlreadyExistsException:
     """
-    router = _FixedRouteRouter(machine, placements, destination_class)
+    router = _FixedRouteRouter(destination_class)
     # pylint:disable=protected-access
     return router._run()
 
@@ -47,19 +46,15 @@ class _FixedRouteRouter(object):
         "_destination_class", "_fixed_route_tables",
         "_machine", "_placements"]
 
-    def __init__(self, machine, placements, destination_class):
-        self._machine = machine
+    def __init__(self, destination_class):
+        self._machine = PacmanDataView.get_machine()
         self._destination_class = destination_class
-        self._placements = placements
+        self._placements = PacmanDataView.get_placements()
         self._fixed_route_tables = dict()
 
     def _run(self):
         """ Runs the fixed route generator for all boards on machine
 
-        :param ~spinn_machine.Machine machine: SpiNNMachine object
-        :param Placements placements: placements object
-        :param destination_class: the destination class to route packets to
-        :type destination_class: type or tuple(type,...)
         :return: router tables for fixed route paths
         :rtype: dict(tuple(int,int), ~spinn_machine.FixedRouteEntry)
         :raises PacmanConfigurationException: if no placement processor found

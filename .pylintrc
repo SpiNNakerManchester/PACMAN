@@ -380,6 +380,8 @@ init-import=no
 defining-attr-methods=__init__,
                       __new__,
                       __call__,
+                      _clear,
+                      _hard_reset,
                       setUp
 
 # List of member names, which should be excluded from the protected access

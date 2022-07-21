@@ -23,6 +23,7 @@ from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import Machine
+from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import MinimisationFailedError
@@ -46,14 +47,11 @@ class AbstractCompressor(object):
         self._accept_overflow = accept_overflow
         self._problems = ""
 
-    def _run(self, router_tables):
+    def _run(self):
         """
-        :param MulticastRoutingTables router_tables:
-        :param bool accept_overflow:
-            A flag which should only be used in testing to stop raising an
-            exception if result is too big
         :rtype: MulticastRoutingTables
         """
+        router_tables = PacmanDataView.get_precompressed()
         # create progress bar
         progress = ProgressBar(
             router_tables.routing_tables,

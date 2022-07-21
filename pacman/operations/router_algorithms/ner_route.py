@@ -31,11 +31,12 @@ from collections import defaultdict
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
+from pacman.data import PacmanDataView
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     route_has_dead_links, avoid_dead_links, convert_a_route,
-    longest_dimension_first, nodes_to_trees, vertex_xy, targets_by_chip,
+    longest_dimension_first, nodes_to_trees, vertex_xy, get_targets_by_chip,
     least_busy_dimension_first, get_app_partitions, vertex_xy_and_route)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
@@ -109,7 +110,7 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
         # node it would create a cycle in the route which would be VeryBad(TM).
         # As a result, we work backward through the route and truncate it at
         # the first point where the route intersects with a connected node.
-        nodes = vector_to_nodes(vector, neighbour, machine)
+        nodes = vector_to_nodes(vector, neighbour)
         i = len(nodes)
         for _direction, (x, y) in reversed(nodes):
             i -= 1
@@ -128,8 +129,7 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
     return route[src]
 
 
-def _do_route(source_xy, post_vertexes, machine, placements,
-              vector_to_nodes):
+def _do_route(source_xy, post_vertexes, machine, vector_to_nodes):
     """ Routing algorithm based on Neighbour Exploring Routing (NER).
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
@@ -144,35 +144,32 @@ def _do_route(source_xy, post_vertexes, machine, placements,
     :param tuple(int,int) source_xy:
     :param iterable(MachineVertex) post_vertexes:
     :param ~spinn_machine.Machine machine:
-    :param Placements placements:
     :param vector_to_nodes:
     :return:
     :rtype: RoutingTree
     """
-    destinations = set(vertex_xy(post_vertex, placements, machine)
+    destinations = set(vertex_xy(post_vertex)
                        for post_vertex in post_vertexes)
     # Generate routing tree (assuming a perfect machine)
     root = _ner_net(source_xy, destinations, machine, vector_to_nodes)
 
     # Fix routes to avoid dead chips/links
-    if route_has_dead_links(root, machine):
-        root = avoid_dead_links(root, machine)
+    if route_has_dead_links(root):
+        root = avoid_dead_links(root)
 
     return root
 
 
-def _ner_route(graph, machine, placements, vector_to_nodes):
+def _ner_route(vector_to_nodes):
     """ Performs routing using rig algorithm
 
-    :param ApplicationGraph graph:
-    :param ~spinn_machine.Machine machine:
-    :param Placements placements:
+    :param vector_to_nodes:
     :return:
     :rtype: MulticastRoutingTableByPartition
     """
     routing_tables = MulticastRoutingTableByPartition()
 
-    partitions = get_app_partitions(graph)
+    partitions = get_app_partitions()
 
     progress_bar = ProgressBar(len(partitions), "Routing")
 
@@ -200,14 +197,13 @@ def _ner_route(graph, machine, placements, vector_to_nodes):
                     post_vertices_by_source[in_part.pre_vertex].add(
                         edge.post_vertex)
 
+        machine = PacmanDataView.get_machine()
         for m_vertex in outgoing:
             post_vertexes = post_vertices_by_source[m_vertex]
-            source_xy, (m_vertex, core, link) = vertex_xy_and_route(
-                m_vertex, placements, machine)
+            source_xy, (m_vertex, core, link) = vertex_xy_and_route(m_vertex)
             routing_tree = _do_route(
-                source_xy, post_vertexes, machine, placements,
-                vector_to_nodes)
-            targets = targets_by_chip(post_vertexes, placements, machine)
+                source_xy, post_vertexes, machine, vector_to_nodes)
+            targets = get_targets_by_chip(post_vertexes, machine)
             convert_a_route(
                 routing_tables, m_vertex, partition.identifier,
                 core, link, routing_tree, targets)
@@ -217,29 +213,21 @@ def _ner_route(graph, machine, placements, vector_to_nodes):
     return routing_tables
 
 
-def ner_route(machine, graph, placements):
+def ner_route():
     """ basic ner router
 
-    :param ApplicationGraph graph: the graph
-    :param ~spinn_machine.Machine machine: spinnaker machine
-    :param Placements placements: the placements
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition
     """
-    return _ner_route(
-        graph, machine, placements, longest_dimension_first)
+    return _ner_route(longest_dimension_first)
 
 
-def ner_route_traffic_aware(machine, graph, placements):
+def ner_route_traffic_aware():
     """ traffic-aware ner router
 
-    :param ApplicationGraph graph: the graph
-    :param ~spinn_machine.Machine machine: spinnaker machine
-    :param Placements placements: the placements
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition
     """
     traffic = defaultdict(lambda: 0)
     return _ner_route(
-        graph, machine, placements,
         functools.partial(least_busy_dimension_first, traffic))

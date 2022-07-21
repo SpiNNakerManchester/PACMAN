@@ -94,10 +94,9 @@ class TestPlacements(unittest.TestCase):
         for i in range(4):
             pl.append(Placement(subv[i], 0, 0, i))
 
-        pls = Placements(pl)
-        container = pls.placements
+        pls = Placements(pl).placements
         for i in range(4):
-            self.assertIn(pl[i], container)
+            self.assertIn(pl[i], pls)
 
 
 if __name__ == '__main__':

@@ -13,15 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_machine_partition_n_keys_map import (
-    AbstractMachinePartitionNKeysMap)
 from .base_key_and_mask import BaseKeyAndMask
-from .dict_based_machine_partition_n_keys_map import (
-    DictBasedMachinePartitionNKeysMap)
 from .routing_info import RoutingInfo
 from .machine_vertex_routing_info import MachineVertexRoutingInfo
 from .app_vertex_routing_info import AppVertexRoutingInfo
 
-__all__ = ["AbstractMachinePartitionNKeysMap", "BaseKeyAndMask",
-           "DictBasedMachinePartitionNKeysMap", "MachineVertexRoutingInfo",
+__all__ = ["BaseKeyAndMask", "MachineVertexRoutingInfo",
            "RoutingInfo", "AppVertexRoutingInfo"]

@@ -19,6 +19,7 @@ from collections import defaultdict
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
+from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
@@ -60,24 +61,19 @@ class _DijkstraInfo(object):
 
 
 def basic_dijkstra_routing(
-        machine, graph, placements,
         bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
     """ Find routes between the edges with the allocated information,
         placed in the given places
 
-    :param ~spinn_machine.Machine machine:
-        The machine through which the routes are to be found
-    :param ApplicationGraph graph: the graph to route
-    :param Placements placements: The placements of the edges
     :param bool use_progress_bar: whether to show a progress bar
     :return: The discovered routes
     :rtype: MulticastRoutingTables
     :raise PacmanRoutingException:
         If something goes wrong with the routing
     """
-    router = _BasicDijkstraRouting(machine, bw_per_route_entry, max_bw)
+    router = _BasicDijkstraRouting(bw_per_route_entry, max_bw)
     # pylint:disable=protected-access
-    return router._run(placements, graph)
+    return router._run()
 
 
 class _BasicDijkstraRouting(object):
@@ -94,27 +90,19 @@ class _BasicDijkstraRouting(object):
         "_bw_per_route_entry",
 
         # parameter to control ...........
-        "_max_bw",
-
-        # the SpiNNMachine object used within the system.
-        "_machine"
+        "_max_bw"
     ]
 
-    def __init__(self, machine, bw_per_route_entry, max_bw):
+    def __init__(self, bw_per_route_entry, max_bw):
         # set up basic data structures
         self._routing_paths = MulticastRoutingTableByPartition()
         self._bw_per_route_entry = bw_per_route_entry
         self._max_bw = max_bw
-        self._machine = machine
 
-    def _run(self, placements, graph):
+    def _run(self):
         """ Find routes between the edges with the allocated information,
             placed in the given places
 
-        :param Placements placements: The placements of the edges
-        :param ~spinn_machine.Machine machine:
-            The machine through which the routes are to be found
-        :param ApplicationGraph graph: the graph object
         :param bool use_progress_bar: whether to show a progress bar
         :return: The discovered routes
         :rtype: MulticastRoutingTableByPartition
@@ -126,17 +114,16 @@ class _BasicDijkstraRouting(object):
         tables = self._initiate_dijkstra_tables()
         self._update_all_weights(nodes_info)
 
-        partitions = get_app_partitions(graph)
+        partitions = get_app_partitions()
         progress = ProgressBar(len(partitions), "Creating routing entries")
 
         for partition in progress.over(partitions):
-            self._route(partition, placements, nodes_info, tables)
+            self._route(partition, nodes_info, tables)
         return self._routing_paths
 
-    def _route(self, partition, placements, node_info, tables):
+    def _route(self, partition, node_info, tables):
         """
         :param ApplicationEdgePartition partition:
-        :param Placements placements:
         :param ApplicationGraph graph:
         :param dict(tuple(int,int),_NodeInfo) node_info:
         :param dict(tuple(int,int),_DijkstraInfo) tables:
@@ -156,8 +143,7 @@ class _BasicDijkstraRouting(object):
                     source, partition.identifier)
 
             for tgt, srcs in target_vertices:
-                xy, (m_vertex, core, link) = vertex_xy_and_route(
-                    tgt, placements, self._machine)
+                xy, (m_vertex, core, link) = vertex_xy_and_route(tgt)
                 for src in srcs:
                     if isinstance(src, ApplicationVertex):
                         for s in src.splitter.get_out_going_vertices(
@@ -181,7 +167,7 @@ class _BasicDijkstraRouting(object):
                 outgoing.add(in_part.pre_vertex)
                 for edge in in_part.edges:
                     xy, (_tgt, core, link) = vertex_xy_and_route(
-                        edge.post_vertex, placements, self._machine)
+                        edge.post_vertex)
                     if core is not None:
                         destinations[in_part.pre_vertex][xy][0].add(core)
                     if link is not None:
@@ -189,8 +175,7 @@ class _BasicDijkstraRouting(object):
                     dest_chips[in_part.pre_vertex].add(xy)
 
         for m_vertex in outgoing:
-            source_xy, (m_vertex, core, link) = vertex_xy_and_route(
-                m_vertex, placements, self._machine)
+            source_xy, (m_vertex, core, link) = vertex_xy_and_route(m_vertex)
             if dest_chips[m_vertex]:
                 self._update_all_weights(node_info)
                 self._reset_tables(tables)
@@ -214,7 +199,7 @@ class _BasicDijkstraRouting(object):
         :rtype: dict(tuple(int,int),_NodeInfo)
         """
         nodes_info = dict()
-        for chip in self._machine.chips:
+        for chip in PacmanDataView.get_machine().chips:
             # get_neighbours should return a list of
             # dictionaries of 'x' and 'y' values
             node = _NodeInfo()
@@ -236,7 +221,7 @@ class _BasicDijkstraRouting(object):
         # Holds all the information about nodes within one full run of
         # Dijkstra's algorithm
         tables = dict()
-        for chip in self._machine.chips:
+        for chip in PacmanDataView.get_machine().chips:
             tables[chip.x, chip.y] = _DijkstraInfo()
         return tables
 

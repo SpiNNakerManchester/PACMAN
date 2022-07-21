@@ -20,6 +20,7 @@ test for partitioning
 import unittest
 
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman.operations.partition_algorithms import splitter_partitioner
 from pacman.model.graphs.application import ApplicationGraph
@@ -58,7 +59,10 @@ class TestBasicPartitioner(unittest.TestCase):
         verts = [vert1, vert2, vert3]
         graph = ApplicationGraph("Graph")
         graph.add_vertices(verts)
-        splitter_partitioner(graph, 3000)
+        writer = PacmanDataWriter.mock()
+        writer._set_runtime_graph(graph)
+        writer.set_plan_n_timesteps(3000)
+        splitter_partitioner()
         self.assertEqual(_n_machine_vertices(graph), 3)
         for vert in verts:
             for m_vert in vert.machine_vertices:
@@ -72,8 +76,11 @@ class TestBasicPartitioner(unittest.TestCase):
         large_vertex.splitter = SplitterFixedLegacy()
         graph = ApplicationGraph("Graph with large vertex")
         graph.add_vertex(large_vertex)
+        writer = PacmanDataWriter.mock()
+        writer.set_plan_n_timesteps(1000)
+        writer._set_runtime_graph(graph)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
-        splitter_partitioner(graph, 1000)
+        splitter_partitioner()
         self.assertEqual(_n_machine_vertices(graph), 2)
 
     def test_partition_on_target_size_vertex_than_has_to_be_split(self):
@@ -84,8 +91,11 @@ class TestBasicPartitioner(unittest.TestCase):
             1000, "Large vertex", max_atoms_per_core=10)
         large_vertex.splitter = SplitterFixedLegacy()
         graph = ApplicationGraph("Graph with large vertex")
+        writer = PacmanDataWriter.mock()
+        writer.set_plan_n_timesteps(1000)
         graph.add_vertex(large_vertex)
-        splitter_partitioner(graph, 3000)
+        writer._set_runtime_graph(graph)
+        splitter_partitioner()
         self.assertEqual(_n_machine_vertices(graph), 100)
 
     def test_partition_with_unsupported_constraints(self):
@@ -104,7 +114,10 @@ class TestBasicPartitioner(unittest.TestCase):
         test that the partitioner can work with an empty graph
         """
         graph = ApplicationGraph("foo")
-        splitter_partitioner(graph, 3000)
+        writer = PacmanDataWriter.mock()
+        writer._set_runtime_graph(graph)
+        writer.set_plan_n_timesteps(3000)
+        splitter_partitioner()
         self.assertEqual(_n_machine_vertices(graph), 0)
 
     def test_partition_with_fixed_atom_constraints(self):
@@ -118,9 +131,11 @@ class TestBasicPartitioner(unittest.TestCase):
         vertex.splitter = SplitterFixedLegacy()
         app_graph = ApplicationGraph("Test")
         app_graph.add_vertex(vertex)
-
+        writer = PacmanDataWriter.mock()
+        writer._set_runtime_graph(app_graph)
+        writer.set_plan_n_timesteps(3000)
         # Do the partitioning - this should just work
-        splitter_partitioner(app_graph, 3000)
+        splitter_partitioner()
         self.assertEqual(4, _n_machine_vertices(app_graph))
 
 

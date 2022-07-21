@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .routing_tree import RoutingTree
+from pacman.data import PacmanDataView
 from pacman.exceptions import MachineHasDisconnectedSubRegion
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartitionEntry)
@@ -24,7 +25,7 @@ import heapq
 import itertools
 
 
-def get_app_partitions(app_graph):
+def get_app_partitions():
     """ Find all application partitions.
 
         Note that where a vertex splitter indicates that it has internal
@@ -49,6 +50,7 @@ def get_app_partitions(app_graph):
     """
 
     # Find all partitions that need to be dealt with
+    app_graph = PacmanDataView.get_runtime_graph()
     partitions = list(app_graph.outgoing_edge_partitions)
     sources = set(p.pre_vertex for p in partitions)
 
@@ -64,19 +66,17 @@ def get_app_partitions(app_graph):
     return partitions
 
 
-def route_has_dead_links(root, machine):
+def route_has_dead_links(root):
     """ Quickly determine if a route uses any dead links.
 
     :param RoutingTree root:
         The root of the RoutingTree which contains nothing but RoutingTrees
         (i.e. no vertices and links).
-    :param ~spinn_machine.Machine machine:
-        The machine in which the routes exist.
     :return: True if the route uses any dead/missing links, False otherwise.
     :rtype: bool
     """
     for _, (x, y), routes in root.traverse():
-        chip = machine.get_chip_at(x, y)
+        chip = PacmanDataView.get_chip_at(x, y)
         for route in routes:
             if chip is None:
                 return True
@@ -85,7 +85,7 @@ def route_has_dead_links(root, machine):
     return False
 
 
-def avoid_dead_links(root, machine):
+def avoid_dead_links(root):
     """ Modify a RoutingTree to route-around dead links in a Machine.
 
     Uses A* to reconnect disconnected branches of the tree (due to dead links
@@ -94,14 +94,12 @@ def avoid_dead_links(root, machine):
     :param RoutingTree root:
         The root of the RoutingTree which contains nothing but RoutingTrees
         (i.e. no vertices and links).
-    :param ~spinn_machine.Machine machine:
-        The machine in which the routes exist.
     :return:
         A new RoutingTree is produced rooted as before.
     :rtype: RoutingTree
     """
     # Make a copy of the RoutingTree with all broken parts disconnected
-    root, lookup, broken_links = _copy_and_disconnect_tree(root, machine)
+    root, lookup, broken_links = _copy_and_disconnect_tree(root)
 
     # For each disconnected subtree, use A* to connect the tree to *any* other
     # disconnected subtree. Note that this process will eventually result in
@@ -113,8 +111,7 @@ def avoid_dead_links(root, machine):
         # Try to reconnect broken links to any other part of the tree
         # (excluding this broken subtree itself since that would create a
         # cycle).
-        path = a_star(
-            child, parent, set(lookup).difference(child_chips), machine)
+        path = a_star(child, parent, set(lookup).difference(child_chips))
 
         # Add new RoutingTree nodes to reconnect the child to the tree.
         last_node = lookup[path[0][1]]
@@ -152,7 +149,7 @@ def avoid_dead_links(root, machine):
     return root
 
 
-def _copy_and_disconnect_tree(root, machine):
+def _copy_and_disconnect_tree(root):
     """
     Copy a RoutingTree (containing nothing but RoutingTrees), disconnecting
     nodes which are not connected in the machine.
@@ -168,8 +165,6 @@ def _copy_and_disconnect_tree(root, machine):
     :param RoutingTree root:
         The root of the RoutingTree that contains nothing but RoutingTrees
         (i.e. no children which are vertices or links).
-    :param ~spinn_machine.Machine machine:
-        The machine in which the routes exist
     :return: (root, lookup, broken_links)
         Where:
         * `root` is the new root of the tree
@@ -194,7 +189,7 @@ def _copy_and_disconnect_tree(root, machine):
     to_visit = deque([(None, None, root)])
     while to_visit:
         new_parent, direction, old_node = to_visit.popleft()
-
+        machine = PacmanDataView.get_machine()
         if machine.is_chip_at(old_node.chip[0], old_node.chip[1]):
             # Create a copy of the node
             new_node = RoutingTree(old_node.chip)
@@ -229,7 +224,7 @@ def _copy_and_disconnect_tree(root, machine):
     return new_root, new_lookup, broken_links
 
 
-def a_star(sink, heuristic_source, sources, machine):
+def a_star(sink, heuristic_source, sources):
     """ Use A* to find a path from any of the sources to the sink.
 
     Note that the heuristic means that the search will proceed towards
@@ -246,7 +241,6 @@ def a_star(sink, heuristic_source, sources, machine):
         An element from `sources` which is used as a guiding heuristic for the
         A* algorithm.
     :param set(tuple(int,int)) sources: set([(x, y), ...])
-    :param ~spinn_machine.Machine machine:
     :return: [(int, (x, y)), ...]
         A path starting with a coordinate in `sources` and terminating at
         connected neighbour of `sink` (i.e. the path does not include `sink`).
@@ -254,6 +248,7 @@ def a_star(sink, heuristic_source, sources, machine):
         (x, y) to arrive at the next point in the path.
     :rtype: list(tuple(int,tuple(int,int)))
     """
+    machine = PacmanDataView.get_machine()
     # Select the heuristic function to use for distances
     heuristic = (lambda the_node: machine.get_vector_length(
         the_node, heuristic_source))
@@ -381,7 +376,7 @@ def convert_a_route(
             next_incoming_link, next_hop, targets_by_chip)
 
 
-def longest_dimension_first(vector, start, machine):
+def longest_dimension_first(vector, start):
     """
     List the (x, y) steps on a longest-dimension first route.
 
@@ -396,10 +391,10 @@ def longest_dimension_first(vector, start, machine):
     """
     return vector_to_nodes(
         sorted(enumerate(vector), key=(lambda x: abs(x[1])), reverse=True),
-        start, machine)
+        start)
 
 
-def least_busy_dimension_first(traffic, vector, start, machine):
+def least_busy_dimension_first(traffic, vector, start):
     """ List the (x, y) steps on a route that goes through the least busy\
         routes first.
 
@@ -418,7 +413,7 @@ def least_busy_dimension_first(traffic, vector, start, machine):
     min_route = None
     for order in itertools.permutations([0, 1, 2]):
         dm_vector = [(i, vector[i]) for i in order]
-        route = vector_to_nodes(dm_vector, start, machine)
+        route = vector_to_nodes(dm_vector, start)
         sum_traffic = sum(traffic[x, y] for _, (x, y) in route)
         if min_route is None or min_sum > sum_traffic:
             min_sum = sum_traffic
@@ -430,17 +425,17 @@ def least_busy_dimension_first(traffic, vector, start, machine):
     return min_route
 
 
-def vector_to_nodes(dm_vector, start, machine):
+def vector_to_nodes(dm_vector, start):
     """ Convert a vector to a set of nodes
 
     :param list(tuple(int,int)) dm_vector:
         A vector made up of a list of (dimension, magnitude), where dimensions
         are x=0, y=1, z=diagonal=2
     :param tuple(int,int) start: The x, y coordinates of the start
-    :param Machine machine: The machine to apply the vector to
     :return: A list of (link_id, (target_x, target_y)) of nodes on a route
     :rtype: list(tuple(int,tuple(int, int)))
     """
+    machine = PacmanDataView.get_machine()
     x, y = start
 
     out = []
@@ -516,16 +511,16 @@ def most_direct_route(source, dest, machine):
     :param Machine machine: The machine on which to route
     """
     vector = machine.get_vector(source, dest)
-    nodes = longest_dimension_first(vector, source, machine)
+    nodes = longest_dimension_first(vector, source)
     route = dict()
     nodes_to_trees(nodes, source, route)
     root = route[source]
-    if route_has_dead_links(root, machine):
-        root = avoid_dead_links(root, machine)
+    if route_has_dead_links(root):
+        root = avoid_dead_links(root)
     return root
 
 
-def targets_by_chip(vertices, placements, machine):
+def get_targets_by_chip(vertices, machine):
     """ Get the target links and cores on the relevant chips
 
     :param list(MachineVertex) vertices: The vertices to target
@@ -536,19 +531,19 @@ def targets_by_chip(vertices, placements, machine):
     """
     by_chip = defaultdict(lambda: (set(), set()))
     for vertex in vertices:
-        x, y = vertex_xy(vertex, placements, machine)
+        x, y = vertex_xy(vertex)
         if isinstance(vertex, AbstractVirtual):
             # Sinks with route-to-endpoint constraints must be routed
             # in the according directions.
             link = route_to_endpoint(vertex, machine)
             by_chip[x, y][1].add(link)
         else:
-            core = placements.get_placement_of_vertex(vertex).p
+            core = PacmanDataView.get_placement_of_vertex(vertex).p
             by_chip[x, y][0].add(core)
     return by_chip
 
 
-def vertex_xy(vertex, placements, machine):
+def vertex_xy(vertex):
     """
     :param MachineVertex vertex:
     :param Placements placements:
@@ -556,25 +551,25 @@ def vertex_xy(vertex, placements, machine):
     :rtype: tuple(int,int)
     """
     if not isinstance(vertex, AbstractVirtual):
-        placement = placements.get_placement_of_vertex(vertex)
+        placement = PacmanDataView.get_placement_of_vertex(vertex)
         return placement.x, placement.y
     link_data = None
     if isinstance(vertex, AbstractFPGA):
+        machine = PacmanDataView.get_machine()
         link_data = machine.get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
     elif isinstance(vertex, AbstractSpiNNakerLink):
+        machine = PacmanDataView.get_machine()
         link_data = machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
     return link_data.connected_chip_x, link_data.connected_chip_y
 
 
-def vertex_xy_and_route(vertex, placements, machine):
+def vertex_xy_and_route(vertex):
     """ Get the non-virtual chip coordinates, the vertex, and processor or
         link to follow to get to the vertex
 
     :param MachineVertex vertex:
-    :param Placements placements:
-    :param ~spinn_machine.Machine machine:
     :return: the xy corridinates of the target vertex mapped to a tuple of
         the vertex, core and link.
         One of core or link is provided the other is None
@@ -582,13 +577,15 @@ def vertex_xy_and_route(vertex, placements, machine):
         tuple(tuple(int, int), tuple(MachineVertex, None, int))
     """
     if not isinstance(vertex, AbstractVirtual):
-        placement = placements.get_placement_of_vertex(vertex)
+        placement = PacmanDataView.get_placement_of_vertex(vertex)
         return (placement.x, placement.y), (vertex, placement.p, None)
     link_data = None
     if isinstance(vertex, AbstractFPGA):
+        machine = PacmanDataView.get_machine()
         link_data = machine.get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
     elif isinstance(vertex, AbstractSpiNNakerLink):
+        machine = PacmanDataView.get_machine()
         link_data = machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
     return ((link_data.connected_chip_x, link_data.connected_chip_y),
