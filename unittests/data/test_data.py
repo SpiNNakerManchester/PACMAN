@@ -77,7 +77,14 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.iterate_partitions()
         with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_n_partitions()
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_outgoing_edge_partitions_starting_at_vertex(
+                app1)
+        with self.assertRaises(DataNotYetAvialable):
             list(PacmanDataView.get_vertices_by_type(SimpleTestVertex2))
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_edges()
 
         writer.create_graphs("test")
         self.assertFalse(PacmanDataView.get_n_vertices() == 1)
@@ -96,17 +103,34 @@ class TestSimulatorData(unittest.TestCase):
         self.assertSetEqual(
             set([app1, app2, app3]),
             set(PacmanDataView.iterate_vertices()))
+        self.assertEqual(
+            [app2, app3],
+            list(PacmanDataView.get_vertices_by_type(SimpleTestVertex2)))
         self.assertEqual(3, PacmanDataView.get_n_vertices())
         partitions = set(PacmanDataView.iterate_partitions())
         self.assertEqual(2, len(partitions))
         self.assertEqual(2, PacmanDataView.get_n_partitions())
+        ps = PacmanDataView.get_outgoing_edge_partitions_starting_at_vertex(
+            app1)
+        self.assertEqual(1, len(ps))
+        self.assertEqual([edge12, edge13, edge11, edge32],
+                         PacmanDataView.get_edges())
 
         writer.shut_down()
         # Graph info calls still work
         PacmanDataView.get_edges_ending_at_vertex(app1)
+        list(PacmanDataView.iterate_vertices())
+        list(PacmanDataView.get_vertices_by_type(SimpleTestVertex2))
+        PacmanDataView.get_n_vertices()
+        set(PacmanDataView.iterate_partitions())
+        PacmanDataView.get_n_partitions()
+        PacmanDataView.get_outgoing_edge_partitions_starting_at_vertex(app1)
+        PacmanDataView.get_edges()
+        # Adding will no longer work
         with self.assertRaises(SimulatorShutdownException):
-            PacmanDataView.add_vertex( SimpleTestVertex(12, "new"))
-
+            PacmanDataView.add_vertex(SimpleTestVertex(12, "new"))
+        with self.assertRaises(SimulatorShutdownException):
+            PacmanDataView.add_edge(ApplicationEdge(app1, app2), "new")
 
     def test_placements(self):
         writer = PacmanDataWriter.setup()

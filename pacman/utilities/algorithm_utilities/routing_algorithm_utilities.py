@@ -49,11 +49,12 @@ def get_app_partitions():
     """
 
     # Find all partitions that need to be dealt with
-    partitions = PacmanDataView.get_partitions_clone()
+    # Make a copy which we can edit
+    partitions = list(PacmanDataView.iterate_partitions())
     sources = set(p.pre_vertex for p in partitions)
 
     # Convert internal partitions to self-connected partitions
-    for v in PacmanDataView.iterate_partitions():
+    for v in PacmanDataView.iterate_vertices():
         internal_partitions = v.splitter.get_internal_multicast_partitions()
         if v not in sources and internal_partitions:
             part_ids = set(p.identifier for p in internal_partitions)

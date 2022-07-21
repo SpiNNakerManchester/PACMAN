@@ -177,6 +177,7 @@ class PacmanDataView(MachineDataView):
         :raises SimulatorNotSetupException: If called before sim.setup
         :raises SimulatorShutdownException: If called after sim.end
         """
+        cls.check_valid_simulator()
         if cls.__pacman_data._graph is None:
             if cls._is_mocked():
                 cls.__pacman_data._graph = ApplicationGraph("Mocked")
@@ -210,9 +211,12 @@ class PacmanDataView(MachineDataView):
         Semantic sugar for vertex in get_graph().vertices
         if isinstance(vertex, vertex_type)
 
+        .. note::
+        The result is a generator so can only be used in a single loop
+
         :param vertex_type: The type(s) to filter the vertices on
         :type vertex_type: Class or iterable(Class)
-        :rtype: list(AbstractVertex)
+        :rtype: generator(AbstractVertex)
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
         """
@@ -223,7 +227,7 @@ class PacmanDataView(MachineDataView):
                 raise cls._exception("graph")
         for vertex in cls.__pacman_data._graph.vertices:
             if isinstance(vertex, vertex_type):
-                yield vertex_type
+                yield vertex
 
     @classmethod
     def get_n_vertices(cls):
@@ -259,25 +263,6 @@ class PacmanDataView(MachineDataView):
                 raise cls._exception("graph")
         return iter(cls.__pacman_data._graph.outgoing_edge_partitions)
 
-    @classmethod
-    def get_partitions_clone(cls):
-        """ The partitions in the user application graph as a list
-
-        Note: This is a shallow copy/ full slice of the original list.
-        Any changes to the output will not affect the original
-
-        Semantic sugar for list(get_graph().outgoing_edge_partitions)
-
-        :rtype: list(ApplicationEdgePartition)
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the graph is currently unavailable
-        """
-        if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
-        return cls.__pacman_data._graph.outgoing_edge_partitions[:]
 
     @classmethod
     def get_n_partitions(cls):
