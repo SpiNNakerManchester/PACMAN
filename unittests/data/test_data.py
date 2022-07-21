@@ -15,7 +15,8 @@
 
 import unittest
 from spinn_utilities.exceptions import (
-    DataNotYetAvialable, SimulatorRunningException)
+    DataNotYetAvialable,
+    SimulatorNotSetupException, SimulatorShutdownException)
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
@@ -28,6 +29,10 @@ from pacman.model.routing_table_by_partition import (
 from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.model.tags import Tags
 from pacman_test_objects import SimpleTestVertex
+
+
+class SimpleTestVertex2(SimpleTestVertex):
+    pass
 
 
 class TestSimulatorData(unittest.TestCase):
@@ -47,39 +52,16 @@ class TestSimulatorData(unittest.TestCase):
         # check there is a value not what it is
         PacmanDataView.get_run_dir_path()
 
-    def test_graphs(self):
-        writer = PacmanDataWriter.setup()
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_n_vertices()
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_runtime_graph()
-
-        writer.create_graphs("bacon")
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_runtime_graph()
-
-        writer.start_run()
-        writer.clone_graphs()
-        PacmanDataView.get_runtime_graph()
-
-        writer.finish_run()
-        PacmanDataView.get_n_vertices()
-        PacmanDataView.get_runtime_graph()
-        # the writer still has access to the runtime graphs
-        writer.get_runtime_graph()
-
-        writer.stopping()
-        PacmanDataView.get_runtime_graph()
-
     def test_graph_functions(self):
         writer = PacmanDataWriter.setup()
         app1 = SimpleTestVertex(12, "app1")
-        app2 = SimpleTestVertex(23, "app21")
-        app3 = SimpleTestVertex(33, "app3")
+        app2 = SimpleTestVertex2(23, "app21")
+        app3 = SimpleTestVertex2(33, "app3")
         edge12 = ApplicationEdge(app1, app2)
         edge32 = ApplicationEdge(app3, app2)
         edge13 = ApplicationEdge(app1, app3)
         edge11 = ApplicationEdge(app1, app1)
+
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_n_vertices()
         with self.assertRaises(DataNotYetAvialable):
@@ -94,6 +76,8 @@ class TestSimulatorData(unittest.TestCase):
             PacmanDataView.get_n_vertices()
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.iterate_partitions()
+        with self.assertRaises(DataNotYetAvialable):
+            list(PacmanDataView.get_vertices_by_type(SimpleTestVertex2))
 
         writer.create_graphs("test")
         self.assertFalse(PacmanDataView.get_n_vertices() == 1)
@@ -117,28 +101,12 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(2, len(partitions))
         self.assertEqual(2, PacmanDataView.get_n_partitions())
 
-        writer.start_run()
-        # the add methods go boom
-        with self.assertRaises(SimulatorRunningException):
-            PacmanDataView.add_vertex(app1)
-        with self.assertRaises(SimulatorRunningException):
-            PacmanDataView.add_edge(edge12, "foo")
-        # The info methods do still work
-        self.assertTrue(PacmanDataView.get_n_vertices() > 0)
-        self.assertSetEqual(
-            set([app1, app2, app3]),
-            set(PacmanDataView.iterate_vertices()))
-        self.assertEqual(3, PacmanDataView.get_n_vertices())
+        writer.shut_down()
+        # Graph info calls still work
+        PacmanDataView.get_edges_ending_at_vertex(app1)
+        with self.assertRaises(SimulatorShutdownException):
+            PacmanDataView.add_vertex( SimpleTestVertex(12, "new"))
 
-        writer.finish_run()
-        app4 = SimpleTestVertex(44, "app4")
-        edge14 = ApplicationEdge(app1, app4)
-        PacmanDataView.add_vertex(app4)
-        self.assertSetEqual(
-            set([app1, app2, app3, app4]),
-            set(PacmanDataView.iterate_vertices()))
-        self.assertEqual(4, PacmanDataView.get_n_vertices())
-        PacmanDataView.add_edge(edge14, "other")
 
     def test_placements(self):
         writer = PacmanDataWriter.setup()

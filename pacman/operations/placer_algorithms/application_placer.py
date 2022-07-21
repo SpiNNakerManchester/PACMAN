@@ -42,14 +42,14 @@ def place_application_graph(system_placements):
     placements = Placements(system_placements)
     # board_colours = dict()
 
-    app_graph = PacmanDataView.get_runtime_graph()
     machine = PacmanDataView.get_machine()
     plan_n_timesteps = PacmanDataView.get_plan_n_timestep()
     spaces = _Spaces(machine, placements, plan_n_timesteps)
 
     # Go through the application graph by application vertex
-    progress = ProgressBar(app_graph.n_vertices, "Placing Vertices")
-    for app_vertex in progress.over(app_graph.vertices):
+    progress = ProgressBar(
+        PacmanDataView.get_n_vertices(), "Placing Vertices")
+    for app_vertex in progress.over(PacmanDataView.iterate_vertices()):
         spaces.restore_chips()
 
         # Try placements from the next chip, but try again if fails
@@ -69,8 +69,8 @@ def place_application_graph(system_placements):
                     next_chip_space, space = spaces.get_next_chip_and_space()
                 except PacmanPlaceException as e:
                     _place_error(
-                        app_graph, placements, system_placements, e,
-                        plan_n_timesteps, machine)
+                        placements, system_placements, e,  plan_n_timesteps,
+                        machine)
                 logger.debug(f"Starting placement from {next_chip_space}")
 
                 placements_to_make = list()
@@ -126,12 +126,12 @@ def place_application_graph(system_placements):
 
 
 def _place_error(
-        app_graph, placements, system_placements, exception, plan_n_timesteps,
+        placements, system_placements, exception, plan_n_timesteps,
         machine):
     unplaceable = list()
     vertex_count = 0
     n_vertices = 0
-    for app_vertex in app_graph.vertices:
+    for app_vertex in PacmanDataView.iterate_vertices():
         same_chip_groups = app_vertex.splitter.get_same_chip_groups()
         app_vertex_placed = True
         found_placed_cores = False
@@ -152,8 +152,8 @@ def _place_error(
     report_file = os.path.join(
         PacmanDataView.get_report_dir_path(), "placements_error.txt")
     with open(report_file, 'w', encoding="utf-8") as f:
-        f.write(f"Could not place {len(unplaceable)} of {app_graph.n_vertices}"
-                " application vertices.\n")
+        f.write(f"Could not place {len(unplaceable)} of "
+                f"{PacmanDataView.get_n_vertices()} application vertices.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
                 " last app vertex\n\n")
         for x, y in placements.chips_with_placements:
