@@ -379,6 +379,8 @@ init-import=no
 # List of method names used to declare (i.e. assign) instance attributes.
 defining-attr-methods=__init__,
                       __new__,
+                      _clear,
+                      _hard_reset,
                       setUp
 
 # List of member names, which should be excluded from the protected access

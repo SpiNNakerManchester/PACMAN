@@ -80,9 +80,11 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """ Get the number of keys required by the given partition of edges.
 
         :param str partition_id: The identifier of the partition
+            partition_id param is only used by some MachineVertex clases
         :return: The number of keys required
         :rtype: int
         """
+        # pylint:disable=unused-argument
         return self._vertex_slice.n_atoms
 
     @property

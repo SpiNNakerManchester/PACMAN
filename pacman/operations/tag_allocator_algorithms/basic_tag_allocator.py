@@ -17,6 +17,7 @@ from collections import namedtuple, defaultdict
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_machine.tags import IPTag, ReverseIPTag
+from pacman.data import PacmanDataView
 from pacman.model.tags import Tags
 from pacman.exceptions import PacmanNotFoundError
 
@@ -30,7 +31,7 @@ _CHIP_TAGS = range(1, 8)
 _Task = namedtuple("_Task", "constraint, board, tag, vertex, placement")
 
 
-def basic_tag_allocator(machine, placements):
+def basic_tag_allocator():
     """
     Basic tag allocator that goes though the boards available and applies\
         the IP tags and reverse IP tags as needed.
@@ -52,8 +53,11 @@ def basic_tag_allocator(machine, placements):
 
     # Go through placements and find tags
     tags = Tags()
-    progress = ProgressBar(placements.n_placements, "Allocating tags")
-    for placement in progress.over(placements.placements):
+
+    progress = ProgressBar(
+        PacmanDataView.get_n_placements(), "Allocating tags")
+    machine = PacmanDataView.get_machine()
+    for placement in progress.over(PacmanDataView.iterate_placemements()):
         resources = placement.vertex.resources_required
         place_chip = machine.get_chip_at(placement.x, placement.y)
         eth_chip = machine.get_chip_at(place_chip.nearest_ethernet_x,

@@ -18,6 +18,7 @@ import math
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
+from pacman.data import PacmanDataView
 from pacman.model.routing_info import (
     RoutingInfo, MachineVertexRoutingInfo, BaseKeyAndMask,
     AppVertexRoutingInfo)
@@ -102,10 +103,8 @@ class ZonedRoutingInfoAllocator(object):
     ]
     # pylint: disable=attribute-defined-outside-init
 
-    def __call__(self, app_graph, extra_allocations, flexible):
+    def __call__(self, extra_allocations, flexible):
         """
-        :param ApplicationGraph app_graph:
-            The graph to allocate the routing info for
         :param list(tuple(ApplicationVertex,str)) extra_allocations:
             Additional (vertex, partition identifier) pairs to allocate
             keys to.  These might not appear in partitions in the graph
@@ -117,6 +116,7 @@ class ZonedRoutingInfoAllocator(object):
         :raise PacmanRouteInfoAllocationException:
             If something goes wrong with the allocation
         """
+        app_graph = PacmanDataView.get_runtime_graph()
         self.__vertex_partitions = OrderedSet(
             (p.pre_vertex, p.identifier)
             for p in app_graph.outgoing_edge_partitions)
@@ -360,13 +360,11 @@ class ZonedRoutingInfoAllocator(object):
         return int(math.ceil(math.log(size, 2)))
 
 
-def flexible_allocate(app_graph, extra_allocations):
+def flexible_allocate(extra_allocations):
     """
     Allocated with fixed bits for the Application/Partition index but
     with the size of the atom and machine bit changing
 
-    :param ApplicationGraph app_graph:
-        The graph to allocate the routing info for
     :param list(tuple(ApplicationVertex,str)) extra_allocations:
         Additional (vertex, partition identifier) pairs to allocate
         keys to.  These might not appear in partitions in the graph
@@ -380,13 +378,11 @@ def flexible_allocate(app_graph, extra_allocations):
 
     allocator = ZonedRoutingInfoAllocator()
 
-    return allocator(app_graph, extra_allocations, True)
+    return allocator(extra_allocations, True)
 
 
-def global_allocate(app_graph, extra_allocations):
+def global_allocate(extra_allocations):
     """
-    :param ApplicationGraph app_graph:
-        The graph to allocate the routing info for
     :param list(tuple(ApplicationVertex,str)) extra_allocations:
         Additional (vertex, partition identifier) pairs to allocate
         keys to.  These might not appear in partitions in the graph
@@ -400,4 +396,4 @@ def global_allocate(app_graph, extra_allocations):
 
     allocator = ZonedRoutingInfoAllocator()
 
-    return allocator(app_graph, extra_allocations, False)
+    return allocator(extra_allocations, False)

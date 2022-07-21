@@ -12,6 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from pacman.data import PacmanDataView
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
@@ -126,13 +128,13 @@ class _Targets(object):
         return vertex, self.__targets_by_source[vertex]
 
 
-def route_application_graph(machine, app_graph, placements):
+def route_application_graph():
     """ Route an application graph
     """
     routing_tables = MulticastRoutingTableByPartition()
 
-    partitions = get_app_partitions(app_graph)
-
+    partitions = get_app_partitions()
+    machine = PacmanDataView.get_machine()
     # Now go through the app edges and route app vertex by app vertex
     progress = ProgressBar(len(partitions), "Routing")
     for partition in progress.over(partitions):
@@ -142,7 +144,7 @@ def route_application_graph(machine, app_graph, placements):
         # Pick a place within the source that we can route from.  Note that
         # this might not end up being the actual source in the end.
         source_mappings = _get_outgoing_mapping(
-            source, partition.identifier, placements, machine)
+            source, partition.identifier)
 
         # No source mappings?  Nothing to route then!
         if not source_mappings:
@@ -150,7 +152,7 @@ def route_application_graph(machine, app_graph, placements):
 
         source_xy = next(iter(source_mappings.keys()))
         # Get all source chips coordinates
-        all_source_xys = _get_all_xys(source, placements, machine)
+        all_source_xys = _get_all_xys(source)
 
         # Keep track of the source edge chips
         source_edge_xys = set()
@@ -174,7 +176,7 @@ def route_application_graph(machine, app_graph, placements):
             if source != target:
 
                 # Find all coordinates for chips (xy) that are in the target
-                target_xys = _get_all_xys(target, placements, machine)
+                target_xys = _get_all_xys(target)
 
                 # Pick one to actually use as a target
                 target_xy = _find_target_xy(
@@ -193,8 +195,7 @@ def route_application_graph(machine, app_graph, placements):
                         source, partition.identifier)
                 real_target_xys = set()
                 for tgt, srcs in target_vertices:
-                    xy, (_vertex, core, link) = vertex_xy_and_route(
-                        tgt, placements, machine)
+                    xy, (_vertex, core, link) = vertex_xy_and_route(tgt)
                     if xy in source_mappings:
                         targets[xy].add_machine_sources_for_target(
                             core, link, srcs, partition.identifier)
@@ -223,8 +224,7 @@ def route_application_graph(machine, app_graph, placements):
                     source.splitter.get_source_specific_in_coming_vertices(
                         source, partition.identifier)
                 for tgt, srcs in target_vertices:
-                    xy, (_vertex, core, link) = vertex_xy_and_route(
-                        tgt, placements, machine)
+                    xy, (_vertex, core, link) = vertex_xy_and_route(tgt)
                     targets[xy].add_machine_sources_for_target(
                         core, link, srcs, partition.identifier)
                     self_xys.add(xy)
@@ -237,8 +237,7 @@ def route_application_graph(machine, app_graph, placements):
                 src = in_part.pre_vertex
                 for edge in in_part.edges:
                     tgt = edge.post_vertex
-                    xy, (_vertex, core, link) = vertex_xy_and_route(
-                        tgt, placements, machine)
+                    xy, (_vertex, core, link) = vertex_xy_and_route(tgt)
                     targets[xy].add_machine_sources_for_target(
                         core, link, [src], in_part.identifier)
                     self_xys.add(xy)
@@ -304,7 +303,7 @@ def _find_target_xy(target_xys, routes, source_mappings):
     return xy
 
 
-def _get_outgoing_mapping(app_vertex, partition_id, placements, machine):
+def _get_outgoing_mapping(app_vertex, partition_id):
     """
     Gets a Mapping from xy sources to a list of (vertex, the vertex,
         processor and link to follow to get to the vertex
@@ -313,35 +312,30 @@ def _get_outgoing_mapping(app_vertex, partition_id, placements, machine):
 
     :param app_vertex:
     :param partition_id:
-    :param placements:
-    :param machine:
     :rtype: dict(tuple(int, int),
         list(tuple(MachineVertex, int,  None) or
              tuple(MachineVertex, None, int)))
     """
     outgoing_mapping = defaultdict(list)
     for m_vertex in app_vertex.splitter.get_out_going_vertices(partition_id):
-        xy, route = vertex_xy_and_route(m_vertex, placements, machine)
+        xy, route = vertex_xy_and_route(m_vertex)
         outgoing_mapping[xy].append(route)
     for in_part in app_vertex.splitter.get_internal_multicast_partitions():
         if in_part.identifier == partition_id:
-            xy, route = vertex_xy_and_route(
-                in_part.pre_vertex, placements, machine)
+            xy, route = vertex_xy_and_route(in_part.pre_vertex)
             outgoing_mapping[xy].append(route)
     return outgoing_mapping
 
 
-def _get_all_xys(app_vertex, placements, machine):
+def _get_all_xys(app_vertex):
     """
     Gets the list of all the xy coordinates the vertexes machine vertices
         are placed on
 
     :param app_vertex:
-    :param placements:
-    :param machine:
     :rtype: set(tuple(int, int))
     """
-    return {vertex_xy(m_vertex, placements, machine)
+    return {vertex_xy(m_vertex)
             for m_vertex in app_vertex.machine_vertices}
 
 
@@ -429,7 +423,7 @@ def _route_pre_to_post(
     """
     # Find a route from source to target
     vector = machine.get_vector(source_xy, dest_xy)
-    nodes_direct = longest_dimension_first(vector, source_xy, machine)
+    nodes_direct = longest_dimension_first(vector, source_xy)
 
     # Route around broken links and chips
     nodes_fixed = _path_without_errors(source_xy, nodes_direct, machine)

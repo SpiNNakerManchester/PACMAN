@@ -158,7 +158,6 @@ class Placements(object):
     @property
     def placements(self):
         """ All of the placements
-
         :return: iterable of placements
         :rtype: iterable(Placement)
         """

@@ -15,21 +15,21 @@
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
+from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.graphs.application import ApplicationVertex
 
 
-def merged_routing_table_generator(
-        routing_infos, routing_table_by_partitions):
+def merged_routing_table_generator():
     """ Creates routing entries by merging adjacent entries from the same
         application vertex when possible.
 
-    :param RoutingInfo routing_infos:
-    :param MulticastRoutingTableByPartition routing_table_by_partitions:
-    :param ~spinn_machine.Machine machine:
     :rtype: MulticastRoutingTables
     """
+    routing_table_by_partitions = (
+        PacmanDataView.get_routing_table_by_partition())
+    routing_infos = PacmanDataView.get_routing_infos()
     progress = ProgressBar(
         routing_table_by_partitions.n_routers, "Generating routing tables")
     routing_tables = MulticastRoutingTables()

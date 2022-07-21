@@ -18,6 +18,7 @@ import sys
 import unittest
 
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
 from pacman.exceptions import PacmanElementAllocationException
 from pacman.operations.router_compressors import (
@@ -35,7 +36,7 @@ class TestUnorderedPairCompressor(unittest.TestCase):
         j_router = os.path.join(path, "many_to_one.json.gz")
         original_tables = from_json(j_router)
 
+        PacmanDataWriter.mock().set_precompressed(original_tables)
         with self.assertRaises(PacmanElementAllocationException):
             pair_compressor(
-                original_tables, ordered=False, accept_overflow=False,
-                verify=True)
+                ordered=False, accept_overflow=False,  verify=True)

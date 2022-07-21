@@ -18,6 +18,7 @@ Miscellaneous minor functions for converting between JSON and Python objects.
 
 import json
 import gzip
+from pacman.data import PacmanDataView
 from pacman.model.resources import (
     CPUCyclesPerTickResource, DTCMResource, IPtagResource, ResourceContainer,
     VariableSDRAM)
@@ -131,7 +132,7 @@ def vertex_to_json(vertex):
     return json_dict
 
 
-def vertex_from_json(json_dict, convert_constraints=True):
+def vertex_from_json(json_dict):
     resources = resource_container_from_json(json_dict.get("resources"))
     return SimpleMachineVertex(resources, label=json_dict["label"])
 
@@ -154,9 +155,9 @@ def placement_to_json(placement):
     return json_dict
 
 
-def placements_to_json(placements):
+def placements_to_json():
     json_list = []
-    for placement in placements:
+    for placement in PacmanDataView.iterate_placemements():
         json_list.append(placement_to_json(placement))
     return json_list
 
@@ -165,18 +166,3 @@ def placement_from_json(json_dict, graph=None):
     vertex = vertex_lookup(json_dict["vertex_label"], graph)
     return Placement(
         vertex, int(json_dict["x"]), int(json_dict["y"]), int(json_dict["p"]))
-
-
-def partition_to_n_keys_map_to_json(partition_to_n_keys_map):
-    json_list = []
-    for partition in partition_to_n_keys_map:
-        json_dict = dict()
-        try:
-            json_dict["pre_vertex_label"] = partition.pre_vertex.label
-            json_dict["identifier"] = partition.identifier
-            json_dict["n_keys"] = partition_to_n_keys_map.n_keys_for_partition(
-                partition)
-        except Exception as ex:  # pylint: disable=broad-except
-            json_dict["exception"] = str(ex)
-        json_list.append(json_dict)
-    return json_list

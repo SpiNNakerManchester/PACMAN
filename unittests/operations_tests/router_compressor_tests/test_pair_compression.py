@@ -18,6 +18,7 @@ import sys
 import unittest
 
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
 from pacman.operations.router_compressors.routing_compression_checker import (
     compare_tables)
@@ -32,11 +33,12 @@ class TestPairCompressor(unittest.TestCase):
     def test_pair_big(self):
         class_file = sys.modules[self.__module__].__file__
         path = os.path.dirname(os.path.abspath(class_file))
-        j_router = os.path.join(path,
-                                "many_to_one.json.gz")
+        j_router = os.path.join(path, "many_to_one.json.gz")
         original_tables = from_json(j_router)
+        PacmanDataWriter.mock().set_precompressed(
+            original_tables)
 
-        compressed_tables = pair_compressor(original_tables)
+        compressed_tables = pair_compressor()
         for original in original_tables:
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)
