@@ -264,7 +264,6 @@ class PacmanDataView(MachineDataView):
                 raise cls._exception("graph")
         return iter(cls.__pacman_data._graph.outgoing_edge_partitions)
 
-
     @classmethod
     def get_n_partitions(cls):
         """ The partitions in the user application graph.

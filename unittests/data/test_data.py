@@ -133,7 +133,7 @@ class TestSimulatorData(unittest.TestCase):
                          PacmanDataView.get_edges())
         self.assertEqual(6, PacmanDataView.get_n_machine_vertices())
         self.assertEqual([m11, m12, m21, m31, m32, m33],
-            list(PacmanDataView.iterate_machine_vertices()))
+                         list(PacmanDataView.iterate_machine_vertices()))
 
         writer.shut_down()
         # Graph info calls still work
