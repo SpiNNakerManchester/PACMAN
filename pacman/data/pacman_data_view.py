@@ -336,14 +336,7 @@ class PacmanDataView(MachineDataView):
             If the runtime_graph is currently unavailable, or if this method
             is used except during run
         """
-        if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                if cls.__pacman_data._graph is None:
-                    raise cls._exception("graph")
-                cls.__pacman_data._graph = cls.__pacman_data._graph
-            else:
-                raise cls._exception("graph")
-        return cls.__pacman_data._graph
+        raise NotImplementedError()
 
     @classmethod
     def get_n_machine_vertices(cls):
@@ -356,7 +349,7 @@ class PacmanDataView(MachineDataView):
             else:
                 raise cls._exception("graph")
         return sum(len(vertex.machine_vertices)
-                   for vertex in cls.get_graph().vertices)
+                   for vertex in cls.__pacman_data._graph.vertices)
 
     @classmethod
     def iterate_machine_vertices(cls):

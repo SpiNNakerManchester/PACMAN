@@ -15,12 +15,12 @@
 
 import unittest
 from spinn_utilities.exceptions import (
-    DataNotYetAvialable,
-    SimulatorNotSetupException, SimulatorShutdownException)
+    DataNotYetAvialable, SimulatorShutdownException)
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.placements import Placements
 from pacman.model.routing_info import RoutingInfo
@@ -55,8 +55,20 @@ class TestSimulatorData(unittest.TestCase):
     def test_graph_functions(self):
         writer = PacmanDataWriter.setup()
         app1 = SimpleTestVertex(12, "app1")
+        m11 = app1.create_machine_vertex(Slice(0, 6), None)
+        app1.remember_machine_vertex(m11)
+        m12 = app1.create_machine_vertex(Slice(7, 12), None)
+        app1.remember_machine_vertex(m12)
         app2 = SimpleTestVertex2(23, "app21")
+        m21 = app2.create_machine_vertex(Slice(0, 23), None)
+        app2.remember_machine_vertex(m21)
         app3 = SimpleTestVertex2(33, "app3")
+        m31 = app3.create_machine_vertex(Slice(0, 11), None)
+        app3.remember_machine_vertex(m31)
+        m32 = app3.create_machine_vertex(Slice(11, 22), None)
+        app3.remember_machine_vertex(m32)
+        m33 = app3.create_machine_vertex(Slice(22, 33), None)
+        app3.remember_machine_vertex(m33)
         edge12 = ApplicationEdge(app1, app2)
         edge32 = ApplicationEdge(app3, app2)
         edge13 = ApplicationEdge(app1, app3)
@@ -85,6 +97,10 @@ class TestSimulatorData(unittest.TestCase):
             list(PacmanDataView.get_vertices_by_type(SimpleTestVertex2))
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_edges()
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_n_machine_vertices()
+        with self.assertRaises(DataNotYetAvialable):
+            list(PacmanDataView.iterate_machine_vertices())
 
         writer.create_graphs("test")
         self.assertFalse(PacmanDataView.get_n_vertices() == 1)
@@ -115,6 +131,9 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(1, len(ps))
         self.assertEqual([edge12, edge13, edge11, edge32],
                          PacmanDataView.get_edges())
+        self.assertEqual(6, PacmanDataView.get_n_machine_vertices())
+        self.assertEqual([m11, m12, m21, m31, m32, m33],
+            list(PacmanDataView.iterate_machine_vertices()))
 
         writer.shut_down()
         # Graph info calls still work
@@ -126,6 +145,9 @@ class TestSimulatorData(unittest.TestCase):
         PacmanDataView.get_n_partitions()
         PacmanDataView.get_outgoing_edge_partitions_starting_at_vertex(app1)
         PacmanDataView.get_edges()
+        PacmanDataView.get_n_machine_vertices()
+        PacmanDataView.iterate_machine_vertices()
+
         # Adding will no longer work
         with self.assertRaises(SimulatorShutdownException):
             PacmanDataView.add_vertex(SimpleTestVertex(12, "new"))
