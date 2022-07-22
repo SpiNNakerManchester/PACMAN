@@ -151,6 +151,7 @@ class PacmanDataView(MachineDataView):
                 cls.__pacman_data._graph = ApplicationGraph("Mocked")
             else:
                 raise cls._exception("graph")
+        cls.check_valid_simulator()
         cls.__pacman_data._graph.add_vertex(vertex)
         cls.__pacman_data._vertices_or_edges_added = True
 
