@@ -280,8 +280,10 @@ def create_big(with_fixed):
     mid_app_vertex = TestAppVertex(label="Population", splitter=TestSplitter())
     PacmanDataView.add_vertex(mid_app_vertex)
 
-    PacmanDataView.add_edge(ApplicationEdge(big_app_vertex, mid_app_vertex), "Test")
-    PacmanDataView.add_edge(ApplicationEdge(mid_app_vertex, out_app_vertex), "Test")
+    PacmanDataView.add_edge(
+        ApplicationEdge(big_app_vertex, mid_app_vertex), "Test")
+    PacmanDataView.add_edge(
+        ApplicationEdge(mid_app_vertex, out_app_vertex), "Test")
 
     # Create a single big machine vertex
     big_mac_vertex = TestMacVertex(

@@ -19,7 +19,6 @@ tests for graph mapping
 import unittest
 
 from pacman.config_setup import unittest_setup
-from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman_test_objects import SimpleTestVertex

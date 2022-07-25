@@ -17,7 +17,6 @@ import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_machine.data.machine_data_writer import MachineDataWriter
-from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.placements import Placements
 from pacman.model.routing_info import RoutingInfo
 from pacman.model.routing_table_by_partition import (
@@ -69,18 +68,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
     def finish_run(self):
         MachineDataWriter.finish_run(self)
         self.__pacman_data._vertices_or_edges_added = False
-
-    def get_runtime_graph(self):  # pylint: disable=arguments-differ
-        """
-        The runtime level graph
-
-        Previously known as asb._graph.
-
-        This removes the safety check so ASB can access the graph anytime
-
-        :rtype: ApplicationGraph
-        """
-        return self.__pacman_data._graph
 
     def set_placements(self, placements):
         """

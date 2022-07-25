@@ -108,7 +108,6 @@ class PacmanDataView(MachineDataView):
 
     # graph methods
 
-
     @classmethod
     def add_vertex(cls, vertex):
         """
@@ -296,29 +295,6 @@ class PacmanDataView(MachineDataView):
             else:
                 raise cls._exception("graph")
         return cls.__pacman_data._graph.edges
-
-    @classmethod
-    def get_runtime_graph(cls):
-        """
-        The runtime application graph
-
-        This is the run time version of the graph which is created by the
-        simulator to add system vertices.
-        Previously known as asb.application_graph.
-
-        Changes to this graph by anything except the insert algorithms is not
-        supported.
-
-         .. note::
-            This method is likely to be removed by another PR.
-            If not it will be replaced with add and iterate methods.
-
-        :rtype: ApplicationGraph
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the runtime_graph is currently unavailable, or if this method
-            is used except during run
-        """
-        raise NotImplementedError()
 
     @classmethod
     def get_n_machine_vertices(cls):
