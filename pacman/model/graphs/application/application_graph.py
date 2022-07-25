@@ -199,6 +199,7 @@ class ApplicationGraph(object):
             for edge in partition.edges:
                 yield edge
 
+
     @property
     def outgoing_edge_partitions(self):
         """ The edge partitions in the graph.
