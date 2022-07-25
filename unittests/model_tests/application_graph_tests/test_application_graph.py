@@ -47,10 +47,6 @@ class TestApplicationGraphModel(unittest.TestCase):
         assert frozenset(verts) == frozenset(graph.vertices)
         assert frozenset(edges) == frozenset(graph.edges)
 
-        assert edge1 not in graph.get_edges_ending_at_vertex(vert1)
-        assert edge2 not in set(graph.get_edges_starting_at_vertex(vert1))
-        assert edge3 not in graph.get_edges_ending_at_vertex(vert1)
-
 
 if __name__ == '__main__':
     unittest.main()

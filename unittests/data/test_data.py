@@ -85,9 +85,6 @@ class TestSimulatorData(unittest.TestCase):
 
         self.assertTrue(PacmanDataView.get_n_vertices() > 0)
         self.assertSetEqual(
-            set([edge12, edge32]),
-            set(PacmanDataView.get_edges_ending_at_vertex(app2)))
-        self.assertSetEqual(
             set([app1, app2, app3]),
             set(PacmanDataView.iterate_vertices()))
         self.assertEqual(
@@ -108,7 +105,6 @@ class TestSimulatorData(unittest.TestCase):
 
         writer.shut_down()
         # Graph info calls still work
-        PacmanDataView.get_edges_ending_at_vertex(app1)
         list(PacmanDataView.iterate_vertices())
         list(PacmanDataView.get_vertices_by_type(SimpleTestVertex2))
         PacmanDataView.get_n_vertices()
