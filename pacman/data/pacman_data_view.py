@@ -66,7 +66,7 @@ class _PacmanDataModel(object):
         """
         Clears out all data
         """
-        self._graph = None
+        self._graph = ApplicationGraph()
         # set at the start of every run
         self._plan_n_timesteps = None
         self._vertices_or_edges_added = False

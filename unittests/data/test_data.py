@@ -45,7 +45,7 @@ class TestSimulatorData(unittest.TestCase):
         # Use manual_check to verify this without dependency
         PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_n_vertices()
+            PacmanDataView.get_n_placements()
 
     def test_mock(self):
         PacmanDataWriter.mock()
@@ -74,35 +74,6 @@ class TestSimulatorData(unittest.TestCase):
         edge13 = ApplicationEdge(app1, app3)
         edge11 = ApplicationEdge(app1, app1)
 
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_n_vertices()
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_edges_ending_at_vertex(app1)
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.add_vertex(app1)
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.add_edge(edge12, "foo")
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.iterate_vertices()
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_n_vertices()
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.iterate_partitions()
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_n_partitions()
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_outgoing_edge_partitions_starting_at_vertex(
-                app1)
-        with self.assertRaises(DataNotYetAvialable):
-            list(PacmanDataView.get_vertices_by_type(SimpleTestVertex2))
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_edges()
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_n_machine_vertices()
-        with self.assertRaises(DataNotYetAvialable):
-            list(PacmanDataView.iterate_machine_vertices())
-
-        writer.create_graphs("test")
         self.assertFalse(PacmanDataView.get_n_vertices() == 1)
         PacmanDataView.add_vertex(app1)
         PacmanDataView.add_vertex(app2)

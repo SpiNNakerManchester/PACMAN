@@ -35,12 +35,12 @@ class ApplicationGraph(Graph):
         "_n_outgoing_edge_partitions"
     ]
 
-    def __init__(self, label):
+    def __init__(self):
         """
         :param label: The label on the graph, or None
         :type label: str or None
         """
-        super().__init__(ApplicationVertex, ApplicationEdge, label)
+        super().__init__(ApplicationVertex, ApplicationEdge)
         self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
         self._n_outgoing_edge_partitions = 0
 
@@ -93,23 +93,6 @@ class ApplicationGraph(Graph):
         :rtype: iterable(AbstractEdgePartition)
         """
         return self._outgoing_edge_partitions_by_pre_vertex[vertex]
-
-    def clone(self):
-        """
-        Makes as shallow as possible copy of the graph.
-
-        Vertices and edges are copied over. Partition will be new objects.
-
-        :return: A shallow copy of this graph
-        :rtype: ApplicationGraph
-        """
-        new_graph = ApplicationGraph(label=self.label)
-        for vertex in self.vertices:
-            new_graph.add_vertex(vertex)
-        for outgoing_partition in self.outgoing_edge_partitions:
-            for edge in outgoing_partition.edges:
-                new_graph.add_edge(edge, outgoing_partition.identifier)
-        return new_graph
 
     def reset(self):
         """ Reset all the application vertices

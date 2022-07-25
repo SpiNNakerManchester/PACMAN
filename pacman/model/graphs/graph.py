@@ -35,14 +35,12 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         "_vertices",
         # The incoming edges by post-vertex
         "_incoming_edges",
-        # The label of the graph
-        "_label",
         # map between labels and vertex
         "_vertex_by_label",
         # count of vertex which had a None or already used label
         "_unlabelled_vertex_count"]
 
-    def __init__(self, allowed_vertex_types, allowed_edge_types, label):
+    def __init__(self, allowed_vertex_types, allowed_edge_types):
         """
         :param allowed_vertex_types:
             A single or tuple of types of vertex to be allowed in the graph
@@ -60,15 +58,6 @@ class Graph(ConstrainedObject, metaclass=AbstractBase):
         self._vertex_by_label = dict()
         self._unlabelled_vertex_count = 0
         self._incoming_edges = defaultdict(OrderedSet)
-        self._label = label
-
-    @property
-    def label(self):
-        """ The label of the graph.
-
-        :rtype: str
-        """
-        return self._label
 
     def _label_postfix(self):
         self._unlabelled_vertex_count += 1

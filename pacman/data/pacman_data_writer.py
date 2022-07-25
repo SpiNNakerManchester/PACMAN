@@ -82,28 +82,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         return self.__pacman_data._graph
 
-    def create_graphs(self, graph_label):
-        """
-        Creates the user/ original graphs based on the label
-
-        :param str graph_label:
-        """
-        # update graph label if needed
-        if graph_label is None:
-            graph_label = "Application_graph"
-
-        self.__pacman_data._graph = ApplicationGraph(label=graph_label)
-
-    def _set_runtime_graph(self, graph):
-        """
-        Only used in unittests
-
-        :raises NotImplementedError: If used outside of unittests
-        """
-        if not self._is_mocked():
-            raise NotImplementedError("Only valid in Mocked state!")
-        self.__pacman_data._graph = graph
-
     def set_placements(self, placements):
         """
         Set the placements

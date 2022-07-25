@@ -38,9 +38,7 @@ class TestGraphMapping(unittest.TestCase):
         test getting the vertex from a graph mapper via the vertex
         """
         vertices = list()
-        app_graph = ApplicationGraph("bacon")
         vert = SimpleTestVertex(10, "Some testing vertex")
-        app_graph.add_vertex(vert)
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))
         vertex1 = SimpleMachineVertex(
@@ -61,9 +59,7 @@ class TestGraphMapping(unittest.TestCase):
         """
         test that the graph mapper can retrieve a vertex from a given vertex
         """
-        app_graph = ApplicationGraph("bacon")
         vert = SimpleTestVertex(10, "Some testing vertex")
-        app_graph.add_vertex(vert)
         vertex1 = SimpleMachineVertex(None, "", app_vertex=vert,
                                       vertex_slice=Slice(0, 1))
         vertex2 = SimpleMachineVertex(None, "", app_vertex=vert,
