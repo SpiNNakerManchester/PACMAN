@@ -40,8 +40,10 @@ class TestApplicationGraphModel(unittest.TestCase):
         verts = [vert1, vert2, vert3]
         edges = [edge1, edge2, edge3]
         graph = ApplicationGraph()
-        graph.add_vertices(verts)
-        graph.add_edges(edges, "foo")  # Any old partition label
+        for vertex in verts:
+            graph.add_vertex(vertex)
+        for edge in edges:
+            graph.add_edge(edge, "foo")  # Any old partition label
         assert frozenset(verts) == frozenset(graph.vertices)
         assert frozenset(edges) == frozenset(graph.edges)
 
