@@ -213,7 +213,7 @@ class PacmanDataView(MachineDataView):
         if isinstance(vertex, vertex_type)
 
         .. note::
-        The result is a generator so can only be used in a single loop
+            The result is a generator so can only be used in a single loop
 
         :param vertex_type: The type(s) to filter the vertices on
         :type vertex_type: Class or iterable(Class)
