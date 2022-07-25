@@ -17,6 +17,7 @@ import unittest
 from collections import defaultdict
 from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ResourceContainer, IPtagResource
@@ -30,7 +31,9 @@ class TestTagsBoardAddresses(unittest.TestCase):
         unittest_setup()
 
     def test_ip_tags(self):
+        writer = PacmanDataWriter.mock()
         machine = virtual_machine(12, 12)
+        writer.set_machine(machine)
         eth_chips = machine.ethernet_connected_chips
         vertices = [
             SimpleMachineVertex(
@@ -42,7 +45,9 @@ class TestTagsBoardAddresses(unittest.TestCase):
         placements = Placements(
             Placement(vertex, chip.x, chip.y, 1)
             for vertex, chip in zip(vertices, eth_chips))
-        tags = basic_tag_allocator(machine, placements)
+        writer.set_placements(placements)
+        writer.set_plan_n_timesteps(None)
+        tags = basic_tag_allocator()
 
         for vertex, chip in zip(vertices, eth_chips):
             iptags = tags.get_ip_tags_for_vertex(vertex)
@@ -58,8 +63,10 @@ class TestTagsBoardAddresses(unittest.TestCase):
             print(placement, "has tag", iptags[0])
 
     def test_too_many_ip_tags_for_1_board(self):
+        writer = PacmanDataWriter.mock()
         n_extra_vertices = 3
         machine = virtual_machine(12, 12)
+        writer.set_machine(machine)
         eth_chips = machine.ethernet_connected_chips
         eth_chip = eth_chips[0]
         eth_chip_2 = machine.get_chip_at(eth_chip.x + 1, eth_chip.y + 1)
@@ -87,7 +94,9 @@ class TestTagsBoardAddresses(unittest.TestCase):
         placements.add_placements(
             Placement(vertex, eth_chip_2.x, eth_chip_2.y, proc)
             for proc, vertex in zip(eth2_procs, eth2_vertices))
-        tags = basic_tag_allocator(machine, placements)
+        writer.set_placements(placements)
+        writer.set_plan_n_timesteps(1000)
+        tags = basic_tag_allocator()
 
         tags_by_board = defaultdict(set)
         for vertices in (eth_vertices, eth2_vertices):

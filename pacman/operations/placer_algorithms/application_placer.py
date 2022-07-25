@@ -13,26 +13,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+import numpy
+import os
+
+from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.log import FormatAdapter
+from spinn_utilities.ordered_set import OrderedSet
+from spinn_utilities.progress_bar import ProgressBar
+
+from pacman.data import PacmanDataView
 from pacman.model.placements import Placements, Placement
 from pacman.model.graphs import AbstractVirtual
 from pacman.exceptions import (
     PacmanPlaceException, PacmanConfigurationException)
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
-from spinn_utilities.ordered_set import OrderedSet
-from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.log import FormatAdapter
-from spinn_utilities.config_holder import get_config_bool
-import os
-import numpy
-import logging
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def place_application_graph(
-        machine, app_graph, plan_n_timesteps, system_placements,
-        report_folder=None):
+def place_application_graph(system_placements):
     """ Perform placement of an application graph on the machine.
         NOTE: app_graph must have been partitioned
     """
@@ -40,6 +41,10 @@ def place_application_graph(
     # Track the placements and  space
     placements = Placements(system_placements)
     # board_colours = dict()
+
+    app_graph = PacmanDataView.get_runtime_graph()
+    machine = PacmanDataView.get_machine()
+    plan_n_timesteps = PacmanDataView.get_plan_n_timestep()
     spaces = _Spaces(machine, placements, plan_n_timesteps)
 
     # Go through the application graph by application vertex
@@ -65,7 +70,7 @@ def place_application_graph(
                 except PacmanPlaceException as e:
                     _place_error(
                         app_graph, placements, system_placements, e,
-                        plan_n_timesteps, machine, report_folder)
+                        plan_n_timesteps, machine)
                 logger.debug(f"Starting placement from {next_chip_space}")
 
                 placements_to_make = list()
@@ -114,17 +119,15 @@ def place_application_graph(
                 spaces.save_chips(chips_attempted)
                 chips_attempted.clear()
 
-    if (get_config_bool("Reports", "draw_placements") and
-            report_folder is not None):
-        report_file = os.path.join(report_folder, "placements.png")
-        _draw_placements(machine, report_file, placements, system_placements)
+    if get_config_bool("Reports", "draw_placements"):
+        _draw_placements(placements, system_placements)
 
     return placements
 
 
 def _place_error(
         app_graph, placements, system_placements, exception, plan_n_timesteps,
-        machine, report_folder):
+        machine):
     unplaceable = list()
     vertex_count = 0
     n_vertices = 0
@@ -146,8 +149,9 @@ def _place_error(
         if not app_vertex_placed:
             unplaceable.append(app_vertex)
 
-    report_file = os.path.join(report_folder, "placements_error.txt")
-    with open(report_file, 'w') as f:
+    report_file = os.path.join(
+        PacmanDataView.get_report_dir_path(), "placements_error.txt")
+    with open(report_file, 'w', encoding="utf-8") as f:
         f.write(f"Could not place {len(unplaceable)} of {app_graph.n_vertices}"
                 " application vertices.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
@@ -190,10 +194,8 @@ def _place_error(
                 f.write(f"    {x}, {y} ({n_procs - system_placed}"
                         " free cores)\n")
 
-    if (get_config_bool("Reports", "draw_placements_on_error") and
-            report_folder is not None):
-        report_file = os.path.join(report_folder, "placements_error.png")
-        _draw_placements(machine, report_file, placements, system_placements)
+    if get_config_bool("Reports", "draw_placements_on_error"):
+        _draw_placements(placements, system_placements)
 
     raise PacmanPlaceException(
         f" {exception}."
@@ -210,19 +212,29 @@ def _next_colour():
         (numpy.random.choice(range(256), size=3) / 256, [1.0])))
 
 
-def _draw_placements(machine, report_file, placements, system_placements):
-    # pylint: disable=import-error
-    from spinner.scripts.contexts import PNGContextManager
-    from spinner.diagrams.machine_map import (
-        get_machine_map_aspect_ratio, draw_machine_map)
-    from spinner import board
-    from collections import defaultdict
-    import math
+def _draw_placements(placements, system_placements):
+    try:
+        # spinner as graphical library so
+        # pylint: disable=import-error
+        from spinner.scripts.contexts import PNGContextManager
+        from spinner.diagrams.machine_map import (
+            get_machine_map_aspect_ratio, draw_machine_map)
+        from spinner import board
+        from collections import defaultdict
+        import math
+    except ImportError:
+        logger.exception(
+            "Unable to draw placements as no spinner install found")
+        return
+
+    report_file = os.path.join(
+        PacmanDataView.get_report_dir_path(), "placements_error.png")
 
     # Colour the boards by placements
     unused = (0.5, 0.5, 0.5, 1.0)
     vertex_colours = defaultdict(_next_colour)
     board_colours = dict()
+    machine = PacmanDataView.get_machine()
     for x, y in machine.chip_coordinates:
         if (placements.n_placements_on_chip(x, y) ==
                 system_placements.n_placements_on_chip(x, y)):
@@ -308,6 +320,7 @@ def _do_constraints(vertices, sdram, placements, machine, next_chip_space):
                 try:
                     next_core = next(next_cores)
                 except StopIteration:
+                    # pylint: disable=raise-missing-from
                     raise PacmanConfigurationException(
                         f"No more cores available on {x}, {y}: {on_chip}")
             placements.add_placement(Placement(vertex, x, y, next_core))
@@ -383,7 +396,7 @@ class _Spaces(object):
                     _Space(self.__last_chip_space.chip))
 
         except StopIteration:
-            raise PacmanPlaceException(
+            raise PacmanPlaceException(  # pylint: disable=raise-missing-from
                 f"No more chips to place on; {self.n_chips_used} of "
                 f"{self.__machine.n_chips} used")
 

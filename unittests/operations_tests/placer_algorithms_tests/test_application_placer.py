@@ -13,13 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_machine.virtual_machine import virtual_machine
+from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ResourceContainer, ConstantSDRAM
-from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.config_setup import unittest_setup
 from pacman.model.placements.placements import Placements
 
@@ -75,19 +76,19 @@ class TestAppVertex(ApplicationVertex):
         return self.__n_atoms
 
 
-def _make_vertices(app_graph, n_atoms, n_groups, n_machine_vertices, label):
+def _make_vertices(writer, n_atoms, n_groups, n_machine_vertices, label):
     vertex = TestAppVertex(n_atoms, label)
     vertex.splitter = TestSplitter(n_groups, n_machine_vertices)
-    app_graph.add_vertex(vertex)
+    writer.add_vertex(vertex)
     vertex.splitter.create_machine_vertices(None)
     return vertex
 
 
 def test_application_placer():
-    app_graph = ApplicationGraph("Test")
     unittest_setup()
+    writer = PacmanDataWriter.mock()
     for i in range(56):
-        _make_vertices(app_graph, 1000, 14, 5, f"app_vertex_{i}")
+        _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
 
-    machine = virtual_machine(24, 12)
-    place_application_graph(machine, app_graph, 100, Placements())
+    writer.set_machine(virtual_machine(24, 12))
+    place_application_graph(Placements())
