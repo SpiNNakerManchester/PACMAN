@@ -18,7 +18,6 @@ from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from .application_edge_partition import ApplicationEdgePartition
 from spinn_utilities.ordered_set import OrderedSet
-from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
 
@@ -28,8 +27,6 @@ class ApplicationGraph(object):
     """
 
     __slots__ = [
-        # The incoming edges by post-vertex
-        "_incoming_edges",
         # The sets of edge partitions by pre-vertex
         "_outgoing_edge_partitions_by_pre_vertex",
         # The total number of outgoing edge partitions
@@ -45,7 +42,6 @@ class ApplicationGraph(object):
         :param label: The label on the graph, or None
         :type label: str or None
         """
-        self._incoming_edges = defaultdict(OrderedSet)
         self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
         self._n_outgoing_edge_partitions = 0
         self._unlabelled_vertex_count = 0
@@ -118,11 +114,11 @@ class ApplicationGraph(object):
                 identifier=outgoing_edge_partition_name,
                 pre_vertex=edge.pre_vertex)
             self.add_outgoing_edge_partition(partition)
-        self._register_edge(edge)
+        self._check_edge(edge)
         partition.add_edge(edge)
         return partition
 
-    def _register_edge(self, edge):
+    def _check_edge(self, edge):
         """ Add an edge to the graph.
 
         :param ApplicationEdge edge: The edge to add
@@ -145,9 +141,6 @@ class ApplicationGraph(object):
             raise PacmanInvalidParameterException(
                 "Edge", str(edge.post_vertex),
                 "Post-vertex must be known in graph")
-
-        # Add the edge to the indices
-        self._incoming_edges[edge.post_vertex].add(edge)
 
     @property
     def edges(self):
@@ -190,7 +183,7 @@ class ApplicationGraph(object):
         self._outgoing_edge_partitions_by_pre_vertex[
             edge_partition.pre_vertex].add(edge_partition)
         for edge in edge_partition.edges:
-            self._register_edge(edge)
+            self._check_edge(edge)
 
         self._n_outgoing_edge_partitions += 1
 
@@ -205,17 +198,6 @@ class ApplicationGraph(object):
         for partition in parts:
             for edge in partition.edges:
                 yield edge
-
-    def get_edges_ending_at_vertex(self, vertex):
-        """ Get all the edges that end at the given vertex.
-
-        :param AbstractVertex vertex:
-            The vertex at which the edges to get end
-        :rtype: iterable(AbstractEdge)
-        """
-        if vertex not in self._incoming_edges:
-            return []
-        return self._incoming_edges[vertex]
 
     @property
     def outgoing_edge_partitions(self):
@@ -273,4 +255,3 @@ class ApplicationGraph(object):
     def _label_postfix(self):
         self._unlabelled_vertex_count += 1
         return str(self._unlabelled_vertex_count)
-

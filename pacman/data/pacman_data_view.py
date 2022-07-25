@@ -108,24 +108,6 @@ class PacmanDataView(MachineDataView):
 
     # graph methods
 
-    @classmethod
-    def get_edges_ending_at_vertex(cls, vertex):
-        """ Get all the edges that end at the given vertex in the user graph
-
-        Semantic sugar for get_graph().get_edges_ending_at_vertex
-
-        :param AbstractVertex vertex:
-            The vertex at which the edges to get end
-        :rtype: iterable(AbstractEdge)
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the graph is currently unavailable
-        """
-        if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
-        return cls.__pacman_data._graph.get_edges_ending_at_vertex(vertex)
 
     @classmethod
     def add_vertex(cls, vertex):
