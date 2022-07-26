@@ -225,8 +225,10 @@ class ApplicationGraph(object):
 
     def get_outgoing_edge_partition_starting_at_vertex(
             self, vertex, outgoing_edge_partition_name):
-        """ Get the given outgoing edge partition that starts at the
-            given vertex, or `None` if no such edge partition exists.
+        """
+        Get the given outgoing edge partition that starts at the\
+        given vertex, or `None` if no such edge partition exists.
+
         :param AbstractVertex vertex:
             The vertex at the start of the edges in the partition
         :param str outgoing_edge_partition_name:
