@@ -38,10 +38,6 @@ class ApplicationGraph(object):
     ]
 
     def __init__(self):
-        """
-        :param label: The label on the graph, or None
-        :type label: str or None
-        """
         self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
         self._n_outgoing_edge_partitions = 0
         self._unlabelled_vertex_count = 0
