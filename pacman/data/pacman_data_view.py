@@ -128,10 +128,7 @@ class PacmanDataView(MachineDataView):
         """
         cls.check_valid_simulator()
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         cls.check_valid_simulator()
         cls.__pacman_data._graph.add_vertex(vertex)
         cls.__pacman_data._vertices_or_edges_added = True
@@ -161,10 +158,7 @@ class PacmanDataView(MachineDataView):
         """
         cls.check_valid_simulator()
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
         cls.__pacman_data._vertices_or_edges_added = True
 
@@ -180,10 +174,7 @@ class PacmanDataView(MachineDataView):
             If the graph is currently unavailable
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         return iter(cls.__pacman_data._graph.vertices)
 
     @classmethod
@@ -203,10 +194,7 @@ class PacmanDataView(MachineDataView):
             If the graph is currently unavailable
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         for vertex in cls.__pacman_data._graph.vertices:
             if isinstance(vertex, vertex_type):
                 yield vertex
@@ -222,10 +210,7 @@ class PacmanDataView(MachineDataView):
             If the graph is currently unavailable
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         return cls.__pacman_data._graph.n_vertices
 
     @classmethod
@@ -239,10 +224,7 @@ class PacmanDataView(MachineDataView):
             If the graph is currently unavailable
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         return iter(cls.__pacman_data._graph.outgoing_edge_partitions)
 
     @classmethod
@@ -256,10 +238,7 @@ class PacmanDataView(MachineDataView):
             If the graph is currently unavailable
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         return cls.__pacman_data._graph.n_outgoing_edge_partitions
 
     @classmethod
@@ -274,10 +253,7 @@ class PacmanDataView(MachineDataView):
         :rtype: iterable(AbstractEdgePartition)
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         return cls.__pacman_data._graph.\
             get_outgoing_edge_partitions_starting_at_vertex(vertex)
 
@@ -290,10 +266,7 @@ class PacmanDataView(MachineDataView):
         :rtype: list(AbstractEdge)
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         return cls.__pacman_data._graph.edges
 
     @classmethod
@@ -302,10 +275,7 @@ class PacmanDataView(MachineDataView):
         Gets the number of machine vertices via the application graph
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         return sum(len(vertex.machine_vertices)
                    for vertex in cls.__pacman_data._graph.vertices)
 
@@ -317,10 +287,7 @@ class PacmanDataView(MachineDataView):
         :return:
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         for app_vertex in cls.__pacman_data._graph.vertices:
             yield from app_vertex.machine_vertices
 
