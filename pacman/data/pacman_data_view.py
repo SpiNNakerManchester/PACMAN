@@ -378,6 +378,22 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._placements.placements
 
     @classmethod
+    def iterate_placements_with_vertex_type(cls, x, y, vertex_type):
+        """
+        Iterate over placements with this x, y and this type
+
+        :param int x: x coordinate to find placements for.
+        :param int y: y coordinate  to find placements for.
+        :param class vertex_type: Class of vertex to find
+        :rtype: Placement
+        """
+        if cls.__pacman_data._placements is None:
+            raise cls._exception("placements")
+        return cls.__pacman_data._placements.\
+            iterate_placements_with_vertex_type(x, y, vertex_type)
+
+
+    @classmethod
     def get_n_placements(cls):
         if cls.__pacman_data._placements is None:
             raise cls._exception("placements")
