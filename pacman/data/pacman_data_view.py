@@ -429,6 +429,27 @@ class PacmanDataView(MachineDataView):
         except KeyError as e:
             raise PacmanNotPlacedError(vertex) from e
 
+    @classmethod
+    def get_vertex_on_processor(cls, x, y, p):
+        """ Return the vertex on a specific processor or raises an exception
+            if the processor has not been allocated
+
+        :param int x: the x coordinate of the chip
+        :param int y: the y coordinate of the chip
+        :param int p: the processor on the chip
+        :return: the vertex placed on the given processor
+        :rtype: MachineVertex
+        :raise PacmanProcessorNotOccupiedError:
+            If the processor is not occupied
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the placements are currently unavailable
+        """
+        if cls.__pacman_data._placements is None:
+            raise cls._exception("placements")
+        try:
+            return cls.__pacman_data._placements.get_vertex_on_processor(
+                x, y, p)
+
     # routing_infos
 
     @classmethod
