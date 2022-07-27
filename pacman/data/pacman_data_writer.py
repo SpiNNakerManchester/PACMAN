@@ -111,6 +111,19 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             raise NotImplementedError("Only valid in Mocked state!")
         self.__pacman_data._runtime_graph = graph
 
+    @classmethod
+    def get_placements(cls):
+        """
+        The placements if known
+
+        :rtype: ~pacman.model.placements.Placements
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the placements is currently unavailable
+        """
+        if cls.__pacman_data._placements is None:
+            raise cls._exception("placements")
+        return cls.__pacman_data._placements
+
     def set_placements(self, placements):
         """
         Set the placements

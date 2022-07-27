@@ -352,19 +352,6 @@ class PacmanDataView(MachineDataView):
     # placements
 
     @classmethod
-    def get_placements(cls):
-        """
-        The placements if known
-
-        :rtype: ~pacman.model.placements.Placements
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the placements is currently unavailable
-        """
-        if cls.__pacman_data._placements is None:
-            raise cls._exception("placements")
-        return cls.__pacman_data._placements
-
-    @classmethod
     def iterate_placemements(cls):
         """
         Iterates over the Placement objects
