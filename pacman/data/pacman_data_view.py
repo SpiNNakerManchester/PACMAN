@@ -51,7 +51,6 @@ class _PacmanDataModel(object):
         "_runtime_graph",
         "_tags",
         "_uncompressed",
-        "_vertices_or_edges_added",
     ]
 
     def __new__(cls):
@@ -70,7 +69,6 @@ class _PacmanDataModel(object):
         self._graph = None
         # set at the start of every run
         self._plan_n_timesteps = None
-        self._vertices_or_edges_added = False
         self._hard_reset()
 
     def _hard_reset(self):
@@ -155,7 +153,8 @@ class PacmanDataView(MachineDataView):
                 raise cls._exception("graph")
         cls.check_user_can_act()
         cls.__pacman_data._graph.add_vertex(vertex)
-        cls.__pacman_data._vertices_or_edges_added = True
+        cls._UtilsDataView__data._requires_mapping = True
+        cls._UtilsDataView__data._requires_data_generation = True
 
     @classmethod
     def add_edge(cls, edge, outgoing_edge_partition_name):
@@ -188,7 +187,8 @@ class PacmanDataView(MachineDataView):
                 raise cls._exception("graph")
         cls.check_user_can_act()
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
-        cls.__pacman_data._vertices_or_edges_added = True
+        cls._UtilsDataView__data._requires_mapping = True
+        cls._UtilsDataView__data._requires_data_generation = True
 
     @classmethod
     def iterate_vertices(cls):

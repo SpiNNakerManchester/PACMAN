@@ -65,11 +65,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         MachineDataWriter._soft_reset(self)
         self.__pacman_data._soft_reset()
 
-    @overrides(MachineDataWriter.finish_run)
-    def finish_run(self):
-        MachineDataWriter.finish_run(self)
-        self.__pacman_data._vertices_or_edges_added = False
-
     def get_runtime_graph(self):  # pylint: disable=arguments-differ
         """
         The runtime level graph
