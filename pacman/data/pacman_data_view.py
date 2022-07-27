@@ -446,9 +446,7 @@ class PacmanDataView(MachineDataView):
         """
         if cls.__pacman_data._placements is None:
             raise cls._exception("placements")
-        try:
-            return cls.__pacman_data._placements.get_vertex_on_processor(
-                x, y, p)
+        return cls.__pacman_data._placements.get_vertex_on_processor(x, y, p)
 
     # routing_infos
 
