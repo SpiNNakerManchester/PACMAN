@@ -58,13 +58,13 @@ def key_mask_to_json(key_mask):
 def resource_container_to_json(container):
     json_dict = dict()
     try:
-        json_dict["dtcm"] = container.dtcm.get_value()
-        json_dict["cpu_cycles"] = container.cpu_cycles.get_value()
-        json_dict["fixed_sdram"] = int(container.sdram.fixed)
+        #json_dict["dtcm"] = container.dtcm.get_value()
+        #json_dict["cpu_cycles"] = container.cpu_cycles.get_value()
+        #json_dict["fixed_sdram"] = int(container.sdram.fixed)
         json_dict["per_timestep_sdram"] = int(container.sdram.per_timestep)
-        json_dict["iptags"] = iptag_resources_to_json(container.iptags)
-        json_dict["reverse_iptags"] = iptag_resources_to_json(
-            container.reverse_iptags)
+        #json_dict["iptags"] = iptag_resources_to_json(container.iptags)
+        #json_dict["reverse_iptags"] = iptag_resources_to_json(
+        #    container.reverse_iptags)
     except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
     return json_dict
@@ -124,9 +124,9 @@ def vertex_to_json(vertex):
     try:
         json_dict["class"] = vertex.__class__.__name__
         json_dict["label"] = vertex.label
-        if vertex.resources_required is not None:
+        if vertex.sdram_required is not None:
             json_dict["resources"] = resource_container_to_json(
-                vertex.resources_required)
+                vertex.sdram_required)
     except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
     return json_dict

@@ -114,8 +114,27 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return "MachineVertex(label={})".format(self.label)
 
     @abstractproperty
-    def resources_required(self):
-        """ The resources required by the vertex
+    def sdram_required(self):
+        """ The sdram required by the vertex
 
-        :rtype: ~pacman.model.resources.ResourceContainer
+        :rtype: ~pacman.model.resources.AbstractSDRAM
         """
+
+    @property
+    def iptags(self):
+        """
+        The iptags used by this vertex if any.
+
+        :rtype: iterable(IPtagResource)
+        """
+        return []
+
+    @property
+    def reverse_iptags(self):
+        """
+        The reverse iptags used by this vertex if any.
+
+        :rtype: iterable(ReverseIPtagResource)
+        """
+        return []
+

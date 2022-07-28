@@ -70,5 +70,5 @@ class ApplicationSpiNNakerLinkVertex(
             self._spinnaker_link_id, self._board_address, label, constraints,
             self, vertex_slice)
         if resources_required:
-            assert (resources_required == machine_vertex.resources_required)
+            assert (resources_required == machine_vertex.sdram_required)
         return machine_vertex

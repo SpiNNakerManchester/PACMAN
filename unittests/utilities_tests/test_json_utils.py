@@ -52,7 +52,7 @@ class TestJsonUtils(unittest.TestCase):
         self.assertEqual(v1.label, v2.label)
         if v1.label in seen:
             return
-        self.assertEqual(v1.resources_required, v2.resources_required)
+        self.assertEqual(v1.sdram_required, v2.sdram_required)
         self.assertEqual(len(v1.constraints), len(v2.constraints))
         seen.append(v1.label)
         for c1, c2 in zip(self.__constraints(v1), self.__constraints(v2)):

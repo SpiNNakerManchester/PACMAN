@@ -34,6 +34,6 @@ class SimpleMachineVertex(MachineVertex):
         self._resources = resources
 
     @property
-    @overrides(MachineVertex.resources_required)
-    def resources_required(self):
+    @overrides(MachineVertex.sdram_required)
+    def sdram_required(self):
         return self._resources
