@@ -42,7 +42,6 @@ def get_app_partitions():
         edges and internal partitions to get a complete picture of all
         targets for each source machine vertex at once.
 
-    :param ApplicationGraph app_graph: The application graph to consider
     :return: list of partitions; note where there are only internal multicast
         partitions, the partition will have no edges.  Caller should use
         vertex.splitter.get_internal_multicast_partitions for details.
@@ -50,12 +49,12 @@ def get_app_partitions():
     """
 
     # Find all partitions that need to be dealt with
-    app_graph = PacmanDataView.get_runtime_graph()
-    partitions = list(app_graph.outgoing_edge_partitions)
+    # Make a copy which we can edit
+    partitions = list(PacmanDataView.iterate_partitions())
     sources = set(p.pre_vertex for p in partitions)
 
     # Convert internal partitions to self-connected partitions
-    for v in app_graph.vertices:
+    for v in PacmanDataView.iterate_vertices():
         internal_partitions = v.splitter.get_internal_multicast_partitions()
         if v not in sources and internal_partitions:
             part_ids = set(p.identifier for p in internal_partitions)

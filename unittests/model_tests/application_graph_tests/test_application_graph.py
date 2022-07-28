@@ -15,8 +15,6 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.application import ApplicationGraphView
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman_test_objects import SimpleTestVertex
 
@@ -30,7 +28,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         unittest_setup()
 
     def test_create_new_empty_graph(self):
-        ApplicationGraph("foo")
+        ApplicationGraph()
 
     def test_create_new_graph(self):
         vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1", 256)
@@ -41,29 +39,13 @@ class TestApplicationGraphModel(unittest.TestCase):
         edge3 = ApplicationEdge(vert1, vert3, label="First edge")
         verts = [vert1, vert2, vert3]
         edges = [edge1, edge2, edge3]
-        graph = ApplicationGraph("Graph")
-        graph.add_vertices(verts)
-        graph.add_edges(edges, "foo")  # Any old partition label
+        graph = ApplicationGraph()
+        for vertex in verts:
+            graph.add_vertex(vertex)
+        for edge in edges:
+            graph.add_edge(edge, "foo")  # Any old partition label
         assert frozenset(verts) == frozenset(graph.vertices)
         assert frozenset(edges) == frozenset(graph.edges)
-
-        assert edge1 not in graph.get_edges_ending_at_vertex(vert1)
-        assert edge2 not in set(graph.get_edges_starting_at_vertex(vert1))
-        assert edge3 not in graph.get_edges_ending_at_vertex(vert1)
-
-        second = graph.clone()
-        assert frozenset(verts) == frozenset(second.vertices)
-        assert frozenset(edges) == frozenset(second.edges)
-
-        third = ApplicationGraphView(graph)
-        assert frozenset(verts) == frozenset(third.vertices)
-        assert frozenset(edges) == frozenset(third.edges)
-        with self.assertRaises(PacmanConfigurationException):
-            third.add_edge("mock", "mock")
-        with self.assertRaises(PacmanConfigurationException):
-            third.add_vertex("mock")
-        with self.assertRaises(PacmanConfigurationException):
-            third.add_outgoing_edge_partition("mock")
 
 
 if __name__ == '__main__':
