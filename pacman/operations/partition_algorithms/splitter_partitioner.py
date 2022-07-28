@@ -46,12 +46,12 @@ class _SplitterPartitioner(AbstractSplitterPartitioner):
         :raise PacmanPartitionException:
             If something goes wrong with the partitioning
         """
-        vertices = PacmanDataView.get_runtime_graph().vertices
-        progress = ProgressBar(len(vertices), "Partitioning Graph")
+        progress = ProgressBar(
+            PacmanDataView.get_n_vertices(), "Partitioning Graph")
 
         # Partition one vertex at a time
         chip_counter = ChipCounter()
-        for vertex in progress.over(vertices):
+        for vertex in progress.over(PacmanDataView.iterate_vertices()):
             vertex.splitter.create_machine_vertices(chip_counter)
 
         return chip_counter.n_chips

@@ -20,10 +20,9 @@ test for partitioning
 import unittest
 
 from pacman.config_setup import unittest_setup
-from pacman.data.pacman_data_writer import PacmanDataWriter
+from pacman.data import PacmanDataView
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman.operations.partition_algorithms import splitter_partitioner
-from pacman.model.graphs.application import ApplicationGraph
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman_test_objects import NewPartitionerConstraint, SimpleTestVertex
 
@@ -57,13 +56,10 @@ class TestBasicPartitioner(unittest.TestCase):
         vert3 = SimpleTestVertex(3, "New AbstractConstrainedVertex 3")
         vert3.splitter = SplitterFixedLegacy()
         verts = [vert1, vert2, vert3]
-        graph = ApplicationGraph("Graph")
-        graph.add_vertices(verts)
-        writer = PacmanDataWriter.mock()
-        writer._set_runtime_graph(graph)
-        writer.set_plan_n_timesteps(3000)
+        for vert in verts:
+            PacmanDataView.add_vertex(vert)
         splitter_partitioner()
-        self.assertEqual(_n_machine_vertices(graph), 3)
+        self.assertEqual(PacmanDataView.get_n_machine_vertices(), 3)
         for vert in verts:
             for m_vert in vert.machine_vertices:
                 self.assertEqual(vert.n_atoms, m_vert.vertex_slice.n_atoms)
@@ -74,14 +70,10 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         large_vertex = SimpleTestVertex(300, "Large vertex")
         large_vertex.splitter = SplitterFixedLegacy()
-        graph = ApplicationGraph("Graph with large vertex")
-        graph.add_vertex(large_vertex)
-        writer = PacmanDataWriter.mock()
-        writer.set_plan_n_timesteps(1000)
-        writer._set_runtime_graph(graph)
+        PacmanDataView.add_vertex(large_vertex)
         self.assertEqual(large_vertex._model_based_max_atoms_per_core, 256)
         splitter_partitioner()
-        self.assertEqual(_n_machine_vertices(graph), 2)
+        self.assertEqual(PacmanDataView.get_n_machine_vertices(), 2)
 
     def test_partition_on_target_size_vertex_than_has_to_be_split(self):
         """
@@ -90,13 +82,9 @@ class TestBasicPartitioner(unittest.TestCase):
         large_vertex = SimpleTestVertex(
             1000, "Large vertex", max_atoms_per_core=10)
         large_vertex.splitter = SplitterFixedLegacy()
-        graph = ApplicationGraph("Graph with large vertex")
-        writer = PacmanDataWriter.mock()
-        writer.set_plan_n_timesteps(1000)
-        graph.add_vertex(large_vertex)
-        writer._set_runtime_graph(graph)
+        PacmanDataView.add_vertex(large_vertex)
         splitter_partitioner()
-        self.assertEqual(_n_machine_vertices(graph), 100)
+        self.assertEqual(PacmanDataView.get_n_machine_vertices(), 100)
 
     def test_partition_with_unsupported_constraints(self):
         """
@@ -113,12 +101,8 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         test that the partitioner can work with an empty graph
         """
-        graph = ApplicationGraph("foo")
-        writer = PacmanDataWriter.mock()
-        writer._set_runtime_graph(graph)
-        writer.set_plan_n_timesteps(3000)
         splitter_partitioner()
-        self.assertEqual(_n_machine_vertices(graph), 0)
+        self.assertEqual(PacmanDataView.get_n_machine_vertices(), 0)
 
     def test_partition_with_fixed_atom_constraints(self):
         """
@@ -129,14 +113,10 @@ class TestBasicPartitioner(unittest.TestCase):
         # Create a vertex which will be split perfectly into 4 cores
         vertex = SimpleTestVertex(16, max_atoms_per_core=4)
         vertex.splitter = SplitterFixedLegacy()
-        app_graph = ApplicationGraph("Test")
-        app_graph.add_vertex(vertex)
-        writer = PacmanDataWriter.mock()
-        writer._set_runtime_graph(app_graph)
-        writer.set_plan_n_timesteps(3000)
+        PacmanDataView.add_vertex(vertex)
         # Do the partitioning - this should just work
         splitter_partitioner()
-        self.assertEqual(4, _n_machine_vertices(app_graph))
+        self.assertEqual(PacmanDataView.get_n_machine_vertices(), 4)
 
 
 if __name__ == '__main__':
