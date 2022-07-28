@@ -85,7 +85,7 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
             self, vertex_slice, resources_required, label=None,
             constraints=None):
         return SimpleMachineVertex(
-            resources_required, label, constraints, self, vertex_slice)
+            sdram_required, label, constraints, self, vertex_slice)
 
     @property
     @overrides(LegacyPartitionerAPI.n_atoms)

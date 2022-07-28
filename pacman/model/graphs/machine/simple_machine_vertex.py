@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,16 +24,25 @@ class SimpleMachineVertex(MachineVertex):
         mininal API. If a more complex Vertex is required consider the
         MockMachineVertex.
     """
-    __slots__ = ["_resources"]
+    __slots__ = ["_iptags", "_sdram"]
 
-    def __init__(self, resources, label=None, constraints=None,
-                 app_vertex=None, vertex_slice=None):
+    def __init__(self, sdram, label=None, constraints=None,
+                 app_vertex=None, vertex_slice=None, iptags=None):
         super().__init__(
             label=label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
-        self._resources = resources
+        self._sdram = sdram
+        if iptags:
+            self._iptags = iptags
+        else:
+            self._iptags = []
 
     @property
     @overrides(MachineVertex.sdram_required)
     def sdram_required(self):
-        return self._resources
+        return self._sdram
+
+    @property
+    @overrides(MachineVertex.iptags)
+    def iptags(self):
+        return self._iptags

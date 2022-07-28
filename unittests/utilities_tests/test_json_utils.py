@@ -100,7 +100,8 @@ class TestJsonUtils(unittest.TestCase):
         self.resource_there_and_back(r2)
 
     def test_vertex(self):
-        s1 = SimpleMachineVertex(ResourceContainer(iptags=[IPtagResource(
-            "127.0.0.1", port=None, strip_sdp=True)]),
+        s1 = SimpleMachineVertex(
+            sdram=ConstantSDRAM(0),
+            iptags=[IPtagResource("127.0.0.1", port=None, strip_sdp=True)],
             label="Vertex")
         self.vertex_there_and_back(s1)
