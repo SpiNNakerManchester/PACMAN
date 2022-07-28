@@ -18,13 +18,11 @@ from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from .application_edge_partition import ApplicationEdgePartition
 from spinn_utilities.ordered_set import OrderedSet
-from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
-from pacman.model.graphs.graph import Graph
 
 
-class ApplicationGraph(Graph):
+class ApplicationGraph(object):
     """ An application-level abstraction of a graph.
     """
 
@@ -32,30 +30,143 @@ class ApplicationGraph(Graph):
         # The sets of edge partitions by pre-vertex
         "_outgoing_edge_partitions_by_pre_vertex",
         # The total number of outgoing edge partitions
-        "_n_outgoing_edge_partitions"
+        "_n_outgoing_edge_partitions",
+        # count of vertex which had a None or already used label
+        "_unlabelled_vertex_count",
+        # map between labels and vertex
+        "_vertex_by_label"
     ]
 
-    def __init__(self, label):
-        """
-        :param label: The label on the graph, or None
-        :type label: str or None
-        """
-        super().__init__(ApplicationVertex, ApplicationEdge, label)
+    def __init__(self):
         self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
         self._n_outgoing_edge_partitions = 0
+        self._unlabelled_vertex_count = 0
+        self._vertex_by_label = dict()
 
-    @overrides(Graph.new_edge_partition)
-    def new_edge_partition(self, name, edge):
-        return ApplicationEdgePartition(
-            identifier=name, pre_vertex=edge.pre_vertex)
+    def add_vertex(self, vertex):
+        """ Add a vertex to the graph.
 
-    @overrides(Graph.add_outgoing_edge_partition)
+        :param ApplicationVertex vertex: The vertex to add
+        :raises PacmanInvalidParameterException:
+            If the vertex is not of a valid type
+        :raises PacmanConfigurationException:
+            If there is an attempt to add the same vertex more than once
+        """
+        if not isinstance(vertex, ApplicationVertex):
+            raise PacmanInvalidParameterException(
+                "vertex", str(vertex.__class__),
+                "Only an ApplicationVertex can be added")
+        if not vertex.label:
+            vertex.set_label(
+                vertex.__class__.__name__ + "_" + self._label_postfix())
+        elif vertex.label in self._vertex_by_label:
+            if self._vertex_by_label[vertex.label] == vertex:
+                raise PacmanAlreadyExistsException("vertex", vertex.label)
+            vertex.set_label(vertex.label + self._label_postfix())
+        vertex.addedToGraph()
+        self._vertex_by_label[vertex.label] = vertex
+
+    @property
+    def vertices(self):
+        """ The vertices in the graph.
+
+        :rtype: iterable(AbstractVertex)
+        """
+        return self._vertex_by_label.values()
+
+    def vertex_by_label(self, label):
+        return self._vertex_by_label[label]
+
+    @property
+    def n_vertices(self):
+        """ The number of vertices in the graph.
+
+        :rtype: int
+        """
+        return len(self._vertex_by_label)
+
+    def add_edge(self, edge, outgoing_edge_partition_name):
+        """ Add an edge to the graph and its partition
+
+        If required and possible will create a new partition in the graph
+
+        Returns the partition the edge was added to
+
+        :param ApplicationEdge edge: The edge to add
+        :param str outgoing_edge_partition_name:
+            The name of the edge partition to add the edge to; each edge
+            partition is the partition of edges that start at the same vertex
+        :rtype: AbstractEdgePartition
+        :raises PacmanInvalidParameterException:
+            If the edge is not of a valid type or if edges have already been
+            added to this partition that start at a different vertex to this
+            one
+        """
+        # Add the edge to the partition
+        partition = self.get_outgoing_edge_partition_starting_at_vertex(
+            edge.pre_vertex, outgoing_edge_partition_name)
+        if partition is None:
+            partition = ApplicationEdgePartition(
+                identifier=outgoing_edge_partition_name,
+                pre_vertex=edge.pre_vertex)
+            self.add_outgoing_edge_partition(partition)
+        self._check_edge(edge)
+        partition.add_edge(edge)
+        return partition
+
+    def _check_edge(self, edge):
+        """ Add an edge to the graph.
+
+        :param ApplicationEdge edge: The edge to add
+        :raises PacmanInvalidParameterException:
+            If the edge is not of a valid type or if edges have already been
+            added to this partition that start at a different vertex to this
+            one
+        """
+        # verify that the edge is one suitable for this graph
+        if not isinstance(edge, ApplicationEdge):
+            raise PacmanInvalidParameterException(
+                "edge", edge.__class__,
+                "Only ApplicationEdges can be added")
+
+        if edge.pre_vertex.label not in self._vertex_by_label:
+            raise PacmanInvalidParameterException(
+                "Edge", str(edge.pre_vertex),
+                "Pre-vertex must be known in graph")
+        if edge.post_vertex.label not in self._vertex_by_label:
+            raise PacmanInvalidParameterException(
+                "Edge", str(edge.post_vertex),
+                "Post-vertex must be known in graph")
+
+    @property
+    def edges(self):
+        # pylint: disable=not-an-iterable
+        # https://github.com/PyCQA/pylint/issues/3105
+        """ The edges in the graph
+
+        :rtype: iterable(AbstractEdge)
+        """
+        return [
+            edge
+            for partition in self.outgoing_edge_partitions
+            for edge in partition.edges]
+
     def add_outgoing_edge_partition(self, edge_partition):
+        """ Add an edge partition to the graph.
+
+        Will also add any edges already in the partition as well
+
+        :param ApplicationEdgePartition edge_partition:
+            The edge partition to add
+        :raises PacmanAlreadyExistsException:
+            If a partition already exists with the same pre_vertex and
+            identifier
+        """
         # verify that this partition is suitable for this graph
         if not isinstance(edge_partition, ApplicationEdgePartition):
             raise PacmanInvalidParameterException(
                 "outgoing_edge_partition", edge_partition.__class__,
-                "Partitions of this graph must be an ApplicationEdgePartition")
+                "Partitions must be an ApplicationEdgePartition")
 
         # check this partition doesn't already exist
         key = (edge_partition.pre_vertex,
@@ -68,21 +179,39 @@ class ApplicationGraph(Graph):
         self._outgoing_edge_partitions_by_pre_vertex[
             edge_partition.pre_vertex].add(edge_partition)
         for edge in edge_partition.edges:
-            self._register_edge(edge)
+            self._check_edge(edge)
 
         self._n_outgoing_edge_partitions += 1
 
+    def get_edges_starting_at_vertex(self, vertex):
+        """ Get all the edges that start at the given vertex.
+
+        :param AbstractVertex vertex:
+            The vertex at which the edges to get start
+        :rtype: iterable(AbstractEdge)
+        """
+        parts = self.get_outgoing_edge_partitions_starting_at_vertex(vertex)
+        for partition in parts:
+            for edge in partition.edges:
+                yield edge
+
     @property
-    @overrides(Graph.outgoing_edge_partitions)
     def outgoing_edge_partitions(self):
+        """ The edge partitions in the graph.
+
+        :rtype: iterable(AbstractEdgePartition)
+        """
         for partitions in \
                 self._outgoing_edge_partitions_by_pre_vertex.values():
             for partition in partitions:
                 yield partition
 
     @property
-    @overrides(Graph.n_outgoing_edge_partitions)
     def n_outgoing_edge_partitions(self):
+        """ The number of outgoing edge partitions in the graph.
+
+        :rtype: int
+        """
         return self._n_outgoing_edge_partitions
 
     def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
@@ -94,25 +223,33 @@ class ApplicationGraph(Graph):
         """
         return self._outgoing_edge_partitions_by_pre_vertex[vertex]
 
-    def clone(self):
+    def get_outgoing_edge_partition_starting_at_vertex(
+            self, vertex, outgoing_edge_partition_name):
         """
-        Makes as shallow as possible copy of the graph.
+        Get the given outgoing edge partition that starts at the\
+        given vertex, or `None` if no such edge partition exists.
 
-        Vertices and edges are copied over. Partition will be new objects.
-
-        :return: A shallow copy of this graph
-        :rtype: ApplicationGraph
+        :param AbstractVertex vertex:
+            The vertex at the start of the edges in the partition
+        :param str outgoing_edge_partition_name:
+            The name of the edge partition
+        :return: the named edge partition, or None if no such partition exists
+        :rtype: AbstractEdgePartition or None
         """
-        new_graph = ApplicationGraph(label=self.label)
-        for vertex in self.vertices:
-            new_graph.add_vertex(vertex)
-        for outgoing_partition in self.outgoing_edge_partitions:
-            for edge in outgoing_partition.edges:
-                new_graph.add_edge(edge, outgoing_partition.identifier)
-        return new_graph
+        # In general, very few partitions start at a given vertex, so iteration
+        # isn't going to be as onerous as it looks
+        parts = self.get_outgoing_edge_partitions_starting_at_vertex(vertex)
+        for partition in parts:
+            if partition.identifier == outgoing_edge_partition_name:
+                return partition
+        return None
 
     def reset(self):
         """ Reset all the application vertices
         """
         for vertex in self.vertices:
             vertex.reset()
+
+    def _label_postfix(self):
+        self._unlabelled_vertex_count += 1
+        return str(self._unlabelled_vertex_count)

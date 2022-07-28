@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.config_setup import unittest_setup
-from pacman.data.pacman_data_writer import PacmanDataWriter
+from pacman.data import PacmanDataView
 from pacman.operations.routing_info_allocator_algorithms.\
     zoned_routing_info_allocator import (flexible_allocate, global_allocate)
 from pacman.model.graphs.application import (
-    ApplicationGraph, ApplicationEdge, ApplicationVertex)
+    ApplicationEdge, ApplicationVertex)
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.partitioner_splitters.abstract_splitters import (
@@ -77,15 +77,15 @@ class TestMacVertex(MachineVertex):
 
 
 def create_graphs1(with_fixed):
-    app_graph = ApplicationGraph("Test")
     # An output vertex to aim things at (to make keys required)
     out_app_vertex = TestAppVertex(splitter=TestSplitter())
-    app_graph.add_vertex(out_app_vertex)
+    PacmanDataView.add_vertex(out_app_vertex)
     # Create 5 application vertices (3 bits)
     app_vertices = list()
     for app_index in range(5):
         app_vertices.append(TestAppVertex(splitter=TestSplitter()))
-    app_graph.add_vertices(app_vertices)
+    for vertex in app_vertices:
+        PacmanDataView.add_vertex(vertex)
 
     # An output vertex to aim things at (to make keys required)
     out_mac_vertex = TestMacVertex(label="out_vertex")
@@ -95,7 +95,7 @@ def create_graphs1(with_fixed):
 
         # Create up to (10 * 4) + 1 = 41 partitions (6 bits)
         for i in range((app_index * 10) + 1):
-            app_graph.add_edge(
+            PacmanDataView.add_edge(
                 ApplicationEdge(app_vertex, out_app_vertex), f"Part{i}")
 
         # For each, create up to (40 * 2) + 1 = 81 machine vertices (7 bits)
@@ -122,16 +122,13 @@ def create_graphs1(with_fixed):
                     [BaseKeyAndMask(0x3300000, 0xFFFFFFFF)],
                     partition="Part1"))
 
-    return app_graph
-
 
 def create_graphs_only_fixed():
-    app_graph = ApplicationGraph("Test")
     # An output vertex to aim things at (to make keys required)
     out_app_vertex = TestAppVertex(splitter=TestSplitter())
-    app_graph.add_vertex(out_app_vertex)
+    PacmanDataView.add_vertex(out_app_vertex)
     app_vertex = TestAppVertex(splitter=TestSplitter())
-    app_graph.add_vertex(app_vertex)
+    PacmanDataView.add_vertex(app_vertex)
 
     # An output vertex to aim things at (to make keys required)
     out_mac_vertex = TestMacVertex(label="out_mac_vertex")
@@ -140,8 +137,10 @@ def create_graphs_only_fixed():
     mac_vertex = TestMacVertex(label="mac_vertex")
     app_vertex.remember_machine_vertex(mac_vertex)
 
-    app_graph.add_edge(ApplicationEdge(app_vertex, out_app_vertex), "Part0")
-    app_graph.add_edge(ApplicationEdge(app_vertex, out_app_vertex), "Part1")
+    PacmanDataView.add_edge(
+        ApplicationEdge(app_vertex, out_app_vertex), "Part0")
+    PacmanDataView.add_edge(
+        ApplicationEdge(app_vertex, out_app_vertex), "Part1")
 
     app_vertex.add_constraint(FixedKeyAndMaskConstraint(
                 [BaseKeyAndMask(0x4c00000, 0xFFFFFFFE)],
@@ -150,15 +149,12 @@ def create_graphs_only_fixed():
                 [BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)],
                 partition="Part1"))
 
-    return app_graph
-
 
 def create_graphs_no_edge():
-    app_graph = ApplicationGraph("Test")
     out_app_vertex = TestAppVertex(splitter=TestSplitter())
-    app_graph.add_vertex(out_app_vertex)
+    PacmanDataView.add_vertex(out_app_vertex)
     app_vertex = TestAppVertex(splitter=TestSplitter())
-    app_graph.add_vertex(app_vertex)
+    PacmanDataView.add_vertex(app_vertex)
 
     # An output vertex to aim things at (to make keys required)
     out_mac_vertex = TestMacVertex()
@@ -166,8 +162,6 @@ def create_graphs_no_edge():
 
     mac_vertex = TestMacVertex()
     app_vertex.remember_machine_vertex(mac_vertex)
-
-    return app_graph
 
 
 def check_masks_all_the_same(routing_info, mask):
@@ -192,11 +186,10 @@ def check_fixed(m_vertex, part_id, key):
     return False
 
 
-def check_keys_for_application_partition_pairs(
-        app_graph, routing_info, app_mask):
+def check_keys_for_application_partition_pairs(routing_info, app_mask):
     # Check the key for each application vertex/ parition pair is the same
     # The bits that should be the same are all but the bottom 12
-    for part in app_graph.outgoing_edge_partitions:
+    for part in PacmanDataView.iterate_partitions():
         mapped_key = None
         for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
                 part.identifier):
@@ -215,11 +208,9 @@ def check_keys_for_application_partition_pairs(
 
 def test_global_allocator():
     unittest_setup()
-    writer = PacmanDataWriter.mock()
 
     # Allocate something and check it does the right thing
-    app_graph = create_graphs1(False)
-    writer._set_runtime_graph(app_graph)
+    create_graphs1(False)
 
     # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
     routing_info = global_allocate([])
@@ -230,32 +221,26 @@ def test_global_allocator():
 
     # all but the bottom 8 + 7 = 15 bits should be the same
     app_mask = 0xFFFF8000
-    check_keys_for_application_partition_pairs(
-        app_graph, routing_info, app_mask)
+    check_keys_for_application_partition_pairs(routing_info, app_mask)
 
 
 def test_flexible_allocator_no_fixed():
     unittest_setup()
 
     # Allocate something and check it does the right thing
-    writer = PacmanDataWriter.mock()
-    app_graph = create_graphs1(False)
-    writer._set_runtime_graph(app_graph)
+    create_graphs1(False)
 
     # The number of bits is 8 + 7 + 6 = 21, so it shouldn't fail
     routing_info = flexible_allocate([])
 
     # all but the bottom 8 + 7 = 15 bits should be the same
     app_mask = 0xFFFF8000
-    check_keys_for_application_partition_pairs(
-        app_graph, routing_info, app_mask)
+    check_keys_for_application_partition_pairs(routing_info, app_mask)
 
 
 def test_fixed_only():
     unittest_setup()
-    writer = PacmanDataWriter.mock()
-    app_graph = create_graphs_only_fixed()
-    writer._set_runtime_graph(app_graph)
+    create_graphs_only_fixed()
     flexible_allocate([])
     routing_info = global_allocate([])
     assert len(list(routing_info)) == 4
@@ -263,9 +248,7 @@ def test_fixed_only():
 
 def test_no_edge():
     unittest_setup()
-    writer = PacmanDataWriter.mock()
-    app_graph = create_graphs_no_edge()
-    writer._set_runtime_graph(app_graph)
+    create_graphs_no_edge()
     flexible_allocate([])
     routing_info = global_allocate([])
     assert len(list(routing_info)) == 0
@@ -274,35 +257,33 @@ def test_no_edge():
 def test_flexible_allocator_with_fixed():
     unittest_setup()
     # Allocate something and check it does the right thing
-    writer = PacmanDataWriter.mock()
-    app_graph = create_graphs1(True)
-    writer._set_runtime_graph(app_graph)
+    create_graphs1(True)
 
     # The number of bits is 6 + 7 + 8 = 21, so it shouldn't fail
     routing_info = flexible_allocate([])
 
     # all but the bottom 8 + 7 = 15 bits should be the same
     app_mask = 0xFFFF8000
-    check_keys_for_application_partition_pairs(
-        app_graph, routing_info, app_mask)
+    check_keys_for_application_partition_pairs(routing_info, app_mask)
 
 
 def create_big(with_fixed):
     # This test shows how easy it is to trip up the allocator with a retina
-    app_graph = ApplicationGraph("Test")
     # Create a single "big" vertex
     big_app_vertex = TestAppVertex(label="Retina", splitter=TestSplitter())
-    app_graph.add_vertex(big_app_vertex)
+    PacmanDataView.add_vertex(big_app_vertex)
     # Create a single output vertex (which won't send)
     out_app_vertex = TestAppVertex(
         label="Destination", splitter=TestSplitter())
-    app_graph.add_vertex(out_app_vertex)
+    PacmanDataView.add_vertex(out_app_vertex)
     # Create a load of middle vertex
     mid_app_vertex = TestAppVertex(label="Population", splitter=TestSplitter())
-    app_graph.add_vertex(mid_app_vertex)
+    PacmanDataView.add_vertex(mid_app_vertex)
 
-    app_graph.add_edge(ApplicationEdge(big_app_vertex, mid_app_vertex), "Test")
-    app_graph.add_edge(ApplicationEdge(mid_app_vertex, out_app_vertex), "Test")
+    PacmanDataView.add_edge(
+        ApplicationEdge(big_app_vertex, mid_app_vertex), "Test")
+    PacmanDataView.add_edge(
+        ApplicationEdge(mid_app_vertex, out_app_vertex), "Test")
 
     # Create a single big machine vertex
     big_mac_vertex = TestMacVertex(
@@ -322,14 +303,11 @@ def create_big(with_fixed):
     if with_fixed:
         big_app_vertex.add_constraint(FixedKeyAndMaskConstraint([
             BaseKeyAndMask(0x0, 0x180000)]))
-    return app_graph
 
 
 def test_big_flexible_no_fixed():
     unittest_setup()
-    writer = PacmanDataWriter.mock()
-    app_graph = create_big(False)
-    writer._set_runtime_graph(app_graph)
+    create_big(False)
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
     routing_info = flexible_allocate([])
@@ -337,15 +315,12 @@ def test_big_flexible_no_fixed():
     # The number of bits is 1 + 21 = 22, so it shouldn't fail
     # all but the bottom 21 bits should be the same
     app_mask = 0xFFE00000
-    check_keys_for_application_partition_pairs(
-        app_graph, routing_info, app_mask)
+    check_keys_for_application_partition_pairs(routing_info, app_mask)
 
 
 def test_big_global_no_fixed():
     unittest_setup()
-    writer = PacmanDataWriter.mock()
-    app_graph = create_big(False)
-    writer._set_runtime_graph(app_graph)
+    create_big(False)
     routing_info = global_allocate([])
 
     # 1 for app 11 for machine so where possible use 20 for atoms
@@ -357,30 +332,24 @@ def test_big_global_no_fixed():
     # Others mask all bit minimum app bits (1)
     # all but the top 1 bits should be the same
     app_mask = 0x80000000
-    check_keys_for_application_partition_pairs(
-        app_graph, routing_info, app_mask)
+    check_keys_for_application_partition_pairs(routing_info, app_mask)
 
 
 def test_big_flexible_fixed():
     unittest_setup()
-    writer = PacmanDataWriter.mock()
-    app_graph = create_big(True)
-    writer._set_runtime_graph(app_graph)
+    create_big(True)
 
     # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
     routing_info = flexible_allocate([])
 
     # all but the bottom 18 bits should be the same
     app_mask = 0xFFFC0000
-    check_keys_for_application_partition_pairs(
-        app_graph, routing_info, app_mask)
+    check_keys_for_application_partition_pairs(routing_info, app_mask)
 
 
 def test_big_global_fixed():
     unittest_setup()
-    writer = PacmanDataWriter.mock()
-    app_graph = create_big(True)
-    writer._set_runtime_graph(app_graph)
+    create_big(True)
     routing_info = global_allocate([])
 
     # 7 bit atoms is 7 as it ignore the retina
@@ -392,5 +361,4 @@ def test_big_global_fixed():
     # Others mask all bit minimum app bits (1)
     # all but the top 1 bits should be the same
     app_mask = 0xFFFC0000
-    check_keys_for_application_partition_pairs(
-        app_graph, routing_info, app_mask)
+    check_keys_for_application_partition_pairs(routing_info, app_mask)
