@@ -42,13 +42,13 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
     __slots__ = [
         "_machine_vertex",
         "_vertex_slice",
-        "_resources_required"]
+        "_sdram_required"]
 
     def __init__(self):
         super().__init__(type(self).__name__)
         self._machine_vertex = None
         self._vertex_slice = None
-        self._resources_required = None
+        self._sdram_required = None
 
     def __str__(self):
         return f"SplitterOneToOneLegacy for {self._governed_app_vertex}"
@@ -60,13 +60,13 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
     def set_governed_app_vertex(self, app_vertex):
         super().set_governed_app_vertex(app_vertex)
         self._vertex_slice = Slice(0, self._governed_app_vertex.n_atoms - 1)
-        self._resources_required = (
+        self._sdram_required = (
             self._governed_app_vertex.get_resources_used_by_atoms(
                 self._vertex_slice))
         self._machine_vertex = (
             self._governed_app_vertex.create_machine_vertex(
                 vertex_slice=self._vertex_slice,
-                resources_required=self._resources_required, label=None,
+                sdram_required=self._sdram_required, label=None,
                 constraints=None))
         self._governed_app_vertex.remember_machine_vertex(self._machine_vertex)
         if not isinstance(app_vertex, LegacyPartitionerAPI):

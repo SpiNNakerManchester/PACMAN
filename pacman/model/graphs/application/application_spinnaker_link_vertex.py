@@ -64,11 +64,11 @@ class ApplicationSpiNNakerLinkVertex(
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
+            self, vertex_slice, sdram_required, label=None,
             constraints=None):
         machine_vertex = MachineSpiNNakerLinkVertex(
             self._spinnaker_link_id, self._board_address, label, constraints,
             self, vertex_slice)
-        if resources_required:
-            assert (resources_required == machine_vertex.sdram_required)
+        if sdram_required:
+            assert (sdram_required == machine_vertex.sdram_required)
         return machine_vertex

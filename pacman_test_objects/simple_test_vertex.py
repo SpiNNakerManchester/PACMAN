@@ -82,7 +82,7 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
+            self, vertex_slice, sdram_required, label=None,
             constraints=None):
         return SimpleMachineVertex(
             sdram_required, label, constraints, self, vertex_slice)
