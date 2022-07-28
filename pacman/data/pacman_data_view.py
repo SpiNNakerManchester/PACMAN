@@ -48,7 +48,6 @@ class _PacmanDataModel(object):
         "_precompressed",
         "_routing_infos",
         "_routing_table_by_partition",
-        "_runtime_graph",
         "_tags",
         "_uncompressed",
     ]
@@ -66,7 +65,7 @@ class _PacmanDataModel(object):
         """
         Clears out all data
         """
-        self._graph = None
+        self._graph = ApplicationGraph()
         # set at the start of every run
         self._plan_n_timesteps = None
         self._hard_reset()
@@ -80,7 +79,6 @@ class _PacmanDataModel(object):
         self._placements = None
         self._precompressed = None
         self._uncompressed = None
-        self._runtime_graph = None
         self._routing_infos = None
         self._routing_table_by_partition = None
         self._tags = None
@@ -109,25 +107,6 @@ class PacmanDataView(MachineDataView):
     # graph methods
 
     @classmethod
-    def get_edges_ending_at_vertex(cls, vertex):
-        """ Get all the edges that end at the given vertex in the user graph
-
-        Semantic sugar for get_graph().get_edges_ending_at_vertex
-
-        :param AbstractVertex vertex:
-            The vertex at which the edges to get end
-        :rtype: iterable(AbstractEdge)
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the graph is currently unavailable
-        """
-        if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
-        return cls.__pacman_data._graph.get_edges_ending_at_vertex(vertex)
-
-    @classmethod
     def add_vertex(cls, vertex):
         """
         Adds an Application vertex to the user graph
@@ -142,16 +121,13 @@ class PacmanDataView(MachineDataView):
             If there is an attempt to add the same vertex more than once
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
-        :raises SimulatorRunningException: If sim.run is currently running
         :raises SimulatorNotSetupException: If called before sim.setup
         :raises SimulatorShutdownException: If called after sim.end
         """
+        cls.check_valid_simulator()
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
-        cls.check_user_can_act()
+            raise cls._exception("graph")
+        cls.check_valid_simulator()
         cls.__pacman_data._graph.add_vertex(vertex)
         cls._UtilsDataView__data._requires_mapping = True
         cls._UtilsDataView__data._requires_data_generation = True
@@ -176,16 +152,12 @@ class PacmanDataView(MachineDataView):
             one
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
-        :raises SimulatorRunningException: If sim.run is currently running
         :raises SimulatorNotSetupException: If called before sim.setup
         :raises SimulatorShutdownException: If called after sim.end
         """
+        cls.check_valid_simulator()
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
-        cls.check_user_can_act()
+            raise cls._exception("graph")
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
         cls._UtilsDataView__data._requires_mapping = True
         cls._UtilsDataView__data._requires_data_generation = True
@@ -202,11 +174,30 @@ class PacmanDataView(MachineDataView):
             If the graph is currently unavailable
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         return iter(cls.__pacman_data._graph.vertices)
+
+    @classmethod
+    def get_vertices_by_type(cls, vertex_type):
+        """ The application vertices in the graph of the specific type
+
+        Semantic sugar for vertex in get_graph().vertices
+        if isinstance(vertex, vertex_type)
+
+        .. note::
+            The result is a generator so can only be used in a single loop
+
+        :param vertex_type: The type(s) to filter the vertices on
+        :type vertex_type: Class or iterable(Class)
+        :rtype: generator(AbstractVertex)
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        """
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        for vertex in cls.__pacman_data._graph.vertices:
+            if isinstance(vertex, vertex_type):
+                yield vertex
 
     @classmethod
     def get_n_vertices(cls):
@@ -219,15 +210,12 @@ class PacmanDataView(MachineDataView):
             If the graph is currently unavailable
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         return cls.__pacman_data._graph.n_vertices
 
     @classmethod
     def iterate_partitions(cls):
-        """ The partitions in the user application graph.
+        """ The partitions in the user application graphs as an iterator
 
         Semantic sugar for get_graph().outgoing_edge_partitions
 
@@ -236,11 +224,8 @@ class PacmanDataView(MachineDataView):
             If the graph is currently unavailable
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
-        return cls.__pacman_data._graph.outgoing_edge_partitions
+            raise cls._exception("graph")
+        return iter(cls.__pacman_data._graph.outgoing_edge_partitions)
 
     @classmethod
     def get_n_partitions(cls):
@@ -253,10 +238,7 @@ class PacmanDataView(MachineDataView):
             If the graph is currently unavailable
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         return cls.__pacman_data._graph.n_outgoing_edge_partitions
 
     @classmethod
@@ -271,69 +253,42 @@ class PacmanDataView(MachineDataView):
         :rtype: iterable(AbstractEdgePartition)
         """
         if cls.__pacman_data._graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("graph")
+            raise cls._exception("graph")
         return cls.__pacman_data._graph.\
             get_outgoing_edge_partitions_starting_at_vertex(vertex)
 
     @classmethod
-    def get_runtime_graph(cls):
+    def get_edges(cls):
+        """ Get all the edges in the graph.
+
+        Semantic sugar for get_graph().edges
+
+        :rtype: list(AbstractEdge)
         """
-        The runtime application graph
-
-        This is the run time version of the graph which is created by the
-        simulator to add system vertices.
-        Previously known as asb.application_graph.
-
-        Changes to this graph by anything except the insert algorithms is not
-        supported.
-
-         .. note::
-            This method is likely to be removed by another PR.
-            If not it will be replaced with add and iterate methods.
-
-        :rtype: ApplicationGraph
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the runtime_graph is currently unavailable, or if this method
-            is used except during run
-        """
-        if cls.__pacman_data._runtime_graph is None:
-            if cls._is_mocked():
-                if cls.__pacman_data._graph is None:
-                    raise cls._exception("graph")
-                cls.__pacman_data._runtime_graph = cls.__pacman_data._graph
-            else:
-                raise cls._exception("runtime_graph")
-        return cls.__pacman_data._runtime_graph
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        return cls.__pacman_data._graph.edges
 
     @classmethod
-    def get_runtime_n_machine_vertices(cls):
+    def get_n_machine_vertices(cls):
         """
         Gets the number of machine vertices via the application graph
         """
-        if cls.__pacman_data._runtime_graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._runtime_graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("runtime_graph")
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
         return sum(len(vertex.machine_vertices)
-                   for vertex in cls.get_runtime_graph().vertices)
+                   for vertex in cls.__pacman_data._graph.vertices)
 
     @classmethod
-    def get_runtime_machine_vertices(cls):
+    def iterate_machine_vertices(cls):
         """
-        Gets the Machine vertioces viua the application graph
+        Iterate the Machine vertices via the application graph
 
         :return:
         """
-        if cls.__pacman_data._runtime_graph is None:
-            if cls._is_mocked():
-                cls.__pacman_data._runtime_graph = ApplicationGraph("Mocked")
-            else:
-                raise cls._exception("runtime_graph")
-        for app_vertex in cls.get_runtime_graph().vertices:
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        for app_vertex in cls.__pacman_data._graph.vertices:
             yield from app_vertex.machine_vertices
 
     @classmethod

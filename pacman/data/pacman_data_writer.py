@@ -17,7 +17,6 @@ import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_machine.data.machine_data_writer import MachineDataWriter
-from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.placements import Placements
 from pacman.model.routing_info import RoutingInfo
 from pacman.model.routing_table_by_partition import (
@@ -64,47 +63,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
     def _soft_reset(self):
         MachineDataWriter._soft_reset(self)
         self.__pacman_data._soft_reset()
-
-    def get_runtime_graph(self):  # pylint: disable=arguments-differ
-        """
-        The runtime level graph
-
-        Previously known as asb._graph.
-
-        This removes the safety check so ASB can access the graph anytime
-
-        :rtype: ApplicationGraph
-        """
-        return self.__pacman_data._runtime_graph
-
-    def create_graphs(self, graph_label):
-        """
-        Creates the user/ original graphs based on the label
-
-        :param str graph_label:
-        """
-        # update graph label if needed
-        if graph_label is None:
-            graph_label = "Application_graph"
-
-        self.__pacman_data._graph = ApplicationGraph(label=graph_label)
-
-    def clone_graphs(self):
-        """
-        Clones the user/ original graphs and creates runtime ones
-
-        """
-        self.__pacman_data._runtime_graph = self.__pacman_data._graph.clone()
-
-    def _set_runtime_graph(self, graph):
-        """
-        Only used in unittests
-
-        :raises NotImplementedError: If used outside of unittests
-        """
-        if not self._is_mocked():
-            raise NotImplementedError("Only valid in Mocked state!")
-        self.__pacman_data._runtime_graph = graph
 
     def set_placements(self, placements):
         """
