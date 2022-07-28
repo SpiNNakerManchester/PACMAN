@@ -55,7 +55,7 @@ class ApplicationGraph(object):
         if not isinstance(vertex, ApplicationVertex):
             raise PacmanInvalidParameterException(
                 "vertex", str(vertex.__class__),
-                "Only ApplicationVertexs can be added")
+                "Only an ApplicationVertex can be added")
         if not vertex.label:
             vertex.set_label(
                 vertex.__class__.__name__ + "_" + self._label_postfix())

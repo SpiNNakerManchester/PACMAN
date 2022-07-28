@@ -215,7 +215,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def iterate_partitions(cls):
-        """ The partitions in the user application graphs an iterator
+        """ The partitions in the user application graphs as an iterator
 
         Semantic sugar for get_graph().outgoing_edge_partitions
 
@@ -282,7 +282,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def iterate_machine_vertices(cls):
         """
-        Iterate the Machine vertices viua the application graph
+        Iterate the Machine vertices via the application graph
 
         :return:
         """
