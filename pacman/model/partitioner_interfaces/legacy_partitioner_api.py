@@ -25,7 +25,6 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
     """
     __slots__ = []
 
-
     @abstractmethod
     def get_sdram_used_by_atoms(self, vertex_slice):
         """ Get the separate sdram requirements for a range of atoms.

@@ -137,4 +137,3 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :rtype: iterable(ReverseIPtagResource)
         """
         return []
-
