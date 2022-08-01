@@ -97,7 +97,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
         app_vertex = self._governed_app_vertex
         remaining_constraints = get_remaining_constraints(app_vertex)
         for vertex_slice in self.__fixed_slices:
-            sdram = app_vertex.get_resources_used_by_atoms(vertex_slice)
+            sdram = app_vertex.get_sdram_used_by_atoms(vertex_slice)
             chip_counter.add_core(sdram)
             label = f"MachineVertex for {vertex_slice} of {app_vertex.label}"
             machine_vertex = app_vertex.create_machine_vertex(

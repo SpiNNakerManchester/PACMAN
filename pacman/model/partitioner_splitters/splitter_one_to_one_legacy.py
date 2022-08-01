@@ -61,7 +61,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         super().set_governed_app_vertex(app_vertex)
         self._vertex_slice = Slice(0, self._governed_app_vertex.n_atoms - 1)
         self._sdram_required = (
-            self._governed_app_vertex.get_resources_used_by_atoms(
+            self._governed_app_vertex.get_sdram_used_by_atoms(
                 self._vertex_slice))
         self._machine_vertex = (
             self._governed_app_vertex.create_machine_vertex(

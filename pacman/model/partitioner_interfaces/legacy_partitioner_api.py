@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The University of Manchester
+# Copyright (c) 2019-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,16 +25,14 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
     """
     __slots__ = []
 
+
     @abstractmethod
-    def get_resources_used_by_atoms(self, vertex_slice):
-        """ Get the separate resource requirements for a range of atoms.
+    def get_sdram_used_by_atoms(self, vertex_slice):
+        """ Get the separate sdram requirements for a range of atoms.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the low value of atoms to calculate resources from
-        :return: a resource container that contains a
-            :py:class:`CPUCyclesPerTickResource`, :py:class:`DTCMResource`
-            and :py:class:`SDRAMResource`
-        :rtype: ~pacman.model.resources.ResourceContainer
+        :rtype: ~pacman.model.resources.AbstractSDRAM
         """
 
     @abstractmethod
