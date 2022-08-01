@@ -19,9 +19,7 @@ Miscellaneous minor functions for converting between JSON and Python objects.
 import json
 import gzip
 from pacman.data import PacmanDataView
-from pacman.model.resources import (
-    CPUCyclesPerTickResource, DTCMResource, IPtagResource, ResourceContainer,
-    VariableSDRAM)
+from pacman.model.resources import (IPtagResource, VariableSDRAM)
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements.placement import Placement
 

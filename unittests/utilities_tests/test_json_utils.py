@@ -15,9 +15,6 @@
 import unittest
 import json
 from pacman.config_setup import unittest_setup
-from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
-    ResourceContainer)
 from pacman.utilities.json_utils import (
     resource_container_to_json, resource_container_from_json,
     vertex_to_json, vertex_from_json)
