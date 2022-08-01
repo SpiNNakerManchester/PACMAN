@@ -19,7 +19,8 @@ Miscellaneous minor functions for converting between JSON and Python objects.
 import json
 import gzip
 from pacman.data import PacmanDataView
-from pacman.model.resources import (IPtagResource, VariableSDRAM)
+from pacman.model.resources import (
+    IPtagResource, ReverseIPtagResource, VariableSDRAM)
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements.placement import Placement
 
@@ -90,15 +91,50 @@ def iptag_resources_from_json(json_list):
     return iptags
 
 
+def reverse_iptag_to_json(iptag):
+    json_dict = dict()
+    try:
+        if iptag.port is not None:
+            json_dict["port"] = iptag.port
+        json_dict["sdp_port"] = iptag.sdp_port
+        if iptag.tag is not None:
+            json_dict["tag"] = iptag.tag
+    except Exception as ex:  # pylint: disable=broad-except
+        json_dict["exception"] = str(ex)
+    return json_dict
+
+
+def reverse_iptag_from_json(json_dict):
+    port = json_dict.get("port")
+    sdp_port = json_dict["sdp_port"]
+    tag = json_dict.get("tag")
+    return ReverseIPtagResource(port, sdp_port, tag)
+
+
+def reverse_iptags_to_json(iptags):
+    json_list = []
+    for iptag in iptags:
+        json_list.append(reverse_iptag_to_json(iptag))
+    return json_list
+
+
+def reverse_iptags_from_json(json_list):
+    iptags = []
+    for json_dict in json_list:
+        iptags.append(reverse_iptag_from_json(json_dict))
+    return iptags
+
+
 def vertex_to_json(vertex):
     json_dict = dict()
     try:
         json_dict["class"] = vertex.__class__.__name__
         json_dict["label"] = vertex.label
         json_dict["fixed_sdram"] = int(vertex.sdram_required.fixed)
-        json_dict["per_timestep_sdram"] = int(vertex.sdram_required.per_timestep)
+        json_dict["per_timestep_sdram"] = int(
+            vertex.sdram_required.per_timestep)
         json_dict["iptags"] = iptag_resources_to_json(vertex.iptags)
-        json_dict["reverse_iptags"] = iptag_resources_to_json(
+        json_dict["reverse_iptags"] = reverse_iptags_to_json(
             vertex.reverse_iptags)
     except Exception as ex:  # pylint: disable=broad-except
         json_dict["exception"] = str(ex)
@@ -109,9 +145,11 @@ def vertex_from_json(json_dict):
     sdram = VariableSDRAM(
         json_dict["fixed_sdram"], json_dict["per_timestep_sdram"])
     iptags = iptag_resources_from_json(json_dict["iptags"])
-    reverse_iptags = iptag_resources_from_json(json_dict["reverse_iptags"])
+    reverse_iptags = reverse_iptags_from_json(json_dict["reverse_iptags"])
     return SimpleMachineVertex(
-        sdram=sdram, label=json_dict["label"], iptags=iptags)
+        sdram=sdram, label=json_dict["label"], iptags=iptags,
+        reverse_iptags=reverse_iptags)
+
 
 def vertex_lookup(label, graph=None):
     if graph:

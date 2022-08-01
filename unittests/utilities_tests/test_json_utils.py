@@ -15,7 +15,8 @@
 import unittest
 import json
 from pacman.config_setup import unittest_setup
-from pacman.model.resources import (ConstantSDRAM, IPtagResource)
+from pacman.model.resources import (
+    ConstantSDRAM, IPtagResource, ReverseIPtagResource)
 from pacman.utilities.json_utils import (vertex_to_json, vertex_from_json)
 from pacman.model.graphs.machine import SimpleMachineVertex
 
@@ -58,13 +59,6 @@ class TestJsonUtils(unittest.TestCase):
     # Composite JSON round-trip testing schemes
     # ------------------------------------------------------------------
 
-    def resource_there_and_back(self, there):
-        j_object = resource_container_to_json(there)
-        j_str = json.dumps(j_object)
-        j_object2 = json.loads(j_str)
-        back = resource_container_from_json(j_object2)
-        self.assertEqual(there, back)
-
     def vertex_there_and_back(self, there):
         j_object = vertex_to_json(there)
         j_str = json.dumps(j_object)
@@ -80,5 +74,6 @@ class TestJsonUtils(unittest.TestCase):
         s1 = SimpleMachineVertex(
             sdram=ConstantSDRAM(0),
             iptags=[IPtagResource("127.0.0.1", port=None, strip_sdp=True)],
+            reverse_iptags=[ReverseIPtagResource(port=25, sdp_port=2, tag=5)],
             label="Vertex")
         self.vertex_there_and_back(s1)
