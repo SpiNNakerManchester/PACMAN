@@ -170,10 +170,10 @@ def check_masks_all_the_same(routing_info, mask):
     seen_keys = set()
     for r_info in routing_info:
         if isinstance(r_info.vertex, MachineVertex):
-            assert(len(r_info.keys_and_masks) == 1)
-            assert(r_info.first_mask == mask or
-                   r_info.machine_vertex.label == "RETINA")
-            assert(r_info.first_key not in seen_keys)
+            assert len(r_info.keys_and_masks) == 1
+            assert (r_info.first_mask == mask or
+                    r_info.machine_vertex.label == "RETINA")
+            assert r_info.first_key not in seen_keys
             seen_keys.add(r_info.first_key)
 
 
@@ -199,11 +199,11 @@ def check_keys_for_application_partition_pairs(routing_info, app_mask):
                 continue
 
             if mapped_key is not None:
-                assert((mapped_key & app_mask) == (key & app_mask))
+                assert (mapped_key & app_mask) == (key & app_mask)
             else:
                 mapped_key = key
             if key != 0:
-                assert((key & app_mask) != 0)
+                assert (key & app_mask) != 0
 
 
 def test_global_allocator():
