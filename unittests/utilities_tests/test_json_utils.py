@@ -15,9 +15,8 @@
 import unittest
 import json
 from pacman.config_setup import unittest_setup
-from pacman.utilities.json_utils import (
-    resource_container_to_json, resource_container_from_json,
-    vertex_to_json, vertex_from_json)
+from pacman.model.resources import (ConstantSDRAM, IPtagResource)
+from pacman.utilities.json_utils import (vertex_to_json, vertex_from_json)
 from pacman.model.graphs.machine import SimpleMachineVertex
 
 
@@ -77,9 +76,9 @@ class TestJsonUtils(unittest.TestCase):
     # Test cases
     # ------------------------------------------------------------------
 
-    #def test_vertex(self):
-    #    s1 = SimpleMachineVertex(
-    #        sdram=ConstantSDRAM(0),
-    #        iptags=[IPtagResource("127.0.0.1", port=None, strip_sdp=True)],
-    #        label="Vertex")
-    #    self.vertex_there_and_back(s1)
+    def test_vertex(self):
+        s1 = SimpleMachineVertex(
+            sdram=ConstantSDRAM(0),
+            iptags=[IPtagResource("127.0.0.1", port=None, strip_sdp=True)],
+            label="Vertex")
+        self.vertex_there_and_back(s1)
