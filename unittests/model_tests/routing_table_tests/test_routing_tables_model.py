@@ -181,7 +181,7 @@ class TestRoutingTable(unittest.TestCase):
     def test_multicast_routing_table_by_partition(self):
         mrt = MulticastRoutingTableByPartition()
         partition_id = "foo"
-        source_vertex = SimpleMachineVertex(resources=None)
+        source_vertex = SimpleMachineVertex(sdram=None)
         entry = MulticastRoutingTableByPartitionEntry(range(2), range(4))
         mrt.add_path_entry(entry, 0, 0, source_vertex, partition_id)
         entry = MulticastRoutingTableByPartitionEntry(range(2, 4), range(4, 8))

@@ -80,28 +80,9 @@ class TestJsonUtils(unittest.TestCase):
     # Test cases
     # ------------------------------------------------------------------
 
-    def test_tags_resources(self):
-        t1 = IPtagResource("1", 2, True)  # Minimal args
-        r1 = ResourceContainer(iptags=[t1])
-        self.resource_there_and_back(r1)
-        t2 = IPtagResource("1.2.3.4", 2, False, 4, 5)
-        r2 = ResourceContainer(reverse_iptags=[t2])
-        self.resource_there_and_back(r2)
-
-    def test_resource_container(self):
-        sdram1 = ConstantSDRAM(128 * (2**20))
-        dtcm = DTCMResource(128 * (2**20) + 1)
-        cpu = CPUCyclesPerTickResource(128 * (2**20) + 2)
-        r1 = ResourceContainer(dtcm, sdram1, cpu)
-        self.resource_there_and_back(r1)
-        t1 = IPtagResource("1", 2, True)  # Minimal args
-        t2 = IPtagResource("1.2.3.4", 2, False, 4, 5)
-        r2 = r1 = ResourceContainer(dtcm, sdram1, cpu, iptags=[t1, t2])
-        self.resource_there_and_back(r2)
-
-    def test_vertex(self):
-        s1 = SimpleMachineVertex(
-            sdram=ConstantSDRAM(0),
-            iptags=[IPtagResource("127.0.0.1", port=None, strip_sdp=True)],
-            label="Vertex")
-        self.vertex_there_and_back(s1)
+    #def test_vertex(self):
+    #    s1 = SimpleMachineVertex(
+    #        sdram=ConstantSDRAM(0),
+    #        iptags=[IPtagResource("127.0.0.1", port=None, strip_sdp=True)],
+    #        label="Vertex")
+    #    self.vertex_there_and_back(s1)
