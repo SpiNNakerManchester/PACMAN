@@ -29,6 +29,5 @@ class DuckLegacyApplicationVertex(ApplicationVertex):
         pass
 
     def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
+            self, vertex_slice, sdram, label=None, constraints=None):
         pass

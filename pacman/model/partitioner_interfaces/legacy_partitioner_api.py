@@ -37,14 +37,13 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
 
     @abstractmethod
     def create_machine_vertex(
-            self, vertex_slice, sdram_required, label=None,
-            constraints=None):
+            self, vertex_slice, sdram, label=None, constraints=None):
         """ Create a machine vertex from this application vertex.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of atoms that the machine vertex will cover.
-        :param ~pacman.model.resourcesAbstractSDRAM sdram_required:
-            The resources used by the machine vertex.
+        :param ~pacman.model.resourcesAbstractSDRAM sdram:
+            The sdram used by the machine vertex.
         :param label: human readable label for the machine vertex
         :type label: str or None
         :param constraints: Constraints to be passed on to the machine vertex.

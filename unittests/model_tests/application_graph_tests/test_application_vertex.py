@@ -94,7 +94,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         subv_from_vert = vert.create_machine_vertex(
             Slice(0, 9),
-            vert.get_sdraam_used_by_atoms(Slice(0, 9)))
+            vert.get_sdram_used_by_atoms(Slice(0, 9)))
         self.assertNotIn(constraint1, subv_from_vert.constraints)
 
     def test_new_create_vertex_from_vertex_no_constraints(self):
@@ -116,9 +116,9 @@ class TestApplicationGraphModel(unittest.TestCase):
 
         """
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
-        resources = vert.get_sdram_used_by_atoms(Slice(0, 9))
-        subv_from_vert = vert.create_machine_vertex(Slice(0, 9), resources, "")
-        self.assertEqual(subv_from_vert.sdram_required, resources)
+        sdram = vert.get_sdram_used_by_atoms(Slice(0, 9))
+        subv_from_vert = vert.create_machine_vertex(Slice(0, 9), sdram, "")
+        self.assertEqual(subv_from_vert.sdram_required, sdram)
 
     def test_create_new_vertex_from_vertex_with_additional_constraints(
             self):

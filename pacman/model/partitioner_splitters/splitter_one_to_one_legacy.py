@@ -66,7 +66,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         self._machine_vertex = (
             self._governed_app_vertex.create_machine_vertex(
                 vertex_slice=self._vertex_slice,
-                sdram_required=self._sdram_required, label=None,
+                sdram=self._sdram_required, label=None,
                 constraints=None))
         self._governed_app_vertex.remember_machine_vertex(self._machine_vertex)
         if not isinstance(app_vertex, LegacyPartitionerAPI):
