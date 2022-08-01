@@ -40,7 +40,6 @@ class SimpleMachineVertex(MachineVertex):
         if reverse_iptags:
             self._reverse_iptags = reverse_iptags
 
-
     @property
     @overrides(MachineVertex.sdram_required)
     def sdram_required(self):
