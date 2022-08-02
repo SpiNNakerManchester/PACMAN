@@ -25,20 +25,6 @@ class TestKeyAllocatorConstraints(unittest.TestCase):
     def setUp(self):
         unittest_setup()
 
-    def test_contiguous_key_range_constraint(self):
-        c1 = ContiguousKeyRangeContraint()
-        c2 = ContiguousKeyRangeContraint()
-        self.assertEqual(c1, c2)
-        self.assertNotEqual(c1, "c1")
-        r = "KeyAllocatorContiguousRangeConstraint()"
-        self.assertEqual(str(c1), r)
-        self.assertEqual(repr(c1), r)
-        d = {}
-        d[c1] = 1
-        d[c2] = 2
-        self.assertEqual(len(d), 1)
-        self.assertEqual(d[c1], 2)
-
     def test_fixed_key_and_mask_constraint(self):
         c1 = FixedKeyAndMaskConstraint([
             BaseKeyAndMask(0xFF0, 0xFF8)])

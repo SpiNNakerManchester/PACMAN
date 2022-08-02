@@ -26,8 +26,8 @@ from pacman.utilities.utility_calls import get_key_ranges
 from pacman.exceptions import PacmanRouteInfoAllocationException,\
     PacmanInvalidParameterException
 from pacman.model.constraints.key_allocator_constraints import (
-    AbstractKeyAllocatorConstraint, ContiguousKeyRangeContraint,
     FixedKeyAndMaskConstraint)
+from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -139,14 +139,6 @@ class ZonedRoutingInfoAllocator(object):
         self.__check_zones()
         return self.__allocate()
 
-    def __check_constraint_supported(self, constraint):
-        if not isinstance(constraint, AbstractKeyAllocatorConstraint):
-            return
-        if isinstance(constraint, ContiguousKeyRangeContraint):
-            return
-        raise PacmanInvalidParameterException(
-            "constraint", constraint, "Unsupported key allocation constraint")
-
     def __find_fixed(self):
         """
         Looks for FixedKeyAmdMask Constraints and keeps track of these.
@@ -163,8 +155,9 @@ class ZonedRoutingInfoAllocator(object):
                             self.__add_fixed(identifier, vert, constraint)
                         self.__add_fixed(
                             identifier, pre, constraint)
-                else:
-                    self.__check_constraint_supported(constraint)
+                elif not isinstance(constraint, ChipAndCoreConstraint):
+                        raise PacmanInvalidParameterException(
+                            "constraint", constraint, "Exexpected constraint")
 
     def __add_fixed(self, part_id, vertex, constraint):
         """

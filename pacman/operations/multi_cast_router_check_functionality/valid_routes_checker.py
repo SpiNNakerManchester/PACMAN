@@ -21,8 +21,6 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.constants import FULL_MASK
@@ -106,17 +104,6 @@ def validate_routes(placements, routing_tables):
                 _search_route(
                     placement, destinations[m_vertex], key_and_mask,
                     routing_tables, m_vertex.vertex_slice.n_atoms)
-
-
-def _check_if_partition_has_continuous_keys(partition):
-    """
-    :param AbstractSingleSourcePartition partition:
-    :rtype: bool
-    """
-    continuous_constraints = locate_constraints_of_type(
-        partition.constraints, ContiguousKeyRangeContraint)
-    # TODO: Can we do better here?
-    return len(continuous_constraints) > 0
 
 
 def _search_route(source_placement, dest_placements, key_and_mask,

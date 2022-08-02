@@ -13,12 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
+from pacman.model.constraints import AbstractConstraint
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.exceptions import PacmanConfigurationException
 
 
-class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
+class FixedKeyAndMaskConstraint(AbstractConstraint):
     """ Key allocator constraint that fixes the key and mask of an edge.
 
     .. note::

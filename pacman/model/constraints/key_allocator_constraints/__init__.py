@@ -13,10 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_key_allocator_constraint import AbstractKeyAllocatorConstraint
-from .contiguous_key_range_constraint import ContiguousKeyRangeContraint
 from .fixed_key_and_mask_constraint import FixedKeyAndMaskConstraint
 
-__all__ = ["AbstractKeyAllocatorConstraint",
-           "ContiguousKeyRangeContraint",
-           "FixedKeyAndMaskConstraint"]
+__all__ = ["FixedKeyAndMaskConstraint"]
