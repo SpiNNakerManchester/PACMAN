@@ -22,7 +22,6 @@ from spinn_utilities.log import FormatAdapter
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.utilities.utility_calls import locate_constraints_of_type
 from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     get_app_partitions)

@@ -23,7 +23,6 @@ from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman.operations.partition_algorithms import splitter_partitioner
-from pacman.exceptions import PacmanInvalidParameterException
 from pacman_test_objects import SimpleTestVertex
 
 
