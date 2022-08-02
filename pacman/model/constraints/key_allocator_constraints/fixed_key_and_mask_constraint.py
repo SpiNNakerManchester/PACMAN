@@ -46,6 +46,7 @@ class FixedKeyAndMaskConstraint(AbstractKeyAllocatorConstraint):
             one partition expected)
         :type partition: str or None
         """
+        assert len(keys_and_masks) == 1
         for keys_and_mask in keys_and_masks:
             if not isinstance(keys_and_mask, BaseKeyAndMask):
                 raise PacmanConfigurationException(
