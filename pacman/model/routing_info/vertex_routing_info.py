@@ -40,6 +40,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         :param int index: The index of the machine vertex
         """
         self.__keys_and_masks = keys_and_masks
+        assert len(keys_and_masks) == 1
         self.__partition_id = partition_id
 
     def get_keys(self, n_keys=None):

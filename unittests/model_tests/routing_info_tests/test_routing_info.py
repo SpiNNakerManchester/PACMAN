@@ -74,14 +74,6 @@ class TestRoutingInfo(unittest.TestCase):
         assert routing_info.get_routing_info_from_pre_vertex(
             pre_vertex, "Test2").get_keys().tolist() == [key]
 
-        info4 = MachineVertexRoutingInfo(
-            [BaseKeyAndMask(key, FULL_MASK),
-             BaseKeyAndMask(key * 2, FULL_MASK)], "Test4", pre_vertex, 0)
-        routing_info.add_routing_info(info4)
-
-        assert routing_info.get_routing_info_from_pre_vertex(
-            pre_vertex, "Test4").get_keys().tolist() == [key, key * 2]
-
     def test_base_key_and_mask(self):
         with self.assertRaises(PacmanConfigurationException):
             BaseKeyAndMask(0xF0, 0x40)
