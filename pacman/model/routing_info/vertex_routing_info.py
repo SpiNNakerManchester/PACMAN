@@ -16,6 +16,7 @@
 import numpy
 from pacman.exceptions import PacmanConfigurationException
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
+from .base_key_and_mask import BaseKeyAndMask
 
 
 class VertexRoutingInfo(object, metaclass=AbstractBase):
@@ -25,13 +26,13 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     __slots__ = [
         # The keys allocated to the machine partition
-        "__keys_and_masks",
+        "__key_and_mask",
 
         # The partition identifier of the allocation
         "__partition_id"
     ]
 
-    def __init__(self, keys_and_masks, partition_id):
+    def __init__(self, key_and_mask, partition_id):
         """
         :param iterable(BaseKeyAndMask) keys_and_masks:\
             The keys allocated to the machine partition
@@ -39,8 +40,12 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         :param MachineVertex machine_vertex: The vertex to set the keys for
         :param int index: The index of the machine vertex
         """
-        self.__keys_and_masks = keys_and_masks
-        assert len(keys_and_masks) == 1
+        if isinstance(key_and_mask, BaseKeyAndMask):
+            self.__key_and_mask = key_and_mask
+        else:
+            assert len(key_and_mask) == 1
+            assert isinstance(key_and_mask[0], BaseKeyAndMask)
+            self.__key_and_mask = key_and_mask[0]
         self.__partition_id = partition_id
 
     def get_keys(self, n_keys=None):
@@ -51,7 +56,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         :rtype: ~numpy.ndarray
         """
 
-        max_n_keys = sum(km.n_keys for km in self.__keys_and_masks)
+        max_n_keys = self.__key_and_mask.n_keys
 
         if n_keys is None:
             n_keys = max_n_keys
@@ -62,17 +67,9 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
         key_array = numpy.zeros(n_keys, dtype=">u4")
         offset = 0
-        for key_and_mask in self.__keys_and_masks:
-            _, offset = key_and_mask.get_keys(
-                key_array=key_array, offset=offset, n_keys=(n_keys - offset))
+        _, offset = self.__key_and_mask.get_keys(
+            key_array=key_array, offset=offset, n_keys=(n_keys - offset))
         return key_array
-
-    @property
-    def keys_and_masks(self):
-        """
-        :rtype: iterable(BaseKeyAndMask)
-        """
-        return self.__keys_and_masks
 
     @property
     def first_key_and_mask(self):
@@ -80,7 +77,15 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
         :rtype: BaseKeyAndMask
         """
-        return self.__keys_and_masks[0]
+        return self.__key_and_mask
+
+    @property
+    def key_and_mask(self):
+        """ The only key and mask
+
+        :rtype: BaseKeyAndMask
+        """
+        return self.__key_and_mask
 
     @property
     def first_key(self):
@@ -88,7 +93,15 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
         :rtype: int
         """
-        return self.__keys_and_masks[0].key
+        return self.__key_and_mask.key
+
+    @property
+    def key(self):
+        """ The first key (or only one if there is only one)
+
+        :rtype: int
+        """
+        return self.__key_and_mask.key
 
     @property
     def first_mask(self):
@@ -96,7 +109,15 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
         :rtype: int
         """
-        return self.__keys_and_masks[0].mask
+        return self.__key_and_mask.mask
+
+    @property
+    def mask(self):
+        """ The first mask (or only one if there is only one)
+
+        :rtype: int
+        """
+        return self.__key_and_mask.mask
 
     @property
     def partition_id(self):
