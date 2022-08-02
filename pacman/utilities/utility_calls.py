@@ -15,8 +15,7 @@
 
 import hashlib
 import numpy
-from pacman.exceptions import (
-    PacmanInvalidParameterException, PacmanValueError)
+from pacman.exceptions import PacmanInvalidParameterException
 
 
 def locate_constraints_of_type(constraints, constraint_type):
@@ -61,45 +60,6 @@ def _is_constraint_supported(constraint, supported_constraints):
     """
     return any(isinstance(constraint, supported_constraint)
                for supported_constraint in supported_constraints)
-
-
-def check_algorithm_can_support_constraints(
-        constrained_vertices, supported_constraints, abstract_constraint_type):
-    """ Helper method to find out if an algorithm can support all the
-        constraints given the objects its expected to work on
-
-    :param list(AbstractVertex) constrained_vertices:
-        a list of constrained vertices which each has constraints given to the
-        algorithm
-    :param list(type(AbstractConstraint)) supported_constraints:
-        The constraints supported
-    :param type(AbstractConstraint) abstract_constraint_type:
-        The overall abstract c type supported
-    :raise PacmanInvalidParameterException:
-        When the algorithm cannot support the constraints demanded of it
-    """
-    for constrained_vertex in constrained_vertices:
-        for c in constrained_vertex.constraints:
-            if isinstance(c, abstract_constraint_type) and not \
-                    _is_constraint_supported(c, supported_constraints):
-                raise PacmanInvalidParameterException(
-                    "constraints", c.__class__,
-                    "Constraints of this class are not supported by this"
-                    " algorithm")
-
-
-def check_constrained_value(value, current_value):
-    """ Checks that the current value and a new value match
-
-    :param value: The value to check
-    :param current_value: The existing value
-    """
-    if not is_equal_or_None(current_value, value):
-        raise PacmanValueError(
-            "Multiple constraints with conflicting values")
-    if value is not None:
-        return value
-    return current_value
 
 
 def expand_to_bit_array(value):

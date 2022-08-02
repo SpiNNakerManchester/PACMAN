@@ -24,7 +24,7 @@ from pacman.data import PacmanDataView
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman.operations.partition_algorithms import splitter_partitioner
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman_test_objects import NewPartitionerConstraint, SimpleTestVertex
+from pacman_test_objects import SimpleTestVertex
 
 
 def _n_machine_vertices(graph):
@@ -85,17 +85,6 @@ class TestBasicPartitioner(unittest.TestCase):
         PacmanDataView.add_vertex(large_vertex)
         splitter_partitioner()
         self.assertEqual(PacmanDataView.get_n_machine_vertices(), 100)
-
-    def test_partition_with_unsupported_constraints(self):
-        """
-        test that when a vertex has a constraint that is unrecognised,
-        it raises an error
-        """
-        constrained_vertex = SimpleTestVertex(13, "Constrained")
-        constrained_vertex.add_constraint(
-            NewPartitionerConstraint("Mock constraint"))
-        with self.assertRaises(PacmanInvalidParameterException):
-            constrained_vertex.splitter = SplitterFixedLegacy()
 
     def test_partition_with_empty_graph(self):
         """

@@ -99,13 +99,10 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
                 self.SETTING_SPLITTER_ERROR_MSG.format(self._label))
         self._splitter = new_value
         self._splitter.set_governed_app_vertex(self)
-        self._splitter.check_supported_constraints()
 
     @overrides(AbstractVertex.add_constraint)
     def add_constraint(self, constraint):
         super().add_constraint(constraint)
-        if self._splitter is not None:
-            self._splitter.check_supported_constraints()
 
     def remember_machine_vertex(self, machine_vertex):
         """

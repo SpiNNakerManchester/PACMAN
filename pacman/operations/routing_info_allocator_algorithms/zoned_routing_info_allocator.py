@@ -157,7 +157,7 @@ class ZonedRoutingInfoAllocator(object):
                             identifier, pre, constraint)
                 elif not isinstance(constraint, ChipAndCoreConstraint):
                         raise PacmanInvalidParameterException(
-                            "constraint", constraint, "Exexpected constraint")
+                            "constraint", constraint, "Unexpected constraint")
 
     def __add_fixed(self, part_id, vertex, constraint):
         """
