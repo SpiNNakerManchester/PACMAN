@@ -281,8 +281,8 @@ def _do_constraints(vertices, sdram, placements, machine, next_chip_space):
     y = None
     constrained = False
     for vertex in vertices:
-        constraints = locate_constraints_of_type(
-            vertex.constraints, ChipAndCoreConstraint)
+        constraints = [c for c in vertex.constraints
+                       if isinstance(c, ChipAndCoreConstraint)]
         for constraint in constraints:
             if constrained and (constraint.x != x or constraint.y != y):
                 raise PacmanConfigurationException(
@@ -303,8 +303,8 @@ def _do_constraints(vertices, sdram, placements, machine, next_chip_space):
         next_cores = iter(cores)
         for vertex in vertices:
             next_core = None
-            constraints = locate_constraints_of_type(
-                vertex.constraints, ChipAndCoreConstraint)
+            constraints = [c for c in vertex.constraints
+                           if isinstance(c, ChipAndCoreConstraint)]
             for constraint in constraints:
                 if constraint.p is not None:
                     if next_core is not None and next_core != constraint.p:

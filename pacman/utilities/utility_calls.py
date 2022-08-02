@@ -18,19 +18,6 @@ import numpy
 from pacman.exceptions import PacmanInvalidParameterException
 
 
-def locate_constraints_of_type(constraints, constraint_type):
-    """ Locates all constraints of a given type out of a list
-
-    :param iterable(AbstractConstraint) constraints: The constraints to filter
-    :param type(AbstractConstraint) constraint_type:
-        The type of constraints to return
-    :return: The constraints of constraint_type that are found in the
-        constraints given
-    :rtype: iterable(AbstractConstraint)
-    """
-    return [c for c in constraints if isinstance(c, constraint_type)]
-
-
 def locate_first_constraint_of_type(constraints, constraint_type):
     """ Locates the first constraint of a given type out of a list
 
