@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_placer_constraint import AbstractPlacerConstraint
 from .chip_and_core_constraint import ChipAndCoreConstraint
 
-__all__ = ["AbstractPlacerConstraint", "ChipAndCoreConstraint"]
+__all__ = ["ChipAndCoreConstraint"]

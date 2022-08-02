@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_placer_constraint import AbstractPlacerConstraint
+from pacman.model.constraints import AbstractConstraint
 
 
-class ChipAndCoreConstraint(AbstractPlacerConstraint):
+class ChipAndCoreConstraint(AbstractConstraint):
     """ A constraint to place a vertex on a specific chip and, optionally, a\
         specific core on that chip.
     """
