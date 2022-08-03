@@ -368,7 +368,7 @@ def _check_edges(routing_tables):
         for m_vertex in outgoing:
             actual_targets = _find_targets(
                 routing_tables, expected_virtual, m_vertex, part.identifier)
-            assert(not actual_targets.difference(required_targets[m_vertex]))
+            assert not actual_targets.difference(required_targets[m_vertex])
 
 
 def _route_and_time(algorithm):
