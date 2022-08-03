@@ -60,5 +60,5 @@ class FPGAConnection(NamedTuple):
                  else FPGA_LINK_IDS)
         for i in ids:
             for lnk in links:
-                yield(FPGAConnection(
-                    i, lnk, self.board_address, self.chip_coords))
+                yield FPGAConnection(
+                    i, lnk, self.board_address, self.chip_coords)
