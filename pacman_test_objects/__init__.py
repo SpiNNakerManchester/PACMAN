@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .duck_legacy_app_vertex import DuckLegacyApplicationVertex
-from .mock_machine_vertex import MockMachineVertex
 from .non_legacy_app_vertex import NonLegacyApplicationVertex
 from .placer_test_support import get_resourced_machine_vertex
 from .simple_test_edge import SimpleTestEdge
@@ -24,7 +23,6 @@ from .simple_test_vertex import SimpleTestVertex
 __all__ = [
     "DuckLegacyApplicationVertex",
     "get_resourced_machine_vertex",
-    "MockMachineVertex",
     "NonLegacyApplicationVertex",
     "NewPartitionerConstraint",
     "SimpleTestEdge",

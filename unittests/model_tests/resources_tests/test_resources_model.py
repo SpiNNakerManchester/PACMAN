@@ -21,8 +21,8 @@ import tempfile
 import unittest
 from pacman.config_setup import unittest_setup
 from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer,
-    IPtagResource, MultiRegionSDRAM, ReverseIPtagResource, VariableSDRAM)
+    ConstantSDRAM, IPtagResource, MultiRegionSDRAM, ReverseIPtagResource,
+    VariableSDRAM)
 
 
 class MockEnum(Enum):
@@ -98,61 +98,6 @@ class TestResourceModels(unittest.TestCase):
         with tempfile.TemporaryFile(mode="w") as target:
             multi3.report(1000, target=target)
         # multi3.report(preamble="core (0,0,1):")
-
-    def test_dtcm(self):
-        """
-        test that adding a DTCM resource to a resource container works
-        correctly
-        """
-        dtcm = DTCMResource(128 * (2**20))
-        self.assertEqual(dtcm.get_value(), 128 * (2**20))
-        dtcm = DTCMResource(128 * (2**19))
-        self.assertEqual(dtcm.get_value(), 128 * (2**19))
-        dtcm = DTCMResource(128 * (2**21))
-        self.assertEqual(dtcm.get_value(), 128 * (2**21))
-
-    def test_cpu(self):
-        """
-        test that adding a CPU resource to a resource container works
-        correctly
-        """
-        cpu = CPUCyclesPerTickResource(128 * (2**20))
-        self.assertEqual(cpu.get_value(), 128 * (2**20))
-        cpu = CPUCyclesPerTickResource(128 * (2**19))
-        self.assertEqual(cpu.get_value(), 128 * (2**19))
-        cpu = CPUCyclesPerTickResource(128 * (2**21))
-        self.assertEqual(cpu.get_value(), 128 * (2**21))
-
-    def test_resource_container(self):
-        """
-        tests that creating multiple resource containers doesn't cause issues.
-        """
-        sdram = ConstantSDRAM(128 * (2**20))
-        dtcm = DTCMResource(128 * (2**20) + 1)
-        cpu = CPUCyclesPerTickResource(128 * (2**20) + 2)
-
-        container = ResourceContainer(dtcm, sdram, cpu)
-        self.assertEqual(container.sdram.get_total_sdram(None), 128 * (2**20))
-        self.assertEqual(container.dtcm.get_value(), 128 * (2**20) + 1)
-        self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**20) + 2)
-
-        sdram = ConstantSDRAM(128 * (2**19))
-        dtcm = DTCMResource(128 * (2**19) + 1)
-        cpu = CPUCyclesPerTickResource(128 * (2**19) + 2)
-
-        container = ResourceContainer(dtcm, sdram, cpu)
-        self.assertEqual(container.sdram.get_total_sdram(None), 128 * (2**19))
-        self.assertEqual(container.dtcm.get_value(), 128 * (2**19) + 1)
-        self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**19) + 2)
-
-        sdram = ConstantSDRAM(128 * (2**21))
-        dtcm = DTCMResource(128 * (2**21) + 1)
-        cpu = CPUCyclesPerTickResource(128 * (2**21) + 2)
-
-        container = ResourceContainer(dtcm, sdram, cpu)
-        self.assertEqual(container.sdram.get_total_sdram(None), 128 * (2**21))
-        self.assertEqual(container.dtcm.get_value(), 128 * (2**21) + 1)
-        self.assertEqual(container.cpu_cycles.get_value(), 128 * (2**21) + 2)
 
     def test_tags_resources(self):
         IPtagResource("1", 2, 3)  # Minimal args
