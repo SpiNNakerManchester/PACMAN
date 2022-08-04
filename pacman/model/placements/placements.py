@@ -146,6 +146,29 @@ class Placements(object):
         """
         return (x, y) in self._placements and p in self._placements[x, y]
 
+    def iterate_placements_on_core(self, x, y):
+        """
+        Iterate over placements with this x, y and this type
+
+        :param int x: x coordinate to find placements for.
+        :param int y: y coordinate  to find placements for.
+        :rtype: Placement
+        """
+        return self._placements[x, y].values()
+
+    def iterate_placements_with_vertex_type(self, x, y, vertex_type):
+        """
+        Iterate over placements with this x, y and this type
+
+        :param int x: x coordinate to find placements for.
+        :param int y: y coordinate  to find placements for.
+        :param class vertex_type: Class of vertex to find
+        :rtype: Placement
+        """
+        for placement in self._placements[x, y].values():
+            if isinstance(placement.vertex, vertex_type):
+                yield placement
+
     def n_placements_on_chip(self, x, y):
         """ The number of placements on the given chip
         :param int x: x coordinate of chip.
