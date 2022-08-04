@@ -15,10 +15,10 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
+from pacman.model.constraints import ChipAndCoreConstraint
 
 
-class TestPlacementConstraints(unittest.TestCase):
+class TestChipAndCoreConstraint(unittest.TestCase):
     """ Tester for pacman.model.constraints.placer_constraints
     """
 

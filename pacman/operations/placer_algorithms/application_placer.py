@@ -27,7 +27,7 @@ from pacman.model.placements import Placements, Placement
 from pacman.model.graphs import AbstractVirtual
 from pacman.exceptions import (
     PacmanPlaceException, PacmanConfigurationException)
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
+from pacman.model.constraints import ChipAndCoreConstraint
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

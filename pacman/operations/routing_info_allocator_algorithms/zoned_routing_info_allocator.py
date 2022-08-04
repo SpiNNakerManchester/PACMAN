@@ -26,7 +26,7 @@ from pacman.utilities.utility_calls import get_key_ranges
 from pacman.exceptions import PacmanRouteInfoAllocationException,\
     PacmanInvalidParameterException
 from pacman.model.constraints import FixedKeyAndMaskConstraint
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
+from pacman.model.constraints import ChipAndCoreConstraint
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 
 logger = FormatAdapter(logging.getLogger(__name__))
