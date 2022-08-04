@@ -307,19 +307,6 @@ class PacmanDataView(MachineDataView):
     # placements
 
     @classmethod
-    def get_placements(cls):
-        """
-        The placements if known
-
-        :rtype: ~pacman.model.placements.Placements
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the placements is currently unavailable
-        """
-        if cls.__pacman_data._placements is None:
-            raise cls._exception("placements")
-        return cls.__pacman_data._placements
-
-    @classmethod
     def iterate_placemements(cls):
         """
         Iterates over the Placement objects
@@ -333,7 +320,45 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._placements.placements
 
     @classmethod
+    def iterate_placements_on_core(cls, x, y):
+        """
+        Iterate over placements with this x, y and this type
+
+        :param int x: x coordinate to find placements for.
+        :param int y: y coordinate  to find placements for.
+        :rtype: Placement
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the placements are currently unavailable
+        """
+        if cls.__pacman_data._placements is None:
+            raise cls._exception("placements")
+        return cls.__pacman_data._placements.iterate_placements_on_core(x, y)
+
+    @classmethod
+    def iterate_placements_with_vertex_type(cls, x, y, vertex_type):
+        """
+        Iterate over placements with this x, y and this type
+
+        :param int x: x coordinate to find placements for.
+        :param int y: y coordinate  to find placements for.
+        :param class vertex_type: Class of vertex to find
+        :rtype: Placement
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the placements are currently unavailable
+        """
+        if cls.__pacman_data._placements is None:
+            raise cls._exception("placements")
+        return cls.__pacman_data._placements.\
+            iterate_placements_with_vertex_type(x, y, vertex_type)
+
+    @classmethod
     def get_n_placements(cls):
+        """ The number of placements
+
+        :rtype: int
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the placements are currently unavailable
+        """
         if cls.__pacman_data._placements is None:
             raise cls._exception("placements")
         return cls.__pacman_data._placements.n_placements
@@ -358,6 +383,25 @@ class PacmanDataView(MachineDataView):
             return cls.__pacman_data._placements._machine_vertices[vertex]
         except KeyError as e:
             raise PacmanNotPlacedError(vertex) from e
+
+    @classmethod
+    def get_vertex_on_processor(cls, x, y, p):
+        """ Return the vertex on a specific processor or raises an exception
+            if the processor has not been allocated
+
+        :param int x: the x coordinate of the chip
+        :param int y: the y coordinate of the chip
+        :param int p: the processor on the chip
+        :return: the vertex placed on the given processor
+        :rtype: MachineVertex
+        :raise PacmanProcessorNotOccupiedError:
+            If the processor is not occupied
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the placements are currently unavailable
+        """
+        if cls.__pacman_data._placements is None:
+            raise cls._exception("placements")
+        return cls.__pacman_data._placements.get_vertex_on_processor(x, y, p)
 
     # routing_infos
 
