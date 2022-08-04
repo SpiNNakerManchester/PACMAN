@@ -15,7 +15,6 @@
 
 import hashlib
 import numpy
-from pacman.exceptions import PacmanInvalidParameterException
 
 
 def expand_to_bit_array(value):
