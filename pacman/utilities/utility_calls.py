@@ -18,37 +18,6 @@ import numpy
 from pacman.exceptions import PacmanInvalidParameterException
 
 
-def locate_first_constraint_of_type(constraints, constraint_type):
-    """ Locates the first constraint of a given type out of a list
-
-    :param iterable(AbstractConstraint) constraints:
-        The constraints to select from
-    :param type(AbstractConstraint) constraint_type:
-        The type of constraints to return
-    :return: The first constraint of `constraint_type` that was found in the
-        constraints given
-    :rtype: AbstractConstraint
-    :raises PacmanInvalidParameterException:
-        If no such constraint is present
-    """
-    for constraint in constraints:
-        if isinstance(constraint, constraint_type):
-            return constraint
-    raise PacmanInvalidParameterException(
-        "constraints", constraint_type.__class__,
-        "Constraints of this class are not present")
-
-
-def _is_constraint_supported(constraint, supported_constraints):
-    """
-    :param AbstractConstraint constraint:
-    :param list(type(AbstractConstraint)) supported_constraints:
-    :rtype: bool
-    """
-    return any(isinstance(constraint, supported_constraint)
-               for supported_constraint in supported_constraints)
-
-
 def expand_to_bit_array(value):
     """ Expand a 32-bit value in to an array of length 32 of uint8 values,
         each of which is a 1 or 0
