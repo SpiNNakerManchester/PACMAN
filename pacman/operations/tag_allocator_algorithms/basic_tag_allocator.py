@@ -68,9 +68,6 @@ def basic_tag_allocator():
             tags.add_ip_tag(
                 __create_tag(alloc_chip, placement, iptag, tag),
                 placement.vertex)
-        a = placement.vertex.reverse_iptags
-        if a is None:
-            print("here")
         for reverse_iptag in placement.vertex.reverse_iptags:
             alloc_chip, tag = __get_chip_and_tag(
                 reverse_iptag, eth_chip, tags_on_chip, machine, tags_available)
