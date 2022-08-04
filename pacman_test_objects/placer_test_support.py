@@ -15,17 +15,11 @@
 
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from pacman.model.resources import ConstantSDRAM
 
 
 def get_resourced_machine_vertex(lo_atom, hi_atom, label=None):
-    cpu_cycles = 10 * (hi_atom - lo_atom)
-    dtcm_requirement = 200 * (hi_atom - lo_atom)
     sdram_requirement = 4000 + 50 * (hi_atom - lo_atom)
-    resources = ResourceContainer(
-        cpu_cycles=CPUCyclesPerTickResource(cpu_cycles),
-        dtcm=DTCMResource(dtcm_requirement),
-        sdram=ConstantSDRAM(sdram_requirement))
+    sdram = ConstantSDRAM(sdram_requirement)
     return SimpleMachineVertex(
-        resources, label=label, vertex_slice=Slice(lo_atom, hi_atom))
+        sdram, label=label, vertex_slice=Slice(lo_atom, hi_atom))

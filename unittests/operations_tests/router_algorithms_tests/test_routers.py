@@ -39,7 +39,7 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placements, Placement
-from pacman.model.resources import ResourceContainer, ConstantSDRAM
+from pacman.model.resources import ConstantSDRAM
 from pacman.model.graphs import AbstractFPGA, AbstractSpiNNakerLink
 
 from collections import defaultdict
@@ -65,7 +65,7 @@ class TestSplitter(AbstractSplitterCommon):
     def create_machine_vertices(self, chip_counter):
         m_vertices = [
             SimpleMachineVertex(
-                ResourceContainer(), app_vertex=self._governed_app_vertex,
+                ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
                 label=f"{self._governed_app_vertex.label}_{i}")
             for i in range(self.__n_machine_vertices)]
         for m_vertex in m_vertices:
@@ -111,12 +111,12 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
         for i in range(self.__n_groups):
             incoming = [
                 SimpleMachineVertex(
-                    ResourceContainer(), app_vertex=self._governed_app_vertex,
+                    ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
                     label=f"{self._governed_app_vertex.label}_{i}_{j}")
                 for j in range(self.__n_incoming_machine_vertices)]
             outgoing = [
                 SimpleMachineVertex(
-                    ResourceContainer(), app_vertex=self._governed_app_vertex,
+                    ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
                     label=f"{self._governed_app_vertex.label}_{i}_{j}")
                 for j in range(self.__n_outgoing_machine_vertices)]
             self.__same_chip_groups.append(
@@ -188,7 +188,7 @@ class TestOneToOneSplitter(AbstractSplitterCommon):
     def create_machine_vertices(self, chip_counter):
         m_vertices = [
             SimpleMachineVertex(
-                ResourceContainer(), app_vertex=self._governed_app_vertex,
+                ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
                 label=f"{self._governed_app_vertex.label}_{i}")
             for i in range(self.__n_machine_vertices)]
         for m_vertex in m_vertices:

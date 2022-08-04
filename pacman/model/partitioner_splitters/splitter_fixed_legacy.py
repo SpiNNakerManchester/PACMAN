@@ -94,11 +94,11 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
     def create_machine_vertices(self, chip_counter):
         app_vertex = self._governed_app_vertex
         for vertex_slice in self.__fixed_slices:
-            resources = app_vertex.get_resources_used_by_atoms(vertex_slice)
-            chip_counter.add_core(resources)
+            sdram = app_vertex.get_sdram_used_by_atoms(vertex_slice)
+            chip_counter.add_core(sdram)
             label = f"MachineVertex for {vertex_slice} of {app_vertex.label}"
             machine_vertex = app_vertex.create_machine_vertex(
-                vertex_slice, resources, label, app_vertex.constraints)
+               vertex_slice, sdram, label, app_vertex.constraints)
             app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.reset_called)

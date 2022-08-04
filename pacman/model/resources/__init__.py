@@ -15,17 +15,12 @@
 
 from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
-from .core_resource import CoreResource
-from .cpu_cycles_per_tick_resource import CPUCyclesPerTickResource
-from .dtcm_resource import DTCMResource
 from .element_free_space import ElementFreeSpace
 from .iptag_resource import IPtagResource
 from .multi_region_sdram import MultiRegionSDRAM
-from .resource_container import ResourceContainer
 from .reverse_iptag_resource import ReverseIPtagResource
 from .variable_sdram import VariableSDRAM
 
-__all__ = ["AbstractSDRAM", "ConstantSDRAM", "CoreResource",
-           "CPUCyclesPerTickResource", "DTCMResource",
+__all__ = ["AbstractSDRAM", "ConstantSDRAM",
            "ElementFreeSpace", "IPtagResource", "MultiRegionSDRAM",
-           "ResourceContainer", "ReverseIPtagResource", "VariableSDRAM"]
+           "ReverseIPtagResource", "VariableSDRAM"]

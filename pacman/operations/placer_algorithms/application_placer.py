@@ -1,4 +1,4 @@
-# Copyright (c) 2021 The University of Manchester
+# Copyright (c) 2021-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -372,7 +372,7 @@ class _Spaces(object):
         on_chip = self.__placements.placements_on_chip(chip.x, chip.y)
         cores_used = {p.p for p in on_chip}
         sdram_used = sum(
-            p.vertex.resources_required.sdram.get_total_sdram(
+            p.vertex.sdram_required.get_total_sdram(
                 self.__plan_n_timesteps) for p in on_chip)
         return cores_used, sdram_used
 
