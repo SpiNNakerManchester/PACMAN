@@ -47,7 +47,7 @@ class ChipCounter(object):
         self.__n_chips = 0
 
     def add_core(self, resources):
-        sdram = resources.sdram.get_total_sdram(
+        sdram = resources.get_total_sdram(
             PacmanDataView.get_plan_n_timestep())
         if self.__cores_free == 0 or self.__sdram_free < sdram:
             self.__n_chips += 1

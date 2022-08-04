@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 The University of Manchester
+# Copyright (c) 2020-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -188,7 +188,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
         :rtype: list(list(MachineVertex), AbstractSDRAM)
         """
-        return [([v], v.resources_required.sdram)
+        return [([v], v.sdram_required)
                 for v in self._governed_app_vertex.machine_vertices]
 
     def get_internal_multicast_partitions(self):

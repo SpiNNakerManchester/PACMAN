@@ -16,11 +16,8 @@ import unittest
 import json
 from pacman.config_setup import unittest_setup
 from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
-    ResourceContainer)
-from pacman.utilities.json_utils import (
-    resource_container_to_json, resource_container_from_json,
-    vertex_to_json, vertex_from_json)
+    ConstantSDRAM, IPtagResource, ReverseIPtagResource)
+from pacman.utilities.json_utils import (vertex_to_json, vertex_from_json)
 from pacman.model.graphs.machine import SimpleMachineVertex
 
 
@@ -52,7 +49,7 @@ class TestJsonUtils(unittest.TestCase):
         self.assertEqual(v1.label, v2.label)
         if v1.label in seen:
             return
-        self.assertEqual(v1.resources_required, v2.resources_required)
+        self.assertEqual(v1.sdram_required, v2.sdram_required)
         self.assertEqual(len(v1.constraints), len(v2.constraints))
         seen.append(v1.label)
         for c1, c2 in zip(self.__constraints(v1), self.__constraints(v2)):
@@ -61,13 +58,6 @@ class TestJsonUtils(unittest.TestCase):
     # ------------------------------------------------------------------
     # Composite JSON round-trip testing schemes
     # ------------------------------------------------------------------
-
-    def resource_there_and_back(self, there):
-        j_object = resource_container_to_json(there)
-        j_str = json.dumps(j_object)
-        j_object2 = json.loads(j_str)
-        back = resource_container_from_json(j_object2)
-        self.assertEqual(there, back)
 
     def vertex_there_and_back(self, there):
         j_object = vertex_to_json(there)
@@ -80,27 +70,10 @@ class TestJsonUtils(unittest.TestCase):
     # Test cases
     # ------------------------------------------------------------------
 
-    def test_tags_resources(self):
-        t1 = IPtagResource("1", 2, True)  # Minimal args
-        r1 = ResourceContainer(iptags=[t1])
-        self.resource_there_and_back(r1)
-        t2 = IPtagResource("1.2.3.4", 2, False, 4, 5)
-        r2 = ResourceContainer(reverse_iptags=[t2])
-        self.resource_there_and_back(r2)
-
-    def test_resource_container(self):
-        sdram1 = ConstantSDRAM(128 * (2**20))
-        dtcm = DTCMResource(128 * (2**20) + 1)
-        cpu = CPUCyclesPerTickResource(128 * (2**20) + 2)
-        r1 = ResourceContainer(dtcm, sdram1, cpu)
-        self.resource_there_and_back(r1)
-        t1 = IPtagResource("1", 2, True)  # Minimal args
-        t2 = IPtagResource("1.2.3.4", 2, False, 4, 5)
-        r2 = r1 = ResourceContainer(dtcm, sdram1, cpu, iptags=[t1, t2])
-        self.resource_there_and_back(r2)
-
     def test_vertex(self):
-        s1 = SimpleMachineVertex(ResourceContainer(iptags=[IPtagResource(
-            "127.0.0.1", port=None, strip_sdp=True)]),
+        s1 = SimpleMachineVertex(
+            sdram=ConstantSDRAM(0),
+            iptags=[IPtagResource("127.0.0.1", port=None, strip_sdp=True)],
+            reverse_iptags=[ReverseIPtagResource(port=25, sdp_port=2, tag=5)],
             label="Vertex")
         self.vertex_there_and_back(s1)
