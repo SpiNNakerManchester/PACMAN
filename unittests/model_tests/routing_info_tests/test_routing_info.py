@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.model.resources import ResourceContainer
+from pacman.model.resources import ConstantSDRAM
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException)
 from pacman.model.routing_info import (
@@ -30,7 +30,7 @@ class TestRoutingInfo(unittest.TestCase):
         unittest_setup()
 
     def test_routing_info(self):
-        pre_vertex = SimpleMachineVertex(resources=ResourceContainer())
+        pre_vertex = SimpleMachineVertex(ConstantSDRAM(0))
         key = 12345
         info = MachineVertexRoutingInfo(
             [BaseKeyAndMask(key, FULL_MASK)], "Test", pre_vertex, 0)

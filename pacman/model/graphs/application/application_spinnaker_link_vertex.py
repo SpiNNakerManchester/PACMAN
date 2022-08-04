@@ -50,7 +50,6 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
     @property
     def spinnaker_link_id(self):
         """ The SpiNNaker link to which this device is connected
-
         :rtype: int
         """
         return self._spinnaker_link_id

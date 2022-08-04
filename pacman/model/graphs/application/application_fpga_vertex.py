@@ -74,7 +74,6 @@ class ApplicationFPGAVertex(ApplicationVertex):
     @property
     def n_machine_vertices_per_link(self):
         """ The number of machine vertices to create for each link of the FPGA
-
         :rtype: int
         """
         return self._n_machine_vertices_per_link

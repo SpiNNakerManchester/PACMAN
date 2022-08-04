@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import FixedRouteEntry, Machine
+from spinn_machine import FixedRouteEntry
 from pacman.data import PacmanDataView
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
@@ -44,12 +44,11 @@ class _FixedRouteRouter(object):
 
     __slots__ = [
         "_destination_class", "_fixed_route_tables",
-        "_machine", "_placements"]
+        "_machine"]
 
     def __init__(self, destination_class):
         self._machine = PacmanDataView.get_machine()
         self._destination_class = destination_class
-        self._placements = PacmanDataView.get_placements()
         self._fixed_route_tables = dict()
 
     def _run(self):
@@ -144,12 +143,9 @@ class _FixedRouteRouter(object):
         """
         x = chip.x
         y = chip.y
-        for p in range(Machine.max_cores_per_chip()):
-            # check if occupied and by the right vertex type
-            if self._placements.is_processor_occupied(x, y, p) and isinstance(
-                    self._placements.get_vertex_on_processor(x, y, p),
-                    self._destination_class):
-                return p
+        for placement in PacmanDataView.iterate_placements_with_vertex_type(
+                x, y, self._destination_class):
+            return placement.p
         raise PacmanConfigurationException(
             "no destination vertex found on Ethernet chip {}:{}".format(
                 chip.x, chip.y))

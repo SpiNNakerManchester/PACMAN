@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractFPGA, AbstractVirtual
-from pacman.model.resources import ResourceContainer
+from pacman.model.resources import ConstantSDRAM
 from .machine_vertex import MachineVertex
 
 
@@ -50,9 +50,9 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         self._outgoing = outgoing
 
     @property
-    @overrides(MachineVertex.resources_required)
-    def resources_required(self):
-        return ResourceContainer()
+    @overrides(MachineVertex.sdram_required)
+    def sdram_required(self):
+        return ConstantSDRAM(0)
 
     @property
     @overrides(AbstractFPGA.fpga_id)

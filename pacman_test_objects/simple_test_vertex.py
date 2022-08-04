@@ -20,8 +20,7 @@ from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.resources import (
-    ConstantSDRAM, DTCMResource, ResourceContainer, CPUCyclesPerTickResource)
+from pacman.model.resources import ConstantSDRAM
 
 
 class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
@@ -39,37 +38,10 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
         self._n_atoms = self.round_n_atoms(n_atoms, "test_param")
         self._fixed_sdram_value = fixed_sdram_value
 
-    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
-    def get_resources_used_by_atoms(self, vertex_slice):
-        """
-        standard method call to get the sdram, cpu and dtcm usage of a
-        collection of atoms
-
-        :param vertex_slice: the collection of atoms
-        """
-        return ResourceContainer(
-            sdram=ConstantSDRAM(
-                self.get_sdram_usage_for_atoms(vertex_slice)),
-            cpu_cycles=CPUCyclesPerTickResource(
-                self.get_cpu_usage_for_atoms(vertex_slice)),
-            dtcm=DTCMResource(
-                self.get_dtcm_usage_for_atoms(vertex_slice)))
-
-    def get_cpu_usage_for_atoms(self, vertex_slice):
-        """
-
-        :param vertex_slice: the atoms being considered
-        :return: the amount of cpu (in cycles this model will use)
-        """
-        return 1 * vertex_slice.n_atoms
-
-    def get_dtcm_usage_for_atoms(self, vertex_slice):
-        """
-
-        :param vertex_slice: the atoms being considered
-        :return: the amount of dtcm (in bytes this model will use)
-        """
-        return 1 * vertex_slice.n_atoms
+    @overrides(LegacyPartitionerAPI.get_sdram_used_by_atoms)
+    def get_sdram_used_by_atoms(self, vertex_slice):
+        return ConstantSDRAM(
+                self.get_sdram_usage_for_atoms(vertex_slice))
 
     def get_sdram_usage_for_atoms(self, vertex_slice):
         """
@@ -82,10 +54,10 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
+            self, vertex_slice, sdram, label=None,
             constraints=None):
         return SimpleMachineVertex(
-            resources_required, label, constraints, self, vertex_slice)
+            sdram, label, constraints, self, vertex_slice)
 
     @property
     @overrides(LegacyPartitionerAPI.n_atoms)

@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,18 +58,17 @@ def basic_tag_allocator():
         PacmanDataView.get_n_placements(), "Allocating tags")
     machine = PacmanDataView.get_machine()
     for placement in progress.over(PacmanDataView.iterate_placemements()):
-        resources = placement.vertex.resources_required
         place_chip = machine.get_chip_at(placement.x, placement.y)
         eth_chip = machine.get_chip_at(place_chip.nearest_ethernet_x,
                                        place_chip.nearest_ethernet_y)
         tags_on_chip = tags_available[eth_chip.x, eth_chip.y]
-        for iptag in resources.iptags:
+        for iptag in placement.vertex.iptags:
             alloc_chip, tag = __get_chip_and_tag(
                 iptag, eth_chip, tags_on_chip, machine, tags_available)
             tags.add_ip_tag(
                 __create_tag(alloc_chip, placement, iptag, tag),
                 placement.vertex)
-        for reverse_iptag in resources.reverse_iptags:
+        for reverse_iptag in placement.vertex.reverse_iptags:
             alloc_chip, tag = __get_chip_and_tag(
                 reverse_iptag, eth_chip, tags_on_chip, machine, tags_available)
             port = __get_port(reverse_iptag, eth_chip, ports_available)

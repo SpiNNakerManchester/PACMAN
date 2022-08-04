@@ -124,10 +124,10 @@ class TestSimulatorData(unittest.TestCase):
     def test_placements(self):
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_placements()
+            PacmanDataView.get_n_placements()
         info = Placements([])
         writer.set_placements(info)
-        self.assertEqual(info, PacmanDataView.get_placements())
+        self.assertEqual(0, PacmanDataView.get_n_placements())
         with self.assertRaises(TypeError):
             writer.set_placements("Bacon")
 
