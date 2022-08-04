@@ -103,11 +103,11 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         app_vertex = self._governed_app_vertex
         for vertex in self.__incoming_vertices:
             # machine_graph.add_vertex(vertex)
-            chip_counter.add_core(vertex.resources_required)
+            chip_counter.add_core(vertex.sdram_required)
             app_vertex.remember_machine_vertex(vertex)
         if self.__outgoing_vertex is not None:
             # machine_graph.add_vertex(self.__outgoing_vertex)
-            chip_counter.add_core(self.__outgoing_vertex.resources_required)
+            chip_counter.add_core(self.__outgoing_vertex.sdram_required)
             app_vertex.remember_machine_vertex(self.__outgoing_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
