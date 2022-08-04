@@ -52,7 +52,7 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
         chip_counter.add_core(
-            self._governed_app_vertex.machine_vertex.resources_required)
+            self._governed_app_vertex.machine_vertex.sdram_required)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):

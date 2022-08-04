@@ -17,7 +17,7 @@ import sys
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from .application_vertex import ApplicationVertex
-from pacman.model.resources import ResourceContainer
+from pacman.model.resources import ConstantSDRAM
 from pacman.model.graphs import (
     AbstractVirtual, AbstractSpiNNakerLink)
 from pacman.model.graphs.machine import MachineSpiNNakerLinkVertex
@@ -58,17 +58,16 @@ class ApplicationSpiNNakerLinkVertex(
     def n_atoms(self):
         return self._n_atoms
 
-    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
-    def get_resources_used_by_atoms(self, vertex_slice):
-        return ResourceContainer()
+    @overrides(LegacyPartitionerAPI.get_sdram_used_by_atoms)
+    def get_sdram_used_by_atoms(self, vertex_slice):
+        return ConstantSDRAM(0)
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
+            self, vertex_slice, sdram, label=None,  constraints=None):
         machine_vertex = MachineSpiNNakerLinkVertex(
             self._spinnaker_link_id, self._board_address, label, constraints,
             self, vertex_slice)
-        if resources_required:
-            assert (resources_required == machine_vertex.resources_required)
+        if sdram:
+            assert (sdram == machine_vertex.sdram_required)
         return machine_vertex

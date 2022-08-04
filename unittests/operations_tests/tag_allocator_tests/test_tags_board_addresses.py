@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.resources import ResourceContainer, IPtagResource
+from pacman.model.resources import ConstantSDRAM, IPtagResource
 from pacman.operations.tag_allocator_algorithms import basic_tag_allocator
 
 
@@ -37,8 +37,9 @@ class TestTagsBoardAddresses(unittest.TestCase):
         eth_chips = machine.ethernet_connected_chips
         vertices = [
             SimpleMachineVertex(
-                ResourceContainer(iptags=[IPtagResource(
-                    "127.0.0.1", port=None, strip_sdp=True)]),
+                sdram=ConstantSDRAM(0),
+                iptags=[IPtagResource(
+                    "127.0.0.1", port=None, strip_sdp=True)],
                 label="Vertex {}".format(i))
             for i in range(len(eth_chips))]
         print("Created {} vertices".format(len(vertices)))
@@ -78,14 +79,16 @@ class TestTagsBoardAddresses(unittest.TestCase):
         proc = procs[-1]
         eth_vertices = [
             SimpleMachineVertex(
-                ResourceContainer(iptags=[IPtagResource(
-                    "127.0.0.1", port=tag, strip_sdp=True)]),
+                sdram=ConstantSDRAM(0),
+                iptags=[IPtagResource(
+                    "127.0.0.1", port=tag, strip_sdp=True)],
                 label="Ethernet Vertex {}".format(proc))
             for tag in eth_chip.tag_ids]
         eth2_vertices = [
             SimpleMachineVertex(
-                ResourceContainer(iptags=[IPtagResource(
-                    "127.0.0.1", port=10000 + tag, strip_sdp=True)]),
+                sdram=ConstantSDRAM(0),
+                iptags=[IPtagResource(
+                    "127.0.0.1", port=10000 + tag, strip_sdp=True)],
                 label="Ethernet 2 Vertex {}".format(proc))
             for tag in range(n_extra_vertices)]
         placements = Placements(

@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.resources import ResourceContainer
+from pacman.model.resources import ConstantSDRAM
 from .machine_vertex import MachineVertex
 from pacman.model.graphs import (
     AbstractVirtual, AbstractSpiNNakerLink)
@@ -38,9 +38,9 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
         self._board_address = board_address
 
     @property
-    @overrides(MachineVertex.resources_required)
-    def resources_required(self):
-        return ResourceContainer()
+    @overrides(MachineVertex.sdram_required)
+    def sdram_required(self):
+        return ConstantSDRAM(0)
 
     @property
     @overrides(AbstractSpiNNakerLink.spinnaker_link_id)
