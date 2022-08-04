@@ -16,8 +16,7 @@
 import unittest
 from pacman.config_setup import unittest_setup
 from pacman.model.routing_info import BaseKeyAndMask
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyAndMaskConstraint)
+from pacman.model.constraints import FixedKeyAndMaskConstraint
 
 
 class TestKeyAllocatorConstraints(unittest.TestCase):

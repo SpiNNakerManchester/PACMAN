@@ -25,8 +25,7 @@ from pacman.model.routing_info import (
 from pacman.utilities.utility_calls import get_key_ranges
 from pacman.exceptions import PacmanRouteInfoAllocationException,\
     PacmanInvalidParameterException
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyAndMaskConstraint)
+from pacman.model.constraints import FixedKeyAndMaskConstraint
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 

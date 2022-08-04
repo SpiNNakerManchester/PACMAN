@@ -22,8 +22,7 @@ from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.model.constraints.key_allocator_constraints \
-    import FixedKeyAndMaskConstraint
+from pacman.model.constraints import FixedKeyAndMaskConstraint
 
 
 class TestSplitter(AbstractSplitterCommon):

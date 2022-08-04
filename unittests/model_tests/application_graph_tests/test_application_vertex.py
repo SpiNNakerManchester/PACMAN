@@ -18,8 +18,7 @@ import unittest
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.routing_info import BaseKeyAndMask
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyAndMaskConstraint)
+from pacman.model.constraints import FixedKeyAndMaskConstraint
 
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex

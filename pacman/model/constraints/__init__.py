@@ -14,5 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_constraint import AbstractConstraint
+from .fixed_key_and_mask_constraint import FixedKeyAndMaskConstraint
 
-__all__ = ["AbstractConstraint"]
+__all__ = ["AbstractConstraint", "FixedKeyAndMaskConstraint"]
