@@ -458,9 +458,7 @@ class _Spaces(object):
             chip_coords = (link.destination_x, link.destination_y)
             target_chip = self.__machine.get_chip_at(*chip_coords)
             if target_chip not in self.__used_chips:
-                # Don't place on virtual chips
-                if not target_chip.virtual:
-                    chips.add(target_chip)
+                chips.add(target_chip)
         return chips
 
     def save_chips(self, chips):
