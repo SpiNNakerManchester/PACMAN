@@ -569,8 +569,8 @@ def _chip_order(machine):
     :param machine:
     :rtype: Chip
     """
-    for x in range(machine.max_chip_x + 1):
-        for y in range(machine.max_chip_y + 1):
+    for x in range(machine.width):
+        for y in range(machine.height):
             chip = machine.get_chip_at(x, y)
             if chip:
                 yield chip
