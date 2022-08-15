@@ -290,19 +290,6 @@ class PacmanDataView(MachineDataView):
         for app_vertex in cls.__pacman_data._graph.vertices:
             yield from app_vertex.machine_vertices
 
-    @classmethod
-    def get_vertices_or_edges_added(cls):
-        """
-        Detects if any vertex of edge has been added since the last run
-
-        If this methods returns True a hard reset is guranteed to be needed.
-        However as there are other reasons to require a hard reset a
-        False does not imply one is not needed.
-
-        :rtype: bool
-        """
-        return cls.__pacman_data._vertices_or_edges_added
-
     # placements
 
     @classmethod
