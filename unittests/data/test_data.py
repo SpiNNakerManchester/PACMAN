@@ -195,3 +195,36 @@ class TestSimulatorData(unittest.TestCase):
             table, PacmanDataView.get_routing_table_by_partition())
         with self.assertRaises(TypeError):
             writer.set_routing_table_by_partition("Bacon")
+
+    def test_add_requires_mapping(self):
+        writer = PacmanDataWriter.setup()
+        # before first run
+        self.assertTrue(PacmanDataView.get_requires_mapping())
+        writer.start_run()
+        writer.finish_run()
+        # after a run
+        self.assertFalse(PacmanDataView.get_requires_mapping())
+        writer.start_run()
+        # check adding while running does not cause reguires mapping
+        v1 = SimpleTestVertex(1)
+        v2 = SimpleTestVertex(2)
+        e12 = ApplicationEdge(v1, v2)
+        writer.add_vertex(v1)
+        writer.add_vertex(v2)
+        writer.add_edge(e12, "foo")
+        writer.finish_run()
+        self.assertFalse(PacmanDataView.get_requires_mapping())
+        # check add vertex outside run
+        v3 = SimpleTestVertex(1)
+        writer.add_vertex(v3)
+        # Check resets
+        self.assertTrue(PacmanDataView.get_requires_mapping())
+        writer.soft_reset()
+        self.assertTrue(PacmanDataView.get_requires_mapping())
+        writer.hard_reset()
+        writer.start_run()
+        writer.finish_run()
+        self.assertFalse(PacmanDataView.get_requires_mapping())
+        e13 = ApplicationEdge(v1, v2)
+        writer.add_edge(e13, "foo")
+        self.assertTrue(PacmanDataView.get_requires_mapping())
