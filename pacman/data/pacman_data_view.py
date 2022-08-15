@@ -129,8 +129,6 @@ class PacmanDataView(MachineDataView):
             raise cls._exception("graph")
         cls.check_valid_simulator()
         cls.__pacman_data._graph.add_vertex(vertex)
-        cls._UtilsDataView__data._requires_mapping = True
-        cls._UtilsDataView__data._requires_data_generation = True
 
     @classmethod
     def add_edge(cls, edge, outgoing_edge_partition_name):
@@ -159,8 +157,6 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
-        cls._UtilsDataView__data._requires_mapping = True
-        cls._UtilsDataView__data._requires_data_generation = True
 
     @classmethod
     def iterate_vertices(cls):
