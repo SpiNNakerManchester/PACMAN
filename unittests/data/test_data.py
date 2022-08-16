@@ -121,6 +121,33 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(SimulatorShutdownException):
             PacmanDataView.add_edge(ApplicationEdge(app1, app2), "new")
 
+    def test_graph_safety_code(self):
+        writer = PacmanDataWriter.setup()
+        # there is always a graph so to hit safety code you need a hack
+        writer._PacmanDataWriter__pacman_data._graph = None
+        with self.assertRaises(DataNotYetAvialable):
+            writer.add_vertex(None)
+        with self.assertRaises(DataNotYetAvialable):
+            writer.add_edge(None, None)
+        with self.assertRaises(DataNotYetAvialable):
+            writer.iterate_vertices()
+        with self.assertRaises(DataNotYetAvialable):
+            list(writer.get_vertices_by_type(None))
+        with self.assertRaises(DataNotYetAvialable):
+            writer.get_n_vertices()
+        with self.assertRaises(DataNotYetAvialable):
+            writer.iterate_partitions()
+        with self.assertRaises(DataNotYetAvialable):
+            writer.get_n_partitions()
+        with self.assertRaises(DataNotYetAvialable):
+            writer.get_outgoing_edge_partitions_starting_at_vertex(None)
+        with self.assertRaises(DataNotYetAvialable):
+            writer.get_edges()
+        with self.assertRaises(DataNotYetAvialable):
+            writer.get_n_machine_vertices()
+        with self.assertRaises(DataNotYetAvialable):
+            list(writer.iterate_machine_vertices())
+
     def test_placements(self):
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
