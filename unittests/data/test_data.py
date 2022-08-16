@@ -150,6 +150,26 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             list(writer.iterate_machine_vertices())
 
+    def test_graph_never_changes(self):
+        writer = PacmanDataWriter.setup()
+        # graph is hidden so need a hack to get it.
+        graph1 = writer._PacmanDataWriter__pacman_data._graph
+        writer.start_run()
+        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        self.assertEqual(id(graph1), id(graph2))
+        writer.finish_run()
+        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        self.assertEqual(id(graph1), id(graph2))
+        writer.hard_reset()
+        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        self.assertEqual(id(graph1), id(graph2))
+        writer.start_run()
+        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        self.assertEqual(id(graph1), id(graph2))
+        writer.finish_run()
+        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        self.assertEqual(id(graph1), id(graph2))
+
     def test_placements_safety_doce(self):
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
@@ -231,7 +251,7 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_uncompressed()
         with self.assertRaises(TypeError):
-            writer.set_precompressed()
+            writer.set_precompressed(None)
 
     def test_plan_n_timesteps(self):
         writer = PacmanDataWriter.setup()
