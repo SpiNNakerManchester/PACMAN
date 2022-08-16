@@ -19,7 +19,7 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
 from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
 from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.resources import ResourceContainer, ConstantSDRAM
+from pacman.model.resources import ConstantSDRAM
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.config_setup import unittest_setup
 from pacman.model.placements.placements import Placements
@@ -37,7 +37,7 @@ class TestSplitter(AbstractSplitterCommon):
         for _ in range(self.__n_groups):
             m_vertices = [
                 SimpleMachineVertex(
-                    ResourceContainer(), app_vertex=self._governed_app_vertex,
+                    ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
                     label=f"{self._governed_app_vertex.label}_{i}")
                 for i in range(self.__n_machine_vertices)]
             for m_vertex in m_vertices:

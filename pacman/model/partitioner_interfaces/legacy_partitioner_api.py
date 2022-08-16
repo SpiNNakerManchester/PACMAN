@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The University of Manchester
+# Copyright (c) 2019-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,27 +26,23 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
     __slots__ = []
 
     @abstractmethod
-    def get_resources_used_by_atoms(self, vertex_slice):
-        """ Get the separate resource requirements for a range of atoms.
+    def get_sdram_used_by_atoms(self, vertex_slice):
+        """ Get the separate sdram requirements for a range of atoms.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the low value of atoms to calculate resources from
-        :return: a resource container that contains a
-            :py:class:`CPUCyclesPerTickResource`, :py:class:`DTCMResource`
-            and :py:class:`SDRAMResource`
-        :rtype: ~pacman.model.resources.ResourceContainer
+        :rtype: ~pacman.model.resources.AbstractSDRAM
         """
 
     @abstractmethod
     def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
+            self, vertex_slice, sdram, label=None, constraints=None):
         """ Create a machine vertex from this application vertex.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of atoms that the machine vertex will cover.
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources used by the machine vertex.
+        :param ~pacman.model.resourcesAbstractSDRAM sdram:
+            The sdram used by the machine vertex.
         :param label: human readable label for the machine vertex
         :type label: str or None
         :param constraints: Constraints to be passed on to the machine vertex.

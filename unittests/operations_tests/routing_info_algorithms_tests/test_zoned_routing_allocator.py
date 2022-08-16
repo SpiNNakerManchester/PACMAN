@@ -71,7 +71,7 @@ class TestMacVertex(MachineVertex):
         return self.__n_keys_required[partition_id]
 
     @property
-    def resources_required(self):
+    def sdram_required(self):
         # Not needed for test
         return None
 

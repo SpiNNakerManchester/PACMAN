@@ -25,10 +25,9 @@ class DuckLegacyApplicationVertex(ApplicationVertex):
     def n_atoms(self):
         pass
 
-    def get_resources_used_by_atoms(self, vertex_slice):
+    def get_sdram_used_by_atoms(self, vertex_slice):
         pass
 
     def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
+            self, vertex_slice, sdram, label=None, constraints=None):
         pass
