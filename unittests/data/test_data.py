@@ -19,10 +19,12 @@ from spinn_utilities.exceptions import (
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
-from pacman.exceptions import PacmanConfigurationException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanNotPlacedError)
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationEdge
-from pacman.model.placements import Placements
+from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.placements import Placement, Placements
 from pacman.model.routing_info import RoutingInfo
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition)
@@ -148,15 +150,43 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             list(writer.iterate_machine_vertices())
 
-    def test_placements(self):
+    def test_placements_safety_doce(self):
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
+            writer.iterate_placemements()
+        with self.assertRaises(DataNotYetAvialable):
+            writer.iterate_placements_on_core(None, None)
+        with self.assertRaises(DataNotYetAvialable):
+            writer.iterate_placements_with_vertex_type(None, None, None)
+        with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_n_placements()
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.iterate_placements_on_core(1, 2)
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_placement_of_vertex(None)
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_vertex_on_processor(None, None, None)
+
+    def test_placements(self):
+        writer = PacmanDataWriter.setup()
         info = Placements([])
+        p1 = Placement(SimpleMachineVertex(None), 1, 2, 3)
+        info.add_placement(p1)
+        v2 = SimpleMachineVertex(None)
+        p2 = Placement(v2, 1, 2, 5)
+        info.add_placement(p2)
+        info.add_placement(Placement(SimpleMachineVertex(None), 2, 2, 3))
         writer.set_placements(info)
-        self.assertEqual(0, PacmanDataView.get_n_placements())
+        self.assertEqual(3, PacmanDataView.get_n_placements())
+        on12 = list(PacmanDataView.iterate_placements_on_core(1, 2))
+        self.assertEqual(on12, [p1, p2])
+        self.assertEqual(v2, PacmanDataView.get_vertex_on_processor(1, 2, 5))
+        with self.assertRaises(PacmanNotPlacedError):
+            PacmanDataView.get_placement_of_vertex(SimpleMachineVertex(None))
+
         with self.assertRaises(TypeError):
             writer.set_placements("Bacon")
+
 
     def test_routing_infos(self):
         writer = PacmanDataWriter.setup()
