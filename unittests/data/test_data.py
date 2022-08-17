@@ -160,6 +160,9 @@ class TestSimulatorData(unittest.TestCase):
         writer.finish_run()
         graph2 = writer._PacmanDataWriter__pacman_data._graph
         self.assertEqual(id(graph1), id(graph2))
+        writer.soft_reset()
+        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        self.assertEqual(id(graph1), id(graph2))
         writer.hard_reset()
         graph2 = writer._PacmanDataWriter__pacman_data._graph
         self.assertEqual(id(graph1), id(graph2))
