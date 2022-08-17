@@ -15,6 +15,7 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
+from pacman.exceptions import PacmanConfigurationException
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.constraints import FixedKeyAndMaskConstraint
 
@@ -46,3 +47,16 @@ class TestKeyAllocatorConstraints(unittest.TestCase):
         self.assertEqual(d[c1], 2)
         self.assertNotEqual(c4, c1)
         self.assertNotEqual(c1, c4)
+
+    def test_partition(self):
+        km = BaseKeyAndMask(0xFF0, 0xFF8)
+        c1 = FixedKeyAndMaskConstraint([km])
+        self.assertIsNone(c1.partition)
+        c2 = FixedKeyAndMaskConstraint([km], "spikes")
+        self.assertEqual(c2.partition, "spikes")
+        self.assertNotEqual(c1, km)
+        self.assertNotEqual(km, c1)
+
+    def test_safety_code(self):
+        with self.assertRaises(PacmanConfigurationException):
+            FixedKeyAndMaskConstraint([BaseKeyAndMask(0xFE0, 0xFF8), "bacon"])
