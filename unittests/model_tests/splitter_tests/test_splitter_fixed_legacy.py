@@ -19,7 +19,7 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman_test_objects import (
     DuckLegacyApplicationVertex, NonLegacyApplicationVertex, SimpleTestVertex)
-
+from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 class TestSplitterFixedLegacy(unittest.TestCase):
 
@@ -38,6 +38,16 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         v2 = SimpleTestVertex(1, "v2")
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v2)
+        chip_counter = ChipCounter()
+        splitter.create_machine_vertices(chip_counter)
+        mvs = list(v1.machine_vertices)
+        self.assertEqual(1, len(mvs))
+        slices = [mvs[0].vertex_slice]
+        self.assertEqual(splitter.get_out_going_slices(), slices)
+        self.assertEqual(splitter.get_in_coming_slices(), slices)
+        self.assertEqual(splitter.get_in_coming_vertices("foo"), mvs)
+        self.assertEqual(splitter.machine_vertices_for_recording("foo"), mvs)
+        splitter.reset_called()
 
     def test_not_api(self):
         splitter = SplitterFixedLegacy("foo")
