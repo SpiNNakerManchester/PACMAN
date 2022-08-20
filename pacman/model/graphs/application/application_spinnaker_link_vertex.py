@@ -54,7 +54,7 @@ class ApplicationSpiNNakerLinkVertex(
         return self._board_address
 
     @property
-    @overrides(LegacyPartitionerAPI.n_atoms)
+    @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
         return self._n_atoms
 

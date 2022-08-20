@@ -52,14 +52,6 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
         :rtype: ~pacman.model.graphs.machine.MachineVertex
         """
 
-    @abstractproperty
-    def n_atoms(self):
-        """ The number of atoms in the vertex
-
-        :return: The number of atoms
-        :rtype: int
-        """
-
     @staticmethod
     def abstract_methods():
         """ Exposes the abstract methods and properties defined in this class.

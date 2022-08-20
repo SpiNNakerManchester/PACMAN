@@ -22,6 +22,7 @@ class DuckLegacyApplicationVertex(ApplicationVertex):
     def __init__(self, label="test"):
         super().__init__(label=label)
 
+    @property
     def n_atoms(self):
         pass
 
