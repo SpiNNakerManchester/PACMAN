@@ -52,7 +52,9 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v1)
 
-    def test_legacy(self):
-        splitter = SplitterOneToOneLegacy()
-        v1 = DuckLegacyApplicationVertex("v1")
-        splitter.set_governed_app_vertex(v1)
+    # https://github.com/SpiNNakerManchester/PACMAN/issues/457
+    # Would also need some methods filled in if kept
+    # def test_legacy(self):
+    #    splitter = SplitterOneToOneLegacy()
+    #    v1 = DuckLegacyApplicationVertex("v1")
+    #    splitter.set_governed_app_vertex(v1)
