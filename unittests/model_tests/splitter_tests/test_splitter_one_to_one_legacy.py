@@ -18,8 +18,9 @@ from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterOneToOneLegacy
 from pacman_test_objects import (
-    DuckLegacyApplicationVertex, NonLegacyApplicationVertex, SimpleTestVertex)
+    NonLegacyApplicationVertex, SimpleTestVertex)
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
+
 
 class TestSplitterFixedLegacy(unittest.TestCase):
 

@@ -21,6 +21,7 @@ from pacman_test_objects import (
     DuckLegacyApplicationVertex, NonLegacyApplicationVertex, SimpleTestVertex)
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
+
 class TestSplitterFixedLegacy(unittest.TestCase):
 
     def setUp(self):
