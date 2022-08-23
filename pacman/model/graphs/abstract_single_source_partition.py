@@ -35,10 +35,10 @@ class AbstractSingleSourcePartition(
 
     @overrides(AbstractEdgePartition.add_edge)
     def add_edge(self, edge):
+        super().add_edge(edge)
         if edge.pre_vertex != self._pre_vertex:
             raise PacmanConfigurationException(
                 "A partition can only contain edges with the same pre_vertex")
-        super().add_edge(edge)
 
     @property
     def pre_vertex(self):
