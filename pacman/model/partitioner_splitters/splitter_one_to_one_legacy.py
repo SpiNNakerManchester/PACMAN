@@ -50,18 +50,12 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         self._vertex_slice = None
         self._sdram = None
 
-    def __str__(self):
-        return f"SplitterOneToOneLegacy for {self._governed_app_vertex}"
-
-    def __repr__(self):
-        return self.__str__()
-
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         super().set_governed_app_vertex(app_vertex)
         self._vertex_slice = Slice(0, self._governed_app_vertex.n_atoms - 1)
         self._sdram = (
-            self._governed_app_vertex.get_sdram_used_by_atoms(
+             self._governed_app_vertex.get_sdram_used_by_atoms(
                 self._vertex_slice))
         self._machine_vertex = (
             self._governed_app_vertex.create_machine_vertex(

@@ -36,9 +36,6 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
     def __init__(self):
         super().__init__()
 
-    def __repr__(self):
-        return self.__str__()
-
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         if not isinstance(app_vertex, AbstractOneAppOneMachineVertex):
