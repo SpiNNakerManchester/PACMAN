@@ -17,7 +17,6 @@ import logging
 import sys
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ordered_set import OrderedSet
-from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
