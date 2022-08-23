@@ -45,7 +45,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         "_sdram"]
 
     def __init__(self):
-        super().__init__(type(self).__name__)
+        super().__init__()
         self._machine_vertex = None
         self._vertex_slice = None
         self._sdram = None
@@ -74,7 +74,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
                 if not check:
                     raise PacmanConfigurationException(
                         self.NOT_SUITABLE_VERTEX_ERROR.format(
-                            app_vertex.label, self._splitter_name,
+                            app_vertex.label, type(self).__name__,
                             abstractmethod))
                 logger.warning(self.NOT_API_WARNING)
 

@@ -28,7 +28,7 @@ from pacman.model.placements.placements import Placements
 class TestSplitter(AbstractSplitterCommon):
 
     def __init__(self, n_groups, n_machine_vertices):
-        AbstractSplitterCommon.__init__(self)
+        AbstractSplitterCommon.__init__()
         self.__n_groups = n_groups
         self.__n_machine_vertices = n_machine_vertices
         self.__same_chip_groups = list()

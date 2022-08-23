@@ -25,10 +25,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
     __slots__ = [
         # the app vertex this splitter governs.
         "_governed_app_vertex",
-
-        # the name of this splitter object, for human readability.
-        "_splitter_name",
-
     ]
 
     FIX_ATOMS_RESET = (
@@ -43,21 +39,18 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         "Illegal attempt to set fixed atoms per core to {} "
         "as that is above a previously set max atoms of {}")
 
-    DEFAULT_SPLITTER_NAME = "AbstractSplitterCommon"
-
-    def __init__(self, splitter_name=None):
+    def __init__(self):
         """
         :param str splitter_name:
         """
-        if splitter_name is None:
-            splitter_name = self.DEFAULT_SPLITTER_NAME
-        self._splitter_name = splitter_name
         self._governed_app_vertex = None
 
     def __str__(self):
-        return (
-            f"{self._splitter_name} governing app vertex"
-            f" {self._governed_app_vertex}")
+        try:
+            return (
+                f"{type(self).__name__} on {self._governed_app_vertex.label}")
+        except AttributeError:
+            return f"{type(self).__name__} no vertex"
 
     def __repr__(self):
         return self.__str__()

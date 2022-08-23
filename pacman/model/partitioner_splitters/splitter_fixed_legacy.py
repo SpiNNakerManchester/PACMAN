@@ -42,12 +42,8 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
         "pacman.model.partitioner_interfaces.legacy_partitioner_api and try "
         "again.")
 
-    SPLITTER_NAME = "SplitterFixedLegacy"
-
-    def __init__(self, splitter_name=None):
-        if splitter_name is None:
-            splitter_name = self.SPLITTER_NAME
-        super().__init__(splitter_name)
+    def __init__(self):
+        super().__init__()
         self.__slices = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
@@ -59,7 +55,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
                 if not check:
                     raise PacmanConfigurationException(
                         self.NOT_SUITABLE_VERTEX_ERROR.format(
-                            app_vertex.label, self._splitter_name,
+                            app_vertex.label, type(self).__name__,
                             abstractmethod))
                 logger.warning(self.NOT_API_WARNING)
 
