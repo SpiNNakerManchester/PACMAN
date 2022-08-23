@@ -29,13 +29,11 @@ class TestSplitterFixedLegacy(unittest.TestCase):
 
     def test_api(self):
         splitter = SplitterFixedLegacy("foo")
-        a = str(splitter)
-        self.assertIsNotNone(a)
+        self.assertIsNotNone(str(splitter))
+        self.assertIsNotNone(repr(splitter))
         v1 = SimpleTestVertex(1, "v1")
         splitter.set_governed_app_vertex(v1)
-        a = str(splitter)
-        self.assertIsNotNone(a)
-        splitter.set_governed_app_vertex(v1)
+        self.assertEqual(id(v1), id(splitter.governed_app_vertex))
         v2 = SimpleTestVertex(1, "v2")
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v2)
@@ -49,6 +47,7 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         self.assertEqual(splitter.get_in_coming_vertices("foo"), mvs)
         self.assertEqual(splitter.machine_vertices_for_recording("foo"), mvs)
         splitter.reset_called()
+        self.splitter.get_internal_multicast_partitions()
 
     def test_not_api(self):
         splitter = SplitterFixedLegacy("foo")

@@ -51,3 +51,7 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
         self.assertEqual(splitter.get_in_coming_vertices("foo"), [mv])
         self.assertEqual(splitter.machine_vertices_for_recording("foo"), [mv])
         splitter.reset_called()
+
+    def test_default_name(self):
+        splitter = SplitterOneAppOneMachine()
+        self.assertIn("SplitterOneAppOneMachine", str(splitter))
