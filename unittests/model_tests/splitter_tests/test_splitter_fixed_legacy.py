@@ -48,7 +48,7 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         self.assertEqual(splitter.machine_vertices_for_recording("foo"), mvs)
         splitter.reset_called()
         self.assertEqual([], splitter.get_internal_multicast_partitions())
-        self.assertEqual([], get_internal_sdram_partitions())
+        self.assertEqual([], splitter.get_internal_sdram_partitions())
 
     def test_not_api(self):
         splitter = SplitterFixedLegacy("foo")
