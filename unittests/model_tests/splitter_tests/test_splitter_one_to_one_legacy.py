@@ -29,8 +29,7 @@ class TestSplitterFixedLegacy(unittest.TestCase):
 
     def test_api(self):
         splitter = SplitterOneToOneLegacy()
-        a = str(splitter)
-        self.assertIsNotNone(a)
+        self.assertIsNotNone(str(splitter))
         v1 = SimpleTestVertex(1, "v1")
         v1.splitter = splitter
         v2 = SimpleTestVertex(1, "v2")
@@ -52,10 +51,3 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         v1 = NonLegacyApplicationVertex("v1")
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v1)
-
-    # https://github.com/SpiNNakerManchester/PACMAN/issues/457
-    # Would also need some methods filled in if kept
-    # def test_legacy(self):
-    #    splitter = SplitterOneToOneLegacy()
-    #    v1 = DuckLegacyApplicationVertex("v1")
-    #    splitter.set_governed_app_vertex(v1)
