@@ -99,13 +99,6 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
                 self.SETTING_SPLITTER_ERROR_MSG.format(self._label))
         self._splitter = new_value
         self._splitter.set_governed_app_vertex(self)
-        self._splitter.check_supported_constraints()
-
-    @overrides(AbstractVertex.add_constraint)
-    def add_constraint(self, constraint):
-        super().add_constraint(constraint)
-        if self._splitter is not None:
-            self._splitter.check_supported_constraints()
 
     def remember_machine_vertex(self, machine_vertex):
         """
@@ -191,3 +184,33 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         self._machine_vertices = OrderedSet()
         if self._splitter is not None:
             self._splitter.reset_called()
+
+    def get_machine_fixed_key_and_mask(self, machine_vertex, partition_id):
+        """ Get a fixed key and mask for the given machine vertex and partition
+            identifier, or None if not fixed (the default).  If this doesn't
+            return None, get_fixed_key_and_mask must also not return None,
+            and the keys returned here must align with those such that for each
+            key:mask returned here, key & app_mask == app_key.  It is OK for
+            this to return None and get_fixed_key_and_mask to return not None
+            iff there is only one machine vertex.
+
+        :param MachineVertex machine_vertex:
+            A source machine vertex of this application vertex
+        :param str partition_id:
+            The identifier of the partition to get the key for
+        :rtype: BaseKeyAndMask or None
+        """
+        # pylint: disable=unused-argument
+        return None
+
+    def get_fixed_key_and_mask(self, partition_id):
+        """ Get a fixed key and mask for the application vertex or None if not
+            fixed (the default).  See get_machine_gixed_key_and_mask for the
+            conditions.
+
+        :param str partition_id:
+            The identifier of the partition to get the key for
+        :rtype: BaseKeyAndMask or None
+        """
+        # pylint: disable=unused-argument
+        return None

@@ -17,20 +17,7 @@
 
 import math
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.constraints.partitioner_constraints import (
-    AbstractPartitionerConstraint)
 from pacman.model.graphs.common import Slice
-
-
-def get_remaining_constraints(vertex):
-    """ Gets the rest of the constraints from a vertex after removing\
-        partitioning constraints.
-
-    :param ApplicationVertex vertex:
-    :rtype: list(AbstractConstraint)
-    """
-    return [constraint for constraint in vertex.constraints
-            if not isinstance(constraint, AbstractPartitionerConstraint)]
 
 
 def get_multidimensional_slices(n_atoms, atoms_per_core):

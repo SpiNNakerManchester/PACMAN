@@ -81,7 +81,7 @@ class Slice(collections.namedtuple('Slice',
         :param int n: The 0-indexed dimension to get the shape of
         :type: slice
         """
-        if n < 0 or n > len(self.shape):
+        if n < 0 or n >= len(self.shape):
             raise IndexError(f"{n} is invalid for slice with {len(self.shape)}"
                              " dimensions")
         return slice(self.start[n], self.start[n] + self.shape[n])
