@@ -48,6 +48,7 @@ class TestApplicationGraphModel(unittest.TestCase):
             graph.add_edge(edge, "foo")  # Any old partition label
         assert frozenset(verts) == frozenset(graph.vertices)
         assert frozenset(edges) == frozenset(graph.edges)
+        graph.reset()
 
     def test_add_vertex(self):
         graph = ApplicationGraph()
