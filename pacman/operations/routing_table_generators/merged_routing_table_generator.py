@@ -87,6 +87,8 @@ def __match(iterator, vertex, part_id, r_info, entry, routing_info):
         return False
     if part_id != next_part_id:
         return False
+    if __mask_has_holes(r_info.first_mask):
+        return False
     next_r_info = routing_info.get_routing_info_from_pre_vertex(
         next_vertex, next_part_id)
     if next_r_info is None:
@@ -97,6 +99,18 @@ def __match(iterator, vertex, part_id, r_info, entry, routing_info):
     app_src = vertex.app_vertex
     next_app_src = next_vertex.app_vertex
     return next_app_src == app_src and entry.has_same_route(next_entry)
+
+
+def __mask_has_holes(mask):
+    """ Detect if the mask has a "hole" somewhere other than at the bottom
+
+    :param int mask: The mask to check
+    :rtype: bool
+    """
+    # The mask is inverted and then add 1.  If this number is a power of 2,
+    # the mask doesn't have holes
+    inv_mask = (~mask) + 1
+    return (inv_mask & (inv_mask - 1)) != 0
 
 
 def __merged_keys_and_masks(entries, routing_info):
