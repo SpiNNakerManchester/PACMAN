@@ -50,10 +50,12 @@ class SplitterExternalDevice(AbstractSplitterCommon):
             # This can have multiple FPGA connections per board
             if app_vertex.incoming_fpga_connections:
                 for fpga in app_vertex.incoming_fpga_connections:
-                    label = (f"Machine vertex for {app_vertex.label}"
-                             f":{fpga.fpga_id}:{fpga.fpga_link_id}"
-                             f":{fpga.board_address}")
                     for i in range(app_vertex.n_machine_vertices_per_link):
+
+                        label = (
+                            f"Machine vertex {i} for {app_vertex.label}"
+                            f":{fpga.fpga_id}:{fpga.fpga_link_id}"
+                            f":{fpga.board_address}:{fpga.chip_coords}")
                         vertex_slice = app_vertex.get_incoming_slice_for_link(
                             fpga, i)
                         vertex = MachineFPGAVertex(
