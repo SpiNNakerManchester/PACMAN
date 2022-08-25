@@ -52,7 +52,7 @@ class TestApplicationEdgeModel(unittest.TestCase):
 
     def test_partition(self):
         vert1 = SimpleTestVertex(10, "Vertex 1", 256)
-        partition = ApplicationEdgePartition("spikes", vert1 )
+        partition = ApplicationEdgePartition("spikes", vert1)
         vert2 = SimpleTestVertex(5, "Vertex 2", 256)
         edge1 = SimpleTestEdge(vert1, vert2)
         partition.add_edge(edge1)
