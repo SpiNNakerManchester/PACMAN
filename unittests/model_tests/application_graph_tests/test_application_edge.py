@@ -40,7 +40,6 @@ class TestPartition(unittest.TestCase):
     def setUp(self):
         unittest_setup()
 
-
     def test_constant(self):
         """
         test ConstantSDRAMMachinePartition
