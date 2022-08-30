@@ -129,7 +129,7 @@ class TestPartition(unittest.TestCase):
         self.assertIsNotNone(str(e1))
         self.assertIsNotNone(repr(e1))
         with self.assertRaises(PacmanConfigurationException):
-            e2 = SDRAMMachineEdge(v2, v1, "bar")
+            SDRAMMachineEdge(v2, v1, "bar")
 
     def test_source(self):
         """
