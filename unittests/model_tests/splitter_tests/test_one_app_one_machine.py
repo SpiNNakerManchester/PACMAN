@@ -18,6 +18,7 @@ from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application.abstract import (
     AbstractOneAppOneMachineVertex)
+from pacman.model.graphs.common import Slice
 from pacman.model.partitioner_splitters import SplitterOneAppOneMachine
 from pacman.model.resources import ConstantSDRAM
 from pacman_test_objects import NonLegacyApplicationVertex
@@ -38,7 +39,7 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
         self.assertIsNotNone(repr(splitter))
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v1)
-        mv = SimpleMachineVertex(ConstantSDRAM(10))
+        mv = SimpleMachineVertex(ConstantSDRAM(10), vertex_slice=Slice(0, 5))
         v2 = AbstractOneAppOneMachineVertex(
             machine_vertex=mv, label="v1", constraints=None)
         splitter.set_governed_app_vertex(v2)
@@ -51,6 +52,9 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
         self.assertEqual(splitter.get_in_coming_vertices("foo"), [mv])
         self.assertEqual(splitter.machine_vertices_for_recording("foo"), [mv])
         splitter.reset_called()
+        v2.remember_machine_vertex(mv)
+        self.assertEqual(6, v2.n_atoms)
+        v2.reset()
 
     def test_default_name(self):
         splitter = SplitterOneAppOneMachine()
