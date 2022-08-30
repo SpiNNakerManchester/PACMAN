@@ -16,14 +16,23 @@
 import numpy
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.exceptions import PacmanInvalidParameterException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint)
-
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman_test_objects import SimpleTestVertex
+
+
+class MockSplitter(SplitterFixedLegacy):
+
+    reset_seen = False
+
+    def reset_called(self):
+        self.reset_seen = True
 
 
 class TestApplicationGraphModel(unittest.TestCase):
@@ -61,6 +70,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert.add_constraint(constraint)
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
+        self.assertIsNotNone(repr(vert))
         assert constraint in vert.constraints
         with self.assertRaises(PacmanInvalidParameterException):
             vert.add_constraint(None)
@@ -156,3 +166,22 @@ class TestApplicationGraphModel(unittest.TestCase):
             SimpleTestVertex(1.5)
         vert = SimpleTestVertex(numpy.int64(23))
         self.assertTrue(isinstance(vert.n_atoms, int))
+
+    def test_set_splitter(self):
+        split1 = MockSplitter()
+        vert = SimpleTestVertex(5, splitter=split1)
+        self.assertEqual(split1, vert.splitter)
+        vert.splitter = split1
+        self.assertEqual(split1, vert.splitter)
+        split2 = MockSplitter()
+        with self.assertRaises(PacmanConfigurationException):
+            vert.splitter = split2
+        self.assertFalse(split1.reset_seen)
+        vert.reset()
+        self.assertTrue(split1.reset_seen)
+
+    def test_max_atoms(self):
+        vert = SimpleTestVertex(5)
+        self.assertEqual(256, vert.get_max_atoms_per_core())
+        vert.set_max_atoms_per_core(100)
+        self.assertEqual(100, vert.get_max_atoms_per_core())
