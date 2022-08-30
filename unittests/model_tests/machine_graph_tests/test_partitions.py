@@ -23,9 +23,9 @@ from pacman.model.graphs import (
     AbstractMultiplePartition, AbstractSupportsSDRAMEdges)
 from pacman.model.graphs.machine import (
      ConstantSDRAMMachinePartition,
-    DestinationSegmentedSDRAMMachinePartition,
-    SDRAMMachineEdge, SimpleMachineVertex,
-    SourceSegmentedSDRAMMachinePartition)
+     DestinationSegmentedSDRAMMachinePartition,
+     SDRAMMachineEdge, SimpleMachineVertex,
+     SourceSegmentedSDRAMMachinePartition)
 from pacman.model.resources import ConstantSDRAM
 
 
