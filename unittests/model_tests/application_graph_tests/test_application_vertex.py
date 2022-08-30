@@ -62,6 +62,10 @@ class TestApplicationGraphModel(unittest.TestCase):
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
         assert constraint in vert.constraints
+        with self.assertRaises(PacmanInvalidParameterException):
+            vert.add_constraint(None)
+        with self.assertRaises(PacmanInvalidParameterException):
+            vert.add_constraint("Bacon")
 
     def test_create_new_vertex_add_constraints(self):
         """

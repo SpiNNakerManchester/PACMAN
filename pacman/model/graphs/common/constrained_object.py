@@ -50,9 +50,6 @@ class ConstrainedObject(object, metaclass=AbstractBase):
         :raise PacmanInvalidParameterException:
             If the constraint is not valid
         """
-        if constraint is None:
-            raise PacmanInvalidParameterException(
-                "constraint", constraint, "must not be None")
         if not isinstance(constraint, AbstractConstraint):
             raise PacmanInvalidParameterException(
                 "constraint", constraint,
