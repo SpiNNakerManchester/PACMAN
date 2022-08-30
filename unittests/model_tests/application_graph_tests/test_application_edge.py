@@ -14,25 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from spinn_utilities.overrides import overrides
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import (
-    PartitionMissingEdgesException, SDRAMEdgeSizeException)
-from pacman.model.graphs import AbstractSupportsSDRAMEdges
-from pacman.model.graphs.machine import (
-    ConstantSDRAMMachinePartition, SDRAMMachineEdge, SimpleMachineVertex)
-from pacman.model.resources import ConstantSDRAM
+    PacmanAlreadyExistsException, PacmanConfigurationException,
+    PacmanInvalidParameterException)
+from pacman.model.graphs.application import ApplicationEdgePartition
+from pacman_test_objects import SimpleTestEdge, SimpleTestVertex
 
 
-class MockSupportsSDRAMEdges(SimpleMachineVertex, AbstractSupportsSDRAMEdges):
-
-    @overrides(AbstractSupportsSDRAMEdges.sdram_requirement)
-    def sdram_requirement(self, sdram_machine_edge):
-        # A mock so that the size can be different depending on prevertex
-        return ConstantSDRAM(16) + self.sdram_required
-
-
-class TestPartition(unittest.TestCase):
+class TestApplicationEdgeModel(unittest.TestCase):
     """
     tests which test the application graph object
     """
@@ -40,32 +30,46 @@ class TestPartition(unittest.TestCase):
     def setUp(self):
         unittest_setup()
 
-    def test_constant(self):
+    def test_create_new_edge(self):
         """
-        test ConstantSDRAMMachinePartition
+        test that you can create a edge between two vertices
         """
-        v1 = MockSupportsSDRAMEdges(ConstantSDRAM(24))
-        part = ConstantSDRAMMachinePartition("foo", v1)
-        with self.assertRaises(PartitionMissingEdgesException):
-            part.total_sdram_requirements()
-        with self.assertRaises(PartitionMissingEdgesException):
-            part.sdram_base_address = 100
-        with self.assertRaises(PartitionMissingEdgesException):
-            part.get_sdram_size_of_region_for(v1)
-        v2 = MockSupportsSDRAMEdges(ConstantSDRAM(12))
-        e1 = SDRAMMachineEdge(v1, v2, "foo")
-        part.add_edge(e1)
-        self.assertEqual(ConstantSDRAM(16+24), part.total_sdram_requirements())
-        self.assertEqual(ConstantSDRAM(16+24),
-                         part.get_sdram_size_of_region_for(v1))
-        v3 = MockSupportsSDRAMEdges(ConstantSDRAM(34))
-        e2 = SDRAMMachineEdge(v1, v3, "foo")
-        part.add_edge(e2)
-        v4 = MockSupportsSDRAMEdges(ConstantSDRAM(100))
-        e3 = SDRAMMachineEdge(v4, v1, "foo")
-        with self.assertRaises(SDRAMEdgeSizeException):
-            part.add_edge(e3)
-        part.sdram_base_address = 200
-        self.assertEqual(200, part.sdram_base_address)
-        self.assertEqual(200, e1.sdram_base_address)
-        self.assertEqual(200, e2.sdram_base_address)
+        vert1 = SimpleTestVertex(10, "Vertex 1", 256)
+        vert2 = SimpleTestVertex(5, "Vertex 2", 256)
+        edge1 = SimpleTestEdge(vert1, vert2, "First edge")
+        self.assertEqual(edge1.pre_vertex, vert1)
+        self.assertEqual(edge1.post_vertex, vert2)
+
+    def test_create_new_edge_without_label(self):
+        """
+        test initisation of a edge without a label
+        """
+        vert1 = SimpleTestVertex(10, "Vertex 1", 256)
+        vert2 = SimpleTestVertex(5, "Vertex 2", 256)
+        edge1 = SimpleTestEdge(vert1, vert2)
+        self.assertEqual(edge1.pre_vertex, vert1)
+        self.assertEqual(edge1.post_vertex, vert2)
+        self.assertEqual(edge1.label, None)
+
+    def test_partition(self):
+        vert1 = SimpleTestVertex(10, "Vertex 1", 256)
+        partition = ApplicationEdgePartition("spikes", vert1)
+        vert2 = SimpleTestVertex(5, "Vertex 2", 256)
+        edge1 = SimpleTestEdge(vert1, vert2)
+        partition.add_edge(edge1)
+        with self.assertRaises(PacmanAlreadyExistsException):
+            partition.add_edge(edge1)
+        with self.assertRaises(PacmanInvalidParameterException):
+            partition.add_edge("edge")
+        edge2 = SimpleTestEdge(vert1, vert2)
+        self.assertNotIn(edge2, partition)
+        partition.add_edge(edge2)
+        self.assertEqual(2, partition.n_edges)
+        self.assertIn(edge2, partition)
+        self.assertIn("ApplicationEdgePartition", str(partition))
+        self.assertIn("spikes", repr(partition))
+        vert3 = SimpleTestVertex(5, "Vertex 3", 256)
+        edge3 = SimpleTestEdge(vert3, vert2)
+        with self.assertRaises(PacmanConfigurationException):
+            partition.add_edge(edge3)
+        self.assertEqual([vert1], list(partition.pre_vertices))
