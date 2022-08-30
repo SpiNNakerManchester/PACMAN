@@ -72,6 +72,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert1 = SimpleTestVertex(10, "Vertex 1", 256)
         vert2 = SimpleTestVertex(5, "Vertex 2", 256)
         edge1 = ApplicationEdge(vert1, vert2, label="First edge")
+        self.assertEqual("First edge", edge1.label)
         with self.assertRaises(PacmanInvalidParameterException):
             graph.add_edge(edge1, "spikes")
         graph.add_vertex(vert1)
