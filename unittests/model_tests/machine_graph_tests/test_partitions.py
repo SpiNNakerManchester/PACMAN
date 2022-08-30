@@ -19,9 +19,11 @@ from pacman.config_setup import unittest_setup
 from pacman.exceptions import (
     PacmanConfigurationException, PartitionMissingEdgesException,
     PacmanValueError, SDRAMEdgeSizeException)
-from pacman.model.graphs import AbstractSupportsSDRAMEdges
+from pacman.model.graphs import (
+    AbstractMultiplePartition, AbstractSupportsSDRAMEdges)
 from pacman.model.graphs.machine import (
-    ConstantSDRAMMachinePartition, DestinationSegmentedSDRAMMachinePartition,
+     ConstantSDRAMMachinePartition,
+    DestinationSegmentedSDRAMMachinePartition,
     SDRAMMachineEdge, SimpleMachineVertex,
     SourceSegmentedSDRAMMachinePartition)
 from pacman.model.resources import ConstantSDRAM
@@ -172,3 +174,13 @@ class TestPartition(unittest.TestCase):
         self.assertEqual(16 + 12, part.get_sdram_size_of_region_for(v2))
         self.assertEqual(100, part.get_sdram_base_address_for(v3))
         self.assertEqual(40 + 28, part.get_sdram_size_of_region_for(v3))
+
+    def test_abstract_multiple_partition(self):
+        v1 = MockSupportsSDRAMEdges(ConstantSDRAM(12))
+        v2 = MockSupportsSDRAMEdges(ConstantSDRAM(12))
+        v3 = MockSupportsSDRAMEdges(ConstantSDRAM(12))
+        with self.assertRaises(PacmanConfigurationException):
+            AbstractMultiplePartition([v1, v1], "foo", None)
+        part = AbstractMultiplePartition([v1, v2], "foo", None)
+        with self.assertRaises(Exception):
+            part.add_edge(SDRAMMachineEdge(v3, v1, "foo"))

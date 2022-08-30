@@ -185,3 +185,12 @@ class TestApplicationGraphModel(unittest.TestCase):
         self.assertEqual(256, vert.get_max_atoms_per_core())
         vert.set_max_atoms_per_core(100)
         self.assertEqual(100, vert.get_max_atoms_per_core())
+
+    def test_set_label(self):
+        vert = SimpleTestVertex(5)
+        vert.set_label("test 1")
+        self.assertEqual("test 1", vert.label)
+        vert.addedToGraph()
+        with self.assertRaises(PacmanConfigurationException):
+            vert.set_label("test 2")
+
