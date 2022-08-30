@@ -50,6 +50,7 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
         self.assertEqual(splitter.get_out_going_slices(), [mv.vertex_slice])
         self.assertEqual(splitter.get_in_coming_slices(), [mv.vertex_slice])
         self.assertEqual(splitter.get_in_coming_vertices("foo"), [mv])
+        self.assertEqual(splitter.get_out_going_vertices("foo"), [mv])
         self.assertEqual(splitter.machine_vertices_for_recording("foo"), [mv])
         splitter.reset_called()
         v2.remember_machine_vertex(mv)

@@ -30,6 +30,7 @@ class TestSplitterFixedLegacy(unittest.TestCase):
     def test_api(self):
         splitter = SplitterOneToOneLegacy()
         self.assertIsNotNone(str(splitter))
+        self.assertIsNotNone(repr(splitter))
         v1 = SimpleTestVertex(1, "v1")
         v1.splitter = splitter
         v2 = SimpleTestVertex(1, "v2")
@@ -43,6 +44,7 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         self.assertEqual(splitter.get_out_going_slices(), slices)
         self.assertEqual(splitter.get_in_coming_slices(), slices)
         self.assertEqual(splitter.get_in_coming_vertices("foo"), mvs)
+        self.assertEqual(splitter.get_out_going_vertices("foo"), mvs)
         self.assertEqual(splitter.machine_vertices_for_recording("foo"), mvs)
         splitter.reset_called()
 
