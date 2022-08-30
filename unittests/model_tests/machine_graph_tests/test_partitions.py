@@ -28,7 +28,6 @@ from pacman.model.resources import ConstantSDRAM
 
 class MockSupportsSDRAMEdges(SimpleMachineVertex, AbstractSupportsSDRAMEdges):
 
-
     @overrides(AbstractSupportsSDRAMEdges.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge):
         # A mock so that the size can be different depending on prevertex
