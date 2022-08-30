@@ -15,7 +15,8 @@
 
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
-    PacmanConfigurationException,  PartitionMissingEdgesException)
+    PacmanConfigurationException,  PartitionMissingEdgesException,
+    PacmanValueError)
 from pacman.model.graphs import AbstractSingleSourcePartition
 from pacman.model.graphs.machine import (
     AbstractSDRAMPartition, SDRAMMachineEdge)
@@ -77,7 +78,7 @@ class DestinationSegmentedSDRAMMachinePartition(
         for edge in self._edges:
             if edge.post_vertex == vertex:
                 return edge.sdram_base_address
-        return None
+        raise PacmanValueError(f"Vertex {vertex} is not in this partition")
 
     @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
     def get_sdram_size_of_region_for(self, vertex):
@@ -86,4 +87,4 @@ class DestinationSegmentedSDRAMMachinePartition(
         for edge in self._edges:
             if edge.post_vertex == vertex:
                 return edge.sdram_size
-        return None
+        raise PacmanValueError(f"Vertex {vertex} is not in this partition")
