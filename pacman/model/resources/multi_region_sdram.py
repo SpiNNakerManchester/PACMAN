@@ -83,7 +83,12 @@ class MultiRegionSDRAM(VariableSDRAM):
             self._per_timestep_sdram + other.per_timestep
         if region in self.__regions:
             if isinstance(other, MultiRegionSDRAM):
-                self.__regions[region].merge(other)
+                if isinstance(self.__regions[region], MultiRegionSDRAM):
+                    self.__regions[region].merge(other)
+                else:
+                    old = self.__regions[region]
+                    other.add_cost(region, old.fixed, old.per_timestep)
+                    self.__regions[region] = other
             else:
                 self.__regions[region] += other
         else:

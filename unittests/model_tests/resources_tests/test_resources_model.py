@@ -20,6 +20,7 @@ from enum import Enum
 import tempfile
 import unittest
 from pacman.config_setup import unittest_setup
+from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import (
     ConstantSDRAM, IPtagResource, MultiRegionSDRAM, ReverseIPtagResource,
     VariableSDRAM)
@@ -79,6 +80,10 @@ class TestResourceModels(unittest.TestCase):
         multi2.add_cost(MockEnum.ZERO, 88)
         multi2.add_cost(MockEnum.ONE, 72)
         multi2.add_cost("overheads", 22)
+        self.assertEqual(multi1, VariableSDRAM(100 + 50 + 20, 4 + 3))
+        self.assertNotEqual(multi1, VariableSDRAM(100 + 50 + 20, 12))
+        self.assertNotEqual(multi1, VariableSDRAM(45, 4 + 3))
+        self.assertNotEqual(multi1, "multi1")
 
         combo = multi1 + multi2
         self.assertEqual(combo.get_total_sdram(150),
@@ -97,7 +102,33 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(multi1, multi3)
         with tempfile.TemporaryFile(mode="w") as target:
             multi3.report(1000, target=target)
-        # multi3.report(preamble="core (0,0,1):")
+        multi3.report(1000, preamble="core (0,0,1):")
+
+    def test_add(self):
+        multi1 = MultiRegionSDRAM()
+        multi1.add_cost(1, 100, 4)
+        multi1.add_cost(1, 50)
+        self.assertEqual(multi1.regions[1], VariableSDRAM(150, 4))
+
+    def test_nest(self):
+        multi1 = MultiRegionSDRAM()
+        multi1.add_cost(1, 100, 4)
+        multi2 = MultiRegionSDRAM()
+        multi2.add_cost(2, 50)
+        multi1.nest(1, multi2)
+        self.assertEqual(multi1.regions[1], VariableSDRAM(150, 4))
+
+    def test_nest2(self):
+        multi1 = MultiRegionSDRAM()
+        multi1.add_cost(1, 100, 4)
+        multi2 = MultiRegionSDRAM()
+        multi2.add_cost(2, 50)
+        multi3 = MultiRegionSDRAM()
+        multi3.nest(12, multi1)
+        multi3.nest(12, multi2)
+        self.assertEqual(multi3.regions[12], VariableSDRAM(150, 4))
+        multi3.report(1000)
+
 
     def test_tags_resources(self):
         IPtagResource("1", 2, 3)  # Minimal args
@@ -120,6 +151,23 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(riptr.get_value(), [1, 2, 3])
         self.assertEqual(str(riptr),
                          "ReverseIPTagResource(port=1, sdp_port=2, tag=3)")
+
+    def test_sub(self):
+        const1 = ConstantSDRAM(128)
+        const2 = ConstantSDRAM(28)
+        self.assertEqual(ConstantSDRAM(100), const1 - const2)
+        self.assertEqual(ConstantSDRAM(100), const2.sub_from(const1))
+        var1 = VariableSDRAM(100, 5)
+        self.assertEqual(VariableSDRAM(28, -5), const1 - var1)
+        self.assertEqual(VariableSDRAM(-28, 5), var1 - const1)
+        self.assertEqual(VariableSDRAM(-28, 5), const1.sub_from(var1))
+
+    def test_total(self):
+        var0 = VariableSDRAM(28, 0)
+        self.assertEqual(28, var0.get_total_sdram(None))
+        var4 = VariableSDRAM(28, 4)
+        with self.assertRaises(PacmanConfigurationException):
+            var4.get_total_sdram(None)
 
 
 if __name__ == '__main__':
