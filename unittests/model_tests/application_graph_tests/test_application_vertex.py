@@ -193,4 +193,3 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert.addedToGraph()
         with self.assertRaises(PacmanConfigurationException):
             vert.set_label("test 2")
-
