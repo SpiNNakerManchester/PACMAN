@@ -150,6 +150,11 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(riptr.get_value(), [1, 2, 3])
         self.assertEqual(str(riptr),
                          "ReverseIPTagResource(port=1, sdp_port=2, tag=3)")
+        riptr2 = ReverseIPtagResource(1, 2, 3)
+        self.assertNotEqual(riptr, str(riptr))
+        self.assertEqual(riptr, riptr2)
+        self.assertEqual(hash(riptr), hash(riptr2))
+
 
     def test_sub(self):
         const1 = ConstantSDRAM(128)
