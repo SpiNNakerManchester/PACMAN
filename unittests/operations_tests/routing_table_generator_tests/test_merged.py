@@ -19,12 +19,11 @@ from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman.model.placements import Placements
-from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartition)
 from pacman.operations.placer_algorithms import place_application_graph
 from pacman.operations.partition_algorithms import splitter_partitioner
 from pacman.operations.router_algorithms.application_router import (
     route_application_graph)
+from pacman.model.routing_info import RoutingInfo
 from pacman.operations.routing_info_allocator_algorithms import (
     ZonedRoutingInfoAllocator)
 from pacman.operations.routing_table_generators import (
@@ -46,16 +45,32 @@ class TestCompressor(unittest.TestCase):
         writer.add_vertex(v2)
         writer.add_edge(ApplicationEdge(v1, v2), "foo")
 
+    def create_graphs2(self, writer):
+        v1 = SimpleTestVertex(
+            100, "app1", max_atoms_per_core=10, splitter=SplitterFixedLegacy())
+        v2 = SimpleTestVertex(
+            100, "app2", max_atoms_per_core=10, splitter=SplitterFixedLegacy())
+        v3 = SimpleTestVertex(
+            10, "app3", max_atoms_per_core=10, splitter=SplitterFixedLegacy())
+        v4 = SimpleTestVertex(
+            10, "app4", max_atoms_per_core=10, splitter=SplitterFixedLegacy())
+        writer.add_vertex(v1)
+        writer.add_vertex(v2)
+        writer.add_vertex(v3)
+        writer.add_vertex(v4)
+        writer.add_edge(ApplicationEdge(v1, v2), "foo")
+        writer.add_edge(ApplicationEdge(v3, v4), "foo")
+
+    def make_data(self, writer):
         splitter_partitioner()
         writer.set_placements(place_application_graph(Placements()))
         writer.set_routing_table_by_partition(route_application_graph())
+        allocator = ZonedRoutingInfoAllocator()
+        writer.set_routing_infos(allocator.__call__([], flexible=False))
 
     def test_empty(self):
         writer = PacmanDataWriter.mock()
-        allocator = ZonedRoutingInfoAllocator()
-        writer.set_routing_infos(allocator.__call__([], flexible=False))
-        table = MulticastRoutingTableByPartition()
-        writer.set_routing_table_by_partition(table)
+        self.make_data(writer)
         data = merged_routing_table_generator()
         self.assertEqual(0, data.max_number_of_entries)
         self.assertEqual(0, len(list(data.routing_tables)))
@@ -63,8 +78,26 @@ class TestCompressor(unittest.TestCase):
     def test_small(self):
         writer = PacmanDataWriter.mock()
         self.create_graphs1(writer)
-        allocator = ZonedRoutingInfoAllocator()
-        writer.set_routing_infos(allocator.__call__([], flexible=False))
+        self.make_data(writer)
         data = merged_routing_table_generator()
         self.assertEqual(1, data.max_number_of_entries)
         self.assertEqual(1, len(list(data.routing_tables)))
+
+    def test_medium(self):
+        writer = PacmanDataWriter.mock()
+        self.create_graphs2(writer)
+        self.make_data(writer)
+        data = merged_routing_table_generator()
+        self.assertEqual(2, data.max_number_of_entries)
+        self.assertEqual(2, len(list(data.routing_tables)))
+
+    def test_bad_infos(self):
+        writer = PacmanDataWriter.mock()
+        self.create_graphs1(writer)
+        self.make_data(writer)
+        writer.set_routing_infos(RoutingInfo())
+        try:
+            merged_routing_table_generator()
+            raise Exception("Should not get here")
+        except Exception as ex:
+            self.assertIn("Missing Routing information", str(ex))
