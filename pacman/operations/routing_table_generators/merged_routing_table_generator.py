@@ -109,7 +109,8 @@ def __mask_has_holes(mask):
     """
     # The mask is inverted and then add 1.  If this number is a power of 2,
     # the mask doesn't have holes
-    inv_mask = (~mask) + 1
+    inv_mask = (~mask & 0xFFFFFFFF) + 1
+    # a & ~a == 0 if a is a power of 2
     return (inv_mask & (inv_mask - 1)) != 0
 
 
