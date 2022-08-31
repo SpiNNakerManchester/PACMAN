@@ -19,7 +19,7 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex)
 from pacman.model.graphs.machine import (
-    MachineFPGAVertex, MachineSpiNNakerLinkVertex, MachineEdge)
+    MachineFPGAVertex, MachineSpiNNakerLinkVertex)
 from pacman.exceptions import PacmanConfigurationException,\
     PacmanNotExistException
 
@@ -130,7 +130,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
             raise PacmanNotExistException(
                 f"The target device of {self} doesn't support outgoing"
                 " traffic")
-        return {self.__outgoing_vertex: [MachineEdge]}
+        return [self.__outgoing_vertex]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id):
@@ -140,7 +140,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
             raise PacmanNotExistException(
                 f"The target device of {self} doesn't support incoming"
                 " traffic")
-        return {v: [MachineEdge] for v in self.__incoming_vertices}
+        return self.__incoming_vertices
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
