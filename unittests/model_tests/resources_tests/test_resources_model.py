@@ -155,7 +155,6 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(riptr, riptr2)
         self.assertEqual(hash(riptr), hash(riptr2))
 
-
     def test_sub(self):
         const1 = ConstantSDRAM(128)
         const2 = ConstantSDRAM(28)

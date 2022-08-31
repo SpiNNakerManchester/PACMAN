@@ -17,13 +17,10 @@ import unittest
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.application import ApplicationEdge
-from pacman.model.graphs.common import Slice
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman.model.placements import Placements
-from pacman.model.routing_info import RoutingInfo
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition)
-from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.operations.placer_algorithms import place_application_graph
 from pacman.operations.partition_algorithms import splitter_partitioner
 from pacman.operations.router_algorithms.application_router import (
@@ -32,7 +29,6 @@ from pacman.operations.routing_info_allocator_algorithms import (
     ZonedRoutingInfoAllocator)
 from pacman.operations.routing_table_generators import (
     merged_routing_table_generator)
-from pacman.utilities.utility_objs.chip_counter import ChipCounter
 from pacman_test_objects import SimpleTestVertex
 
 
