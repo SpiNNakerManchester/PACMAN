@@ -48,7 +48,6 @@ class TestPlacement(unittest.TestCase):
         self.assertEqual(hash(pl), hash(pl2))
         self.assertFalse(pl != pl2)
 
-
     def test_create_new_placements_duplicate_vertex(self):
         """
         check that you cant put a vertex in multiple placements

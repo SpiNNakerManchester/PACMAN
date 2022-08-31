@@ -129,7 +129,6 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(multi3.regions[12], VariableSDRAM(150, 4))
         multi3.report(1000)
 
-
     def test_tags_resources(self):
         IPtagResource("1", 2, 3)  # Minimal args
         iptr = IPtagResource("1.2.3.4", 2, 3, 4, 5)
