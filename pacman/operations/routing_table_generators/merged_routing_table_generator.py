@@ -71,9 +71,6 @@ def __create_routing_table(x, y, partitions_in_table, routing_info):
         for entry in __merged_keys_and_masks(entries, routing_info):
             table.add_multicast_routing_entry(entry)
 
-    for source_vertex, partition_id in partitions_in_table:
-        entry = partitions_in_table[source_vertex, partition_id]
-
     return table
 
 
@@ -111,18 +108,6 @@ def __merged_keys_and_masks(entries, routing_info):
         app_r_info = routing_info.get_routing_info_from_pre_vertex(
             vertex.app_vertex, part_id)
         yield from app_r_info.merge_machine_entries(entries)
-
-
-def __create_entry(key_and_mask, entry):
-    """
-    :param BaseKeyAndMask key_and_mask:
-    :param MulticastRoutingTableByPartitionEntry entry:
-    :rtype: MulticastRoutingEntry
-    """
-    return MulticastRoutingEntry(
-        routing_entry_key=key_and_mask.key_combo,
-        defaultable=entry.defaultable, mask=key_and_mask.mask,
-        link_ids=entry.link_ids, processor_ids=entry.processor_ids)
 
 
 class _IteratorWithNext(object):
