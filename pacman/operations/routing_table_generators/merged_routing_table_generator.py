@@ -55,14 +55,14 @@ def __create_routing_table(x, y, partitions_in_table, routing_info):
     table = UnCompressedMulticastRoutingTable(x, y)
     iterator = _IteratorWithNext(partitions_in_table.items())
     while iterator.has_next:
-        (vertex, part_id), entry = iterator.next
+        (vertex, part_id), entry = iterator.pop()
         r_info = routing_info.get_routing_info_from_pre_vertex(vertex, part_id)
         if r_info is None:
             raise Exception(
                 f"Missing Routing information for {vertex}, {part_id}")
         entries = [(vertex, part_id, entry, r_info)]
         while __match(iterator, vertex, part_id, r_info, entry, routing_info):
-            (vertex, part_id), entry = iterator.next
+            (vertex, part_id), entry = iterator.pop()
             r_info = routing_info.get_routing_info_from_pre_vertex(
                 vertex, part_id)
             entries.append((vertex, part_id, entry, r_info))
@@ -82,7 +82,7 @@ def __match(iterator, vertex, part_id, r_info, entry, routing_info):
         return False
     if isinstance(vertex, ApplicationVertex):
         return False
-    (next_vertex, next_part_id), next_entry = iterator.peek
+    (next_vertex, next_part_id), next_entry = iterator.peek()
     if isinstance(next_vertex, ApplicationVertex):
         return False
     if part_id != next_part_id:
@@ -136,7 +136,6 @@ class _IteratorWithNext(object):
             self.__next = None
             self.__has_next = False
 
-    @property
     def peek(self):
         return self.__next
 
@@ -144,8 +143,7 @@ class _IteratorWithNext(object):
     def has_next(self):
         return self.__has_next
 
-    @property
-    def next(self):
+    def pop(self):
         if not self.__has_next:
             raise StopIteration
         nxt = self.__next
