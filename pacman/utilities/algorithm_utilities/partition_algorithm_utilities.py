@@ -23,7 +23,7 @@ from pacman.model.graphs.common import Slice
 def get_multidimensional_slices(n_atoms, atoms_per_core):
     if isinstance(atoms_per_core, int):
         atoms_per_core = [atoms_per_core] * len(n_atoms)
-    while len(atoms_per_core) != len(n_atoms):
+    if len(atoms_per_core) != len(n_atoms):
         raise PacmanConfigurationException(
             "The length of atoms_per_core doesn't match the number of"
             " dimensions")
