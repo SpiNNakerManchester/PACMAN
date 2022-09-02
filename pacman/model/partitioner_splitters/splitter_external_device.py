@@ -45,7 +45,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         self.__incoming_slices = list()
         self.__outgoing_vertex = None
         self.__outgoing_slice = None
-        # Easier to set this True first to avoid a None check later
+
         if isinstance(app_vertex, ApplicationFPGAVertex):
             # This can have multiple FPGA connections per board
             if app_vertex.incoming_fpga_connections:
