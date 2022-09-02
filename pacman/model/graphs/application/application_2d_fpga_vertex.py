@@ -19,6 +19,8 @@ from spinn_utilities.overrides import overrides
 
 
 class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
+    """ A device connected to an FPGA with input or output in two dimensions
+    """
 
     __slots__ = [
         "__width",
@@ -31,6 +33,28 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
             self, width, height, sub_width, sub_height,
             incoming_fpga_connections=None, outgoing_fpga_connection=None,
             label=None, constraints=None):
+        """
+
+        :param int width: The width of the vertex in atoms
+        :param int height: The height of the vertex in atoms
+        :param int sub_width:
+            The width of the sub-rectangle to break the vertex up into
+        :param int sub_height:
+            The height of the sub-rectangle to break the vertex up into
+        :param incoming_fpga_connections:
+            The connections from one or more FPGAs that that packets are
+            expected to be received from for this device, or None if no
+            incoming traffic is expected from the device
+        :type incoming_fpga_connections: list(FPGAConnection) or None
+        :param outgoing_fpga_connection:
+            The connection to an FPGA that packets to be sent to this device
+            should be sent down, or None if no outgoing traffic is expected to
+            be sent to the device.
+        :type outgoing_fpga_connection: FPGAConnection or None
+        :param str label: The optional name of the vertex.
+        :param iterable(AbstractConstraint) constraints:
+            The optional initial constraints of the vertex.
+        """
         # Set variables first as this lets us call properties
         self.__width = width
         self.__height = height

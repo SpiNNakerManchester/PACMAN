@@ -20,6 +20,8 @@ from spinn_utilities.overrides import overrides
 
 class Application2DSpiNNakerLinkVertex(
         ApplicationSpiNNakerLinkVertex, Abstract2DDeviceVertex):
+    """
+    """
 
     __slots__ = [
         "__width",
@@ -32,6 +34,26 @@ class Application2DSpiNNakerLinkVertex(
             self, width, height, sub_width, sub_height,
             spinnaker_link_id, board_address=None, label=None,
             constraints=None, incoming=True, outgoing=False):
+        """
+        :param int width: The width of the vertex in atoms
+        :param int height: The height of the vertex in atoms
+        :param int sub_width:
+            The width of the sub-rectangle to break the vertex up into
+        :param int sub_height:
+            The height of the sub-rectangle to break the vertex up into
+        :param int spinnaker_link_id:
+            The index of the spinnaker link to which the device is connected
+        :param str board_address:
+            The optional IP address of the board to which the device is
+            connected e.g. in a multi-board system
+        :param str label: The optional name of the vertex.
+        :param iterable(AbstractConstraint) constraints:
+            The optional initial constraints of the vertex.
+        :param bool incoming:
+            Whether the device supports sending traffic into spinnaker
+        :param bool outgoing:
+            Whether the device supports receiving traffic from spinnaker
+        """
         # Set variables first as this lets us call properties
         self.__width = width
         self.__height = height
