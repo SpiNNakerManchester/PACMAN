@@ -92,16 +92,6 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
         """
         return Slice(0, self.n_atoms - 1)
 
-    def get_outgoing_keys_and_masks(self, machine_vertex):
-        """ Get the outgoing keys and masks for a machine vertex of this vertex
-            or None if this isn't explicitly defined.  By default this returns
-            None, but can be overridden to allow the routing information
-            to be passed to the machine vertex.
-
-        :rtype: list of KeyAndMask or None
-        """
-        return None
-
     @property
     def incoming(self):
         return self._incoming
