@@ -14,12 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs import AbstractFPGA, AbstractVirtual
+from pacman.model.graphs import AbstractVirtual
 from pacman.model.resources import ConstantSDRAM
 from .machine_vertex import MachineVertex
 
 
-class MachineFPGAVertex(MachineVertex, AbstractFPGA):
+class MachineFPGAVertex(MachineVertex, AbstractVirtual):
     """ A virtual vertex on an FPGA link.
     """
 
@@ -55,12 +55,10 @@ class MachineFPGAVertex(MachineVertex, AbstractFPGA):
         return ConstantSDRAM(0)
 
     @property
-    @overrides(AbstractFPGA.fpga_id)
     def fpga_id(self):
         return self._fpga_id
 
     @property
-    @overrides(AbstractFPGA.fpga_link_id)
     def fpga_link_id(self):
         return self._fpga_link_id
 

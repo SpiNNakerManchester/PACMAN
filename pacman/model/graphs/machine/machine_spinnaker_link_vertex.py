@@ -16,11 +16,10 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.resources import ConstantSDRAM
 from .machine_vertex import MachineVertex
-from pacman.model.graphs import (
-    AbstractVirtual, AbstractSpiNNakerLink)
+from pacman.model.graphs import AbstractVirtual
 
 
-class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
+class MachineSpiNNakerLinkVertex(MachineVertex, AbstractVirtual):
     """ A virtual vertex on a SpiNNaker Link.
     """
 
@@ -55,7 +54,6 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
         return ConstantSDRAM(0)
 
     @property
-    @overrides(AbstractSpiNNakerLink.spinnaker_link_id)
     def spinnaker_link_id(self):
         return self._spinnaker_link_id
 

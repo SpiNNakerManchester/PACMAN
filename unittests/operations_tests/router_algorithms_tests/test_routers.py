@@ -40,7 +40,8 @@ from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placements, Placement
 from pacman.model.resources import ConstantSDRAM
-from pacman.model.graphs import AbstractFPGA, AbstractSpiNNakerLink
+from pacman.model.graphs.machine import (
+    MachineFPGAVertex, MachineSpiNNakerLinkVertex)
 
 from collections import defaultdict
 import math
@@ -321,10 +322,10 @@ def _find_targets(
 
 def _add_virtual(expected_virtual, vertex):
     link_data = None
-    if isinstance(vertex, AbstractFPGA):
+    if isinstance(vertex, MachineFPGAVertex):
         link_data = PacmanDataView.get_machine().get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
-    elif isinstance(vertex, AbstractSpiNNakerLink):
+    elif isinstance(vertex, MachineSpiNNakerLinkVertex):
         link_data = PacmanDataView.get_machine().get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
     if link_data is not None:

@@ -14,17 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_edge import AbstractEdge
-from .abstract_fpga import AbstractFPGA
 from .abstract_vertex import AbstractVertex
 from .abstract_virtual import AbstractVirtual
-from .abstract_spinnaker_link import AbstractSpiNNakerLink
 from .abstract_edge_partition import AbstractEdgePartition
 from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
 from .abstract_supports_sdram_edges import AbstractSupportsSDRAMEdges
 
 __all__ = [
-    "AbstractEdge", "AbstractEdgePartition", "AbstractFPGA",
+    "AbstractEdge", "AbstractEdgePartition",
     "AbstractMultiplePartition", "AbstractSingleSourcePartition",
-    "AbstractSpiNNakerLink", "AbstractSupportsSDRAMEdges", "AbstractVertex",
+    "AbstractSupportsSDRAMEdges", "AbstractVertex",
     "AbstractVirtual"]

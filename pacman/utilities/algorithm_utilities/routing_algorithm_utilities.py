@@ -17,8 +17,9 @@ from pacman.data import PacmanDataView
 from pacman.exceptions import MachineHasDisconnectedSubRegion
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartitionEntry)
-from pacman.model.graphs import (
-    AbstractFPGA, AbstractSpiNNakerLink, AbstractVirtual)
+from pacman.model.graphs import AbstractVirtual
+from pacman.model.graphs.machine import (
+    MachineFPGAVertex, MachineSpiNNakerLinkVertex)
 from pacman.model.graphs.application import ApplicationEdgePartition
 from collections import deque, defaultdict
 import heapq
@@ -548,11 +549,11 @@ def _get_link_data(vertex):
     :rtype: AbstractLinkData
     """
     machine = PacmanDataView.get_machine()
-    if isinstance(vertex, AbstractFPGA):
+    if isinstance(vertex, MachineFPGAVertex):
         return machine.get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address,
             vertex.linked_chip_coordinates)
-    if isinstance(vertex, AbstractSpiNNakerLink):
+    if isinstance(vertex, MachineSpiNNakerLinkVertex):
         return machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address,
             vertex.linked_chip_coordinates)

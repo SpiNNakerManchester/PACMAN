@@ -14,8 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.log import FormatAdapter
 from spinn_machine import MulticastRoutingEntry
-from pacman.model.graphs import (
-    AbstractVirtual, AbstractFPGA, AbstractSpiNNakerLink)
+from pacman.model.graphs import AbstractVirtual
+from pacman.model.graphs.machine import (
+    MachineFPGAVertex, MachineSpiNNakerLinkVertex)
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.routing_tables import UnCompressedMulticastRoutingTable
 import logging
@@ -98,11 +99,11 @@ def _real_xy(vertex, machine):
     :rtype: tuple(int,int)
     """
     link_data = None
-    if isinstance(vertex, AbstractFPGA):
+    if isinstance(vertex, MachineFPGAVertex):
         link_data = machine.get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address,
             vertex.linked_chip_coordinates)
-    elif isinstance(vertex, AbstractSpiNNakerLink):
+    elif isinstance(vertex, MachineSpiNNakerLinkVertex):
         link_data = machine.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
     return link_data.connected_chip_x, link_data.connected_chip_y
