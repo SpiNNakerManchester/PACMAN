@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -65,16 +65,25 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         :param int v: The value to test
         :rtype: bool
         """
-        return 2 ** int(math.log2(v)) == v
+        return (v & (v - 1) == 0) and (v != 0)
 
     def _verify_sub_size(self):
         """ Ensure the sub width and height are within constraints
         """
-        if (not self.__is_power_of_2(self._sub_width) or
-                not self.__is_power_of_2(self._sub_height)):
+        if not self.__is_power_of_2(self._sub_width):
             raise PacmanConfigurationException(
-                f"sub_width ({self._sub_width}) and sub_height"
-                f" ({self._sub_height}) must each be a power of 2")
+                f"sub_width ({self._sub_width}) must be a power of 2")
+        if not self.__is_power_of_2(self._sub_height):
+            raise PacmanConfigurationException(
+                f"sub_height ({self._sub_height}) must be a power of 2")
+        if self._sub_width > self._width:
+            raise PacmanConfigurationException(
+                f"sub_width ({self._sub_width}) must not be greater than "
+                f"width ({self._width})")
+        if self._sub_height > self._height:
+            raise PacmanConfigurationException(
+                f"sub_height ({self._sub_height}) must not be greater than "
+                f"height ({self._height})")
 
     @property
     def _n_sub_rectangles(self):
