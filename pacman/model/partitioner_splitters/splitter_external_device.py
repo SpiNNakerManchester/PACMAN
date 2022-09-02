@@ -51,9 +51,9 @@ class SplitterExternalDevice(AbstractSplitterCommon):
             if app_vertex.incoming_fpga_connections:
                 for fpga in app_vertex.incoming_fpga_connections:
                     for i in range(app_vertex.n_machine_vertices_per_link):
-
                         label = (
-                            f"Machine vertex {i} for {app_vertex.label}"
+                            f"Incoming Machine vertex {i} for"
+                            f" {app_vertex.label}"
                             f":{fpga.fpga_id}:{fpga.fpga_link_id}"
                             f":{fpga.board_address}:{fpga.chip_coords}")
                         vertex_slice = app_vertex.get_incoming_slice_for_link(
@@ -67,10 +67,14 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                         self.__incoming_slices.append(vertex_slice)
             fpga = app_vertex.outgoing_fpga_connection
             if fpga is not None:
+                label = (
+                    f"Outgoing Machine vertex for {app_vertex.label}"
+                    f":{fpga.fpga_id}:{fpga.fpga_link_id}"
+                    f":{fpga.board_address}:{fpga.chip_coords}")
                 vertex_slice = app_vertex.get_outgoing_slice()
                 vertex = MachineFPGAVertex(
                     fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
-                    fpga.chip_coords, app_vertex=app_vertex,
+                    fpga.chip_coords, app_vertex=app_vertex, label=label,
                     vertex_slice=vertex_slice, incoming=False, outgoing=True)
                 self.__outgoing_vertex = vertex
                 self.__outgoing_slice = vertex_slice
