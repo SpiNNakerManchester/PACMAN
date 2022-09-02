@@ -23,6 +23,7 @@ from .fpga_connection import FPGAConnection
 from .application_2d_fpga_vertex import Application2DFPGAVertex
 from .application_2d_spinnaker_link_vertex import (
     Application2DSpiNNakerLinkVertex)
+from .application_virtual_vertex import ApplicationVirtualVertex
 
 
 __all__ = ["ApplicationEdge", "ApplicationEdgePartition",
