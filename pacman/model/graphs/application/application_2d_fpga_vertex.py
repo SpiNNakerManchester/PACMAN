@@ -16,7 +16,6 @@
 from .application_fpga_vertex import ApplicationFPGAVertex
 from pacman.model.graphs.application.abstract import Abstract2DDeviceVertex
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.common.slice import Slice
 
 
 class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
