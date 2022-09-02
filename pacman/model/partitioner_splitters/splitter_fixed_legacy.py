@@ -27,7 +27,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class SplitterFixedLegacy(AbstractSplitterCommon):
 
-    __slots__ = ["__slices", "__vertex_map"]
+    __slots__ = ["__slices"]
 
     NOT_API_WARNING = (
         "Your vertex is deprecated. Please add a Splitter or "
@@ -47,7 +47,6 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
         if splitter_name is None:
             splitter_name = self.SPLITTER_NAME
         super().__init__(splitter_name)
-        # self.__vertex_map = None
         self.__slices = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
@@ -74,12 +73,6 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
         return list(self._governed_app_vertex.machine_vertices)
-
-    # @property
-    # def __all_vertex_map(self):
-    #     if self.__vertex_map is None:
-    #         self.__vertex_map = self._get_map([MachineEdge])
-    #     return self.__vertex_map
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
@@ -111,4 +104,3 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):
         self.__slices = None
-        # self.__vertex_map = None
