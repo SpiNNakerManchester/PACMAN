@@ -400,7 +400,7 @@ class ZonedRoutingInfoAllocator(object):
         """
         if size == 0:
             return 0
-        return int(math.ceil(math.log(size, 2)))
+        return int(math.ceil(math.log2(size)))
 
 
 def flexible_allocate(extra_allocations):

@@ -227,7 +227,7 @@ def get_n_bits(n_values):
         return 0
     if n_values == 1:
         return 1
-    return int(math.ceil(math.log(n_values, 2)))
+    return int(math.ceil(math.log2(n_values)))
 
 
 def get_field_based_keys(key, vertex_slice):
