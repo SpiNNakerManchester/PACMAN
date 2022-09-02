@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,11 +12,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from pacman.model.graphs.application import ApplicationVertex
+from spinn_utilities.abstract_base import abstractmethod
 
-from .abstract_one_app_one_machine_vertex import AbstractOneAppOneMachineVertex
-from .abstract_2d_device_vertex import Abstract2DDeviceVertex
-from .abstract_virtual_application_vertex import (
-    AbstractVirtualApplicationVertex)
 
-__all__ = ["AbstractOneAppOneMachineVertex", "Abstract2DDeviceVertex",
-           "AbstractVirtualApplicationVertex"]
+class AbstractVirtualApplicationVertex(ApplicationVertex):
+    """ An application vertex which is virtual
+    """
+
+    __slots__ = []
+
+    @abstractmethod
+    def get_outgoing_link_data(self, machine):
+        """ Get the link data for outgoing connections from the machine
+
+        :param Machine machine: The machine to get the link data from
+        :rtype: AbstractLinkData
+        """

@@ -13,13 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .application_vertex import ApplicationVertex
 from pacman.exceptions import PacmanInvalidParameterException
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.application.abstract import (
+    AbstractVirtualApplicationVertex)
 
 
-class ApplicationFPGAVertex(ApplicationVertex):
+class ApplicationFPGAVertex(AbstractVirtualApplicationVertex):
     """ A virtual application vertex connected to one or more FPGA links
     """
 
@@ -67,7 +68,7 @@ class ApplicationFPGAVertex(ApplicationVertex):
                 "link ID")
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(AbstractVirtualApplicationVertex.n_atoms)
     def n_atoms(self):
         return self._n_atoms
 
@@ -119,3 +120,12 @@ class ApplicationFPGAVertex(ApplicationVertex):
         :rtype: FPGAConnection or None
         """
         return self._outgoing_fpga_connection
+
+    @overrides(AbstractVirtualApplicationVertex.get_outgoing_link_data)
+    def get_outgoing_link_data(self, machine):
+        if self._outgoing_fpga_connection is None:
+            raise NotImplementedError("This vertex doesn't have outgoing data")
+        fpga = self._outgoing_fpga_connection
+        return machine.get_fpga_link_with_id(
+            fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
+            fpga.chip_coords)

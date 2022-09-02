@@ -13,12 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .application_vertex import ApplicationVertex
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.application.abstract import (
+    AbstractVirtualApplicationVertex)
 
 
-class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
+class ApplicationSpiNNakerLinkVertex(AbstractVirtualApplicationVertex):
     """ A virtual application vertex on a SpiNNaker Link.
     """
 
@@ -54,7 +55,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
         self._outgoing = outgoing
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(AbstractVirtualApplicationVertex.n_atoms)
     def n_atoms(self):
         return self._n_atoms
 
@@ -110,3 +111,10 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVertex):
     @property
     def outgoing(self):
         return self._outgoing
+
+    @overrides(AbstractVirtualApplicationVertex.get_outgoing_link_data)
+    def get_outgoing_link_data(self, machine):
+        if not self._outgoing:
+            raise NotImplementedError("This vertex doesn't have outgoing data")
+        return machine.get_spinnaker_link_with_id(
+            self._spinnaker_link_id, self._board_address)
