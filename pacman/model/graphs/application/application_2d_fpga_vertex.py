@@ -71,7 +71,3 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
     @overrides(ApplicationFPGAVertex.get_incoming_slice_for_link)
     def get_incoming_slice_for_link(self, link, index):
         return self._get_slice(index)
-
-    @overrides(ApplicationFPGAVertex.get_outgoing_slice)
-    def get_outgoing_slice(self):
-        return Slice(0, self.n_atoms - 1)
