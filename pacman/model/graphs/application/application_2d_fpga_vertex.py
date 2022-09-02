@@ -16,6 +16,7 @@
 from .application_fpga_vertex import ApplicationFPGAVertex
 from pacman.model.graphs.application.abstract import Abstract2DDeviceVertex
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.common.slice import Slice
 
 
 class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
@@ -73,4 +74,4 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
 
     @overrides(ApplicationFPGAVertex.get_outgoing_slice)
     def get_outgoing_slice(self):
-        return None
+        return Slice(0, self.n_atoms - 1)
