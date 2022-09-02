@@ -50,21 +50,24 @@ class Slice(collections.namedtuple('Slice',
             raise PacmanValueError(
                 'hi_atom {:d} < lo_atom {:d}'.format(hi_atom, lo_atom))
 
-        if (start is None) != (shape is None):
-            raise PacmanValueError(
-                "Both shape and start must be specified together")
-        if shape is not None and len(shape) != len(start):
-            raise PacmanValueError(
-                "Both shape and start must have the same length")
-
         # Number of atoms represented by this slice
         n_atoms = hi_atom - lo_atom + 1
 
         # The shape of the atoms in the slice is all the atoms in a line by
         # default
         if shape is None:
+            if start is not None:
+                raise PacmanValueError(
+                    "shape must be specified if start is specified")
             shape = (n_atoms,)
             start = (lo_atom,)
+        else:
+            if start is None:
+                raise PacmanValueError(
+                    "start must be specified if shape is specified")
+            if len(shape) != len(start):
+                raise PacmanValueError(
+                    "Both shape and start must have the same length")
 
         # Create the Slice object as a `namedtuple` with these pre-computed
         # values filled in.
@@ -81,10 +84,11 @@ class Slice(collections.namedtuple('Slice',
         :param int n: The 0-indexed dimension to get the shape of
         :type: slice
         """
-        if n < 0 or n >= len(self.shape):
+        try:
+            return slice(self.start[n], self.start[n] + self.shape[n])
+        except IndexError:
             raise IndexError(f"{n} is invalid for slice with {len(self.shape)}"
                              " dimensions")
-        return slice(self.start[n], self.start[n] + self.shape[n])
 
     @property
     def slices(self):
