@@ -68,3 +68,11 @@ class AbstractVirtual(object):
 
         :rtype: bool
         """
+
+    @abstractmethod
+    def get_link_data(self, machine):
+        """ Get link data from the machine
+
+        :param Machine machine: The machine to get the data from
+        :rtype: AbstractLinkData
+        """

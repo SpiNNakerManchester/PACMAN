@@ -85,3 +85,9 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
     @overrides(AbstractVirtual.outgoing)
     def outgoing(self):
         return self._outgoing
+
+    @overrides(AbstractVirtual.get_link_data)
+    def get_link_data(self, machine):
+        return machine.get_fpga_link_with_id(
+            self._fpga_id, self._fpga_link_id, self._board_address,
+            self._linked_chip_coordinates)

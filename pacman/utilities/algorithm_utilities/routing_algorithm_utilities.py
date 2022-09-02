@@ -542,24 +542,6 @@ def get_targets_by_chip(vertices):
     return by_chip
 
 
-def _get_link_data(vertex):
-    """ Get link data from an abstract virtual vertex
-
-    :param AbstractVirtual vertex: The vertex to find the link data for
-    :rtype: AbstractLinkData
-    """
-    machine = PacmanDataView.get_machine()
-    if isinstance(vertex, MachineFPGAVertex):
-        return machine.get_fpga_link_with_id(
-            vertex.fpga_id, vertex.fpga_link_id, vertex.board_address,
-            vertex.linked_chip_coordinates)
-    if isinstance(vertex, MachineSpiNNakerLinkVertex):
-        return machine.get_spinnaker_link_with_id(
-            vertex.spinnaker_link_id, vertex.board_address,
-            vertex.linked_chip_coordinates)
-    raise TypeError(f"Vertex {vertex} has unknown type")
-
-
 def vertex_xy(vertex):
     """
     :param MachineVertex vertex:
@@ -570,7 +552,8 @@ def vertex_xy(vertex):
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)
         return placement.x, placement.y
-    link_data = _get_link_data(vertex)
+    machine = PacmanDataView.get_machine()
+    link_data = vertex.get_link_data(machine)
     return link_data.connected_chip_x, link_data.connected_chip_y
 
 
@@ -588,7 +571,8 @@ def vertex_xy_and_route(vertex):
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)
         return (placement.x, placement.y), (vertex, placement.p, None)
-    link_data = _get_link_data(vertex)
+    machine = PacmanDataView.get_machine()
+    link_data = vertex.get_link_data(machine)
     return ((link_data.connected_chip_x, link_data.connected_chip_y),
             (vertex, None, link_data.connected_link))
 
@@ -599,5 +583,6 @@ def route_to_endpoint(vertex):
     :param ~spinn_machine.Machine machine:
     :rtype: int
     """
-    link_data = _get_link_data(vertex)
+    machine = PacmanDataView.get_machine()
+    link_data = vertex.get_link_data(machine)
     return link_data.connected_link
