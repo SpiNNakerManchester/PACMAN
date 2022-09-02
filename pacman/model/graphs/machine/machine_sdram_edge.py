@@ -52,4 +52,4 @@ class SDRAMMachineEdge(MachineEdge):
                 f" sdram_size={self.sdram_size})")
 
     def __str__(self):
-        return f"{self.__repr__()}"
+        return self.__repr__()
