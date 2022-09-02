@@ -16,11 +16,10 @@
 from pacman.exceptions import PacmanInvalidParameterException
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common.slice import Slice
-from pacman.model.graphs.application.abstract import (
-    AbstractVirtualApplicationVertex)
+from .application_virtual_vertex import ApplicationVirtualVertex
 
 
-class ApplicationFPGAVertex(AbstractVirtualApplicationVertex):
+class ApplicationFPGAVertex(ApplicationVirtualVertex):
     """ A virtual application vertex connected to one or more FPGA links
     """
 
@@ -68,7 +67,7 @@ class ApplicationFPGAVertex(AbstractVirtualApplicationVertex):
                 "link ID")
 
     @property
-    @overrides(AbstractVirtualApplicationVertex.n_atoms)
+    @overrides(ApplicationVirtualVertex.n_atoms)
     def n_atoms(self):
         return self._n_atoms
 
@@ -121,7 +120,7 @@ class ApplicationFPGAVertex(AbstractVirtualApplicationVertex):
         """
         return self._outgoing_fpga_connection
 
-    @overrides(AbstractVirtualApplicationVertex.get_outgoing_link_data)
+    @overrides(ApplicationVirtualVertex.get_outgoing_link_data)
     def get_outgoing_link_data(self, machine):
         if self._outgoing_fpga_connection is None:
             raise NotImplementedError("This vertex doesn't have outgoing data")

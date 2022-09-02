@@ -15,8 +15,5 @@
 
 from .abstract_one_app_one_machine_vertex import AbstractOneAppOneMachineVertex
 from .abstract_2d_device_vertex import Abstract2DDeviceVertex
-from .abstract_virtual_application_vertex import (
-    AbstractVirtualApplicationVertex)
 
-__all__ = ["AbstractOneAppOneMachineVertex", "Abstract2DDeviceVertex",
-           "AbstractVirtualApplicationVertex"]
+__all__ = ["AbstractOneAppOneMachineVertex", "Abstract2DDeviceVertex"]

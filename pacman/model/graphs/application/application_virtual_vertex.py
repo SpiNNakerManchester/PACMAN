@@ -12,11 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.application import ApplicationVertex
 from spinn_utilities.abstract_base import abstractmethod
+from .application_vertex import ApplicationVertex
 
 
-class AbstractVirtualApplicationVertex(ApplicationVertex):
+class ApplicationVirtualVertex(ApplicationVertex):
     """ An application vertex which is virtual
     """
 

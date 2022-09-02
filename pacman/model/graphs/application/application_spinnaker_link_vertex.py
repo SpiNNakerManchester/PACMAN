@@ -15,11 +15,10 @@
 
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common.slice import Slice
-from pacman.model.graphs.application.abstract import (
-    AbstractVirtualApplicationVertex)
+from .application_virtual_vertex import ApplicationVirtualVertex
 
 
-class ApplicationSpiNNakerLinkVertex(AbstractVirtualApplicationVertex):
+class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
     """ A virtual application vertex on a SpiNNaker Link.
     """
 
@@ -55,7 +54,7 @@ class ApplicationSpiNNakerLinkVertex(AbstractVirtualApplicationVertex):
         self._outgoing = outgoing
 
     @property
-    @overrides(AbstractVirtualApplicationVertex.n_atoms)
+    @overrides(ApplicationVirtualVertex.n_atoms)
     def n_atoms(self):
         return self._n_atoms
 
@@ -112,7 +111,7 @@ class ApplicationSpiNNakerLinkVertex(AbstractVirtualApplicationVertex):
     def outgoing(self):
         return self._outgoing
 
-    @overrides(AbstractVirtualApplicationVertex.get_outgoing_link_data)
+    @overrides(ApplicationVirtualVertex.get_outgoing_link_data)
     def get_outgoing_link_data(self, machine):
         if not self._outgoing:
             raise NotImplementedError("This vertex doesn't have outgoing data")
