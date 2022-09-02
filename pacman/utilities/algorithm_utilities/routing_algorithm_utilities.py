@@ -18,8 +18,6 @@ from pacman.exceptions import MachineHasDisconnectedSubRegion
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartitionEntry)
 from pacman.model.graphs import AbstractVirtual
-from pacman.model.graphs.machine import (
-    MachineFPGAVertex, MachineSpiNNakerLinkVertex)
 from pacman.model.graphs.application import ApplicationEdgePartition
 from collections import deque, defaultdict
 import heapq
