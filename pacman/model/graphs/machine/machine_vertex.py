@@ -16,7 +16,7 @@
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
-from pacman.utilities.utility_calls import get_n_bits, get_n_bits_for_fields
+from pacman.utilities.utility_calls import get_n_bits_for_fields
 
 
 class MachineVertex(AbstractVertex, metaclass=AbstractBase):
