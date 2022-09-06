@@ -277,3 +277,13 @@ def get_field_based_index(base_key, vertex_slice):
         key: i
         for i, key in enumerate(field_based_keys)
     }
+
+
+def get_n_bits_for_fields(field_sizes):
+    """ Get the number of bits required for the fields in the vertex slice
+
+    :param iterable(int) field_sizes: The sizes each of the fields
+    :rtype: int
+    """
+    field_size = [get_n_bits(n) for n in field_sizes]
+    return sum(field_size)

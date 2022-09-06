@@ -20,9 +20,15 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import Slice
 
 
-def get_multidimensional_slices(n_atoms, atoms_per_core):
-    if isinstance(atoms_per_core, int):
-        atoms_per_core = [atoms_per_core] * len(n_atoms)
+def get_multidimensional_slices(app_vertex):
+    """ Get the multi-dimensional slices of an application vertex
+        such that each is sized to the maximum atoms per dimension per core
+        except the last which might be smaller in one or more dimensions
+
+    :param ApplicationVertex app_vertex: The vertex to get the slices of
+    """
+    atoms_per_core = app_vertex.get_max_atoms_per_dimension_per_core()
+    n_atoms = app_vertex.atoms_shape
     if len(atoms_per_core) != len(n_atoms):
         raise PacmanConfigurationException(
             "The length of atoms_per_core doesn't match the number of"

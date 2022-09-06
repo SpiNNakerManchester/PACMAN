@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import sys
+import numpy
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.log import FormatAdapter
@@ -36,22 +36,31 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         # The splitter object associated with this app vertex
         "_splitter",
 
-        # The maximun number of atoms for each core.
-        # Typically all but possibly the last core will have this number
-        "_max_atoms_per_core"]
+        # The maximum number of atoms for each dimension for each core.
+        # For example, a 2D vertex might have a shape of 640 by 480 with
+        # rectangles on each core or 32 by 16.
+        # Typically all but possibly the last core will have this number. If
+        # the vertex has multiple dimensions, one or more of the dimensions
+        # might have fewer atoms on the last core (e.g. the rectangle on the
+        # last core of a 2D vertex might be smaller).
+        "_max_atoms_per_dimension_per_core"]
 
     SETTING_SPLITTER_ERROR_MSG = (
         "The splitter object on {} has already been set, it cannot be "
         "reset. Please fix and try again. ")
 
     def __init__(self, label=None, constraints=None,
-                 max_atoms_per_core=sys.maxsize, splitter=None):
+                 max_atoms_per_core=None, splitter=None):
         """
         :param str label: The optional name of the vertex.
         :param iterable(AbstractConstraint) constraints:
             The optional initial constraints of the vertex.
-        :param int max_atoms_per_core: The max number of atoms that can be
-            placed on a core, used in partitioning.
+        :param max_atoms_per_core: The max number of atoms that can be
+            placed on a core for each dimension, used in partitioning.
+            If the vertex is n-dimensional, with n > 1, the value must be a
+            tuple with a value for each dimension.  If it is single-dimensional
+            the value can be a 1-tuple or an int.
+        :type max_atoms_per_core: None or int or tuple.
         :param splitter: The splitter object needed for this vertex.
             Leave as None to delegate the choice of splitter to the selector.
         :type splitter: None or
@@ -65,7 +74,10 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         self._machine_vertices = OrderedSet()
         # Use setter as there is extra work to do
         self.splitter = splitter
-        self._max_atoms_per_core = max_atoms_per_core
+        # Keep the name for simplicity but move to new internal representation
+        self._max_atoms_per_dimension_per_core = max_atoms_per_core
+        if isinstance(max_atoms_per_core, int):
+            self._max_atoms_per_dimension_per_core = (max_atoms_per_core, )
 
     def __str__(self):
         return self.label
@@ -164,17 +176,43 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
         :rtype: int
         """
-        return self._max_atoms_per_core
+        if self._max_atoms_per_dimension_per_core is None:
+            return self.n_atoms
+        return int(numpy.prod(self._max_atoms_per_dimension_per_core))
 
-    def set_max_atoms_per_core(self, new_value):
+    def get_max_atoms_per_dimension_per_core(self):
+        """ Gets the maximum number of atoms per dimension per core.  This
+            will return a tuple with a number for each dimension of the vertex,
+            which might be one if this is a single-dimension vertex
+
+        :rtype: tuple(int)
         """
-        Set the max_atoms_per_core.
+        if self._max_atoms_per_dimension_per_core is None:
+            return self.atoms_shape
+        return self._max_atoms_per_dimension_per_core
 
-        Can be used to raise or lower the maximum number of atoms.
-
-        :param int new_value: Value to set
+    def set_max_atoms_per_dimension_per_core(self, new_value):
         """
-        self._max_atoms_per_core = new_value
+        Set the maximum number of atoms per dimension per core.
+
+        Can be used to raise or lower the maximum number of atoms per core
+        or per dimension per core.
+
+        :param new_value:
+            Value to set.  If the vertex is n-dimensional where n > 1, a tuple
+            of n values must be given.  If the vertex is 1 dimensional,
+            a 1-tuple or integer can be given.  If this is set to None the
+            vertex will have atoms_shape as the maximum.
+        :type new_value: None or int or tuple(int)
+        """
+        self._max_atoms_per_dimension_per_core = new_value
+        if isinstance(new_value, int):
+            self._max_atoms_per_dimension_per_core = (new_value, )
+        if (len(self._max_atoms_per_dimension_per_core) !=
+                len(self.atoms_shape)):
+            raise ValueError(
+                "The number of dimensions of new_value must be the same as the"
+                " number of dimensions of atoms_shape")
 
     def reset(self):
         """ Forget all machine vertices in the application vertex, and reset

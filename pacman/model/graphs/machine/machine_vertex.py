@@ -16,7 +16,7 @@
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
-from pacman.utilities.utility_calls import get_n_bits
+from pacman.utilities.utility_calls import get_n_bits, get_n_bits_for_fields
 
 
 class MachineVertex(AbstractVertex, metaclass=AbstractBase):
@@ -85,9 +85,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :return: The number of keys required
         :rtype: int
         """
-        # Work out the number of bits required in the various dimensions
-        field_size = [get_n_bits(n) for n in self._vertex_slice.shape]
-        return 1 << sum(field_size)
+        return 1 << get_n_bits_for_fields(self._vertex_slice.shape)
 
     @property
     def index(self):

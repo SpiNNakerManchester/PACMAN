@@ -85,9 +85,8 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
     @property
     def __fixed_slices(self):
         if self.__slices is None:
-            n_atoms = self._governed_app_vertex.atoms_shape
             self.__slices = get_multidimensional_slices(
-                n_atoms, self._governed_app_vertex.get_max_atoms_per_core())
+                self._governed_app_vertex)
         return self.__slices
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
