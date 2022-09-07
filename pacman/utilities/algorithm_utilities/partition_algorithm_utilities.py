@@ -27,6 +27,11 @@ def get_multidimensional_slices(app_vertex):
 
     :param ApplicationVertex app_vertex: The vertex to get the slices of
     """
+    # If there is only one slice, get that
+    if app_vertex.n_atoms < app_vertex.get_max_atoms_per_core():
+        return [Slice(0, app_vertex.n_atoms - 1, app_vertex.atoms_shape,
+                      tuple(0 for _ in app_vertex.atoms_shape))]
+
     atoms_per_core = app_vertex.get_max_atoms_per_dimension_per_core()
     n_atoms = app_vertex.atoms_shape
     if len(atoms_per_core) != len(n_atoms):
