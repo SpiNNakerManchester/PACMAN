@@ -20,15 +20,14 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.utilities.algorithm_utilities\
-    .partition_algorithm_utilities import get_remaining_constraints
-from pacman.model.graphs.common.slice import Slice
+    .partition_algorithm_utilities import get_multidimensional_slices
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SplitterFixedLegacy(AbstractSplitterCommon):
 
-    __slots__ = ["__slices", "__vertex_map"]
+    __slots__ = ["__slices"]
 
     NOT_API_WARNING = (
         "Your vertex is deprecated. Please add a Splitter or "
@@ -86,22 +85,19 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
     @property
     def __fixed_slices(self):
         if self.__slices is None:
-            n_atoms = self._governed_app_vertex.n_atoms
-            per_core = self._governed_app_vertex.get_max_atoms_per_core()
-            self.__slices = [Slice(i, min(i + per_core - 1, n_atoms - 1))
-                             for i in range(0, n_atoms, per_core)]
+            self.__slices = get_multidimensional_slices(
+                self._governed_app_vertex)
         return self.__slices
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
         app_vertex = self._governed_app_vertex
-        remaining_constraints = get_remaining_constraints(app_vertex)
         for vertex_slice in self.__fixed_slices:
             sdram = app_vertex.get_sdram_used_by_atoms(vertex_slice)
             chip_counter.add_core(sdram)
             label = f"MachineVertex for {vertex_slice} of {app_vertex.label}"
             machine_vertex = app_vertex.create_machine_vertex(
-                vertex_slice, sdram, label, remaining_constraints)
+                vertex_slice, sdram, label, app_vertex.constraints)
             app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.reset_called)
