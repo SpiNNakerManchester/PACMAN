@@ -203,7 +203,7 @@ def _ner_route(vector_to_nodes):
             source_xy, (m_vertex, core, link) = vertex_xy_and_route(m_vertex)
             routing_tree = _do_route(
                 source_xy, post_vertexes, machine, vector_to_nodes)
-            targets = get_targets_by_chip(post_vertexes, machine)
+            targets = get_targets_by_chip(post_vertexes)
             convert_a_route(
                 routing_tables, m_vertex, partition.identifier,
                 core, link, routing_tree, targets)
