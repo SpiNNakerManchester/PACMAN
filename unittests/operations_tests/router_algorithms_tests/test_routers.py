@@ -19,9 +19,9 @@ from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationEdge,
-    ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex)
+    ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex, FPGAConnection)
 from pacman.model.graphs.machine import MulticastEdgePartition, MachineEdge
-from pacman.model.partitioner_splitters import SplitterFixedLegacy
+from pacman.model.partitioner_splitters import SplitterExternalDevice
 from pacman.utilities.utility_objs import ChipCounter
 from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
@@ -40,7 +40,8 @@ from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placements, Placement
 from pacman.model.resources import ConstantSDRAM
-from pacman.model.graphs import AbstractFPGA, AbstractSpiNNakerLink
+from pacman.model.graphs.machine import (
+    MachineFPGAVertex, MachineSpiNNakerLinkVertex)
 
 from collections import defaultdict
 import math
@@ -321,10 +322,10 @@ def _find_targets(
 
 def _add_virtual(expected_virtual, vertex):
     link_data = None
-    if isinstance(vertex, AbstractFPGA):
+    if isinstance(vertex, MachineFPGAVertex):
         link_data = PacmanDataView.get_machine().get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
-    elif isinstance(vertex, AbstractSpiNNakerLink):
+    elif isinstance(vertex, MachineSpiNNakerLinkVertex):
         link_data = PacmanDataView.get_machine().get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
     if link_data is not None:
@@ -578,11 +579,11 @@ def test_spinnaker_link(params):
     unittest_setup()
     writer = PacmanDataWriter.mock()
     in_device = ApplicationSpiNNakerLinkVertex(100, 0)
-    in_device.splitter = SplitterFixedLegacy()
+    in_device.splitter = SplitterExternalDevice()
     in_device.splitter.create_machine_vertices(ChipCounter())
     writer.add_vertex(in_device)
     out_device = ApplicationSpiNNakerLinkVertex(100, 0)
-    out_device.splitter = SplitterFixedLegacy()
+    out_device.splitter = SplitterExternalDevice()
     out_device.splitter.create_machine_vertices(ChipCounter())
     writer.add_vertex(out_device)
     for i in range(n_vertices):
@@ -600,12 +601,15 @@ def test_fpga_link(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     writer = PacmanDataWriter.mock()
-    in_device = ApplicationFPGAVertex(100, 0, 0)
-    in_device.splitter = SplitterFixedLegacy()
+    in_device = ApplicationFPGAVertex(
+        100, [FPGAConnection(0, 0, None, None)], None)
+    in_device.splitter = SplitterExternalDevice()
     in_device.splitter.create_machine_vertices(ChipCounter())
     writer.add_vertex(in_device)
-    out_device = ApplicationFPGAVertex(100, 0, 1)
-    out_device.splitter = SplitterFixedLegacy()
+    out_device = ApplicationFPGAVertex(
+        100, [FPGAConnection(0, 1, None, None)],
+        FPGAConnection(0, 1, None, None))
+    out_device.splitter = SplitterExternalDevice()
     out_device.splitter.create_machine_vertices(ChipCounter())
     writer.add_vertex(out_device)
     for i in range(n_vertices):

@@ -14,10 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import collections
+import numpy
 from pacman.exceptions import PacmanValueError
 
 
-class Slice(collections.namedtuple('Slice', 'lo_atom hi_atom n_atoms')):
+class Slice(collections.namedtuple('Slice',
+                                   'lo_atom hi_atom n_atoms shape start')):
     """ Represents a slice of a vertex.
 
     :attr int lo_atom: The lowest atom represented in the slice.
@@ -25,8 +27,12 @@ class Slice(collections.namedtuple('Slice', 'lo_atom hi_atom n_atoms')):
     :attr int n_atoms: The number of atoms represented by the slice.
     :attr slice as_slice: This slice represented as a `slice` object (for
         use in indexing lists, arrays, etc.)
+    :attr tuple(int,...) shape: The shape of the atoms over multiple
+        dimensions.  By default the shape will be 1-dimensional.
+    :attr tuple(int,...) start: The start coordinates of the slice.  By default
+        this will be lo_atom in 1 dimension.
     """
-    def __new__(cls, lo_atom, hi_atom):
+    def __new__(cls, lo_atom, hi_atom, shape=None, start=None):
         """ Create a new Slice object.
 
         :param int lo_atom: Index of the lowest atom to represent.
@@ -47,11 +53,67 @@ class Slice(collections.namedtuple('Slice', 'lo_atom hi_atom n_atoms')):
         # Number of atoms represented by this slice
         n_atoms = hi_atom - lo_atom + 1
 
+        # The shape of the atoms in the slice is all the atoms in a line by
+        # default
+        if shape is None:
+            if start is not None:
+                raise PacmanValueError(
+                    "shape must be specified if start is specified")
+            shape = (n_atoms,)
+            start = (lo_atom,)
+        else:
+            if start is None:
+                raise PacmanValueError(
+                    "start must be specified if shape is specified")
+            if len(shape) != len(start):
+                raise PacmanValueError(
+                    "Both shape and start must have the same length")
+
         # Create the Slice object as a `namedtuple` with these pre-computed
         # values filled in.
-        return super().__new__(cls, lo_atom, hi_atom, n_atoms)
+        return super().__new__(cls, lo_atom, hi_atom, n_atoms, shape, start)
 
     @property
     def as_slice(self):
         # Slice for accessing arrays of values
         return slice(self.lo_atom, self.hi_atom + 1)
+
+    def get_slice(self, n):
+        """ Get a slice in the n-th dimension
+
+        :param int n: The 0-indexed dimension to get the shape of
+        :type: slice
+        """
+        try:
+            return slice(self.start[n], self.start[n] + self.shape[n])
+        except IndexError:
+            raise IndexError(f"{n} is invalid for slice with {len(self.shape)}"
+                             " dimensions")
+
+    @property
+    def slices(self):
+        """ Get slices for every dimension
+
+        :rtype: tuple(slice)
+        """
+        return tuple(self.get_slice(n) for n in range(len(self.shape)))
+
+    @property
+    def end(self):
+        """ The end positions of the slice in each dimension
+        """
+        return tuple((numpy.array(self.start) + numpy.array(self.shape)) - 1)
+
+    def get_raster_ids(self, atoms_shape):
+        """ Get the IDs of the atoms in the slice as they would appear in a
+            "raster scan" of the atoms over the whole shape.
+
+        :param tuple(int) atoms_shape:
+            The size of each dimension of the whole shape
+        :return: A list of the global raster IDs of the atoms in this slice
+        """
+        slices = tuple(self.get_slice(n)
+                       for n in reversed(range(len(self.start))))
+        ids = numpy.arange(numpy.prod(atoms_shape)).reshape(
+            tuple(reversed(atoms_shape)))
+        return ids[slices].flatten()

@@ -16,26 +16,37 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.resources import ConstantSDRAM
 from .machine_vertex import MachineVertex
-from pacman.model.graphs import (
-    AbstractVirtual, AbstractSpiNNakerLink)
+from pacman.model.graphs import AbstractVirtual
 
 
-class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
+class MachineSpiNNakerLinkVertex(MachineVertex, AbstractVirtual):
     """ A virtual vertex on a SpiNNaker Link.
     """
 
     __slots__ = [
         "_spinnaker_link_id",
-        "_board_address"]
+        "_board_address",
+        "_linked_chip_coordinates",
+        "_virtual_chip_x",
+        "_virtual_chip_y",
+        "_outgoing_keys_and_masks",
+        "_incoming",
+        "_outgoing"]
 
     def __init__(
-            self, spinnaker_link_id, board_address=None, label=None,
-            constraints=None, app_vertex=None, vertex_slice=None):
+            self, spinnaker_link_id, board_address=None,
+            linked_chip_coordinates=None, label=None, constraints=None,
+            app_vertex=None, vertex_slice=None, outgoing_keys_and_masks=None,
+            incoming=True, outgoing=False):
         super().__init__(
             label=label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address
+        self._linked_chip_coordinates = linked_chip_coordinates
+        self._outgoing_keys_and_masks = outgoing_keys_and_masks
+        self._incoming = incoming
+        self._outgoing = outgoing
 
     @property
     @overrides(MachineVertex.sdram_required)
@@ -43,7 +54,6 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
         return ConstantSDRAM(0)
 
     @property
-    @overrides(AbstractSpiNNakerLink.spinnaker_link_id)
     def spinnaker_link_id(self):
         return self._spinnaker_link_id
 
@@ -51,3 +61,28 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractSpiNNakerLink):
     @overrides(AbstractVirtual.board_address)
     def board_address(self):
         return self._board_address
+
+    @property
+    @overrides(AbstractVirtual.linked_chip_coordinates)
+    def linked_chip_coordinates(self):
+        return self._linked_chip_coordinates
+
+    @overrides(AbstractVirtual.outgoing_keys_and_masks)
+    def outgoing_keys_and_masks(self):
+        return self._outgoing_keys_and_masks
+
+    @property
+    @overrides(AbstractVirtual.incoming)
+    def incoming(self):
+        return self._incoming
+
+    @property
+    @overrides(AbstractVirtual.outgoing)
+    def outgoing(self):
+        return self._outgoing
+
+    @overrides(AbstractVirtual.get_link_data)
+    def get_link_data(self, machine):
+        return machine.get_spinnaker_link_with_id(
+            self._spinnaker_link_id, self._board_address,
+            self._linked_chip_coordinates)

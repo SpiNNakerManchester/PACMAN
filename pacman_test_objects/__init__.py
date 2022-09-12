@@ -16,12 +16,10 @@
 from .non_legacy_app_vertex import NonLegacyApplicationVertex
 from .placer_test_support import get_resourced_machine_vertex
 from .simple_test_edge import SimpleTestEdge
-from .simple_test_partitioning_constraint import NewPartitionerConstraint
 from .simple_test_vertex import SimpleTestVertex
 
 __all__ = [
     "get_resourced_machine_vertex",
     "NonLegacyApplicationVertex",
-    "NewPartitionerConstraint",
     "SimpleTestEdge",
     "SimpleTestVertex"]
