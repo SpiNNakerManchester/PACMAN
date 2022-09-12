@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.abstract_base import abstractproperty
+from spinn_utilities.abstract_base import abstractmethod, abstractproperty
 from spinn_utilities.require_subclass import require_subclass
 from pacman.model.graphs.abstract_vertex import AbstractVertex
 
@@ -32,8 +32,47 @@ class AbstractVirtual(object):
 
     @abstractproperty
     def board_address(self):
-        """ The IP address of the board to which the device is connected,\
-            or ``None`` for the boot board.
+        """ The IP address of the board to which the device is connected,
+            or ``None`` for the boot board, or when using linked chip
+            coordinates.
 
-        :rtype: str
+        :rtype: str or None
+        """
+
+    @abstractproperty
+    def linked_chip_coordinates(self):
+        """ The coordinates of the chip to which the device is connected,
+            or ``None`` for the boot board, or when using a board address.
+
+        :rtype: tuple(int, int) or None
+        """
+
+    @abstractmethod
+    def outgoing_keys_and_masks(self):
+        """ Get the keys sent by the device or None if there aren't any
+            explicitly defined.
+
+        :rtype: list of KeyAndMask or None
+        """
+
+    @abstractproperty
+    def incoming(self):
+        """ Indicates if this device sends traffic into SpiNNaker
+
+        :rtype: bool
+        """
+
+    @abstractproperty
+    def outgoing(self):
+        """ Indicates if this device receives traffic from SpiNNaker
+
+        :rtype: bool
+        """
+
+    @abstractmethod
+    def get_link_data(self, machine):
+        """ Get link data from the machine
+
+        :param Machine machine: The machine to get the data from
+        :rtype: AbstractLinkData
         """

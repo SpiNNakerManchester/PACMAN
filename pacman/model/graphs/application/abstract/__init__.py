@@ -14,5 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_one_app_one_machine_vertex import AbstractOneAppOneMachineVertex
+from .abstract_2d_device_vertex import Abstract2DDeviceVertex
 
-__all__ = ["AbstractOneAppOneMachineVertex"]
+__all__ = ["AbstractOneAppOneMachineVertex", "Abstract2DDeviceVertex"]
