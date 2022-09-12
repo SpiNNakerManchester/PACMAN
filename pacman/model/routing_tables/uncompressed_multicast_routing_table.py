@@ -82,8 +82,14 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
 
         tuple_key = (routing_entry_key, mask)
         if tuple_key in self._entries_by_key_mask:
+            # Only fail if they don't go to the same place
+            if self._entries_by_key_mask[tuple_key] == multicast_routing_entry:
+                return
             raise PacmanAlreadyExistsException(
-                "Multicast_routing_entry", str(multicast_routing_entry))
+                f"Multicast_routing_entry {tuple_key}: "
+                f"{self._entries_by_key_mask[tuple_key]} on "
+                f"{self._x}, {self._y}",
+                str(multicast_routing_entry))
 
         self._entries_by_key_mask[tuple_key] = multicast_routing_entry
 
