@@ -14,10 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.constraints.partitioner_constraints import (
-    AbstractPartitionerConstraint)
-from pacman.utilities.utility_calls import (
-    check_algorithm_can_support_constraints)
 
 
 class AbstractSplitterCommon(object, metaclass=AbstractBase):
@@ -77,18 +73,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
                 f"The app vertex {self._governed_app_vertex} is already"
                 f" governed by this splitter. ")
         self._governed_app_vertex = app_vertex
-        self.check_supported_constraints()
         app_vertex.splitter = self
-
-    def check_supported_constraints(self):
-        """
-        :raise PacmanInvalidParameterException:
-            When partitioner constraints are used.
-        """
-        check_algorithm_can_support_constraints(
-            constrained_vertices=[self._governed_app_vertex],
-            supported_constraints=[],
-            abstract_constraint_type=AbstractPartitionerConstraint)
 
     @abstractmethod
     def create_machine_vertices(self, chip_counter):
