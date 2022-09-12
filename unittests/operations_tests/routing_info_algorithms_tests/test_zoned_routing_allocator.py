@@ -22,8 +22,7 @@ from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.model.constraints.key_allocator_constraints \
-    import FixedKeyAndMaskConstraint
+from spinn_utilities.overrides import overrides
 
 
 class TestSplitter(AbstractSplitterCommon):
@@ -52,9 +51,33 @@ class TestSplitter(AbstractSplitterCommon):
 
 class TestAppVertex(ApplicationVertex):
 
+    def __init__(self, splitter=None, fixed_keys_by_partition=None,
+                 fixed_key=None, fixed_machine_keys_by_partition=None):
+        super(TestAppVertex, self).__init__(splitter=splitter)
+        self.__fixed_keys_by_partition = fixed_keys_by_partition
+        self.__fixed_key = fixed_key
+        self.__fixed_machine_keys_by_partition = \
+            fixed_machine_keys_by_partition
+
     @property
+    @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
         return 10
+
+    @overrides(ApplicationVertex.get_fixed_key_and_mask)
+    def get_fixed_key_and_mask(self, partition_id):
+        if self.__fixed_key is not None:
+            return self.__fixed_key
+        if self.__fixed_keys_by_partition is None:
+            return None
+        return self.__fixed_keys_by_partition.get(partition_id)
+
+    @overrides(ApplicationVertex.get_machine_fixed_key_and_mask)
+    def get_machine_fixed_key_and_mask(self, machine_vertex, partition_id):
+        if self.__fixed_machine_keys_by_partition is None:
+            return None
+        return self.__fixed_machine_keys_by_partition.get(
+            (machine_vertex, partition_id))
 
 
 class TestMacVertex(MachineVertex):
@@ -83,12 +106,56 @@ def create_graphs1(with_fixed):
     # Create 5 application vertices (3 bits)
     app_vertices = list()
     for app_index in range(5):
-        app_vertices.append(TestAppVertex(splitter=TestSplitter()))
+        fixed_keys_by_partition = None
+        fixed_machine_keys_by_partition = None
+        if with_fixed:
+            fixed_keys_by_partition = dict()
+            fixed_machine_keys_by_partition = dict()
+            if app_index == 2:
+                fixed_keys_by_partition["Part7"] = BaseKeyAndMask(
+                    0xFE000000, 0xFFFF0000)
+                fixed_keys_by_partition["Part1"] = BaseKeyAndMask(
+                    0x4c000000, 0xFFFF0000)
+            if app_index == 3:
+                fixed_keys_by_partition["Part1"] = BaseKeyAndMask(
+                    0x33000000, 0xFFFF0000)
+
+        app_vertex = TestAppVertex(
+            splitter=TestSplitter(),
+            fixed_keys_by_partition=fixed_keys_by_partition,
+            fixed_machine_keys_by_partition=fixed_machine_keys_by_partition)
+
+        # For each, create up to (40 * 2) + 1 = 81 machine vertices (7 bits)
+        for mac_index in range((app_index * 2 * 10) + 1):
+
+            # Give the vertex up to (80 * 2) + 1 = 161 keys (8 bits)
+            mac_vertex = TestMacVertex(
+                label=f"Part{mac_index}_vertex",
+                app_vertex=app_vertex,
+                n_keys_required={f"Part{i}": (mac_index * 2) + 1
+                                 for i in range((app_index * 10) + 1)})
+            if with_fixed:
+                if app_index == 2:
+                    fixed_machine_keys_by_partition[
+                        mac_vertex, "Part7"] = BaseKeyAndMask(
+                            0xFE000000 + (mac_index << 8), 0xFFFFFF00)
+                    fixed_machine_keys_by_partition[
+                        mac_vertex, "Part1"] = BaseKeyAndMask(
+                            0x4c000000 + (mac_index << 8), 0xFFFFFF00)
+                if app_index == 3:
+                    fixed_machine_keys_by_partition[
+                        mac_vertex, "Part1"] = BaseKeyAndMask(
+                            0x33000000 + (mac_index << 8), 0xFFFFFF00)
+
+            app_vertex.remember_machine_vertex(mac_vertex)
+
+        app_vertices.append(app_vertex)
     for vertex in app_vertices:
         PacmanDataView.add_vertex(vertex)
 
     # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = TestMacVertex(label="out_vertex")
+    out_mac_vertex = TestMacVertex(
+        label="out_vertex", app_vertex=out_app_vertex)
     out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
     for app_index, app_vertex in enumerate(app_vertices):
@@ -98,56 +165,33 @@ def create_graphs1(with_fixed):
             PacmanDataView.add_edge(
                 ApplicationEdge(app_vertex, out_app_vertex), f"Part{i}")
 
-        # For each, create up to (40 * 2) + 1 = 81 machine vertices (7 bits)
-        for mac_index in range((app_index * 2 * 10) + 1):
-
-            # Give the vertex up to (80 * 2) + 1 = 161 keys (8 bits)
-            mac_vertex = TestMacVertex(
-                label=f"Part{i}_vertex",
-                n_keys_required={f"Part{i}": (mac_index * 2) + 1
-                                 for i in range((app_index * 10) + 1)})
-            app_vertex.remember_machine_vertex(mac_vertex)
-
-        if with_fixed:
-            if app_index == 2:
-                app_vertex.add_constraint(FixedKeyAndMaskConstraint(
-                    [BaseKeyAndMask(0xFE00000, 0xFFFFFFC0)],
-                    partition="Part7"))
-            if app_index == 2:
-                app_vertex.add_constraint(FixedKeyAndMaskConstraint(
-                    [BaseKeyAndMask(0x4c00000, 0xFFFFFFFE)],
-                    partition="Part1"))
-            if app_index == 3:
-                app_vertex.add_constraint(FixedKeyAndMaskConstraint(
-                    [BaseKeyAndMask(0x3300000, 0xFFFFFFFF)],
-                    partition="Part1"))
-
 
 def create_graphs_only_fixed():
     # An output vertex to aim things at (to make keys required)
     out_app_vertex = TestAppVertex(splitter=TestSplitter())
     PacmanDataView.add_vertex(out_app_vertex)
-    app_vertex = TestAppVertex(splitter=TestSplitter())
+
+    fixed_keys_by_partition = {
+        "Part0": BaseKeyAndMask(0x4c00000, 0xFFFFFFFE),
+        "Part1": BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)
+    }
+    app_vertex = TestAppVertex(
+        splitter=TestSplitter(),
+        fixed_keys_by_partition=fixed_keys_by_partition)
     PacmanDataView.add_vertex(app_vertex)
 
     # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = TestMacVertex(label="out_mac_vertex")
+    out_mac_vertex = TestMacVertex(
+        label="out_mac_vertex", app_vertex=out_app_vertex)
     out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
-    mac_vertex = TestMacVertex(label="mac_vertex")
+    mac_vertex = TestMacVertex(label="mac_vertex", app_vertex=app_vertex)
     app_vertex.remember_machine_vertex(mac_vertex)
 
     PacmanDataView.add_edge(
         ApplicationEdge(app_vertex, out_app_vertex), "Part0")
     PacmanDataView.add_edge(
         ApplicationEdge(app_vertex, out_app_vertex), "Part1")
-
-    app_vertex.add_constraint(FixedKeyAndMaskConstraint(
-                [BaseKeyAndMask(0x4c00000, 0xFFFFFFFE)],
-                partition="Part0"))
-    app_vertex.add_constraint(FixedKeyAndMaskConstraint(
-                [BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)],
-                partition="Part1"))
 
 
 def create_graphs_no_edge():
@@ -157,10 +201,10 @@ def create_graphs_no_edge():
     PacmanDataView.add_vertex(app_vertex)
 
     # An output vertex to aim things at (to make keys required)
-    out_mac_vertex = TestMacVertex()
+    out_mac_vertex = TestMacVertex(app_vertex=out_app_vertex)
     out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
-    mac_vertex = TestMacVertex()
+    mac_vertex = TestMacVertex(app_vertex=app_vertex)
     app_vertex.remember_machine_vertex(mac_vertex)
 
 
@@ -178,12 +222,12 @@ def check_masks_all_the_same(routing_info, mask):
 
 
 def check_fixed(m_vertex, part_id, key):
-    for constraint in m_vertex.constraints:
-        if isinstance(constraint, FixedKeyAndMaskConstraint):
-            if constraint.applies_to_partition(part_id):
-                assert key == constraint.keys_and_masks[0].key
-                return True
-    return False
+    key_and_mask = m_vertex.app_vertex.get_machine_fixed_key_and_mask(
+        m_vertex, part_id)
+    if key_and_mask is None:
+        return False
+    assert key == key_and_mask.key
+    return True
 
 
 def check_keys_for_application_partition_pairs(routing_info, app_mask):
@@ -270,14 +314,17 @@ def test_flexible_allocator_with_fixed():
 def create_big(with_fixed):
     # This test shows how easy it is to trip up the allocator with a retina
     # Create a single "big" vertex
-    big_app_vertex = TestAppVertex(label="Retina", splitter=TestSplitter())
+    fixed_key = None
+    if with_fixed:
+        fixed_key = BaseKeyAndMask(0x0, 0x180000)
+    big_app_vertex = TestAppVertex(
+        splitter=TestSplitter(), fixed_key=fixed_key)
     PacmanDataView.add_vertex(big_app_vertex)
     # Create a single output vertex (which won't send)
-    out_app_vertex = TestAppVertex(
-        label="Destination", splitter=TestSplitter())
+    out_app_vertex = TestAppVertex(splitter=TestSplitter())
     PacmanDataView.add_vertex(out_app_vertex)
     # Create a load of middle vertex
-    mid_app_vertex = TestAppVertex(label="Population", splitter=TestSplitter())
+    mid_app_vertex = TestAppVertex(splitter=TestSplitter())
     PacmanDataView.add_vertex(mid_app_vertex)
 
     PacmanDataView.add_edge(
@@ -287,22 +334,21 @@ def create_big(with_fixed):
 
     # Create a single big machine vertex
     big_mac_vertex = TestMacVertex(
-        label="RETINA", n_keys_required={"Test": 1024 * 768 * 2})
+        label="RETINA", n_keys_required={"Test": 1024 * 768 * 2},
+        app_vertex=big_app_vertex)
     big_app_vertex.remember_machine_vertex(big_mac_vertex)
 
     # Create a single output vertex (which won't send)
-    out_mac_vertex = TestMacVertex(label="OutMacVertex")
+    out_mac_vertex = TestMacVertex(
+        label="OutMacVertex", app_vertex=out_app_vertex)
     out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
     # Create a load of middle vertices and connect them up
     for i in range(2000):  # 2000 needs 11 bits
-        mid_mac_vertex = TestMacVertex(label=f"MidMacVertex{i}",
-                                       n_keys_required={"Test": 100})
+        mid_mac_vertex = TestMacVertex(
+            label=f"MidMacVertex{i}", n_keys_required={"Test": 100},
+            app_vertex=mid_app_vertex)
         mid_app_vertex.remember_machine_vertex(mid_mac_vertex)
-
-    if with_fixed:
-        big_app_vertex.add_constraint(FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(0x0, 0x180000)]))
 
 
 def test_big_flexible_no_fixed():

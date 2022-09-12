@@ -18,13 +18,11 @@ import unittest
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
-from pacman.model.routing_info import BaseKeyAndMask
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyAndMaskConstraint)
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman_test_objects import SimpleTestVertex
+from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 
 
 class MockSplitter(SplitterFixedLegacy):
@@ -64,8 +62,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         """
         test initialisation of a vertex with a max size constraint
         """
-        constraint = FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(0xFF0, 0xFF8)])
+        constraint = ChipAndCoreConstraint(0, 0, 1)
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         vert.add_constraint(constraint)
         self.assertEqual(vert.n_atoms, 10)
@@ -81,11 +78,9 @@ class TestApplicationGraphModel(unittest.TestCase):
         """
         test that creating a vertex and then adding constraints in a list
         """
-        constraint1 = FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(0xFF0, 0xFF8)])
+        constraint1 = ChipAndCoreConstraint(0, 0, 1)
         # Ignore that these two dont make sense together
-        constraint2 = FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(0xFF0, 0xFF7)])
+        constraint2 = ChipAndCoreConstraint(0, 0, 2)
         constr = list()
         constr.append(constraint1)
         constr.append(constraint2)
@@ -103,8 +98,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         vertex actually works and generates a vertex
         with the same constraints mapped over
         """
-        constraint1 = FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(0xFF0, 0xFF8)])
+        constraint1 = ChipAndCoreConstraint(0, 0, 1)
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         subv_from_vert = vert.create_machine_vertex(
             Slice(0, 9),
@@ -140,11 +134,9 @@ class TestApplicationGraphModel(unittest.TestCase):
         test that a vertex created from a vertex with
         constraints can have more constraints added to it.
         """
-        constraint1 = FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(0xFF0, 0xFF8)])
+        constraint1 = ChipAndCoreConstraint(0, 0, 1)
         # Ignore that these two dont make sense together
-        constraint2 = FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(0xFF0, 0xFF7)])
+        constraint2 = ChipAndCoreConstraint(0, 0, 2)
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         vert.add_constraint(constraint1)
         subv_from_vert = vert.create_machine_vertex(
