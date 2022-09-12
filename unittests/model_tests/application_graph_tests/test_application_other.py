@@ -27,12 +27,6 @@ class TestApplicationOther(unittest.TestCase):
     def setUp(self):
         unittest_setup()
 
-    def test_fpga(self):
-        fpga = ApplicationFPGAVertex(100, 2, 3, "127.4.5.6")
-        self.assertEqual(2, fpga.fpga_id)
-        self.assertEqual(3, fpga.fpga_link_id)
-        self.assertEqual("127.4.5.6", fpga.board_address)
-
     def test_spinnake_link(self):
         slv = ApplicationSpiNNakerLinkVertex(100, 2, "127.4.5.6")
         self.assertEqual(2, slv.spinnaker_link_id)
