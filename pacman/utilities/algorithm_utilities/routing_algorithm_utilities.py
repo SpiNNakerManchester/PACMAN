@@ -17,8 +17,7 @@ from pacman.data import PacmanDataView
 from pacman.exceptions import MachineHasDisconnectedSubRegion
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartitionEntry)
-from pacman.model.graphs import (
-    AbstractFPGA, AbstractSpiNNakerLink, AbstractVirtual)
+from pacman.model.graphs import AbstractVirtual
 from pacman.model.graphs.application import ApplicationEdgePartition
 from collections import deque, defaultdict
 import heapq
@@ -519,12 +518,11 @@ def most_direct_route(source, dest, machine):
     return root
 
 
-def get_targets_by_chip(vertices, machine):
+def get_targets_by_chip(vertices):
     """ Get the target links and cores on the relevant chips
 
     :param list(MachineVertex) vertices: The vertices to target
     :param Placements placements: Where the vertices are placed
-    :param Machine machine: The machine placed on
     :return: A dict of (x, y) to target (cores, links)
     :rtype: dict((int, int), (list, list))
     """
@@ -534,7 +532,7 @@ def get_targets_by_chip(vertices, machine):
         if isinstance(vertex, AbstractVirtual):
             # Sinks with route-to-endpoint constraints must be routed
             # in the according directions.
-            link = route_to_endpoint(vertex, machine)
+            link = route_to_endpoint(vertex)
             by_chip[x, y][1].add(link)
         else:
             core = PacmanDataView.get_placement_of_vertex(vertex).p
@@ -552,15 +550,8 @@ def vertex_xy(vertex):
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)
         return placement.x, placement.y
-    link_data = None
-    if isinstance(vertex, AbstractFPGA):
-        machine = PacmanDataView.get_machine()
-        link_data = machine.get_fpga_link_with_id(
-            vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
-    elif isinstance(vertex, AbstractSpiNNakerLink):
-        machine = PacmanDataView.get_machine()
-        link_data = machine.get_spinnaker_link_with_id(
-            vertex.spinnaker_link_id, vertex.board_address)
+    machine = PacmanDataView.get_machine()
+    link_data = vertex.get_link_data(machine)
     return link_data.connected_chip_x, link_data.connected_chip_y
 
 
@@ -578,29 +569,18 @@ def vertex_xy_and_route(vertex):
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)
         return (placement.x, placement.y), (vertex, placement.p, None)
-    link_data = None
-    if isinstance(vertex, AbstractFPGA):
-        machine = PacmanDataView.get_machine()
-        link_data = machine.get_fpga_link_with_id(
-            vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
-    elif isinstance(vertex, AbstractSpiNNakerLink):
-        machine = PacmanDataView.get_machine()
-        link_data = machine.get_spinnaker_link_with_id(
-            vertex.spinnaker_link_id, vertex.board_address)
+    machine = PacmanDataView.get_machine()
+    link_data = vertex.get_link_data(machine)
     return ((link_data.connected_chip_x, link_data.connected_chip_y),
             (vertex, None, link_data.connected_link))
 
 
-def route_to_endpoint(vertex, machine):
+def route_to_endpoint(vertex):
     """
     :param MachineVertex vertex:
     :param ~spinn_machine.Machine machine:
     :rtype: int
     """
-    if isinstance(vertex, AbstractFPGA):
-        link_data = machine.get_fpga_link_with_id(
-            vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
-    else:
-        link_data = machine.get_spinnaker_link_with_id(
-            vertex.spinnaker_link_id, vertex.board_address)
+    machine = PacmanDataView.get_machine()
+    link_data = vertex.get_link_data(machine)
     return link_data.connected_link

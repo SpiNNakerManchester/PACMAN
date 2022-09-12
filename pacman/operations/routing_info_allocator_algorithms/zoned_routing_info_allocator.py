@@ -22,12 +22,10 @@ from pacman.data import PacmanDataView
 from pacman.model.routing_info import (
     RoutingInfo, MachineVertexRoutingInfo, BaseKeyAndMask,
     AppVertexRoutingInfo)
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.machine import MachineVertex
 from pacman.utilities.utility_calls import get_key_ranges
-from pacman.exceptions import PacmanRouteInfoAllocationException,\
-    PacmanInvalidParameterException
-from pacman.model.constraints.key_allocator_constraints import (
-    AbstractKeyAllocatorConstraint, ContiguousKeyRangeContraint,
-    FixedKeyAndMaskConstraint)
+from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -99,7 +97,9 @@ class ZonedRoutingInfoAllocator(object):
         # Map of (partition identifier, machine_vertex) to fixed_key_and_mask
         "__fixed_partitions",
         # Set of app_part indexes used by fixed
-        "__fixed_used"
+        "__fixed_used",
+        # True if all partitions are fixed
+        "__all_fixed"
     ]
 
     def __call__(self, extra_allocations, flexible):
@@ -129,22 +129,18 @@ class ZonedRoutingInfoAllocator(object):
         self.__n_bits_atoms = 0
         self.__atom_bits_per_app_part = dict()
         self.__flexible = flexible
-        self.__fixed_keys = list()
         self.__fixed_partitions = dict()
         self.__fixed_used = set()
+        self.__all_fixed = True
 
         self.__find_fixed()
         self.__calculate_zones()
         self.__check_zones()
-        return self.__allocate()
 
-    def __check_constraint_supported(self, constraint):
-        if not isinstance(constraint, AbstractKeyAllocatorConstraint):
-            return
-        if isinstance(constraint, ContiguousKeyRangeContraint):
-            return
-        raise PacmanInvalidParameterException(
-            "constraint", constraint, "Unsupported key allocation constraint")
+        if self.__all_fixed:
+            return self.__allocate_all_fixed()
+
+        return self.__allocate()
 
     def __find_fixed(self):
         """
@@ -152,45 +148,51 @@ class ZonedRoutingInfoAllocator(object):
 
         See :py:meth:`__add_fixed`
         """
+        self.__all_fixed = True
         for pre, identifier in self.__vertex_partitions:
-            # Try the application vertex
-            for constraint in pre.constraints:
-                if isinstance(constraint, FixedKeyAndMaskConstraint):
-                    if constraint.applies_to_partition(identifier):
-                        for vert in pre.splitter.get_out_going_vertices(
-                                identifier):
-                            self.__add_fixed(identifier, vert, constraint)
-                        self.__add_fixed(
-                            identifier, pre, constraint)
+            app_key_and_mask = pre.get_fixed_key_and_mask(identifier)
+            is_fixed_m_key = False
+            is_unfixed_m_key = False
+            outgoing = list(pre.splitter.get_out_going_vertices(identifier))
+            for vert in outgoing:
+                key_and_mask = pre.get_machine_fixed_key_and_mask(
+                    vert, identifier)
+                if key_and_mask is not None:
+                    if is_unfixed_m_key:
+                        raise PacmanRouteInfoAllocationException(
+                            "A fixed key has been found for one machine vertex"
+                            f" but not for all machine vertices of {pre}")
+                    is_fixed_m_key = True
+                    if app_key_and_mask is None:
+                        raise PacmanRouteInfoAllocationException(
+                            "No application fixed key found, but machine "
+                            f"fixed key {key_and_mask} found on vertex {pre}, "
+                            f"machine vertex {vert}, partition {identifier}")
+                    if (key_and_mask.key & app_key_and_mask.mask !=
+                            app_key_and_mask.key):
+                        raise PacmanRouteInfoAllocationException(
+                            f"For application vertex {pre}, the fixed key for "
+                            f"machine vertex {vert} of {key_and_mask} does "
+                            f"not align with the app key {app_key_and_mask}")
+                    self.__fixed_partitions[identifier, vert] = key_and_mask
                 else:
-                    self.__check_constraint_supported(constraint)
+                    if is_fixed_m_key:
+                        raise PacmanRouteInfoAllocationException(
+                            "A fixed key has been found for one machine vertex"
+                            f" but not for all machine vertices of {pre}")
+                    is_unfixed_m_key = True
 
-    def __add_fixed(self, part_id, vertex, constraint):
-        """
-        Precomputes and caches FixedKeyAndMask for easier use later
-
-        Saves a map of partition to the constraint records these in a dict by
-        Partition so they can be found easier in future passes.
-
-        Saves a list of the keys and their n_keys so these zones can be blocked
-
-        :param str part_id: The identifier of the partition
-        :param MachineVertex vertex: The machine vertex this applies to
-        :param FixedKeyAndMaskConstraint constraint:
-        """
-        if (part_id, vertex) in self.__fixed_partitions:
-            raise PacmanInvalidParameterException(
-                "constraint", constraint,
-                "Multiple FixedKeyConstraints apply to the same vertex"
-                f" {vertex} and partition {part_id}:"
-                f" {constraint.keys_and_masks} and "
-                f" {self.__fixed_partitions[part_id, vertex]}")
-        self.__fixed_partitions[part_id, vertex] = constraint.keys_and_masks
-        for key_and_mask in constraint.keys_and_masks:
-            # Go through the mask sets and save keys and n_keys
-            for key, n_keys in get_key_ranges(
-                    key_and_mask.key, key_and_mask.mask):
-                self.__fixed_keys.append((key, n_keys))
+            if app_key_and_mask is None:
+                self.__all_fixed = False
+            else:
+                if not is_fixed_m_key:
+                    if len(outgoing) > 1:
+                        raise PacmanRouteInfoAllocationException(
+                            f"On {pre} only a fixed app key has been provided,"
+                            " but there is more than one machine vertex.")
+                    self.__fixed_partitions[
+                        identifier, vert] = app_key_and_mask
+                self.__fixed_partitions[identifier, pre] = app_key_and_mask
 
     def __calculate_zones(self):
         """
@@ -273,13 +275,55 @@ class ZonedRoutingInfoAllocator(object):
         """
         Block the use of ``AP`` indexes that would clash with fixed keys
         """
+        # The idea below is to generate all combinations of the A-P keys that
+        # overlap with one of the fixed keys and masks. Example:
+        # | A | P | M | X |
+        # |1111000|0000000| (1)
+        # |1111111|1100000| (2)
+        # |1010110|0000000| (3)
+        # Case (1): the mask of the key is all within A and P, so it will
+        #           generate 16 AP values which need to be blocked out
+        # Case (2): the mask of the key goes beyond A and P, so it will
+        #           generate only one AP value that can't be used
+        # Case (3): the mask that overlaps AP is complex; all possible
+        #           combinations of AP within the 0s of the mask will be
+        #           blocked from use
+
         self.__fixed_used = set()
-        bucket_size = 2 ** self.__n_bits_atoms_and_mac
-        for (key, n_keys) in self.__fixed_keys:
-            start = key // bucket_size
-            end = (key + n_keys) // bucket_size
-            for i in range(start, end + 1):
-                self.__fixed_used.add(i)
+        n_app_part_bits = BITS_IN_KEY - self.__n_bits_atoms_and_mac
+        for key_and_mask in self.__fixed_partitions.values():
+            # Get the key and mask that overlap with the A-P key and mask
+            key = key_and_mask.key >> self.__n_bits_atoms_and_mac
+            mask = key_and_mask.mask >> self.__n_bits_atoms_and_mac
+
+            # Make the mask all 1s in the MSBs where it has been shifted
+            mask |= (((1 << self.__n_bits_atoms_and_mac) - 1) <<
+                     n_app_part_bits)
+
+            # Generate all possible combinations of keys for the remaining
+            # mask
+            for k, n_keys in get_key_ranges(key, mask):
+                for i in range(n_keys):
+                    self.__fixed_used.add(k + i)
+
+    def __allocate_all_fixed(self):
+        routing_infos = RoutingInfo()
+        progress = ProgressBar(
+            len(self.__fixed_partitions), "Allocating routing keys")
+        for (part_id, vertex), key_and_mask in progress.over(
+                self.__fixed_partitions.items()):
+            if isinstance(vertex, ApplicationVertex):
+                n_bits_atoms = self.__atom_bits_per_app_part[vertex, part_id]
+                routing_infos.add_routing_info(
+                    AppVertexRoutingInfo(
+                        [key_and_mask], part_id, vertex,
+                        self.__mask(n_bits_atoms), n_bits_atoms,
+                        len(vertex.machine_vertices)-1))
+            elif isinstance(vertex, MachineVertex):
+                routing_infos.add_routing_info(
+                    MachineVertexRoutingInfo(
+                        [key_and_mask], part_id, vertex, vertex.index))
+        return routing_infos
 
     def __allocate(self):
         progress = ProgressBar(
@@ -312,27 +356,27 @@ class ZonedRoutingInfoAllocator(object):
                 key = (identifier, machine_vertex)
                 if key in self.__fixed_partitions:
                     # Ignore zone calculations and just use fixed
-                    keys_and_masks = self.__fixed_partitions[key]
+                    key_and_mask = self.__fixed_partitions[key]
                 else:
                     mask = self.__mask(n_bits_atoms)
                     key = app_part_index
                     key = (key << n_bits_machine) | machine_index
                     key = key << n_bits_atoms
-                    keys_and_masks = [BaseKeyAndMask(base_key=key, mask=mask)]
+                    key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
                 routing_infos.add_routing_info(MachineVertexRoutingInfo(
-                    keys_and_masks, identifier, machine_vertex,
+                    [key_and_mask], identifier, machine_vertex,
                     machine_index))
 
             # Add application-level routing information
             key = (identifier, pre)
             if key in self.__fixed_partitions:
-                keys_and_masks = self.__fixed_partitions[key]
+                key_and_mask = self.__fixed_partitions[key]
             else:
                 key = app_part_index << (n_bits_atoms + n_bits_machine)
                 mask = self.__mask(n_bits_atoms + n_bits_machine)
-                keys_and_masks = [BaseKeyAndMask(key, mask)]
+                key_and_mask = BaseKeyAndMask(key, mask)
             routing_infos.add_routing_info(AppVertexRoutingInfo(
-                keys_and_masks, identifier, pre,
+                [key_and_mask], identifier, pre,
                 self.__mask(n_bits_atoms), n_bits_atoms,
                 len(machine_vertices) - 1))
             app_part_index += 1
@@ -355,7 +399,7 @@ class ZonedRoutingInfoAllocator(object):
         """
         if size == 0:
             return 0
-        return int(math.ceil(math.log(size, 2)))
+        return int(math.ceil(math.log2(size)))
 
 
 def flexible_allocate(extra_allocations):

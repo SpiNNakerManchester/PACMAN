@@ -16,6 +16,7 @@
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
+from pacman.utilities.utility_calls import get_n_bits_for_fields
 
 
 class MachineVertex(AbstractVertex, metaclass=AbstractBase):
@@ -84,8 +85,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :return: The number of keys required
         :rtype: int
         """
-        # pylint:disable=unused-argument
-        return self._vertex_slice.n_atoms
+        return 1 << get_n_bits_for_fields(self._vertex_slice.shape)
 
     @property
     def index(self):
