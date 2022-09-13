@@ -27,8 +27,6 @@ from pacman.model.placements import Placements, Placement
 from pacman.model.graphs import AbstractVirtual
 from pacman.exceptions import (
     PacmanPlaceException, PacmanConfigurationException)
-from pacman.utilities.utility_calls import locate_constraints_of_type
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -88,8 +86,8 @@ def place_application_graph(system_placements):
                     sdram = sdram.get_total_sdram(plan_n_timesteps)
                     n_cores = len(vertices_to_place)
 
-                    if _do_constraints(vertices_to_place, sdram, placements,
-                                       machine, next_chip_space):
+                    if _do_fixed_location(vertices_to_place, sdram, placements,
+                                          machine, next_chip_space):
                         continue
 
                     # Try to find a chip with space; this might result in a
@@ -267,7 +265,7 @@ class _SpaceExceededException(Exception):
     pass
 
 
-def _do_constraints(vertices, sdram, placements, machine, next_chip_space):
+def _do_fixed_location(vertices, sdram, placements, machine, next_chip_space):
     """
 
     :param vertices:
@@ -281,15 +279,9 @@ def _do_constraints(vertices, sdram, placements, machine, next_chip_space):
     y = None
     constrained = False
     for vertex in vertices:
-        constraints = locate_constraints_of_type(
-            vertex.constraints, ChipAndCoreConstraint)
-        for constraint in constraints:
-            if constrained and (constraint.x != x or constraint.y != y):
-                raise PacmanConfigurationException(
-                    f"Multiple conflicting constraints: Vertices {vertices}"
-                    " are on the same chip, but constraints say different")
-            x = constraint.x
-            y = constraint.y
+        if vertex.fixed_location:
+            x = vertex.fixed_location.x
+            y = vertex.fixed_location.y
             constrained = True
     if constrained:
         chip = machine.get_chip_at(x, y)
@@ -303,19 +295,14 @@ def _do_constraints(vertices, sdram, placements, machine, next_chip_space):
         next_cores = iter(cores)
         for vertex in vertices:
             next_core = None
-            constraints = locate_constraints_of_type(
-                vertex.constraints, ChipAndCoreConstraint)
-            for constraint in constraints:
-                if constraint.p is not None:
-                    if next_core is not None and next_core != constraint.p:
+            if vertex.fixed_location:
+                fixed = vertex.fixed_location
+                if fixed.p is not None:
+                    if fixed.p not in next_cores:
                         raise PacmanConfigurationException(
-                            f"Vertex {vertex} constrained to more than one"
-                            " core")
-                    next_core = constraint.p
-            if next_core is not None and next_core not in next_cores:
-                raise PacmanConfigurationException(
-                    f"Core {next_core} on {x}, {y} not available to place"
-                    f" {vertex} on")
+                            f"Core {fixed.p} on {x}, {y} not available to "
+                            f"place {vertex} on")
+                    next_core = fixed.p
             if next_core is None:
                 try:
                     next_core = next(next_cores)

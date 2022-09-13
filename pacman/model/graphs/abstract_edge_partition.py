@@ -17,8 +17,6 @@ from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanAlreadyExistsException)
 
-_REPR_TEMPLATE = "{}(identifier={}, edges={}, constraints={}, label={})"
-
 
 class AbstractEdgePartition(object, metaclass=AbstractBase):
     """ A collection of edges which start at a single vertex which have the\

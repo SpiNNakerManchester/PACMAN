@@ -39,10 +39,6 @@ class TestJsonUtils(unittest.TestCase):
                 c1.__class__, c2.__class__))
         self._compare_vertex(c1.vertex, c2.vertex, seen)
 
-    @staticmethod
-    def __constraints(vertex):
-        return sorted(vertex.constraints, key=lambda c: c.__class__.__name__)
-
     def _compare_vertex(self, v1, v2, seen=None):
         if seen is None:
             seen = []
@@ -50,10 +46,7 @@ class TestJsonUtils(unittest.TestCase):
         if v1.label in seen:
             return
         self.assertEqual(v1.sdram_required, v2.sdram_required)
-        self.assertEqual(len(v1.constraints), len(v2.constraints))
         seen.append(v1.label)
-        for c1, c2 in zip(self.__constraints(v1), self.__constraints(v2)):
-            self._compare_constraint(c1, c2, seen)
 
     # ------------------------------------------------------------------
     # Composite JSON round-trip testing schemes

@@ -26,14 +26,10 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     __slots__ = ["_app_vertex", "_index", "_vertex_slice"]
     _DEFAULT_SLICE = Slice(0, 0)
 
-    def __init__(self, label=None, constraints=None, app_vertex=None,
-                 vertex_slice=None):
+    def __init__(self, label=None, app_vertex=None, vertex_slice=None):
         """
         :param label: The optional name of the vertex
         :type label: str or None
-        :param iterable(AbstractConstraint) constraints:
-            The optional initial constraints of the vertex
-        :type constraints: iterable(AbstractConstraint)  or None
         :param app_vertex:
             The application vertex that caused this machine vertex to be
             created. If None, there is no such application vertex.
@@ -42,15 +38,13 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
             The slice of the application vertex that this machine vertex
             implements.
         :type vertex_slice: Slice or None
-        :raise PacmanInvalidParameterException:
-            If one of the constraints is not valid
         :raises PacmanValueError: If the slice of the machine_vertex is too big
         :raise AttributeError:
             If a not None app_vertex is not an ApplicationVertex
         """
         if label is None:
             label = str(type(self))
-        super().__init__(label, constraints)
+        super().__init__(label)
         self._added_to_graph = False
         self._app_vertex = app_vertex
         self._index = None
@@ -108,10 +102,10 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return self.__repr__() if _l is None else _l
 
     def __repr__(self):
-        if self.constraints:
-            return "MachineVertex(label={}, constraints={})".format(
-                self.label, self.constraints)
-        return "MachineVertex(label={})".format(self.label)
+        if self.fixed_location:
+            return f"MachineVertex({self.label}, at{self.fixed_location})"
+        else:
+            return f"MachineVertex({self.label})"
 
     @abstractproperty
     def sdram_required(self):
@@ -137,3 +131,24 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :rtype: iterable(ReverseIPtagResource)
         """
         return []
+
+    @property
+    def fixed_location(self):
+        """
+        The x, y and possibly p the vertex MUST be placed on.
+
+        Typically NONE! Does not have the value of a normal placememts.
+
+        If the Machine vertex has no fixed_location
+        but does have an app_vertex, app_vertex.fixed_location is used.
+        If both have a fixed_location the app level is ignored!
+
+        Used instead of ChipAndCoreConstraint
+
+        :rtype: None or ChipAndCore
+        """
+        if self._fixed_location:
+            return self._fixed_location
+        if self._app_vertex:
+            return self._app_vertex._fixed_location
+        return None

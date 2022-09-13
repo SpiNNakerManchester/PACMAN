@@ -26,12 +26,11 @@ class SimpleMachineVertex(MachineVertex):
     """
     __slots__ = ["_iptags", "_reverse_iptags", "_sdram"]
 
-    def __init__(self, sdram, label=None, constraints=None,
+    def __init__(self, sdram, label=None,
                  app_vertex=None, vertex_slice=None, iptags=None,
                  reverse_iptags=None):
         super().__init__(
-            label=label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=vertex_slice)
+            label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self._sdram = sdram
         self._iptags = []
         if iptags:

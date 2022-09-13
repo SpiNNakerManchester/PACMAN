@@ -36,8 +36,7 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v1)
         v2 = AbstractOneAppOneMachineVertex(
-            machine_vertex=SimpleMachineVertex(None),
-            label="v1", constraints=None)
+            machine_vertex=SimpleMachineVertex(None), label="v1")
         splitter.set_governed_app_vertex(v2)
         a = str(splitter)
         self.assertIsNotNone(a)

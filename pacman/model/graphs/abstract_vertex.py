@@ -15,14 +15,13 @@
 
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
-from pacman.model.graphs.common import ConstrainedObject, ChipAndCore
+from pacman.model.graphs.common import ChipAndCore
 
 
-class AbstractVertex(ConstrainedObject):
+class AbstractVertex(object):
     """ A vertex in a graph.
     """
 
-    # Because of diamond inheritance slots must be empty
     __slots__ = [
         # Indicates if the Vertex has been added to a graph
         "_added_to_graph",
@@ -32,20 +31,16 @@ class AbstractVertex(ConstrainedObject):
         "_fixed_location"
     ]
 
-    def __init__(self, label=None, constraints=None):
+    def __init__(self, label=None):
         """
         :param str label: The optional name of the vertex
-        :param iterable(AbstractConstraint) constraints:
-            The optional initial constraints of the vertex
-        :raise PacmanInvalidParameterException:
-            If one of the constraints is not valid
+        :param fixed_location:
+            The optional fixed location of the vertex.
+            Only if the Vertex is fixed before placement.
         """
-
-        super().__init__(constraints)
         self._label = label
         self._added_to_graph = False
         self._fixed_location = None
-
 
     @property
     def label(self):
@@ -83,7 +78,7 @@ class AbstractVertex(ConstrainedObject):
         """
         The x, y and possibly p the vertex MUST be placed on.
 
-        Typically NONE! Does not have the value of a normal placememtn.
+        Typically NONE! Does not have the value of a normal placememts.
 
         Used instead of ChipAndCoreConstraint
 
@@ -91,18 +86,19 @@ class AbstractVertex(ConstrainedObject):
         """
         return self._fixed_location
 
-    def set_fixed_location(self, fixed_location):
+    @fixed_location.setter
+    def fixed_location(self, fixed_location):
         """
 
         :param ChipAndCore fixed_location:
         """
-        if fixed_location == self._fixed_location:
-            return
         if not isinstance(fixed_location, ChipAndCore):
             raise PacmanInvalidParameterException(
                 "fixed_location", str(ChipAndCore.__class__),
                 "Fixed Location must be ChipAndCore")
         if self._fixed_location is not None:
+            if fixed_location == self._fixed_location:
+                return
             raise PacmanConfigurationException(
                 "Once set to a value fixed_location can not be changed")
         self._fixed_location = fixed_location
