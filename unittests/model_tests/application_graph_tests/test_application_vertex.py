@@ -16,13 +16,11 @@
 import numpy
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.exceptions import PacmanInvalidParameterException
-
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.model.graphs.common import Slice, ChipAndCore
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman_test_objects import SimpleTestVertex
-from pacman.exceptions import (
-    PacmanConfigurationException, PacmanInvalidParameterException)
 
 
 class TestApplicationGraphModel(unittest.TestCase):
