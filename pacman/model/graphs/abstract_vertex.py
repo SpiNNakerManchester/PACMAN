@@ -13,8 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.common import ConstrainedObject
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanInvalidParameterException)
+from pacman.model.graphs.common import ConstrainedObject, ChipAndCore
 
 
 class AbstractVertex(ConstrainedObject):
@@ -26,7 +27,10 @@ class AbstractVertex(ConstrainedObject):
         # Indicates if the Vertex has been added to a graph
         "_added_to_graph",
         # Label for the vertex. Changable until added to graph
-        "_label"]
+        "_label",
+        # the x, y (and p) this vertex MUST be placed on
+        "_fixed_location"
+    ]
 
     def __init__(self, label=None, constraints=None):
         """
@@ -40,6 +44,8 @@ class AbstractVertex(ConstrainedObject):
         super().__init__(constraints)
         self._label = label
         self._added_to_graph = False
+        self._fixed_location = None
+
 
     @property
     def label(self):
@@ -71,3 +77,32 @@ class AbstractVertex(ConstrainedObject):
             If there is an attempt to add the same vertex more than once
         """
         self._added_to_graph = True
+
+    @property
+    def fixed_location(self):
+        """
+        The x, y and possibly p the vertex MUST be placed on.
+
+        Typically NONE! Does not have the value of a normal placememtn.
+
+        Used instead of ChipAndCoreConstraint
+
+        :rtype: None or ChipAndCore
+        """
+        return self._fixed_location
+
+    def set_fixed_location(self, fixed_location):
+        """
+
+        :param ChipAndCore fixed_location:
+        """
+        if fixed_location == self._fixed_location:
+            return
+        if not isinstance(fixed_location, ChipAndCore):
+            raise PacmanInvalidParameterException(
+                "fixed_location", str(ChipAndCore.__class__),
+                "Fixed Location must be ChipAndCore")
+        if self._fixed_location is not None:
+            raise PacmanConfigurationException(
+                "Once set to a value fixed_location can not be changed")
+        self._fixed_location = fixed_location

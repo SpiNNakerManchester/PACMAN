@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from chip_and_core import ChipAndCore
 from .constrained_object import ConstrainedObject
 from .slice import Slice
 
-__all__ = ["ConstrainedObject", "Slice"]
+__all__ = ["ChipAndCore", "ConstrainedObject", "Slice"]
