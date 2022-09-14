@@ -86,8 +86,8 @@ class AbstractVertex(object):
         """
         return self._fixed_location
 
-    @fixed_location.setter
-    def fixed_location(self, fixed_location):
+    # Note: overriding the @property hides a setter
+    def set_fixed_location(self, fixed_location):
         """
 
         :param ChipAndCore fixed_location:

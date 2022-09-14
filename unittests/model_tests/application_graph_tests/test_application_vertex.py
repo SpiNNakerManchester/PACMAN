@@ -54,13 +54,13 @@ class TestApplicationGraphModel(unittest.TestCase):
         """
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
         self.assertIsNone(vert.fixed_location)
-        vert.fixed_location = ChipAndCore(0, 0, 1)
+        vert.set_fixed_location(ChipAndCore(0, 0, 1))
         self.assertEqual(vert.fixed_location, ChipAndCore(0, 0, 1))
         with self.assertRaises(PacmanConfigurationException):
-            vert.fixed_location = ChipAndCore(0, 1, 2)
+            vert.set_fixed_location(ChipAndCore(0, 1, 2))
         with self.assertRaises(PacmanInvalidParameterException):
-            vert.fixed_location = None
-        vert.fixed_location = ChipAndCore(0, 0, 1)
+            vert.set_fixed_location(None)
+        vert.set_fixed_location(ChipAndCore(0, 0, 1))
 
     def test_new_create_vertex_from_vertex_no_fixed(self):
         """
