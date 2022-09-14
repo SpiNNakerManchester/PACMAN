@@ -15,7 +15,7 @@
 
 import unittest
 from spinn_utilities.exceptions import (
-    DataNotYetAvialable, SimulatorShutdownException)
+    DataNotYetAvialable, SimulatorRunningException, SimulatorShutdownException)
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
@@ -274,3 +274,73 @@ class TestSimulatorData(unittest.TestCase):
             table, PacmanDataView.get_routing_table_by_partition())
         with self.assertRaises(TypeError):
             writer.set_routing_table_by_partition("Bacon")
+
+    def test_add_requires_mapping(self):
+        writer = PacmanDataWriter.setup()
+        # before first run
+        self.assertTrue(PacmanDataView.get_requires_mapping())
+        writer.start_run()
+        writer.finish_run()
+        # after a run false
+        self.assertFalse(PacmanDataView.get_requires_mapping())
+
+        # Check add vertex requires mapping
+        v1 = SimpleTestVertex(1)
+        PacmanDataView.add_vertex(v1)
+        self.assertTrue(PacmanDataView.get_requires_mapping())
+        v2 = SimpleTestVertex(2)
+        PacmanDataView.add_vertex(v2)
+
+        # after a run false
+        writer.start_run()
+        writer.finish_run()
+        self.assertFalse(PacmanDataView.get_requires_mapping())
+
+        # Check add edge requires mapping
+        e12 = ApplicationEdge(v1, v2)
+        PacmanDataView.add_edge(e12, "foo")
+        self.assertTrue(PacmanDataView.get_requires_mapping())
+
+        # after a run false
+        writer.start_run()
+        writer.finish_run()
+        self.assertFalse(PacmanDataView.get_requires_mapping())
+
+        # check can not add if requires mapping false
+        v3 = SimpleTestVertex(1)
+        e13 = ApplicationEdge(v1, v2)
+        writer.start_run()
+        with self.assertRaises(SimulatorRunningException):
+            PacmanDataView.add_vertex(v3)
+        with self.assertRaises(SimulatorRunningException):
+            PacmanDataView.add_edge(e13, "foo")
+        with self.assertRaises(PacmanConfigurationException):
+            writer.add_vertex(v3)
+        with self.assertRaises(PacmanConfigurationException):
+            writer.add_edge(e13, "foo")
+        writer.finish_run()
+        self.assertFalse(PacmanDataView.get_requires_mapping())
+
+        # check writer can add if requires mapping True
+        PacmanDataView.add_vertex(v3)
+        v4 = SimpleTestVertex(1)
+        e13 = ApplicationEdge(v1, v2)
+        self.assertTrue(PacmanDataView.get_requires_mapping())
+        writer.start_run()
+        with self.assertRaises(SimulatorRunningException):
+            PacmanDataView.add_vertex(v4)
+        with self.assertRaises(SimulatorRunningException):
+            PacmanDataView.add_edge(e13, "foo")
+        writer.add_vertex(v4)
+        writer.add_edge(e13, "foo")
+        writer.finish_run()
+        self.assertFalse(PacmanDataView.get_requires_mapping())
+
+        # Check resets
+        v5 = SimpleTestVertex(1)
+        PacmanDataView.add_vertex(v5)
+        self.assertTrue(PacmanDataView.get_requires_mapping())
+        writer.soft_reset()
+        self.assertTrue(PacmanDataView.get_requires_mapping())
+        writer.hard_reset()
+        self.assertTrue(PacmanDataView.get_requires_mapping())
