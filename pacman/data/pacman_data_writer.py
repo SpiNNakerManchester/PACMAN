@@ -156,3 +156,21 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
                 "MulticastRoutingTableByPartition")
         self.__pacman_data._routing_table_by_partition = \
             routing_table_by_partition
+
+    @classmethod
+    def add_vertex(cls, vertex):
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        if not cls.get_requires_mapping():
+            raise PacmanConfigurationException(
+                "This call is only expected if requires mapping is True")
+        cls.__pacman_data._graph.add_vertex(vertex)
+
+    @classmethod
+    def add_edge(cls, edge, outgoing_edge_partition_name):
+        if cls.__pacman_data._graph is None:
+            raise cls._exception("graph")
+        if not cls.get_requires_mapping():
+            raise PacmanConfigurationException(
+                "This call is only expected if requires mapping is True")
+        cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
