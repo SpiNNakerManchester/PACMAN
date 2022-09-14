@@ -40,12 +40,8 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         :param MachineVertex machine_vertex: The vertex to set the keys for
         :param int index: The index of the machine vertex
         """
-        if isinstance(key_and_mask, BaseKeyAndMask):
-            self.__key_and_mask = key_and_mask
-        else:
-            assert len(key_and_mask) == 1
-            assert isinstance(key_and_mask[0], BaseKeyAndMask)
-            self.__key_and_mask = key_and_mask[0]
+        assert isinstance(key_and_mask, BaseKeyAndMask)
+        self.__key_and_mask = key_and_mask
         self.__partition_id = partition_id
 
     def get_keys(self, n_keys=None):
