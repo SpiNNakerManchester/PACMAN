@@ -78,8 +78,9 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         return self.label
 
     def __repr__(self):
-        if self.fixed_location:
-            return f"ApplicationVertex({self.label}, at{self.fixed_location})"
+        if self.get_fixed_location():
+            return f"ApplicationVertex({self.label}," \
+                   f" at{self.get_fixed_location()})"
         else:
             return f"ApplicationVertex({self.label})"
 

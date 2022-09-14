@@ -53,14 +53,12 @@ class TestApplicationGraphModel(unittest.TestCase):
         test that creating a vertex and then adding fixed_locations
         """
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
-        self.assertIsNone(vert.fixed_location)
-        vert.set_fixed_location(ChipAndCore(0, 0, 1))
-        self.assertEqual(vert.fixed_location, ChipAndCore(0, 0, 1))
+        self.assertIsNone(vert.get_fixed_location())
+        vert.set_fixed_location(0, 0, 1)
+        self.assertEqual(vert.get_fixed_location(), ChipAndCore(0, 0, 1))
         with self.assertRaises(PacmanConfigurationException):
-            vert.set_fixed_location(ChipAndCore(0, 1, 2))
-        with self.assertRaises(PacmanInvalidParameterException):
-            vert.set_fixed_location(None)
-        vert.set_fixed_location(ChipAndCore(0, 0, 1))
+            vert.set_fixed_location(0, 0)
+        vert.set_fixed_location(0, 0, 1)
 
     def test_new_create_vertex_from_vertex_no_fixed(self):
         """

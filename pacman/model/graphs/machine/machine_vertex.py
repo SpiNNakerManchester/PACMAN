@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_calls import get_n_bits_for_fields
@@ -102,8 +103,9 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return self.__repr__() if _l is None else _l
 
     def __repr__(self):
-        if self.fixed_location:
-            return f"MachineVertex({self.label}, at{self.fixed_location})"
+        if self.get_fixed_location():
+            return f"MachineVertex({self.label}, " \
+                   f"at{self.get_fixed_location()})"
         else:
             return f"MachineVertex({self.label})"
 
@@ -132,8 +134,8 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """
         return []
 
-    @property
-    def fixed_location(self):
+    @overrides(AbstractVertex.get_fixed_location)
+    def get_fixed_location(self):
         """
         The x, y and possibly p the vertex MUST be placed on.
 

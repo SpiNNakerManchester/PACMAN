@@ -73,8 +73,7 @@ class AbstractVertex(object):
         """
         self._added_to_graph = True
 
-    @property
-    def fixed_location(self):
+    def get_fixed_location(self):
         """
         The x, y and possibly p the vertex MUST be placed on.
 
@@ -86,16 +85,12 @@ class AbstractVertex(object):
         """
         return self._fixed_location
 
-    # Note: overriding the @property hides a setter
-    def set_fixed_location(self, fixed_location):
+    def set_fixed_location(self, x, y, p=None):
         """
 
         :param ChipAndCore fixed_location:
         """
-        if not isinstance(fixed_location, ChipAndCore):
-            raise PacmanInvalidParameterException(
-                "fixed_location", str(ChipAndCore.__class__),
-                "Fixed Location must be ChipAndCore")
+        fixed_location = ChipAndCore(x, y, p)
         if self._fixed_location is not None:
             if fixed_location == self._fixed_location:
                 return

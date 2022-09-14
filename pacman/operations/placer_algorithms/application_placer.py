@@ -279,9 +279,9 @@ def _do_fixed_location(vertices, sdram, placements, machine, next_chip_space):
     y = None
     constrained = False
     for vertex in vertices:
-        if vertex.fixed_location:
-            x = vertex.fixed_location.x
-            y = vertex.fixed_location.y
+        if vertex.get_fixed_location():
+            x = vertex.get_fixed_location().x
+            y = vertex.get_fixed_location().y
             constrained = True
     if constrained:
         chip = machine.get_chip_at(x, y)
@@ -295,8 +295,8 @@ def _do_fixed_location(vertices, sdram, placements, machine, next_chip_space):
         next_cores = iter(cores)
         for vertex in vertices:
             next_core = None
-            if vertex.fixed_location:
-                fixed = vertex.fixed_location
+            if vertex.get_fixed_location():
+                fixed = vertex.get_fixed_location()
                 if fixed.p is not None:
                     if fixed.p not in next_cores:
                         raise PacmanConfigurationException(
