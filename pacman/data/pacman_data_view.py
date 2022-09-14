@@ -50,7 +50,6 @@ class _PacmanDataModel(object):
         "_routing_table_by_partition",
         "_tags",
         "_uncompressed",
-        "_vertices_or_edges_added",
     ]
 
     def __new__(cls):
@@ -69,7 +68,6 @@ class _PacmanDataModel(object):
         self._graph = ApplicationGraph()
         # set at the start of every run
         self._plan_n_timesteps = None
-        self._vertices_or_edges_added = False
         self._hard_reset()
 
     def _hard_reset(self):
@@ -129,9 +127,8 @@ class PacmanDataView(MachineDataView):
         cls.check_valid_simulator()
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
-        cls.check_valid_simulator()
+        cls.set_requires_mapping()
         cls.__pacman_data._graph.add_vertex(vertex)
-        cls.__pacman_data._vertices_or_edges_added = True
 
     @classmethod
     def add_edge(cls, edge, outgoing_edge_partition_name):
@@ -159,8 +156,8 @@ class PacmanDataView(MachineDataView):
         cls.check_valid_simulator()
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
+        cls.set_requires_mapping()
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
-        cls.__pacman_data._vertices_or_edges_added = True
 
     @classmethod
     def iterate_vertices(cls):
@@ -290,19 +287,6 @@ class PacmanDataView(MachineDataView):
             raise cls._exception("graph")
         for app_vertex in cls.__pacman_data._graph.vertices:
             yield from app_vertex.machine_vertices
-
-    @classmethod
-    def get_vertices_or_edges_added(cls):
-        """
-        Detects if any vertex of edge has been added since the last run
-
-        If this methods returns True a hard reset is guranteed to be needed.
-        However as there are other reasons to require a hard reset a
-        False does not imply one is not needed.
-
-        :rtype: bool
-        """
-        return cls.__pacman_data._vertices_or_edges_added
 
     # placements
 
