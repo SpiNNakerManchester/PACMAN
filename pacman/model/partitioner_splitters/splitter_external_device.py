@@ -48,23 +48,22 @@ class SplitterExternalDevice(AbstractSplitterCommon):
 
         if isinstance(app_vertex, ApplicationFPGAVertex):
             # This can have multiple FPGA connections per board
-            if app_vertex.incoming_fpga_connections:
-                for fpga in app_vertex.incoming_fpga_connections:
-                    for i in range(app_vertex.n_machine_vertices_per_link):
-                        label = (
-                            f"Incoming Machine vertex {i} for"
-                            f" {app_vertex.label}"
-                            f":{fpga.fpga_id}:{fpga.fpga_link_id}"
-                            f":{fpga.board_address}:{fpga.chip_coords}")
-                        vertex_slice = app_vertex.get_incoming_slice_for_link(
-                            fpga, i)
-                        vertex = MachineFPGAVertex(
-                            fpga.fpga_id, fpga.fpga_link_id,
-                            fpga.board_address, fpga.chip_coords, label=label,
-                            app_vertex=app_vertex, vertex_slice=vertex_slice,
-                            incoming=True, outgoing=False)
-                        self.__incoming_vertices.append(vertex)
-                        self.__incoming_slices.append(vertex_slice)
+            for fpga in app_vertex.incoming_fpga_connections:
+                for i in range(app_vertex.n_machine_vertices_per_link):
+                    label = (
+                        f"Incoming Machine vertex {i} for"
+                        f" {app_vertex.label}"
+                        f":{fpga.fpga_id}:{fpga.fpga_link_id}"
+                        f":{fpga.board_address}:{fpga.chip_coords}")
+                    vertex_slice = app_vertex.get_incoming_slice_for_link(
+                        fpga, i)
+                    vertex = MachineFPGAVertex(
+                        fpga.fpga_id, fpga.fpga_link_id,
+                        fpga.board_address, fpga.chip_coords, label=label,
+                        app_vertex=app_vertex, vertex_slice=vertex_slice,
+                        incoming=True, outgoing=False)
+                    self.__incoming_vertices.append(vertex)
+                    self.__incoming_slices.append(vertex_slice)
             fpga = app_vertex.outgoing_fpga_connection
             if fpga is not None:
                 label = (
