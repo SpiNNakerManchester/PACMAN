@@ -112,7 +112,6 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
             for conn in self._incoming_fpga_connections:
                 yield from conn.expanded
 
-
     @property
     def outgoing_fpga_connection(self):
         """ The connection to one FPGA via one link to which packets are sent
