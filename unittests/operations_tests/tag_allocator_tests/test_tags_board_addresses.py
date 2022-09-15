@@ -21,7 +21,8 @@ from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanNotFoundError
 from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.resources import ConstantSDRAM, IPtagResource
+from pacman.model.resources import (
+    ConstantSDRAM, IPtagResource, ReverseIPtagResource)
 from pacman.operations.tag_allocator_algorithms import basic_tag_allocator
 
 
@@ -175,3 +176,24 @@ class TestTagsBoardAddresses(unittest.TestCase):
 
     def test_fixed_repeat_tag_3_boards(self):
         self.do_fixed_repeat_tag(virtual_machine(12, 12))
+
+    def do_reverse(self, machine):
+        writer = PacmanDataWriter.mock()
+        writer.set_machine(machine)
+        chip00 = machine.get_chip_at(0, 0)
+        procs = [
+            proc.processor_id for proc in chip00.processors
+            if not proc.is_monitor]
+        placements = Placements()
+        vertex = SimpleMachineVertex(
+            sdram=ConstantSDRAM(0),
+            reverse_iptags=[ReverseIPtagResource(port=10000, tag=1)],
+            label=f"Vertex")
+        placements.add_placement(Placement(vertex, 0, 0, procs[1]))
+        writer.set_placements(placements)
+        writer.set_plan_n_timesteps(1000)
+        tags = basic_tag_allocator()
+        self.assertEqual(1, len(list(tags.reverse_ip_tags)))
+
+    def test_do_reverse_3_boards(self):
+        self.do_reverse(virtual_machine(12, 12))
