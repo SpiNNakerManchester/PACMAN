@@ -46,7 +46,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
             return (
                 f"{type(self).__name__} on {self._governed_app_vertex.label}")
         except AttributeError:
-            return f"{type(self).__name__} no vertex"
+            return f"{type(self).__name__} has no governed_app_vertex"
 
     def __repr__(self):
         return self.__str__()
