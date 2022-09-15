@@ -47,7 +47,7 @@ class RoutingTree(object):
         :param tuple(int,int) chip:
             The chip the route is currently passing through.
         """
-        self.chip = chip
+        self._chip_x, self._chip_y = chip
         self._children = []
         self._label = label
 
@@ -62,10 +62,6 @@ class RoutingTree(object):
         :rtype: tuple(int,int)
         """
         return (self._chip_x, self._chip_y)
-
-    @chip.setter
-    def chip(self, chip):
-        self._chip_x, self._chip_y = chip
 
     @property
     def children(self):
@@ -91,7 +87,7 @@ class RoutingTree(object):
           additional logic may be required to determine what core to target to\
           reach the vertex.
 
-        :rtype: iterable(RoutingTree or MachineVertex)
+        :rtype: iterable(tuple(int, RoutingTree or MachineVertex))
         """
         for child in self._children:
             yield child
@@ -99,14 +95,14 @@ class RoutingTree(object):
     def append_child(self, child):
         """
         :param child:
-        :type child: RoutingTree or MachineVertex
+        :type child: tuple(int, RoutingTree or MachineVertex)
         """
         self._children.append(child)
 
     def remove_child(self, child):
         """
         :param child:
-        :type child: RoutingTree or MachineVertex
+        :type child: tuple(int, RoutingTree or MachineVertex)
         """
         self._children.remove(child)
 
