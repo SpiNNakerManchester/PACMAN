@@ -187,8 +187,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         placements = Placements()
         vertex = SimpleMachineVertex(
             sdram=ConstantSDRAM(0),
-            reverse_iptags=[ReverseIPtagResource(port=10000, tag=1)],
-            label=f"Vertex")
+            reverse_iptags=[ReverseIPtagResource(port=10000, tag=1)])
         placements.add_placement(Placement(vertex, 0, 0, procs[1]))
         writer.set_placements(placements)
         writer.set_plan_n_timesteps(1000)
