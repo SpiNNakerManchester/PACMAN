@@ -28,7 +28,7 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         unittest_setup()
 
     def test_api(self):
-        splitter = SplitterFixedLegacy("foo")
+        splitter = SplitterFixedLegacy()
         self.assertIsNotNone(str(splitter))
         self.assertIsNotNone(repr(splitter))
         v1 = SimpleTestVertex(1, "v1")
