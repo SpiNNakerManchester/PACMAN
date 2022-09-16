@@ -30,6 +30,7 @@ class TestRoutingTre(unittest.TestCase):
         self.assertIsNone(rt1.label)
         self.assertEqual(rt1.chip, (3, 4))
         self.assertTrue(rt1.is_leaf)
+        self.assertIsNotNone(repr(rt1))
         rt1.append_child((1, "m_vertexA"))
         rt1.append_child((2, "m_vertexB"))
         self.assertFalse(rt1.is_leaf)
@@ -47,13 +48,16 @@ class TestRoutingTre(unittest.TestCase):
 
         self.assertListEqual([(2, "m_vertex1"), (1, "m_vertex2"), (3, rt1)],
                              list(rt2.children))
-
+        self.assertIsNotNone(str(rt2))
         rt2.remove_child((1, "m_vertex2"))
         self.assertListEqual([(2, "m_vertex1"), (3, rt1)], list(rt2.children))
         a = list(iter(rt2))
         self.assertListEqual([rt2, "m_vertex1", rt1, "m_vertexA", "m_vertexB"],
                              list(iter(rt2)))
-
+        self.assertListEqual(
+            [(None, (4, 5), {2, 3}), (3, (3, 4), {1, 2})],
+            list(rt2.traverse())
+        )
 
 
 if __name__ == '__main__':
