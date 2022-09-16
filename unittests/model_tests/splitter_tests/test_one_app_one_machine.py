@@ -32,7 +32,7 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
         unittest_setup()
 
     def test_legacy(self):
-        splitter = SplitterOneAppOneMachine("foo")
+        splitter = SplitterOneAppOneMachine()
         v1 = NonLegacyApplicationVertex("v1")
         a = str(splitter)
         self.assertIsNotNone(a)

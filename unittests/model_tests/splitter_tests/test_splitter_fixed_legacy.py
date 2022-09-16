@@ -51,12 +51,12 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         self.assertEqual([], splitter.get_internal_sdram_partitions())
 
     def test_not_api(self):
-        splitter = SplitterFixedLegacy("foo")
+        splitter = SplitterFixedLegacy()
         v1 = NonLegacyApplicationVertex("v1")
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v1)
 
     def test_legacy(self):
-        splitter = SplitterFixedLegacy("foo")
+        splitter = SplitterFixedLegacy()
         v1 = DuckLegacyApplicationVertex("v1")
         splitter.set_governed_app_vertex(v1)
