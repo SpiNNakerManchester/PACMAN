@@ -33,20 +33,15 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
 
     __slots__ = []
 
-    def __init__(self, splitter_name=None):
-        if splitter_name is None:
-            splitter_name = type(self).__name__
-        super().__init__(splitter_name)
-
-    def __repr__(self):
-        return self.__str__()
+    def __init__(self):
+        super().__init__()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         if not isinstance(app_vertex, AbstractOneAppOneMachineVertex):
             raise PacmanConfigurationException(
                 self.NOT_SUITABLE_VERTEX_ERROR.format(
-                    app_vertex.label, self._splitter_name))
+                    app_vertex.label, type(self).__name__))
         super().set_governed_app_vertex(app_vertex)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
