@@ -51,7 +51,6 @@ class TestRoutingTre(unittest.TestCase):
         self.assertIsNotNone(str(rt2))
         rt2.remove_child((1, "m_vertex2"))
         self.assertListEqual([(2, "m_vertex1"), (3, rt1)], list(rt2.children))
-        a = list(iter(rt2))
         self.assertListEqual([rt2, "m_vertex1", rt1, "m_vertexA", "m_vertexB"],
                              list(iter(rt2)))
         self.assertListEqual(
