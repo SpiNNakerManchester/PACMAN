@@ -60,7 +60,7 @@ def params(request):
 class TestSplitter(AbstractSplitterCommon):
 
     def __init__(self, n_machine_vertices):
-        AbstractSplitterCommon.__init__(self)
+        super().__init__()
         self.__n_machine_vertices = n_machine_vertices
 
     def create_machine_vertices(self, chip_counter):
@@ -96,7 +96,7 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
     def __init__(self, n_incoming_machine_vertices,
                  n_outgoing_machine_vertices, n_groups,
                  internal_multicast=False):
-        AbstractSplitterCommon.__init__(self)
+        super().__init__()
         self.__n_incoming_machine_vertices = n_incoming_machine_vertices
         self.__n_outgoing_machine_vertices = n_outgoing_machine_vertices
         self.__n_groups = n_groups
@@ -183,7 +183,7 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
 class TestOneToOneSplitter(AbstractSplitterCommon):
 
     def __init__(self, n_machine_vertices):
-        AbstractSplitterCommon.__init__(self)
+        super().__init__()
         self.__n_machine_vertices = n_machine_vertices
 
     def create_machine_vertices(self, chip_counter):

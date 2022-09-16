@@ -33,16 +33,10 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         "_sdram"]
 
     def __init__(self):
-        super().__init__(type(self).__name__)
+        super().__init__()
         self._machine_vertex = None
         self._vertex_slice = None
         self._sdram = None
-
-    def __str__(self):
-        return f"SplitterOneToOneLegacy for {self._governed_app_vertex}"
-
-    def __repr__(self):
-        return self.__str__()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):

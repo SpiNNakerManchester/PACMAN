@@ -29,12 +29,8 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
 
     __slots__ = ["__slices"]
 
-    SPLITTER_NAME = "SplitterFixedLegacy"
-
     def __init__(self, splitter_name=None):
-        if splitter_name is None:
-            splitter_name = self.SPLITTER_NAME
-        super().__init__(splitter_name)
+        super().__init__()
         self.__slices = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
