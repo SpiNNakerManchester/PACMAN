@@ -13,14 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .duck_legacy_app_vertex import DuckLegacyApplicationVertex
 from .non_legacy_app_vertex import NonLegacyApplicationVertex
 from .placer_test_support import get_resourced_machine_vertex
 from .simple_test_edge import SimpleTestEdge
 from .simple_test_vertex import SimpleTestVertex
 
 __all__ = [
-    "DuckLegacyApplicationVertex",
     "get_resourced_machine_vertex",
     "NonLegacyApplicationVertex",
     "SimpleTestEdge",

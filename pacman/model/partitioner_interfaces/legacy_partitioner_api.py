@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+    AbstractBase, abstractmethod)
 
 
 # Can't use this decorator: circular import problem
@@ -50,14 +50,6 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
             iterable(~pacman.model.constraints.AbstractConstraint)
         :return: The created machine vertex
         :rtype: ~pacman.model.graphs.machine.MachineVertex
-        """
-
-    @abstractproperty
-    def n_atoms(self):
-        """ The number of atoms in the vertex
-
-        :return: The number of atoms
-        :rtype: int
         """
 
     @staticmethod
