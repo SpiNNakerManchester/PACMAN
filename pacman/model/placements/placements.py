@@ -156,7 +156,7 @@ class Placements(object):
         """
         return self._placements[x, y].values()
 
-    def iterate_placements_with_vertex_type(self, x, y, vertex_type):
+    def iterate_placements_by_xy_and_type(self, x, y, vertex_type):
         """
         Iterate over placements with this x, y and this type
 
