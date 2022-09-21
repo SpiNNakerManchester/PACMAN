@@ -17,8 +17,7 @@ import unittest
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
-from pacman_test_objects import (
-    DuckLegacyApplicationVertex, NonLegacyApplicationVertex, SimpleTestVertex)
+from pacman_test_objects import (NonLegacyApplicationVertex, SimpleTestVertex)
 
 
 class TestSplitterFixedLegacy(unittest.TestCase):
@@ -44,8 +43,3 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         v1 = NonLegacyApplicationVertex("v1")
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v1)
-
-    def test_legacy(self):
-        splitter = SplitterFixedLegacy()
-        v1 = DuckLegacyApplicationVertex("v1")
-        splitter.set_governed_app_vertex(v1)
