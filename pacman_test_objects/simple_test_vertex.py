@@ -57,6 +57,6 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
         return SimpleMachineVertex(sdram, label, self, vertex_slice)
 
     @property
-    @overrides(LegacyPartitionerAPI.n_atoms)
+    @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
         return self._n_atoms
