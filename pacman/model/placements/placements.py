@@ -158,7 +158,7 @@ class Placements(object):
 
     def iterate_placements_by_xy_and_type(self, x, y, vertex_type):
         """
-        Iterate over placements with this x, y and this type
+        Iterate over placements with this x, y and this vertex_type
 
         :param int x: x coordinate to find placements for.
         :param int y: y coordinate  to find placements for.
@@ -166,6 +166,17 @@ class Placements(object):
         :rtype: Placement
         """
         for placement in self._placements[x, y].values():
+            if isinstance(placement.vertex, vertex_type):
+                yield placement
+
+    def iterate_placements_by_vertex_type(self, vertex_type):
+        """
+        Iterate over placements on any chip with this vertex_type
+
+        :param class vertex_type: Class of vertex to find
+        :rtype: Placement
+        """
+        for placement in self._machine_vertices.values():
             if isinstance(placement.vertex, vertex_type):
                 yield placement
 
