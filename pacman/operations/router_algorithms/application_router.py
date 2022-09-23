@@ -234,24 +234,12 @@ def _route_source_to_target(
         The routes made by chip (updated here)
 
     """
-    # Find all coordinates for chips (xy) that are in the target
-    target_xys = _get_all_xys(target)
-
-    # Pick one to actually use as a target
-    target_xy, overlaps = _find_target_xy(
-        target_xys, routes, source_mappings)
-
-    # Make a route between source and target, without any source
-    # or target chips in it
-    source_edge_xy, target_edge_xy = _route_pre_to_post(
-        source_xy, target_xy, routes, machine,
-        f"Source to Target ({target.label})", all_source_xys,
-        target_xys)
-
-    # Add all the targets for the route
+    # Get which vertices are targetted by the source
     target_vertices = \
         target.splitter.get_source_specific_in_coming_vertices(
             source, partition.identifier)
+
+    # Add all the targets for the route
     real_target_xys = set()
     for tgt, srcs in target_vertices:
         xy, (_vertex, core, link) = vertex_xy_and_route(tgt)
@@ -263,6 +251,27 @@ def _route_source_to_target(
                 core, link, srcs, partition.identifier)
 
         real_target_xys.add(xy)
+
+    # If there is just one real target, use that directly
+    if len(real_target_xys) == 1:
+        target_xys = [xy]
+        target_xy = xy
+        overlaps = None
+    else:
+
+        # Find all coordinates for chips (xy) that are in the target
+        target_xys = _get_all_xys(target)
+
+        # Pick one to actually use as a target
+        target_xy, overlaps = _find_target_xy(
+            target_xys, routes, source_mappings)
+
+    # Make a route between source and target, without any source
+    # or target chips in it
+    source_edge_xy, target_edge_xy = _route_pre_to_post(
+        source_xy, target_xy, routes, machine,
+        f"Source to Target ({target.label})", all_source_xys,
+        target_xys)
 
     if not overlaps:
         _route_single_source_to_target(
