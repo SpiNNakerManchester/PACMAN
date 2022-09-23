@@ -486,18 +486,18 @@ def _make_source_to_source_edge_routes(
 
 
 def _find_target_xy(target_xys, routes, source_mappings):
-    """
+    """ Find a target chip to use from the set of target chips
 
-    :param set(tuple(int, int)) target_xys:
-    :param routes:
-    :param dict(tuple(int, int), list) outgoing_mappings:
+    :param set(tuple(int, int)) target_xys: The chips in the target
+    :param dict(tuple(int,int),RoutingTree) routes: The routes in existence
+    :param source_mappings: The sources mapped to their routes
+    :type source_mappings: dict(tuple(int, int),
+        list(tuple(MachineVertex, int,  None) or
+        tuple(MachineVertex, None, int)))
     :return: A chip to use as a target, and the set of overlapping chips
     :rtype: tuple(int, int), (set(tuple(x, y)) or None)
     """
-    overlaps = set()
-    for xy in target_xys:
-        if xy in source_mappings:
-            overlaps.add(xy)
+    overlaps = target_xys.intersection(source_mappings)
 
     if overlaps:
         target_chip = next(iter(overlaps))
