@@ -227,7 +227,7 @@ def _route_source_to_target(
         Set of chips that routes are currently going outward from the source
         (updated here)
     :param ApplicationVertex target: The target application vertex
-    :param Targets targets:
+    :param dict(tuple(int,int),_Targets) targets:
         The set of actual targets to be added on chips (updated here)
     :param OutgoingEdgePartition partition: The partition being routed
     :param dict(tuple(int,int), RoutingTree) routes:
@@ -351,7 +351,7 @@ def _route_source_to_source(source, partition, targets, self_xys):
 
     :param ApplicationVertex source: The source vertex to route
     :param OutgoingEdgePartition partition: The partition being routed
-    :param Targets targets: Actual targets on the chips
+    :param dict(tuple(int,int),_Targets) targets: Actual targets on the chips
     :param set(tuple(int,int)) self_xys:
         The coordinates of chips that are targets
     """
@@ -369,7 +369,7 @@ def _route_internal(internal, targets, self_xys):
     """ Route internal multicast edges
 
     :param list(MulticastEdgePartition) internal: A list of partitions to route
-    :param Targets targets: Actual things to target
+    :param dict(tuple(int,int),_Targets) targets: Actual things to target
     :param set(tuple(int,int)) self_xys: Chips to target
     """
     for in_part in internal:
@@ -395,7 +395,8 @@ def _make_source_to_target_routes(
     :type source_mappings: dict(tuple(int, int),
         list(tuple(MachineVertex, int,  None) or
         tuple(MachineVertex, None, int)))
-    :param Targets targets: The actual targets to hit on each chip
+    :param dict(tuple(int,int),_Targets) targets:
+        The actual targets to hit on each chip
     :param MulticastRoutingTableByPartition routing_tables: The tables to write
     :param dict(tuple(int,int),RoutingTree) routes: The routes to convert
     """
@@ -431,7 +432,8 @@ def _make_source_to_source_routes(
     :param Machine machine: The machine to route on
     :param OutgoingEdgePartition partition: The partition to route
     :param MulticastRoutingTableByPartition routing_tables: The tables to write
-    :param Targets targets: The target end-points of the routes
+    :param dict(tuple(int,int),_Targets) targets:
+        The target end-points of the routes
     """
     for xy in source_mappings:
         source_routes = dict()
@@ -562,10 +564,14 @@ def _route_to_xys(first_xy, all_xys, machine, routes, targets, label):
             continue
         visited.add(xy)
 
+        # If we have reached a xy that has already been routed to,
+        # cut the path off here
+        if xy in routes:
+            path = list()
+
         # If we have reached a target, add the path to the routes
-        if xy in targets:
-            if xy not in routes:
-                routes[xy] = RoutingTree(xy, label)
+        elif xy in targets:
+            routes[xy] = RoutingTree(xy, label)
             last_route = routes[xy]
             for parent, link in reversed(path):
                 if parent not in routes:
@@ -574,11 +580,6 @@ def _route_to_xys(first_xy, all_xys, machine, routes, targets, label):
                 last_route = routes[parent]
 
             # The path can be reset from here as we have already routed here
-            path = list()
-
-        # If we have reached a xy that has already been routed to,
-        # cut the path off here
-        elif xy in routes:
             path = list()
 
         for link in range(6):
