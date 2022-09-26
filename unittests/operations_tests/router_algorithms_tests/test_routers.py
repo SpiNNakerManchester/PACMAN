@@ -222,6 +222,58 @@ class TestOneToOneSplitter(AbstractSplitterCommon):
                 self._governed_app_vertex.machine_vertices)]
 
 
+class TestNearestEthernetSplitter(AbstractSplitterCommon):
+
+    def __init__(self):
+        super().__init__()
+        self.__placements = Placements()
+        self.__m_vertex_by_ethernet = dict()
+
+    def create_machine_vertices(self, chip_counter):
+        machine = PacmanDataView.get_machine()
+        for chip in machine.ethernet_connected_chips:
+            m_vertex = SimpleMachineVertex(
+                ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
+                label=f"{self._governed_app_vertex.label}_{chip.x}_{chip.y}")
+            self._governed_app_vertex.remember_machine_vertex(m_vertex)
+            self.__placements.add_placement(
+                Placement(m_vertex, chip.x, chip.y, 1))
+            self.__m_vertex_by_ethernet[chip.x, chip.y] = m_vertex
+
+    def get_out_going_slices(self):
+        return None
+
+    def get_in_coming_slices(self):
+        return None
+
+    def get_out_going_vertices(self, partition_id):
+        return self._governed_app_vertex.machine_vertices
+
+    def get_in_coming_vertices(self, partition_id):
+        return self._governed_app_vertex.machine_vertices
+
+    def machine_vertices_for_recording(self, variable_to_record):
+        return []
+
+    def reset_called(self):
+        pass
+
+    def get_source_specific_in_coming_vertices(
+            self, source_vertex, partition_id):
+
+        m_vertex = next(iter(source_vertex.splitter.get_out_going_vertices(
+            partition_id)))
+        x, y = vertex_xy(m_vertex)
+        chip = PacmanDataView.get_chip_at(x, y)
+        target_m_vertex = self.__m_vertex_by_ethernet[
+            chip.nearest_ethernet_x, chip.nearest_ethernet_y]
+        return [(target_m_vertex, [source_vertex])]
+
+    @property
+    def placements(self):
+        return self.__placements
+
+
 class TestAppVertex(ApplicationVertex):
     def __init__(self, n_atoms, label):
         super(TestAppVertex, self).__init__(label)
@@ -243,6 +295,14 @@ def _make_vertices(writer, n_atoms, n_machine_vertices, label):
 def _make_one_to_one_vertices(writer, n_atoms, n_machine_vertices, label):
     vertex = TestAppVertex(n_atoms, label)
     vertex.splitter = TestOneToOneSplitter(n_machine_vertices)
+    writer.add_vertex(vertex)
+    vertex.splitter.create_machine_vertices(None)
+    return vertex
+
+
+def _make_ethernet_vertices(writer, n_atoms, label):
+    vertex = TestAppVertex(n_atoms, label)
+    vertex.splitter = TestNearestEthernetSplitter()
     writer.add_vertex(vertex)
     vertex.splitter.create_machine_vertices(None)
     return vertex
@@ -650,6 +710,26 @@ def test_odd_case(params):
         x, y, p = next(core_iter)
         placements.add_placement(Placement(m_vertex, x, y, p))
 
+    writer.set_placements(placements)
+    routing_tables = _route_and_time(algorithm)
+    _check_edges(routing_tables)
+
+
+def test_with_ethernet_system_placements(params):
+    # This is a test of LPG-style functionality, where an application vertex
+    # is placed on multiple ethernet chips, but the source is only connected
+    # to one of them
+    algorithm, _n_vertices, _n_m_vertices = params
+    unittest_setup()
+    writer = PacmanDataWriter.mock()
+    writer.set_machine(virtual_machine(16, 16))
+    source_vertex = _make_vertices(writer, 200, 3, "app_vertex")
+    target_vertex = _make_ethernet_vertices(writer, 1, "eth_vertex")
+    writer.add_edge(ApplicationEdge(source_vertex, target_vertex), "Test")
+    placements = target_vertex.splitter.placements
+    chips_to_use = [(7, 8), (7, 7), (8, 7)]
+    for m_vertex, chip in zip(source_vertex.machine_vertices, chips_to_use):
+        placements.add_placement(Placement(m_vertex, chip[0], chip[1], 2))
     writer.set_placements(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
