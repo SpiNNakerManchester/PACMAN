@@ -81,23 +81,6 @@ class Placements(object):
         self._placements[x, y][p] = placement
         self._machine_vertices[placement.vertex] = placement
 
-    def get_vertex_on_processor(self, x, y, p):
-        """ Return the vertex on a specific processor or raises an exception
-            if the processor has not been allocated
-
-        :param int x: the x coordinate of the chip
-        :param int y: the y coordinate of the chip
-        :param int p: the processor on the chip
-        :return: the vertex placed on the given processor
-        :rtype: MachineVertex
-        :raise PacmanProcessorNotOccupiedError:
-            If the processor is not occupied
-        """
-        try:
-            return self._placements[x, y][p].vertex
-        except KeyError as e:
-            raise PacmanProcessorNotOccupiedError((x, y, p)) from e
-
     def get_placement_on_processor(self, x, y, p):
         """ Return the placement on a specific processor or raises an exception
             if the processor has not been allocated
