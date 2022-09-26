@@ -369,7 +369,7 @@ class PacmanDataView(MachineDataView):
             raise PacmanNotPlacedError(vertex) from e
 
     @classmethod
-    def get_vertex_on_processor(cls, x, y, p):
+    def get_placement_on_processor(cls, x, y, p):
         """ Return the vertex on a specific processor or raises an exception
             if the processor has not been allocated
 
@@ -385,7 +385,8 @@ class PacmanDataView(MachineDataView):
         """
         if cls.__pacman_data._placements is None:
             raise cls._exception("placements")
-        return cls.__pacman_data._placements.get_vertex_on_processor(x, y, p)
+        return cls.__pacman_data._placements.get_placement_on_processor(
+            x, y, p)
 
     # routing_infos
 
