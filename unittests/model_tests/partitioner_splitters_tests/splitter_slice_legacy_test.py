@@ -23,7 +23,7 @@ from pacman_test_objects import (
 
 
 class TestSplitterFixedLegacy(unittest.TestCase):
-    """ Tester for pacman.model.constraints.placer_constraints
+    """ Tester for SplitterFixedLegacy
     """
 
     def setUp(self):

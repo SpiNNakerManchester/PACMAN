@@ -32,8 +32,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
 
     def __init__(
             self, n_atoms, spinnaker_link_id, board_address=None, label=None,
-            constraints=None, n_machine_vertices=1,
-            incoming=True, outgoing=True):
+            n_machine_vertices=1, incoming=True, outgoing=True):
         """
         :param int n_atoms: The number of atoms in the vertex
         :param int spinnaker_link_id:
@@ -42,10 +41,8 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
             The optional IP address of the board to which the device is
             connected e.g. in a multi-board system
         :param str label: The optional name of the vertex.
-        :param iterable(AbstractConstraint) constraints:
-            The optional initial constraints of the vertex.
         """
-        super().__init__(label=label, constraints=constraints)
+        super().__init__(label=label)
         self._n_atoms = self.round_n_atoms(n_atoms)
         self._spinnaker_link_id = spinnaker_link_id
         self._board_address = board_address

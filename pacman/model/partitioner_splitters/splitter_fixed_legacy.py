@@ -75,7 +75,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
             chip_counter.add_core(sdram)
             label = f"MachineVertex for {vertex_slice} of {app_vertex.label}"
             machine_vertex = app_vertex.create_machine_vertex(
-                vertex_slice, sdram, label, app_vertex.constraints)
+                vertex_slice, sdram, label)
             app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.reset_called)

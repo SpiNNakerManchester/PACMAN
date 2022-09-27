@@ -15,26 +15,25 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
+from pacman.model.graphs.common import ChipAndCore
 
 
 class TestPlacementConstraints(unittest.TestCase):
-    """ Tester for pacman.model.constraints.placer_constraints
+    """ Tester for ChipAndCore
     """
 
     def setUp(self):
         unittest_setup()
 
     def test_chip_and_core_constraint(self):
-        c1 = ChipAndCoreConstraint(1, 2)
+        c1 = ChipAndCore(1, 2)
         self.assertEqual(c1.x, 1)
         self.assertEqual(c1.y, 2)
         self.assertEqual(c1.p, None)
-        self.assertEqual(c1.location, {"x": 1, "y": 2, "p": None})
-        self.assertEqual(c1, ChipAndCoreConstraint(1, 2))
-        self.assertEqual(str(c1), 'ChipAndCoreConstraint(x=1, y=2, p=None)')
-        c2 = ChipAndCoreConstraint(2, 1)
-        c3 = ChipAndCoreConstraint(1, 2, 3)
+        self.assertEqual(c1, ChipAndCore(1, 2))
+        self.assertEqual(str(c1), 'X:1,Y2')
+        c2 = ChipAndCore(2, 1)
+        c3 = ChipAndCore(1, 2, 3)
         self.assertNotEqual(c1, c2)
         self.assertNotEqual(c1, c3)
         self.assertNotEqual(c1, "1.2.3.4")
