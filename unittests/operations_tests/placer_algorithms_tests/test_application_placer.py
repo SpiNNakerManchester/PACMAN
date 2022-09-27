@@ -17,8 +17,6 @@ import unittest
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.constraints.placer_constraints\
-    .chip_and_core_constraint import ChipAndCoreConstraint
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
@@ -98,7 +96,7 @@ def test_application_placer():
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
     fixed.splitter = SplitterFixedLegacy()
-    fixed.add_constraint(ChipAndCoreConstraint(0, 0))
+    fixed.set_fixed_location(0, 0)
     writer.add_vertex(fixed)
     fixed.splitter.create_machine_vertices(ChipCounter())
     for i in range(56):
@@ -115,7 +113,7 @@ def test_application_placer_late_fixed():
     # fixed later should work too
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
     fixed.splitter = SplitterFixedLegacy()
-    fixed.add_constraint(ChipAndCoreConstraint(0, 0))
+    fixed.set_fixed_location(0, 0)
     writer.add_vertex(fixed)
     fixed.splitter.create_machine_vertices(ChipCounter())
 

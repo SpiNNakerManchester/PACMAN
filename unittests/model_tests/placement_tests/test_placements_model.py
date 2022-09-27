@@ -110,7 +110,7 @@ class TestPlacements(unittest.TestCase):
         with self.assertRaises(PacmanProcessorAlreadyOccupiedError):
             pls.add_placement(pl2)
         with self.assertRaises(PacmanProcessorNotOccupiedError):
-            pls.get_vertex_on_processor(0, 0, 2)
+            pls.get_placement_on_processor(0, 0, 2)
         with self.assertRaises(PacmanProcessorNotOccupiedError):
             pls.get_placement_on_processor(1, 1, 2)
         with self.assertRaises(PacmanNotPlacedError):

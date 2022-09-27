@@ -188,7 +188,7 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_placement_of_vertex(None)
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_vertex_on_processor(None, None, None)
+            PacmanDataView.get_placement_on_processor(None, None, None)
 
     def test_placements(self):
         writer = PacmanDataWriter.setup()
@@ -203,7 +203,8 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(3, PacmanDataView.get_n_placements())
         on12 = list(PacmanDataView.iterate_placements_on_core(1, 2))
         self.assertEqual(on12, [p1, p2])
-        self.assertEqual(v2, PacmanDataView.get_vertex_on_processor(1, 2, 5))
+        vertex = PacmanDataView.get_placement_on_processor(1, 2, 5).vertex
+        self.assertEqual(v2, vertex )
         with self.assertRaises(PacmanNotPlacedError):
             PacmanDataView.get_placement_of_vertex(SimpleMachineVertex(None))
 
