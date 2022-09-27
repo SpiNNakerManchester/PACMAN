@@ -204,7 +204,7 @@ class TestSimulatorData(unittest.TestCase):
         on12 = list(PacmanDataView.iterate_placements_on_core(1, 2))
         self.assertEqual(on12, [p1, p2])
         vertex = PacmanDataView.get_placement_on_processor(1, 2, 5).vertex
-        self.assertEqual(v2, vertex )
+        self.assertEqual(v2, vertex)
         with self.assertRaises(PacmanNotPlacedError):
             PacmanDataView.get_placement_of_vertex(SimpleMachineVertex(None))
 
