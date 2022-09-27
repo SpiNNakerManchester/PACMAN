@@ -41,7 +41,7 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
             splitter.set_governed_app_vertex(v1)
         mv = SimpleMachineVertex(ConstantSDRAM(10), vertex_slice=Slice(0, 5))
         v2 = AbstractOneAppOneMachineVertex(
-            machine_vertex=mv, label="v1", constraints=None)
+            machine_vertex=mv, label="v1")
         splitter.set_governed_app_vertex(v2)
         a = str(splitter)
         self.assertIsNotNone(a)

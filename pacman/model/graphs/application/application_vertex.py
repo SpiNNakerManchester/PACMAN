@@ -49,12 +49,9 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         "The splitter object on {} has already been set, it cannot be "
         "reset. Please fix and try again. ")
 
-    def __init__(self, label=None, constraints=None,
-                 max_atoms_per_core=None, splitter=None):
+    def __init__(self, label=None, max_atoms_per_core=None, splitter=None):
         """
         :param str label: The optional name of the vertex.
-        :param iterable(AbstractConstraint) constraints:
-            The optional initial constraints of the vertex.
         :param max_atoms_per_core: The max number of atoms that can be
             placed on a core for each dimension, used in partitioning.
             If the vertex is n-dimensional, with n > 1, the value must be a
@@ -65,12 +62,10 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             Leave as None to delegate the choice of splitter to the selector.
         :type splitter: None or
             ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
-        :raise PacmanInvalidParameterException:
-            If one of the constraints is not valid
         """
         # Need to set to None temporarily as add_constraint checks splitter
         self._splitter = None
-        super().__init__(label, constraints)
+        super().__init__(label)
         self._machine_vertices = OrderedSet()
         # Use setter as there is extra work to do
         self.splitter = splitter
@@ -83,8 +78,11 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         return self.label
 
     def __repr__(self):
-        return "ApplicationVertex(label={}, constraints={}".format(
-            self.label, self.constraints)
+        if self.get_fixed_location():
+            return f"ApplicationVertex({self.label}," \
+                   f" at{self.get_fixed_location()})"
+        else:
+            return f"ApplicationVertex({self.label})"
 
     @property
     def splitter(self):

@@ -21,6 +21,7 @@ from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
 from .abstract_supports_sdram_edges import AbstractSupportsSDRAMEdges
 
+
 __all__ = [
     "AbstractEdge", "AbstractEdgePartition",
     "AbstractMultiplePartition", "AbstractSingleSourcePartition",

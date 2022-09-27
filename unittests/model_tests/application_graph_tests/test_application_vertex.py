@@ -18,11 +18,10 @@ import unittest
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
-from pacman.model.graphs.common import Slice
+from pacman.model.graphs.common import Slice, ChipAndCore
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman_test_objects import SimpleTestVertex
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 
 
 class MockSplitter(SplitterFixedLegacy):
@@ -58,54 +57,19 @@ class TestApplicationGraphModel(unittest.TestCase):
         pieces = vert.label.split(" ")
         self.assertIn(pieces[0], "Population n")
 
-    def test_create_new_vertex_with_constraint_list(self):
+    def test_create_new_vertex_add_fixed(self):
         """
-        test initialisation of a vertex with a max size constraint
+        test that creating a vertex and then adding fixed_locations
         """
-        constraint = ChipAndCoreConstraint(0, 0, 1)
         vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
-        vert.add_constraint(constraint)
-        self.assertEqual(vert.n_atoms, 10)
-        self.assertEqual(vert.label, "New AbstractConstrainedVertex")
-        self.assertIsNotNone(repr(vert))
-        assert constraint in vert.constraints
-        with self.assertRaises(PacmanInvalidParameterException):
-            vert.add_constraint(None)
-        with self.assertRaises(PacmanInvalidParameterException):
-            vert.add_constraint("Bacon")
+        self.assertIsNone(vert.get_fixed_location())
+        vert.set_fixed_location(0, 0, 1)
+        self.assertEqual(vert.get_fixed_location(), ChipAndCore(0, 0, 1))
+        with self.assertRaises(PacmanConfigurationException):
+            vert.set_fixed_location(0, 0)
+        vert.set_fixed_location(0, 0, 1)
 
-    def test_create_new_vertex_add_constraints(self):
-        """
-        test that creating a vertex and then adding constraints in a list
-        """
-        constraint1 = ChipAndCoreConstraint(0, 0, 1)
-        # Ignore that these two dont make sense together
-        constraint2 = ChipAndCoreConstraint(0, 0, 2)
-        constr = list()
-        constr.append(constraint1)
-        constr.append(constraint2)
-        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
-        vert.add_constraints(constr)
-        self.assertEqual(vert.n_atoms, 10)
-        self.assertEqual(vert.label, "New AbstractConstrainedVertex")
-        self.assertEqual(len(vert.constraints), 2)
-        for constraint in constr:
-            self.assertIn(constraint, vert.constraints)
-
-    def test_create_vertex_from_vertex_with_previous_constraints(self):
-        """
-        test the create vertex command given by the
-        vertex actually works and generates a vertex
-        with the same constraints mapped over
-        """
-        constraint1 = ChipAndCoreConstraint(0, 0, 1)
-        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
-        subv_from_vert = vert.create_machine_vertex(
-            Slice(0, 9),
-            vert.get_sdram_used_by_atoms(Slice(0, 9)))
-        self.assertNotIn(constraint1, subv_from_vert.constraints)
-
-    def test_new_create_vertex_from_vertex_no_constraints(self):
+    def test_new_create_vertex_from_vertex_no_fixed(self):
         """
         test the creating of a vertex by the
         create vertex method will actually create a vertex of the
@@ -127,26 +91,6 @@ class TestApplicationGraphModel(unittest.TestCase):
         sdram = vert.get_sdram_used_by_atoms(Slice(0, 9))
         subv_from_vert = vert.create_machine_vertex(Slice(0, 9), sdram, "")
         self.assertEqual(subv_from_vert.sdram_required, sdram)
-
-    def test_create_new_vertex_from_vertex_with_additional_constraints(
-            self):
-        """
-        test that a vertex created from a vertex with
-        constraints can have more constraints added to it.
-        """
-        constraint1 = ChipAndCoreConstraint(0, 0, 1)
-        # Ignore that these two dont make sense together
-        constraint2 = ChipAndCoreConstraint(0, 0, 2)
-        vert = SimpleTestVertex(10, "New AbstractConstrainedVertex", 256)
-        vert.add_constraint(constraint1)
-        subv_from_vert = vert.create_machine_vertex(
-            Slice(0, 9),
-            vert.get_sdram_used_by_atoms(Slice(0, 9)), "",
-            [constraint2])
-        subv_from_vert.add_constraint(constraint1)
-        self.assertEqual(len(subv_from_vert.constraints), 2)
-        self.assertIn(constraint1, subv_from_vert.constraints)
-        self.assertIn(constraint2, subv_from_vert.constraints)
 
     def test_round_n_atoms(self):
         # .1 is not exact in floating point

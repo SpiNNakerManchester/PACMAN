@@ -34,28 +34,6 @@
             * Vertices in the Machine Graph must be able to fit on a single\
               chip of the machine in terms of resource usage.
 
-            * A Vertex can have a number of constraints which must be\
-              respected by any algorithm which uses the graph.  Algorithms\
-              must check that they can support the given constraints and must\
-              fail if they cannot.  Provided constraints include support for:
-
-                  * The maximum number of atoms which any Machine Graph Vertex\
-                    can contain for a given Application Graph vertex
-
-                  * The chip and/or processor on to which a Machine Graph\
-                    Vertex should be placed.
-
-                  * A set of Application Graph Vertices whose corresponding\
-                    Machine Graph vertices should contain the same number of\
-                    atoms.
-
-                  * A set of Application Graph Vertices whose corresponding\
-                    Machine Graph vertices should be placed on the same chip\
-                    if they contain the same atom.
-
-            * It should be possible to create new constraints as the need\
-              arises.
-
             * Multiple edges can exist between the same two vertices.
 
             * It must be possible to build the Machine Graph directly without\
@@ -98,20 +76,13 @@
               algorithms or provide one, although a default should be provided\
               in the absence of such a choice .
 
-            * Any partitioning constraints should be met; if there are any\
+            * Any fixed_location should be met; if there are any\
               that cannot, or that are not understood by the algorithm in use\
-              an exception should be thrown.  Non-partitioning constraints can\
-              be ignored, although these can be used if it makes sense for\
-              the given algorithm.
+              an exception should be thrown.
 
             * It must be possible to create at least one grouping of the\
               generated Vertices so that each group fits within the\
               resources provided by a single chip on the machine.
-
-            * It should not be assumed that a given grouping of Vertices\
-              will be the final grouping on the machine, although it is\
-              acceptable to make hints through additional constraints about\
-              what is likely to work.
 
             * The machine itself must not be altered by the partitioning, so\
               that it can be used in further processing.
@@ -142,11 +113,8 @@
               algorithms or provide one, although a default should be provided\
               in the absence of such a choice.
 
-            * Any placement constraints should be met; if there are any that\
-              cannot, or that are not understood by placement algorithm, an\
-              exception should be thrown.  Non-placement constraints can be\
-              ignored, although these can be used if it makes sense for the\
-              given algorithm.
+            * Any fixed_location should be met; if not an\
+              exception should be thrown.
 
             * The machine itself should not be altered by placement so that\
               it can be used in further processing.
