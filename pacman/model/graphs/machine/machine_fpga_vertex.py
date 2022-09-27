@@ -34,12 +34,11 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
 
     def __init__(
             self, fpga_id, fpga_link_id, board_address=None,
-            linked_chip_coordinates=None, label=None, constraints=None,
+            linked_chip_coordinates=None, label=None,
             app_vertex=None, vertex_slice=None, outgoing_keys_and_masks=None,
             incoming=True, outgoing=False):
         super().__init__(
-            label=label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=vertex_slice)
+            label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
 
         self._fpga_id = fpga_id
         self._fpga_link_id = fpga_link_id

@@ -30,10 +30,10 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
     _model_based_max_atoms_per_core = None
 
     def __init__(self, n_atoms, label="testVertex", max_atoms_per_core=256,
-                 constraints=None, fixed_sdram_value=None, splitter=None):
+                 fixed_sdram_value=None, splitter=None):
         super().__init__(
             label=label, max_atoms_per_core=max_atoms_per_core,
-            constraints=constraints, splitter=splitter)
+            splitter=splitter)
         self._model_based_max_atoms_per_core = max_atoms_per_core
         self._n_atoms = self.round_n_atoms(n_atoms, "test_param")
         self._fixed_sdram_value = fixed_sdram_value
@@ -53,11 +53,8 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
         return self._fixed_sdram_value
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
-    def create_machine_vertex(
-            self, vertex_slice, sdram, label=None,
-            constraints=None):
-        return SimpleMachineVertex(
-            sdram, label, constraints, self, vertex_slice)
+    def create_machine_vertex(self, vertex_slice, sdram, label=None):
+        return SimpleMachineVertex(sdram, label, self, vertex_slice)
 
     @property
     @overrides(ApplicationVertex.n_atoms)

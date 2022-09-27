@@ -24,19 +24,15 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
         # A pointer to the machine vertex set at init time
         "_machine_vertex"]
 
-    def __init__(self, machine_vertex, label, constraints, n_atoms=1):
+    def __init__(self, machine_vertex, label, n_atoms=1):
         """
         Creates an ApplicationVertex which has exactly one predefined \
         MachineVertex
 
         :param machine_vertex: MachineVertex
         :param str label: The optional name of the vertex.
-        :param iterable(AbstractConstraint) constraints:
-            The optional initial constraints of the vertex.
-        :raise PacmanInvalidParameterException:
-            If one of the constraints is not valid
         """
-        super().__init__(label, constraints, n_atoms)
+        super().__init__(label, n_atoms)
         self._machine_vertex = machine_vertex
         super().remember_machine_vertex(machine_vertex)
 

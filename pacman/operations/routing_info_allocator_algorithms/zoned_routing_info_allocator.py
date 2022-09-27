@@ -416,9 +416,6 @@ def flexible_allocate(extra_allocations):
         dict((ApplicationVertex, str), BaseKeyAndMask))
     :raise PacmanRouteInfoAllocationException:
     """
-    # check that this algorithm supports the constraints put onto the
-    # partitions
-
     allocator = ZonedRoutingInfoAllocator()
 
     return allocator(extra_allocations, True)
@@ -434,9 +431,6 @@ def global_allocate(extra_allocations):
         dict((ApplicationVertex, str), BaseKeyAndMask))
     :raise PacmanRouteInfoAllocationException:
     """
-    # check that this algorithm supports the constraints put onto the
-    # partitions
-
     allocator = ZonedRoutingInfoAllocator()
 
     return allocator(extra_allocations, False)

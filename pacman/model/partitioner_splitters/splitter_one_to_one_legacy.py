@@ -51,7 +51,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         self._machine_vertex = (
             self._governed_app_vertex.create_machine_vertex(
                 vertex_slice=self._vertex_slice,
-                sdram=self._sdram, label=None, constraints=None))
+                sdram=self._sdram, label=None))
         self._governed_app_vertex.remember_machine_vertex(self._machine_vertex)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)

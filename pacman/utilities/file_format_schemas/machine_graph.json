@@ -16,22 +16,6 @@
       "type": "string"
     },
 
-    "constraints":{
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": true,
-        "properties": {
-          "class": { "$ref": "#/types/class" },
-          "exception": {"$ref": "#/types/exception" }
-        },
-        "anyOf": [
-          { "required": [ "class"] },
-          { "required": [ "exception"] }
-        ]
-      }
-    },
-
     "edges": {
       "type": "array",
       "items": {
@@ -116,13 +100,12 @@
         "properties": {
           "class": { "$ref": "#/types/class" },
           "label": { "$ref": "#/types/vertex_label" },
-          "constraints": { "$ref": "#/types/constraints" },
           "resources": { "$ref": "#/types/resources" },
           "exception": {"$ref": "#/types/exception" }
         },
         "additionalProperties": false,
         "anyOf": [
-          { "required": [ "class", "label", "constraints", "resources"] },
+          { "required": [ "class", "label", "resources"] },
           { "required": [ "exception"] }
         ]
       }

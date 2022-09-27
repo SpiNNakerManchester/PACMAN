@@ -83,11 +83,10 @@ class TestAppVertex(ApplicationVertex):
 class TestMacVertex(MachineVertex):
 
     def __init__(
-            self, label=None, constraints=None, app_vertex=None,
+            self, label=None, app_vertex=None,
             vertex_slice=None, n_keys_required=None):
         super(TestMacVertex, self).__init__(
-            label=label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=vertex_slice)
+            label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__n_keys_required = n_keys_required
 
     def get_n_keys_for_partition(self, partition_id):
