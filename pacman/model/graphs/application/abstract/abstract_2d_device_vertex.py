@@ -68,7 +68,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return (v & (v - 1) == 0) and (v != 0)
 
     def _verify_sub_size(self):
-        """ Ensure the sub width and height are within constraints
+        """ Ensure the sub width and height are within restrictions
         """
         if not self.__is_power_of_2(self._sub_width):
             raise PacmanConfigurationException(

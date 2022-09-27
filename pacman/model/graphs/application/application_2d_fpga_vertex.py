@@ -32,7 +32,7 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
     def __init__(
             self, width, height, sub_width, sub_height,
             incoming_fpga_connections=None, outgoing_fpga_connection=None,
-            label=None, constraints=None):
+            label=None):
         """
 
         :param int width: The width of the vertex in atoms
@@ -52,8 +52,6 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
             be sent to the device.
         :type outgoing_fpga_connection: FPGAConnection or None
         :param str label: The optional name of the vertex.
-        :param iterable(AbstractConstraint) constraints:
-            The optional initial constraints of the vertex.
         """
         # Set variables first as this lets us call properties
         self.__width = width
@@ -62,7 +60,7 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
         self.__sub_height = sub_height
         super(Application2DFPGAVertex, self).__init__(
             width * height, incoming_fpga_connections,
-            outgoing_fpga_connection, label, constraints,
+            outgoing_fpga_connection, label,
             n_machine_vertices_per_link=self._n_sub_rectangles)
         self._verify_sub_size()
 

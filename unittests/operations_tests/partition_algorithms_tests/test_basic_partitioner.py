@@ -44,9 +44,9 @@ class TestBasicPartitioner(unittest.TestCase):
         """
         unittest_setup()
 
-    def test_partition_with_no_additional_constraints(self):
+    def test_partition_with_no_fixed(self):
         """
-        test a partitioning with a graph with no extra constraints
+        test a partitioning with a graph with no fixed_location
         """
         vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1")
         vert1.splitter = SplitterFixedLegacy()
@@ -92,7 +92,7 @@ class TestBasicPartitioner(unittest.TestCase):
         splitter_partitioner()
         self.assertEqual(PacmanDataView.get_n_machine_vertices(), 0)
 
-    def test_partition_with_fixed_atom_constraints(self):
+    def test_partition_with_fixed_atom(self):
         """
         test a partitioning with a graph with fixed atom constraint which\
         should fit but is close to the limit
