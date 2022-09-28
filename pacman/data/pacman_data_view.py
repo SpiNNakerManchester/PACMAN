@@ -304,6 +304,21 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._placements.placements
 
     @classmethod
+    def iterate_placements_by_vertex_type(cls, vertex_type):
+        """
+         Iterate over placements on any chip with this vertex_type
+
+        :param class vertex_type: Class of vertex to find
+        :rtype: Placement
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the placements are currently unavailable
+        """
+        if cls.__pacman_data._placements is None:
+            raise cls._exception("placements")
+        return cls.__pacman_data._placements.\
+            iterate_placements_by_vertex_type(vertex_type)
+
+    @classmethod
     def iterate_placements_on_core(cls, x, y):
         """
         Iterate over placements with this x, y and this type
@@ -319,7 +334,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._placements.iterate_placements_on_core(x, y)
 
     @classmethod
-    def iterate_placements_with_vertex_type(cls, x, y, vertex_type):
+    def iterate_placements_by_xy_and_type(cls, x, y, vertex_type):
         """
         Iterate over placements with this x, y and this type
 
@@ -333,7 +348,7 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._placements is None:
             raise cls._exception("placements")
         return cls.__pacman_data._placements.\
-            iterate_placements_with_vertex_type(x, y, vertex_type)
+            iterate_placements_by_xy_and_type(x, y, vertex_type)
 
     @classmethod
     def get_n_placements(cls):
