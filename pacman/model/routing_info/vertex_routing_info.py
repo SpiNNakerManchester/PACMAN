@@ -68,14 +68,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         return key_array
 
     @property
-    def first_key_and_mask(self):
-        """ The first key and mask (or only one if there is only one)
-
-        :rtype: BaseKeyAndMask
-        """
-        return self.__key_and_mask
-
-    @property
     def key_and_mask(self):
         """ The only key and mask
 
@@ -84,28 +76,12 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         return self.__key_and_mask
 
     @property
-    def first_key(self):
-        """ The first key (or only one if there is only one)
-
-        :rtype: int
-        """
-        return self.__key_and_mask.key
-
-    @property
     def key(self):
         """ The first key (or only one if there is only one)
 
         :rtype: int
         """
         return self.__key_and_mask.key
-
-    @property
-    def first_mask(self):
-        """ The first mask (or only one if there is only one)
-
-        :rtype: int
-        """
-        return self.__key_and_mask.mask
 
     @property
     def mask(self):
