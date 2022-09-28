@@ -143,7 +143,7 @@ class _FixedRouteRouter(object):
         """
         x = chip.x
         y = chip.y
-        for placement in PacmanDataView.iterate_placements_with_vertex_type(
+        for placement in PacmanDataView.iterate_placements_by_xy_and_type(
                 x, y, self._destination_class):
             return placement.p
         raise PacmanConfigurationException(
