@@ -213,7 +213,7 @@ def check_masks_all_the_same(routing_info, mask):
     seen_keys = set()
     for r_info in routing_info:
         if isinstance(r_info.vertex, MachineVertex):
-            assert (r_info.first == mask or
+            assert (r_info.mask == mask or
                     r_info.machine_vertex.label == "RETINA")
             assert r_info.key not in seen_keys
             seen_keys.add(r_info.key)
