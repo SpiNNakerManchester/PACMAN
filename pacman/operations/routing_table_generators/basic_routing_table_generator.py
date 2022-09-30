@@ -56,9 +56,9 @@ def __create_routing_table(x, y, partitions_in_table, routing_infos):
         r_info = routing_infos.get_routing_info_from_pre_vertex(
             source_vertex, partition_id)
         entry = partitions_in_table[source_vertex, partition_id]
-        for key_and_mask in r_info.keys_and_masks:
-            table.add_multicast_routing_entry(
-                __create_entry(key_and_mask, entry))
+        table.add_multicast_routing_entry(
+            __create_entry(r_info.key_and_mask, entry))
+
     return table
 
 

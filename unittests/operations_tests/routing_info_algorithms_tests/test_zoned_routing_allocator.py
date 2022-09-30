@@ -213,11 +213,10 @@ def check_masks_all_the_same(routing_info, mask):
     seen_keys = set()
     for r_info in routing_info:
         if isinstance(r_info.vertex, MachineVertex):
-            assert len(r_info.keys_and_masks) == 1
-            assert (r_info.first_mask == mask or
+            assert (r_info.mask == mask or
                     r_info.machine_vertex.label == "RETINA")
-            assert r_info.first_key not in seen_keys
-            seen_keys.add(r_info.first_key)
+            assert r_info.key not in seen_keys
+            seen_keys.add(r_info.key)
 
 
 def check_fixed(m_vertex, part_id, key):
