@@ -33,7 +33,7 @@ class TestRoutingInfo(unittest.TestCase):
         pre_vertex = SimpleMachineVertex(ConstantSDRAM(0))
         key = 12345
         info = MachineVertexRoutingInfo(
-            [BaseKeyAndMask(key, FULL_MASK)], "Test", pre_vertex, 0)
+            BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
         routing_info = RoutingInfo()
         routing_info.add_routing_info(info)
 
@@ -57,14 +57,14 @@ class TestRoutingInfo(unittest.TestCase):
         assert next(iter(routing_info)) == info
 
         info2 = MachineVertexRoutingInfo(
-            [BaseKeyAndMask(key, FULL_MASK)], "Test", pre_vertex, 0)
+            BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
 
         with self.assertRaises(PacmanAlreadyExistsException):
             routing_info.add_routing_info(info2)
         assert info != info2
 
         info3 = MachineVertexRoutingInfo(
-            [BaseKeyAndMask(key, FULL_MASK)], "Test2", pre_vertex, 0)
+            BaseKeyAndMask(key, FULL_MASK), "Test2", pre_vertex, 0)
         routing_info.add_routing_info(info3)
         assert info != info3
         assert routing_info.get_routing_info_from_pre_vertex(
@@ -73,14 +73,6 @@ class TestRoutingInfo(unittest.TestCase):
                 pre_vertex, "Test")
         assert routing_info.get_routing_info_from_pre_vertex(
             pre_vertex, "Test2").get_keys().tolist() == [key]
-
-        info4 = MachineVertexRoutingInfo(
-            [BaseKeyAndMask(key, FULL_MASK),
-             BaseKeyAndMask(key * 2, FULL_MASK)], "Test4", pre_vertex, 0)
-        routing_info.add_routing_info(info4)
-
-        assert routing_info.get_routing_info_from_pre_vertex(
-            pre_vertex, "Test4").get_keys().tolist() == [key, key * 2]
 
     def test_base_key_and_mask(self):
         with self.assertRaises(PacmanConfigurationException):

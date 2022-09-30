@@ -99,10 +99,9 @@ def validate_routes(placements, routing_tables):
                 m_vertex, partition.identifier)
 
             # search for these destinations
-            for key_and_mask in r_info.keys_and_masks:
-                _search_route(
-                    placement, destinations[m_vertex], key_and_mask,
-                    routing_tables, m_vertex.vertex_slice.n_atoms)
+            _search_route(
+                placement, destinations[m_vertex], r_info.key_and_mask,
+                routing_tables, m_vertex.vertex_slice.n_atoms)
 
 
 def _search_route(source_placement, dest_placements, key_and_mask,

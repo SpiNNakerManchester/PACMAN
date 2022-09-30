@@ -144,8 +144,7 @@ class ZonedRoutingTableGenerator(object):
         for partition in partitions:
             r_info = routing_infos.get_routing_info_from_partition(partition)
             entry = partitions_in_table[partition]
-            for key_and_mask in r_info.keys_and_masks:
-                self.__add_key_and_mask(key_and_mask, entry, table)
+            self.__add_key_and_mask(r_info.key_and_mask, entry, table)
 
     @staticmethod
     def __add_key_and_mask(key_and_mask, entry, table):
