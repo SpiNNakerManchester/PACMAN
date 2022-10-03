@@ -121,10 +121,7 @@ class Slice(collections.namedtuple('Slice',
     def __str__(self):
         if len(self.shape) <= 1:
             return (f"({self.lo_atom}:{self.hi_atom})")
-        value = "["
+        value = ""
         for slice in self.slices:
             value += f"({slice.start}:{slice.stop})"
-        value += "]"
-        if len(value) < 80:
-            return value
-        return super.__str__()
+        return f"[{value}]"
