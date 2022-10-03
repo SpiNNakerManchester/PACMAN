@@ -173,18 +173,18 @@ class TestSimulatorData(unittest.TestCase):
         graph2 = writer._PacmanDataWriter__pacman_data._graph
         self.assertEqual(id(graph1), id(graph2))
 
-    def test_placements_safety_doce(self):
+    def test_placements_safety_code(self):
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             writer.iterate_placemements()
         with self.assertRaises(DataNotYetAvialable):
+            writer.iterate_placements_by_vertex_type(None)
+        with self.assertRaises(DataNotYetAvialable):
             writer.iterate_placements_on_core(None, None)
         with self.assertRaises(DataNotYetAvialable):
-            writer.iterate_placements_with_vertex_type(None, None, None)
+            writer.iterate_placements_by_xy_and_type(None, None, None)
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_n_placements()
-        with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.iterate_placements_on_core(1, 2)
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_placement_of_vertex(None)
         with self.assertRaises(DataNotYetAvialable):
