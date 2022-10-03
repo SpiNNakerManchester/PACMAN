@@ -117,3 +117,14 @@ class Slice(collections.namedtuple('Slice',
         ids = numpy.arange(numpy.prod(atoms_shape)).reshape(
             tuple(reversed(atoms_shape)))
         return ids[slices].flatten()
+
+    def __str__(self):
+        if len(self.shape) <= 1:
+            return (f"({self.lo_atom}:{self.hi_atom})")
+        value = "["
+        for slice in self.slices:
+            value += f"({slice.start}:{slice.stop})"
+        value += "]"
+        if len(value) < 80:
+            return value
+        return super.__str__()
