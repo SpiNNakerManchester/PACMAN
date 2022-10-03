@@ -73,7 +73,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
         for vertex_slice in self.__fixed_slices:
             sdram = app_vertex.get_sdram_used_by_atoms(vertex_slice)
             chip_counter.add_core(sdram)
-            label = f"MachineVertex for {vertex_slice} of {app_vertex.label}"
+            label = f"{app_vertex.label}{vertex_slice}"
             machine_vertex = app_vertex.create_machine_vertex(
                 vertex_slice, sdram, label)
             app_vertex.remember_machine_vertex(machine_vertex)
