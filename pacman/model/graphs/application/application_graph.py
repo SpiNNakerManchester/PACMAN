@@ -156,6 +156,7 @@ class ApplicationGraph(object):
 
         Will also add any edges already in the partition as well
 
+        :param ApplicationEdgePartition edge_partition:
         """
         self._outgoing_edge_partitions_by_pre_vertex[
             edge_partition.pre_vertex].add(edge_partition)
