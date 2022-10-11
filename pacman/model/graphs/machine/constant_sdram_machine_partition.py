@@ -85,6 +85,7 @@ class ConstantSDRAMMachinePartition(
 
     @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
     def get_sdram_size_of_region_for(self, vertex):
-        if len(self._edges) == 0:
-            return 0
-        return self._edges.peek().sdram_size
+        if self._sdram_size is None:
+            raise PartitionMissingEdgesException(
+                self.MISSING_EDGE_ERROR_MESSAGE.format(self))
+        return self._sdram_size

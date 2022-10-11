@@ -102,6 +102,7 @@ class ApplicationGraph(object):
             added to this partition that start at a different vertex to this
             one
         """
+        self._check_edge(edge)
         # Add the edge to the partition
         partition = self.get_outgoing_edge_partition_starting_at_vertex(
             edge.pre_vertex, outgoing_edge_partition_name)
@@ -109,8 +110,7 @@ class ApplicationGraph(object):
             partition = ApplicationEdgePartition(
                 identifier=outgoing_edge_partition_name,
                 pre_vertex=edge.pre_vertex)
-            self.add_outgoing_edge_partition(partition)
-        self._check_edge(edge)
+            self._add_outgoing_edge_partition(partition)
         partition.add_edge(edge)
         return partition
 
@@ -151,49 +151,16 @@ class ApplicationGraph(object):
             for partition in self.outgoing_edge_partitions
             for edge in partition.edges]
 
-    def add_outgoing_edge_partition(self, edge_partition):
+    def _add_outgoing_edge_partition(self, edge_partition):
         """ Add an edge partition to the graph.
 
         Will also add any edges already in the partition as well
 
         :param ApplicationEdgePartition edge_partition:
-            The edge partition to add
-        :raises PacmanAlreadyExistsException:
-            If a partition already exists with the same pre_vertex and
-            identifier
         """
-        # verify that this partition is suitable for this graph
-        if not isinstance(edge_partition, ApplicationEdgePartition):
-            raise PacmanInvalidParameterException(
-                "outgoing_edge_partition", edge_partition.__class__,
-                "Partitions must be an ApplicationEdgePartition")
-
-        # check this partition doesn't already exist
-        key = (edge_partition.pre_vertex,
-               edge_partition.identifier)
-        if edge_partition in self._outgoing_edge_partitions_by_pre_vertex[
-                edge_partition.pre_vertex]:
-            raise PacmanAlreadyExistsException(
-                str(ApplicationEdgePartition), key)
-
         self._outgoing_edge_partitions_by_pre_vertex[
             edge_partition.pre_vertex].add(edge_partition)
-        for edge in edge_partition.edges:
-            self._check_edge(edge)
-
         self._n_outgoing_edge_partitions += 1
-
-    def get_edges_starting_at_vertex(self, vertex):
-        """ Get all the edges that start at the given vertex.
-
-        :param AbstractVertex vertex:
-            The vertex at which the edges to get start
-        :rtype: iterable(AbstractEdge)
-        """
-        parts = self.get_outgoing_edge_partitions_starting_at_vertex(vertex)
-        for partition in parts:
-            for edge in partition.edges:
-                yield edge
 
     @property
     def outgoing_edge_partitions(self):
