@@ -83,11 +83,10 @@ class TestAppVertex(ApplicationVertex):
 class TestMacVertex(MachineVertex):
 
     def __init__(
-            self, label=None, constraints=None, app_vertex=None,
+            self, label=None, app_vertex=None,
             vertex_slice=None, n_keys_required=None):
         super(TestMacVertex, self).__init__(
-            label=label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=vertex_slice)
+            label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__n_keys_required = n_keys_required
 
     def get_n_keys_for_partition(self, partition_id):
@@ -214,11 +213,10 @@ def check_masks_all_the_same(routing_info, mask):
     seen_keys = set()
     for r_info in routing_info:
         if isinstance(r_info.vertex, MachineVertex):
-            assert len(r_info.keys_and_masks) == 1
-            assert (r_info.first_mask == mask or
+            assert (r_info.mask == mask or
                     r_info.machine_vertex.label == "RETINA")
-            assert r_info.first_key not in seen_keys
-            seen_keys.add(r_info.first_key)
+            assert r_info.key not in seen_keys
+            seen_keys.add(r_info.key)
 
 
 def check_fixed(m_vertex, part_id, key):

@@ -27,37 +27,22 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class SplitterOneToOneLegacy(AbstractSplitterCommon):
 
-    NOT_API_WARNING = (
-        "Your vertex is deprecated. Please add a Splitter or "
-        "inherit from the class in "
-        "pacman.model.partitioner_interfaces.legacy_partitioner_api")
-
-    NOT_SUITABLE_VERTEX_ERROR = (
-        "The vertex {} cannot be supported by the {} as"
-        " the vertex does not support the required method {} of "
-        "LegacyPartitionerAPI. Please inherit from the class in "
-        "pacman.model.partitioner_interfaces.legacy_partitioner_api and try "
-        "again.")
-
     __slots__ = [
         "_machine_vertex",
         "_vertex_slice",
         "_sdram"]
 
     def __init__(self):
-        super().__init__(type(self).__name__)
+        super().__init__()
         self._machine_vertex = None
         self._vertex_slice = None
         self._sdram = None
 
-    def __str__(self):
-        return f"SplitterOneToOneLegacy for {self._governed_app_vertex}"
-
-    def __repr__(self):
-        return self.__str__()
-
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
+        if not isinstance(app_vertex, LegacyPartitionerAPI):
+            raise PacmanConfigurationException(
+                f"{self} is not a LegacyPartitionerAPI")
         super().set_governed_app_vertex(app_vertex)
         self._vertex_slice = Slice(0, self._governed_app_vertex.n_atoms - 1)
         self._sdram = (
@@ -66,17 +51,8 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
         self._machine_vertex = (
             self._governed_app_vertex.create_machine_vertex(
                 vertex_slice=self._vertex_slice,
-                sdram=self._sdram, label=None, constraints=None))
+                sdram=self._sdram, label=None))
         self._governed_app_vertex.remember_machine_vertex(self._machine_vertex)
-        if not isinstance(app_vertex, LegacyPartitionerAPI):
-            for abstractmethod in LegacyPartitionerAPI.abstract_methods():
-                check = getattr(app_vertex, abstractmethod, None)
-                if not check:
-                    raise PacmanConfigurationException(
-                        self.NOT_SUITABLE_VERTEX_ERROR.format(
-                            app_vertex.label, self._splitter_name,
-                            abstractmethod))
-                logger.warning(self.NOT_API_WARNING)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):

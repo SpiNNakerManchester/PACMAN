@@ -19,11 +19,11 @@ from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman_test_objects import (
-    DuckLegacyApplicationVertex, NonLegacyApplicationVertex, SimpleTestVertex)
+    NonLegacyApplicationVertex, SimpleTestVertex)
 
 
 class TestSplitterFixedLegacy(unittest.TestCase):
-    """ Tester for pacman.model.constraints.placer_constraints
+    """ Tester for SplitterFixedLegacy
     """
 
     def setUp(self):
@@ -34,17 +34,6 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         vertex = NonLegacyApplicationVertex()
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(vertex)
-
-    def test_with_methods(self):
-        splitter = SplitterFixedLegacy()
-        vertex = DuckLegacyApplicationVertex()
-        with LogCapture() as lc:
-            splitter.set_governed_app_vertex(vertex)
-            found = False
-            for record in lc.records:
-                if record.msg.fmt == splitter.NOT_API_WARNING:
-                    found = True
-            self.assertTrue(found)
 
     def test_with_api(self):
         splitter = SplitterFixedLegacy()

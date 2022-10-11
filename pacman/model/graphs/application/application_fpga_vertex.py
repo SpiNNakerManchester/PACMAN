@@ -31,7 +31,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     def __init__(
             self, n_atoms, incoming_fpga_connections=None,
-            outgoing_fpga_connection=None, label=None, constraints=None,
+            outgoing_fpga_connection=None, label=None,
             n_machine_vertices_per_link=1):
         """
 
@@ -47,13 +47,11 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
             be sent to the device.
         :type outgoing_fpga_connection: FPGAConnection or None
         :param str label: The optional name of the vertex.
-        :param iterable(AbstractConstraint) constraints:
-            The optional initial constraints of the vertex.
         :param int n_machine_vertices_per_link:
             The optional number of machine vertices to create for each FPGA
             link (1 by default)
         """
-        super().__init__(label=label, constraints=constraints)
+        super().__init__(label=label)
         self._n_atoms = n_atoms
         self._incoming_fpga_connections = incoming_fpga_connections
         self._outgoing_fpga_connection = outgoing_fpga_connection
@@ -108,8 +106,9 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
         :rtype: iter(FPGAConnection)
         """
-        for conn in self._incoming_fpga_connections:
-            yield from conn.expanded
+        if self._incoming_fpga_connections:
+            for conn in self._incoming_fpga_connections:
+                yield from conn.expanded
 
     @property
     def outgoing_fpga_connection(self):

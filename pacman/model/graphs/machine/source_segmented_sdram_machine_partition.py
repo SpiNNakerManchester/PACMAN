@@ -55,52 +55,52 @@ class SourceSegmentedSDRAMMachinePartition(
 
     @overrides(AbstractMultiplePartition.add_edge)
     def add_edge(self, edge):
+        # check
+        if len(self._destinations):
+            if edge.post_vertex not in self._destinations:
+                raise PacmanConfigurationException(
+                    "The {} can only support 1 destination vertex".format(
+                        self.__class__.__name__))
+        try:
+            if len(self._pre_vertices[edge.pre_vertex]) != 0:
+                raise PacmanConfigurationException(
+                    f"The {self.__class__.__name__} only supports 1 edge from "
+                    f"a given pre vertex.")
+        except KeyError as ex:
+            raise PacmanConfigurationException(
+                "Edge pre_vertex is not a Partition. pre vertex") from ex
         # add
         super().add_edge(edge)
 
-        # check
-        if len(self._destinations.keys()) != 1:
-            raise PacmanConfigurationException(
-                "The {} can only support 1 destination vertex".format(
-                    self.__class__.__name__))
-        if len(self._pre_vertices[edge.pre_vertex]) != 1:
-            raise PacmanConfigurationException(
-                "The {} only supports 1 edge from a given pre vertex.".format(
-                    self.__class__.__name__))
-
-        if self._sdram_base_address is not None:
-            raise PacmanConfigurationException(
-                "Illegal attempt to add an edge after sdram_base_address set")
-
     @sdram_base_address.setter
     def sdram_base_address(self, new_value):
+        if len(self.pre_vertices) != len(self.edges):
+            raise PartitionMissingEdgesException(
+                f"There are {len(self.pre_vertices)} pre vertices "
+                f"but only {len(self.edges)} edges")
+
         self._sdram_base_address = new_value
 
         for pre_vertex in self._pre_vertices.keys():
-            try:
-                # allocate for the pre_vertex
-                edge = self._pre_vertices[pre_vertex].peek()
-                edge.sdram_base_address = new_value
-                new_value += edge.sdram_size
-            except KeyError as e:
-                raise PartitionMissingEdgesException(
-                    "This partition has no edge from {}".format(
-                        pre_vertex)) from e
+            # allocate for the pre_vertex
+            edge = self._pre_vertices[pre_vertex].peek()
+            edge.sdram_base_address = new_value
+            new_value += edge.sdram_size
 
     @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
     def get_sdram_base_address_for(self, vertex):
+        if self._sdram_base_address is None:
+            return None
         if vertex in self._pre_vertices:
-            for edge in self._edges:
-                if edge.pre_vertex == vertex:
-                    return edge.sdram_base_address
+            edge = self._pre_vertices[vertex].peek()
+            return edge.sdram_base_address
         else:
             return self._sdram_base_address
 
     @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
     def get_sdram_size_of_region_for(self, vertex):
         if vertex in self._pre_vertices:
-            for edge in self._edges:
-                if edge.pre_vertex == vertex:
-                    return edge.sdram_size
+            edge = self._pre_vertices[vertex].peek()
+            return edge.sdram_size
         else:
             return self.total_sdram_requirements()

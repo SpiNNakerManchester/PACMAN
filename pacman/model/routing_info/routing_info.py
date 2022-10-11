@@ -68,9 +68,8 @@ class RoutingInfo(object):
         :return: The routing key of the partition
         :rtype: int
         """
-        key = (vertex, partition_id)
-        if key in self._info:
-            return self._info[key].keys_and_masks[0].key
+        if (vertex, partition_id) in self._info:
+            return self._info[(vertex, partition_id)].key
         return None
 
     def __iter__(self):

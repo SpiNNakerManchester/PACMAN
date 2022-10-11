@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+    AbstractBase, abstractmethod)
 
 
 # Can't use this decorator: circular import problem
@@ -36,7 +36,7 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
 
     @abstractmethod
     def create_machine_vertex(
-            self, vertex_slice, sdram, label=None, constraints=None):
+            self, vertex_slice, sdram, label=None):
         """ Create a machine vertex from this application vertex.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -45,19 +45,8 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
             The sdram used by the machine vertex.
         :param label: human readable label for the machine vertex
         :type label: str or None
-        :param constraints: Constraints to be passed on to the machine vertex.
-        :type constraints:
-            iterable(~pacman.model.constraints.AbstractConstraint)
         :return: The created machine vertex
         :rtype: ~pacman.model.graphs.machine.MachineVertex
-        """
-
-    @abstractproperty
-    def n_atoms(self):
-        """ The number of atoms in the vertex
-
-        :return: The number of atoms
-        :rtype: int
         """
 
     @staticmethod

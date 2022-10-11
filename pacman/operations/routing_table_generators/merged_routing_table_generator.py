@@ -55,14 +55,14 @@ def __create_routing_table(x, y, partitions_in_table, routing_info):
     table = UnCompressedMulticastRoutingTable(x, y)
     iterator = _IteratorWithNext(partitions_in_table.items())
     while iterator.has_next:
-        (vertex, part_id), entry = iterator.next
+        (vertex, part_id), entry = iterator.pop()
         r_info = routing_info.get_routing_info_from_pre_vertex(vertex, part_id)
         if r_info is None:
             raise Exception(
                 f"Missing Routing information for {vertex}, {part_id}")
         entries = [(vertex, part_id, entry, r_info)]
         while __match(iterator, vertex, part_id, r_info, entry, routing_info):
-            (vertex, part_id), entry = iterator.next
+            (vertex, part_id), entry = iterator.pop()
             r_info = routing_info.get_routing_info_from_pre_vertex(
                 vertex, part_id)
             entries.append((vertex, part_id, entry, r_info))
@@ -70,9 +70,6 @@ def __create_routing_table(x, y, partitions_in_table, routing_info):
         # Now attempt to merge sources together as much as possible
         for entry in __merged_keys_and_masks(entries, routing_info):
             table.add_multicast_routing_entry(entry)
-
-    for source_vertex, partition_id in partitions_in_table:
-        entry = partitions_in_table[source_vertex, partition_id]
 
     return table
 
@@ -82,12 +79,12 @@ def __match(iterator, vertex, part_id, r_info, entry, routing_info):
         return False
     if isinstance(vertex, ApplicationVertex):
         return False
-    (next_vertex, next_part_id), next_entry = iterator.peek
+    (next_vertex, next_part_id), next_entry = iterator.peek()
     if isinstance(next_vertex, ApplicationVertex):
         return False
     if part_id != next_part_id:
         return False
-    if __mask_has_holes(r_info.first_mask):
+    if __mask_has_holes(r_info.mask):
         return False
     next_r_info = routing_info.get_routing_info_from_pre_vertex(
         next_vertex, next_part_id)
@@ -120,24 +117,12 @@ def __merged_keys_and_masks(entries, routing_info):
     (vertex, part_id, entry, r_info) = entries[0]
     if isinstance(vertex, ApplicationVertex) or len(entries) == 1:
         yield MulticastRoutingEntry(
-            r_info.first_key, r_info.first_mask, defaultable=entry.defaultable,
+            r_info.key, r_info.mask, defaultable=entry.defaultable,
             spinnaker_route=entry.spinnaker_route)
     else:
         app_r_info = routing_info.get_routing_info_from_pre_vertex(
             vertex.app_vertex, part_id)
         yield from app_r_info.merge_machine_entries(entries)
-
-
-def __create_entry(key_and_mask, entry):
-    """
-    :param BaseKeyAndMask key_and_mask:
-    :param MulticastRoutingTableByPartitionEntry entry:
-    :rtype: MulticastRoutingEntry
-    """
-    return MulticastRoutingEntry(
-        routing_entry_key=key_and_mask.key_combo,
-        defaultable=entry.defaultable, mask=key_and_mask.mask,
-        link_ids=entry.link_ids, processor_ids=entry.processor_ids)
 
 
 class _IteratorWithNext(object):
@@ -151,7 +136,6 @@ class _IteratorWithNext(object):
             self.__next = None
             self.__has_next = False
 
-    @property
     def peek(self):
         return self.__next
 
@@ -159,8 +143,7 @@ class _IteratorWithNext(object):
     def has_next(self):
         return self.__has_next
 
-    @property
-    def next(self):
+    def pop(self):
         if not self.__has_next:
             raise StopIteration
         nxt = self.__next

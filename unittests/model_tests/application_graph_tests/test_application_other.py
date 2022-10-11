@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,30 +15,24 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.model.graphs.common import ChipAndCore
+from pacman.model.graphs.application import (
+    ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex)
 
 
-class TestPlacementConstraints(unittest.TestCase):
-    """ Tester for ChipAndCore
+class TestApplicationOther(unittest.TestCase):
+    """
+    tests which test the application graph object
     """
 
     def setUp(self):
         unittest_setup()
 
-    def test_chip_and_core_constraint(self):
-        c1 = ChipAndCore(1, 2)
-        self.assertEqual(c1.x, 1)
-        self.assertEqual(c1.y, 2)
-        self.assertEqual(c1.p, None)
-        self.assertEqual(c1, ChipAndCore(1, 2))
-        self.assertEqual(str(c1), 'X:1,Y2')
-        c2 = ChipAndCore(2, 1)
-        c3 = ChipAndCore(1, 2, 3)
-        self.assertNotEqual(c1, c2)
-        self.assertNotEqual(c1, c3)
-        self.assertNotEqual(c1, "1.2.3.4")
-        d = {}
-        d[c1] = 1
-        d[c2] = 2
-        d[c3] = 3
-        self.assertEqual(len(d), 3)
+    def test_spinnaker_link(self):
+        slv = ApplicationSpiNNakerLinkVertex(100, 2, "127.4.5.6")
+        self.assertEqual(2, slv.spinnaker_link_id)
+        self.assertEqual("127.4.5.6", slv.board_address)
+
+    def test_fpga_no_connection(self):
+        fpga = ApplicationFPGAVertex(100)
+        self.assertEqual(0, len(list(fpga.incoming_fpga_connections)))
+        self.assertIsNone(fpga.outgoing_fpga_connection)

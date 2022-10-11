@@ -12,10 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import unittest
+
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.data.pacman_data_writer import PacmanDataWriter
+from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
+from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
 from pacman.model.graphs.machine import SimpleMachineVertex
@@ -23,12 +27,14 @@ from pacman.model.resources import ConstantSDRAM
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.config_setup import unittest_setup
 from pacman.model.placements.placements import Placements
+from pacman.utilities.utility_objs.chip_counter import ChipCounter
+from pacman_test_objects import SimpleTestVertex
 
 
 class TestSplitter(AbstractSplitterCommon):
 
     def __init__(self, n_groups, n_machine_vertices):
-        AbstractSplitterCommon.__init__(self)
+        super().__init__()
         self.__n_groups = n_groups
         self.__n_machine_vertices = n_machine_vertices
         self.__same_chip_groups = list()
@@ -87,8 +93,33 @@ def _make_vertices(writer, n_atoms, n_groups, n_machine_vertices, label):
 def test_application_placer():
     unittest_setup()
     writer = PacmanDataWriter.mock()
+    # fixed early works as this vertex is looked at first
+    fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
+    fixed.splitter = SplitterFixedLegacy()
+    fixed.set_fixed_location(0, 0)
+    writer.add_vertex(fixed)
+    fixed.splitter.create_machine_vertices(ChipCounter())
     for i in range(56):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
-
     writer.set_machine(virtual_machine(24, 12))
     place_application_graph(Placements())
+
+
+def test_application_placer_late_fixed():
+    unittest_setup()
+    writer = PacmanDataWriter.mock()
+    for i in range(56):
+        _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
+    # fixed later should work too
+    fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
+    fixed.splitter = SplitterFixedLegacy()
+    fixed.set_fixed_location(0, 0)
+    writer.add_vertex(fixed)
+    fixed.splitter.create_machine_vertices(ChipCounter())
+
+    writer.set_machine(virtual_machine(24, 12))
+    try:
+        place_application_graph(Placements())
+    except PacmanConfigurationException:
+        raise unittest.SkipTest(
+            "https://github.com/SpiNNakerManchester/PACMAN/issues/444")

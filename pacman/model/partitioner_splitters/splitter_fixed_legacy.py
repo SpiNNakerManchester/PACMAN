@@ -29,38 +29,16 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
 
     __slots__ = ["__slices"]
 
-    NOT_API_WARNING = (
-        "Your vertex is deprecated. Please add a Splitter or "
-        "inherit from the class in "
-        "pacman.model.partitioner_interfaces.legacy_partitioner_api")
-
-    NOT_SUITABLE_VERTEX_ERROR = (
-        "The vertex {} cannot be supported by the {} as"
-        " the vertex does not support the required method {} of "
-        "LegacyPartitionerAPI. Please inherit from the class in "
-        "pacman.model.partitioner_interfaces.legacy_partitioner_api and try "
-        "again.")
-
-    SPLITTER_NAME = "SplitterFixedLegacy"
-
     def __init__(self, splitter_name=None):
-        if splitter_name is None:
-            splitter_name = self.SPLITTER_NAME
-        super().__init__(splitter_name)
+        super().__init__()
         self.__slices = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
-        super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, LegacyPartitionerAPI):
-            for abstractmethod in LegacyPartitionerAPI.abstract_methods():
-                check = getattr(app_vertex, abstractmethod, None)
-                if not check:
-                    raise PacmanConfigurationException(
-                        self.NOT_SUITABLE_VERTEX_ERROR.format(
-                            app_vertex.label, self._splitter_name,
-                            abstractmethod))
-                logger.warning(self.NOT_API_WARNING)
+            raise PacmanConfigurationException(
+                f"{self} is not a LegacyPartitionerAPI")
+        super().set_governed_app_vertex(app_vertex)
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id):
@@ -97,7 +75,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
             chip_counter.add_core(sdram)
             label = f"MachineVertex for {vertex_slice} of {app_vertex.label}"
             machine_vertex = app_vertex.create_machine_vertex(
-                vertex_slice, sdram, label, app_vertex.constraints)
+                vertex_slice, sdram, label)
             app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.reset_called)

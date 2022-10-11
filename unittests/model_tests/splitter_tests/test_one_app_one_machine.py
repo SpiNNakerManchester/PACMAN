@@ -18,9 +18,12 @@ from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application.abstract import (
     AbstractOneAppOneMachineVertex)
+from pacman.model.graphs.common import Slice
 from pacman.model.partitioner_splitters import SplitterOneAppOneMachine
+from pacman.model.resources import ConstantSDRAM
 from pacman_test_objects import NonLegacyApplicationVertex
 from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 
 class TestSplitterOneAppOneMachine(unittest.TestCase):
@@ -29,15 +32,31 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
         unittest_setup()
 
     def test_legacy(self):
-        splitter = SplitterOneAppOneMachine("foo")
+        splitter = SplitterOneAppOneMachine()
         v1 = NonLegacyApplicationVertex("v1")
         a = str(splitter)
         self.assertIsNotNone(a)
+        self.assertIsNotNone(repr(splitter))
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v1)
+        mv = SimpleMachineVertex(ConstantSDRAM(10), vertex_slice=Slice(0, 5))
         v2 = AbstractOneAppOneMachineVertex(
-            machine_vertex=SimpleMachineVertex(None),
-            label="v1", constraints=None)
+            machine_vertex=mv, label="v1")
         splitter.set_governed_app_vertex(v2)
         a = str(splitter)
         self.assertIsNotNone(a)
+        chip_counter = ChipCounter()
+        splitter.create_machine_vertices(chip_counter)
+        self.assertEqual(splitter.get_out_going_slices(), [mv.vertex_slice])
+        self.assertEqual(splitter.get_in_coming_slices(), [mv.vertex_slice])
+        self.assertEqual(splitter.get_in_coming_vertices("foo"), [mv])
+        self.assertEqual(splitter.get_out_going_vertices("foo"), [mv])
+        self.assertEqual(splitter.machine_vertices_for_recording("foo"), [mv])
+        splitter.reset_called()
+        v2.remember_machine_vertex(mv)
+        self.assertEqual(6, v2.n_atoms)
+        v2.reset()
+
+    def test_default_name(self):
+        splitter = SplitterOneAppOneMachine()
+        self.assertIn("SplitterOneAppOneMachine", str(splitter))

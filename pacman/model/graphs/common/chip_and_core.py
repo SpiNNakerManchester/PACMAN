@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_placer_constraint import AbstractPlacerConstraint
-
-
-class ChipAndCoreConstraint(AbstractPlacerConstraint):
+class ChipAndCore(object):
     """ A constraint to place a vertex on a specific chip and, optionally, a\
         specific core on that chip.
     """
@@ -70,27 +67,18 @@ class ChipAndCoreConstraint(AbstractPlacerConstraint):
         """
         return self._p
 
-    @property
-    def location(self):
-        """ The location as a dictionary with three keys: "``x``", "``y``"
-            and "``p``"
-
-        :rtype: dict(str, int)
-        """
-        return {"x": self._x, "y": self._y, "p": self._p}
-
     def __repr__(self):
-        return "ChipAndCoreConstraint(x={}, y={}, p={})".format(
-            self._x, self._y, self._p)
+        if self._p is None:
+            return f"X:{self._x},Y{self._y}"
+        else:
+            return f"X:{self._x},Y:{self._y},P:{self._p}"
 
     def __eq__(self, other):
-        if not isinstance(other, ChipAndCoreConstraint):
+        if not isinstance(other, ChipAndCore):
             return False
         return (self._x, self._y, self._p) == (other.x, other.y, other.p)
 
     def __ne__(self, other):
-        if not isinstance(other, ChipAndCoreConstraint):
-            return True
         return not self.__eq__(other)
 
     def __hash__(self):

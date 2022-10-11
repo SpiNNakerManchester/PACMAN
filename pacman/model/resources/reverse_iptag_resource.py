@@ -87,6 +87,8 @@ class ReverseIPtagResource(object):
         )
 
     def __eq__(self, other):
+        if not isinstance(other, ReverseIPtagResource):
+            return False
         return (self._port == other._port and
                 self._sdp_port == other._sdp_port and
                 self._tag == other._tag)

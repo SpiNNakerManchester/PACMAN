@@ -530,7 +530,7 @@ def get_targets_by_chip(vertices):
     for vertex in vertices:
         x, y = vertex_xy(vertex)
         if isinstance(vertex, AbstractVirtual):
-            # Sinks with route-to-endpoint constraints must be routed
+            # Sinks with route-to-endpoint restriction must be routed
             # in the according directions.
             link = route_to_endpoint(vertex)
             by_chip[x, y][1].add(link)
