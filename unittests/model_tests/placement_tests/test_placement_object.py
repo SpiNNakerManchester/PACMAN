@@ -36,11 +36,17 @@ class TestPlacement(unittest.TestCase):
         test that creating a new placement puts stuff in the right place
         """
         subv = SimpleMachineVertex(None, "")
-        pl = Placement(subv, 0, 0, 1)
-        self.assertEqual(pl.x, 0)
-        self.assertEqual(pl.y, 0)
-        self.assertEqual(pl.p, 1)
+        pl = Placement(subv, 1, 2, 3)
+        self.assertEqual(pl.x, 1)
+        self.assertEqual(pl.y, 2)
+        self.assertEqual(pl.p, 3)
         self.assertEqual(subv, pl.vertex)
+        self.assertEqual((1, 2), pl.xy)
+        self.assertFalse(pl.__eq__("pl"))
+        pl2 = Placement(subv, 1, 2, 3)
+        self.assertEqual(pl, pl2)
+        self.assertEqual(hash(pl), hash(pl2))
+        self.assertFalse(pl != pl2)
 
     def test_create_new_placements_duplicate_vertex(self):
         """

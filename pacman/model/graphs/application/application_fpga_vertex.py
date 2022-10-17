@@ -106,8 +106,9 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
         :rtype: iter(FPGAConnection)
         """
-        for conn in self._incoming_fpga_connections:
-            yield from conn.expanded
+        if self._incoming_fpga_connections:
+            for conn in self._incoming_fpga_connections:
+                yield from conn.expanded
 
     @property
     def outgoing_fpga_connection(self):

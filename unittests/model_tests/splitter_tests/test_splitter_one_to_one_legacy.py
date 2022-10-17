@@ -16,8 +16,9 @@
 import unittest
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.partitioner_splitters import SplitterFixedLegacy
-from pacman_test_objects import (NonLegacyApplicationVertex, SimpleTestVertex)
+from pacman.model.partitioner_splitters import SplitterOneToOneLegacy
+from pacman_test_objects import (
+    NonLegacyApplicationVertex, SimpleTestVertex)
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 
@@ -27,12 +28,11 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         unittest_setup()
 
     def test_api(self):
-        splitter = SplitterFixedLegacy()
+        splitter = SplitterOneToOneLegacy()
         self.assertIsNotNone(str(splitter))
         self.assertIsNotNone(repr(splitter))
         v1 = SimpleTestVertex(1, "v1")
-        splitter.set_governed_app_vertex(v1)
-        self.assertEqual(id(v1), id(splitter.governed_app_vertex))
+        v1.splitter = splitter
         v2 = SimpleTestVertex(1, "v2")
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v2)
@@ -44,13 +44,12 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         self.assertEqual(splitter.get_out_going_slices(), slices)
         self.assertEqual(splitter.get_in_coming_slices(), slices)
         self.assertEqual(splitter.get_in_coming_vertices("foo"), mvs)
+        self.assertEqual(splitter.get_out_going_vertices("foo"), mvs)
         self.assertEqual(splitter.machine_vertices_for_recording("foo"), mvs)
         splitter.reset_called()
-        self.assertEqual([], splitter.get_internal_multicast_partitions())
-        self.assertEqual([], splitter.get_internal_sdram_partitions())
 
     def test_not_api(self):
-        splitter = SplitterFixedLegacy()
+        splitter = SplitterOneToOneLegacy()
         v1 = NonLegacyApplicationVertex("v1")
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(v1)

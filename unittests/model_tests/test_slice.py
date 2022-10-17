@@ -38,10 +38,22 @@ class TestSlice(unittest.TestCase):
             # Check for negative atom
             Slice(-1, 10)
 
+    def test_check_lo_atom_int(self):
+        # Check for value sanity
+        with self.assertRaises(Exception):
+            # Check for int atom
+            Slice("1", 10)
+
     def test_check_hi_atom_sanity(self):
         with self.assertRaises(ValueError):
             # Check for slice which goes backwards
             Slice(5, 4)
+
+    def test_check_hi_atom_int(self):
+        # Check for value sanity
+        with self.assertRaises(Exception):
+            # Check for int atom
+            Slice(1, "10")
 
     def test_equal_hi_lo_atoms(self):
         # This should be fine...

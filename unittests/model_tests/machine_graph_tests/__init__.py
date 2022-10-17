@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,10 +12,3 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-jsonschema < 4.4; python_version == '3.6'
-jsonschema; python_version >= '3.7'
-sortedcollections
-SpiNNUtilities == 1!6.0.1
-SpiNNMachine == 1!6.0.1
-importlib-resources < 5.10.0; python_version == '3.6'
