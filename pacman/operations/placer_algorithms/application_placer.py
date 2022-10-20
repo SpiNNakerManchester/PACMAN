@@ -148,7 +148,7 @@ def _place_error(
             unplaceable.append(app_vertex)
 
     report_file = os.path.join(
-        PacmanDataView.get_report_dir_path(), "placements_error.txt")
+        PacmanDataView.get_run_dir_path(), "placements_error.txt")
     with open(report_file, 'w', encoding="utf-8") as f:
         f.write(f"Could not place {len(unplaceable)} of "
                 f"{PacmanDataView.get_n_vertices()} application vertices.\n")
@@ -226,7 +226,7 @@ def _draw_placements(placements, system_placements):
         return
 
     report_file = os.path.join(
-        PacmanDataView.get_report_dir_path(), "placements_error.png")
+        PacmanDataView.get_run_dir_path(), "placements_error.png")
 
     # Colour the boards by placements
     unused = (0.5, 0.5, 0.5, 1.0)
