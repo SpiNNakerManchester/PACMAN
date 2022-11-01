@@ -124,4 +124,25 @@ class Slice(collections.namedtuple('Slice',
         value = ""
         for slice in self.slices:
             value += f"({slice.start}:{slice.stop})"
-        return f"[{value}]"
+        return f"{self.lo_atom}{value}"
+
+    @classmethod
+    def from_string(cls, str):
+        if str[0] == "(":
+            parts = str[1:-1].split(":")
+            lo_atom = int(parts[0])
+            hi_atom = int(parts[1])
+            return Slice(lo_atom, hi_atom)
+        parts = str.split("(")
+        lo_atom = int(parts[0])
+        shape = []
+        start = []
+        size = 1
+        for part in parts[1:]:
+            subs = part.split(":")
+            begin = int(subs[0])
+            atoms = int(subs[1][:-1]) - begin
+            size *= atoms
+            shape.append(atoms)
+            start.append(begin)
+        return Slice(lo_atom, lo_atom + size - 1, tuple(shape), tuple(start))
