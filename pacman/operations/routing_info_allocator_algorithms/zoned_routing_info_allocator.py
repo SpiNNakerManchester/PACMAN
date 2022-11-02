@@ -218,11 +218,9 @@ class ZonedRoutingInfoAllocator(object):
                 continue
             max_keys = 0
             for machine_vertex in machine_vertices:
-                if ((identifier, machine_vertex) not in
-                        self.__fixed_partitions):
-                    n_keys = machine_vertex.get_n_keys_for_partition(
-                        identifier)
-                    max_keys = max(max_keys, n_keys)
+                n_keys = machine_vertex.get_n_keys_for_partition(
+                    identifier)
+                max_keys = max(max_keys, n_keys)
 
             if max_keys > 0:
                 atom_bits = self.__bits_needed(max_keys)
