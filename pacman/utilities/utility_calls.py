@@ -145,13 +145,17 @@ def get_n_bits(n_values):
     return int(math.ceil(math.log2(n_values)))
 
 
-def get_field_based_keys(key, vertex_slice):
+def get_field_based_keys(key, vertex_slice, shift=0):
     """ Translate a vertex slice with potentially multiple dimensions into
         a list of keys, one for each atom of the vertex, by putting the values
         into fields of the keys based on the shape of the slice.
 
     :param int key: The base key
     :param Slice vertex_slice: The slice to translate
+    :param int shift:
+        The left shift to apply to the atom key before adding to the key. Can
+        be used to make space for additional information at the bottom of the
+        key.
     :rtype: list(int)
     """
 
@@ -172,6 +176,9 @@ def get_field_based_keys(key, vertex_slice):
     # We now left shift each coordinate into its field and add them up to
     # get the key
     keys = numpy.sum(numpy.left_shift(coords, shifts), axis=1)
+
+    # Do any final shifting as required (zero shift is valid but does nothing)
+    keys = numpy.left_shift(keys, shift)
 
     # The final result is the above with the base key added
     return keys + key
