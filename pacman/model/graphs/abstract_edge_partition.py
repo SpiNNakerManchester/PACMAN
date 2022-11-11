@@ -62,7 +62,6 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         if edge in self._edges:
             raise PacmanAlreadyExistsException("Edge", edge)
         self._edges.add(edge)
-        edge.post_vertex.add_incoming_edge(edge, self)
 
     @property
     def identifier(self):
