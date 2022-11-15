@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractSingleSourcePartition
 from .application_edge import ApplicationEdge
 
@@ -33,3 +34,8 @@ class ApplicationEdgePartition(AbstractSingleSourcePartition):
         super().__init__(
             pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=ApplicationEdge)
+
+    @overrides(AbstractSingleSourcePartition.add_edge)
+    def add_edge(self, edge):
+        super().add_edge(edge)
+        edge.post_vertex.add_incoming_edge(edge, self)
