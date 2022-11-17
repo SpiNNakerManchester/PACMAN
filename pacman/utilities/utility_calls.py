@@ -178,7 +178,8 @@ def get_field_based_keys(key, vertex_slice, shift=0):
     keys = numpy.sum(numpy.left_shift(coords, shifts), axis=1)
 
     # Do any final shifting as required (zero shift is valid but does nothing)
-    keys = numpy.left_shift(keys, shift)
+    if shift:
+        keys = numpy.left_shift(keys, shift)
 
     # The final result is the above with the base key added
     return keys + key
