@@ -85,6 +85,7 @@ class TestSlice(unittest.TestCase):
         s = Slice(0, 8, (3, 3), (0, 0))
         self.assertEqual("0(0:3)(0:3)", str(s))
         s2 = Slice.from_string(str(s))
+        self.assertEqual(s, s2)
 
     def test_2a(self):
         s = Slice(36, 44, (3, 3), (0, 6))
