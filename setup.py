@@ -75,9 +75,7 @@ setup(
     install_requires=[
         'SpiNNUtilities == 1!6.0.1',
         'SpiNNMachine == 1!6.0.1',
-        "importlib-resources < 5.10.0; python_version == '3.6'",
-        "jsonschema < 4.4; python_version == '3.6'",
-        "jsonschema; python_version >= '3.7'",
+        "jsonschema",
         "sortedcollections"],
     maintainer="SpiNNakerTeam",
     maintainer_email="spinnakerusers@googlegroups.com"
