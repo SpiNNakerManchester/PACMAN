@@ -247,7 +247,6 @@ def _draw_placements(placements, system_placements):
                     break
             if vertex is not None:
                 board_colours[x, y] = vertex_colours[vertex.app_vertex]
-
     include_boards = [
         (chip.x, chip.y) for chip in machine.ethernet_connected_chips]
     w = math.ceil(machine.width / 12)
@@ -259,8 +258,9 @@ def _draw_placements(placements, system_placements):
     hex_boards = board.create_torus(w, h)
     with PNGContextManager(
             output_filename, image_width, image_height) as ctx:
-        draw_machine_map(ctx, image_width, image_height, w, h, hex_boards,
-                         dict(), board_colours, include_boards)
+        draw_machine_map(
+            ctx, image_width, image_height, machine.width, machine.height,
+            hex_boards, dict(), board_colours, include_boards)
 
 
 class _SpaceExceededException(Exception):
