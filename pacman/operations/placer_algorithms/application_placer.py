@@ -134,7 +134,7 @@ def _place_error(
         app_vertex_placed = True
         found_placed_cores = False
         for vertices, _sdram in same_chip_groups:
-            if isinstance(vertics[0], AbstractVirtual):
+            if isinstance(vertices[0], AbstractVirtual):
                 break
             if placements.is_vertex_placed(vertices[0]):
                 found_placed_cores = True
