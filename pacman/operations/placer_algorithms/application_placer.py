@@ -151,13 +151,7 @@ def _place_error(
 
     report_file = os.path.join(
         PacmanDataView.get_run_dir_path(), "placements_error.txt")
-    with open(report_file, 'w', encoding="utf-8") as try:
-                    next_chip_space, space = spaces.get_next_chip_and_space()
-                except PacmanPlaceException as e:
-                    _place_error(
-                        placements, system_placements, e,  plan_n_timesteps,
-                        machine)
-                logger.debug(f"Starting placement from {next_chip_space}")f:
+    with open(report_file, 'w', encoding="utf-8") as f:
         f.write(f"Could not place {len(unplaceable)} of "
                 f"{PacmanDataView.get_n_vertices()} application vertices.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
