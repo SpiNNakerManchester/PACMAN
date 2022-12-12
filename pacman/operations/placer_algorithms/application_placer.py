@@ -557,6 +557,8 @@ def _chip_order(machine):
     :rtype: Chip
     """
     s_x, s_y = get_config_str("Mapping", "placer_start_chip").split(",")
+    s_x = int(s_x)
+    s_y = int(s_y)
 
     for x in range(machine.width):
         for y in range(machine.height):
