@@ -17,7 +17,7 @@ import logging
 import numpy
 import os
 
-from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.config_holder import get_config_bool, get_config_str
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
@@ -556,8 +556,12 @@ def _chip_order(machine):
     :param machine:
     :rtype: Chip
     """
+    s_x, s_y = get_config_str("Mapping", "placer_start_chip").split(",")
+
     for x in range(machine.width):
         for y in range(machine.height):
-            chip = machine.get_chip_at(x, y)
+            c_x = (x + s_x) % machine.width
+            c_y = (y + s_y) % machine.height
+            chip = machine.get_chip_at(c_x, c_y)
             if chip:
                 yield chip
