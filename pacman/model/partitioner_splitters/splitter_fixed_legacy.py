@@ -29,7 +29,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
 
     __slots__ = ["__slices"]
 
-    def __init__(self, splitter_name=None):
+    def __init__(self):
         super().__init__()
         self.__slices = None
 
