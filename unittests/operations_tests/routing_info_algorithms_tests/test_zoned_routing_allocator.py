@@ -184,7 +184,9 @@ def create_graphs_only_fixed():
         label="out_mac_vertex", app_vertex=out_app_vertex)
     out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
-    mac_vertex = TestMacVertex(label="mac_vertex", app_vertex=app_vertex)
+    mac_vertex = TestMacVertex(
+        label="mac_vertex", app_vertex=app_vertex,
+        n_keys_required={"Part0": 2, "Part1": 1})
     app_vertex.remember_machine_vertex(mac_vertex)
 
     PacmanDataView.add_edge(

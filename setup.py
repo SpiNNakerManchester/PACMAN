@@ -69,15 +69,14 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
     packages=packages,
     package_data=package_data,
     install_requires=[
         'SpiNNUtilities == 1!6.0.1',
         'SpiNNMachine == 1!6.0.1',
-        "importlib-resources < 5.10.0; python_version == '3.6'",
-        "jsonschema < 4.4; python_version == '3.6'",
-        "jsonschema; python_version >= '3.7'",
+        "jsonschema",
         "sortedcollections"],
     maintainer="SpiNNakerTeam",
     maintainer_email="spinnakerusers@googlegroups.com"
