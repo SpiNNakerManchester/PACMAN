@@ -153,5 +153,5 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         if self._fixed_location:
             return self._fixed_location
         if self._app_vertex:
-            return self._app_vertex.get_fixed_location(self)
+            return self._app_vertex.get_fixed_location()
         return None
