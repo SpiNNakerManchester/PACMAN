@@ -86,6 +86,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
+        # pylint: disable=unused-argument
         atoms_per_slice = self.n_atoms // self._n_machine_vertices_per_link
         low_atom = atoms_per_slice * index
         hi_atom = (atoms_per_slice * (index + 1)) - 1

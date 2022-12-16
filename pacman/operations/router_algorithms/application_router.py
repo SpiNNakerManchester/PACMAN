@@ -512,7 +512,7 @@ def _find_target_xy(target_xys, routes, source_mappings):
     for xy in target_xys:
         if xy in routes:
             return xy, None
-    return xy, None
+    return xy, None  # pylint:disable=undefined-loop-variable
 
 
 def _get_outgoing_mapping(app_vertex, partition_id):
