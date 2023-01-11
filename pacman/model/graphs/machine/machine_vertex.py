@@ -80,6 +80,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :return: The number of keys required
         :rtype: int
         """
+        # pylint: disable=unused-argument
         return 1 << get_n_bits_for_fields(self._vertex_slice.shape)
 
     @property
@@ -152,5 +153,5 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         if self._fixed_location:
             return self._fixed_location
         if self._app_vertex:
-            return self._app_vertex._fixed_location
+            return self._app_vertex.get_fixed_location()
         return None

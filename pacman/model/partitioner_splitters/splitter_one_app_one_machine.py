@@ -33,9 +33,6 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
 
     __slots__ = []
 
-    def __init__(self):
-        super().__init__()
-
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         if not isinstance(app_vertex, AbstractOneAppOneMachineVertex):

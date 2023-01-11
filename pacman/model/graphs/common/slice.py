@@ -86,9 +86,9 @@ class Slice(collections.namedtuple('Slice',
         """
         try:
             return slice(self.start[n], self.start[n] + self.shape[n])
-        except IndexError:
+        except IndexError as exc:
             raise IndexError(f"{n} is invalid for slice with {len(self.shape)}"
-                             " dimensions")
+                             " dimensions") from exc
 
     @property
     def slices(self):
@@ -122,18 +122,18 @@ class Slice(collections.namedtuple('Slice',
         if len(self.shape) <= 1:
             return (f"({self.lo_atom}:{self.hi_atom})")
         value = ""
-        for slice in self.slices:
-            value += f"({slice.start}:{slice.stop})"
+        for a_slice in self.slices:
+            value += f"({a_slice.start}:{a_slice.stop})"
         return f"{self.lo_atom}{value}"
 
     @classmethod
-    def from_string(cls, str):
-        if str[0] == "(":
-            parts = str[1:-1].split(":")
+    def from_string(cls, as_str):
+        if as_str[0] == "(":
+            parts = as_str[1:-1].split(":")
             lo_atom = int(parts[0])
             hi_atom = int(parts[1])
             return Slice(lo_atom, hi_atom)
-        parts = str.split("(")
+        parts = as_str.split("(")
         lo_atom = int(parts[0])
         shape = []
         start = []

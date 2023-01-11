@@ -101,7 +101,6 @@ class ZonedRoutingInfoAllocator(object):
         # True if all partitions are fixed
         "__all_fixed"
     ]
-    # pylint: disable=attribute-defined-outside-init
 
     def __call__(self, extra_allocations, flexible):
         """
@@ -191,6 +190,7 @@ class ZonedRoutingInfoAllocator(object):
                         raise PacmanRouteInfoAllocationException(
                             f"On {pre} only a fixed app key has been provided,"
                             " but there is more than one machine vertex.")
+                    # pylint:disable=undefined-loop-variable
                     self.__fixed_partitions[
                         identifier, vert] = app_key_and_mask
                 self.__fixed_partitions[identifier, pre] = app_key_and_mask

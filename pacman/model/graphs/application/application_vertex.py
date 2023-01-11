@@ -254,4 +254,3 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """ Add an edge incoming to this vertex.  This is ignored by default,
             but could be used to track incoming edges, and/or report faults.
         """
-        pass
