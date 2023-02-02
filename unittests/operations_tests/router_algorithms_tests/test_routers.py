@@ -741,7 +741,8 @@ def _check_path(source, nodes_fixed, machine, target):
     seen = set()
     for direction, (n_x, n_y) in nodes_fixed:
         if (c_x, c_y) in seen:
-            raise PacmanRoutingException(f"Loop detected at {c_x}, {c_y}: {nodes_fixed}")
+            raise PacmanRoutingException(
+                f"Loop detected at {c_x}, {c_y}: {nodes_fixed}")
         if not machine.is_chip_at(c_x, c_y):
             raise PacmanRoutingException(
                 f"Route through down chip {c_x}, {c_y}: {nodes_fixed}")
