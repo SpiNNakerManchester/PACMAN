@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.log import FormatAdapter
-from pacman.exceptions import PacmanInvalidParameterException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanInvalidParameterException)
 import logging
 
 log = FormatAdapter(logging.getLogger(__name__))
@@ -141,13 +142,13 @@ class MulticastRoutingTableByPartitionEntry(object):
     @incoming_link.setter
     def incoming_link(self, incoming_link):
         if self.incoming_processor is not None:
-            raise Exception(
-                "Entry already has an incoming processor {}".format(
-                    self.incoming_processor))
+            raise PacmanConfigurationException(
+                f"Entry already has an incoming processor "
+                f"{self.incoming_processor}")
         self_link = self.incoming_link
         if self_link is not None and self_link != incoming_link:
-            raise Exception(
-                "Entry already has an incoming link {}".format(self_link))
+            raise PacmanConfigurationException(
+                f"Entry already has an incoming link {self_link}")
         self.__set_incoming_link(incoming_link)
 
     @property
@@ -166,14 +167,12 @@ class MulticastRoutingTableByPartitionEntry(object):
     @incoming_processor.setter
     def incoming_processor(self, incoming_processor):
         if self.incoming_link is not None:
-            raise Exception(
-                "Entry already has an incoming link {}".format(
-                    self.incoming_link))
+            raise PacmanConfigurationException(
+                f"Entry already has an incoming link {self.incoming_link}")
         self_proc = self.incoming_processor
         if self_proc is not None and self_proc != incoming_processor:
-            raise Exception(
-                "Entry already has an incoming processor {}".format(
-                    self_proc))
+            raise PacmanConfigurationException(
+                f"Entry already has an incoming processor {self_proc}")
         self.__set_incoming_proc(incoming_processor)
 
     @property

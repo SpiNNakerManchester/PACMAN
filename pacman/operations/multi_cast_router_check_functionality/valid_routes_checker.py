@@ -20,7 +20,8 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from pacman.data import PacmanDataView
-from pacman.exceptions import PacmanRoutingException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanRoutingException)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
@@ -392,11 +393,10 @@ def _locate_routing_entry(current_router, key, n_atoms):
             last_atom = key + n_atoms
             last_key = e_key + (~entry.mask & FULL_MASK)
             if min(last_key, last_atom) - max(e_key, key) + 1 > 0:
-                raise Exception(
-                    "Key range partially covered:  key:{} key_combo:{} "
-                    "mask:{}, last_key:{}, e_key:{}".format(
-                        hex(key), hex(key_combo), hex(entry.mask),
-                        hex(last_key), hex(e_key)))
+                raise PacmanConfigurationException(
+                    f"Key range partially covered:  key:{hex(key)}, "
+                    f"key_combo:{hex(key_combo)} mask:{hex(entry.mask)}, "
+                    f"last_key:{hex(last_key)}, e_key:{hex(e_key)}")
     if found_entry is None:
         raise PacmanRoutingException("no entry located")
     return found_entry

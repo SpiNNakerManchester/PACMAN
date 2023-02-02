@@ -16,7 +16,7 @@
 from collections import defaultdict
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
-from pacman.exceptions import PacmanConfigurationException
+from pacman.exceptions import PacmanConfigurationException, PacmanValueError
 from pacman.model.graphs import AbstractEdgePartition
 
 
@@ -49,7 +49,7 @@ class AbstractMultiplePartition(AbstractEdgePartition):
     def add_edge(self, edge):
         # safety checks
         if edge.pre_vertex not in self._pre_vertices.keys():
-            raise Exception(
+            raise PacmanValueError(
                 "The edge {} is not allowed in this outgoing partition".format(
                     edge))
 

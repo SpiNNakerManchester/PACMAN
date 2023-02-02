@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.data import PacmanDataView
+from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
@@ -601,7 +602,7 @@ def _route_to_xys(first_xy, all_xys, machine, routes, targets, label):
                     xys_to_explore.append((next_xy, new_path))
     # Sanity check
     if targets_to_visit:
-        raise Exception(
+        raise PacmanRoutingException(
             f"Failed to visit all targets {targets} from {first_xy}: "
             f" Not visited {targets_to_visit}")
 
@@ -671,7 +672,7 @@ def _route_pre_to_post(
             print(f"Direct path from {source_xy} to {dest_xy}: {nodes_direct}")
             print(f"Avoiding down chips: {nodes_fixed}")
             print(f"Trimmed path is from {route_pre} to {route_post}: {nodes}")
-            raise Exception(
+            raise PacmanRoutingException(
                 f"Somehow node {dest_node} already in routes with label"
                 f" {routes[dest_node].label}")
         dest_route = RoutingTree(dest_node, label)
@@ -780,7 +781,7 @@ def _find_path(source_xy, target_xy, machine):
                     new_path = list(path)
                     new_path.append((link, next_xy))
                     xys_to_explore.append((next_xy, new_path))
-    raise Exception(f"No path from {source_xy} to {target_xy}")
+    raise PacmanRoutingException(f"No path from {source_xy} to {target_xy}")
 
 
 def _in_group(item, group):
