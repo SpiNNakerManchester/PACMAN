@@ -15,7 +15,7 @@
 
 import collections
 import numpy
-from pacman.exceptions import PacmanValueError
+from pacman.exceptions import PacmanValueError, PacmanTypeError
 
 
 class Slice(collections.namedtuple('Slice',
@@ -40,9 +40,9 @@ class Slice(collections.namedtuple('Slice',
         :raises PacmanValueError: If the bounds of the slice are invalid.
         """
         if not isinstance(lo_atom, int):
-            raise Exception("lo atom needs to be a int")
+            raise PacmanTypeError("lo atom needs to be a int")
         if not isinstance(hi_atom, int):
-            raise Exception("hi atom needs to be a int")
+            raise PacmanTypeError("hi atom needs to be a int")
 
         if lo_atom < 0:
             raise PacmanValueError('lo_atom < 0')

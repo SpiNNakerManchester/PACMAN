@@ -16,6 +16,7 @@
 import unittest
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
+from pacman.exceptions import PacmanRoutingException
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
@@ -134,8 +135,8 @@ class TestMerged(unittest.TestCase):
         writer.set_routing_infos(RoutingInfo())
         try:
             merged_routing_table_generator()
-            raise Exception("Should not get here")
-        except Exception as ex:
+            raise PacmanRoutingException("Should not get here")
+        except PacmanRoutingException as ex:
             self.assertIn("Missing Routing information", str(ex))
 
     def test_iterator_with_next(self):

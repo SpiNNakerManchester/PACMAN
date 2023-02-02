@@ -194,7 +194,7 @@ class _PairCompressor(AbstractCompressor):
                 return 1
             if self._routes[i] == route_b:
                 return -1
-        raise Exception("Apply Gibbs slap!")
+        raise PacmanElementAllocationException("Sorting error")
 
     def _three_way_partition_table(self, low, high):
         """
