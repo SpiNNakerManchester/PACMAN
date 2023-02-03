@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import math
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
@@ -238,7 +237,8 @@ class ZonedRoutingInfoAllocator(object):
 
     def __check_zones(self):
         # See if it could fit even before considerding fixed
-        app_part_bits = allocator_bits_needed(len(self.__atom_bits_per_app_part))
+        app_part_bits = allocator_bits_needed(
+            len(self.__atom_bits_per_app_part))
         if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
