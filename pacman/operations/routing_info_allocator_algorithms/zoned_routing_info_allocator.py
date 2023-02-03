@@ -24,7 +24,8 @@ from pacman.model.routing_info import (
     AppVertexRoutingInfo)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
-from pacman.utilities.utility_calls import get_key_ranges
+from pacman.utilities.utility_calls import (
+    get_key_ranges, allocator_bits_needed)
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 
@@ -223,10 +224,10 @@ class ZonedRoutingInfoAllocator(object):
                 max_keys = max(max_keys, n_keys)
 
             if max_keys > 0:
-                atom_bits = self.__bits_needed(max_keys)
+                atom_bits = allocator_bits_needed(max_keys)
                 if (identifier, pre) not in self.__fixed_partitions:
                     self.__n_bits_atoms = max(self.__n_bits_atoms, atom_bits)
-                    machine_bits = self.__bits_needed(len(machine_vertices))
+                    machine_bits = allocator_bits_needed(len(machine_vertices))
                     self.__n_bits_machine = max(
                         self.__n_bits_machine, machine_bits)
                     self.__n_bits_atoms_and_mac = max(
@@ -237,7 +238,7 @@ class ZonedRoutingInfoAllocator(object):
 
     def __check_zones(self):
         # See if it could fit even before considerding fixed
-        app_part_bits = self.__bits_needed(len(self.__atom_bits_per_app_part))
+        app_part_bits = allocator_bits_needed(len(self.__atom_bits_per_app_part))
         if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
@@ -246,7 +247,7 @@ class ZonedRoutingInfoAllocator(object):
 
         # Reserve fixed and check it still works
         self.__set_fixed_used()
-        app_part_bits = self.__bits_needed(
+        app_part_bits = allocator_bits_needed(
             len(self.__atom_bits_per_app_part) + len(self.__fixed_used))
         if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
@@ -390,16 +391,6 @@ class ZonedRoutingInfoAllocator(object):
         :rtype int:
         """
         return FULL_MASK - ((2 ** bits) - 1)
-
-    @staticmethod
-    def __bits_needed(size):
-        """
-        :param int size:
-        :rtype: int
-        """
-        if size == 0:
-            return 0
-        return int(math.ceil(math.log2(size)))
 
 
 def flexible_allocate(extra_allocations):
