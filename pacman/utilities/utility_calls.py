@@ -214,3 +214,15 @@ def get_n_bits_for_fields(field_sizes):
     """
     field_size = [get_n_bits(n) for n in field_sizes]
     return sum(field_size)
+
+
+def allocator_bits_needed(size):
+    """ Get the bits needed for the routing info allocator
+
+    :param int size: The size to calculate the number of bits for
+    :return: the number of bits required for that size
+    :rtype: int
+    """
+    if size == 0:
+        return 0
+    return int(math.ceil(math.log2(size)))
