@@ -58,7 +58,7 @@ Documentation
 =============
 [PACMAN python documentation](http://pacman.readthedocs.io)
 <br>
-[Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)
+[Combined python documentation](http://spinnakermanchester.readthedocs.io)
 
 
 PACMAN Executor
