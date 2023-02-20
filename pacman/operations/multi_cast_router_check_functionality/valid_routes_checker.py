@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2014 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """ Collection of functions which together validate routes.
 """
 from collections import namedtuple, defaultdict
@@ -20,7 +19,8 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from pacman.data import PacmanDataView
-from pacman.exceptions import PacmanRoutingException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanRoutingException)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
@@ -392,11 +392,10 @@ def _locate_routing_entry(current_router, key, n_atoms):
             last_atom = key + n_atoms
             last_key = e_key + (~entry.mask & FULL_MASK)
             if min(last_key, last_atom) - max(e_key, key) + 1 > 0:
-                raise Exception(
-                    "Key range partially covered:  key:{} key_combo:{} "
-                    "mask:{}, last_key:{}, e_key:{}".format(
-                        hex(key), hex(key_combo), hex(entry.mask),
-                        hex(last_key), hex(e_key)))
+                raise PacmanConfigurationException(
+                    f"Key range partially covered:  key:{hex(key)}, "
+                    f"key_combo:{hex(key_combo)} mask:{hex(entry.mask)}, "
+                    f"last_key:{hex(last_key)}, e_key:{hex(e_key)}")
     if found_entry is None:
         raise PacmanRoutingException("no entry located")
     return found_entry

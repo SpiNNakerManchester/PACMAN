@@ -1,19 +1,19 @@
 # Copyright (c) 2021 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from pacman.data import PacmanDataView
+from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
@@ -524,7 +524,7 @@ def _find_target_xy(target_xys, routes, source_mappings):
     for xy in target_xys:
         if xy in routes:
             return xy, None
-    return xy, None
+    return xy, None  # pylint:disable=undefined-loop-variable
 
 
 def _get_outgoing_mapping(app_vertex, partition_id):
@@ -613,7 +613,7 @@ def _route_to_xys(first_xy, all_xys, machine, routes, targets, label):
                     xys_to_explore.append((next_xy, new_path))
     # Sanity check
     if targets_to_visit:
-        raise Exception(
+        raise PacmanRoutingException(
             f"Failed to visit all targets {targets} from {first_xy}: "
             f" Not visited {targets_to_visit}")
 
@@ -706,7 +706,7 @@ def _route_pre_to_post(
             print(f"Direct path from {source_xy} to {dest_xy}: {nodes_direct}")
             print(f"Avoiding down chips: {nodes_fixed}")
             print(f"Trimmed path is from {route_pre} to {route_post}: {nodes}")
-            raise Exception(
+            raise PacmanRoutingException(
                 f"Somehow node {dest_node} already in routes with label"
                 f" {routes[dest_node].label}")
         dest_route = RoutingTree(dest_node, label)
@@ -815,7 +815,7 @@ def _find_path(source_xy, target_xy, machine):
                     new_path = list(path)
                     new_path.append((link, next_xy))
                     xys_to_explore.append((next_xy, new_path))
-    raise Exception(f"No path from {source_xy} to {target_xy}")
+    raise PacmanRoutingException(f"No path from {source_xy} to {target_xy}")
 
 
 def _in_group(item, group):

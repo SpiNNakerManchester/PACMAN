@@ -1,20 +1,18 @@
 # Copyright (c) 2019 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import logging
-import math
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
@@ -24,7 +22,8 @@ from pacman.model.routing_info import (
     AppVertexRoutingInfo)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
-from pacman.utilities.utility_calls import get_key_ranges
+from pacman.utilities.utility_calls import (
+    get_key_ranges, allocator_bits_needed)
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 
@@ -101,7 +100,6 @@ class ZonedRoutingInfoAllocator(object):
         # True if all partitions are fixed
         "__all_fixed"
     ]
-    # pylint: disable=attribute-defined-outside-init
 
     def __call__(self, extra_allocations, flexible):
         """
@@ -191,6 +189,7 @@ class ZonedRoutingInfoAllocator(object):
                         raise PacmanRouteInfoAllocationException(
                             f"On {pre} only a fixed app key has been provided,"
                             " but there is more than one machine vertex.")
+                    # pylint:disable=undefined-loop-variable
                     self.__fixed_partitions[
                         identifier, vert] = app_key_and_mask
                 self.__fixed_partitions[identifier, pre] = app_key_and_mask
@@ -223,10 +222,10 @@ class ZonedRoutingInfoAllocator(object):
                 max_keys = max(max_keys, n_keys)
 
             if max_keys > 0:
-                atom_bits = self.__bits_needed(max_keys)
+                atom_bits = allocator_bits_needed(max_keys)
                 if (identifier, pre) not in self.__fixed_partitions:
                     self.__n_bits_atoms = max(self.__n_bits_atoms, atom_bits)
-                    machine_bits = self.__bits_needed(len(machine_vertices))
+                    machine_bits = allocator_bits_needed(len(machine_vertices))
                     self.__n_bits_machine = max(
                         self.__n_bits_machine, machine_bits)
                     self.__n_bits_atoms_and_mac = max(
@@ -237,7 +236,8 @@ class ZonedRoutingInfoAllocator(object):
 
     def __check_zones(self):
         # See if it could fit even before considerding fixed
-        app_part_bits = self.__bits_needed(len(self.__atom_bits_per_app_part))
+        app_part_bits = allocator_bits_needed(
+            len(self.__atom_bits_per_app_part))
         if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
@@ -246,7 +246,7 @@ class ZonedRoutingInfoAllocator(object):
 
         # Reserve fixed and check it still works
         self.__set_fixed_used()
-        app_part_bits = self.__bits_needed(
+        app_part_bits = allocator_bits_needed(
             len(self.__atom_bits_per_app_part) + len(self.__fixed_used))
         if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
@@ -390,16 +390,6 @@ class ZonedRoutingInfoAllocator(object):
         :rtype int:
         """
         return FULL_MASK - ((2 ** bits) - 1)
-
-    @staticmethod
-    def __bits_needed(size):
-        """
-        :param int size:
-        :rtype: int
-        """
-        if size == 0:
-            return 0
-        return int(math.ceil(math.log2(size)))
 
 
 def flexible_allocate(extra_allocations):

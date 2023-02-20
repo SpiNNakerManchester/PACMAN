@@ -1,20 +1,20 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2015 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from spinn_utilities.log import FormatAdapter
-from pacman.exceptions import PacmanInvalidParameterException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanInvalidParameterException)
 import logging
 
 log = FormatAdapter(logging.getLogger(__name__))
@@ -141,13 +141,13 @@ class MulticastRoutingTableByPartitionEntry(object):
     @incoming_link.setter
     def incoming_link(self, incoming_link):
         if self.incoming_processor is not None:
-            raise Exception(
-                "Entry already has an incoming processor {}".format(
-                    self.incoming_processor))
+            raise PacmanConfigurationException(
+                f"Entry already has an incoming processor "
+                f"{self.incoming_processor}")
         self_link = self.incoming_link
         if self_link is not None and self_link != incoming_link:
-            raise Exception(
-                "Entry already has an incoming link {}".format(self_link))
+            raise PacmanConfigurationException(
+                f"Entry already has an incoming link {self_link}")
         self.__set_incoming_link(incoming_link)
 
     @property
@@ -166,14 +166,12 @@ class MulticastRoutingTableByPartitionEntry(object):
     @incoming_processor.setter
     def incoming_processor(self, incoming_processor):
         if self.incoming_link is not None:
-            raise Exception(
-                "Entry already has an incoming link {}".format(
-                    self.incoming_link))
+            raise PacmanConfigurationException(
+                f"Entry already has an incoming link {self.incoming_link}")
         self_proc = self.incoming_processor
         if self_proc is not None and self_proc != incoming_processor:
-            raise Exception(
-                "Entry already has an incoming processor {}".format(
-                    self_proc))
+            raise PacmanConfigurationException(
+                f"Entry already has an incoming processor {self_proc}")
         self.__set_incoming_proc(incoming_processor)
 
     @property

@@ -1,21 +1,20 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2014 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import collections
 import numpy
-from pacman.exceptions import PacmanValueError
+from pacman.exceptions import PacmanValueError, PacmanTypeError
 
 
 class Slice(collections.namedtuple('Slice',
@@ -40,9 +39,9 @@ class Slice(collections.namedtuple('Slice',
         :raises PacmanValueError: If the bounds of the slice are invalid.
         """
         if not isinstance(lo_atom, int):
-            raise Exception("lo atom needs to be a int")
+            raise PacmanTypeError("lo atom needs to be a int")
         if not isinstance(hi_atom, int):
-            raise Exception("hi atom needs to be a int")
+            raise PacmanTypeError("hi atom needs to be a int")
 
         if lo_atom < 0:
             raise PacmanValueError('lo_atom < 0')
@@ -86,9 +85,9 @@ class Slice(collections.namedtuple('Slice',
         """
         try:
             return slice(self.start[n], self.start[n] + self.shape[n])
-        except IndexError:
+        except IndexError as exc:
             raise IndexError(f"{n} is invalid for slice with {len(self.shape)}"
-                             " dimensions")
+                             " dimensions") from exc
 
     @property
     def slices(self):
@@ -122,18 +121,18 @@ class Slice(collections.namedtuple('Slice',
         if len(self.shape) <= 1:
             return (f"({self.lo_atom}:{self.hi_atom})")
         value = ""
-        for slice in self.slices:
-            value += f"({slice.start}:{slice.stop})"
+        for a_slice in self.slices:
+            value += f"({a_slice.start}:{a_slice.stop})"
         return f"{self.lo_atom}{value}"
 
     @classmethod
-    def from_string(cls, str):
-        if str[0] == "(":
-            parts = str[1:-1].split(":")
+    def from_string(cls, as_str):
+        if as_str[0] == "(":
+            parts = as_str[1:-1].split(":")
             lo_atom = int(parts[0])
             hi_atom = int(parts[1])
             return Slice(lo_atom, hi_atom)
-        parts = str.split("(")
+        parts = as_str.split("(")
         lo_atom = int(parts[0])
         shape = []
         start = []

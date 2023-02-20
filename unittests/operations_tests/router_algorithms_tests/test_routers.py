@@ -1,22 +1,22 @@
 # Copyright (c) 2022 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 from spinn_utilities.timer import Timer
 from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
+from pacman.exceptions import PacmanRoutingException
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationEdge,
     ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex, FPGAConnection)
@@ -328,10 +328,10 @@ def _get_entry(routing_tables, x, y, source_vertex, partition_id, allow_none):
     if entry is None and app_entry is None:
         if allow_none:
             return None
-        raise Exception(
+        raise PacmanRoutingException(
             f"No entry found on {x}, {y} for {source_vertex}, {partition_id}")
     if entry is not None and app_entry is not None:
-        raise Exception(
+        raise PacmanRoutingException(
             f"App-entry and non-app-entry found on {x}, {y} for"
             f" {source_vertex}, {partition_id}: {app_entry}: {entry}")
     if app_entry is not None:
@@ -354,15 +354,15 @@ def _find_targets(
     while to_follow:
         x, y, next_to_follow = to_follow.pop()
         if not machine.is_chip_at(x, y):
-            raise Exception(
+            raise PacmanRoutingException(
                 f"Route goes through {x}, {y} but that doesn't exist!")
         if (x, y) in visited:
-            raise Exception(
+            raise PacmanRoutingException(
                 f"Potential loop found when going through {x}, {y}")
         visited.add((x, y))
         for p in next_to_follow.processor_ids:
             if (x, y, p) in found_targets:
-                raise Exception(
+                raise PacmanRoutingException(
                     f"Potential Loop found when adding routes at {x}, {y}")
             found_targets.add(((x, y), p, None))
         for link in next_to_follow.link_ids:
@@ -370,7 +370,7 @@ def _find_targets(
                 found_targets.add(((x, y), None, link))
             else:
                 if not machine.is_link_at(x, y, link):
-                    raise Exception(
+                    raise PacmanRoutingException(
                         f"Route from {source_vertex}, {partition_id} uses link"
                         f" {x}, {y}, {link} but that doesn't exist!")
                 next_x, next_y = machine.xy_over_link(x, y, link)
@@ -740,23 +740,25 @@ def _check_path(source, nodes_fixed, machine, target):
     seen = set()
     for direction, (n_x, n_y) in nodes_fixed:
         if (c_x, c_y) in seen:
-            raise Exception(f"Loop detected at {c_x}, {c_y}: {nodes_fixed}")
+            raise PacmanRoutingException(
+                f"Loop detected at {c_x}, {c_y}: {nodes_fixed}")
         if not machine.is_chip_at(c_x, c_y):
-            raise Exception(
+            raise PacmanRoutingException(
                 f"Route through down chip {c_x}, {c_y}: {nodes_fixed}")
         if not machine.is_link_at(c_x, c_y, direction):
-            raise Exception(
+            raise PacmanRoutingException(
                 f"Route through down link {c_x}, {c_y}, {direction}:"
                 f" {nodes_fixed}")
         if not machine.xy_over_link(c_x, c_y, direction) == (n_x, n_y):
-            raise Exception(
+            raise PacmanRoutingException(
                 f"Invalid route from {c_x}, {c_y}, {direction} to {n_x}, {n_y}"
                 f": {nodes_fixed}")
         seen.add((c_x, c_y))
         c_x, c_y = n_x, n_y
 
     if (c_x, c_y) != target:
-        raise Exception(f"Route doesn't end at (5, 5): {nodes_fixed}")
+        raise PacmanRoutingException(
+            f"Route doesn't end at (5, 5): {nodes_fixed}")
 
 
 def test_route_around():
