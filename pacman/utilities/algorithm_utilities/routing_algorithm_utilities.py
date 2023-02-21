@@ -392,7 +392,8 @@ def longest_dimension_first(vector, start):
 
 
 def least_busy_dimension_first(traffic, vector, start):
-    """ List the (x, y) steps on a route that goes through the least busy\
+    """
+    List the (x, y) steps on a route that goes through the least busy\
         routes first.
 
     :param traffic: A dictionary of (x, y): count of routes
