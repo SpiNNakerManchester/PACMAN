@@ -690,12 +690,13 @@ def test_fpga_link_overlap(params):
     set_config("Machine", "down_chips", "6,1")
     writer.set_machine(virtual_machine(12, 12))
     in_device = ApplicationFPGAVertex(
-        100, [FPGAConnection(0, i, None, None) for i in range(15, 0, -2)], None)
+        100, [FPGAConnection(0, i, None, None) for i in range(15, 0, -2)],
+        None)
     in_device.splitter = SplitterExternalDevice()
     in_device.splitter.create_machine_vertices(ChipCounter())
     writer.add_vertex(in_device)
     app_vertex = _make_vertices(
-        writer, 1000, 60 * 16, f"app_vertex")
+        writer, 1000, 60 * 16, "app_vertex")
     writer.add_edge(ApplicationEdge(in_device, app_vertex), "Test")
 
     writer.set_placements(place_application_graph(Placements()))
