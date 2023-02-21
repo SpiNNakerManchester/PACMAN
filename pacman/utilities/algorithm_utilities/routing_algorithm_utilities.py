@@ -402,7 +402,7 @@ def least_busy_dimension_first(traffic, vector, start):
     :param start: (x, y)
         The coordinates from which the path should start (note this is a 2D
         coordinate).
-    :param machine:the spinn machine.
+    :param machine: the spinn machine.
     :return: min route
     """
 
