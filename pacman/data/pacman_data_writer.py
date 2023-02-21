@@ -145,7 +145,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         Sets the _routing_table_by_partition
 
         :param MulticastRoutingTableByPartition routing_table_by_partition:
-        raises TypeError: if routing_table_by_partition is no a
+            raises TypeError: if routing_table_by_partition is no a
             MulticastRoutingTableByPartition
         """
         if not isinstance(
