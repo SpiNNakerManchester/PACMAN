@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pacman.model.tags.tags import Tags
+from .tags import Tags
 
 __all__ = ["Tags"]
