@@ -102,7 +102,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
         :param MulticastRoutingTables router_tables: new value
         :raises TypeError:
-        if the router_tables is not a MulticastRoutingTables
+            if the router_tables is not a MulticastRoutingTables
         """
         if not isinstance(router_tables, MulticastRoutingTables):
             raise TypeError(
@@ -115,7 +115,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
         :param MulticastRoutingTables router_tables: new value
         :raises TypeError:
-        if the router_tables is not a MulticastRoutingTables
+            if the router_tables is not a MulticastRoutingTables
         """
         if not isinstance(router_tables, MulticastRoutingTables):
             raise TypeError(
@@ -145,8 +145,8 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         Sets the _routing_table_by_partition
 
         :param MulticastRoutingTableByPartition routing_table_by_partition:
-        raises TypeError: if routing_table_by_partition is no a
-        MulticastRoutingTableByPartition
+            raises TypeError: if routing_table_by_partition is no a
+            MulticastRoutingTableByPartition
         """
         if not isinstance(
                 routing_table_by_partition, MulticastRoutingTableByPartition):
