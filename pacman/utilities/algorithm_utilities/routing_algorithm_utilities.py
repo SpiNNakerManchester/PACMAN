@@ -392,7 +392,8 @@ def longest_dimension_first(vector, start):
 
 
 def least_busy_dimension_first(traffic, vector, start):
-    """ List the (x, y) steps on a route that goes through the least busy\
+    """
+    List the (x, y) steps on a route that goes through the least busy\
         routes first.
 
     :param traffic: A dictionary of (x, y): count of routes
@@ -401,7 +402,7 @@ def least_busy_dimension_first(traffic, vector, start):
     :param start: (x, y)
         The coordinates from which the path should start (note this is a 2D
         coordinate).
-    :param machine:the spinn machine.
+    :param machine: the spinn machine.
     :return: min route
     """
 
