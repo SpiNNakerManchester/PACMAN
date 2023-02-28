@@ -155,11 +155,11 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def _key_fields(self):
         """ The fields in the key for X and Y
 
-        :return: (start, mask, shift) for each of X and Y
-        :rtype: tuple(tuple(int, int int), tuple(int, int, int))
+        :return: (start, size, mask, shift) for each of X and Y
+        :rtype: tuple(tuple(int, int, int int), tuple(int, int, int, int))
         """
-        return ((0, self._source_x_mask, self._source_x_shift),
-                (0, self._source_y_mask, self._source_y_shift))
+        return ((0, self._width, self._source_x_mask, self._source_x_shift),
+                (0, self._height, self._source_y_mask, self._source_y_shift))
 
     @property
     def _x_bits(self):

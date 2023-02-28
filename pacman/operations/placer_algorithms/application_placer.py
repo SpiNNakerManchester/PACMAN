@@ -16,7 +16,7 @@ import logging
 import numpy
 import os
 
-from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.config_holder import get_config_bool, get_config_str
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
@@ -133,6 +133,8 @@ def _place_error(
         app_vertex_placed = True
         found_placed_cores = False
         for vertices, _sdram in same_chip_groups:
+            if isinstance(vertices[0], AbstractVirtual):
+                break
             if placements.is_vertex_placed(vertices[0]):
                 found_placed_cores = True
             elif found_placed_cores:
@@ -244,7 +246,6 @@ def _draw_placements(placements, system_placements):
                     break
             if vertex is not None:
                 board_colours[x, y] = vertex_colours[vertex.app_vertex]
-
     include_boards = [
         (chip.x, chip.y) for chip in machine.ethernet_connected_chips]
     w = math.ceil(machine.width / 12)
@@ -256,8 +257,9 @@ def _draw_placements(placements, system_placements):
     hex_boards = board.create_torus(w, h)
     with PNGContextManager(
             output_filename, image_width, image_height) as ctx:
-        draw_machine_map(ctx, image_width, image_height, w, h, hex_boards,
-                         dict(), board_colours, include_boards)
+        draw_machine_map(
+            ctx, image_width, image_height, machine.width, machine.height,
+            hex_boards, dict(), board_colours, include_boards)
 
 
 class _SpaceExceededException(Exception):
@@ -553,8 +555,14 @@ def _chip_order(machine):
     :param machine:
     :rtype: Chip
     """
+    s_x, s_y = get_config_str("Mapping", "placer_start_chip").split(",")
+    s_x = int(s_x)
+    s_y = int(s_y)
+
     for x in range(machine.width):
         for y in range(machine.height):
-            chip = machine.get_chip_at(x, y)
+            c_x = (x + s_x) % machine.width
+            c_y = (y + s_y) % machine.height
+            chip = machine.get_chip_at(c_x, c_y)
             if chip:
                 yield chip

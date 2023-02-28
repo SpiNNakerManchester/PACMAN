@@ -338,16 +338,28 @@ def _route_multiple_source_to_target(
         Chips which overlap between source and target
     """
 
-    # Deal with the overlaps first by removing them from the set of things
-    # that can be targeted and routing directly to them
+    # Deal with the overlaps first by finding the set of all things that can
+    # be reached in the target from each of them, without hitting any other
+    # overlaps, and routing the source from there directly
+    reached_xys = set(overlaps)
     for overlap_xy in overlaps:
-        target_xys.remove(overlap_xy)
-        source_edge_xys.add(overlap_xy)
-        this_target_xys = {overlap_xy}
-        real_target_xys.remove(overlap_xy)
+        targets = _find_reachable(overlap_xy, machine, target_xys, reached_xys)
+        this_target_xys = {xy for xy in real_target_xys if xy in targets}
         _route_to_xys(
-            overlap_xy, {overlap_xy}, machine, routes, this_target_xys,
-            "Overlap Target to Target")
+            overlap_xy, targets, machine, routes, this_target_xys,
+            f"Overlap {overlap_xy} to Targets")
+
+        # We now need to make sure the source edges go here too
+        source_edge_xys.add(overlap_xy)
+
+        # We also need to stop the targets we have found being needed in future
+        for xy in this_target_xys:
+            real_target_xys.remove(xy)
+            target_xys.remove(xy)
+
+        # And we need to stop next run of the loop going through chips
+        # we have already done as more overlapping is not a good idea!
+        reached_xys.update(targets)
 
     # Now do the last bit, which is getting to the rest of the chips
     _route_to_xys(
@@ -604,6 +616,29 @@ def _route_to_xys(first_xy, all_xys, machine, routes, targets, label):
         raise PacmanRoutingException(
             f"Failed to visit all targets {targets} from {first_xy}: "
             f" Not visited {targets_to_visit}")
+
+
+def _find_reachable(source_xy, machine, allowed_xys, disallowed_xys):
+    """ Find a set of chips that can be reached from a source only via the
+        allowed chips, but not looking at the disallowed chips.  A chip in
+        the disallowed chips is not used unless it is the source even if in the
+        allowed chips!
+    """
+    xys_to_explore = deque([source_xy])
+    visited = set()
+    while xys_to_explore:
+        xy = xys_to_explore.pop()
+        if xy in visited:
+            continue
+        visited.add(xy)
+        for link in range(6):
+            x, y = xy
+            if machine.is_link_at(x, y, link):
+                next_xy = machine.xy_over_link(x, y, link)
+                if (_is_open_chip(next_xy, allowed_xys, visited, machine) and
+                        next_xy not in disallowed_xys):
+                    xys_to_explore.append(next_xy)
+    return visited
 
 
 def _is_open_chip(xy, xys, visited, machine):
