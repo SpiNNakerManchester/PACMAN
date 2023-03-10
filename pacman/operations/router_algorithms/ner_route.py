@@ -16,7 +16,7 @@
 Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast routing,
 Parallel Computing (2014).
 
-`http://dx.doi.org/10.1016/j.parco.2015.01.002`
+`https://dx.doi.org/10.1016/j.parco.2015.01.002`
 
 Based on
 https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/ner.py
@@ -133,7 +133,7 @@ def _do_route(source_xy, post_vertexes, machine, vector_to_nodes):
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
     routing, Parallel Computing (2014).
-    http://dx.doi.org/10.1016/j.parco.2015.01.002
+    https://dx.doi.org/10.1016/j.parco.2015.01.002
 
     This algorithm attempts to use NER to generate routing trees for all nets
     and routes around broken links using A* graph search. If the system is
