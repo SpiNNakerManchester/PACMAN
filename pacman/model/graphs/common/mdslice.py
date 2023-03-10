@@ -14,10 +14,11 @@
 
 import numpy
 from pacman.exceptions import PacmanValueError, PacmanTypeError
+from .slice import Slice
 
 
-class Slice(object):
-    """ Represents a Simple Single Dimensional slice of a vertex.
+class MDSlice(Slice):
+    """ Represents a Multi Dimension slice of a vertex.
 
     :attr int lo_atom: The lowest atom represented in the slice.
     :attr int hi_atom: The highest atom represented in the slice.
@@ -30,64 +31,59 @@ class Slice(object):
         this will be lo_atom in 1 dimension.
     """
 
-    __slots__ = ["_lo_atom", "_n_atoms"]
+    __slots__ = ["_shape", "_start", "_atom_shape"]
 
-    def __init__(self, lo_atom, hi_atom):
-        """ Create a new Slice object.
+    def __init__(self, lo_atom, hi_atom, shape, start):
+        """ Create a new Mutile dimensional Slice object.
 
         :param int lo_atom: Index of the lowest atom to represent.
         :param int hi_atom: Index of the highest atom to represent.
         :raises PacmanValueError: If the bounds of the slice are invalid.
         """
-        if not isinstance(lo_atom, int):
-            raise PacmanTypeError("lo atom needs to be a int")
-        if not isinstance(hi_atom, int):
-            raise PacmanTypeError("hi atom needs to be a int")
+        super().__init__(lo_atom, hi_atom)
 
-        if lo_atom < 0:
-            raise PacmanValueError('lo_atom < 0')
-        if hi_atom < lo_atom:
+        # The shape of the atoms in the slice is all the atoms in a line by
+        if shape is None:
             raise PacmanValueError(
-                'hi_atom {:d} < lo_atom {:d}'.format(hi_atom, lo_atom))
-
-        self._lo_atom = lo_atom
-        # Number of atoms represented by this slice
-        self._n_atoms = hi_atom - lo_atom + 1
-
-    @property
-    def lo_atom(self):
-        return self._lo_atom
+                "shape must be specified if start is specified")
+        if start is None:
+            raise PacmanValueError(
+                "start must be specified if shape is specified")
+        if len(shape) != len(start):
+            raise PacmanValueError(
+                "Both shape and start must have the same length")
+        self._shape = shape
+        self._start = start
 
     @property
     def hi_atom(self):
-        return self._lo_atom + self._n_atoms - 1
-
-    @property
-    def n_atoms(self):
-        return self._n_atoms
+        raise NotImplementedError(
+            "hi_atom does not work for multi dimensional slices")
 
     @property
     def shape(self):
-        return (self._n_atoms, )
+        return self._shape
 
     @property
     def start(self):
-        return (self._lo_atom,)
+        return self._start
 
     @property
     def as_slice(self):
-        # Slice for accessing arrays of values
-        return slice(self._lo_atom, self._lo_atom + self._n_atoms)
+        raise NotImplementedError(
+            "as slice does not work for multi dimensional slices")
 
     def get_slice(self, n):
         """ Get a slice in the n-th dimension
 
-        :param int n: Must be 0
+        :param int n: The 0-indexed dimension to get the shape of
         :type: slice
         """
-        if n == 0:
-            return slice(self._lo_atom, self._lo_atom + self._n_atoms)
-        raise IndexError(f"{n} is invalid for a 1 Deminsion Slice ")
+        try:
+            return slice(self.start[n], self.start[n] + self.shape[n])
+        except IndexError as exc:
+            raise IndexError(f"{n} is invalid for slice with {len(self.shape)}"
+                             " dimensions") from exc
 
     @property
     def slices(self):
@@ -95,13 +91,13 @@ class Slice(object):
 
         :rtype: tuple(slice)
         """
-        return tuple(self.as_slice())
+        return tuple(self.get_slice(n) for n in range(len(self.shape)))
 
     @property
     def end(self):
         """ The end positions of the slice in each dimension
         """
-        return tuple(self._lo_atom + self._n_atoms)
+        return tuple((numpy.array(self.start) + numpy.array(self.shape)) - 1)
 
     def get_raster_ids(self, atoms_shape):
         """ Get the IDs of the atoms in the slice as they would appear in a
@@ -118,24 +114,38 @@ class Slice(object):
         return ids[slices].flatten()
 
     def __str__(self):
-        return (f"({self.lo_atom}:{self.hi_atom})")
+        value = ""
+        for a_slice in self.slices:
+            value += f"({a_slice.start}:{a_slice.stop})"
+        return f"{self.lo_atom}{value}"
 
     def __eq__(self, other):
-        if not isinstance(other, Slice):
+        if not isinstance(other, MDSlice):
             return False
-        if self._lo_atom != other.lo_atom:
+        if not super().__eq__(other):
             return False
-        return self._n_atoms == other.n_atoms
+        if self._shape != other.shape:
+            return False
+        return self._start == other.start
 
     def __hash__(self):
-        return hash((self._lo_atom, self._n_atoms))
+        return hash((self._lo_atom, self._n_atoms, self._shape, self._start))
 
     @classmethod
     def from_string(cls, as_str):
-        if as_str[0] != "(":
-            raise NotImplementedError("Please use MDSlice method")
-
-        parts = as_str[1:-1].split(":")
+        if as_str[0] == "(":
+            return Slice.from_string(as_str)
+        parts = as_str.split("(")
         lo_atom = int(parts[0])
-        hi_atom = int(parts[1])
-        return Slice(lo_atom, hi_atom)
+        shape = []
+        start = []
+        size = 1
+        for part in parts[1:]:
+            subs = part.split(":")
+            begin = int(subs[0])
+            atoms = int(subs[1][:-1]) - begin
+            size *= atoms
+            shape.append(atoms)
+            start.append(begin)
+        return MDSlice(
+            lo_atom, lo_atom + size - 1, tuple(shape), tuple(start))
