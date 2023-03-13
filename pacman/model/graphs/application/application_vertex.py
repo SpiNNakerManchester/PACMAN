@@ -24,8 +24,9 @@ logger = FormatAdapter(logging.getLogger(__file__))
 
 
 class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
-    """ A vertex that can be broken down into a number of smaller vertices\
-        based on the resources that the vertex requires.
+    """
+    A vertex that can be broken down into a number of smaller vertices
+    based on the resources that the vertex requires.
     """
 
     __slots__ = [
@@ -98,7 +99,6 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         :param new_value: The new splitter object
         :type new_value:
             ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
-        :rtype: None
         """
         if self._splitter == new_value:
             return
@@ -120,10 +120,11 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     @property
     def atoms_shape(self):
-        """ The "shape" of the atoms in the vertex i.e. how the atoms are split
-            between the dimensions of the vertex.  By default everything is
-            1-dimensional, so the return will be a 1-tuple but can be
-            overridden by a vertex that supports multiple dimensions.
+        """
+        The "shape" of the atoms in the vertex i.e. how the atoms are split
+        between the dimensions of the vertex.  By default everything is
+        1-dimensional, so the return will be a 1-tuple but can be
+        overridden by a vertex that supports multiple dimensions.
 
         :rtype: tuple(int, ...)
         """
@@ -131,18 +132,19 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     @abstractproperty
     def n_atoms(self):
-        """ The number of atoms in the vertex
+        """ The number of atoms in the vertex.
 
         :rtype: int
         """
 
     def round_n_atoms(self, n_atoms, label="n_atoms"):
         """
-        Utility function to allow suoer-classes to make sure n_atom is an int
+        Utility function to allow suoer-classes to make sure n_atom is an int.
 
         :param n_atoms: Value convertible to int to be used for n_atoms
         :type n_atoms: int or float or numpy.
-        :return:
+        :return: Number of atoms.
+        :rtype: int
         """
         if isinstance(n_atoms, int):
             return n_atoms
@@ -156,20 +158,21 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
                     label, n_atoms, temp)
             return temp
         raise PacmanInvalidParameterException(
-            label, n_atoms, "int value expected for {}".format(label))
+            label, n_atoms, f"int value expected for {label}")
 
     @property
     def machine_vertices(self):
-        """ The machine vertices that this application vertex maps to
+        """ The machine vertices that this application vertex maps to.
 
         :rtype: iterable(MachineVertex)
         """
         return self._machine_vertices
 
     def get_max_atoms_per_core(self):
-        """ Gets the maximum number of atoms per core, which is either the\
-            number of atoms required across the whole application vertex,\
-            or a lower value set.
+        """
+        Gets the maximum number of atoms per core, which is either the
+        number of atoms required across the whole application vertex,
+        or a lower value set.
 
         :rtype: int
         """
@@ -178,9 +181,10 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         return int(numpy.prod(self._max_atoms_per_dimension_per_core))
 
     def get_max_atoms_per_dimension_per_core(self):
-        """ Gets the maximum number of atoms per dimension per core.  This
-            will return a tuple with a number for each dimension of the vertex,
-            which might be one if this is a single-dimension vertex
+        """
+        Gets the maximum number of atoms per dimension per core.  This
+        will return a tuple with a number for each dimension of the vertex,
+        which might be one if this is a single-dimension vertex.
 
         :rtype: tuple(int)
         """
@@ -212,21 +216,23 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
                 " number of dimensions of atoms_shape")
 
     def reset(self):
-        """ Forget all machine vertices in the application vertex, and reset
-            the splitter (if any)
+        """
+        Forget all machine vertices in the application vertex, and reset
+        the splitter (if any).
         """
         self._machine_vertices = OrderedSet()
         if self._splitter is not None:
             self._splitter.reset_called()
 
     def get_machine_fixed_key_and_mask(self, machine_vertex, partition_id):
-        """ Get a fixed key and mask for the given machine vertex and partition
-            identifier, or None if not fixed (the default).  If this doesn't
-            return None, get_fixed_key_and_mask must also not return None,
-            and the keys returned here must align with those such that for each
-            key:mask returned here, key & app_mask == app_key.  It is OK for
-            this to return None and get_fixed_key_and_mask to return not None
-            iff there is only one machine vertex.
+        """
+        Get a fixed key and mask for the given machine vertex and partition
+        identifier, or `None` if not fixed (the default).  If this doesn't
+        return `None`, get_fixed_key_and_mask must also not return `None`,
+        and the keys returned here must align with those such that for each
+        key:mask returned here, key & app_mask == app_key.  It is OK for
+        this to return `None` and get_fixed_key_and_mask to return not `None`
+        iff there is only one machine vertex.
 
         :param MachineVertex machine_vertex:
             A source machine vertex of this application vertex
@@ -238,9 +244,10 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         return None
 
     def get_fixed_key_and_mask(self, partition_id):
-        """ Get a fixed key and mask for the application vertex or None if not
-            fixed (the default).  See get_machine_gixed_key_and_mask for the
-            conditions.
+        """
+        Get a fixed key and mask for the application vertex or `None` if not
+        fixed (the default).  See :py:meth:`get_machine_gixed_key_and_mask` for
+        the conditions.
 
         :param str partition_id:
             The identifier of the partition to get the key for
@@ -250,6 +257,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         return None
 
     def add_incoming_edge(self, edge, partition):
-        """ Add an edge incoming to this vertex.  This is ignored by default,
-            but could be used to track incoming edges, and/or report faults.
+        """
+        Add an edge incoming to this vertex.  This is ignored by default,
+        but could be used to track incoming edges, and/or report faults.
         """

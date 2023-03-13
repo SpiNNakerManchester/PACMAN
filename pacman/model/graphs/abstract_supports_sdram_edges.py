@@ -24,7 +24,7 @@ class AbstractSupportsSDRAMEdges(object, metaclass=AbstractBase):
 
     @abstractmethod
     def sdram_requirement(self, sdram_machine_edge):
-        """ Asks a machine vertex for the sdram requirement it needs.
+        """ Asks a machine vertex for the SDRAM requirement it needs.
 
         :param sdram_machine_edge: The SDRAM edge in question
         :return: the size in bytes this vertex needs for the SDRAM edge

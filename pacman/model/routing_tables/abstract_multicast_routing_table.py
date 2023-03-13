@@ -20,7 +20,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
     @abstractproperty
     def x(self):
-        """The x-coordinate of the chip of this table
+        """ The x-coordinate of the chip of this table.
 
         :return: The x-coordinate
         :rtype: int
@@ -28,7 +28,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
     @abstractproperty
     def y(self):
-        """ The y-coordinate of the chip of this table
+        """ The y-coordinate of the chip of this table.
 
         :return: The y-coordinate
         :rtype: int
@@ -36,7 +36,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
     @abstractproperty
     def multicast_routing_entries(self):
-        """ The multicast routing entries in the table
+        """ The multicast routing entries in the table.
 
         :return: an iterable of multicast routing entries
         :rtype: iterable(:py:class:`spinn_machine.MulticastRoutingEntry`)
@@ -45,16 +45,18 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
     @abstractproperty
     def number_of_entries(self):
-        """ The number of multi-cast routing entries there are in the\
-            multicast routing table
+        """
+        The number of multicast routing entries there are in the
+        multicast routing table.
 
         :return: int
         """
 
     @abstractproperty
     def number_of_defaultable_entries(self):
-        """ The number of multi-cast routing entries that are set to be\
-            defaultable within this multicast routing table
+        """
+        The number of multicast routing entries that are set to be
+        defaultable within this multicast routing table.
 
         :return: int
         """

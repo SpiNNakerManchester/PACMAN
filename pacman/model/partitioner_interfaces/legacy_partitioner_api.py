@@ -19,8 +19,9 @@ from spinn_utilities.abstract_base import (
 # Can't use this decorator: circular import problem
 # @require_subclass(ApplicationVertex)
 class LegacyPartitionerAPI(object, metaclass=AbstractBase):
-    """ API used by the vertices which dont have their own splitters but use\
-        what master did before the self partitioning stuff came to be.
+    """
+    API used by the vertices which dont have their own splitters but use
+    what master did before the self partitioning stuff came to be.
     """
     __slots__ = []
 

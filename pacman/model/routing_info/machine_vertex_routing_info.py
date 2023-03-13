@@ -16,8 +16,9 @@ from spinn_utilities.overrides import overrides
 
 
 class MachineVertexRoutingInfo(VertexRoutingInfo):
-    """ Associates a machine vertex and partition identifier to its routing
-        information (keys and masks).
+    """
+    Associates a machine vertex and partition identifier to its routing
+    information (keys and masks).
     """
 
     __slots__ = [
@@ -32,7 +33,7 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
 
     def __init__(self, keys_and_masks, partition_id, machine_vertex, index):
         """
-        :param iterable(BaseKeyAndMask) keys_and_masks:\
+        :param iterable(BaseKeyAndMask) keys_and_masks:
             The keys allocated to the machine partition
         :param str partition_id: The partition to set the keys for
         :param MachineVertex machine_vertex: The vertex to set the keys for
@@ -45,7 +46,7 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
 
     @property
     def machine_vertex(self):
-        """ The machine vertex
+        """ The machine vertex.
 
         :rtype: MachineVertex
         """
@@ -58,6 +59,6 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
 
     @property
     def index(self):
-        """ The index of the vertex
+        """ The index of the vertex.
         """
         return self.__index

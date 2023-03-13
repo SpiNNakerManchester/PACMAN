@@ -49,8 +49,7 @@ class AbstractMultiplePartition(AbstractEdgePartition):
         # safety checks
         if edge.pre_vertex not in self._pre_vertices.keys():
             raise PacmanValueError(
-                "The edge {} is not allowed in this outgoing partition".format(
-                    edge))
+                f"The edge {edge} is not allowed in this outgoing partition")
 
         super(AbstractMultiplePartition, self).add_edge(edge)
 

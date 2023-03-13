@@ -14,8 +14,9 @@
 
 
 class ReverseIPtagResource(object):
-    """ Represents the ability to talk to a SpiNNaker machine by sending UDP\
-        packets to it during execution.
+    """
+    Represents the ability to talk to a SpiNNaker machine by sending UDP
+    packets to it during execution.
     """
 
     __slots__ = [
@@ -57,8 +58,9 @@ class ReverseIPtagResource(object):
 
     @property
     def sdp_port(self):
-        """ The SDP port to use when constructing the SDP message from the\
-            received UDP message
+        """
+        The SDP port to use when constructing the SDP message from the
+        received UDP message
 
         :rtype: int
         """
@@ -66,7 +68,7 @@ class ReverseIPtagResource(object):
 
     @property
     def tag(self):
-        """ The tag required, or None if any tag is OK
+        """ The tag required, or `None` if any tag is OK
 
         :rtype: int or None
         """

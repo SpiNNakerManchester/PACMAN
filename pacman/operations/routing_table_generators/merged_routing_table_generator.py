@@ -22,8 +22,9 @@ from pacman.model.graphs.application import ApplicationVertex
 
 
 def merged_routing_table_generator():
-    """ Creates routing entries by merging adjacent entries from the same
-        application vertex when possible.
+    """
+    Creates routing entries by merging adjacent entries from the same
+    application vertex when possible.
 
     :rtype: MulticastRoutingTables
     """
@@ -99,7 +100,7 @@ def __match(iterator, vertex, part_id, r_info, entry, routing_info):
 
 
 def __mask_has_holes(mask):
-    """ Detect if the mask has a "hole" somewhere other than at the bottom
+    """ Detect if the mask has a "hole" somewhere other than at the bottom.
 
     :param int mask: The mask to check
     :rtype: bool

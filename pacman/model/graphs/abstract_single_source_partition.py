@@ -41,8 +41,8 @@ class AbstractSingleSourcePartition(
 
     @property
     def pre_vertex(self):
-        """ The vertex at which all edges in this outgoing edge partition\
-            start.
+        """
+        The vertex at which all edges in this outgoing edge partition start.
 
         :rtype: AbstractVertex
         """

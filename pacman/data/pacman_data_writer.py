@@ -38,7 +38,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     This class is designed to only be used directly within the PACMAN
     repository unittests as all methods are available to subclasses
-
     """
     __pacman_data = _PacmanDataModel()
     __slots__ = []
@@ -129,7 +128,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         :param plan_n_timesteps:
         :type plan_n_timesteps: int or None
         :raises TypeError: if the plan_n_timesteps are not an int or None
-        :raises PacmanConfigurationException: On a megative plan_n_timesteps
+        :raises PacmanConfigurationException: On a negative plan_n_timesteps
         """
         if plan_n_timesteps is not None:
             if not isinstance(plan_n_timesteps, int):

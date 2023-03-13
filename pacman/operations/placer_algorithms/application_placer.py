@@ -31,8 +31,12 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def place_application_graph(system_placements):
-    """ Perform placement of an application graph on the machine.
-        NOTE: app_graph must have been partitioned
+    """
+    Perform placement of an application graph on the machine.
+
+    .. note:
+
+        app_graph must have been partitioned
     """
 
     # Track the placements and  space
@@ -202,8 +206,8 @@ def _place_error(
 
 
 def _next_colour():
-    """ Get the next (random) RGB colour to use for a vertex for placement
-        drawings
+    """
+    Get the next (random) RGB colour to use for a vertex for placement drawings
 
     :rtype: tuple(int, int, int)
     """
@@ -268,7 +272,6 @@ class _SpaceExceededException(Exception):
 
 def _do_fixed_location(vertices, sdram, placements, machine, next_chip_space):
     """
-
     :param vertices:
     :param sdram:
     :param placements:
@@ -321,7 +324,6 @@ def _do_fixed_location(vertices, sdram, placements, machine, next_chip_space):
 
 def _store_on_chip(placements_to_make, vertices, sdram, next_chip_space):
     """
-
     :param placements_to_make:
     :param vertices:
     :param sdram:
@@ -335,7 +337,6 @@ def _store_on_chip(placements_to_make, vertices, sdram, next_chip_space):
 
 
 class _Spaces(object):
-
     __slots__ = ["__machine", "__chips", "__next_chip", "__used_chips",
                  "__system_placements", "__placements", "__plan_n_timesteps",
                  "__last_chip_space", "__saved_chips", "__restored_chips"]
@@ -353,7 +354,6 @@ class _Spaces(object):
 
     def __cores_and_sdram(self, chip):
         """
-
         :param Chip chip:
         :rtype: (int, int)
         :return:
@@ -367,7 +367,6 @@ class _Spaces(object):
 
     def get_next_chip_and_space(self):
         """
-
         :rtype: (_ChipWithSpace, _Space)
         """
         try:
@@ -390,7 +389,6 @@ class _Spaces(object):
 
     def __get_next_chip(self):
         """
-
         :rtype: Chip
         """
         while self.__restored_chips:
@@ -403,7 +401,6 @@ class _Spaces(object):
 
     def get_next_chip_space(self, space, last_chip_space):
         """
-
         :param _Space space:
         :param _ChipWithSpace last_chip_space:
         :rtype: _ChipWithSpace
@@ -429,7 +426,6 @@ class _Spaces(object):
     @property
     def n_chips_used(self):
         """
-
         :rtype: int
         :return:
         """
@@ -437,7 +433,6 @@ class _Spaces(object):
 
     def __usable_from_chip(self, chip):
         """
-
         :param Chip chip:
         :rtype set(Chip)
         """
@@ -481,7 +476,6 @@ class _Space(object):
 
     def pop(self):
         """
-
         :type: Chip
         :return:
         """
@@ -503,7 +497,6 @@ class _Space(object):
 
     def update(self, chips):
         """
-
         :param iter(Chip) chips:
         """
         for chip in chips:
@@ -514,7 +507,7 @@ class _Space(object):
 
 
 class _ChipWithSpace(object):
-    """ A chip with space for placement
+    """ A chip with space for placement.
     """
 
     __slots__ = ["chip", "cores", "sdram"]
@@ -551,7 +544,6 @@ class _ChipWithSpace(object):
 
 def _chip_order(machine):
     """
-
     :param machine:
     :rtype: Chip
     """

@@ -21,7 +21,7 @@ from pacman.exceptions import (
 
 
 def fixed_route_router(destination_class):
-    """ Runs the fixed route generator for all boards on machine
+    """ Runs the fixed route generator for all boards on machine.
 
     :param destination_class: the destination class to route packets to
     :type destination_class: type or tuple(type,...)
@@ -37,8 +37,9 @@ def fixed_route_router(destination_class):
 
 
 class _FixedRouteRouter(object):
-    """ Computes the fixed routes used to direct data out traffic to the
-        board-local gatherer processors.
+    """
+    Computes the fixed routes used to direct data out traffic to the
+    board-local gatherer processors.
     """
 
     __slots__ = [
@@ -51,7 +52,8 @@ class _FixedRouteRouter(object):
         self._fixed_route_tables = dict()
 
     def _run(self):
-        """ Runs the fixed route generator for all boards on machine
+        """
+        Runs the fixed route generator for all boards on machine.
 
         :return: router tables for fixed route paths
         :rtype: dict(tuple(int,int), ~spinn_machine.FixedRouteEntry)
@@ -70,8 +72,9 @@ class _FixedRouteRouter(object):
         return self._fixed_route_tables
 
     def _do_fixed_routing(self, ethernet_connected_chip):
-        """ Handles this board through the quick routing process, based on a\
-            predefined routing table.
+        """
+        Handles this board through the quick routing process, based on a
+        predefined routing table.
 
         :param ~spinn_machine.Chip ethernet_connected_chip:
             the Ethernet connected chip
@@ -132,8 +135,9 @@ class _FixedRouteRouter(object):
         self._fixed_route_tables[key] = fixed_route_entry
 
     def __locate_destination(self, chip):
-        """ Locate destination vertex on (Ethernet-connected) chip to send
-            fixed data to
+        """
+        Locate destination vertex on an (Ethernet-connected) chip to send
+        fixed data to.
 
         :param ~spinn_machine.Chip chip:
         :return: processor ID as a int

@@ -64,7 +64,7 @@ class AbstractVertex(object):
         self._label = label
 
     def addedToGraph(self):
-        """ Records that the vertex has been added to a graph
+        """ Records that the vertex has been added to a graph.
 
         :raises PacmanConfigurationException:
             If there is an attempt to add the same vertex more than once
@@ -73,9 +73,9 @@ class AbstractVertex(object):
 
     def get_fixed_location(self):
         """
-        The x, y and possibly p the vertex MUST be placed on.
+        The x, y and possibly p the vertex *must* be placed on.
 
-        Typically NONE! Does not have the value of a normal placememts.
+        Typically `None`! Does not have the value of a normal placememts.
 
         Used instead of ChipAndCoreConstraint
 
@@ -85,7 +85,6 @@ class AbstractVertex(object):
 
     def set_fixed_location(self, x, y, p=None):
         """
-
         :param ChipAndCore fixed_location:
         """
         fixed_location = ChipAndCore(x, y, p)

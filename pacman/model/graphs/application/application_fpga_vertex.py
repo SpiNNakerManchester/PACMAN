@@ -19,7 +19,7 @@ from .application_virtual_vertex import ApplicationVirtualVertex
 
 
 class ApplicationFPGAVertex(ApplicationVirtualVertex):
-    """ A virtual application vertex connected to one or more FPGA links
+    """ A virtual application vertex connected to one or more FPGA links.
     """
 
     __slots__ = [
@@ -33,7 +33,6 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
             outgoing_fpga_connection=None, label=None,
             n_machine_vertices_per_link=1):
         """
-
         :param int n_atoms: The number of atoms in the vertex
         :param incoming_fpga_connections:
             The connections from one or more FPGAs that that packets are
@@ -70,13 +69,15 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     @property
     def n_machine_vertices_per_link(self):
-        """ The number of machine vertices to create for each link of the FPGA
+        """
+        The number of machine vertices to create for each link of the FPGA.
+
         :rtype: int
         """
         return self._n_machine_vertices_per_link
 
     def get_incoming_slice_for_link(self, link, index):
-        """ Get the slice to be given to the connection from the given link
+        """ Get the slice to be given to the connection from the given link.
 
         :param FPGAConnection link: The FPGA connection to get the slice for
         :param int index:
@@ -93,7 +94,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         return Slice(low_atom, hi_atom)
 
     def get_outgoing_slice(self):
-        """ Get the slice to be given to the outgoing connection
+        """ Get the slice to be given to the outgoing connection.
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
@@ -101,8 +102,9 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     @property
     def incoming_fpga_connections(self):
-        """ The connections from one or more FPGAs that packets are expected
-            to be received from for this device
+        """
+        The connections from one or more FPGAs that packets are expected
+        to be received from for this device.
 
         :rtype: iter(FPGAConnection)
         """
@@ -112,8 +114,9 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     @property
     def outgoing_fpga_connection(self):
-        """ The connection to one FPGA via one link to which packets are sent
-            to this device.
+        """
+        The connection to one FPGA via one link to which packets are sent
+        to this device.
 
         :rtype: FPGAConnection or None
         """

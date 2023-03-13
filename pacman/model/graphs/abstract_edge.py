@@ -22,21 +22,21 @@ class AbstractEdge(object, metaclass=AbstractBase):
 
     @abstractproperty
     def label(self):
-        """ The label of the edge
+        """ The label of the edge.
 
         :rtype: str
         """
 
     @abstractproperty
     def pre_vertex(self):
-        """ The vertex at the start of the edge
+        """ The vertex at the start of the edge.
 
         :rtype: AbstractVertex
         """
 
     @abstractproperty
     def post_vertex(self):
-        """ The vertex at the end of the edge
+        """ The vertex at the end of the edge.
 
         :rtype: AbstractVertex
         """

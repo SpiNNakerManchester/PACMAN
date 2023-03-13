@@ -26,18 +26,13 @@ import itertools
 def get_app_partitions():
     """ Find all application partitions.
 
-        Note that where a vertex splitter indicates that it has internal
+    .. note::
+
+        Where a vertex splitter indicates that it has internal
         partitions but is not the source of an external partition, a "fake"
         empty application partition is added.  This allows the calling
         algorithm to loop over the returned list and look at the set of
         edges *and* internal partitions to get a complete picture of *all*
-        targets for each source machine vertex at once.
-
-    Note that where a vertex splitter indicates that it has internal
-        partitions but is not the source of an external partition, a "fake"
-        empty application partition is added.  This allows the calling
-        algorithm to loop over the returned list and look at the set of
-        edges and internal partitions to get a complete picture of all
         targets for each source machine vertex at once.
 
     :return: list of partitions; note where there are only internal multicast
@@ -151,13 +146,15 @@ def _copy_and_disconnect_tree(root):
     Copy a RoutingTree (containing nothing but RoutingTrees), disconnecting
     nodes which are not connected in the machine.
 
-    Note that if a dead chip is part of the input RoutingTree, no corresponding
-    node will be included in the copy. The assumption behind this is that the
-    only reason a tree would visit a dead chip is because a route passed
-    through the chip and wasn't actually destined to arrive at that chip. This
-    situation is impossible to confirm since the input routing trees have not
-    yet been populated with vertices. The caller is responsible for being
-    sensible.
+    .. note::
+
+        If a dead chip is part of the input RoutingTree, no corresponding node
+        will be included in the copy. The assumption behind this is that the
+        only reason a tree would visit a dead chip is because a route passed
+        through the chip and wasn't actually destined to arrive at that chip.
+        This situation is impossible to confirm since the input routing trees
+        have not yet been populated with vertices. The caller is responsible
+        for being sensible.
 
     :param RoutingTree root:
         The root of the RoutingTree that contains nothing but RoutingTrees
@@ -224,14 +221,16 @@ def _copy_and_disconnect_tree(root):
 def a_star(sink, heuristic_source, sources):
     """ Use A* to find a path from any of the sources to the sink.
 
-    Note that the heuristic means that the search will proceed towards
-    heuristic_source without any concern for any other sources. This means that
-    the algorithm may miss a very close neighbour in order to pursue its goal
-    of reaching heuristic_source. This is not considered a problem since 1) the
-    heuristic source will typically be in the direction of the rest of the tree
-    and near by and often the closest entity 2) it prevents us accidentally
-    forming loops in the rest of the tree since we'll stop as soon as we touch
-    any part of it.
+    .. note::
+
+        The heuristic means that the search will proceed towards
+        heuristic_source without any concern for any other sources. This means
+        that the algorithm may miss a very close neighbour in order to pursue
+        its goal of reaching heuristic_source. This is not considered a problem
+        since 1) the heuristic source will typically be in the direction of the
+        rest of the tree and near by and often the closest entity 2) it
+        prevents us accidentally forming loops in the rest of the tree since
+        we'll stop as soon as we touch any part of it.
 
     :param tuple(int,int) sink: (x, y)
     :param tuple(int,int) heuristic_source: (x, y)
@@ -295,8 +294,7 @@ def a_star(sink, heuristic_source, sources):
     # Fail of no paths exist
     if selected_source is None:
         raise MachineHasDisconnectedSubRegion(
-            "Could not find path from {} to {}".format(
-                sink, heuristic_source))
+            f"Could not find path from {sink} to {heuristic_source}")
 
     # Reconstruct the discovered path, starting from the source we found and
     # working back until the sink.
@@ -334,7 +332,7 @@ def convert_a_route(
         routing_tables, source_vertex, partition_id, incoming_processor,
         incoming_link, route, targets_by_chip):
     """
-    Converts the algorithm specific partition_route back to standard spinnaker
+    Converts the algorithm specific partition_route back to standard SpiNNaker
     and ands it to the routing_tables.
 
     :param MulticastRoutingTableByPartition routing_tables:
@@ -383,7 +381,7 @@ def longest_dimension_first(vector, start):
         The coordinates from which the path should start (note this is a 2D
         coordinate).
     :param ~spinn_machine.Machine machine:
-    :return:
+    :return: min route
     :rtype: list(tuple(int,tuple(int, int)))
     """
     return vector_to_nodes(
@@ -393,8 +391,8 @@ def longest_dimension_first(vector, start):
 
 def least_busy_dimension_first(traffic, vector, start):
     """
-    List the (x, y) steps on a route that goes through the least busy\
-        routes first.
+    List the (x, y) steps on a route that goes through the least busy
+    routes first.
 
     :param traffic: A dictionary of (x, y): count of routes
     :param vector: (x, y, z)
@@ -404,6 +402,7 @@ def least_busy_dimension_first(traffic, vector, start):
         coordinate).
     :param machine: the spinn machine.
     :return: min route
+    :rtype: list(tuple(int,tuple(int, int)))
     """
 
     # Go through and find the sum of traffic depending on the route taken
@@ -424,7 +423,7 @@ def least_busy_dimension_first(traffic, vector, start):
 
 
 def vector_to_nodes(dm_vector, start):
-    """ Convert a vector to a set of nodes
+    """ Convert a vector to a set of nodes.
 
     :param list(tuple(int,int)) dm_vector:
         A vector made up of a list of (dimension, magnitude), where dimensions
@@ -479,8 +478,8 @@ def vector_to_nodes(dm_vector, start):
 
 
 def nodes_to_trees(nodes, start, route):
-    """ Convert a list of nodes into routing trees, adding them to existing
-        routes
+    """
+    Convert a list of nodes into routing trees, adding them to existing routes.
 
     :param list(tuple(int,tuple(int,int))) nodes:
         The list of (link_id, (target_x, target_y)) nodes on the route
@@ -502,7 +501,7 @@ def nodes_to_trees(nodes, start, route):
 
 
 def most_direct_route(source, dest, machine):
-    """ Find the most direct route from source to target on the machine
+    """ Find the most direct route from source to target on the machine.
 
     :param tuple(int,int) source: The source x, y coordinates
     :param tuple(int,int) dest: The destination x, y coordinated
@@ -519,7 +518,7 @@ def most_direct_route(source, dest, machine):
 
 
 def get_targets_by_chip(vertices):
-    """ Get the target links and cores on the relevant chips
+    """ Get the target links and cores on the relevant chips.
 
     :param list(MachineVertex) vertices: The vertices to target
     :param Placements placements: Where the vertices are placed
@@ -556,8 +555,9 @@ def vertex_xy(vertex):
 
 
 def vertex_xy_and_route(vertex):
-    """ Get the non-virtual chip coordinates, the vertex, and processor or
-        link to follow to get to the vertex
+    """
+    Get the non-virtual chip coordinates, the vertex, and processor or
+    link to follow to get to the vertex.
 
     :param MachineVertex vertex:
     :return: the xy corridinates of the target vertex mapped to a tuple of

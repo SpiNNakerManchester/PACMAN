@@ -28,7 +28,7 @@ class _PacmanDataModel(object):
 
     This class should not be accessed directly please use the DataView and
     DataWriter classes.
-    Accessing or editing the data held here directly is NOT SUPPORTED
+    Accessing or editing the data held here directly is *not supported!*
 
     There may be other DataModel classes which sit next to this one and hold
     additional data. The DataView and DataWriter classes will combine these
@@ -62,7 +62,7 @@ class _PacmanDataModel(object):
 
     def _clear(self):
         """
-        Clears out all data
+        Clears out all data.
         """
         self._graph = ApplicationGraph()
         # set at the start of every run
@@ -71,7 +71,7 @@ class _PacmanDataModel(object):
 
     def _hard_reset(self):
         """
-        Clears out all data that should change after a reset and graph change
+        Clears out all data that should change after a reset and graph change.
         """
         if self._graph:
             self._graph.reset()
@@ -85,14 +85,14 @@ class _PacmanDataModel(object):
 
     def _soft_reset(self):
         """
-        Clears timing and other data that should changed every reset
+        Clears timing and other data that should changed every reset.
         """
         # Holder for any later additions
 
 
 class PacmanDataView(MachineDataView):
     """
-    Adds the extra Methods to the View for pacman level.
+    Adds the extra Methods to the View for PACMAN level.
 
     See UtilsDataView for a more detailed description.
 
@@ -108,7 +108,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def add_vertex(cls, vertex):
         """
-        Adds an Application vertex to the user graph
+        Adds an Application vertex to the user graph.
 
         Semantic sugar for get_graph().add_vertex
 
@@ -132,7 +132,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def add_edge(cls, edge, outgoing_edge_partition_name):
         """
-        Adds an Application edge to the user graph
+        Adds an Application edge to the user graph.
 
         Semantic sugar for get_graph().add_edge
 
@@ -175,7 +175,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_vertices_by_type(cls, vertex_type):
-        """ The application vertices in the graph of the specific type
+        """ The application vertices in the graph of the specific type.
 
         Semantic sugar for vertex in get_graph().vertices
         if isinstance(vertex, vertex_type)
@@ -211,7 +211,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def iterate_partitions(cls):
-        """ The partitions in the user application graphs as an iterator
+        """ The partitions in the user application graphs as an iterator.
 
         Semantic sugar for get_graph().outgoing_edge_partitions
 
@@ -268,7 +268,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_n_machine_vertices(cls):
         """
-        Gets the number of machine vertices via the application graph
+        Gets the number of machine vertices via the application graph.
         """
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
@@ -278,7 +278,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def iterate_machine_vertices(cls):
         """
-        Iterate the Machine vertices via the application graph
+        Iterate over the Machine vertices via the application graph.
 
         :return:
         """
@@ -292,7 +292,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def iterate_placemements(cls):
         """
-        Iterates over the Placement objects
+        Iterates over the Placement objects.
 
         Semantic sugar for get_placement_placements
 
@@ -305,7 +305,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def iterate_placements_by_vertex_type(cls, vertex_type):
         """
-         Iterate over placements on any chip with this vertex_type
+        Iterate over placements on any chip with this vertex_type.
 
         :param class vertex_type: Class of vertex to find
         :rtype: Placement
@@ -320,10 +320,10 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def iterate_placements_on_core(cls, x, y):
         """
-        Iterate over placements with this x, y and this type
+        Iterate over placements with this x and y.
 
         :param int x: x coordinate to find placements for.
-        :param int y: y coordinate  to find placements for.
+        :param int y: y coordinate to find placements for.
         :rtype: Placement
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the placements are currently unavailable
@@ -335,7 +335,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def iterate_placements_by_xy_and_type(cls, x, y, vertex_type):
         """
-        Iterate over placements with this x, y and this type
+        Iterate over placements with this x, y and type.
 
         :param int x: x coordinate to find placements for.
         :param int y: y coordinate  to find placements for.
@@ -351,7 +351,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_n_placements(cls):
-        """ The number of placements
+        """ The number of placements.
 
         :rtype: int
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -363,7 +363,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_placement_of_vertex(cls, vertex):
-        """ Return the placement information for a vertex
+        """ Return the placement information for a vertex.
 
         Semantic sugar for get_placements().get_placement_of_vertex(vertex)
         Optimised for speed
@@ -384,8 +384,9 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_placement_on_processor(cls, x, y, p):
-        """ Return the vertex on a specific processor or raises an exception
-            if the processor has not been allocated
+        """
+        Return the vertex on a specific processor or raises an exception
+        if the processor has not been allocated.
 
         :param int x: the x coordinate of the chip
         :param int y: the y coordinate of the chip
@@ -407,7 +408,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_routing_infos(cls):
         """
-        The routing_infos if known
+        The routing_infos if known.
 
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the routing_infos is currently unavailable
@@ -421,7 +422,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_tags(cls):
         """
-        The Tags object if known
+        The Tags object if known.
 
         :rtype: ~pacman.model.tags.Tags
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -468,7 +469,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_plan_n_timestep(cls):
         """
-        The number of timesets to plan for.
+        The number of timesteps to plan for.
 
         Use by partitioners and such but not to reserve data regions
 
@@ -480,7 +481,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_routing_table_by_partition(cls):
         """
-        The MulticastRoutingTableByPartition if it has been set
+        The MulticastRoutingTableByPartition, if it has been set.
 
         :rtype: MulticastRoutingTableByPartition
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:

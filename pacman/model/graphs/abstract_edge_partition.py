@@ -18,9 +18,10 @@ from pacman.exceptions import (
 
 
 class AbstractEdgePartition(object, metaclass=AbstractBase):
-    """ A collection of edges which start at a single vertex which have the\
-        same semantics and so can share a single key or block of SDRAM\
-        (depending on edge type).
+    """
+    A collection of edges which start at a single vertex which have the
+    same semantics and so can share a single key or block of SDRAM
+    (depending on edge type).
     """
 
     __slots__ = [
@@ -57,7 +58,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
             raise PacmanInvalidParameterException(
                 "edge", str(edge.__class__),
                 "Edges of this graph must be one of the following types:"
-                " {}".format(self._allowed_edge_types))
+                f" {self._allowed_edge_types}")
         if edge in self._edges:
             raise PacmanAlreadyExistsException("Edge", edge)
         self._edges.add(edge)
@@ -98,7 +99,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         return self.__repr__()
 
     def __contains__(self, edge):
-        """ Check if the edge is contained within this partition
+        """ Check if the edge is contained within this partition.
 
         :param AbstractEdge edge: the edge to search for.
         :rtype: bool
@@ -108,7 +109,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
     @abstractproperty
     def pre_vertices(self):
         """
-        Provides the vertices associated with this partition
+        Provides the vertices associated with this partition.
 
         .. note::
             Most edge partitions will be

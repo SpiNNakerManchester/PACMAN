@@ -85,7 +85,7 @@ class ApplicationGraph(object):
         return len(self._vertex_by_label)
 
     def add_edge(self, edge, outgoing_edge_partition_name):
-        """ Add an edge to the graph and its partition
+        """ Add an edge to the graph and its partition.
 
         If required and possible will create a new partition in the graph
 
@@ -141,7 +141,7 @@ class ApplicationGraph(object):
     def edges(self):
         # pylint: disable=not-an-iterable
         # https://github.com/PyCQA/pylint/issues/3105
-        """ The edges in the graph
+        """ The edges in the graph.
 
         :rtype: iterable(AbstractEdge)
         """
@@ -192,7 +192,7 @@ class ApplicationGraph(object):
     def get_outgoing_edge_partition_starting_at_vertex(
             self, vertex, outgoing_edge_partition_name):
         """
-        Get the given outgoing edge partition that starts at the\
+        Get the given outgoing edge partition that starts at the
         given vertex, or `None` if no such edge partition exists.
 
         :param AbstractVertex vertex:
@@ -211,7 +211,7 @@ class ApplicationGraph(object):
         return None
 
     def reset(self):
-        """ Reset all the application vertices
+        """ Reset all the application vertices.
         """
         for vertex in self.vertices:
             vertex.reset()

@@ -22,8 +22,9 @@ from pacman.model.graphs.machine import SDRAMMachineEdge
 
 class ConstantSDRAMMachinePartition(
         AbstractSingleSourcePartition, AbstractSDRAMPartition):
-    """ An SDRAM partition that uses a fixed amount of memory. The edges in\
-        the partition must agree on how much memory is required.
+    """
+    An SDRAM partition that uses a fixed amount of memory. The edges in
+    the partition must agree on how much memory is required.
     """
 
     __slots__ = [

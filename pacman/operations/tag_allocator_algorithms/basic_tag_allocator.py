@@ -32,8 +32,8 @@ _Task = namedtuple("_Task", "constraint, board, tag, vertex, placement")
 
 def basic_tag_allocator():
     """
-    Basic tag allocator that goes though the boards available and applies\
-        the IP tags and reverse IP tags as needed.
+    Basic tag allocator that goes though the boards available and applies
+    the IP tags and reverse IP tags as needed.
 
     :param ~spinn_machine.Machine machine:
         The machine with respect to which to partition the application

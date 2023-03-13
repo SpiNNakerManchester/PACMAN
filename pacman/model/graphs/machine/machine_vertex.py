@@ -55,8 +55,9 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
     @property
     def app_vertex(self):
-        """ The application vertex that caused this machine vertex to be
-            created. If None, there is no such application vertex.
+        """
+        The application vertex that caused this machine vertex to be
+        created. If `None`, there is no such application vertex.
 
         :rtype: ApplicationVertex or None
         """
@@ -64,8 +65,9 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
     @property
     def vertex_slice(self):
-        """ The slice of the application vertex that this machine vertex
-            implements.
+        """
+        The slice of the application vertex that this machine vertex
+        implements.
 
         :rtype: Slice
         """
@@ -84,8 +86,9 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
     @property
     def index(self):
-        """ The index into the collection of machine vertices for an
-            application vertex.
+        """
+        The index into the collection of machine vertices for an
+        application vertex.
 
         :rtype: int
         """
@@ -93,8 +96,9 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
     @index.setter
     def index(self, value):
-        """ The index into the collection of machine vertices for an
-            application vertex.
+        """
+        The index into the collection of machine vertices for an
+        application vertex.
         """
         self._index = value
 
@@ -111,7 +115,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
     @abstractproperty
     def sdram_required(self):
-        """ The sdram required by the vertex
+        """ The SDRAM space required by the vertex.
 
         :rtype: ~pacman.model.resources.AbstractSDRAM
         """
@@ -119,7 +123,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     @property
     def iptags(self):
         """
-        The iptags used by this vertex if any.
+        The IPtags used by this vertex if any.
 
         :rtype: iterable(IPtagResource)
         """
@@ -128,7 +132,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     @property
     def reverse_iptags(self):
         """
-        The reverse iptags used by this vertex if any.
+        The reverse IPtags used by this vertex if any.
 
         :rtype: iterable(ReverseIPtagResource)
         """
@@ -137,9 +141,9 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     @overrides(AbstractVertex.get_fixed_location)
     def get_fixed_location(self):
         """
-        The x, y and possibly p the vertex MUST be placed on.
+        The x, y and possibly p the vertex *must* be placed on.
 
-        Typically NONE! Does not have the value of a normal placememts.
+        Typically `None`! Does not have the value of a normal placememts.
 
         If the Machine vertex has no fixed_location
         but does have an app_vertex, app_vertex.fixed_location is used.

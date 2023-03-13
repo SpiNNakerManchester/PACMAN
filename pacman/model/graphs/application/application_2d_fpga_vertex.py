@@ -18,7 +18,7 @@ from spinn_utilities.overrides import overrides
 
 
 class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
-    """ A device connected to an FPGA with input or output in two dimensions
+    """ A device connected to an FPGA with input or output in two dimensions.
     """
 
     __slots__ = [
@@ -33,7 +33,6 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
             incoming_fpga_connections=None, outgoing_fpga_connection=None,
             label=None):
         """
-
         :param int width: The width of the vertex in atoms
         :param int height: The height of the vertex in atoms
         :param int sub_width:

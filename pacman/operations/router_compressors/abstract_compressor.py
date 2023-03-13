@@ -68,7 +68,7 @@ class AbstractCompressor(object):
         """
 
     def compress_tables(self, router_tables, progress):
-        """ Compress all the unordered routing tables
+        """ Compress all the unordered routing tables.
 
         Tables who start of smaller than target_length are not compressed
 
@@ -107,7 +107,7 @@ class AbstractCompressor(object):
             if self._ordered and not self._accept_overflow:
                 raise MinimisationFailedError(
                     "The routing table after compression will still not fit"
-                    " within the machines router: {}".format(self._problems))
+                    f" within the machines router: {self._problems}")
             else:
                 logger.warning(self._problems)
         return compressed_tables

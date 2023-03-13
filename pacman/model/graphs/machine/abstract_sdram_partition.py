@@ -27,8 +27,9 @@ class AbstractSDRAMPartition(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_sdram_base_address_for(self, vertex):
-        """ Get the SDRAM base address for a edge given which side \
-            the vertex is on.
+        """
+        Get the SDRAM base address for a edge given which side
+        the vertex is on.
 
         :param vertex: the vertex to find SDRAM base address of
         :return: the SDRAM address for this vertex

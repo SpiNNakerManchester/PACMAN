@@ -58,8 +58,9 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         return self._governed_app_vertex
 
     def set_governed_app_vertex(self, app_vertex):
-        """ Sets a app vertex to be governed by this splitter object. \
-            Once set it can't be reset
+        """
+        Sets a app vertex to be governed by this splitter object.
+        Once set it can't be reset.
 
         :param ApplicationVertex app_vertex: the app vertex to govern
         :raises PacmanConfigurationException:
@@ -99,7 +100,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_out_going_vertices(self, partition_id):
-        """ Get machine pre vertices
+        """ Get machine pre-vertices.
 
         The output vertices are the ones that will serve as source vertices
         for external edges.
@@ -110,11 +111,15 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_in_coming_vertices(self, partition_id):
-        """ Get machine post vertices for a given partition.
+        """ Get machine post-vertices for a given partition.
 
         The input vertices are the ones that will serve as target vertices
-        for external edges.  Note this method returns all that could be used
-        for any source machine vertex in the given partition.
+        for external edges.
+
+        .. note::
+
+            This method returns all that could be used
+            for any source machine vertex in the given partition.
 
         :param str partition_id: The identifier of the incoming partition
         :rtype: list(MachineVertex)
@@ -122,11 +127,15 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     def get_source_specific_in_coming_vertices(
             self, source_vertex, partition_id):
-        """ Get machine post vertices for a given source.
+        """ Get machine post-vertices for a given source.
 
         The input vertices are the ones that will serve as target vertices
-        for external edges.  Note this method allows filtering of the targets
-        for a specific source machine vertex.
+        for external edges.
+
+        .. note::
+
+            This method allows filtering of the targets
+            for a specific source machine vertex.
 
         This default method makes every machine vertex a target for the source.
         This should be overridden if there are specific machine vertices for
@@ -154,14 +163,15 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     @abstractmethod
     def reset_called(self):
-        """ reset the splitter to be as if it has not operated a splitting yet.
+        """ Reset the splitter to be as if it has not operated a splitting yet.
         """
 
     def get_same_chip_groups(self):
-        """ Get a list of lists of vertices and sdram which must be
-            allocated on the same chip.  By default this returns a list of each
-            machine vertex and its SDRAM; override if there are groups of
-            machine vertices on the same chip.
+        """
+        Get a list of lists of vertices and sdram which must be
+        allocated on the same chip.  By default this returns a list of each
+        machine vertex and its SDRAM; override if there are groups of
+        machine vertices on the same chip.
 
         :rtype: list(list(MachineVertex), AbstractSDRAM)
         """
@@ -169,18 +179,20 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
                 for v in self._governed_app_vertex.machine_vertices]
 
     def get_internal_multicast_partitions(self):
-        """ Get edge partitions between machine vertices that are to be
-            handled by Multicast.  Returns empty by default, override if there
-            are Multicast connections between internal vertices
+        """
+        Get edge partitions between machine vertices that are to be
+        handled by Multicast.  Returns empty by default, override if there
+        are Multicast connections between internal vertices
 
         :rtype: list(MulticastEdgePartition)
         """
         return []
 
     def get_internal_sdram_partitions(self):
-        """ Get edge partitions between machine vertices that are to be
-            handled by SDRAM.  Returns empty by default, override if there
-            are SDRAM connections between internal vertices
+        """
+        Get edge partitions between machine vertices that are to be
+        handled by SDRAM.  Returns empty by default, override if there
+        are SDRAM connections between internal vertices
 
         :rtype: list(AbstractSDRAMPartition)
         """

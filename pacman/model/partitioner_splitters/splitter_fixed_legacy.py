@@ -18,8 +18,8 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
-from pacman.utilities.algorithm_utilities\
-    .partition_algorithm_utilities import get_multidimensional_slices
+from pacman.utilities.algorithm_utilities.partition_algorithm_utilities import\
+    get_multidimensional_slices
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

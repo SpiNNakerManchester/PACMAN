@@ -160,10 +160,10 @@ def _do_route(source_xy, post_vertexes, machine, vector_to_nodes):
 
 
 def _ner_route(vector_to_nodes):
-    """ Performs routing using rig algorithm
+    """ Performs routing using rig algorithm.
 
     :param vector_to_nodes:
-    :return:
+    :return: the routing tables
     :rtype: MulticastRoutingTableByPartition
     """
     routing_tables = MulticastRoutingTableByPartition()
@@ -213,7 +213,7 @@ def _ner_route(vector_to_nodes):
 
 
 def ner_route():
-    """ basic ner router
+    """ basic ner router.
 
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition
@@ -222,7 +222,7 @@ def ner_route():
 
 
 def ner_route_traffic_aware():
-    """ traffic-aware ner router
+    """ traffic-aware ner router.
 
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition

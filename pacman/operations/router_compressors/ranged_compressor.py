@@ -28,7 +28,6 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 def range_compressor(accept_overflow=True):
     """
-
     :param MulticastRoutingTables router_tables:
     :param bool accept_overflow:
         A flag which should only be used in testing to stop raising an

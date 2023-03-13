@@ -33,8 +33,9 @@ def _reduce_route_value(processors_ids, link_ids):
 
 
 def _expand_route_value(processors_ids, link_ids):
-    """ Convert a 32-bit route word into a string which lists the target cores\
-        and links.
+    """
+    Convert a 32-bit route word into a string which lists the target cores
+    and links.
 
     :param iterable(int) processors_ids:
     :param iterable(int) link_ids:
@@ -45,7 +46,7 @@ def _expand_route_value(processors_ids, link_ids):
     route_string = "["
     separator = ""
     for processor in processors_ids:
-        route_string += "{}{}".format(separator, processor)
+        route_string += f"{separator}{processor}"
         separator = ", "
 
     route_string += "] ["
@@ -55,7 +56,7 @@ def _expand_route_value(processors_ids, link_ids):
 
     separator = ""
     for link in link_ids:
-        route_string += "{}{}".format(separator, link_labels[link])
+        route_string += f"{separator}{link_labels[link]}"
         separator = ", "
     route_string += "]"
     return route_string

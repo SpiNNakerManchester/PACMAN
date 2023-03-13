@@ -109,7 +109,7 @@ class MulticastRoutingTableByPartitionEntry(object):
 
     @property
     def processor_ids(self):
-        """ The destination processors of the entry
+        """ The destination processors of the entry.
 
         :rtype: set(int)
         """
@@ -118,7 +118,7 @@ class MulticastRoutingTableByPartitionEntry(object):
 
     @property
     def link_ids(self):
-        """ The destination links of the entry
+        """ The destination links of the entry.
 
         :rtype: set(int)
         """
@@ -127,7 +127,7 @@ class MulticastRoutingTableByPartitionEntry(object):
 
     @property
     def incoming_link(self):
-        """ The source link for this path entry
+        """ The source link for this path entry.
 
         :rtype: int or None
         """
@@ -152,7 +152,7 @@ class MulticastRoutingTableByPartitionEntry(object):
 
     @property
     def incoming_processor(self):
-        """ The source processor
+        """ The source processor.
 
         :rtype: int or None
         """
@@ -176,7 +176,7 @@ class MulticastRoutingTableByPartitionEntry(object):
 
     @property
     def defaultable(self):
-        """ The defaultable status of the entry
+        """ The defaultable status of the entry.
         """
         if self.incoming_processor is not None:
             return False
@@ -203,8 +203,9 @@ class MulticastRoutingTableByPartitionEntry(object):
             "different " + name + "s, and so can't be merged")
 
     def merge_entry(self, other):
-        """ Merges the another entry with this one and returns a new\
-            MulticastRoutingTableByPartitionEntry
+        """
+        Merges the another entry with this one and returns a new
+        MulticastRoutingTableByPartitionEntry
 
         :param MulticastRoutingTableByPartitionEntry other:
             the entry to merge into this one

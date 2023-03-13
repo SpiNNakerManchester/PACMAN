@@ -22,7 +22,7 @@ class SUPPORTED_TAGS(Enum):
 
 
 class Field(object):
-    """ Field object used in a field constraint for key allocation
+    """ Field object used in a field constraint for key allocation.
     """
 
     __slots__ = [
@@ -51,7 +51,7 @@ class Field(object):
 
     @property
     def lo(self):
-        """ the low bit in the routing table entry for this field
+        """ The low bit in the routing table entry for this field.
 
         :rtype: int
         """
@@ -59,7 +59,7 @@ class Field(object):
 
     @property
     def hi(self):
-        """ the high bit in the routing table entry for this field
+        """ The high bit in the routing table entry for this field.
 
         :rtype: int
         """
@@ -67,7 +67,7 @@ class Field(object):
 
     @property
     def name(self):
-        """ field name
+        """ The field name.
 
         :rtype: str or ~uuid.UUID
         """
@@ -79,7 +79,7 @@ class Field(object):
 
     @property
     def value(self):
-        """ the value to store in this field
+        """ The value to store in this field.
 
         :rtype: int
         """
@@ -91,7 +91,7 @@ class Field(object):
 
     @property
     def tag(self):
-        """ field tag
+        """ The field tag.
 
         :rtype: SUPPORTED_TAGS
         """

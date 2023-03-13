@@ -37,9 +37,10 @@ _Failure = namedtuple('_Failure', 'router_x router_y keys source_mask')
 
 
 def validate_routes(placements, routing_tables):
-    """ Go though the placements given and check that the routing entries\
-        within the routing tables support reach the correction destinations\
-        as well as not producing any cycles.
+    """
+    Go though the placements given and check that the routing entries
+    within the routing tables support reach the correction destinations
+    as well as not producing any cycles.
 
     :param Placements placements: the placements container
     :param RoutingInfo routing_infos: the routing info container
@@ -106,8 +107,8 @@ def validate_routes(placements, routing_tables):
 
 def _search_route(source_placement, dest_placements, key_and_mask,
                   routing_tables, n_atoms):
-    """ Locate if the routing tables work for the source to desks as\
-        defined
+    """
+    Locate if the routing tables work for the source to desks as defined.
 
     :param Placement source_placement:
         the placement from which the search started
@@ -119,7 +120,6 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     :param int n_atoms: the number of atoms going through this path
     :param bool is_continuous:
         whether the keys and atoms mapping is continuous
-    :rtype: None
     :raise PacmanRoutingException:
         when the trace completes and there are still destinations not visited
     """
@@ -149,7 +149,7 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     if failed_to_reach_destinations:
         output_string = ""
         for dest in failed_to_reach_destinations:
-            output_string += "[{}:{}:{}]".format(dest.x, dest.y, dest.p)
+            output_string += f"[{dest.x}:{dest.y}:{dest.p}]"
         source_processor = "[{}:{}:{}]".format(
             source_placement.x, source_placement.y, source_placement.p)
         error_message += ("failed to locate all destinations with vertex"
@@ -162,7 +162,7 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     if located_destinations:
         output_string = ""
         for dest in located_destinations:
-            output_string += "[{}:{}:{}]".format(dest.x, dest.y, dest.p)
+            output_string += f"[{dest.x}:{dest.y}:{dest.p}]"
         source_processor = "[{}:{}:{}]".format(
             source_placement.x, source_placement.y, source_placement.p)
         error_message += ("trace went to more failed to locate all "
@@ -198,8 +198,9 @@ def _search_route(source_placement, dest_placements, key_and_mask,
 def _start_trace_via_routing_tables(
         source_placement, key_and_mask, reached_placements, routing_tables,
         n_atoms, failed_to_cover_all_keys_routers):
-    """ Start the trace, by using the source placement's router and tracing\
-        from the route.
+    """
+    Start the trace, by using the source placement's router and tracing
+    from the route.
 
     :param Placement source_placement: the source placement used by the trace
     :param BaseKeyAndMask key_and_mask:
@@ -210,7 +211,6 @@ def _start_trace_via_routing_tables(
     :param int n_atoms: the number of atoms going through this path
     :param list(_Failure) failed_to_cover_all_keys_routers:
         list of failed routers for all keys
-    :rtype: None
     """
     current_router_table = routing_tables.get_routing_table_for_chip(
         source_placement.x, source_placement.y)
@@ -250,8 +250,9 @@ def _recursive_trace_to_destinations(
         entry, current_router, chip_x, chip_y, key_and_mask, visited_routers,
         reached_placements, routing_tables, n_atoms,
         failed_to_cover_all_keys_routers):
-    """ Recursively search though routing tables until no more entries are\
-        registered with this key.
+    """
+    Recursively search though routing tables until no more entries are
+    registered with this key.
 
     :param ~spinn_machine.MulticastRoutingEntry entry:
         the original entry used by the first router which resides on the
@@ -273,7 +274,6 @@ def _recursive_trace_to_destinations(
     :param int n_atoms: the number of atoms going through this path
     :param list(_Failure) failed_to_cover_all_keys_routers:
         list of failed routers for all keys
-    :rtype: None
     """
 
     # determine where the route takes us
@@ -321,12 +321,11 @@ def _recursive_trace_to_destinations(
 
 
 def _check_visited_routers(chip_x, chip_y, visited_routers):
-    """ Check if the trace has visited this router already
+    """ Check if the trace has visited this router already.
 
     :param int chip_x: the x coordinate of the chip being checked
     :param int chip_y: the y coordinate of the chip being checked
     :param set(tuple(int,int)) visited_routers: routers already visited
-    :rtype: None
     :raise PacmanRoutingException: when a router has been visited twice.
     """
     visited_routers_router = (chip_x, chip_y)
@@ -340,7 +339,7 @@ def _check_visited_routers(chip_x, chip_y, visited_routers):
 
 
 def _is_dest(processor_ids, current_router, reached_placements):
-    """ Check for processors to be removed
+    """ Collect processors to be removed.
 
     :param list(int) processor_ids:
         the processor IDs which the last router entry said the trace should
@@ -349,7 +348,6 @@ def _is_dest(processor_ids, current_router, reached_placements):
         the current router being used in the trace
     :param set(PlacementTuple) reached_placements:
         the placements to which the trace visited
-    :rtype: None
     """
     dest_x, dest_y = current_router.x, current_router.y
     for processor_id in processor_ids:
@@ -357,7 +355,7 @@ def _is_dest(processor_ids, current_router, reached_placements):
 
 
 def _locate_routing_entry(current_router, key, n_atoms):
-    """ Locate the entry from the router based off the edge
+    """ Locate the entry from the router based off the edge.
 
     :param MulticastRoutingTable current_router:
         the current router being used in the trace

@@ -15,8 +15,9 @@ from spinn_utilities.abstract_base import AbstractBase
 
 
 class AbstractSplitterPartitioner(object, metaclass=AbstractBase):
-    """ Splitter API to allow other Partitioner's to add more stuff to the\
-        edge creation process.
+    """
+    Splitter API to allow other Partitioner's to add more stuff to the
+    edge creation process.
 
     This makes sure that the methods the superclass expects to be there are
     not removed.

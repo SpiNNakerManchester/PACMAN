@@ -15,8 +15,8 @@
 import json
 import gzip
 from pacman.exceptions import PacmanAlreadyExistsException
-from .uncompressed_multicast_routing_table import \
-    UnCompressedMulticastRoutingTable
+from .uncompressed_multicast_routing_table import (
+    UnCompressedMulticastRoutingTable)
 from spinn_machine import MulticastRoutingEntry
 
 
@@ -46,10 +46,9 @@ class MulticastRoutingTables(object):
                 self.add_routing_table(routing_table)
 
     def add_routing_table(self, routing_table):
-        """ Add a routing table
+        """ Add a routing table.
 
         :param MulticastRoutingTable routing_table: a routing table to add
-        :rtype: None
         :raise PacmanAlreadyExistsException:
             If a routing table already exists for the chip
         """
@@ -65,7 +64,7 @@ class MulticastRoutingTables(object):
 
     @property
     def routing_tables(self):
-        """ The routing tables stored within
+        """ The routing tables stored within.
 
         :return: an iterable of routing tables
         :rtype: iterable(MulticastRoutingTable)
@@ -76,8 +75,8 @@ class MulticastRoutingTables(object):
     @property
     def max_number_of_entries(self):
         """
-        The maximumn number of multi-cast routing entries there are in any\
-            multicast routing table
+        The maximum number of multicast routing entries there are in any
+        multicast routing table.
 
         Will return zero if there are no routing tables
 
@@ -86,7 +85,7 @@ class MulticastRoutingTables(object):
         return self._max_number_of_entries
 
     def get_routing_table_for_chip(self, x, y):
-        """ Get a routing table for a particular chip
+        """ Get a routing table for a particular chip.
 
         :param int x: The x-coordinate of the chip
         :param int y: The y-coordinate of the chip
@@ -97,7 +96,7 @@ class MulticastRoutingTables(object):
         return self._routing_tables_by_chip.get((x, y), None)
 
     def __iter__(self):
-        """ Iterator for the multicast routing tables stored within
+        """ Iterator for the multicast routing tables stored within.
 
         :return: iterator of multicast_routing_table
         """

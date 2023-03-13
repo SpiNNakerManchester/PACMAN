@@ -16,8 +16,9 @@ from pacman.exceptions import PacmanAlreadyExistsException
 
 
 class RoutingInfo(object):
-    """ An association of machine vertices to a non-overlapping set of keys\
-        and masks.
+    """
+    An association of machine vertices to a non-overlapping set of keys
+    and masks.
     """
 
     __slots__ = [
@@ -34,11 +35,10 @@ class RoutingInfo(object):
         self._info = dict()
 
     def add_routing_info(self, info):
-        """ Add a routing information item
+        """ Add a routing information item.
 
         :param VertexRoutingInfo info:
             The routing information item to add
-        :rtype: None
         :raise PacmanAlreadyExistsException:
             If the partition is already in the set of edges
         """
@@ -50,19 +50,19 @@ class RoutingInfo(object):
         self._info[key] = info
 
     def get_routing_info_from_pre_vertex(self, vertex, partition_id):
-        """ Get routing information for a given partition_id from a vertex
+        """ Get routing information for a given partition_id from a vertex.
 
         :param AbstractVertex vertex: The vertex to search for
-        :param str partition_id:\
+        :param str partition_id:
             The ID of the partition for which to get the routing information
         """
         return self._info.get((vertex, partition_id))
 
     def get_first_key_from_pre_vertex(self, vertex, partition_id):
-        """ Get the first key for the partition starting at a vertex
+        """ Get the first key for the partition starting at a vertex.
 
         :param AbstractVertex vertex: The vertex which the partition starts at
-        :param str partition_id:\
+        :param str partition_id:
             The ID of the partition for which to get the routing information
         :return: The routing key of the partition
         :rtype: int
@@ -72,7 +72,7 @@ class RoutingInfo(object):
         return None
 
     def __iter__(self):
-        """ Gets an iterator for the routing information
+        """ Gets an iterator for the routing information.
 
         :return: a iterator of routing information
         """

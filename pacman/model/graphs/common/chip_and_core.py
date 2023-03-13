@@ -13,8 +13,9 @@
 # limitations under the License.
 
 class ChipAndCore(object):
-    """ A constraint to place a vertex on a specific chip and, optionally, a\
-        specific core on that chip.
+    """
+    A constraint to place a vertex on a specific chip and, optionally, a
+    specific core on that chip.
     """
 
     __slots__ = [
@@ -44,7 +45,7 @@ class ChipAndCore(object):
 
     @property
     def x(self):
-        """ The x-coordinate of the chip
+        """ The x-coordinate of the chip.
 
         :rtype: int
         """
@@ -52,7 +53,7 @@ class ChipAndCore(object):
 
     @property
     def y(self):
-        """ The y-coordinate of the chip
+        """ The y-coordinate of the chip.
 
         :rtype: int
         """
@@ -60,7 +61,7 @@ class ChipAndCore(object):
 
     @property
     def p(self):
-        """ The processor on the chip, or None if that is not constrained
+        """ The processor on the chip, or `None` if that is not constrained.
 
         :rtype: int or None
         """

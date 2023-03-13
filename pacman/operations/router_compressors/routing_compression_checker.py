@@ -28,7 +28,7 @@ def codify(route, length=32):
 
     Starts of with the assumption that the key is always covered.
 
-    Whenever a mask bit is zero the list of covered keys is doubled to\
+    Whenever a mask bit is zero the list of covered keys is doubled to
     include both the key with a zero and a one at that place.
 
     :param ~spinn_machine.MulticastRoutingEntry route: single routing Entry
@@ -110,7 +110,6 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
     :param str o_code:
     :param int start:
     :param ~io.FileIO f:
-    :rtype: None
     """
     if o_code is None:
         o_code = codify(o_route)
@@ -120,7 +119,7 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
         if covers(o_code, c_code):
             c_route = compressed_dict[c_code]
             if f is not None:
-                f.write("\t\t{}\n".format(format_route(c_route)))
+                f.write(f"\t\t{format_route(c_route)}\n")
             if o_route.processor_ids != c_route.processor_ids:
                 if set(o_route.processor_ids) != set(c_route.processor_ids):
                     raise PacmanRoutingException(
@@ -147,17 +146,16 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
                                   start=i + 1, f=f)
             return
     if not o_route.defaultable:
-        # print("No route found {}".format(o_route))
-        raise PacmanRoutingException("No route found {}".format(o_route))
+        # print(f"No route found {o_route}")
+        raise PacmanRoutingException(f"No route found {o_route}")
 
 
 def compare_tables(original, compressed):
-    """ Compares the two tables without generating any output
+    """ Compares the two tables without generating any output.
 
     :param MulticastRoutingTable original: The original routing tables
     :param MulticastRoutingTable compressed: The compressed routing tables.
         Which will be considered in order.
-    :rtype: None
     :raises: PacmanRoutingException if there is any error
     """
     compressed_dict = codify_table(compressed)

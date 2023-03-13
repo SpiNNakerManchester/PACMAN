@@ -20,7 +20,6 @@ from .entry import Entry
 
 def pair_compressor(ordered=True, accept_overflow=False, verify=False):
     """
-
     :param bool accept_overflow:
         A flag which should only be used in testing to stop raising an
         exception if result is too big
@@ -50,15 +49,16 @@ def verify_lengths(compressed):
     if len(problems) > 0:
         raise PacmanElementAllocationException(
             "The routing table after compression will still not fit"
-            " within the machines router: {}".format(problems))
+            f" within the machines router: {problems}")
 
 
 class _PairCompressor(AbstractCompressor):
-    """ Routing Table compressor based on brute force. \
+    """
+    Routing Table compressor based on brute force.
     Finds mergable pairs to replace.
 
-    This algorithm assumes unordered routing tables and returns \
-    a possibly ordered routing tables. If unordered it can be used \
+    This algorithm assumes unordered routing tables and returns
+    a possibly ordered routing tables. If unordered it can be used
     as a precompressor for another that makes use of order.
 
     In the simplest format the algorithm is:
@@ -117,21 +117,21 @@ class _PairCompressor(AbstractCompressor):
 
     A farther optimisation is to uses order.
     The entries are sorted by route frequency from low to high.
-    The results are considered ordered so previous routes are not \
+    The results are considered ordered so previous routes are not
     considered.
 
-    The advantage is this allows all the entries from the most frequent \
-    route to be merged into a single entry. And the second most \
+    The advantage is this allows all the entries from the most frequent
+    route to be merged into a single entry. And the second most
     frequent only has to consider the most frequent routes.
 
-    Step 1 requires the counting of the frequency of routes and the \
+    Step 1 requires the counting of the frequency of routes and the
     sorting the routes based on this frequency.
-    The current tie break between routes with the same frequency is \
+    The current tie break between routes with the same frequency is
     the route but this is arbitrary at the algorithm level.
-    This code does not use a dictionary to keep the code the same as \
+    This code does not use a dictionary to keep the code the same as
     the C.
 
-    Step 2 is change in that the previous entries \
+    Step 2 is change in that the previous entries
     (0 to _previous_pointer(-1)) are not considered for clash checking
     """
 
@@ -253,7 +253,7 @@ class _PairCompressor(AbstractCompressor):
         self._routes[index_b] = temp
 
     def _three_way_partition_routes(self, low, high):
-        """ Partitions the routes and frequencies into three parts
+        """ Partitions the routes and frequencies into three parts.
 
         based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
 
@@ -278,7 +278,7 @@ class _PairCompressor(AbstractCompressor):
 
     def _quicksort_routes(self, low, high):
         """
-        Sorts the routes in place based on frequency
+        Sorts the routes in place based on frequency.
 
         :param int low: Inclusive lowest index to consider
         :param int high: Inclusive highest index to consider
@@ -290,7 +290,7 @@ class _PairCompressor(AbstractCompressor):
 
     def _find_merge(self, left, index):
         """
-        Attempt to find a merge between the left entry and the index entry
+        Attempt to find a merge between the left entry and the index entry.
 
         Creates a merge and then checks it does not intersect with entries
         with different routes.
@@ -324,7 +324,7 @@ class _PairCompressor(AbstractCompressor):
 
     def _compress_by_route(self, left, right):
         """
-        Compresses the entries between left and right
+        Compresses the entries between left and right.
 
         :param int left: Inclusive index of first entry to merge
         :param int right: Inclusive index of last entry to merge
@@ -441,7 +441,7 @@ class _PairCompressor(AbstractCompressor):
         return (key_a & mask_b) == (key_b & mask_a)
 
     def merge(self, entry1, entry2):
-        """ Merges two entries/triples into one that covers both
+        """ Merges two entries/triples into one that covers both.
 
         The assumption is that they both have the same known spinnaker_route
 

@@ -25,7 +25,8 @@ from spinn_utilities.timer import Timer
 def minimise(
         routing_table, use_timer_cut_off=False,
         time_to_run_for_before_raising_exception=None):
-    """Reduce the size of a routing table by merging together entries where \
+    """
+    Reduce the size of a routing table by merging together entries where
     possible and by removing any remaining default routes.
 
     .. warning::
@@ -72,7 +73,8 @@ def minimise(
 def ordered_covering(
         routing_table, target_length, aliases=None, no_raise=False,
         use_timer_cut_off=False, time_to_run_for=None):
-    """Reduce the size of a routing table by merging together entries where
+    """
+    Reduce the size of a routing table by merging together entries where
     possible.
 
     .. warning::
@@ -254,8 +256,9 @@ def _get_all_merges(routing_table):
 
 
 def _get_insertion_index(routing_table, generality):
-    """ Determine the index in the routing table where a new entry should be
-        inserted.
+    """
+    Determine the index in the routing table where a new entry should be
+    inserted.
 
     :param Entry routing_table: Routing entries to be merged.
     :param int generality:
@@ -416,7 +419,8 @@ class _Merge(object):
 
 
 def _refine_merge(merge, aliases, min_goodness):
-    """ Remove entries from a merge to generate a valid merge which may be
+    """
+    Remove entries from a merge to generate a valid merge which may be
     applied to the routing table.
 
     :param _Merge merge: Initial merge to refine.

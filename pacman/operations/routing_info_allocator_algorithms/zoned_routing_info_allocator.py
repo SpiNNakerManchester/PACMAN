@@ -31,49 +31,50 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class ZonedRoutingInfoAllocator(object):
-    """ A routing key allocator that uses fixed zones that are the same for\
-        all vertices.  This will hopefully make the keys more compressible.
+    """
+    A routing key allocator that uses fixed zones that are the same for
+    all vertices.  This will hopefully make the keys more compressible.
 
-        Keys will have the format::
+    Keys will have the format::
 
-                  <--- 32 bits --->
-            Key:  | A | P | M | X |
-            Mask: |11111111111|   | (i.e. 1s covering A, P and M fields)
+              <--- 32 bits --->
+        Key:  | A | P | M | X |
+        Mask: |11111111111|   | (i.e. 1s covering A, P and M fields)
 
-        Field ``A``:
-            The index of the application vertex.
-        Field ``P``:
-            The index of the name of outgoing edge partition of the vertex.
-        Field ``M``:
-            The index of the machine vertex of the application vertex.
-        Field ``X``:
-            Space for the maximum number of keys required by any outgoing edge
-            partition.
+    Field ``A``:
+        The index of the application vertex.
+    Field ``P``:
+        The index of the name of outgoing edge partition of the vertex.
+    Field ``M``:
+        The index of the machine vertex of the application vertex.
+    Field ``X``:
+        Space for the maximum number of keys required by any outgoing edge
+        partition.
 
-        The ``A`` and ``P`` are combined into a single index (``AP``) so that
-        applications with multiple partitions use multiple entries
-        while ones with only 1 use just one.
+    The ``A`` and ``P`` are combined into a single index (``AP``) so that
+    applications with multiple partitions use multiple entries
+    while ones with only 1 use just one.
 
-        The split between the ``AP`` bit and other parts is always fixed
-        This also means that all machine vertices of the same
-        application vertex and partition will have a shared key.
+    The split between the ``AP`` bit and other parts is always fixed
+    This also means that all machine vertices of the same
+    application vertex and partition will have a shared key.
 
-        The split between the ``M`` and ``X`` may vary depending on how the
-        allocator is called.
+    The split between the ``M`` and ``X`` may vary depending on how the
+    allocator is called.
 
-        In "global" mode the widths of the fields are predetermined and fixed
-        such that every key will have every field in the same place in the key,
-        and the mask is the same for every vertex.
-        The global approach is particularly sensitive to the one large and
-        many small vertices limit.
+    In "global" mode the widths of the fields are predetermined and fixed
+    such that every key will have every field in the same place in the key,
+    and the mask is the same for every vertex.
+    The global approach is particularly sensitive to the one large and
+    many small vertices limit.
 
-        In "flexible" mode the size of the ``M`` and ``X`` will change for each
-        application/partition. Every vertex for a application/partition pair
-        but different pairs may have different masks.
-        This should result in less gaps between the machine vertexes.
-        Even in none Flexible mode if the sizes are too big to keep ``M`` and
-        ``X`` the same size they will be allowed to change for those vertexes
-        will a very high number of atoms.
+    In "flexible" mode the size of the ``M`` and ``X`` will change for each
+    application/partition. Every vertex for a application/partition pair
+    but different pairs may have different masks.
+    This should result in less gaps between the machine vertexes.
+    Even in none Flexible mode if the sizes are too big to keep ``M`` and
+    ``X`` the same size they will be allowed to change for those vertexes
+    will a very high number of atoms.
     """
 
     __slots__ = [
@@ -395,7 +396,7 @@ class ZonedRoutingInfoAllocator(object):
 def flexible_allocate(extra_allocations):
     """
     Allocated with fixed bits for the Application/Partition index but
-    with the size of the atom and machine bit changing
+    with the size of the atom and machine bit changing.
 
     :param list(tuple(ApplicationVertex,str)) extra_allocations:
         Additional (vertex, partition identifier) pairs to allocate

@@ -61,8 +61,9 @@ class _DijkstraInfo(object):
 
 def basic_dijkstra_routing(
         bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
-    """ Find routes between the edges with the allocated information,
-        placed in the given places
+    """
+    Find routes between the edges with the allocated information,
+    placed in the given places
 
     :param bool use_progress_bar: whether to show a progress bar
     :return: The discovered routes
@@ -76,9 +77,10 @@ def basic_dijkstra_routing(
 
 
 class _BasicDijkstraRouting(object):
-    """ An routing algorithm that can find routes for edges between vertices\
-        in a machine graph that have been placed on a machine by the use of a\
-        Dijkstra shortest path algorithm.
+    """
+    A routing algorithm that can find routes for edges between vertices
+    in a machine graph that have been placed on a machine by the use of a
+    Dijkstra shortest path algorithm.
     """
 
     __slots__ = [
@@ -99,8 +101,9 @@ class _BasicDijkstraRouting(object):
         self._max_bw = max_bw
 
     def _run(self):
-        """ Find routes between the edges with the allocated information,
-            placed in the given places
+        """
+        Find routes between the edges with the allocated information,
+        placed in the given places
 
         :param bool use_progress_bar: whether to show a progress bar
         :return: The discovered routes
@@ -191,8 +194,9 @@ class _BasicDijkstraRouting(object):
                     m_vertex, partition.identifier)
 
     def _initiate_node_info(self):
-        """ Set up a dictionary which contains data for each chip in the\
-            machine
+        """
+        Set up a dictionary which contains data for each chip in the
+        machine.
 
         :return: nodes_info dictionary
         :rtype: dict(tuple(int,int),_NodeInfo)
@@ -211,8 +215,9 @@ class _BasicDijkstraRouting(object):
         return nodes_info
 
     def _initiate_dijkstra_tables(self):
-        """ Set up the Dijkstra's table which includes if you've reached a\
-            given node
+        """
+        Set up the Dijkstra's table which includes if you've reached a
+        given node.
 
         :return: the  Dijkstra's table dictionary
         :rtype: dict(tuple(int,int),_DijkstraInfo)
@@ -258,8 +263,9 @@ class _BasicDijkstraRouting(object):
 
     def _propagate_costs_until_reached_destinations(
             self, tables, nodes_info, dest_chips, x_source, y_source):
-        """ Propagate the weights till the destination nodes of the source\
-            nodes are retraced
+        """
+        Propagate the weights till the destination nodes of the source
+        nodes are retraced.
 
         :param dict(tuple(int,int),_DijkstraInfo) tables:
             the dictionary object for the Dijkstra-tables

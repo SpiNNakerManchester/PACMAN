@@ -19,8 +19,9 @@ from .base_key_and_mask import BaseKeyAndMask
 
 
 class VertexRoutingInfo(object, metaclass=AbstractBase):
-    """ Associates a partition identifier to its routing information
-        (keys and masks).
+    """
+    Associates a partition identifier to its routing information
+    (keys and masks).
     """
 
     __slots__ = [
@@ -33,7 +34,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     def __init__(self, key_and_mask, partition_id):
         """
-        :param iterable(BaseKeyAndMask) keys_and_masks:\
+        :param iterable(BaseKeyAndMask) keys_and_masks:
             The keys allocated to the machine partition
         :param str partition_id: The partition to set the keys for
         :param MachineVertex machine_vertex: The vertex to set the keys for
@@ -44,7 +45,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         self.__partition_id = partition_id
 
     def get_keys(self, n_keys=None):
-        """ Get the ordered list of individual keys allocated to the edge
+        """ Get the ordered list of individual keys allocated to the edge.
 
         :param int n_keys: Optional limit on the number of keys to return
         :return: An array of keys
@@ -57,8 +58,8 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
             n_keys = max_n_keys
         elif max_n_keys < n_keys:
             raise PacmanConfigurationException(
-                "You asked for {} keys, but the routing info can only "
-                "provide {} keys.".format(n_keys, max_n_keys))
+                f"You asked for {n_keys} keys, but the routing info can only "
+                f"provide {max_n_keys} keys.")
 
         key_array = numpy.zeros(n_keys, dtype=">u4")
         offset = 0
@@ -68,7 +69,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     @property
     def key_and_mask(self):
-        """ The only key and mask
+        """ The only key and mask.
 
         :rtype: BaseKeyAndMask
         """
@@ -76,7 +77,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     @property
     def key(self):
-        """ The first key (or only one if there is only one)
+        """ The first key (or only one if there is only one).
 
         :rtype: int
         """
@@ -84,7 +85,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     @property
     def mask(self):
-        """ The first mask (or only one if there is only one)
+        """ The first mask (or only one if there is only one).
 
         :rtype: int
         """
@@ -92,7 +93,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     @property
     def partition_id(self):
-        """ The identifier of the partition
+        """ The identifier of the partition.
 
         :rtype: str
         """
@@ -100,7 +101,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     @abstractproperty
     def vertex(self):
-        """ The vertex of the information
+        """ The vertex of the information.
 
         :rtype: ApplicationVertex or MachineVertex
         """
