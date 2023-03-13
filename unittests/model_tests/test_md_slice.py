@@ -24,25 +24,25 @@ class TestMD_Slice(unittest.TestCase):
         unittest_setup()
 
     def test_2d(self):
-        s = MDSlice(0, 8, (3, 3), (0, 0))
-        self.assertEqual("0(0:3)(0:3)", str(s))
+        s = MDSlice(0, 8, (3, 3), (0, 0), (6, 6))
+        self.assertEqual("0(6, 6)(0:3)(0:3)", str(s))
         s2 = MDSlice.from_string(str(s))
         self.assertEqual(s, s2)
 
     def test_2a(self):
-        s = MDSlice(36, 44, (3, 3), (0, 6))
-        self.assertEqual("36(0:3)(6:9)", str(s))
+        s = MDSlice(36, 44, (3, 3), (0, 6), (5, 11))
+        self.assertEqual("36(5, 11)(0:3)(6:9)", str(s))
         s2 = MDSlice.from_string(str(s))
         self.assertEqual(s, s2)
 
     def test_2b(self):
-        s = MDSlice(9, 17, (3, 3), (3, 0))
-        self.assertEqual("9(3:6)(0:3)", str(s))
+        s = MDSlice(9, 17, (3, 3), (3, 0), (7, 8))
+        self.assertEqual("9(7, 8)(3:6)(0:3)", str(s))
         s2 = MDSlice.from_string(str(s))
         self.assertEqual(s, s2)
 
     def test_3b(self):
-        s = MDSlice(432, 455, (2, 3, 4), (6, 9, 16))
-        self.assertEqual("432(6:8)(9:12)(16:20)", str(s))
+        s = MDSlice(432, 455, (2, 3, 4), (6, 9, 16), (11, 15, 23))
+        self.assertEqual("432(11, 15, 23)(6:8)(9:12)(16:20)", str(s))
         s2 = MDSlice.from_string(str(s))
         self.assertEqual(s, s2)

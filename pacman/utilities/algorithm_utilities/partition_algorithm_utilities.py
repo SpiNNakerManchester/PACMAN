@@ -18,6 +18,18 @@ import math
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import MDSlice, Slice
 
+def _make_edges(sub_length, total_length):
+    lo_atom = 0
+    hi_atom = lo_atom + sub_length -1
+    max_atom = total_length -1
+    while hi_atom < max_atom:
+        print (lo_atom, hi_atom)
+        yield lo_atom, hi_atom
+        hi_atom += sub_length
+        lo_atom += sub_length
+    print(lo_atom, max_atom)
+    yield lo_atom, max_atom
+
 
 def get_multidimensional_slices(app_vertex):
     """ Get the multi-dimensional slices of an application vertex
@@ -39,7 +51,8 @@ def get_multidimensional_slices(app_vertex):
     # If there is only one slice, get that
     if app_vertex.n_atoms < app_vertex.get_max_atoms_per_core():
         return [MDSlice(0, app_vertex.n_atoms - 1, app_vertex.atoms_shape,
-                        tuple(0 for _ in app_vertex.atoms_shape))]
+                        tuple(0 for _ in app_vertex.atoms_shape),
+                        app_vertex.atoms_shape)]
 
     # Find out how many vertices we will create, keeping track of the
     # total atoms per core, and the numerator to divide by when working
@@ -77,7 +90,8 @@ def get_multidimensional_slices(app_vertex):
         lo_atom = hi_atom + 1
         hi_atom = (lo_atom + total_on_core) - 1
         vertex_slice = MDSlice(
-            lo_atom, hi_atom, tuple(n_on_core), tuple(start))
+            lo_atom, hi_atom, tuple(n_on_core), tuple(start),
+            app_vertex.atoms_shape)
         slices.append(vertex_slice)
 
     return slices
@@ -104,7 +118,7 @@ def get_single_dimension_slices(app_vertex):
     for v in range(n_vertices):
         # Make a slice and a vertex
         lo_atom = hi_atom + 1
-        hi_atom = min(app_vertex.n_atoms, (lo_atom + total_on_core) - 1)
+        hi_atom = min(app_vertex.n_atoms - 1, (lo_atom + total_on_core) - 1)
         vertex_slice = Slice(lo_atom, hi_atom)
         slices.append(vertex_slice)
 

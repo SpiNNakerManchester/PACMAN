@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import numpy
+from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanValueError, PacmanTypeError
 from .slice import Slice
 
@@ -31,9 +32,9 @@ class MDSlice(Slice):
         this will be lo_atom in 1 dimension.
     """
 
-    __slots__ = ["_shape", "_start", "_atom_shape"]
+    __slots__ = ["_shape", "_start", "_atoms_shape"]
 
-    def __init__(self, lo_atom, hi_atom, shape, start):
+    def __init__(self, lo_atom, hi_atom, shape, start, atoms_shape):
         """ Create a new Mutile dimensional Slice object.
 
         :param int lo_atom: Index of the lowest atom to represent.
@@ -54,6 +55,7 @@ class MDSlice(Slice):
                 "Both shape and start must have the same length")
         self._shape = shape
         self._start = start
+        self._atoms_shape = atoms_shape
 
     @property
     def hi_atom(self):
@@ -99,7 +101,11 @@ class MDSlice(Slice):
         """
         return tuple((numpy.array(self.start) + numpy.array(self.shape)) - 1)
 
-    def get_raster_ids(self, atoms_shape):
+    @overrides(Slice.get_ids_as_slice_or_list)
+    def get_ids_as_slice_or_list(self):
+        return self.get_raster_ids()
+
+    def get_raster_ids(self, atoms_shape=None):
         """ Get the IDs of the atoms in the slice as they would appear in a
             "raster scan" of the atoms over the whole shape.
 
@@ -107,29 +113,34 @@ class MDSlice(Slice):
             The size of each dimension of the whole shape
         :return: A list of the global raster IDs of the atoms in this slice
         """
+        if atoms_shape is not None:
+            assert(self._atoms_shape == atoms_shape)
         slices = tuple(self.get_slice(n)
                        for n in reversed(range(len(self.start))))
-        ids = numpy.arange(numpy.prod(atoms_shape)).reshape(
-            tuple(reversed(atoms_shape)))
+        ids = numpy.arange(numpy.prod(self._atoms_shape)).reshape(
+            tuple(reversed(self._atoms_shape)))
         return ids[slices].flatten()
 
     def __str__(self):
         value = ""
         for a_slice in self.slices:
             value += f"({a_slice.start}:{a_slice.stop})"
-        return f"{self.lo_atom}{value}"
+        return f"{self.lo_atom}{self._atoms_shape}{value}"
 
     def __eq__(self, other):
         if not isinstance(other, MDSlice):
             return False
         if not super().__eq__(other):
             return False
+        if self._atoms_shape != other._atoms_shape:
+            return False
         if self._shape != other.shape:
             return False
         return self._start == other.start
 
     def __hash__(self):
-        return hash((self._lo_atom, self._n_atoms, self._shape, self._start))
+        return hash((self._lo_atom, self._n_atoms, self._shape, self._start,
+                     self._atoms_shape))
 
     @classmethod
     def from_string(cls, as_str):
@@ -140,7 +151,8 @@ class MDSlice(Slice):
         shape = []
         start = []
         size = 1
-        for part in parts[1:]:
+        atoms_shape = tuple(int(sub) for sub in parts[1][:-1].split(","))
+        for part in parts[2:]:
             subs = part.split(":")
             begin = int(subs[0])
             atoms = int(subs[1][:-1]) - begin
@@ -148,4 +160,5 @@ class MDSlice(Slice):
             shape.append(atoms)
             start.append(begin)
         return MDSlice(
-            lo_atom, lo_atom + size - 1, tuple(shape), tuple(start))
+            lo_atom, lo_atom + size - 1, tuple(shape), tuple(start),
+            atoms_shape)

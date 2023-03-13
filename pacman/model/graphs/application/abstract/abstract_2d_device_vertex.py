@@ -121,7 +121,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         hi_atom = (lo_atom + n_atoms_per_subsquare) - 1
         return MDSlice(
             lo_atom, hi_atom, (self._sub_width, self._sub_height),
-            (lo_atom_x, lo_atom_y))
+            (lo_atom_x, lo_atom_y), self.atoms_shape)
 
     def _get_key_and_mask(self, base_key, index):
         """ Get the key and mask of the given machine vertex index

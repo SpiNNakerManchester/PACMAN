@@ -60,6 +60,15 @@ class Slice(object):
 
     @property
     def hi_atom(self):
+        """
+        Returns the high atom where possible.
+
+        .. note::
+            Use of this method is NOT recommended
+            It fails for multi dimensional slices and may be removed
+
+        :return: The highest atom form a 1 D Slice ONLY
+        """
         return self._lo_atom + self._n_atoms - 1
 
     @property
@@ -76,7 +85,18 @@ class Slice(object):
 
     @property
     def as_slice(self):
-        # Slice for accessing arrays of values
+        """
+        Converts the Slice to a standard slice object IF Possible
+
+        .. note::
+            Use of this method is NOT recommended
+            It fails for multi dimensional slices and may be removed
+
+        :return: a standard builtin slice object
+        :rtype: slice
+        :raises NotImplementedError: If called on a Multi Dimensional slice
+        """
+        # slice for accessing arrays of values
         return slice(self._lo_atom, self._lo_atom + self._n_atoms)
 
     def get_slice(self, n):
@@ -87,7 +107,7 @@ class Slice(object):
         """
         if n == 0:
             return slice(self._lo_atom, self._lo_atom + self._n_atoms)
-        raise IndexError(f"{n} is invalid for a 1 Deminsion Slice ")
+        raise IndexError(f"{n} is invalid for a 1 dimension Slice ")
 
     @property
     def slices(self):
@@ -95,13 +115,23 @@ class Slice(object):
 
         :rtype: tuple(slice)
         """
-        return tuple(self.as_slice())
+        return (slice(self._lo_atom, self._lo_atom + self._n_atoms), )
 
     @property
     def end(self):
         """ The end positions of the slice in each dimension
         """
         return tuple(self._lo_atom + self._n_atoms)
+
+    def get_ids_as_slice_or_list(self):
+        """
+        Returns the ids as a builtin slice if possible \
+        otherwise as a list of ids
+
+        :return: a slice or list of ids
+        :rtype: slice or list(int)
+        """
+        return slice(self._lo_atom, self._lo_atom + self._n_atoms)
 
     def get_raster_ids(self, atoms_shape):
         """ Get the IDs of the atoms in the slice as they would appear in a
