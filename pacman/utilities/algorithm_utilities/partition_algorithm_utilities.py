@@ -18,18 +18,6 @@ import math
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import MDSlice, Slice
 
-def _make_edges(sub_length, total_length):
-    lo_atom = 0
-    hi_atom = lo_atom + sub_length -1
-    max_atom = total_length -1
-    while hi_atom < max_atom:
-        print (lo_atom, hi_atom)
-        yield lo_atom, hi_atom
-        hi_atom += sub_length
-        lo_atom += sub_length
-    print(lo_atom, max_atom)
-    yield lo_atom, max_atom
-
 
 def get_multidimensional_slices(app_vertex):
     """ Get the multi-dimensional slices of an application vertex

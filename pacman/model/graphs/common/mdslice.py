@@ -14,7 +14,7 @@
 
 import numpy
 from spinn_utilities.overrides import overrides
-from pacman.exceptions import PacmanValueError, PacmanTypeError
+from pacman.exceptions import PacmanValueError
 from .slice import Slice
 
 
@@ -114,7 +114,7 @@ class MDSlice(Slice):
         :return: A list of the global raster IDs of the atoms in this slice
         """
         if atoms_shape is not None:
-            assert(self._atoms_shape == atoms_shape)
+            assert (self._atoms_shape == atoms_shape)
         slices = tuple(self.get_slice(n)
                        for n in reversed(range(len(self.start))))
         ids = numpy.arange(numpy.prod(self._atoms_shape)).reshape(

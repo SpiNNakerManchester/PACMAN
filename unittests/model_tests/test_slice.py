@@ -14,7 +14,7 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.model.graphs.common import MDSlice, Slice
+from pacman.model.graphs.common import Slice
 
 
 class TestSlice(unittest.TestCase):
