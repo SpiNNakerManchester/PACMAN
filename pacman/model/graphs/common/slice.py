@@ -133,7 +133,7 @@ class Slice(object):
         """
         return slice(self._lo_atom, self._lo_atom + self._n_atoms)
 
-    def get_raster_ids(self, atoms_shape):
+    def get_raster_ids(self, atoms_shape=None):
         """ Get the IDs of the atoms in the slice as they would appear in a
             "raster scan" of the atoms over the whole shape.
 
@@ -141,11 +141,7 @@ class Slice(object):
             The size of each dimension of the whole shape
         :return: A list of the global raster IDs of the atoms in this slice
         """
-        slices = tuple(self.get_slice(n)
-                       for n in reversed(range(len(self.start))))
-        ids = numpy.arange(numpy.prod(atoms_shape)).reshape(
-            tuple(reversed(atoms_shape)))
-        return ids[slices].flatten()
+        return numpy.array(range(self._lo_atom, self._lo_atom + self._n_atoms))
 
     def __str__(self):
         return (f"({self.lo_atom}:{self.hi_atom})")
