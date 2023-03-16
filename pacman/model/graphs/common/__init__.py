@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .chip_and_core import ChipAndCore
+from .mdslice import MDSlice
 from .slice import Slice
 
-__all__ = ["ChipAndCore", "Slice"]
+__all__ = ["ChipAndCore", "MDSlice", "Slice"]

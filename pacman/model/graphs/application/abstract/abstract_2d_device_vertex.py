@@ -17,7 +17,7 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.utilities.utility_calls import get_n_bits
 from pacman.utilities.constants import BITS_IN_KEY
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.common import MDSlice
 
 
 class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
@@ -119,9 +119,9 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         n_atoms_per_subsquare = self._sub_width * self._sub_height
         lo_atom = index * n_atoms_per_subsquare
         hi_atom = (lo_atom + n_atoms_per_subsquare) - 1
-        return Slice(
+        return MDSlice(
             lo_atom, hi_atom, (self._sub_width, self._sub_height),
-            (lo_atom_x, lo_atom_y))
+            (lo_atom_x, lo_atom_y), self.atoms_shape)
 
     def _get_key_and_mask(self, base_key, index):
         """ Get the key and mask of the given machine vertex index
