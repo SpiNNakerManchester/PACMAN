@@ -160,7 +160,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def iterate_vertices(cls):
-        """ The vertices in the user application graph.
+        """
+        The vertices in the user application graph.
 
         Semantic sugar for get_graph().vertices except that the result is an
         iterable and not a list
@@ -175,7 +176,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_vertices_by_type(cls, vertex_type):
-        """ The application vertices in the graph of the specific type.
+        """
+        The application vertices in the graph of the specific type.
 
         Semantic sugar for vertex in get_graph().vertices
         if isinstance(vertex, vertex_type)
@@ -197,7 +199,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_n_vertices(cls):
-        """ The number of vertices in the user application graph.
+        """
+        The number of vertices in the user application graph.
 
         Semantic sugar for get_graph().n_vertices
 
@@ -211,7 +214,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def iterate_partitions(cls):
-        """ The partitions in the user application graphs as an iterator.
+        """
+        The partitions in the user application graphs as an iterator.
 
         Semantic sugar for get_graph().outgoing_edge_partitions
 
@@ -225,7 +229,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_n_partitions(cls):
-        """ The partitions in the user application graph.
+        """
+        The partitions in the user application graph.
 
         Semantic sugar for get_graph().n_outgoing_edge_partitions
 
@@ -239,7 +244,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_outgoing_edge_partitions_starting_at_vertex(cls, vertex):
-        """ Get all the edge partitions that start at the given vertex.
+        """
+        Get all the edge partitions that start at the given vertex.
 
         Semantic sugar for get_graph().
         get_outgoing_edge_partitions_starting_at_vertex
@@ -255,7 +261,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_edges(cls):
-        """ Get all the edges in the graph.
+        """
+        Get all the edges in the graph.
 
         Semantic sugar for get_graph().edges
 
@@ -351,7 +358,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_n_placements(cls):
-        """ The number of placements.
+        """
+        The number of placements.
 
         :rtype: int
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -363,7 +371,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_placement_of_vertex(cls, vertex):
-        """ Return the placement information for a vertex.
+        """
+        Return the placement information for a vertex.
 
         Semantic sugar for get_placements().get_placement_of_vertex(vertex)
         Optimised for speed

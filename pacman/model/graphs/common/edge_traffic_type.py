@@ -16,7 +16,8 @@ from enum import IntEnum
 
 
 class EdgeTrafficType(IntEnum):
-    """ Indicates the traffic type of an Edge in a graph.
+    """
+    Indicates the traffic type of an Edge in a graph.
     """
 
     #: Edge communicates using multicast packets

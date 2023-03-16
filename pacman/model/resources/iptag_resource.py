@@ -64,7 +64,8 @@ class IPtagResource(object):
 
     @property
     def ip_address(self):
-        """ The IP address to assign to the tag.
+        """
+        The IP address to assign to the tag.
 
         :rtype: str
         """
@@ -72,7 +73,8 @@ class IPtagResource(object):
 
     @property
     def port(self):
-        """ The port of the tag.
+        """
+        The port of the tag.
 
         :rtype: int
         """
@@ -80,13 +82,15 @@ class IPtagResource(object):
 
     @property
     def traffic_identifier(self):
-        """ The traffic identifier for this IP tag.
+        """
+        The traffic identifier for this IP tag.
         """
         return self._traffic_identifier
 
     @property
     def strip_sdp(self):
-        """ Whether SDP headers should be stripped for this tag.
+        """
+        Whether SDP headers should be stripped for this tag.
 
         :rtype: bool
         """
@@ -94,7 +98,8 @@ class IPtagResource(object):
 
     @property
     def tag(self):
-        """ The tag required, or `None` if any tag is OK.
+        """
+        The tag required, or `None` if any tag is OK.
 
         :rtype: int or None
         """

@@ -17,7 +17,8 @@ from pacman.model.graphs.common import ChipAndCore
 
 
 class AbstractVertex(object):
-    """ A vertex in a graph.
+    """
+    A vertex in a graph.
     """
 
     __slots__ = [
@@ -42,7 +43,8 @@ class AbstractVertex(object):
 
     @property
     def label(self):
-        """ The current label to the vertex.
+        """
+        The current label to the vertex.
 
         This label could change when the vertex is added to the graph.
 
@@ -51,7 +53,8 @@ class AbstractVertex(object):
         return self._label
 
     def set_label(self, label):
-        """ Changes the label for a vertex *not yet added* to a graph.
+        """
+        Changes the label for a vertex *not yet added* to a graph.
 
         :param str label: new value for the label
         :raises PacmanConfigurationException:
@@ -64,7 +67,8 @@ class AbstractVertex(object):
         self._label = label
 
     def addedToGraph(self):
-        """ Records that the vertex has been added to a graph.
+        """
+        Records that the vertex has been added to a graph.
 
         :raises PacmanConfigurationException:
             If there is an attempt to add the same vertex more than once

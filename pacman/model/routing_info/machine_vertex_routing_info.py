@@ -46,7 +46,8 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
 
     @property
     def machine_vertex(self):
-        """ The machine vertex.
+        """
+        The machine vertex.
 
         :rtype: MachineVertex
         """
@@ -59,6 +60,7 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
 
     @property
     def index(self):
-        """ The index of the vertex.
+        """
+        The index of the vertex.
         """
         return self.__index

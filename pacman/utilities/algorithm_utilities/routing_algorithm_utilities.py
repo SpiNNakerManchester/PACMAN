@@ -24,10 +24,10 @@ import itertools
 
 
 def get_app_partitions():
-    """ Find all application partitions.
+    """
+    Find all application partitions.
 
     .. note::
-
         Where a vertex splitter indicates that it has internal
         partitions but is not the source of an external partition, a "fake"
         empty application partition is added.  This allows the calling
@@ -59,7 +59,8 @@ def get_app_partitions():
 
 
 def route_has_dead_links(root):
-    """ Quickly determine if a route uses any dead links.
+    """
+    Quickly determine if a route uses any dead links.
 
     :param RoutingTree root:
         The root of the RoutingTree which contains nothing but RoutingTrees
@@ -78,7 +79,8 @@ def route_has_dead_links(root):
 
 
 def avoid_dead_links(root):
-    """ Modify a RoutingTree to route-around dead links in a Machine.
+    """
+    Modify a RoutingTree to route-around dead links in a Machine.
 
     Uses A* to reconnect disconnected branches of the tree (due to dead links
     in the machine).
@@ -147,7 +149,6 @@ def _copy_and_disconnect_tree(root):
     nodes which are not connected in the machine.
 
     .. note::
-
         If a dead chip is part of the input RoutingTree, no corresponding node
         will be included in the copy. The assumption behind this is that the
         only reason a tree would visit a dead chip is because a route passed
@@ -222,7 +223,6 @@ def a_star(sink, heuristic_source, sources):
     """ Use A* to find a path from any of the sources to the sink.
 
     .. note::
-
         The heuristic means that the search will proceed towards
         heuristic_source without any concern for any other sources. This means
         that the algorithm may miss a very close neighbour in order to pursue
@@ -423,7 +423,8 @@ def least_busy_dimension_first(traffic, vector, start):
 
 
 def vector_to_nodes(dm_vector, start):
-    """ Convert a vector to a set of nodes.
+    """
+    Convert a vector to a set of nodes.
 
     :param list(tuple(int,int)) dm_vector:
         A vector made up of a list of (dimension, magnitude), where dimensions
@@ -501,7 +502,8 @@ def nodes_to_trees(nodes, start, route):
 
 
 def most_direct_route(source, dest, machine):
-    """ Find the most direct route from source to target on the machine.
+    """
+    Find the most direct route from source to target on the machine.
 
     :param tuple(int,int) source: The source x, y coordinates
     :param tuple(int,int) dest: The destination x, y coordinated
@@ -518,7 +520,8 @@ def most_direct_route(source, dest, machine):
 
 
 def get_targets_by_chip(vertices):
-    """ Get the target links and cores on the relevant chips.
+    """
+    Get the target links and cores on the relevant chips.
 
     :param list(MachineVertex) vertices: The vertices to target
     :param Placements placements: Where the vertices are placed

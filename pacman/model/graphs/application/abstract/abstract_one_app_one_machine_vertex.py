@@ -17,7 +17,8 @@ from pacman.model.graphs.application import ApplicationVertex
 
 
 class AbstractOneAppOneMachineVertex(ApplicationVertex):
-    """ An ApplicationVertex that has a fixed singleton MachineVertex.
+    """
+    An ApplicationVertex that has a fixed singleton MachineVertex.
     """
     __slots__ = [
         # A pointer to the machine vertex set at init time

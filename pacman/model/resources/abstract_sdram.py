@@ -17,7 +17,8 @@ from spinn_utilities.abstract_base import (
 
 
 class AbstractSDRAM(object, metaclass=AbstractBase):
-    """ Represents an amount of SDRAM used on a chip in the machine.
+    """
+    Represents an amount of SDRAM used on a chip in the machine.
     """
 
     @abstractmethod
@@ -32,7 +33,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
     @abstractmethod
     def __add__(self, other):
         """
-        Combines this SDRAM resource with the other one and creates a new one
+        Combines this SDRAM resource with the other one and creates a new one.
 
         :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
@@ -41,7 +42,8 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
 
     @abstractmethod
     def __sub__(self, other):
-        """ Creates a new SDRAM which is this one less the other
+        """
+        Creates a new SDRAM which is this one less the other.
 
         :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
@@ -50,7 +52,8 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
 
     @abstractmethod
     def sub_from(self, other):
-        """ Creates a new SDRAM which is the other less this one
+        """
+        Creates a new SDRAM which is the other less this one.
 
         :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
@@ -59,12 +62,14 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
 
     @abstractproperty
     def fixed(self):
-        """ Returns the fixed SDRAM cost
+        """
+        Returns the fixed SDRAM cost.
         """
 
     @abstractproperty
     def per_timestep(self):
-        """ Returns extra SDRAM cost for each additional timestep
+        """
+        Returns extra SDRAM cost for each additional timestep.
 
         .. warning::
             May well be zero.
@@ -79,7 +84,8 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
 
     @abstractmethod
     def report(self, timesteps, indent="", preamble="", target=None):
-        """ Writes a description of this SDRAM to the target.
+        """
+        Writes a description of this SDRAM to the target.
 
         :param int timesteps: Number of timesteps to do total cost for
         :param str indent: Text at the start of this and all children

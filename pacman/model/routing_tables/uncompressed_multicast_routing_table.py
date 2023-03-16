@@ -25,7 +25,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
-    """ Represents a uncompressed routing table for a chip.
+    """
+    Represents a uncompressed routing table for a chip.
     """
 
     __slots__ = [
@@ -67,7 +68,8 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
                 self.add_multicast_routing_entry(multicast_routing_entry)
 
     def add_multicast_routing_entry(self, multicast_routing_entry):
-        """ Adds a routing entry to this table.
+        """ A
+        dds a routing entry to this table.
 
         :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
             The route to add
@@ -98,7 +100,8 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     @property
     @overrides(AbstractMulticastRoutingTable.x)
     def x(self):
-        """ The x-coordinate of the chip of this table.
+        """
+        The x-coordinate of the chip of this table.
 
         :rtype: int
         """
@@ -107,7 +110,8 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     @property
     @overrides(AbstractMulticastRoutingTable.y)
     def y(self):
-        """ The y-coordinate of the chip of this table.
+        """
+        The y-coordinate of the chip of this table.
 
         :rtype: int
         """
@@ -116,7 +120,8 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     @property
     @overrides(AbstractMulticastRoutingTable.multicast_routing_entries)
     def multicast_routing_entries(self):
-        """ The multicast routing entries in the table.
+        """
+        The multicast routing entries in the table.
 
         :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
         """

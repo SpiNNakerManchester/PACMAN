@@ -20,7 +20,8 @@ from pacman.utilities.utility_calls import get_n_bits_for_fields
 
 
 class MachineVertex(AbstractVertex, metaclass=AbstractBase):
-    """ A machine graph vertex.
+    """
+    A machine graph vertex.
     """
 
     __slots__ = ["_app_vertex", "_index", "_vertex_slice"]
@@ -74,7 +75,8 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return self._vertex_slice
 
     def get_n_keys_for_partition(self, partition_id):
-        """ Get the number of keys required by the given partition of edges.
+        """
+        Get the number of keys required by the given partition of edges.
 
         :param str partition_id: The identifier of the partition
             partition_id param is only used by some MachineVertex clases
@@ -115,7 +117,8 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
     @abstractproperty
     def sdram_required(self):
-        """ The SDRAM space required by the vertex.
+        """
+        The SDRAM space required by the vertex.
 
         :rtype: ~pacman.model.resources.AbstractSDRAM
         """

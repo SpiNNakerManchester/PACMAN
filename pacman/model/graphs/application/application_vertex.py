@@ -94,7 +94,8 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     @splitter.setter
     def splitter(self, new_value):
-        """ Sets the splitter object. Does not allow repeated settings.
+        """
+        Sets the splitter object. Does not allow repeated settings.
 
         :param new_value: The new splitter object
         :type new_value:
@@ -114,7 +115,6 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
         :param MachineVertex machine_vertex: A pointer to a machine_vertex
         """
-
         machine_vertex.index = len(self._machine_vertices)
         self._machine_vertices.add(machine_vertex)
 
@@ -132,7 +132,8 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     @abstractproperty
     def n_atoms(self):
-        """ The number of atoms in the vertex.
+        """
+        The number of atoms in the vertex.
 
         :rtype: int
         """
@@ -162,7 +163,8 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     @property
     def machine_vertices(self):
-        """ The machine vertices that this application vertex maps to.
+        """
+        The machine vertices that this application vertex maps to.
 
         :rtype: iterable(MachineVertex)
         """

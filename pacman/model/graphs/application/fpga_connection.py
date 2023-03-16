@@ -22,7 +22,8 @@ FPGA_LINK_IDS = range(0, 16)
 
 
 class FPGAConnection(NamedTuple):
-    """ A connection from or to an FPGA.
+    """
+    A connection from or to an FPGA.
     """
 
     #: The ID of the FPGA on the board (0, 1 or 2), or None for all of them
@@ -41,7 +42,8 @@ class FPGAConnection(NamedTuple):
 
     @property
     def is_concrete(self):
-        """ Determine if the connection has the FPGA id and link id set.
+        """
+        Determine if the connection has the FPGA id and link id set.
 
         :rtype: bool
         """

@@ -17,7 +17,8 @@ from .abstract_sdram import AbstractSDRAM
 
 
 class ConstantSDRAM(AbstractSDRAM):
-    """ Represents an amount of SDRAM used  on a chip in the machine.
+    """
+    Represents an amount of SDRAM used  on a chip in the machine.
 
     This is used when the amount of SDRAM needed is not effected by runtime
     """

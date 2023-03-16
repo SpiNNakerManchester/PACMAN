@@ -21,7 +21,8 @@ from spinn_machine import MulticastRoutingEntry
 
 
 class MulticastRoutingTables(object):
-    """ Represents the multicast routing tables for a number of chips.
+    """
+    Represents the multicast routing tables for a number of chips.
     """
 
     __slots__ = [
@@ -46,7 +47,8 @@ class MulticastRoutingTables(object):
                 self.add_routing_table(routing_table)
 
     def add_routing_table(self, routing_table):
-        """ Add a routing table.
+        """
+        Add a routing table.
 
         :param MulticastRoutingTable routing_table: a routing table to add
         :raise PacmanAlreadyExistsException:

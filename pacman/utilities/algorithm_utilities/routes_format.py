@@ -63,7 +63,8 @@ def _expand_route_value(processors_ids, link_ids):
 
 
 def format_route(entry):
-    """ How to render a single routing entry.
+    """
+    How to render a single routing entry.
 
     :param ~spinn_machine.MulticastRoutingEntry entry:
     :rtype: str

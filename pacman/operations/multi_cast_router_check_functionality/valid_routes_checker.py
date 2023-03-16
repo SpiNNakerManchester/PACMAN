@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" Collection of functions which together validate routes.
+"""
+Collection of functions which together validate routes.
 """
 from collections import namedtuple, defaultdict
 import logging
@@ -321,7 +322,8 @@ def _recursive_trace_to_destinations(
 
 
 def _check_visited_routers(chip_x, chip_y, visited_routers):
-    """ Check if the trace has visited this router already.
+    """
+    Check if the trace has visited this router already.
 
     :param int chip_x: the x coordinate of the chip being checked
     :param int chip_y: the y coordinate of the chip being checked
@@ -339,7 +341,8 @@ def _check_visited_routers(chip_x, chip_y, visited_routers):
 
 
 def _is_dest(processor_ids, current_router, reached_placements):
-    """ Collect processors to be removed.
+    """
+    Collect processors to be removed.
 
     :param list(int) processor_ids:
         the processor IDs which the last router entry said the trace should
@@ -355,7 +358,8 @@ def _is_dest(processor_ids, current_router, reached_placements):
 
 
 def _locate_routing_entry(current_router, key, n_atoms):
-    """ Locate the entry from the router based off the edge.
+    """
+    Locate the entry from the router based off the edge.
 
     :param MulticastRoutingTable current_router:
         the current router being used in the trace

@@ -19,7 +19,8 @@ from .application_virtual_vertex import ApplicationVirtualVertex
 
 
 class ApplicationFPGAVertex(ApplicationVirtualVertex):
-    """ A virtual application vertex connected to one or more FPGA links.
+    """
+    A virtual application vertex connected to one or more FPGA links.
     """
 
     __slots__ = [
@@ -77,7 +78,8 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         return self._n_machine_vertices_per_link
 
     def get_incoming_slice_for_link(self, link, index):
-        """ Get the slice to be given to the connection from the given link.
+        """
+        Get the slice to be given to the connection from the given link.
 
         :param FPGAConnection link: The FPGA connection to get the slice for
         :param int index:
@@ -94,7 +96,8 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         return Slice(low_atom, hi_atom)
 
     def get_outgoing_slice(self):
-        """ Get the slice to be given to the outgoing connection.
+        """
+        Get the slice to be given to the outgoing connection.
 
         :rtype: ~pacman.model.graphs.common.Slice
         """

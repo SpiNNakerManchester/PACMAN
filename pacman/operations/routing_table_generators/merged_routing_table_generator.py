@@ -100,7 +100,8 @@ def __match(iterator, vertex, part_id, r_info, entry, routing_info):
 
 
 def __mask_has_holes(mask):
-    """ Detect if the mask has a "hole" somewhere other than at the bottom.
+    """
+    Detect if the mask has a "hole" somewhere other than at the bottom.
 
     :param int mask: The mask to check
     :rtype: bool

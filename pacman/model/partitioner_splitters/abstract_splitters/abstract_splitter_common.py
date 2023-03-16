@@ -77,14 +77,16 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     @abstractmethod
     def create_machine_vertices(self, chip_counter):
-        """ Method for specific splitter objects to override.
+        """
+        Method for specific splitter objects to override.
 
         :param ChipCounter chip_counter: counter of used chips
         """
 
     @abstractmethod
     def get_out_going_slices(self):
-        """ The slices of the output vertices.
+        """
+        The slices of the output vertices.
 
         :return: list of Slices
         :rtype: list(~pacman.model.graphs.common.Slice)
@@ -92,7 +94,8 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_in_coming_slices(self):
-        """ The slices of the input vertices.
+        """
+        The slices of the input vertices.
 
         :return: list of Slices
         :rtype: list(~pacman.model.graphs.common.Slice)
@@ -100,7 +103,8 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_out_going_vertices(self, partition_id):
-        """ Get machine pre-vertices.
+        """
+        Get machine pre-vertices.
 
         The output vertices are the ones that will serve as source vertices
         for external edges.
@@ -111,13 +115,13 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_in_coming_vertices(self, partition_id):
-        """ Get machine post-vertices for a given partition.
+        """
+        Get machine post-vertices for a given partition.
 
         The input vertices are the ones that will serve as target vertices
         for external edges.
 
         .. note::
-
             This method returns all that could be used
             for any source machine vertex in the given partition.
 
@@ -127,13 +131,13 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     def get_source_specific_in_coming_vertices(
             self, source_vertex, partition_id):
-        """ Get machine post-vertices for a given source.
+        """
+        Get machine post-vertices for a given source.
 
         The input vertices are the ones that will serve as target vertices
         for external edges.
 
         .. note::
-
             This method allows filtering of the targets
             for a specific source machine vertex.
 
@@ -154,7 +158,8 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     @abstractmethod
     def machine_vertices_for_recording(self, variable_to_record):
-        """ Gets the machine vertices which are recording this variable.
+        """
+        Gets the machine vertices which are recording this variable.
 
         :param str variable_to_record: the variable to get machine verts for.
         :return: list of machine vertices
@@ -163,7 +168,8 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     @abstractmethod
     def reset_called(self):
-        """ Reset the splitter to be as if it has not operated a splitting yet.
+        """
+        Reset the splitter to be as if it has not operated a splitting yet.
         """
 
     def get_same_chip_groups(self):

@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""An explicit representation of a routing tree in a machine.
+"""
+An explicit representation of a routing tree in a machine.
 
 This representation of a route explicitly describes a tree-structure and the
 complete path taken by a route. This is used during place and route in
@@ -26,7 +27,8 @@ from collections import deque
 
 
 class RoutingTree(object):
-    """ Explicitly defines a multicast route through a SpiNNaker machine.
+    """
+    Explicitly defines a multicast route through a SpiNNaker machine.
 
     Each instance represents a single hop in a route and recursively refers to
     following steps.
@@ -56,7 +58,8 @@ class RoutingTree(object):
 
     @property
     def chip(self):
-        """ The chip the route is currently passing through.
+        """
+        The chip the route is currently passing through.
 
         :rtype: tuple(int,int)
         """
@@ -69,7 +72,6 @@ class RoutingTree(object):
         (route, object) tuple.
 
         .. note::
-
             Up until Rig 1.5.1, this structure used :py:class:`set`\\ s to
             store children. This was changed to :py:class:`list`\\ s since
             sets incur a large memory overhead and in practice the set-like
@@ -85,7 +87,6 @@ class RoutingTree(object):
           at the supplied vertex.
 
         .. note::
-
             The direction may be `None` and so additional logic may be required
             to determine what core to target to reach the vertex.
 

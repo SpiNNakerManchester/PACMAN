@@ -507,7 +507,8 @@ class _Space(object):
 
 
 class _ChipWithSpace(object):
-    """ A chip with space for placement.
+    """
+    A chip with space for placement.
     """
 
     __slots__ = ["chip", "cores", "sdram"]

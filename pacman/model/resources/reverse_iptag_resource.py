@@ -50,7 +50,8 @@ class ReverseIPtagResource(object):
 
     @property
     def port(self):
-        """ The port of the tag
+        """
+        The port of the tag.
 
         :rtype: int
         """
@@ -60,7 +61,7 @@ class ReverseIPtagResource(object):
     def sdp_port(self):
         """
         The SDP port to use when constructing the SDP message from the
-        received UDP message
+        received UDP message.
 
         :rtype: int
         """
@@ -68,7 +69,8 @@ class ReverseIPtagResource(object):
 
     @property
     def tag(self):
-        """ The tag required, or `None` if any tag is OK
+        """
+        The tag required, or `None` if any tag is OK.
 
         :rtype: int or None
         """

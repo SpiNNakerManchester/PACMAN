@@ -151,7 +151,8 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
 
 
 def compare_tables(original, compressed):
-    """ Compares the two tables without generating any output.
+    """
+    Compares the two tables without generating any output.
 
     :param MulticastRoutingTable original: The original routing tables
     :param MulticastRoutingTable compressed: The compressed routing tables.

@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" A simple bit of support code for validation.
+"""
+A simple bit of support code for validation.
 """
 
 import os

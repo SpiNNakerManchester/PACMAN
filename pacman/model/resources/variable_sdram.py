@@ -18,7 +18,8 @@ from .abstract_sdram import AbstractSDRAM
 
 
 class VariableSDRAM(AbstractSDRAM):
-    """ Represents an amount of SDRAM used on a chip in the machine.
+    """
+    Represents an amount of SDRAM used on a chip in the machine.
 
     This is where the usage increase as the run time increases
     """

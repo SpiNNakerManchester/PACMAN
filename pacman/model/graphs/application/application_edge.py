@@ -17,7 +17,8 @@ from pacman.model.graphs import AbstractEdge
 
 
 class ApplicationEdge(AbstractEdge):
-    """ A simple implementation of an application edge.
+    """
+    A simple implementation of an application edge.
     """
 
     __slots__ = [

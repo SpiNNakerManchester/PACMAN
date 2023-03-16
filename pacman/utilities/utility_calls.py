@@ -68,7 +68,8 @@ def is_equal_or_None(a, b):
 
 
 def is_single(iterable):
-    """ Test if there is exactly one item in the iterable.
+    """
+    Test if there is exactly one item in the iterable.
 
     :rtype: bool
     """
@@ -87,7 +88,8 @@ def is_single(iterable):
 
 
 def md5(string):
-    """ Get the MD5 hash of the given string, which is UTF-8 encoded.
+    """
+    Get the MD5 hash of the given string, which is UTF-8 encoded.
 
     :param str string:
     :rtype: str
@@ -136,7 +138,8 @@ def get_key_ranges(key, mask):
 
 
 def get_n_bits(n_values):
-    """ Determine how many bits are required for the given number of values.
+    """
+    Determine how many bits are required for the given number of values.
 
     :param int n_values: the number of values (starting at 0)
     :return: the number of bits required to express that many values
@@ -191,7 +194,8 @@ def get_field_based_keys(key, vertex_slice, shift=0):
 
 
 def get_field_based_index(base_key, vertex_slice, shift=0):
-    """ Map field based keys back to indices.
+    """
+    Map field based keys back to indices.
 
     :param int base_key: The base key
     :param Slice vertex_slice: The slice to translate
@@ -212,7 +216,8 @@ def get_field_based_index(base_key, vertex_slice, shift=0):
 
 
 def get_n_bits_for_fields(field_sizes):
-    """ Get the number of bits required for the fields in the vertex slice.
+    """
+    Get the number of bits required for the fields in the vertex slice.
 
     :param iterable(int) field_sizes: The sizes each of the fields
     :rtype: int
@@ -222,7 +227,8 @@ def get_n_bits_for_fields(field_sizes):
 
 
 def allocator_bits_needed(size):
-    """ Get the bits needed for the routing info allocator.
+    """
+    Get the bits needed for the routing info allocator.
 
     :param int size: The size to calculate the number of bits for
     :return: the number of bits required for that size

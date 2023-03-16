@@ -18,7 +18,8 @@ from spinn_utilities.overrides import overrides
 
 
 class MultiRegionSDRAM(VariableSDRAM):
-    """ A resource for SDRAM that comes in regions.
+    """
+    A resource for SDRAM that comes in regions.
 
     .. note:
         Adding or subtracting two MultiRegionSDRAM objects will be assumed to
@@ -43,7 +44,8 @@ class MultiRegionSDRAM(VariableSDRAM):
         return self.__regions
 
     def add_cost(self, region, fixed_sdram, per_timestep_sdram=0):
-        """ Adds the cost for the specified region.
+        """
+        Adds the cost for the specified region.
 
         :param region: Key to identify the region
         :type region: int or str or enum
@@ -65,7 +67,8 @@ class MultiRegionSDRAM(VariableSDRAM):
             self.__regions[region] = sdram
 
     def nest(self, region, other):
-        """ Combines the other SDRAM cost, in a nested fashion.
+        """
+        Combines the other SDRAM cost, in a nested fashion.
 
         The totals for the new region are added to the total of this one.
         A new region is created summarising the cost of others.
@@ -94,7 +97,8 @@ class MultiRegionSDRAM(VariableSDRAM):
             self.__regions[region] = other
 
     def merge(self, other):
-        """ Combines the other SDRAM costs keeping the region mappings.
+        """
+        Combines the other SDRAM costs keeping the region mappings.
 
         .. note:
             This method should only be called when combining cost for the same

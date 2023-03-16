@@ -16,14 +16,16 @@ from .application_vertex import ApplicationVertex
 
 
 class ApplicationVirtualVertex(ApplicationVertex):
-    """ An application vertex which is virtual.
+    """
+    An application vertex which is virtual.
     """
 
     __slots__ = []
 
     @abstractmethod
     def get_outgoing_link_data(self, machine):
-        """ Get the link data for outgoing connections from the machine.
+        """
+        Get the link data for outgoing connections from the machine.
 
         :param Machine machine: The machine to get the link data from
         :rtype: AbstractLinkData

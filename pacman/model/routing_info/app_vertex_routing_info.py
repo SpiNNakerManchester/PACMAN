@@ -91,7 +91,8 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
 
     @property
     def machine_mask(self):
-        """ The mask that covers a specific machine vertex.
+        """
+        The mask that covers a specific machine vertex.
 
         :rtype: int
         """
@@ -100,7 +101,8 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
 
     @property
     def n_bits_atoms(self):
-        """ The number of bits for the atoms.
+        """
+        The number of bits for the atoms.
 
         :rtype: int
         """

@@ -68,7 +68,8 @@ class AbstractCompressor(object):
         """
 
     def compress_tables(self, router_tables, progress):
-        """ Compress all the unordered routing tables.
+        """
+        Compress all the unordered routing tables.
 
         Tables who start of smaller than target_length are not compressed
 

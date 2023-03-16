@@ -253,7 +253,8 @@ class _PairCompressor(AbstractCompressor):
         self._routes[index_b] = temp
 
     def _three_way_partition_routes(self, low, high):
-        """ Partitions the routes and frequencies into three parts.
+        """
+        Partitions the routes and frequencies into three parts.
 
         based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
 
@@ -365,7 +366,8 @@ class _PairCompressor(AbstractCompressor):
         self._routes_count += 1
 
     def compress_table(self, router_table):
-        """ Compresses all the entries for a single table.
+        """
+        Compresses all the entries for a single table.
 
         Compressed the entries for this unordered table
         returning a new table with possibly fewer entries
@@ -441,7 +443,8 @@ class _PairCompressor(AbstractCompressor):
         return (key_a & mask_b) == (key_b & mask_a)
 
     def merge(self, entry1, entry2):
-        """ Merges two entries/triples into one that covers both.
+        """
+        Merges two entries/triples into one that covers both.
 
         The assumption is that they both have the same known spinnaker_route
 

@@ -16,7 +16,8 @@ from pacman.data import PacmanDataView
 
 
 def splitter_reset():
-    """ Performs resetting of splitters to indicate a new phase of operation.
+    """
+    Performs resetting of splitters to indicate a new phase of operation.
     """
     for vertex in PacmanDataView.iterate_vertices():
         if vertex.splitter is not None:

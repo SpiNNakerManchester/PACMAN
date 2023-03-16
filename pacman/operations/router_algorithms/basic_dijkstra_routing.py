@@ -230,7 +230,8 @@ class _BasicDijkstraRouting(object):
         return tables
 
     def _update_all_weights(self, nodes_info):
-        """ Change the weights of the neighbouring nodes
+        """
+        Change the weights of the neighbouring nodes.
 
         :param dict(tuple(int,int),_NodeInfo) nodes_info:
             the node info dictionary
@@ -240,7 +241,8 @@ class _BasicDijkstraRouting(object):
                 self._update_neighbour_weights(nodes_info, key)
 
     def _update_neighbour_weights(self, nodes_info, key):
-        """ Change the weights of the neighbouring nodes
+        """
+        Change the weights of the neighbouring nodes.
 
         :param dict(tuple(int,int),_NodeInfo) nodes_info:
             the node info dictionary
@@ -253,7 +255,8 @@ class _BasicDijkstraRouting(object):
 
     @staticmethod
     def _reset_tables(tables):
-        """ Reset the Dijkstra tables for a new path search
+        """
+        Reset the Dijkstra tables for a new path search.
 
         :param dict(tuple(int,int),_DijkstraInfo) tables:
             the dictionary object for the Dijkstra-tables
@@ -278,7 +281,6 @@ class _BasicDijkstraRouting(object):
             when the destination node could not be reached from this source
             node
         """
-
         dest_chips_to_find = set(dest_chips)
         source = (x_source, y_source)
         dest_chips_to_find.discard(source)
@@ -334,7 +336,8 @@ class _BasicDijkstraRouting(object):
 
     @staticmethod
     def _update_neighbour(tables, neighbour, current, source, weight):
-        """ Update the lowest cost for each neighbour_xy of a node
+        """
+        Update the lowest cost for each neighbour_xy of a node.
 
         :param dict(tuple(int,int),_DijkstraInfo) tables:
         :param ~spinn_machine.Link neighbour:
@@ -428,7 +431,8 @@ class _BasicDijkstraRouting(object):
     def _create_routing_entry(
             self, neighbour_xy, tables, neighbour_index,
             nodes_info, x, y, previous_entry, pre_vertex, partition_id):
-        """ Create a new routing entry
+        """
+        Create a new routing entry.
 
         :param tuple(int,int) neighbour_xy:
         :param dict(tuple(int,int),_DijkstraInfo) tables:
@@ -484,7 +488,8 @@ class _BasicDijkstraRouting(object):
 
     @staticmethod
     def _get_reverse_direction(neighbour_position):
-        """ Determine the direction of a link to go down
+        """
+        Determine the direction of a link to go down.
 
         :param int neighbour_position: the position the neighbour is at
         :return: The position of the opposite link

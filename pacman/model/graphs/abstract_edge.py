@@ -15,28 +15,32 @@ from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 
 class AbstractEdge(object, metaclass=AbstractBase):
-    """ A directed edge in a graph between two vertices.
+    """
+    A directed edge in a graph between two vertices.
     """
 
     __slots__ = ()
 
     @abstractproperty
     def label(self):
-        """ The label of the edge.
+        """
+        The label of the edge.
 
         :rtype: str
         """
 
     @abstractproperty
     def pre_vertex(self):
-        """ The vertex at the start of the edge.
+        """
+        The vertex at the start of the edge.
 
         :rtype: AbstractVertex
         """
 
     @abstractproperty
     def post_vertex(self):
-        """ The vertex at the end of the edge.
+        """
+        The vertex at the end of the edge.
 
         :rtype: AbstractVertex
         """

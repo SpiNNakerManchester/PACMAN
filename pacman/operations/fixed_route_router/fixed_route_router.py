@@ -21,7 +21,8 @@ from pacman.exceptions import (
 
 
 def fixed_route_router(destination_class):
-    """ Runs the fixed route generator for all boards on machine.
+    """
+    Runs the fixed route generator for all boards on machine.
 
     :param destination_class: the destination class to route packets to
     :type destination_class: type or tuple(type,...)

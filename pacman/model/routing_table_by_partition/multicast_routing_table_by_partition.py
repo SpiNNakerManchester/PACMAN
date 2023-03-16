@@ -20,7 +20,8 @@ log = logging.getLogger(__name__)
 
 
 class MulticastRoutingTableByPartition(object):
-    """ A set of multicast routing path objects.
+    """
+    A set of multicast routing path objects.
     """
 
     __slots__ = [
@@ -34,7 +35,8 @@ class MulticastRoutingTableByPartition(object):
 
     def add_path_entry(
             self, entry, router_x, router_y, source_vertex, partition_id):
-        """ Adds a multicast routing path entry.
+        """
+        Adds a multicast routing path entry.
 
         :param MulticastRoutingTableByPartitionEntry entry: the entry to add
         :param int router_x: the x coord of the router
@@ -77,7 +79,8 @@ class MulticastRoutingTableByPartition(object):
                 raise e
 
     def get_routers(self):
-        """ Get the coordinates of all stored routers.
+        """
+        Get the coordinates of all stored routers.
 
         :rtype: iterable(tuple(int, int))
         """
@@ -85,14 +88,16 @@ class MulticastRoutingTableByPartition(object):
 
     @property
     def n_routers(self):
-        """ Get the number of routers stored.
+        """
+        Get the number of routers stored.
 
         :rtype: int
         """
         return len(self._router_to_entries_map)
 
     def get_entries_for_router(self, router_x, router_y):
-        """ Get the set of multicast path entries assigned to this router.
+        """
+        Get the set of multicast path entries assigned to this router.
 
         :param int router_x: the x coord of the router
         :param int router_y: the y coord of the router
@@ -105,7 +110,8 @@ class MulticastRoutingTableByPartition(object):
 
     def get_entry_on_coords_for_edge(
             self, source_vertex, partition_id, router_x, router_y):
-        """ Get an entry from a specific coordinate.
+        """
+        Get an entry from a specific coordinate.
 
         :param source_vertex:
         :type source_vertex: ApplicationVertex or MachineVertex

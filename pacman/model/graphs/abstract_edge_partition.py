@@ -46,7 +46,8 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         self._edges = OrderedSet()
 
     def add_edge(self, edge):
-        """ Add an edge to the edge partition.
+        """
+        Add an edge to the edge partition.
 
         :param AbstractEdge edge: the edge to add
         :raises PacmanInvalidParameterException:
@@ -65,7 +66,8 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
 
     @property
     def identifier(self):
-        """ The identifier of this edge partition.
+        """
+        The identifier of this edge partition.
 
         :rtype: str
         """
@@ -73,7 +75,8 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
 
     @property
     def edges(self):
-        """ The edges in this edge partition.
+        """
+        The edges in this edge partition.
 
         .. note::
             The order in which the edges are added is preserved for when they
@@ -85,7 +88,8 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
 
     @property
     def n_edges(self):
-        """ The number of edges in the edge partition.
+        """
+        The number of edges in the edge partition.
 
         :rtype: int
         """
@@ -99,7 +103,8 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         return self.__repr__()
 
     def __contains__(self, edge):
-        """ Check if the edge is contained within this partition.
+        """
+        Check if the edge is contained within this partition.
 
         :param AbstractEdge edge: the edge to search for.
         :rtype: bool

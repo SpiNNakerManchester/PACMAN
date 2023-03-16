@@ -32,7 +32,8 @@ def ordered_covering_compressor():
 
 
 class _OrderedCoveringCompressor(AbstractCompressor):
-    """ Compressor from rig that has been tied into the main tool chain stack.
+    """
+    Compressor from rig that has been tied into the main tool chain stack.
     """
 
     __slots__ = []

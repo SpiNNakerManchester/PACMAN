@@ -162,7 +162,8 @@ def ordered_covering(
 
 
 def get_generality(key, mask):
-    """Count the number of Xs in the key-mask pair.
+    """
+    Count the number of Xs in the key-mask pair.
 
     For example, there are 32 Xs in ``0x00000000/0x00000000``::
 
@@ -226,7 +227,8 @@ def _get_best_merge(routing_table, aliases):
 
 
 def _get_all_merges(routing_table):
-    """ Get possible sets of entries to merge.
+    """
+    Get possible sets of entries to merge.
 
     :param Entry routing_table: Routing entries to be merged.
     :rtype: iterable(_Merge)
@@ -295,7 +297,9 @@ def _get_insertion_index(routing_table, generality):
 
 
 class _Merge(object):
-    """Represents a potential merge of routing table entries. """
+    """
+    Represents a potential merge of routing table entries.
+    """
 
     _slots__ = [
         # Reference to the routing table against which the merge is defined.

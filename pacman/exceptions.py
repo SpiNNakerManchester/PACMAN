@@ -14,12 +14,14 @@
 
 
 class PacmanException(Exception):
-    """ Indicates a general exception from Pacman.
+    """
+    Indicates a general exception from Pacman.
     """
 
 
 class PacmanInvalidParameterException(PacmanException):
-    """ A parameter has an invalid value.
+    """
+    A parameter has an invalid value.
     """
 
     def __init__(self, parameter, value, problem):
@@ -34,7 +36,8 @@ class PacmanInvalidParameterException(PacmanException):
 
 
 class PacmanAlreadyExistsException(PacmanException):
-    """ Something already exists and that adding another would be a conflict.
+    """
+    Something already exists and that adding another would be a conflict.
     """
 
     def __init__(self, item_type, item_id):
@@ -48,17 +51,20 @@ class PacmanAlreadyExistsException(PacmanException):
 
 
 class PacmanPartitionException(PacmanException):
-    """ Something went wrong with partitioning.
+    """
+    Something went wrong with partitioning.
     """
 
 
 class PacmanPlaceException(PacmanException):
-    """ Something went wrong with placement.
+    """
+    Something went wrong with placement.
     """
 
 
 class PacmanPruneException(PacmanException):
-    """ Something went wrong with pruning.
+    """
+    Something went wrong with pruning.
     """
 
 
@@ -68,17 +74,20 @@ class PacmanRouteInfoAllocationException(PacmanException):
 
 
 class PacmanElementAllocationException(PacmanException):
-    """ Something went wrong with element allocation.
+    """
+    Something went wrong with element allocation.
     """
 
 
 class PacmanRoutingException(PacmanException):
-    """ Something went wrong with routing.
+    """
+    Something went wrong with routing.
     """
 
 
 class PacmanConfigurationException(PacmanException):
-    """ Something went wrong with configuring some part of PACMAN.
+    """
+    Something went wrong with configuring some part of PACMAN.
     """
 
 
@@ -103,47 +112,56 @@ class PacmanAlgorithmFailedToGenerateOutputsException(PacmanException):
 
 
 class PacmanAlreadyPlacedError(ValueError):
-    """ Multiple placements are being made for a vertex.
+    """
+    Multiple placements are being made for a vertex.
     """
 
 
 class PacmanNotPlacedError(KeyError):
-    """ No placements are made for a vertex.
+    """
+    No placements are made for a vertex.
     """
 
 
 class PacmanProcessorAlreadyOccupiedError(ValueError):
-    """ Multiple placements are being made to a processor.
+    """
+    Multiple placements are being made to a processor.
     """
 
 
 class PacmanProcessorNotOccupiedError(KeyError):
-    """ No placement has been made to a processor.
+    """
+    No placement has been made to a processor.
     """
 
 
 class PacmanValueError(ValueError, PacmanException):
-    """ A value is invalid for some reason.
+    """
+    A value is invalid for some reason.
     """
 
 
 class PacmanNotFoundError(KeyError, PacmanException):
-    """ Some object has not been found when requested.
+    """
+    Some object has not been found when requested.
     """
 
 
 class PacmanTypeError(TypeError, PacmanException):
-    """ An object is of incorrect type.
+    """
+    An object is of incorrect type.
     """
 
 
 class PacmanNoMergeException(PacmanException):
-    """ There are no merges worth performing.
+    """
+    There are no merges worth performing.
     """
 
 
 class PacmanCanNotFindChipException(PacmanException):
-    """ The chip was not in the list of chips.
+    """
+    The chip was not in the list of chips.
     """
 
 

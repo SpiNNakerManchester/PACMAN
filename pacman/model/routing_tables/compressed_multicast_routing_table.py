@@ -17,7 +17,8 @@ from spinn_utilities.overrides import overrides
 
 
 class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
-    """ Represents a compressed routing table for a chip.
+    """
+    Represents a compressed routing table for a chip.
     """
 
     __slots__ = [
@@ -58,7 +59,8 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
                 self.add_multicast_routing_entry(multicast_routing_entry)
 
     def add_multicast_routing_entry(self, multicast_routing_entry):
-        """ Adds a routing entry to this table.
+        """
+        Adds a routing entry to this table.
 
         :param multicast_routing_entry: The route to add
         :type multicast_routing_entry:

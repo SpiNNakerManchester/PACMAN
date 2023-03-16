@@ -27,7 +27,8 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_sdram_used_by_atoms(self, vertex_slice):
-        """ Get the separate sdram requirements for a range of atoms.
+        """
+        Get the separate sdram requirements for a range of atoms.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the low value of atoms to calculate resources from
@@ -37,7 +38,8 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
     @abstractmethod
     def create_machine_vertex(
             self, vertex_slice, sdram, label=None):
-        """ Create a machine vertex from this application vertex.
+        """
+        Create a machine vertex from this application vertex.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of atoms that the machine vertex will cover.
@@ -51,7 +53,8 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
 
     @staticmethod
     def abstract_methods():
-        """ Exposes the abstract methods and properties defined in this class.
+        """
+        Exposes the abstract methods and properties defined in this class.
 
         :rtype frozenset(str)
         """

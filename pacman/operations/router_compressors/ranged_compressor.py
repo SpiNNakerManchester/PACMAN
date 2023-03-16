@@ -73,7 +73,8 @@ class RangeCompressor(object):
         self._entries = None
 
     def compress_table(self, uncompressed):
-        """ Compresses all the entries for a single table.
+        """
+        Compresses all the entries for a single table.
 
         Compressed the entries for this unordered table
         returning a new table with possibly fewer entries
