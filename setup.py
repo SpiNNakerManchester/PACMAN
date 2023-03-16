@@ -75,7 +75,7 @@ setup(
     install_requires=[
         'SpiNNUtilities == 1!6.0.1',
         'SpiNNMachine == 1!6.0.1',
-        "jsonschema"],
+        "jsonschema <= 4.17.3"],
     maintainer="SpiNNakerTeam",
     maintainer_email="spinnakerusers@googlegroups.com"
 )
