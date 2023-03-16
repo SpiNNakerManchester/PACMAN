@@ -75,7 +75,9 @@ setup(
     install_requires=[
         'SpiNNUtilities == 1!6.0.1',
         'SpiNNMachine == 1!6.0.1',
-        "jsonschema <= 4.17.3"],
+        "jsonschema <= 4.17.3; python_version == '3.7'",
+        "jsonschema; python_version >= '3.8'",
+    ],
     maintainer="SpiNNakerTeam",
     maintainer_email="spinnakerusers@googlegroups.com"
 )
