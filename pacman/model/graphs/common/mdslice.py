@@ -114,11 +114,6 @@ class MDSlice(Slice):
 
     @overrides(Slice.get_raster_ids)
     def get_raster_ids(self):
-        """ Get the IDs of the atoms in the slice as they would appear in a
-            "raster scan" of the atoms over the whole shape.
-
-        :return: A list of the global raster IDs of the atoms in this slice
-        """
         slices = tuple(self.get_slice(n)
                        for n in reversed(range(len(self.start))))
         ids = numpy.arange(numpy.prod(self._atoms_shape)).reshape(
