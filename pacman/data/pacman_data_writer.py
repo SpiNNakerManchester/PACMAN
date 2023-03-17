@@ -123,11 +123,11 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_plan_n_timesteps(self, plan_n_timesteps):
         """
-        Sets the plan_n_timestep. Use None for run forever
+        Sets the plan_n_timestep. Use `None` for run forever
 
         :param plan_n_timesteps:
         :type plan_n_timesteps: int or None
-        :raises TypeError: if the plan_n_timesteps are not an int or None
+        :raises TypeError: if the plan_n_timesteps are not an int or `None`
         :raises PacmanConfigurationException: On a negative plan_n_timesteps
         """
         if plan_n_timesteps is not None:

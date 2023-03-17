@@ -33,7 +33,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :type label: str or None
         :param app_vertex:
             The application vertex that caused this machine vertex to be
-            created. If None, there is no such application vertex.
+            created. If `None`, there is no such application vertex.
         :type app_vertex: ApplicationVertex or None
         :param vertex_slice:
             The slice of the application vertex that this machine vertex

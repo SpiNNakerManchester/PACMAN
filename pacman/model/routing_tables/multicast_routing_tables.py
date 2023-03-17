@@ -71,7 +71,6 @@ class MulticastRoutingTables(object):
 
         :return: an iterable of routing tables
         :rtype: iterable(MulticastRoutingTable)
-        :raise None: does not raise any known exceptions
         """
         return self._routing_tables_by_chip.values()
 
@@ -93,9 +92,8 @@ class MulticastRoutingTables(object):
 
         :param int x: The x-coordinate of the chip
         :param int y: The y-coordinate of the chip
-        :return: The routing table, or None if no such table exists
+        :return: The routing table, or `None` if no such table exists
         :rtype: MulticastRoutingTable or None
-        :raise None: No known exceptions are raised
         """
         return self._routing_tables_by_chip.get((x, y), None)
 

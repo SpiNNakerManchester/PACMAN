@@ -483,7 +483,7 @@ class PacmanDataView(MachineDataView):
         Use by partitioners and such but not to reserve data regions
 
         :rtype: int or None
-        :return: The plan n timesteps for None if run forever
+        :return: The plan n timesteps for `None` if run forever
         """
         return cls.__pacman_data._plan_n_timesteps
 

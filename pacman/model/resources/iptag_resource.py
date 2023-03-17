@@ -49,7 +49,7 @@ class IPtagResource(object):
         :type port: int or None
         :param bool strip_sdp: Whether the tag requires that SDP headers are
             stripped before transmission of data
-        :param tag: A fixed tag ID to assign, or None if any tag is OK
+        :param tag: A fixed tag ID to assign, or `None` if any tag is OK
         :type tag: int or None
         :param str traffic_identifier: The traffic to be sent using this tag;
             traffic with the same traffic_identifier can be sent using

@@ -210,7 +210,8 @@ class ApplicationGraph(object):
             The vertex at the start of the edges in the partition
         :param str outgoing_edge_partition_name:
             The name of the edge partition
-        :return: the named edge partition, or None if no such partition exists
+        :return:
+            The named edge partition, or `None` if no such partition exists
         :rtype: AbstractEdgePartition or None
         """
         # In general, very few partitions start at a given vertex, so iteration

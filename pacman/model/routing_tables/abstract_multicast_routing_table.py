@@ -43,7 +43,6 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
         :return: an iterable of multicast routing entries
         :rtype: iterable(:py:class:`spinn_machine.MulticastRoutingEntry`)
-        :raise None: does not raise any known exceptions
         """
 
     @abstractproperty

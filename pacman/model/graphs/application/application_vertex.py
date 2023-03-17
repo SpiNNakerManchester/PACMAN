@@ -59,7 +59,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             the value can be a 1-tuple or an int.
         :type max_atoms_per_core: None or int or tuple.
         :param splitter: The splitter object needed for this vertex.
-            Leave as None to delegate the choice of splitter to the selector.
+            Leave as `None` to delegate the choice of splitter to the selector.
         :type splitter: None or
             ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
         """
@@ -204,7 +204,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         :param new_value:
             Value to set.  If the vertex is n-dimensional where n > 1, a tuple
             of n values must be given.  If the vertex is 1 dimensional,
-            a 1-tuple or integer can be given.  If this is set to None the
+            a 1-tuple or integer can be given.  If this is set to `None` the
             vertex will have atoms_shape as the maximum.
         :type new_value: None or int or tuple(int)
         """

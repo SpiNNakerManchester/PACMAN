@@ -96,7 +96,7 @@ def ordered_covering(
     :param target_length:
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
-        possible. If None then the table will be made as small as possible.
+        possible. If `None` then the table will be made as small as possible.
     :type target_length: int or None
     :param aliases:
         Dictionary of which keys and masks in the routing table are
@@ -109,8 +109,8 @@ def ordered_covering(
     :param bool no_raise:
         If False (the default) then an error will be raised if the table cannot
         be minimised to be smaller than `target_length` and `target_length` is
-        not None. If True then a table will be returned regardless of the size
-        of the final table.
+        not `None`. If True then a table will be returned regardless of the
+        size of the final table.
     :return: new routing table, A new aliases dictionary.
     :rtype: tuple(list(Entry), dict(tuple(int,int), set(tuple(int,int))))
     :raises MinimisationFailedError:

@@ -72,7 +72,7 @@ class ZonedRoutingInfoAllocator(object):
     application/partition. Every vertex for a application/partition pair
     but different pairs may have different masks.
     This should result in less gaps between the machine vertexes.
-    Even in none Flexible mode if the sizes are too big to keep ``M`` and
+    Even in non-flexible mode if the sizes are too big to keep ``M`` and
     ``X`` the same size they will be allowed to change for those vertexes
     will a very high number of atoms.
     """

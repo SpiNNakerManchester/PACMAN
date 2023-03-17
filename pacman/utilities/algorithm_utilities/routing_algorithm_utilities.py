@@ -340,8 +340,10 @@ def convert_a_route(
         spinnaker format routing tables
     :param AbstractSingleSourcePartition partition:
         Partition this route applies to
-    :param int or None incoming_processor: processor this link came from
-    :param int or None incoming_link: link this link came from
+    :param incoming_processor: processor this link came from
+    :type incoming_processor: int or None
+    :param incoming_link: link this link came from
+    :type incoming_link: int or None
     :param RoutingTree route: algorithm specific format of the route
     :param dict((int,int),(list,list)): targets_by_chip:
         Target cores and links of things on the route that are final end points
@@ -566,8 +568,8 @@ def vertex_xy_and_route(vertex):
     :param MachineVertex vertex:
     :return: the xy corridinates of the target vertex mapped to a tuple of
         the vertex, core and link.
-        One of core or link is provided the other is None
-    :rtype: tuple(tuple(int, int), tuple(MachineVertex, int,  None)) or
+        One of core or link is provided the other is `None`
+    :rtype: tuple(tuple(int, int), tuple(MachineVertex, int, None)) or
         tuple(tuple(int, int), tuple(MachineVertex, None, int))
     """
     if not isinstance(vertex, AbstractVirtual):

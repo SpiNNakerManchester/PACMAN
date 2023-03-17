@@ -52,7 +52,7 @@ class AbstractVirtual(object):
     @abstractmethod
     def outgoing_keys_and_masks(self):
         """
-        Get the keys sent by the device or None if there aren't any
+        Get the keys sent by the device or `None` if there aren't any
         explicitly defined.
 
         :rtype: list of KeyAndMask or None

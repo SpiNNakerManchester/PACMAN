@@ -49,9 +49,9 @@ class _Targets(object):
         """
         Add a set of vertices that target a given core or link.
 
-        :param core: The core to target with the sources or None if no core
+        :param core: The core to target with the sources or `None` if no core
         :type core: int or None
-        :param link: The link to target with the sources or None if no link
+        :param link: The link to target with the sources or `None` if no link
         :type link: int or None
         :param source_vertices: A list of sources which target something here
         :type source_vertices: list(ApplicationVertex or MachineVertex)
@@ -73,9 +73,9 @@ class _Targets(object):
         """
         Add a set of machine vertices that target a given core or link.
 
-        :param core: The core to target with the sources or None if no core
+        :param core: The core to target with the sources or `None` if no core
         :type core: int or None
-        :param link: The link to target with the sources or None if no link
+        :param link: The link to target with the sources or `None` if no link
         :type link: int or None
         :param source_vertices: A list of sources which target something here
         :type source_vertices: list(ApplicationVertex or MachineVertex)
@@ -548,7 +548,7 @@ def _get_outgoing_mapping(app_vertex, partition_id):
     Gets a Mapping from xy sources to a list of (vertex, the vertex,
     processor and link to follow to get to the vertex.
 
-    For each tuple in the list either processor or link will be None
+    For each tuple in the list either processor or link will be `None`.
 
     :param app_vertex:
     :param partition_id:
