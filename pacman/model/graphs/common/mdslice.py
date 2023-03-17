@@ -58,23 +58,28 @@ class MDSlice(Slice):
         self._atoms_shape = atoms_shape
 
     @property
+    @overrides(Slice.hi_atom)
     def hi_atom(self):
         # Should go pop here
         return super().hi_atom
 
     @property
+    @overrides(Slice.shape)
     def shape(self):
         return self._shape
 
     @property
+    @overrides(Slice.start)
     def start(self):
         return self._start
 
     @property
+    @overrides(Slice.as_slice)
     def as_slice(self):
         # Should go pop here
         return super().as_slice
 
+    @overrides(Slice.get_slice)
     def get_slice(self, n):
         """ Get a slice in the n-th dimension
 
@@ -88,6 +93,7 @@ class MDSlice(Slice):
                              " dimensions") from exc
 
     @property
+    @overrides(Slice.slices)
     def slices(self):
         """ Get slices for every dimension
 
@@ -96,6 +102,7 @@ class MDSlice(Slice):
         return tuple(self.get_slice(n) for n in range(len(self.shape)))
 
     @property
+    @overrides(Slice.end)
     def end(self):
         """ The end positions of the slice in each dimension
         """
@@ -105,6 +112,7 @@ class MDSlice(Slice):
     def get_ids_as_slice_or_list(self):
         return self.get_raster_ids()
 
+    @overrides(Slice.get_raster_ids)
     def get_raster_ids(self):
         """ Get the IDs of the atoms in the slice as they would appear in a
             "raster scan" of the atoms over the whole shape.
@@ -135,6 +143,7 @@ class MDSlice(Slice):
         return self._lo_atom
 
     @classmethod
+    @overrides(Slice.from_string)
     def from_string(cls, as_str):
         if as_str[0] == "(":
             return Slice.from_string(as_str)
