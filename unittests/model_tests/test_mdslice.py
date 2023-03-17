@@ -32,7 +32,7 @@ class TestSlice(unittest.TestCase):
         self.assertEqual((0, 0), s.start)
         self.assertListEqual([0, 1, 2, 6, 7, 8, 12, 13, 14],
                              list(s.get_raster_ids()))
-        self.assertEqual(s.slices, (slice(0, 3), slice(0, 3)))
+        self.assertEqual(s.dimension, (slice(0, 3), slice(0, 3)))
         self.assertEqual("0(6, 6)(0:3)(0:3)", str(s))
         s2 = MDSlice.from_string(str(s))
         self.assertEqual(s, s2)
@@ -44,7 +44,7 @@ class TestSlice(unittest.TestCase):
         self.assertEqual(44, s.hi_atom)  # As specified
         self.assertEqual((3, 3), s.shape)
         self.assertEqual((0, 6), s.start)
-        self.assertEqual(s.slices, (slice(0, 3), slice(6, 9)))
+        self.assertEqual(s.dimension, (slice(0, 3), slice(6, 9)))
         self.assertEqual("36(6, 12)(0:3)(6:9)", str(s))
         s2 = MDSlice.from_string(str(s))
         self.assertEqual(s, s2)
@@ -56,7 +56,7 @@ class TestSlice(unittest.TestCase):
         self.assertEqual(17, s.hi_atom)  # As specified
         self.assertEqual((3, 3), s.shape)
         self.assertEqual((3, 0), s.start)
-        self.assertEqual(s.slices, (slice(3, 6), slice(0, 3)))
+        self.assertEqual(s.dimension, (slice(3, 6), slice(0, 3)))
         self.assertEqual("9(6, 12)(3:6)(0:3)", str(s))
         self.assertListEqual([3, 4, 5, 9, 10, 11, 15, 16, 17],
                              list(s.get_raster_ids()))
@@ -70,7 +70,7 @@ class TestSlice(unittest.TestCase):
         self.assertEqual(455, s.hi_atom)  # As specified
         self.assertEqual((2, 3, 4), s.shape)
         self.assertEqual((6, 9, 16), s.start)
-        self.assertEqual(s.slices, (slice(6, 8), slice(9, 12), slice(16, 20)))
+        self.assertEqual(s.dimension, (slice(6, 8), slice(9, 12), slice(16, 20)))
         self.assertEqual("432(9, 15, 20)(6:8)(9:12)(16:20)", str(s))
         self.assertListEqual([2247, 2248, 2256, 2257, 2265, 2266,
                               2382, 2383, 2391, 2392, 2400, 2401,

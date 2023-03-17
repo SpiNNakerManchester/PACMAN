@@ -110,8 +110,11 @@ class Slice(object):
         raise IndexError(f"{n} is invalid for a 1 dimension Slice ")
 
     @property
-    def slices(self):
-        """ Get slices for every dimension
+    def dimension(self):
+        """ Get directions or edges as slices for every dimension
+
+        This is the width and if available height, depth ect of the Slice/Grid
+        as represented as slices form the origin along in that direction.
 
         :rtype: tuple(slice)
         """

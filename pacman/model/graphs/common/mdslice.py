@@ -93,8 +93,8 @@ class MDSlice(Slice):
                              " dimensions") from exc
 
     @property
-    @overrides(Slice.slices)
-    def slices(self):
+    @overrides(Slice.dimension)
+    def dimension(self):
         """ Get slices for every dimension
 
         :rtype: tuple(slice)
@@ -127,7 +127,7 @@ class MDSlice(Slice):
 
     def __str__(self):
         value = ""
-        for a_slice in self.slices:
+        for a_slice in self.dimension:
             value += f"({a_slice.start}:{a_slice.stop})"
         return f"{self.lo_atom}{self._atoms_shape}{value}"
 
