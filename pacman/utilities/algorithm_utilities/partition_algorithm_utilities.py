@@ -97,8 +97,8 @@ def get_single_dimension_slices(app_vertex):
     # Run over all the vertices and create slices for them
     slices = list()
     hi_atom = -1
-    for v in range(n_vertices):
-        # Make a slice and a vertex
+    for _ in range(n_vertices):
+        # Make a slice
         lo_atom = hi_atom + 1
         hi_atom = min(app_vertex.n_atoms - 1, (lo_atom + total_on_core) - 1)
         vertex_slice = Slice(lo_atom, hi_atom)
