@@ -12,27 +12,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" A simple bit of support code for validation.
+"""
+Support code for validation.
 """
 
 import os
 import json
-import jsonschema
+import concurrent.futures
+
+_jsonschema = None
+
+
+def _init():
+    import jsonschema
+    global _jsonschema  # pylint: disable=global-statement
+    _jsonschema = jsonschema
+
+
+def _validate(json_obj, schema_doc: str):
+    _jsonschema.validate(json_obj, schema_doc)
+
+
+#: A single thread that we fire all validation work through.
+_executor = concurrent.futures.ThreadPoolExecutor(
+    max_workers=1, initializer=_init)
 
 
 def validate(json_obj, schema_filename):
-    """ Check that the given JSON object (or array) is valid against the\
-        given schema. The schema is given by filename relative to this package.
+    """
+    Check that the given JSON object (or array) is valid against the
+    given schema. The schema is given by filename relative to this package.
 
     :param json_obj: The entity to validate
     :type json_obj: dict or list
     :param str schema_filename:
         The name of the file containing the schema (e.g., "routes.json")
-    :rtype: None
     :raises IOError: If the schema file doesn't exist.
     :raises ~jsonschema.exceptions.ValidationError:
         If the JSON object isn't valid.
     """
     schema_file = os.path.join(os.path.dirname(__file__), schema_filename)
+    # Validate in a single thread to stop leakage of thread-bound resources
+    # https://github.com/python-jsonschema/jsonschema/issues/1059
     with open(schema_file, "r", encoding="utf-8") as f:
-        jsonschema.validate(json_obj, json.load(f))
+        schema_doc = json.load(f)
+        _executor.submit(_validate, json_obj, schema_doc).result()
