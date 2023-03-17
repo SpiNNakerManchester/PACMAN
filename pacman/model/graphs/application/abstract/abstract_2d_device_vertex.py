@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.overrides import overrides
 import math
 from pacman.exceptions import PacmanConfigurationException
 from pacman.utilities.utility_calls import get_n_bits
 from pacman.utilities.constants import BITS_IN_KEY
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import MDSlice
 
 
@@ -57,6 +59,11 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+
+    @abstractproperty
+    @overrides(ApplicationVertex.atoms_shape)
+    def atoms_shape(self):
+        # Any Abstract2DDeviceVertex must also be an ApplicationVertex
 
     def __is_power_of_2(self, v):
         """ Determine if a value is a power of 2
