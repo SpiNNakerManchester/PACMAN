@@ -220,7 +220,8 @@ def _copy_and_disconnect_tree(root):
 
 
 def a_star(sink, heuristic_source, sources):
-    """ Use A* to find a path from any of the sources to the sink.
+    """
+    Use A* to find a path from any of the sources to the sink.
 
     .. note::
         The heuristic means that the search will proceed towards

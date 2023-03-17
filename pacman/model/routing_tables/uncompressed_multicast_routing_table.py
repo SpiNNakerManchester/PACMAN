@@ -68,8 +68,8 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
                 self.add_multicast_routing_entry(multicast_routing_entry)
 
     def add_multicast_routing_entry(self, multicast_routing_entry):
-        """ A
-        dds a routing entry to this table.
+        """
+        Adds a routing entry to this table.
 
         :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
             The route to add

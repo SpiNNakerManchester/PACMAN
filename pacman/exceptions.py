@@ -69,7 +69,8 @@ class PacmanPruneException(PacmanException):
 
 
 class PacmanRouteInfoAllocationException(PacmanException):
-    """ Something went wrong with route info allocation.
+    """
+    Something went wrong with route info allocation.
     """
 
 

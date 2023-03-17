@@ -66,7 +66,8 @@ class MulticastRoutingTables(object):
 
     @property
     def routing_tables(self):
-        """ The routing tables stored within.
+        """
+        The routing tables stored within.
 
         :return: an iterable of routing tables
         :rtype: iterable(MulticastRoutingTable)
@@ -87,7 +88,8 @@ class MulticastRoutingTables(object):
         return self._max_number_of_entries
 
     def get_routing_table_for_chip(self, x, y):
-        """ Get a routing table for a particular chip.
+        """
+        Get a routing table for a particular chip.
 
         :param int x: The x-coordinate of the chip
         :param int y: The y-coordinate of the chip
@@ -98,7 +100,8 @@ class MulticastRoutingTables(object):
         return self._routing_tables_by_chip.get((x, y), None)
 
     def __iter__(self):
-        """ Iterator for the multicast routing tables stored within.
+        """
+        Iterator for the multicast routing tables stored within.
 
         :return: iterator of multicast_routing_table
         """

@@ -26,7 +26,8 @@ from spinn_utilities.progress_bar import ProgressBar
 
 
 class _Targets(object):
-    """ A set of targets to be added to a route on a chip(xy).
+    """
+    A set of targets to be added to a route on a chip(xy).
     """
     __slots__ = ["__targets_by_source"]
 
@@ -34,7 +35,8 @@ class _Targets(object):
         self.__targets_by_source = defaultdict(lambda: (list(), list()))
 
     def ensure_source(self, source_vertex):
-        """ Ensure that a source exists, even if it targets nothing.
+        """
+        Ensure that a source exists, even if it targets nothing.
 
         :param source_vertex: The vertex to ensure exists
         :type source_vertex: ApplicationVertex or MachineVertex
@@ -44,7 +46,8 @@ class _Targets(object):
 
     def add_sources_for_target(
             self, core, link, source_vertices, partition_id):
-        """ Add a set of vertices that target a given core or link.
+        """
+        Add a set of vertices that target a given core or link.
 
         :param core: The core to target with the sources or None if no core
         :type core: int or None
@@ -67,7 +70,8 @@ class _Targets(object):
 
     def add_machine_sources_for_target(
             self, core, link, source_vertices, partition_id):
-        """ Add a set of machine vertices that target a given core or link.
+        """
+        Add a set of machine vertices that target a given core or link.
 
         :param core: The core to target with the sources or None if no core
         :type core: int or None
@@ -112,7 +116,8 @@ class _Targets(object):
 
     @property
     def targets_by_source(self):
-        """ Get a list of (source, (list of cores, list of links)) to target.
+        """
+        Get a list of (source, (list of cores, list of links)) to target.
 
         :rtype: tuple(MachineVertex or ApplicationVertex,
                       tuple(list(int), list(int)))
@@ -120,7 +125,8 @@ class _Targets(object):
         return self.__targets_by_source.items()
 
     def get_targets_for_source(self, vertex):
-        """ Get the cores and links for a specific source.
+        """
+        Get the cores and links for a specific source.
 
         :return: tuple(list of cores, list of links)
         :rtype: tuple(list(int), list(int))
@@ -129,7 +135,8 @@ class _Targets(object):
 
 
 def route_application_graph():
-    """ Route an application graph.
+    """
+    Route an application graph.
     """
     routing_tables = MulticastRoutingTableByPartition()
 
@@ -323,7 +330,8 @@ def _route_single_source_to_target(
 def _route_multiple_source_to_target(
         machine, source_edge_xys, target_edge_xy, target_xys,
         real_target_xys, routes, overlaps):
-    """ Route from multiple source connection points to all target chips.
+    """
+    Route from multiple source connection points to all target chips.
 
     :param Machine machine: The machine to route on
     :param set(tuple(int,int)) source_edge_xys:
@@ -370,7 +378,8 @@ def _route_multiple_source_to_target(
 
 
 def _route_source_to_source(source, partition, targets, self_xys):
-    """ Routes the source to itself.
+    """
+    Routes the source to itself.
 
     :param ApplicationVertex source: The source vertex to route
     :param OutgoingEdgePartition partition: The partition being routed
@@ -389,7 +398,8 @@ def _route_source_to_source(source, partition, targets, self_xys):
 
 
 def _route_internal(internal, targets, self_xys):
-    """ Route internal multicast edges.
+    """
+    Route internal multicast edges.
 
     :param list(MulticastEdgePartition) internal: A list of partitions to route
     :param dict(tuple(int,int),_Targets) targets: Actual things to target
@@ -408,7 +418,8 @@ def _route_internal(internal, targets, self_xys):
 def _make_source_to_target_routes(
         source, partition, source_edge_xys, source_mappings, targets,
         routing_tables, routes):
-    """ Convert the routes from source to targets into routing table entries.
+    """
+    Convert the routes from source to targets into routing table entries.
 
     :param ApplicationVertex source: The source application vertex
     :param OutgoingEdgePartition partition: The partition to route
@@ -502,7 +513,8 @@ def _make_source_to_source_edge_routes(
 
 
 def _find_target_xy(target_xys, routes, source_mappings):
-    """ Find a target chip to use from the set of target chips.
+    """
+    Find a target chip to use from the set of target chips.
 
     :param set(tuple(int, int)) target_xys: The chips in the target
     :param dict(tuple(int,int),RoutingTree) routes: The routes in existence
