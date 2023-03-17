@@ -63,7 +63,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     @abstractproperty
     @overrides(ApplicationVertex.atoms_shape)
     def atoms_shape(self):
-        # Any Abstract2DDeviceVertex must also be an ApplicationVertex
+        pass
 
     def __is_power_of_2(self, v):
         """ Determine if a value is a power of 2
