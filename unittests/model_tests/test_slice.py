@@ -70,7 +70,6 @@ class TestSlice(unittest.TestCase):
         assert s.as_slice == slice(4, 5)  # Slice object supported by arrays
         self.assertListEqual([4], list(s.get_raster_ids()))
 
-
         self.assertEqual(s.slices, (slice(4, 5),))
         self.assertEqual("(4:4)", str(s))
         s2 = Slice.from_string(str(s))
