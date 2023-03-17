@@ -105,16 +105,12 @@ class MDSlice(Slice):
     def get_ids_as_slice_or_list(self):
         return self.get_raster_ids()
 
-    def get_raster_ids(self, atoms_shape=None):
+    def get_raster_ids(self):
         """ Get the IDs of the atoms in the slice as they would appear in a
             "raster scan" of the atoms over the whole shape.
 
-        :param tuple(int) atoms_shape:
-            The size of each dimension of the whole shape
         :return: A list of the global raster IDs of the atoms in this slice
         """
-        if atoms_shape is not None:
-            assert (self._atoms_shape == atoms_shape)
         slices = tuple(self.get_slice(n)
                        for n in reversed(range(len(self.start))))
         ids = numpy.arange(numpy.prod(self._atoms_shape)).reshape(

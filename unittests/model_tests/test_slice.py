@@ -30,7 +30,7 @@ class TestSlice(unittest.TestCase):
         self.assertEqual(10, s.hi_atom)  # As specified
         assert s.as_slice == slice(0, 11)  # Slice object supported by arrays
         self.assertListEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                             list(s.get_raster_ids((20, ))))
+                             list(s.get_raster_ids()))
         self.assertEqual(s.slices, (slice(0, 11),))
         self.assertEqual("(0:10)", str(s))
         s2 = Slice.from_string(str(s))
@@ -68,7 +68,9 @@ class TestSlice(unittest.TestCase):
         self.assertEqual(4, s.lo_atom)  # As specified
         self.assertEqual(4, s.hi_atom)  # As specified
         assert s.as_slice == slice(4, 5)  # Slice object supported by arrays
-        self.assertListEqual([4], list(s.get_raster_ids((20,))))
+        self.assertListEqual([4], list(s.get_raster_ids()))
+
+
         self.assertEqual(s.slices, (slice(4, 5),))
         self.assertEqual("(4:4)", str(s))
         s2 = Slice.from_string(str(s))

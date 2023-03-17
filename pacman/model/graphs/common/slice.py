@@ -133,12 +133,10 @@ class Slice(object):
         """
         return slice(self._lo_atom, self._lo_atom + self._n_atoms)
 
-    def get_raster_ids(self, atoms_shape=None):
+    def get_raster_ids(self):
         """ Get the IDs of the atoms in the slice as they would appear in a
             "raster scan" of the atoms over the whole shape.
 
-        :param tuple(int) atoms_shape:
-            The size of each dimension of the whole shape
         :return: A list of the global raster IDs of the atoms in this slice
         """
         return numpy.array(range(self._lo_atom, self._lo_atom + self._n_atoms))
