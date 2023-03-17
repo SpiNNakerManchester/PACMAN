@@ -70,7 +70,8 @@ class TestSlice(unittest.TestCase):
         self.assertEqual(455, s.hi_atom)  # As specified
         self.assertEqual((2, 3, 4), s.shape)
         self.assertEqual((6, 9, 16), s.start)
-        self.assertEqual(s.dimension, (slice(6, 8), slice(9, 12), slice(16, 20)))
+        self.assertEqual(s.dimension,
+                         (slice(6, 8), slice(9, 12), slice(16, 20)))
         self.assertEqual("432(9, 15, 20)(6:8)(9:12)(16:20)", str(s))
         self.assertListEqual([2247, 2248, 2256, 2257, 2265, 2266,
                               2382, 2383, 2391, 2392, 2400, 2401,
