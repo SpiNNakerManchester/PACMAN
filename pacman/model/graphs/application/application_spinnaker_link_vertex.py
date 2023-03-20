@@ -113,3 +113,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
             raise NotImplementedError("This vertex doesn't have outgoing data")
         return machine.get_spinnaker_link_with_id(
             self._spinnaker_link_id, self._board_address)
+
+    @overrides(ApplicationVirtualVertex.get_max_atoms_per_core)
+    def get_max_atoms_per_core(self):
+        return self.n_atoms // self._n_machine_vertices
