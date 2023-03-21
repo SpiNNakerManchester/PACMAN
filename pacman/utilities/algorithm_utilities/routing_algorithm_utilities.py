@@ -35,9 +35,12 @@ def get_app_partitions():
         edges *and* internal partitions to get a complete picture of *all*
         targets for each source machine vertex at once.
 
-    :return: list of partitions; note where there are only internal multicast
-        partitions, the partition will have no edges.  Caller should use
-        vertex.splitter.get_internal_multicast_partitions for details.
+    :return: list of partitions
+
+        .. note::
+            Where there are only internal multicast partitions, the partition
+            will have no edges.  Caller should use
+            `vertex.splitter.get_internal_multicast_partitions` for details.
     :rtype: list(ApplicationEdgePartition)
     """
 
@@ -381,8 +384,10 @@ def longest_dimension_first(vector, start):
     :param tuple(int,int,int) vector: (x, y, z)
         The vector which the path should cover.
     :param tuple(int,int) start: (x, y)
-        The coordinates from which the path should start (note this is a 2D
-        coordinate).
+        The coordinates from which the path should start.
+
+        .. note::
+            This is a 2D coordinate.
     :param ~spinn_machine.Machine machine:
     :return: min route
     :rtype: list(tuple(int,tuple(int, int)))
@@ -401,8 +406,10 @@ def least_busy_dimension_first(traffic, vector, start):
     :param vector: (x, y, z)
         The vector which the path should cover.
     :param start: (x, y)
-        The coordinates from which the path should start (note this is a 2D
-        coordinate).
+        The coordinates from which the path should start.
+
+        .. note::
+            This is a 2D coordinate.
     :param machine: the spinn machine.
     :return: min route
     :rtype: list(tuple(int,tuple(int, int)))

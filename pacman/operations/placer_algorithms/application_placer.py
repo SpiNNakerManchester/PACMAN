@@ -34,8 +34,7 @@ def place_application_graph(system_placements):
     """
     Perform placement of an application graph on the machine.
 
-    .. note:
-
+    .. note::
         app_graph must have been partitioned
     """
 

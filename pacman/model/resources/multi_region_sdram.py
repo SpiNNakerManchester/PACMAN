@@ -21,7 +21,7 @@ class MultiRegionSDRAM(VariableSDRAM):
     """
     A resource for SDRAM that comes in regions.
 
-    .. note:
+    .. note::
         Adding or subtracting two MultiRegionSDRAM objects will be assumed to
         be an operation over multiple cores/placements so these functions
         return a VariableSDRAM object without the regions data.
@@ -100,7 +100,7 @@ class MultiRegionSDRAM(VariableSDRAM):
         """
         Combines the other SDRAM costs keeping the region mappings.
 
-        .. note:
+        .. note::
             This method should only be called when combining cost for the same
             core/ placement. Use + to combine for different cores
 
