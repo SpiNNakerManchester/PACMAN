@@ -81,7 +81,7 @@ class BaseKeyAndMask(object):
         return not self.__eq__(other)
 
     def __repr__(self):
-        return "KeyAndMask:{}:{}".format(hex(self._base_key), hex(self._mask))
+        return f"KeyAndMask:0x{self._base_key:x}:0x{self._mask:x}"
 
     def __str__(self):
         return self.__repr__()

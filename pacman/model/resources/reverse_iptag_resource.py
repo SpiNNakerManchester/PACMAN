@@ -84,10 +84,8 @@ class ReverseIPtagResource(object):
         return [self._port, self._sdp_port, self._tag]
 
     def __repr__(self):
-        return (
-            "ReverseIPTagResource(port={}, sdp_port={}, tag={})"
-            .format(self._port, self._sdp_port, self._tag)
-        )
+        return (f"ReverseIPTagResource(port={self._port}, "
+                f"sdp_port={self._sdp_port}, tag={self._tag})")
 
     def __eq__(self, other):
         if not isinstance(other, ReverseIPtagResource):

@@ -34,8 +34,6 @@ class ConstantSDRAMMachinePartition(
         "_sdram_size",
     ]
 
-    MISSING_EDGE_ERROR_MESSAGE = "Partition {} has no edges"
-
     def __init__(self, identifier, pre_vertex):
         super().__init__(
             pre_vertex, identifier, allowed_edge_types=SDRAMMachineEdge)
@@ -48,33 +46,33 @@ class ConstantSDRAMMachinePartition(
             self._sdram_size = edge.sdram_size
         elif self._sdram_size != edge.sdram_size:
             raise SDRAMEdgeSizeException(
-                "The edges within the constant sdram partition {} have "
-                "inconsistent memory size requests.".format(self))
+                f"The edges within the constant sdram partition {self} have "
+                "inconsistent memory size requests.")
         if self._sdram_base_address is None:
             super().add_edge(edge)
         else:
             raise PacmanConfigurationException(
                 "Illegal attempt to add an edge after sdram_base_address set")
 
+    def __missing_edge_msg(self):
+        return f"Partition {self} has no edges"
+
     @overrides(AbstractSDRAMPartition.total_sdram_requirements)
     def total_sdram_requirements(self):
         if self._sdram_size is None:
-            raise PartitionMissingEdgesException(
-                self.MISSING_EDGE_ERROR_MESSAGE.format(self))
+            raise PartitionMissingEdgesException(self.__missing_edge_msg())
         return self._sdram_size
 
     @property
     def sdram_base_address(self):
         if self._sdram_size is None:
-            raise PartitionMissingEdgesException(
-                self.MISSING_EDGE_ERROR_MESSAGE.format(self))
+            raise PartitionMissingEdgesException(self.__missing_edge_msg())
         return self._sdram_base_address
 
     @sdram_base_address.setter
     def sdram_base_address(self, new_value):
         if len(self.edges) == 0:
-            raise PartitionMissingEdgesException(
-                self.MISSING_EDGE_ERROR_MESSAGE.format(self))
+            raise PartitionMissingEdgesException(self.__missing_edge_msg())
         self._sdram_base_address = new_value
         for edge in self.edges:
             edge.sdram_base_address = self._sdram_base_address
@@ -86,6 +84,5 @@ class ConstantSDRAMMachinePartition(
     @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
     def get_sdram_size_of_region_for(self, vertex):
         if self._sdram_size is None:
-            raise PartitionMissingEdgesException(
-                self.MISSING_EDGE_ERROR_MESSAGE.format(self))
+            raise PartitionMissingEdgesException(self.__missing_edge_msg())
         return self._sdram_size

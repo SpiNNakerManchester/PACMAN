@@ -56,9 +56,10 @@ class MulticastRoutingTables(object):
         """
         if (routing_table.x, routing_table.y) in self._routing_tables_by_chip:
             raise PacmanAlreadyExistsException(
-                "The Routing table for chip {}:{} already exists in this "
-                "collection and therefore is deemed an error to re-add it"
-                .format(routing_table.x, routing_table.y), str(routing_table))
+                "The Routing table for chip "
+                f"{routing_table.x}:{routing_table.y} already exists in this "
+                "collection and therefore is deemed an error to re-add it",
+                str(routing_table))
         self._routing_tables_by_chip[(routing_table.x, routing_table.y)] = \
             routing_table
         self._max_number_of_entries = max(

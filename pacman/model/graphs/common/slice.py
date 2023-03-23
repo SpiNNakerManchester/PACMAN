@@ -95,9 +95,9 @@ class Slice(collections.namedtuple('Slice',
     @property
     def slices(self):
         """
-        Get slices for every dimension.
+        Slices for every dimension.
 
-        :rtype: tuple(slice)
+        :rtype: tuple(slice, ...)
         """
         return tuple(self.get_slice(n) for n in range(len(self.shape)))
 

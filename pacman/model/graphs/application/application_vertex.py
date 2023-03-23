@@ -45,10 +45,6 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         # last core of a 2D vertex might be smaller).
         "_max_atoms_per_dimension_per_core"]
 
-    SETTING_SPLITTER_ERROR_MSG = (
-        "The splitter object on {} has already been set, it cannot be "
-        "reset. Please fix and try again. ")
-
     def __init__(self, label=None, max_atoms_per_core=None, splitter=None):
         """
         :param str label: The optional name of the vertex.
@@ -105,7 +101,8 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             return
         if self._splitter is not None:
             raise PacmanConfigurationException(
-                self.SETTING_SPLITTER_ERROR_MSG.format(self._label))
+                f"The splitter object on {self._label} has already been set, "
+                "it cannot be reset. Please fix and try again.")
         self._splitter = new_value
         self._splitter.set_governed_app_vertex(self)
 
@@ -123,7 +120,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """
         The "shape" of the atoms in the vertex i.e. how the atoms are split
         between the dimensions of the vertex.  By default everything is
-        1-dimensional, so the return will be a 1-tuple but can be
+        1-dimensional, so the value will be a 1-tuple but can be
         overridden by a vertex that supports multiple dimensions.
 
         :rtype: tuple(int, ...)

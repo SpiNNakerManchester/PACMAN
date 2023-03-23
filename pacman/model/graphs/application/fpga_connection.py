@@ -43,7 +43,7 @@ class FPGAConnection(NamedTuple):
     @property
     def is_concrete(self):
         """
-        Determine if the connection has the FPGA id and link id set.
+        Whether the connection has the FPGA id and link id set.
 
         :rtype: bool
         """

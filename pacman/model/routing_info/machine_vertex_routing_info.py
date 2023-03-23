@@ -62,5 +62,7 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
     def index(self):
         """
         The index of the vertex.
+
+        :rtype: int
         """
         return self.__index

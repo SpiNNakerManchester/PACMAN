@@ -139,7 +139,7 @@ class Tags(object):
     @property
     def ip_tags_vertices(self):
         """
-        List the (IPTag, vertex) pairs stored.
+        The list of (IPTag, vertex) pairs stored.
 
         :rtype: iterable(tuple(IPTag, MachineVertex))
         """

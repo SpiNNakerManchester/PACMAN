@@ -53,6 +53,9 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
     @property
     def governed_app_vertex(self):
         """
+        The app vertex to be governed by this splitter object.
+        If `None`, not yet set.
+
         :rtype: ApplicationVertex
         """
         return self._governed_app_vertex

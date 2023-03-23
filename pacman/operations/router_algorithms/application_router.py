@@ -117,7 +117,7 @@ class _Targets(object):
     @property
     def targets_by_source(self):
         """
-        Get a list of (source, (list of cores, list of links)) to target.
+        List of (source, (list of cores, list of links)) to target.
 
         :rtype: tuple(MachineVertex or ApplicationVertex,
                       tuple(list(int), list(int)))

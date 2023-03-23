@@ -204,7 +204,7 @@ class Placements(object):
     @property
     def chips_with_placements(self):
         """
-        Get the chips with placements on them.
+        The chips with placements on them.
 
         :rtype: iterable(tuple(int,int))
         """

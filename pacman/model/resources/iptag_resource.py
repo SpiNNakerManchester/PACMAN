@@ -117,10 +117,9 @@ class IPtagResource(object):
 
     def __repr__(self):
         return (
-            "IPTagResource(ip_address={}, port={}, strip_sdp={}, tag={}, "
-            "traffic_identifier={})".format(
-                self._ip_address, self._port, self._strip_sdp, self._tag,
-                self._traffic_identifier))
+            f"IPTagResource(ip_address={self._ip_address}, port={self._port}, "
+            f"strip_sdp={self._strip_sdp}, tag={self._tag}, "
+            f"traffic_identifier={self._traffic_identifier})")
 
     def __eq__(self, other):
         """

@@ -44,8 +44,7 @@ def verify_lengths(compressed):
     problems = ""
     for table in compressed:
         if table.number_of_entries > Machine.ROUTER_ENTRIES:
-            problems += "(x:{},y:{})={} ".format(
-                table.x, table.y, table.number_of_entries)
+            problems += f"(x:{table.x},y:{table.y})={table.number_of_entries} "
     if len(problems) > 0:
         raise PacmanElementAllocationException(
             "The routing table after compression will still not fit"

@@ -350,9 +350,9 @@ class _BasicDijkstraRouting(object):
         neighbour_xy = (neighbour.destination_x, neighbour.destination_y)
         if neighbour_xy not in tables:
             raise PacmanRoutingException(
-                "Tried to propagate to ({}, {}), which is not in the"
-                " graph: remove non-existent neighbours"
-                .format(neighbour.destination_x, neighbour.destination_y))
+                f"Tried to propagate to ({neighbour.destination_x}, "
+                f"{neighbour.destination_y}), which is not in the"
+                " graph: remove non-existent neighbours")
 
         chip_cost = tables[current].cost
         neighbour_cost = tables[neighbour_xy].cost
@@ -368,8 +368,8 @@ class _BasicDijkstraRouting(object):
 
         if tables[neighbour_xy].cost == 0 and neighbour_xy != source:
             raise PacmanRoutingException(
-                "!!!Cost of non-source node ({}, {}) was set to zero!!!"
-                .format(neighbour.destination_x, neighbour.destination_y))
+                f"!!!Cost of non-source node ({neighbour.destination_x}, "
+                f"{neighbour.destination_y}) was set to zero!!!")
 
     def _retrace_back_to_source(
             self, dest_xy, dest_cores, dest_links, tables, nodes_info,

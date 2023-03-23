@@ -41,6 +41,11 @@ class MultiRegionSDRAM(VariableSDRAM):
 
     @property
     def regions(self):
+        """
+        The map from region identifiers to the to the amount of SDRAM required.
+
+        :rtype: dict(int or str or enum, AbstractSDRAM)
+        """
         return self.__regions
 
     def add_cost(self, region, fixed_sdram, per_timestep_sdram=0):
@@ -77,8 +82,8 @@ class MultiRegionSDRAM(VariableSDRAM):
 
         :param region: Key to identify the summary region
         :type region: int or str or enum
-        :param AbstractSDRAM other: Another SDRAM model to make combine by
-            nesting
+        :param AbstractSDRAM other:
+            Another SDRAM model to make combine by nesting
         """
         self._fixed_sdram = self._fixed_sdram + other.fixed
         self._per_timestep_sdram = \

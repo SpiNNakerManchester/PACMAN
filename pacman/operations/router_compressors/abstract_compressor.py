@@ -54,8 +54,7 @@ class AbstractCompressor(object):
         # create progress bar
         progress = ProgressBar(
             router_tables.routing_tables,
-            "Compressing routing Tables using {}".format(
-                self.__class__.__name__))
+            f"Compressing routing Tables using {self.__class__.__name__}")
         return self.compress_tables(router_tables, progress)
 
     @abstractmethod
@@ -99,8 +98,9 @@ class AbstractCompressor(object):
                     new_table.add_multicast_routing_entry(
                         entry.to_MulticastRoutingEntry())
                 if new_table.number_of_entries > Machine.ROUTER_ENTRIES:
-                    self._problems += "(x:{},y:{})={} ".format(
-                        new_table.x, new_table.y, new_table.number_of_entries)
+                    self._problems += (
+                        f"(x:{new_table.x},y:{new_table.y})="
+                        f"{new_table.number_of_entries} ")
 
             compressed_tables.add_routing_table(new_table)
 

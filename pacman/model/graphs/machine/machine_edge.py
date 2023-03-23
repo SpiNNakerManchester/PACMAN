@@ -70,5 +70,5 @@ class MachineEdge(AbstractEdge):
 
     def __repr__(self):
         return (
-            "MachineEdge(pre_vertex={}, post_vertex={}, label={})".format(
-                self._pre_vertex, self._post_vertex, self.label))
+            f"MachineEdge(pre_vertex={self._pre_vertex}, "
+            f"post_vertex={self._post_vertex}, label={self.label})")

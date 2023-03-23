@@ -89,7 +89,7 @@ class MulticastRoutingTableByPartition(object):
     @property
     def n_routers(self):
         """
-        Get the number of routers stored.
+        The number of routers stored.
 
         :rtype: int
         """

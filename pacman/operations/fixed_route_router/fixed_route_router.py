@@ -109,8 +109,8 @@ class _FixedRouteRouter(object):
                             break
             if len(found) == 0:
                 raise PacmanRoutingException(
-                    "Unable to do fixed point routing on {}.".format(
-                        ethernet_connected_chip.ip_address))
+                    "Unable to do fixed point routing "
+                    f"on {ethernet_connected_chip.ip_address}.")
             for key in found:
                 to_route.remove(key)
                 routed.add(key)
@@ -151,5 +151,4 @@ class _FixedRouteRouter(object):
                 x, y, self._destination_class):
             return placement.p
         raise PacmanConfigurationException(
-            "no destination vertex found on Ethernet chip {}:{}".format(
-                chip.x, chip.y))
+            f"no destination vertex found on Ethernet chip {x}:{y}")

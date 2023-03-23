@@ -46,7 +46,7 @@ class ChipAndCore(object):
     @property
     def x(self):
         """
-        The x-coordinate of the chip.
+        The X-coordinate of the chip.
 
         :rtype: int
         """
@@ -55,7 +55,7 @@ class ChipAndCore(object):
     @property
     def y(self):
         """
-        The y-coordinate of the chip.
+        The Y-coordinate of the chip.
 
         :rtype: int
         """

@@ -148,46 +148,39 @@ def _search_route(source_placement, dest_placements, key_and_mask,
     # check for error if trace didn't reach a destination it was meant to
     error_message = ""
     if failed_to_reach_destinations:
-        output_string = ""
-        for dest in failed_to_reach_destinations:
-            output_string += f"[{dest.x}:{dest.y}:{dest.p}]"
-        source_processor = "[{}:{}:{}]".format(
-            source_placement.x, source_placement.y, source_placement.p)
-        error_message += ("failed to locate all destinations with vertex"
-                          " {} on processor {} with keys {} as it did not "
-                          "reach destinations {}".format(
-                              source_placement.vertex.label, source_processor,
-                              key_and_mask, output_string))
+        failures = ", ".join(
+            f"[{dest.x}:{dest.y}:{dest.p}]"
+            for dest in failed_to_reach_destinations)
+        error_message += (
+            "failed to locate all destinations with vertex "
+            f"{source_placement.vertex.label} on processor "
+            f"[{source_placement.x}:{source_placement.y}:{source_placement.p}]"
+            f" with keys {key_and_mask} as it did not reach destinations "
+            f"{failures}")
 
     # check for error if the trace went to a destination it shouldn't have
     if located_destinations:
-        output_string = ""
-        for dest in located_destinations:
-            output_string += f"[{dest.x}:{dest.y}:{dest.p}]"
-        source_processor = "[{}:{}:{}]".format(
-            source_placement.x, source_placement.y, source_placement.p)
-        error_message += ("trace went to more failed to locate all "
-                          "destinations with vertex {} on processor {} "
-                          "with keys {} as it didn't reach destinations {}"
-                          .format(
-                              source_placement.vertex.label, source_processor,
-                              key_and_mask, output_string))
+        failures = ", ".join(
+             f"[{dest.x}:{dest.y}:{dest.p}]"
+             for dest in located_destinations)
+        error_message += (
+            "trace went to more failed to locate all destinations with "
+            f"vertex {source_placement.vertex.label} on processor "
+            f"[{source_placement.x}:{source_placement.y}:{source_placement.p}]"
+            f" with keys {key_and_mask} as it didn't reach destinations "
+            f"{failures}")
 
     if failed_to_cover_all_keys_routers:
-        output_string = ""
-        for data_entry in failed_to_cover_all_keys_routers:
-            output_string += "[{}, {}, {}, {}]".format(
-                data_entry.router_x, data_entry.router_y,
-                data_entry.keys, data_entry.source_mask)
-        source_processor = "[{}:{}:{}]".format(
-            source_placement.x, source_placement.y, source_placement.p)
+        failures = ", ".join(
+            f"[{router.router_x}, {router.router_y}, "
+            f"{router.keys}, {router.source_mask}]"
+            for router in failed_to_cover_all_keys_routers)
         error_message += (
-            "trace detected that there were atoms which the routing entry's"
-            " wont cover and therefore packets will fly off to unknown places."
-            " These keys came from the vertex {} on processor {} and the"
-            " failed routers are {}".format(
-                source_placement.vertex.label, source_processor,
-                output_string))
+            "trace detected that there were atoms which the routing entries "
+            "won't cover and therefore packets will fly off to unknown places."
+            f" These keys came from the vertex {source_placement.vertex.label}"
+            f" on processor [{source_placement.x}:{source_placement.y}:"
+            f"{source_placement.p}] and the failed routers are {failures}")
 
     # raise error if required
     if error_message != "":
@@ -334,9 +327,8 @@ def _check_visited_routers(chip_x, chip_y, visited_routers):
     if visited_routers_router in visited_routers:
         raise PacmanRoutingException(
             "visited this router before, there is a cycle here. "
-            "The routers I've currently visited are {} and the router i'm "
-            "visiting is {}"
-            .format(visited_routers, visited_routers_router))
+            f"The routers I've currently visited are {visited_routers} and "
+            f"the router i'm visiting is {visited_routers_router}")
     visited_routers.add(visited_routers_router)
 
 
@@ -386,18 +378,17 @@ def _locate_routing_entry(current_router, key, n_atoms):
                 last_key = e_key + (~entry.mask & FULL_MASK)
                 if last_key < last_atom:
                     raise PacmanRoutingException(
-                        "Full key range not covered: key:{} key_combo:{} "
-                        "mask:{}, last_key:{}, e_key:{}".format(
-                            hex(key), hex(key_combo), hex(entry.mask),
-                            hex(last_key), hex(e_key)))
+                        f"Full key range not covered: key:0x{key:x} "
+                        f"key_combo:0x{key_combo:x} mask:0x{entry.mask:x}, "
+                        f"last_key:0x{last_key:x}, e_key:0x{e_key:x}")
         elif entry.mask in range_masks:
             last_atom = key + n_atoms
             last_key = e_key + (~entry.mask & FULL_MASK)
             if min(last_key, last_atom) - max(e_key, key) + 1 > 0:
                 raise PacmanConfigurationException(
-                    f"Key range partially covered:  key:{hex(key)}, "
-                    f"key_combo:{hex(key_combo)} mask:{hex(entry.mask)}, "
-                    f"last_key:{hex(last_key)}, e_key:{hex(e_key)}")
+                    f"Key range partially covered:  key:0x{key:x}, "
+                    f"key_combo:0x{key_combo:x} mask:0x{entry.mask:x}, "
+                    f"last_key:0x{last_key:x}, e_key:0x{e_key:x}")
     if found_entry is None:
         raise PacmanRoutingException("no entry located")
     return found_entry

@@ -425,8 +425,9 @@ class _Spaces(object):
     @property
     def n_chips_used(self):
         """
+        The number of chips used.
+
         :rtype: int
-        :return:
         """
         return len(self.__used_chips)
 

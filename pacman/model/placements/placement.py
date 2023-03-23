@@ -62,7 +62,7 @@ class Placement(object):
     @property
     def x(self):
         """
-        The x-coordinate of the chip where the vertex is placed.
+        The X-coordinate of the chip where the vertex is placed.
 
         :rtype: int
         """
@@ -71,7 +71,7 @@ class Placement(object):
     @property
     def y(self):
         """
-        The y-coordinate of the chip where the vertex is placed.
+        The Y-coordinate of the chip where the vertex is placed.
 
         :rtype: int
         """
@@ -117,5 +117,5 @@ class Placement(object):
         return not self.__eq__(other)
 
     def __repr__(self):
-        return "Placement(vertex={}, x={}, y={}, p={})".format(
-            self._vertex, self._x, self._y, self._p)
+        return (f"Placement(vertex={self._vertex}, "
+                f"x={self._x}, y={self._y}, p={self._p})")

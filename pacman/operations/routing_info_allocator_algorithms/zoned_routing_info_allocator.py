@@ -242,8 +242,8 @@ class ZonedRoutingInfoAllocator(object):
         if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
-                "different allocator as it needs {} + {} bits".format(
-                    app_part_bits, self.__n_bits_atoms_and_mac))
+                f"different allocator as it needs {app_part_bits} + "
+                f"{self.__n_bits_atoms_and_mac} bits")
 
         # Reserve fixed and check it still works
         self.__set_fixed_used()
@@ -252,8 +252,8 @@ class ZonedRoutingInfoAllocator(object):
         if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
-                "different allocator as it needs {} + {} bits".format(
-                    app_part_bits, self.__n_bits_atoms_and_mac))
+                f"different allocator as it needs {app_part_bits} + "
+                f"{self.__n_bits_atoms_and_mac} bits")
 
         if not self.__flexible:
             # If using global see if the fixed M and X zones are too big

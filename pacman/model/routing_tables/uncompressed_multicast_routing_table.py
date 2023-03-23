@@ -101,7 +101,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     @overrides(AbstractMulticastRoutingTable.x)
     def x(self):
         """
-        The x-coordinate of the chip of this table.
+        The X-coordinate of the chip of this table.
 
         :rtype: int
         """
@@ -111,7 +111,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     @overrides(AbstractMulticastRoutingTable.y)
     def y(self):
         """
-        The y-coordinate of the chip of this table.
+        The Y-coordinate of the chip of this table.
 
         :rtype: int
         """

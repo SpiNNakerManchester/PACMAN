@@ -47,9 +47,9 @@ def codify(route, length=32):
             code = str(int(key & bit_value != 0)) + code
         else:
             # Safety key 1 with mask 0 is an error
-            assert key & bit_value == 0, \
-                "Bit {} on the mask:{} is 0 but 1 in the key:{}".format(
-                    i, bin(mask), bin(key))
+            assert key & bit_value == 0, (
+                f"Bit {i} on the mask:{bin(mask)} is 0 "
+                f"but 1 in the key:{bin(key)}")
             code = WILDCARD + code
     return code
 
@@ -123,19 +123,18 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
             if o_route.processor_ids != c_route.processor_ids:
                 if set(o_route.processor_ids) != set(c_route.processor_ids):
                     raise PacmanRoutingException(
-                        "Compressed route {} covers original route {} but has "
-                        "a different processor_ids.".format(c_route, o_route))
+                        f"Compressed route {c_route} covers original route "
+                        f"{o_route} but has a different processor_ids.")
             if o_route.link_ids != c_route.link_ids:
                 if set(o_route.link_ids) != set(c_route.link_ids):
                     raise PacmanRoutingException(
-                        "Compressed route {} covers original route {} but has "
-                        "a different link_ids.".format(c_route, o_route))
+                        f"Compressed route {c_route} covers original route "
+                        f"{o_route} but has a different link_ids.")
             if not o_route.defaultable and c_route.defaultable:
                 if o_route == c_route:
                     raise PacmanRoutingException(
-                        "Compressed route {} while original route {} but has "
-                        "a different defaultable value.".format(
-                            c_route, o_route))
+                        f"Compressed route {c_route} while original route "
+                        f"{o_route} but has a different defaultable value.")
                 else:
                     compare_route(o_route, compressed_dict, o_code=o_code,
                                   start=i + 1, f=f)
