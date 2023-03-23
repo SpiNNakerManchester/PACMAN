@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-jsonschema
+jsonschema <= 4.17.3; python_version == '3.7'
+jsonschema; python_version >= '3.8'
 SpiNNUtilities == 1!6.0.1
 SpiNNMachine == 1!6.0.1
