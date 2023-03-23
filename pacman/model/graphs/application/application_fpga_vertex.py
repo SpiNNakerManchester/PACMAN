@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
 from pacman.exceptions import PacmanInvalidParameterException
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common.slice import Slice
@@ -86,7 +87,8 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         :rtype: ~pacman.model.graphs.common.Slice
         """
         # pylint: disable=unused-argument
-        atoms_per_slice = self.n_atoms // self._n_machine_vertices_per_link
+        atoms_per_slice = int(math.ceil(
+            self.n_atoms / self._n_machine_vertices_per_link))
         low_atom = atoms_per_slice * index
         hi_atom = (atoms_per_slice * (index + 1)) - 1
         hi_atom = min((hi_atom, self.n_atoms - 1))
