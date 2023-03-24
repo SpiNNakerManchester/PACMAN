@@ -22,14 +22,12 @@ class RoutingInfo(object):
     """
 
     __slots__ = [
-
         # Partition information indexed by edge pre vertex and partition ID\
         # name
         "_info"
     ]
 
     def __init__(self):
-
         # Partition information indexed by edge pre vertex and partition ID
         # name
         self._info = dict()

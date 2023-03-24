@@ -59,9 +59,8 @@ class MultiRegionSDRAM(VariableSDRAM):
         :param per_timestep_sdram: The variable cost for this region is any
         :type per_timestep_sdram: int or numpy.integer
         """
-        self._fixed_sdram = self._fixed_sdram + fixed_sdram
-        self._per_timestep_sdram = \
-            self._per_timestep_sdram + per_timestep_sdram
+        self._fixed_sdram += fixed_sdram
+        self._per_timestep_sdram += per_timestep_sdram
         if per_timestep_sdram:
             sdram = VariableSDRAM(int(fixed_sdram), int(per_timestep_sdram))
         else:
@@ -85,9 +84,8 @@ class MultiRegionSDRAM(VariableSDRAM):
         :param AbstractSDRAM other:
             Another SDRAM model to make combine by nesting
         """
-        self._fixed_sdram = self._fixed_sdram + other.fixed
-        self._per_timestep_sdram = \
-            self._per_timestep_sdram + other.per_timestep
+        self._fixed_sdram += other.fixed
+        self._per_timestep_sdram += other.per_timestep
         if region in self.__regions:
             if isinstance(other, MultiRegionSDRAM):
                 if isinstance(self.__regions[region], MultiRegionSDRAM):
@@ -111,9 +109,8 @@ class MultiRegionSDRAM(VariableSDRAM):
 
         :param MultiRegionSDRAM other: Another mapping of costs by region
         """
-        self._fixed_sdram = self._fixed_sdram + other.fixed
-        self._per_timestep_sdram = \
-            self._per_timestep_sdram + other.per_timestep
+        self._fixed_sdram += other.fixed
+        self._per_timestep_sdram += other.per_timestep
         for region in other.regions:
             if region in self.regions:
                 self.__regions[region] += other.regions[region]

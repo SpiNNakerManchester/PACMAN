@@ -243,9 +243,8 @@ def _route_source_to_target(
 
     """
     # Get which vertices are targetted by the source
-    target_vertices = \
-        target.splitter.get_source_specific_in_coming_vertices(
-            source, partition.identifier)
+    target_vertices = target.splitter.get_source_specific_in_coming_vertices(
+        source, partition.identifier)
 
     # Add all the targets for the route
     real_target_xys = set()

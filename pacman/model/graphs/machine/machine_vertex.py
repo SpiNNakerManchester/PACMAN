@@ -110,8 +110,8 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
     def __repr__(self):
         if self.get_fixed_location():
-            return f"MachineVertex({self.label}, " \
-                   f"at{self.get_fixed_location()})"
+            return (f"MachineVertex({self.label}, "
+                    f"at{self.get_fixed_location()})")
         else:
             return f"MachineVertex({self.label})"
 
