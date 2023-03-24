@@ -132,4 +132,5 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     @overrides(ApplicationVirtualVertex.get_max_atoms_per_core)
     def get_max_atoms_per_core(self):
-        return self._n_atoms // self._n_machine_vertices_per_link
+        return int(math.ceil(
+            self._n_atoms / self._n_machine_vertices_per_link))
