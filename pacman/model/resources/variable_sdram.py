@@ -83,6 +83,6 @@ class VariableSDRAM(AbstractSDRAM):
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps, indent="", preamble="", target=None):
         print(indent, preamble,
-              "Fixed {} bytes Per_timestep {} bytes for a total of {}".format(
-                  self._fixed_sdram, self._per_timestep_sdram,
-                  self.get_total_sdram(timesteps)), file=target)
+              f"Fixed {self._fixed_sdram} bytes "
+              f"Per_timestep {self._per_timestep_sdram} bytes "
+              f"for a total of {self.get_total_sdram(timesteps)}", file=target)

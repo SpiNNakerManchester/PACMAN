@@ -62,5 +62,5 @@ def format_route(entry):
     key = entry.routing_entry_key
     mask = entry.mask
     route = _reduce_route_value(entry.processor_ids, entry.link_ids)
-    return (f"0x{key:08X} 0x{mask:08X} 0x{route:08X} {entry.defaultable:<7s} "
+    return (f"0x{key:08X} 0x{mask:08X} 0x{route:08X} {entry.defaultable:<7} "
             f"{_expand_route_value(entry.processor_ids, entry.link_ids)}")
