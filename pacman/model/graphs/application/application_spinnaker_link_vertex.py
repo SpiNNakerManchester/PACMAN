@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common.slice import Slice
 from .application_virtual_vertex import ApplicationVirtualVertex
@@ -86,7 +87,8 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
-        atoms_per_slice = self.n_atoms // self._n_machine_vertices
+        atoms_per_slice = int(math.ceil(
+            self._n_atoms / self._n_machine_vertices))
         low_atom = atoms_per_slice * index
         hi_atom = (atoms_per_slice * (index + 1)) - 1
         hi_atom = min((hi_atom, self.n_atoms - 1))
@@ -113,3 +115,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
             raise NotImplementedError("This vertex doesn't have outgoing data")
         return machine.get_spinnaker_link_with_id(
             self._spinnaker_link_id, self._board_address)
+
+    @overrides(ApplicationVirtualVertex.get_max_atoms_per_core)
+    def get_max_atoms_per_core(self):
+        return int(math.ceil(self._n_atoms / self._n_machine_vertices))
