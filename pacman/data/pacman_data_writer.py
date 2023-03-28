@@ -34,10 +34,10 @@ REPORTS_DIRNAME = "reports"
 
 class PacmanDataWriter(MachineDataWriter, PacmanDataView):
     """
-    See UtilsDataWriter
+    See :py:class:`spinn_utilities.data.UtilsDataWriter`.
 
     This class is designed to only be used directly within the PACMAN
-    repository unittests as all methods are available to subclasses
+    repository unit tests as all methods are available to subclasses.
     """
     __pacman_data = _PacmanDataModel()
     __slots__ = []
@@ -64,7 +64,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_placements(self, placements):
         """
-        Set the placements
+        Set the placements.
 
         :param Placements placements:
         :raises TypeError: if the placements is not a Placements
@@ -75,7 +75,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_routing_infos(self, routing_infos):
         """
-        Set the routing_infos
+        Set the routing_infos.
 
         :param RoutingInfo routing_infos:
         :raises TypeError: if the routing_infos is not a RoutingInfo
@@ -86,7 +86,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_tags(self, tags):
         """
-        Set the tags
+        Set the tags.
 
         :param Tags tags:
         :raises TypeError: if the tags is not a Tags
@@ -97,7 +97,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_uncompressed(self, router_tables):
         """
-        Sets the uncompressed router_tables value
+        Sets the uncompressed `router_tables` value.
 
         :param MulticastRoutingTables router_tables: new value
         :raises TypeError:
@@ -110,7 +110,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_precompressed(self, router_tables):
         """
-        Sets the precompressed router_tables value
+        Sets the precompressed `router_tables` value.
 
         :param MulticastRoutingTables router_tables: new value
         :raises TypeError:
@@ -123,7 +123,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_plan_n_timesteps(self, plan_n_timesteps):
         """
-        Sets the plan_n_timestep. Use `None` for run forever
+        Sets the `plan_n_timestep`. Use `None` for run forever.
 
         :param plan_n_timesteps:
         :type plan_n_timesteps: int or None
@@ -141,7 +141,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_routing_table_by_partition(self, routing_table_by_partition):
         """
-        Sets the _routing_table_by_partition
+        Sets the `_routing_table_by_partition`.
 
         :param MulticastRoutingTableByPartition routing_table_by_partition:
             raises TypeError: if routing_table_by_partition is no a

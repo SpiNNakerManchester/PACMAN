@@ -25,6 +25,9 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SplitterFixedLegacy(AbstractSplitterCommon):
+    """
+    Splitter for old-style vertices.
+    """
 
     __slots__ = ["__slices"]
 

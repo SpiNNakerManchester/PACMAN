@@ -35,7 +35,8 @@ class AbstractVertex(object):
         :param str label: The optional name of the vertex
         :param fixed_location:
             The optional fixed location of the vertex.
-            Only if the Vertex is fixed before placement.
+            Should only be given via this argument if the vertex is fixed in
+            location *before* placement.
         """
         self._label = label
         self._added_to_graph = False
@@ -79,9 +80,9 @@ class AbstractVertex(object):
         """
         The x, y and possibly p the vertex *must* be placed on.
 
-        Typically `None`! Does not have the value of a normal placememts.
+        Typically `None`! Does not have the value of a normal placements.
 
-        Used instead of ChipAndCoreConstraint
+        Used instead of `ChipAndCoreConstraint`.
 
         :rtype: None or ChipAndCore
         """

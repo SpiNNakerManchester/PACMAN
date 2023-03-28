@@ -16,6 +16,9 @@ from pacman.exceptions import PacmanConfigurationException
 
 
 class AbstractSplitterCommon(object, metaclass=AbstractBase):
+    """
+    Common base class for vertex splitters, defining some utility methods.
+    """
 
     __slots__ = [
         # the app vertex this splitter governs.
@@ -35,9 +38,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         "as that is above a previously set max atoms of {}")
 
     def __init__(self):
-        """
-        :param str splitter_name:
-        """
         self._governed_app_vertex = None
 
     def __str__(self):

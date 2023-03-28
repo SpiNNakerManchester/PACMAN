@@ -27,6 +27,7 @@ class ApplicationVirtualVertex(ApplicationVertex):
         """
         Get the link data for outgoing connections from the machine.
 
-        :param Machine machine: The machine to get the link data from
+        :param ~spinn_machine.Machine machine:
+            The machine to get the link data from
         :rtype: AbstractLinkData
         """

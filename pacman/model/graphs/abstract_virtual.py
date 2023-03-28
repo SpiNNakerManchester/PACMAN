@@ -55,7 +55,7 @@ class AbstractVirtual(object):
         Get the keys sent by the device or `None` if there aren't any
         explicitly defined.
 
-        :rtype: list of KeyAndMask or None
+        :rtype: list(BaseKeyAndMask) or None
         """
 
     @abstractproperty
@@ -79,6 +79,7 @@ class AbstractVirtual(object):
         """
         Get link data from the machine.
 
-        :param Machine machine: The machine to get the data from
-        :rtype: AbstractLinkData
+        :param ~spinn_machine.Machine machine:
+            The machine to get the data from
+        :rtype: ~spinn_machine.link_data_objects.AbstractLinkData
         """

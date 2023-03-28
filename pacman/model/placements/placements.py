@@ -86,7 +86,7 @@ class Placements(object):
 
     def get_placement_on_processor(self, x, y, p):
         """
-        Return the placement on a specific processor, or raises an exception
+        Get the placement on a specific processor, or raises an exception
         if the processor has not been allocated.
 
         :param int x: the x coordinate of the chip
@@ -142,7 +142,7 @@ class Placements(object):
 
         :param int x: x coordinate to find placements for.
         :param int y: y coordinate  to find placements for.
-        :rtype: Placement
+        :rtype: iterable(Placement)
         """
         return self._placements[x, y].values()
 
@@ -153,7 +153,7 @@ class Placements(object):
         :param int x: x coordinate to find placements for.
         :param int y: y coordinate  to find placements for.
         :param class vertex_type: Class of vertex to find
-        :rtype: Placement
+        :rtype: iterable(Placement)
         """
         for placement in self._placements[x, y].values():
             if isinstance(placement.vertex, vertex_type):
@@ -164,7 +164,7 @@ class Placements(object):
         Iterate over placements on any chip with this vertex_type.
 
         :param class vertex_type: Class of vertex to find
-        :rtype: Placement
+        :rtype: iterable(Placement)
         """
         for placement in self._machine_vertices.values():
             if isinstance(placement.vertex, vertex_type):
@@ -176,6 +176,7 @@ class Placements(object):
 
         :param int x: x coordinate of chip.
         :param int y: y coordinate of chip.
+        :rtype: int
         """
         if (x, y) not in self._placements:
             return 0

@@ -28,7 +28,8 @@ class AbstractSupportsSDRAMEdges(object, metaclass=AbstractBase):
         """
         Asks a machine vertex for the SDRAM requirement it needs.
 
-        :param sdram_machine_edge: The SDRAM edge in question
-        :return: the size in bytes this vertex needs for the SDRAM edge
+        :param SDRAMMachineEdge sdram_machine_edge:
+            The SDRAM edge in question
+        :return: The size in bytes this vertex needs for the SDRAM edge.
         :rtype: int (most likely a multiple of 4)
         """
