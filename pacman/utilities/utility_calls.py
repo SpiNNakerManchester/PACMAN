@@ -20,7 +20,7 @@ import math
 def expand_to_bit_array(value):
     """
     Expand a 32-bit value in to an array of length 32 of uint8 values,
-    each of which is a 1 or 0
+    each of which is a 1 or 0.
 
     :param int value: The value to expand
     :rtype: ~numpy.ndarray(uint8)
@@ -32,7 +32,7 @@ def expand_to_bit_array(value):
 def compress_from_bit_array(bit_array):
     """
     Compress a bit array of 32 uint8 values, where each is a 1 or 0,
-    into a 32-bit value
+    into a 32-bit value.
 
     :param ~numpy.ndarray(uint8) bit_array: The array to compress
     :rtype: int
@@ -166,7 +166,6 @@ def get_field_based_keys(key, vertex_slice, shift=0):
         key.
     :rtype: list(int)
     """
-
     # Find the size of field required for each coordinate, and the shift
     # required to get to this field position (the first field has a shift
     # of 0)
