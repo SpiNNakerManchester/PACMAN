@@ -144,17 +144,10 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     @overrides(AbstractVertex.get_fixed_location)
     def get_fixed_location(self):
         """
-        The x, y and possibly p the vertex *must* be placed on.
-
-        Typically `None`! Does not have the value of a normal placememts.
-
-        If the Machine vertex has no fixed_location
-        but does have an app_vertex, app_vertex.fixed_location is used.
-        If both have a fixed_location the app level is ignored!
-
-        Used instead of ChipAndCoreConstraint
-
-        :rtype: None or ChipAndCore
+        .. note::
+            If the Machine vertex has no fixed_location
+            but does have an app_vertex, app_vertex.fixed_location is used.
+            If both have a fixed_location the app level is ignored!
         """
         if self._fixed_location:
             return self._fixed_location

@@ -58,4 +58,7 @@ class ChipCounter(object):
 
     @property
     def n_chips(self):
+        """
+        :rtype: int
+        """
         return self.__n_chips

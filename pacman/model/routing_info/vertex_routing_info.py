@@ -52,7 +52,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         :return: An array of keys
         :rtype: ~numpy.ndarray
         """
-
         max_n_keys = self.__key_and_mask.n_keys
 
         if n_keys is None:

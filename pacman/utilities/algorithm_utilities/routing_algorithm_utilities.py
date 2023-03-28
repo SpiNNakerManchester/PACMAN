@@ -388,7 +388,6 @@ def longest_dimension_first(vector, start):
 
         .. note::
             This is a 2D coordinate.
-    :param ~spinn_machine.Machine machine:
     :return: min route
     :rtype: list(tuple(int,tuple(int, int)))
     """
@@ -403,14 +402,16 @@ def least_busy_dimension_first(traffic, vector, start):
     routes first.
 
     :param traffic: A dictionary of (x, y): count of routes
+    :type traffic: dict(tuple(int,int), int)
     :param vector: (x, y, z)
         The vector which the path should cover.
+    :type vector: tuple(int, int, int)
     :param start: (x, y)
         The coordinates from which the path should start.
 
         .. note::
             This is a 2D coordinate.
-    :param machine: the spinn machine.
+    :type start: tuple(int, int)
     :return: min route
     :rtype: list(tuple(int,tuple(int, int)))
     """
@@ -517,7 +518,7 @@ def most_direct_route(source, dest, machine):
 
     :param tuple(int,int) source: The source x, y coordinates
     :param tuple(int,int) dest: The destination x, y coordinated
-    :param Machine machine: The machine on which to route
+    :param ~spinn_machine.Machine machine: The machine on which to route
     """
     vector = machine.get_vector(source, dest)
     nodes = longest_dimension_first(vector, source)

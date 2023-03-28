@@ -29,5 +29,5 @@ class ApplicationVirtualVertex(ApplicationVertex):
 
         :param ~spinn_machine.Machine machine:
             The machine to get the link data from
-        :rtype: AbstractLinkData
+        :rtype: ~spinn_machine.link_data_objects.AbstractLinkData
         """

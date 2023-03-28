@@ -53,7 +53,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             If the vertex is n-dimensional, with n > 1, the value must be a
             tuple with a value for each dimension.  If it is single-dimensional
             the value can be a 1-tuple or an int.
-        :type max_atoms_per_core: None or int or tuple.
+        :type max_atoms_per_core: None or int or tuple(int,...)
         :param splitter: The splitter object needed for this vertex.
             Leave as `None` to delegate the choice of splitter to the selector.
         :type splitter: None or
@@ -108,7 +108,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     def remember_machine_vertex(self, machine_vertex):
         """
-        Adds the Machine vertex the iterable returned by machine_vertices
+        Adds the machine vertex to the iterable returned by machine_vertices
 
         :param MachineVertex machine_vertex: A pointer to a machine_vertex
         """
@@ -185,7 +185,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         will return a tuple with a number for each dimension of the vertex,
         which might be one if this is a single-dimension vertex.
 
-        :rtype: tuple(int)
+        :rtype: tuple(int,...)
         """
         if self._max_atoms_per_dimension_per_core is None:
             return self.atoms_shape
@@ -203,7 +203,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             of n values must be given.  If the vertex is 1 dimensional,
             a 1-tuple or integer can be given.  If this is set to `None` the
             vertex will have atoms_shape as the maximum.
-        :type new_value: None or int or tuple(int)
+        :type new_value: None or int or tuple(int,...)
         """
         self._max_atoms_per_dimension_per_core = new_value
         if isinstance(new_value, int):
@@ -259,4 +259,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """
         Add an edge incoming to this vertex.  This is ignored by default,
         but could be used to track incoming edges, and/or report faults.
+
+        :param ApplicationEdge edge:
+        :param ApplicationEdgePartition partition:
         """

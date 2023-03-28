@@ -42,7 +42,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         The multicast routing entries in the table.
 
         :return: an iterable of multicast routing entries
-        :rtype: iterable(:py:class:`spinn_machine.MulticastRoutingEntry`)
+        :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
         """
 
     @abstractproperty
@@ -51,7 +51,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         The number of multicast routing entries there are in the
         multicast routing table.
 
-        :return: int
+        :rtype: int
         """
 
     @abstractproperty
@@ -60,7 +60,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         The number of multicast routing entries that are set to be
         defaultable within this multicast routing table.
 
-        :return: int
+        :rtype: int
         """
 
     @abstractmethod

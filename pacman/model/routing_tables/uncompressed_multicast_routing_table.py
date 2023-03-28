@@ -100,53 +100,26 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     @property
     @overrides(AbstractMulticastRoutingTable.x)
     def x(self):
-        """
-        The X-coordinate of the chip of this table.
-
-        :rtype: int
-        """
         return self._x
 
     @property
     @overrides(AbstractMulticastRoutingTable.y)
     def y(self):
-        """
-        The Y-coordinate of the chip of this table.
-
-        :rtype: int
-        """
         return self._y
 
     @property
     @overrides(AbstractMulticastRoutingTable.multicast_routing_entries)
     def multicast_routing_entries(self):
-        """
-        The multicast routing entries in the table.
-
-        :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
-        """
         return self._entries_by_key_mask.values()
 
     @property
     @overrides(AbstractMulticastRoutingTable.number_of_entries)
     def number_of_entries(self):
-        """
-        The number of multicast routing entries there are in the
-        multicast routing table.
-
-        :rtype: int
-        """
         return len(self._entries_by_key_mask)
 
     @property
     @overrides(AbstractMulticastRoutingTable.number_of_defaultable_entries)
     def number_of_defaultable_entries(self):
-        """
-        The number of multicast routing entries that are set to be
-        defaultable within this multicast routing table.
-
-        :rtype: int
-        """
         return self._number_of_defaulted_routing_entries
 
     @overrides(AbstractMulticastRoutingTable.__eq__)

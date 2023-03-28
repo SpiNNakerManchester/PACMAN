@@ -33,10 +33,6 @@ class AbstractVertex(object):
     def __init__(self, label=None):
         """
         :param str label: The optional name of the vertex
-        :param fixed_location:
-            The optional fixed location of the vertex.
-            Should only be given via this argument if the vertex is fixed in
-            location *before* placement.
         """
         self._label = label
         self._added_to_graph = False
@@ -90,7 +86,16 @@ class AbstractVertex(object):
 
     def set_fixed_location(self, x, y, p=None):
         """
-        :param ChipAndCore fixed_location:
+        Set the location where the vertex must be placed.
+
+        .. note::
+            If called, must be called prior to the placement algorithms.
+
+        :param int x: X coordinate of fixed location
+        :param int y: Y coordinate of fixed location
+        :param int p: Processor ID of fixed location
+        :raises PacmanConfigurationException:
+            If a fixed location has already been set to a different location.
         """
         fixed_location = ChipAndCore(x, y, p)
         if self._fixed_location is not None:

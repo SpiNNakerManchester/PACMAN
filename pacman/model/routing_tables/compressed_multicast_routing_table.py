@@ -62,9 +62,8 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         """
         Adds a routing entry to this table.
 
-        :param multicast_routing_entry: The route to add
-        :type multicast_routing_entry:
-            ~spinn_machine.MulticastRoutingEntry
+        :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
+            The route to add
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing
             entry with the same key-mask combination already exists
         """

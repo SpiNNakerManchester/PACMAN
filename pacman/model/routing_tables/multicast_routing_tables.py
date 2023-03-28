@@ -91,8 +91,8 @@ class MulticastRoutingTables(object):
         """
         Get a routing table for a particular chip.
 
-        :param int x: The x-coordinate of the chip
-        :param int y: The y-coordinate of the chip
+        :param int x: The X-coordinate of the chip
+        :param int y: The Y-coordinate of the chip
         :return: The routing table, or `None` if no such table exists
         :rtype: MulticastRoutingTable or None
         """
