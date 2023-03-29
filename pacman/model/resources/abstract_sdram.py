@@ -63,13 +63,13 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
     @abstractproperty
     def fixed(self):
         """
-        Returns the fixed SDRAM cost.
+        The fixed SDRAM cost.
         """
 
     @abstractproperty
     def per_timestep(self):
         """
-        Returns extra SDRAM cost for each additional timestep.
+        The extra SDRAM cost for each additional timestep.
 
         .. warning::
             May well be zero.

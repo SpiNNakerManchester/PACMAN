@@ -114,7 +114,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
     @abstractproperty
     def pre_vertices(self):
         """
-        Provides the vertices associated with this partition.
+        The vertices associated with this partition.
 
         .. note::
             Most edge partitions will be

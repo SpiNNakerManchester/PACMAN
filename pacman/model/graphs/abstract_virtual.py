@@ -61,7 +61,7 @@ class AbstractVirtual(object):
     @abstractproperty
     def incoming(self):
         """
-        Indicates if this device sends traffic into SpiNNaker.
+        Whether this device sends traffic into SpiNNaker.
 
         :rtype: bool
         """
@@ -69,7 +69,7 @@ class AbstractVirtual(object):
     @abstractproperty
     def outgoing(self):
         """
-        Indicates if this device receives traffic from SpiNNaker.
+        Whether this device receives traffic from SpiNNaker.
 
         :rtype: bool
         """

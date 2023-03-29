@@ -21,18 +21,16 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
     @abstractproperty
     def x(self):
         """
-        The x-coordinate of the chip of this table.
+        The X-coordinate of the chip of this table.
 
-        :return: The x-coordinate
         :rtype: int
         """
 
     @abstractproperty
     def y(self):
         """
-        The y-coordinate of the chip of this table.
+        The Y-coordinate of the chip of this table.
 
-        :return: The y-coordinate
         :rtype: int
         """
 
@@ -41,7 +39,6 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         """
         The multicast routing entries in the table.
 
-        :return: an iterable of multicast routing entries
         :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
         """
 
