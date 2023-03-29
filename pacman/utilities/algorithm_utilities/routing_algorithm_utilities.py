@@ -340,7 +340,7 @@ def convert_a_route(
     and ands it to the routing_tables.
 
     :param MulticastRoutingTableByPartition routing_tables:
-        spinnaker format routing tables
+        SpiNNaker-format routing tables
     :param AbstractSingleSourcePartition partition:
         Partition this route applies to
     :param incoming_processor: processor this link came from
@@ -348,7 +348,7 @@ def convert_a_route(
     :param incoming_link: link this link came from
     :type incoming_link: int or None
     :param RoutingTree route: algorithm specific format of the route
-    :param dict((int,int),(list,list)): targets_by_chip:
+    :param dict((int,int),(list,list)) targets_by_chip:
         Target cores and links of things on the route that are final end points
     """
     x, y = route.chip
