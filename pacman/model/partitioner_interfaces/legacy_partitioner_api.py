@@ -43,7 +43,7 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of atoms that the machine vertex will cover.
-        :param ~pacman.model.resourcesAbstractSDRAM sdram:
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the machine vertex.
         :param label: human readable label for the machine vertex
         :type label: str or None
