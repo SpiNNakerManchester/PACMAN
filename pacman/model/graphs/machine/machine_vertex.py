@@ -34,14 +34,15 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :param app_vertex:
             The application vertex that caused this machine vertex to be
             created. If `None`, there is no such application vertex.
-        :type app_vertex: ApplicationVertex or None
+        :type app_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex or None
         :param vertex_slice:
             The slice of the application vertex that this machine vertex
             implements.
-        :type vertex_slice: Slice or None
+        :type vertex_slice: ~pacman.model.graphs.common.Slice or None
         :raises PacmanValueError: If the slice of the machine_vertex is too big
         :raise AttributeError:
-            If a not None app_vertex is not an ApplicationVertex
+            If a not-`None` app_vertex is not an ApplicationVertex
         """
         if label is None:
             label = str(type(self))
@@ -60,7 +61,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         The application vertex that caused this machine vertex to be
         created. If `None`, there is no such application vertex.
 
-        :rtype: ApplicationVertex or None
+        :rtype: ~pacman.model.graphs.application.ApplicationVertex or None
         """
         return self._app_vertex
 
@@ -70,7 +71,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         The slice of the application vertex that this machine vertex
         implements.
 
-        :rtype: Slice
+        :rtype: ~pacman.model.graphs.common.Slice
         """
         return self._vertex_slice
 
@@ -78,8 +79,8 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """
         Get the number of keys required by the given partition of edges.
 
-        :param str partition_id: The identifier of the partition
-            partition_id param is only used by some MachineVertex clases
+        :param str partition_id: The identifier of the partition; the
+            partition_id param is only used by some MachineVertex subclasses
         :return: The number of keys required
         :rtype: int
         """
@@ -128,7 +129,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """
         The IPtags used by this vertex if any.
 
-        :rtype: iterable(IPtagResource)
+        :rtype: iterable(~pacman.model.resources.IPtagResource)
         """
         return []
 
@@ -137,7 +138,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """
         The reverse IPtags used by this vertex if any.
 
-        :rtype: iterable(ReverseIPtagResource)
+        :rtype: iterable(~pacman.model.resources.ReverseIPtagResource)
         """
         return []
 
@@ -145,9 +146,9 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     def get_fixed_location(self):
         """
         .. note::
-            If the Machine vertex has no fixed_location
-            but does have an app_vertex, app_vertex.fixed_location is used.
-            If both have a fixed_location the app level is ignored!
+            If the Machine vertex has no `fixed_location`
+            but does have an `app_vertex`, `app_vertex.fixed_location` is used.
+            If both have a `fixed_location` the app level is ignored!
         """
         if self._fixed_location:
             return self._fixed_location

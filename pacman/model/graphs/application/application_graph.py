@@ -47,7 +47,8 @@ class ApplicationGraph(object):
         """
         Add a vertex to the graph.
 
-        :param ApplicationVertex vertex: The vertex to add
+        :param ~pacman.model.graphs.application.ApplicationVertex vertex:
+            The vertex to add
         :raises PacmanInvalidParameterException:
             If the vertex is not of a valid type
         :raises PacmanConfigurationException:
@@ -72,7 +73,7 @@ class ApplicationGraph(object):
         """
         The vertices in the graph.
 
-        :rtype: iterable(AbstractVertex)
+        :rtype: iterable(~pacman.model.graphs.AbstractVertex)
         """
         return self._vertex_by_label.values()
 
@@ -94,13 +95,13 @@ class ApplicationGraph(object):
 
         If required and possible will create a new partition in the graph
 
-        Returns the partition the edge was added to
-
-        :param ApplicationEdge edge: The edge to add
+        :param ~pacman.model.graphs.application.ApplicationEdge edge:
+            The edge to add
         :param str outgoing_edge_partition_name:
             The name of the edge partition to add the edge to; each edge
             partition is the partition of edges that start at the same vertex
-        :rtype: AbstractEdgePartition
+        :return: The partition the edge was added to.
+        :rtype: ~pacman.model.graphs.AbstractEdgePartition
         :raises PacmanInvalidParameterException:
             If the edge is not of a valid type or if edges have already been
             added to this partition that start at a different vertex to this
@@ -122,7 +123,8 @@ class ApplicationGraph(object):
         """
         Add an edge to the graph.
 
-        :param ApplicationEdge edge: The edge to add
+        :param ~pacman.model.graphs.application.ApplicationEdge edge:
+            The edge to add
         :raises PacmanInvalidParameterException:
             If the edge is not of a valid type or if edges have already been
             added to this partition that start at a different vertex to this
@@ -150,7 +152,7 @@ class ApplicationGraph(object):
         """
         The edges in the graph.
 
-        :rtype: iterable(AbstractEdge)
+        :rtype: iterable(~pacman.model.graphs.AbstractEdge)
         """
         return [
             edge
@@ -163,7 +165,9 @@ class ApplicationGraph(object):
 
         Will also add any edges already in the partition as well
 
-        :param ApplicationEdgePartition edge_partition:
+        :param edge_partition:
+        :type edge_partition:
+            ~pacman.model.graphs.application.ApplicationEdgePartition
         """
         self._outgoing_edge_partitions_by_pre_vertex[
             edge_partition.pre_vertex].add(edge_partition)
@@ -174,7 +178,7 @@ class ApplicationGraph(object):
         """
         The edge partitions in the graph.
 
-        :rtype: iterable(AbstractEdgePartition)
+        :rtype: iterable(~pacman.model.graphs.AbstractEdgePartition)
         """
         for partitions in \
                 self._outgoing_edge_partitions_by_pre_vertex.values():
@@ -194,9 +198,9 @@ class ApplicationGraph(object):
         """
         Get all the edge partitions that start at the given vertex.
 
-        :param AbstractVertex vertex:
+        :param ~pacman.model.graphs.AbstractVertex vertex:
             The vertex at which the edge partitions to find starts
-        :rtype: iterable(AbstractEdgePartition)
+        :rtype: iterable(~pacman.model.graphs.AbstractEdgePartition)
         """
         return self._outgoing_edge_partitions_by_pre_vertex[vertex]
 
@@ -206,13 +210,13 @@ class ApplicationGraph(object):
         Get the given outgoing edge partition that starts at the
         given vertex, or `None` if no such edge partition exists.
 
-        :param AbstractVertex vertex:
+        :param ~pacman.model.graphs.AbstractVertex vertex:
             The vertex at the start of the edges in the partition
         :param str outgoing_edge_partition_name:
             The name of the edge partition
         :return:
             The named edge partition, or `None` if no such partition exists
-        :rtype: AbstractEdgePartition or None
+        :rtype: ~pacman.model.graphs.AbstractEdgePartition or None
         """
         # In general, very few partitions start at a given vertex, so iteration
         # isn't going to be as onerous as it looks

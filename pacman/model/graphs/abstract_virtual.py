@@ -25,7 +25,7 @@ class AbstractVirtual(object):
 
     .. note::
         Everything that is an instance of ``AbstractVirtual`` is also an
-        instance of :py:class:`AbstractVertex`.
+        instance of :py:class:`~pacman.model.graphs.AbstractVertex`.
     """
 
     __slots__ = ()
@@ -55,7 +55,7 @@ class AbstractVirtual(object):
         Get the keys sent by the device or `None` if there aren't any
         explicitly defined.
 
-        :rtype: list(BaseKeyAndMask) or None
+        :rtype: list(~pacman.model.routing_info.BaseKeyAndMask) or None
         """
 
     @abstractproperty

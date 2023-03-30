@@ -33,7 +33,7 @@ class SourceSegmentedSDRAMMachinePartition(
         """
         :param str identifier: The identifier of the partition
         :param str label: A label of the partition
-        :param iterable(AbstractVertex) pre_vertices:
+        :param iterable(~pacman.model.graphs.AbstractVertex) pre_vertices:
             The vertices that an edge in this partition may originate at
         """
         super().__init__(
