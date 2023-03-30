@@ -19,7 +19,8 @@ from pacman.exceptions import PacmanValueError, PacmanTypeError
 
 class Slice(collections.namedtuple('Slice',
                                    'lo_atom hi_atom n_atoms shape start')):
-    """ Represents a slice of a vertex.
+    """
+    Represents a slice of a vertex.
 
     :attr int lo_atom: The lowest atom represented in the slice.
     :attr int hi_atom: The highest atom represented in the slice.
@@ -32,7 +33,8 @@ class Slice(collections.namedtuple('Slice',
         this will be lo_atom in 1 dimension.
     """
     def __new__(cls, lo_atom, hi_atom, shape=None, start=None):
-        """ Create a new Slice object.
+        """
+        Create a new Slice object.
 
         :param int lo_atom: Index of the lowest atom to represent.
         :param int hi_atom: Index of the highest atom to represent.
@@ -47,7 +49,7 @@ class Slice(collections.namedtuple('Slice',
             raise PacmanValueError('lo_atom < 0')
         if hi_atom < lo_atom:
             raise PacmanValueError(
-                'hi_atom {:d} < lo_atom {:d}'.format(hi_atom, lo_atom))
+                f'hi_atom {hi_atom:d} < lo_atom {lo_atom:d}')
 
         # Number of atoms represented by this slice
         n_atoms = hi_atom - lo_atom + 1
@@ -78,7 +80,8 @@ class Slice(collections.namedtuple('Slice',
         return slice(self.lo_atom, self.hi_atom + 1)
 
     def get_slice(self, n):
-        """ Get a slice in the n-th dimension
+        """
+        Get a slice in the n-th dimension.
 
         :param int n: The 0-indexed dimension to get the shape of
         :type: slice
@@ -91,21 +94,24 @@ class Slice(collections.namedtuple('Slice',
 
     @property
     def slices(self):
-        """ Get slices for every dimension
+        """
+        Slices for every dimension.
 
-        :rtype: tuple(slice)
+        :rtype: tuple(slice, ...)
         """
         return tuple(self.get_slice(n) for n in range(len(self.shape)))
 
     @property
     def end(self):
-        """ The end positions of the slice in each dimension
+        """
+        The end positions of the slice in each dimension.
         """
         return tuple((numpy.array(self.start) + numpy.array(self.shape)) - 1)
 
     def get_raster_ids(self, atoms_shape):
-        """ Get the IDs of the atoms in the slice as they would appear in a
-            "raster scan" of the atoms over the whole shape.
+        """
+        Get the IDs of the atoms in the slice as they would appear in a
+        "raster scan" of the atoms over the whole shape.
 
         :param tuple(int) atoms_shape:
             The size of each dimension of the whole shape

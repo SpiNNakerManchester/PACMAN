@@ -33,45 +33,34 @@ def _reduce_route_value(processors_ids, link_ids):
 
 
 def _expand_route_value(processors_ids, link_ids):
-    """ Convert a 32-bit route word into a string which lists the target cores\
-        and links.
+    """
+    Convert a 32-bit route word into a string which lists the target cores
+    and links.
 
     :param iterable(int) processors_ids:
     :param iterable(int) link_ids:
     :rtype: str
     """
-
     # Convert processor targets to readable values:
-    route_string = "["
-    separator = ""
-    for processor in processors_ids:
-        route_string += "{}{}".format(separator, processor)
-        separator = ", "
-
-    route_string += "] ["
+    processors = ", ".join(
+        f"{processor}" for processor in processors_ids)
 
     # Convert link targets to readable values:
     link_labels = {0: 'E', 1: 'NE', 2: 'N', 3: 'W', 4: 'SW', 5: 'S'}
+    links = ", ".join(link_labels[link] for link in link_ids)
 
-    separator = ""
-    for link in link_ids:
-        route_string += "{}{}".format(separator, link_labels[link])
-        separator = ", "
-    route_string += "]"
-    return route_string
+    return f"[{processors}] [{links}]"
 
 
 def format_route(entry):
-    """ How to render a single routing entry.
+    """
+    How to render a single routing entry.
 
     :param ~spinn_machine.MulticastRoutingEntry entry:
     :rtype: str
     """
-    line_format = "0x{:08X} 0x{:08X} 0x{:08X} {: <7s} {}"
-
     key = entry.routing_entry_key
     mask = entry.mask
     route = _reduce_route_value(entry.processor_ids, entry.link_ids)
-    route_txt = _expand_route_value(entry.processor_ids, entry.link_ids)
-    return line_format.format(key, mask, route, str(entry.defaultable),
-                              route_txt)
+    return (f"0x{key:08X} 0x{mask:08X} 0x{route:08X} {entry.defaultable:<7} "
+            f"{_expand_route_value(entry.processor_ids, entry.link_ids)}")

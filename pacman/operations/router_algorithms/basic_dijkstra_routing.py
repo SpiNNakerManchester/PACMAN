@@ -61,8 +61,9 @@ class _DijkstraInfo(object):
 
 def basic_dijkstra_routing(
         bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
-    """ Find routes between the edges with the allocated information,
-        placed in the given places
+    """
+    Find routes between the edges with the allocated information,
+    placed in the given places
 
     :param bool use_progress_bar: whether to show a progress bar
     :return: The discovered routes
@@ -76,9 +77,10 @@ def basic_dijkstra_routing(
 
 
 class _BasicDijkstraRouting(object):
-    """ An routing algorithm that can find routes for edges between vertices\
-        in a machine graph that have been placed on a machine by the use of a\
-        Dijkstra shortest path algorithm.
+    """
+    A routing algorithm that can find routes for edges between vertices
+    in a machine graph that have been placed on a machine by the use of a
+    Dijkstra shortest path algorithm.
     """
 
     __slots__ = [
@@ -99,8 +101,9 @@ class _BasicDijkstraRouting(object):
         self._max_bw = max_bw
 
     def _run(self):
-        """ Find routes between the edges with the allocated information,
-            placed in the given places
+        """
+        Find routes between the edges with the allocated information,
+        placed in the given places
 
         :param bool use_progress_bar: whether to show a progress bar
         :return: The discovered routes
@@ -191,8 +194,9 @@ class _BasicDijkstraRouting(object):
                     m_vertex, partition.identifier)
 
     def _initiate_node_info(self):
-        """ Set up a dictionary which contains data for each chip in the\
-            machine
+        """
+        Set up a dictionary which contains data for each chip in the
+        machine.
 
         :return: nodes_info dictionary
         :rtype: dict(tuple(int,int),_NodeInfo)
@@ -211,8 +215,9 @@ class _BasicDijkstraRouting(object):
         return nodes_info
 
     def _initiate_dijkstra_tables(self):
-        """ Set up the Dijkstra's table which includes if you've reached a\
-            given node
+        """
+        Set up the Dijkstra's table which includes if you've reached a
+        given node.
 
         :return: the  Dijkstra's table dictionary
         :rtype: dict(tuple(int,int),_DijkstraInfo)
@@ -225,7 +230,8 @@ class _BasicDijkstraRouting(object):
         return tables
 
     def _update_all_weights(self, nodes_info):
-        """ Change the weights of the neighbouring nodes
+        """
+        Change the weights of the neighbouring nodes.
 
         :param dict(tuple(int,int),_NodeInfo) nodes_info:
             the node info dictionary
@@ -235,7 +241,8 @@ class _BasicDijkstraRouting(object):
                 self._update_neighbour_weights(nodes_info, key)
 
     def _update_neighbour_weights(self, nodes_info, key):
-        """ Change the weights of the neighbouring nodes
+        """
+        Change the weights of the neighbouring nodes.
 
         :param dict(tuple(int,int),_NodeInfo) nodes_info:
             the node info dictionary
@@ -248,7 +255,8 @@ class _BasicDijkstraRouting(object):
 
     @staticmethod
     def _reset_tables(tables):
-        """ Reset the Dijkstra tables for a new path search
+        """
+        Reset the Dijkstra tables for a new path search.
 
         :param dict(tuple(int,int),_DijkstraInfo) tables:
             the dictionary object for the Dijkstra-tables
@@ -258,8 +266,9 @@ class _BasicDijkstraRouting(object):
 
     def _propagate_costs_until_reached_destinations(
             self, tables, nodes_info, dest_chips, x_source, y_source):
-        """ Propagate the weights till the destination nodes of the source\
-            nodes are retraced
+        """
+        Propagate the weights till the destination nodes of the source
+        nodes are retraced.
 
         :param dict(tuple(int,int),_DijkstraInfo) tables:
             the dictionary object for the Dijkstra-tables
@@ -272,7 +281,6 @@ class _BasicDijkstraRouting(object):
             when the destination node could not be reached from this source
             node
         """
-
         dest_chips_to_find = set(dest_chips)
         source = (x_source, y_source)
         dest_chips_to_find.discard(source)
@@ -328,7 +336,8 @@ class _BasicDijkstraRouting(object):
 
     @staticmethod
     def _update_neighbour(tables, neighbour, current, source, weight):
-        """ Update the lowest cost for each neighbour_xy of a node
+        """
+        Update the lowest cost for each neighbour_xy of a node.
 
         :param dict(tuple(int,int),_DijkstraInfo) tables:
         :param ~spinn_machine.Link neighbour:
@@ -341,9 +350,9 @@ class _BasicDijkstraRouting(object):
         neighbour_xy = (neighbour.destination_x, neighbour.destination_y)
         if neighbour_xy not in tables:
             raise PacmanRoutingException(
-                "Tried to propagate to ({}, {}), which is not in the"
-                " graph: remove non-existent neighbours"
-                .format(neighbour.destination_x, neighbour.destination_y))
+                f"Tried to propagate to ({neighbour.destination_x}, "
+                f"{neighbour.destination_y}), which is not in the"
+                " graph: remove non-existent neighbours")
 
         chip_cost = tables[current].cost
         neighbour_cost = tables[neighbour_xy].cost
@@ -359,8 +368,8 @@ class _BasicDijkstraRouting(object):
 
         if tables[neighbour_xy].cost == 0 and neighbour_xy != source:
             raise PacmanRoutingException(
-                "!!!Cost of non-source node ({}, {}) was set to zero!!!"
-                .format(neighbour.destination_x, neighbour.destination_y))
+                f"!!!Cost of non-source node ({neighbour.destination_x}, "
+                f"{neighbour.destination_y}) was set to zero!!!")
 
     def _retrace_back_to_source(
             self, dest_xy, dest_cores, dest_links, tables, nodes_info,
@@ -422,7 +431,8 @@ class _BasicDijkstraRouting(object):
     def _create_routing_entry(
             self, neighbour_xy, tables, neighbour_index,
             nodes_info, x, y, previous_entry, pre_vertex, partition_id):
-        """ Create a new routing entry
+        """
+        Create a new routing entry.
 
         :param tuple(int,int) neighbour_xy:
         :param dict(tuple(int,int),_DijkstraInfo) tables:
@@ -478,7 +488,8 @@ class _BasicDijkstraRouting(object):
 
     @staticmethod
     def _get_reverse_direction(neighbour_position):
-        """ Determine the direction of a link to go down
+        """
+        Determine the direction of a link to go down.
 
         :param int neighbour_position: the position the neighbour is at
         :return: The position of the opposite link

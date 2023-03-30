@@ -18,8 +18,9 @@ import math
 
 
 def expand_to_bit_array(value):
-    """ Expand a 32-bit value in to an array of length 32 of uint8 values,
-        each of which is a 1 or 0
+    """
+    Expand a 32-bit value in to an array of length 32 of uint8 values,
+    each of which is a 1 or 0.
 
     :param int value: The value to expand
     :rtype: ~numpy.ndarray(uint8)
@@ -29,8 +30,9 @@ def expand_to_bit_array(value):
 
 
 def compress_from_bit_array(bit_array):
-    """ Compress a bit array of 32 uint8 values, where each is a 1 or 0,
-        into a 32-bit value
+    """
+    Compress a bit array of 32 uint8 values, where each is a 1 or 0,
+    into a 32-bit value.
 
     :param ~numpy.ndarray(uint8) bit_array: The array to compress
     :rtype: int
@@ -39,8 +41,9 @@ def compress_from_bit_array(bit_array):
 
 
 def compress_bits_from_bit_array(bit_array, bit_positions):
-    """ Compress specific positions from a bit array of 32 uint8 value,\
-        where is a 1 or 0, into a 32-bit value.
+    """
+    Compress specific positions from a bit array of 32 uint8 value,
+    where is a 1 or 0, into a 32-bit value.
 
     :param ~numpy.ndarray(uint8) bit_array:
         The array to extract the value from
@@ -55,8 +58,9 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
 
 
 def is_equal_or_None(a, b):
-    """ If a and b are both not None, return True iff they are equal,\
-        otherwise return True
+    """
+    If a and b are both not `None`, return True iff they are equal,
+    otherwise return True.
 
     :rtype: bool
     """
@@ -64,7 +68,8 @@ def is_equal_or_None(a, b):
 
 
 def is_single(iterable):
-    """ Test if there is exactly one item in the iterable
+    """
+    Test if there is exactly one item in the iterable.
 
     :rtype: bool
     """
@@ -83,7 +88,8 @@ def is_single(iterable):
 
 
 def md5(string):
-    """ Get the MD5 hash of the given string, which is UTF-8 encoded.
+    """
+    Get the MD5 hash of the given string, which is UTF-8 encoded.
 
     :param str string:
     :rtype: str
@@ -92,8 +98,9 @@ def md5(string):
 
 
 def get_key_ranges(key, mask):
-    """ Get a generator of base_key, n_keys pairs that represent ranges
-        allowed by the mask.
+    """
+    Get a generator of base_key, n_keys pairs that represent ranges
+    allowed by the mask.
 
     :param int key: The base key
     :param int mask: The mask
@@ -131,7 +138,8 @@ def get_key_ranges(key, mask):
 
 
 def get_n_bits(n_values):
-    """ Determine how many bits are required for the given number of values
+    """
+    Determine how many bits are required for the given number of values.
 
     :param int n_values: the number of values (starting at 0)
     :return: the number of bits required to express that many values
@@ -145,9 +153,10 @@ def get_n_bits(n_values):
 
 
 def get_field_based_keys(key, vertex_slice, shift=0):
-    """ Translate a vertex slice with potentially multiple dimensions into
-        a list of keys, one for each atom of the vertex, by putting the values
-        into fields of the keys based on the shape of the slice.
+    """
+    Translate a vertex slice with potentially multiple dimensions into
+    a list of keys, one for each atom of the vertex, by putting the values
+    into fields of the keys based on the shape of the slice.
 
     :param int key: The base key
     :param Slice vertex_slice: The slice to translate
@@ -157,7 +166,6 @@ def get_field_based_keys(key, vertex_slice, shift=0):
         key.
     :rtype: list(int)
     """
-
     # Find the size of field required for each coordinate, and the shift
     # required to get to this field position (the first field has a shift
     # of 0)
@@ -185,7 +193,8 @@ def get_field_based_keys(key, vertex_slice, shift=0):
 
 
 def get_field_based_index(base_key, vertex_slice, shift=0):
-    """ Map field based keys back to indices
+    """
+    Map field based keys back to indices.
 
     :param int base_key: The base key
     :param Slice vertex_slice: The slice to translate
@@ -206,7 +215,8 @@ def get_field_based_index(base_key, vertex_slice, shift=0):
 
 
 def get_n_bits_for_fields(field_sizes):
-    """ Get the number of bits required for the fields in the vertex slice
+    """
+    Get the number of bits required for the fields in the vertex slice.
 
     :param iterable(int) field_sizes: The sizes each of the fields
     :rtype: int
@@ -216,7 +226,8 @@ def get_n_bits_for_fields(field_sizes):
 
 
 def allocator_bits_needed(size):
-    """ Get the bits needed for the routing info allocator
+    """
+    Get the bits needed for the routing info allocator.
 
     :param int size: The size to calculate the number of bits for
     :return: the number of bits required for that size

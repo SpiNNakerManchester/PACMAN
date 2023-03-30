@@ -32,8 +32,9 @@ def splitter_partitioner():
 
 
 class _SplitterPartitioner(AbstractSplitterPartitioner):
-    """ Partitioner which hands the partitioning work to application vertices'\
-        splitter objects.
+    """
+    Partitioner which hands the partitioning work to application vertices'
+    splitter objects.
     """
 
     __slots__ = []
