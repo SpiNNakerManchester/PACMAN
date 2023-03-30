@@ -34,8 +34,10 @@ class MachineEdge(AbstractEdge):
 
     def __init__(self, pre_vertex, post_vertex, label=None):
         """
-        :param MachineVertex pre_vertex: The vertex at the start of the edge.
-        :param MachineVertex post_vertex: The vertex at the end of the edge.
+        :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
+            The vertex at the start of the edge.
+        :param ~pacman.model.graphs.machine.MachineVertex post_vertex:
+            The vertex at the end of the edge.
         :param label: The name of the edge.
         :type label: str or None
         """

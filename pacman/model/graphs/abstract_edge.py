@@ -34,7 +34,7 @@ class AbstractEdge(object, metaclass=AbstractBase):
         """
         The vertex at the start of the edge.
 
-        :rtype: AbstractVertex
+        :rtype: ~pacman.model.graphs.AbstractVertex
         """
 
     @abstractproperty
@@ -42,5 +42,5 @@ class AbstractEdge(object, metaclass=AbstractBase):
         """
         The vertex at the end of the edge.
 
-        :rtype: AbstractVertex
+        :rtype: ~pacman.model.graphs.AbstractVertex
         """

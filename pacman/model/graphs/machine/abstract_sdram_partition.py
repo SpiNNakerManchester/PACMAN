@@ -33,7 +33,8 @@ class AbstractSDRAMPartition(object, metaclass=AbstractBase):
         Get the SDRAM base address for a edge given which side
         the vertex is on.
 
-        :param MachineVertex vertex: the vertex to find SDRAM base address of
+        :param ~pacman.model.graphs.machine.MachineVertex vertex:
+            the vertex to find SDRAM base address of
         :return: the SDRAM address for this vertex
         :rtype: int
         """
@@ -43,7 +44,8 @@ class AbstractSDRAMPartition(object, metaclass=AbstractBase):
         """
         Get the size of the region for a vertex given a edge.
 
-        :param MachineVertex vertex: the vertex to find SDRAM size of
+        :param ~pacman.model.graphs.machine.MachineVertex vertex:
+            the vertex to find SDRAM size of
         :return: the SDRAM size for this vertex
         :rtype: int
         """

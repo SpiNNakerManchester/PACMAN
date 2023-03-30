@@ -110,7 +110,8 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """
         Adds the machine vertex to the iterable returned by machine_vertices
 
-        :param MachineVertex machine_vertex: A pointer to a machine_vertex
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+            A pointer to a machine_vertex
         """
         machine_vertex.index = len(self._machine_vertices)
         self._machine_vertices.add(machine_vertex)
@@ -137,9 +138,10 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     def round_n_atoms(self, n_atoms, label="n_atoms"):
         """
-        Utility function to allow suoer-classes to make sure n_atom is an int.
+        Utility function to allow suoer-classes to make sure `n_atoms` is an
+        integer.
 
-        :param n_atoms: Value convertible to int to be used for n_atoms
+        :param n_atoms: Value convertible to int to be used for `n_atoms`
         :type n_atoms: int or float or numpy.
         :return: Number of atoms.
         :rtype: int
@@ -163,7 +165,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """
         The machine vertices that this application vertex maps to.
 
-        :rtype: iterable(MachineVertex)
+        :rtype: iterable(~pacman.model.graphs.machine.MachineVertex)
         """
         return self._machine_vertices
 
@@ -233,11 +235,11 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         this to return `None` and get_fixed_key_and_mask to return not `None`
         iff there is only one machine vertex.
 
-        :param MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
             A source machine vertex of this application vertex
         :param str partition_id:
             The identifier of the partition to get the key for
-        :rtype: BaseKeyAndMask or None
+        :rtype: ~pacman.model.routing_info.BaseKeyAndMask or None
         """
         # pylint: disable=unused-argument
         return None
@@ -250,7 +252,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
         :param str partition_id:
             The identifier of the partition to get the key for
-        :rtype: BaseKeyAndMask or None
+        :rtype: ~pacman.model.routing_info.BaseKeyAndMask or None
         """
         # pylint: disable=unused-argument
         return None
@@ -260,6 +262,9 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         Add an edge incoming to this vertex.  This is ignored by default,
         but could be used to track incoming edges, and/or report faults.
 
-        :param ApplicationEdge edge:
-        :param ApplicationEdgePartition partition:
+        :param ~pacman.model.graphs.application.ApplicationEdge edge:
+            The edge to add.
+        :param partition: The partition to add the edge to.
+        :type partition:
+            ~pacman.model.graphs.application.ApplicationEdgePartition
         """

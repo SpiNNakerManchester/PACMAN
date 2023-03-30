@@ -44,12 +44,14 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
             The connections from one or more FPGAs that that packets are
             expected to be received from for this device, or `None` if no
             incoming traffic is expected from the device
-        :type incoming_fpga_connections: list(FPGAConnection) or None
+        :type incoming_fpga_connections:
+            list(~pacman.model.graphs.application.FPGAConnection) or None
         :param outgoing_fpga_connection:
             The connection to an FPGA that packets to be sent to this device
             should be sent down, or `None` if no outgoing traffic is expected
             to be sent to the device.
-        :type outgoing_fpga_connection: FPGAConnection or None
+        :type outgoing_fpga_connection:
+            ~pacman.model.graphs.application.FPGAConnection or None
         :param str label: The optional name of the vertex.
         """
         # Set variables first as this lets us call properties
