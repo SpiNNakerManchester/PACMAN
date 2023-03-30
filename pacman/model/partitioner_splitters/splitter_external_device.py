@@ -19,8 +19,8 @@ from pacman.model.graphs.application import (
     ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex)
 from pacman.model.graphs.machine import (
     MachineFPGAVertex, MachineSpiNNakerLinkVertex)
-from pacman.exceptions import PacmanConfigurationException,\
-    PacmanNotExistException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanNotExistException)
 
 
 class SplitterExternalDevice(AbstractSplitterCommon):

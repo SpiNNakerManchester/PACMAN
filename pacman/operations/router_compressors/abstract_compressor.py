@@ -54,8 +54,7 @@ class AbstractCompressor(object):
         # create progress bar
         progress = ProgressBar(
             router_tables.routing_tables,
-            "Compressing routing Tables using {}".format(
-                self.__class__.__name__))
+            f"Compressing routing Tables using {self.__class__.__name__}")
         return self.compress_tables(router_tables, progress)
 
     @abstractmethod
@@ -68,7 +67,8 @@ class AbstractCompressor(object):
         """
 
     def compress_tables(self, router_tables, progress):
-        """ Compress all the unordered routing tables
+        """
+        Compress all the unordered routing tables.
 
         Tables who start of smaller than target_length are not compressed
 
@@ -98,8 +98,9 @@ class AbstractCompressor(object):
                     new_table.add_multicast_routing_entry(
                         entry.to_MulticastRoutingEntry())
                 if new_table.number_of_entries > Machine.ROUTER_ENTRIES:
-                    self._problems += "(x:{},y:{})={} ".format(
-                        new_table.x, new_table.y, new_table.number_of_entries)
+                    self._problems += (
+                        f"(x:{new_table.x},y:{new_table.y})="
+                        f"{new_table.number_of_entries} ")
 
             compressed_tables.add_routing_table(new_table)
 
@@ -107,7 +108,7 @@ class AbstractCompressor(object):
             if self._ordered and not self._accept_overflow:
                 raise MinimisationFailedError(
                     "The routing table after compression will still not fit"
-                    " within the machines router: {}".format(self._problems))
+                    f" within the machines router: {self._problems}")
             else:
                 logger.warning(self._problems)
         return compressed_tables

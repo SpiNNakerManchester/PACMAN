@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Neighbour Exploring Routing (NER) algorithm from J. Navaridas et al.
+"""
+Neighbour Exploring Routing (NER) algorithm from J. Navaridas et al.
 
 Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast routing,
 Parallel Computing (2014).
@@ -42,7 +43,8 @@ from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 
 
 def _ner_net(src, destinations, machine, vector_to_nodes):
-    """ Produce a shortest path tree for a given net using NER.
+    """
+    Produce a shortest path tree for a given net using NER.
 
     This is the kernel of the NER algorithm.
 
@@ -129,7 +131,8 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
 
 
 def _do_route(source_xy, post_vertexes, machine, vector_to_nodes):
-    """ Routing algorithm based on Neighbour Exploring Routing (NER).
+    """
+    Routing algorithm based on Neighbour Exploring Routing (NER).
 
     Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
     routing, Parallel Computing (2014).
@@ -160,10 +163,11 @@ def _do_route(source_xy, post_vertexes, machine, vector_to_nodes):
 
 
 def _ner_route(vector_to_nodes):
-    """ Performs routing using rig algorithm
+    """
+    Performs routing using rig algorithm.
 
     :param vector_to_nodes:
-    :return:
+    :return: the routing tables
     :rtype: MulticastRoutingTableByPartition
     """
     routing_tables = MulticastRoutingTableByPartition()
@@ -213,7 +217,8 @@ def _ner_route(vector_to_nodes):
 
 
 def ner_route():
-    """ basic ner router
+    """
+    basic ner router.
 
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition
@@ -222,7 +227,8 @@ def ner_route():
 
 
 def ner_route_traffic_aware():
-    """ traffic-aware ner router
+    """
+    traffic-aware ner router.
 
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition

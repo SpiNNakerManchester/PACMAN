@@ -15,29 +15,35 @@ from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 
 class AbstractSDRAMPartition(object, metaclass=AbstractBase):
-    """ An edge partition that contains SDRAM edges.
+    """
+    An edge partition that contains SDRAM edges.
     """
 
     @abstractmethod
     def total_sdram_requirements(self):
-        """ Get the total SDRAM required by this outgoing partition.
+        """
+        Get the total SDRAM required by this outgoing partition.
 
         :return: int
         """
 
     @abstractmethod
     def get_sdram_base_address_for(self, vertex):
-        """ Get the SDRAM base address for a edge given which side \
-            the vertex is on.
+        """
+        Get the SDRAM base address for a edge given which side
+        the vertex is on.
 
-        :param vertex: the vertex to find SDRAM base address of
+        :param MachineVertex vertex: the vertex to find SDRAM base address of
         :return: the SDRAM address for this vertex
+        :rtype: int
         """
 
     @abstractmethod
     def get_sdram_size_of_region_for(self, vertex):
-        """ Get the size of the region for a vertex given a edge.
+        """
+        Get the size of the region for a vertex given a edge.
 
-        :param vertex: the vertex to find SDRAM size of
+        :param MachineVertex vertex: the vertex to find SDRAM size of
         :return: the SDRAM size for this vertex
+        :rtype: int
         """

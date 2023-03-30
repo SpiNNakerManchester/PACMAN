@@ -116,7 +116,7 @@ class Slice(object):
         This is the width and if available height, depth ect of the Slice/Grid
         as represented as slices form the origin along in that direction.
 
-        :rtype: tuple(slice)
+        :rtype: tuple(slice, ...)
         """
         return (slice(self._lo_atom, self._lo_atom + self._n_atoms), )
 
