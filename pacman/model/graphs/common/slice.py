@@ -113,7 +113,7 @@ class Slice(object):
     def slices(self):
         """ Get slices for every dimension
 
-        :rtype: tuple(slice)
+        :rtype: tuple(slice, ...)
         """
         return (slice(self._lo_atom, self._lo_atom + self._n_atoms), )
 

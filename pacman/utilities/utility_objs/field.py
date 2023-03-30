@@ -22,7 +22,8 @@ class SUPPORTED_TAGS(Enum):
 
 
 class Field(object):
-    """ Field object used in a field constraint for key allocation
+    """
+    Field object used in a field constraint for key allocation.
     """
 
     __slots__ = [
@@ -51,7 +52,8 @@ class Field(object):
 
     @property
     def lo(self):
-        """ the low bit in the routing table entry for this field
+        """
+        The low bit in the routing table entry for this field.
 
         :rtype: int
         """
@@ -59,7 +61,8 @@ class Field(object):
 
     @property
     def hi(self):
-        """ the high bit in the routing table entry for this field
+        """
+        The high bit in the routing table entry for this field.
 
         :rtype: int
         """
@@ -67,7 +70,8 @@ class Field(object):
 
     @property
     def name(self):
-        """ field name
+        """
+        The field name.
 
         :rtype: str or ~uuid.UUID
         """
@@ -79,7 +83,8 @@ class Field(object):
 
     @property
     def value(self):
-        """ the value to store in this field
+        """
+        The value to store in this field.
 
         :rtype: int
         """
@@ -91,7 +96,8 @@ class Field(object):
 
     @property
     def tag(self):
-        """ field tag
+        """
+        The field tag.
 
         :rtype: SUPPORTED_TAGS
         """
@@ -102,8 +108,8 @@ class Field(object):
         self._tag = new_value
 
     def __repr__(self):
-        return "Field(lo={}, hi={}, value={}, tag={}, name={})".format(
-            self.lo, self.hi, self.value, self._value, self._name)
+        return (f"Field(lo={self.lo}, hi={self.hi}, value={self.value}, "
+                f"tag={self._value}, name={self._name})")
 
     def __str__(self):
         return self.__repr__()

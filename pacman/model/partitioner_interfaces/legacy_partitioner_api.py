@@ -19,14 +19,16 @@ from spinn_utilities.abstract_base import (
 # Can't use this decorator: circular import problem
 # @require_subclass(ApplicationVertex)
 class LegacyPartitionerAPI(object, metaclass=AbstractBase):
-    """ API used by the vertices which dont have their own splitters but use\
-        what master did before the self partitioning stuff came to be.
+    """
+    API used by the vertices which dont have their own splitters but use
+    what master did before the self partitioning stuff came to be.
     """
     __slots__ = []
 
     @abstractmethod
     def get_sdram_used_by_atoms(self, vertex_slice):
-        """ Get the separate sdram requirements for a range of atoms.
+        """
+        Get the separate SDRAM requirements for a range of atoms.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the low value of atoms to calculate resources from
@@ -36,12 +38,13 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
     @abstractmethod
     def create_machine_vertex(
             self, vertex_slice, sdram, label=None):
-        """ Create a machine vertex from this application vertex.
+        """
+        Create a machine vertex from this application vertex.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of atoms that the machine vertex will cover.
-        :param ~pacman.model.resourcesAbstractSDRAM sdram:
-            The sdram used by the machine vertex.
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The SDRAM used by the machine vertex.
         :param label: human readable label for the machine vertex
         :type label: str or None
         :return: The created machine vertex
@@ -50,7 +53,8 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
 
     @staticmethod
     def abstract_methods():
-        """ Exposes the abstract methods and properties defined in this class.
+        """
+        Exposes the abstract methods and properties defined in this class.
 
         :rtype frozenset(str)
         """

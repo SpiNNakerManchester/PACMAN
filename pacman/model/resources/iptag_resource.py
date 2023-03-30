@@ -14,8 +14,9 @@
 
 
 class IPtagResource(object):
-    """ Represents the ability to have a SpiNNaker machine send messages to\
-        you during execution.
+    """
+    Represents the ability to have a SpiNNaker machine send messages to
+    you during execution.
     """
 
     __slots__ = [
@@ -48,7 +49,7 @@ class IPtagResource(object):
         :type port: int or None
         :param bool strip_sdp: Whether the tag requires that SDP headers are
             stripped before transmission of data
-        :param tag: A fixed tag ID to assign, or None if any tag is OK
+        :param tag: A fixed tag ID to assign, or `None` if any tag is OK
         :type tag: int or None
         :param str traffic_identifier: The traffic to be sent using this tag;
             traffic with the same traffic_identifier can be sent using
@@ -63,7 +64,8 @@ class IPtagResource(object):
 
     @property
     def ip_address(self):
-        """ The IP address to assign to the tag
+        """
+        The IP address to assign to the tag.
 
         :rtype: str
         """
@@ -71,7 +73,8 @@ class IPtagResource(object):
 
     @property
     def port(self):
-        """ The port of the tag
+        """
+        The port of the tag.
 
         :rtype: int
         """
@@ -79,14 +82,15 @@ class IPtagResource(object):
 
     @property
     def traffic_identifier(self):
-        """ The traffic identifier for this IP tag
-
+        """
+        The traffic identifier for this IP tag.
         """
         return self._traffic_identifier
 
     @property
     def strip_sdp(self):
-        """ Whether SDP headers should be stripped for this tag
+        """
+        Whether SDP headers should be stripped for this tag.
 
         :rtype: bool
         """
@@ -94,7 +98,8 @@ class IPtagResource(object):
 
     @property
     def tag(self):
-        """ The tag required, or None if any tag is OK
+        """
+        The tag required, or `None` if any tag is OK.
 
         :rtype: int or None
         """
@@ -112,14 +117,13 @@ class IPtagResource(object):
 
     def __repr__(self):
         return (
-            "IPTagResource(ip_address={}, port={}, strip_sdp={}, tag={}, "
-            "traffic_identifier={})".format(
-                self._ip_address, self._port, self._strip_sdp, self._tag,
-                self._traffic_identifier))
+            f"IPTagResource(ip_address={self._ip_address}, port={self._port}, "
+            f"strip_sdp={self._strip_sdp}, tag={self._tag}, "
+            f"traffic_identifier={self._traffic_identifier})")
 
     def __eq__(self, other):
         """
-        For unit tests ONLY so __hash__ and __eq__ pairing not done!
+        For unit tests *only* so __hash__ and __eq__ pairing not done!
         """
         return (self._ip_address == other._ip_address and
                 self._port == other._port and

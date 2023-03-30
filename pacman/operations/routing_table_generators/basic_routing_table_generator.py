@@ -21,7 +21,7 @@ from pacman.model.routing_tables import (
 
 def basic_routing_table_generator():
     """
-     An basic algorithm that can produce routing tables
+    An basic algorithm that can produce routing tables.
 
     :rtype: MulticastRoutingTables
     """

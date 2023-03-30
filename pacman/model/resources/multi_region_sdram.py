@@ -18,10 +18,11 @@ from spinn_utilities.overrides import overrides
 
 
 class MultiRegionSDRAM(VariableSDRAM):
-    """ A resource for SDRAM that comes in regions
+    """
+    A resource for SDRAM that comes in regions.
 
-    .. note:
-        Adding or Subtracting two MultiRegionSDRAM objects will be assumed to
+    .. note::
+        Adding or subtracting two MultiRegionSDRAM objects will be assumed to
         be an operation over multiple cores/placements so these functions
         return a VariableSDRAM object without the regions data.
 
@@ -40,10 +41,16 @@ class MultiRegionSDRAM(VariableSDRAM):
 
     @property
     def regions(self):
+        """
+        The map from region identifiers to the to the amount of SDRAM required.
+
+        :rtype: dict(int or str or enum, AbstractSDRAM)
+        """
         return self.__regions
 
     def add_cost(self, region, fixed_sdram, per_timestep_sdram=0):
-        """ Adds the cost for the specified region
+        """
+        Adds the cost for the specified region.
 
         :param region: Key to identify the region
         :type region: int or str or enum
@@ -52,9 +59,8 @@ class MultiRegionSDRAM(VariableSDRAM):
         :param per_timestep_sdram: The variable cost for this region is any
         :type per_timestep_sdram: int or numpy.integer
         """
-        self._fixed_sdram = self._fixed_sdram + fixed_sdram
-        self._per_timestep_sdram = \
-            self._per_timestep_sdram + per_timestep_sdram
+        self._fixed_sdram += fixed_sdram
+        self._per_timestep_sdram += per_timestep_sdram
         if per_timestep_sdram:
             sdram = VariableSDRAM(int(fixed_sdram), int(per_timestep_sdram))
         else:
@@ -65,7 +71,8 @@ class MultiRegionSDRAM(VariableSDRAM):
             self.__regions[region] = sdram
 
     def nest(self, region, other):
-        """ Combines the other SDRAM cost, in a nested fashion.
+        """
+        Combines the other SDRAM cost, in a nested fashion.
 
         The totals for the new region are added to the total of this one.
         A new region is created summarising the cost of others.
@@ -74,12 +81,11 @@ class MultiRegionSDRAM(VariableSDRAM):
 
         :param region: Key to identify the summary region
         :type region: int or str or enum
-        :param AbstractSDRAM other: Another SDRAM model to make combine by
-            nesting
+        :param AbstractSDRAM other:
+            Another SDRAM model to make combine by nesting
         """
-        self._fixed_sdram = self._fixed_sdram + other.fixed
-        self._per_timestep_sdram = \
-            self._per_timestep_sdram + other.per_timestep
+        self._fixed_sdram += other.fixed
+        self._per_timestep_sdram += other.per_timestep
         if region in self.__regions:
             if isinstance(other, MultiRegionSDRAM):
                 if isinstance(self.__regions[region], MultiRegionSDRAM):
@@ -94,17 +100,17 @@ class MultiRegionSDRAM(VariableSDRAM):
             self.__regions[region] = other
 
     def merge(self, other):
-        """ Combines the other SDRAM costs keeping the region mappings
+        """
+        Combines the other SDRAM costs keeping the region mappings.
 
-        .. note:
+        .. note::
             This method should only be called when combining cost for the same
             core/ placement. Use + to combine for different cores
 
         :param MultiRegionSDRAM other: Another mapping of costs by region
         """
-        self._fixed_sdram = self._fixed_sdram + other.fixed
-        self._per_timestep_sdram = \
-            self._per_timestep_sdram + other.per_timestep
+        self._fixed_sdram += other.fixed
+        self._per_timestep_sdram += other.per_timestep
         for region in other.regions:
             if region in self.regions:
                 self.__regions[region] += other.regions[region]

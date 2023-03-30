@@ -19,7 +19,8 @@ from .application_virtual_vertex import ApplicationVirtualVertex
 
 
 class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
-    """ A virtual application vertex on a SpiNNaker Link.
+    """
+    A virtual application vertex on a SpiNNaker Link.
     """
 
     __slots__ = [
@@ -57,15 +58,18 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
 
     @property
     def spinnaker_link_id(self):
-        """ The SpiNNaker link to which this device is connected
+        """
+        The SpiNNaker link to which this device is connected.
+
         :rtype: int
         """
         return self._spinnaker_link_id
 
     @property
     def board_address(self):
-        """ The board to which this device is connected, or None for the
-            default board
+        """
+        The board to which this device is connected, or `None` for the
+        default board.
 
         :rtype: str or None
         """
@@ -73,14 +77,16 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
 
     @property
     def n_machine_vertices(self):
-        """ The number of machine vertices to create
+        """
+        The number of machine vertices to create.
 
         :rtype: int
         """
         return self._n_machine_vertices
 
     def get_incoming_slice(self, index):
-        """ Get the slice to be given to the connection
+        """
+        Get the slice to be given to the connection.
 
         :param int index:
             The index of the connection, for when n_machine_vertices > 1
@@ -95,7 +101,8 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         return Slice(low_atom, hi_atom)
 
     def get_outgoing_slice(self):
-        """ Get the slice to be given to the outgoing connection
+        """
+        Get the slice to be given to the outgoing connection.
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
