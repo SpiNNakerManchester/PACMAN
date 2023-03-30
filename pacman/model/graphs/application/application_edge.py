@@ -34,16 +34,12 @@ class ApplicationEdge(AbstractEdge):
 
     def __init__(self, pre_vertex, post_vertex, label=None):
         """
-        :param ApplicationVertex pre_vertex:
+        :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:
             The application vertex at the start of the edge.
-        :param ApplicationVertex post_vertex:
+        :param ~pacman.model.graphs.application.ApplicationVertex post_vertex:
             The application vertex at the end of the edge.
         :param label: The name of the edge.
         :type label: str or None
-        :param machine_edge_type:
-            The type of machine edges made from this app edge. If ``None``,
-            standard machine edges will be made.
-        :type machine_edge_type: type(MachineEdge)
         """
         self._label = label
         self._pre_vertex = pre_vertex

@@ -39,12 +39,14 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
             The connections from one or more FPGAs that that packets are
             expected to be received from for this device, or `None` if no
             incoming traffic is expected from the device
-        :type incoming_fpga_connections: list(FPGAConnection) or None
+        :type incoming_fpga_connections:
+            list(~pacman.model.graphs.application.FPGAConnection) or None
         :param outgoing_fpga_connection:
             The connection to an FPGA that packets to be sent to this device
             should be sent down, or `None` if no outgoing traffic is expected
             to be sent to the device.
-        :type outgoing_fpga_connection: FPGAConnection or None
+        :type outgoing_fpga_connection:
+            ~pacman.model.graphs.application.FPGAConnection or None
         :param str label: The optional name of the vertex.
         :param int n_machine_vertices_per_link:
             The optional number of machine vertices to create for each FPGA
@@ -81,11 +83,11 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         """
         Get the slice to be given to the connection from the given link.
 
-        :param FPGAConnection link: The FPGA connection to get the slice for
+        :param ~pacman.model.graphs.application.FPGAConnection link:
+            The FPGA connection to get the slice for
         :param int index:
             The index of the connection on the FGPA link, for when
             n_machine_vertices_per_link > 1
-
         :rtype: ~pacman.model.graphs.common.Slice
         """
         # pylint: disable=unused-argument
@@ -109,7 +111,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         The connections from one or more FPGAs that packets are expected
         to be received from for this device.
 
-        :rtype: iter(FPGAConnection)
+        :rtype: iterable(~pacman.model.graphs.application.FPGAConnection)
         """
         if self._incoming_fpga_connections:
             for conn in self._incoming_fpga_connections:
@@ -121,7 +123,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         The connection to one FPGA via one link to which packets are sent
         to this device.
 
-        :rtype: FPGAConnection or None
+        :rtype: ~pacman.model.graphs.application.FPGAConnection or None
         """
         return self._outgoing_fpga_connection
 
