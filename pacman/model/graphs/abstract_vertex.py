@@ -80,7 +80,7 @@ class AbstractVertex(object):
 
         Used instead of `ChipAndCoreConstraint`.
 
-        :rtype: None or ChipAndCore
+        :rtype: None or ~pacman.model.graphs.common.ChipAndCore
         """
         return self._fixed_location
 
