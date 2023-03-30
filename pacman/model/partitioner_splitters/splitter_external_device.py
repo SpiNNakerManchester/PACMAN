@@ -24,6 +24,9 @@ from pacman.exceptions import (
 
 
 class SplitterExternalDevice(AbstractSplitterCommon):
+    """
+    A splitter for handling external devices.
+    """
 
     __slots__ = [
         # Machine vertices that will send packets into the network
@@ -35,6 +38,13 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         # Slice of outgoing vertex (which really doesn't matter here)
         "__outgoing_slice"
     ]
+
+    def __init__(self):
+        super().__init__()
+        self.__incoming_vertices = list()
+        self.__incoming_slices = list()
+        self.__outgoing_vertex = None
+        self.__outgoing_slice = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):

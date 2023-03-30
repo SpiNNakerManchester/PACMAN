@@ -49,11 +49,10 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         """
         Add an edge to the edge partition.
 
-        :param AbstractEdge edge: the edge to add
+        :param ~pacman.model.graphs.AbstractEdge edge: the edge to add
         :raises PacmanInvalidParameterException:
             If the edge does not belong in this edge partition
         """
-
         # Check for an incompatible edge
         if not isinstance(edge, self._allowed_edge_types):
             raise PacmanInvalidParameterException(
@@ -82,7 +81,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
             The order in which the edges are added is preserved for when they
             are requested later. If not, please talk to the software team.
 
-        :rtype: iterable(AbstractEdge)
+        :rtype: iterable(~pacman.model.graphs.AbstractEdge)
         """
         return self._edges
 
@@ -106,7 +105,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         """
         Check if the edge is contained within this partition.
 
-        :param AbstractEdge edge: the edge to search for.
+        :param ~pacman.model.graphs.AbstractEdge edge: the edge to search for.
         :rtype: bool
         """
         return edge in self._edges
@@ -121,5 +120,5 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
             :py:class:`AbstractSingleSourcePartition`
             and therefore provide the ``pre_vertex`` method.
 
-        :rtype: iter(AbstractVertex)
+        :rtype: iterable(~pacman.model.graphs.AbstractVertex)
         """

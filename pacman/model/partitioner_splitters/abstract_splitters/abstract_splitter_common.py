@@ -56,7 +56,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         The app vertex to be governed by this splitter object.
         If `None`, not yet set.
 
-        :rtype: ApplicationVertex
+        :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
         return self._governed_app_vertex
 
@@ -65,7 +65,8 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         Sets a app vertex to be governed by this splitter object.
         Once set it can't be reset.
 
-        :param ApplicationVertex app_vertex: the app vertex to govern
+        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+            the app vertex to govern
         :raises PacmanConfigurationException:
             if the app vertex has already been set.
         """
@@ -83,7 +84,8 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         """
         Method for specific splitter objects to override.
 
-        :param ChipCounter chip_counter: counter of used chips
+        :param ~pacman.utilities.utility_objs.ChipCounter chip_counter:
+            counter of used chips
         """
 
     @abstractmethod
@@ -113,7 +115,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         for external edges.
 
         :param str partition_id: The identifier of the outgoing partition
-        :rtype: list(MachineVertex)
+        :rtype: list(~pacman.model.graphs.machine.MachineVertex)
         """
 
     @abstractmethod
@@ -129,7 +131,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
             for any source machine vertex in the given partition.
 
         :param str partition_id: The identifier of the incoming partition
-        :rtype: list(MachineVertex)
+        :rtype: list(~pacman.model.graphs.machine.MachineVertex)
         """
 
     def get_source_specific_in_coming_vertices(
@@ -148,13 +150,14 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         This should be overridden if there are specific machine vertices for
         any given source vertex.
 
-        :param ApplicationVertex source_vertex:
-            The source to get incoming vertices for
+        :param source_vertex: The source to get incoming vertices for
+        :type source_vertex: ~pacman.model.graphs.application.ApplicationVertex
         :param str partition_id: The identifier of the incoming partition
         :return: A list of tuples of (target machine vertex, list of source
             machine or application vertices that should hit the target)
-        :rtype: list(tuple(MachineVertex,
-                     list(MachineVertex or ApplicationVertex)))
+        :rtype: list(tuple(~pacman.model.graphs.machine.MachineVertex,
+            list(~pacman.model.graphs.machine.MachineVertex or
+            ~pacman.model.graphs.application.ApplicationVertex)))
         """
         return [(m_vertex, [source_vertex])
                 for m_vertex in self.get_in_coming_vertices(partition_id)]
@@ -182,7 +185,8 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         machine vertex and its SDRAM; override if there are groups of
         machine vertices on the same chip.
 
-        :rtype: list(list(MachineVertex), AbstractSDRAM)
+        :rtype: list(list(~pacman.model.graphs.machine.MachineVertex),
+            ~pacman.model.resources.AbstractSDRAM)
         """
         return [([v], v.sdram_required)
                 for v in self._governed_app_vertex.machine_vertices]
@@ -193,7 +197,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         handled by Multicast.  Returns empty by default, override if there
         are Multicast connections between internal vertices
 
-        :rtype: list(MulticastEdgePartition)
+        :rtype: list(~pacman.model.graphs.machine.MulticastEdgePartition)
         """
         return []
 
@@ -203,6 +207,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         handled by SDRAM.  Returns empty by default, override if there
         are SDRAM connections between internal vertices
 
-        :rtype: list(AbstractSDRAMPartition)
+        :rtype: list(~pacman.model.graphs.machine.AbstractSDRAMPartition)
         """
         return []
