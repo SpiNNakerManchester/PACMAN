@@ -18,9 +18,10 @@ from .application_edge import ApplicationEdge
 
 
 class ApplicationEdgePartition(AbstractSingleSourcePartition):
-    """ A simple implementation of an application edge partition that will\
-        communicate using SpiNNaker multicast packets. They have the same \
-        source(s) and semantics and so can share a single key.
+    """
+    A simple implementation of an application edge partition that will
+    communicate using SpiNNaker multicast packets. They have the same
+    source(s) and semantics and so can share a single key.
     """
 
     __slots__ = ()

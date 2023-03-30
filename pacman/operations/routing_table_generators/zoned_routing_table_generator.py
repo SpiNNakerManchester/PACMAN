@@ -48,7 +48,8 @@ class SharedEntry(object):
 
 
 class ZonedRoutingTableGenerator(object):
-    """ An algorithm that can produce routing tables in zones
+    """
+    An algorithm that can produce routing tables in zones.
     """
 
     __slots__ = []

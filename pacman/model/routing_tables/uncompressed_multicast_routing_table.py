@@ -25,7 +25,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
-    """ Represents a uncompressed routing table for a chip.
+    """
+    Represents a uncompressed routing table for a chip.
     """
 
     __slots__ = [
@@ -67,11 +68,11 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
                 self.add_multicast_routing_entry(multicast_routing_entry)
 
     def add_multicast_routing_entry(self, multicast_routing_entry):
-        """ Adds a routing entry to this table
+        """
+        Adds a routing entry to this table.
 
         :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
             The route to add
-        :rtype: None
         :raise PacmanAlreadyExistsException:
             If a routing entry with the same key-mask combination already
             exists
@@ -99,49 +100,26 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     @property
     @overrides(AbstractMulticastRoutingTable.x)
     def x(self):
-        """ The x-coordinate of the chip of this table
-
-        :rtype: int
-        """
         return self._x
 
     @property
     @overrides(AbstractMulticastRoutingTable.y)
     def y(self):
-        """ The y-coordinate of the chip of this table
-
-        :rtype: int
-        """
         return self._y
 
     @property
     @overrides(AbstractMulticastRoutingTable.multicast_routing_entries)
     def multicast_routing_entries(self):
-        """ The multicast routing entries in the table
-
-        :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
-        :raise None: does not raise any known exceptions
-        """
         return self._entries_by_key_mask.values()
 
     @property
     @overrides(AbstractMulticastRoutingTable.number_of_entries)
     def number_of_entries(self):
-        """ The number of multicast routing entries there are in the\
-            multicast routing table
-
-        :rtype: int
-        """
         return len(self._entries_by_key_mask)
 
     @property
     @overrides(AbstractMulticastRoutingTable.number_of_defaultable_entries)
     def number_of_defaultable_entries(self):
-        """ The number of multicast routing entries that are set to be\
-            defaultable within this multicast routing table
-
-        :rtype: int
-        """
         return self._number_of_defaulted_routing_entries
 
     @overrides(AbstractMulticastRoutingTable.__eq__)
@@ -160,8 +138,8 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     def __repr__(self):
         entry_string = ""
         for entry in self.multicast_routing_entries:
-            entry_string += "{}\n".format(entry)
-        return "{}:{}\n\n{}".format(self._x, self._y, entry_string)
+            entry_string += f"{entry}\n"
+        return f"{self._x}:{self._y}\n\n{entry_string}"
 
     @overrides(AbstractMulticastRoutingTable.__hash__)
     def __hash__(self):

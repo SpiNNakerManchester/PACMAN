@@ -14,7 +14,8 @@
 
 
 class Placement(object):
-    """ The placement of a vertex on to a machine chip and core.
+    """
+    The placement of a vertex on to a machine chip and core.
     """
 
     __slots__ = [
@@ -51,7 +52,8 @@ class Placement(object):
 
     @property
     def vertex(self):
-        """ The vertex that was placed
+        """
+        The vertex that was placed.
 
         :rtype: MachineVertex
         """
@@ -59,7 +61,8 @@ class Placement(object):
 
     @property
     def x(self):
-        """ The x-coordinate of the chip where the vertex is placed
+        """
+        The X-coordinate of the chip where the vertex is placed.
 
         :rtype: int
         """
@@ -67,7 +70,8 @@ class Placement(object):
 
     @property
     def y(self):
-        """ The y-coordinate of the chip where the vertex is placed
+        """
+        The Y-coordinate of the chip where the vertex is placed.
 
         :rtype: int
         """
@@ -75,7 +79,8 @@ class Placement(object):
 
     @property
     def p(self):
-        """ The ID of the processor of the chip where the vertex is placed
+        """
+        The ID of the processor of the chip where the vertex is placed.
 
         :rtype: int
         """
@@ -83,7 +88,8 @@ class Placement(object):
 
     @property
     def location(self):
-        """ The (x,y,p) tuple that represents the location of this placement.
+        """
+        The (x,y,p) tuple that represents the location of this placement.
 
         :rtype: tuple(int,int,int)
         """
@@ -91,7 +97,8 @@ class Placement(object):
 
     @property
     def xy(self):
-        """ The (x,y) tuple that represents the chip of this placement.
+        """
+        The (x,y) tuple that represents the chip of this placement.
 
         :rtype: tuple(int,int)
         """
@@ -110,5 +117,5 @@ class Placement(object):
         return not self.__eq__(other)
 
     def __repr__(self):
-        return "Placement(vertex={}, x={}, y={}, p={})".format(
-            self._vertex, self._x, self._y, self._p)
+        return (f"Placement(vertex={self._vertex}, "
+                f"x={self._x}, y={self._y}, p={self._p})")

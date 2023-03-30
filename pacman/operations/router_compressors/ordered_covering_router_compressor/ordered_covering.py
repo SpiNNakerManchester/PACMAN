@@ -25,7 +25,8 @@ from spinn_utilities.timer import Timer
 def minimise(
         routing_table, use_timer_cut_off=False,
         time_to_run_for_before_raising_exception=None):
-    """Reduce the size of a routing table by merging together entries where \
+    """
+    Reduce the size of a routing table by merging together entries where
     possible and by removing any remaining default routes.
 
     .. warning::
@@ -72,7 +73,8 @@ def minimise(
 def ordered_covering(
         routing_table, target_length, aliases=None, no_raise=False,
         use_timer_cut_off=False, time_to_run_for=None):
-    """Reduce the size of a routing table by merging together entries where
+    """
+    Reduce the size of a routing table by merging together entries where
     possible.
 
     .. warning::
@@ -94,7 +96,7 @@ def ordered_covering(
     :param target_length:
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
-        possible. If None then the table will be made as small as possible.
+        possible. If `None` then the table will be made as small as possible.
     :type target_length: int or None
     :param aliases:
         Dictionary of which keys and masks in the routing table are
@@ -107,8 +109,8 @@ def ordered_covering(
     :param bool no_raise:
         If False (the default) then an error will be raised if the table cannot
         be minimised to be smaller than `target_length` and `target_length` is
-        not None. If True then a table will be returned regardless of the size
-        of the final table.
+        not `None`. If True then a table will be returned regardless of the
+        size of the final table.
     :return: new routing table, A new aliases dictionary.
     :rtype: tuple(list(Entry), dict(tuple(int,int), set(tuple(int,int))))
     :raises MinimisationFailedError:
@@ -160,7 +162,8 @@ def ordered_covering(
 
 
 def get_generality(key, mask):
-    """Count the number of Xs in the key-mask pair.
+    """
+    Count the number of Xs in the key-mask pair.
 
     For example, there are 32 Xs in ``0x00000000/0x00000000``::
 
@@ -224,7 +227,8 @@ def _get_best_merge(routing_table, aliases):
 
 
 def _get_all_merges(routing_table):
-    """ Get possible sets of entries to merge.
+    """
+    Get possible sets of entries to merge.
 
     :param Entry routing_table: Routing entries to be merged.
     :rtype: iterable(_Merge)
@@ -254,8 +258,9 @@ def _get_all_merges(routing_table):
 
 
 def _get_insertion_index(routing_table, generality):
-    """ Determine the index in the routing table where a new entry should be
-        inserted.
+    """
+    Determine the index in the routing table where a new entry should be
+    inserted.
 
     :param Entry routing_table: Routing entries to be merged.
     :param int generality:
@@ -292,7 +297,9 @@ def _get_insertion_index(routing_table, generality):
 
 
 class _Merge(object):
-    """Represents a potential merge of routing table entries. """
+    """
+    Represents a potential merge of routing table entries.
+    """
 
     _slots__ = [
         # Reference to the routing table against which the merge is defined.
@@ -416,7 +423,8 @@ class _Merge(object):
 
 
 def _refine_merge(merge, aliases, min_goodness):
-    """ Remove entries from a merge to generate a valid merge which may be
+    """
+    Remove entries from a merge to generate a valid merge which may be
     applied to the routing table.
 
     :param _Merge merge: Initial merge to refine.
