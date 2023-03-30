@@ -45,7 +45,7 @@ class AbstractSingleSourcePartition(
         """
         The vertex at which all edges in this outgoing edge partition start.
 
-        :rtype: AbstractVertex
+        :rtype: ~pacman.model.graphs.AbstractVertex
         """
         return self._pre_vertex
 

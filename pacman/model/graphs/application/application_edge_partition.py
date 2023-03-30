@@ -29,7 +29,8 @@ class ApplicationEdgePartition(AbstractSingleSourcePartition):
     def __init__(self, identifier, pre_vertex):
         """
         :param str identifier: The identifier of the partition
-        :param ApplicationVertex pre_vertex: The source of this partition
+        :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:
+            The source of this partition
         """
         super().__init__(
             pre_vertex=pre_vertex, identifier=identifier,
