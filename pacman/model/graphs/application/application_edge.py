@@ -17,7 +17,8 @@ from pacman.model.graphs import AbstractEdge
 
 
 class ApplicationEdge(AbstractEdge):
-    """ A simple implementation of an application edge.
+    """
+    A simple implementation of an application edge.
     """
 
     __slots__ = [
@@ -31,8 +32,7 @@ class ApplicationEdge(AbstractEdge):
         "_label"
     ]
 
-    def __init__(
-            self, pre_vertex, post_vertex, label=None):
+    def __init__(self, pre_vertex, post_vertex, label=None):
         """
         :param ApplicationVertex pre_vertex:
             The application vertex at the start of the edge.

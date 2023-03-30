@@ -17,7 +17,8 @@ from pacman.model.graphs.common import ChipAndCore
 
 
 class AbstractVertex(object):
-    """ A vertex in a graph.
+    """
+    A vertex in a graph.
     """
 
     __slots__ = [
@@ -32,9 +33,6 @@ class AbstractVertex(object):
     def __init__(self, label=None):
         """
         :param str label: The optional name of the vertex
-        :param fixed_location:
-            The optional fixed location of the vertex.
-            Only if the Vertex is fixed before placement.
         """
         self._label = label
         self._added_to_graph = False
@@ -42,7 +40,8 @@ class AbstractVertex(object):
 
     @property
     def label(self):
-        """ The current label to the vertex.
+        """
+        The current label to the vertex.
 
         This label could change when the vertex is added to the graph.
 
@@ -51,7 +50,8 @@ class AbstractVertex(object):
         return self._label
 
     def set_label(self, label):
-        """ Changes the label for a vertex *not yet added* to a graph.
+        """
+        Changes the label for a vertex *not yet added* to a graph.
 
         :param str label: new value for the label
         :raises PacmanConfigurationException:
@@ -64,7 +64,8 @@ class AbstractVertex(object):
         self._label = label
 
     def addedToGraph(self):
-        """ Records that the vertex has been added to a graph
+        """
+        Records that the vertex has been added to a graph.
 
         :raises PacmanConfigurationException:
             If there is an attempt to add the same vertex more than once
@@ -73,11 +74,11 @@ class AbstractVertex(object):
 
     def get_fixed_location(self):
         """
-        The x, y and possibly p the vertex MUST be placed on.
+        The x, y and possibly p the vertex *must* be placed on.
 
-        Typically NONE! Does not have the value of a normal placememts.
+        Typically `None`! Does not have the value of a normal placements.
 
-        Used instead of ChipAndCoreConstraint
+        Used instead of `ChipAndCoreConstraint`.
 
         :rtype: None or ChipAndCore
         """
@@ -85,8 +86,16 @@ class AbstractVertex(object):
 
     def set_fixed_location(self, x, y, p=None):
         """
+        Set the location where the vertex must be placed.
 
-        :param ChipAndCore fixed_location:
+        .. note::
+            If called, must be called prior to the placement algorithms.
+
+        :param int x: X coordinate of fixed location
+        :param int y: Y coordinate of fixed location
+        :param int p: Processor ID of fixed location
+        :raises PacmanConfigurationException:
+            If a fixed location has already been set to a different location.
         """
         fixed_location = ChipAndCore(x, y, p)
         if self._fixed_location is not None:

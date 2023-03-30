@@ -21,8 +21,9 @@ from pacman.model.graphs.machine import (
 
 class SourceSegmentedSDRAMMachinePartition(
         AbstractMultiplePartition, AbstractSDRAMPartition):
-    """ An SDRAM partition that gives each edge its own slice of memory from a\
-        contiguous block. The edges all have the same destination vertex.
+    """
+    An SDRAM partition that gives each edge its own slice of memory from a
+    contiguous block. The edges all have the same destination vertex.
     """
     __slots__ = [
         "_sdram_base_address",
@@ -58,13 +59,13 @@ class SourceSegmentedSDRAMMachinePartition(
         if len(self._destinations):
             if edge.post_vertex not in self._destinations:
                 raise PacmanConfigurationException(
-                    "The {} can only support 1 destination vertex".format(
-                        self.__class__.__name__))
+                    f"The {self.__class__.__name__} can only support "
+                    "1 destination vertex")
         try:
             if len(self._pre_vertices[edge.pre_vertex]) != 0:
                 raise PacmanConfigurationException(
                     f"The {self.__class__.__name__} only supports 1 edge from "
-                    f"a given pre vertex.")
+                    "a given pre vertex.")
         except KeyError as ex:
             raise PacmanConfigurationException(
                 "Edge pre_vertex is not a Partition. pre vertex") from ex

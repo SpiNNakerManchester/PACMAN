@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" A collection of methods which support partitioning algorithms.
+"""
+A collection of methods which support partitioning algorithms.
 """
 
 import math
@@ -20,11 +21,14 @@ from pacman.model.graphs.common import Slice
 
 
 def get_multidimensional_slices(app_vertex):
-    """ Get the multi-dimensional slices of an application vertex
-        such that each is sized to the maximum atoms per dimension per core
-        except the last which might be smaller in one or more dimensions
+    """
+    Get the multi-dimensional slices of an application vertex
+    such that each is sized to the maximum atoms per dimension per core
+    except the last, which might be smaller in one or more dimensions.
 
     :param ApplicationVertex app_vertex: The vertex to get the slices of
+    :return: The slices
+    :rtype: list(~pacman.model.graphs.common.Slice)
     """
     # If there is only one slice, get that
     if app_vertex.n_atoms < app_vertex.get_max_atoms_per_core():

@@ -19,7 +19,8 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/utils.py
 
 
 def intersect(key_a, mask_a, key_b, mask_b):
-    """Return if key-mask pairs intersect (i.e., would both match some of the
+    """
+    Return if key-mask pairs intersect (i.e., would both match some of the
     same keys).
 
     For example, the key-mask pairs ``00XX`` and ``001X`` both match the keys
