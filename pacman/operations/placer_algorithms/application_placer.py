@@ -518,7 +518,7 @@ class _ChipWithSpace(object):
         self.cores = set(p.processor_id for p in chip.processors
                          if not p.is_monitor)
         self.cores -= used_processors
-        self.sdram = chip.sdram.size - used_sdram
+        self.sdram = chip.sdram - used_sdram
 
     @property
     def x(self):
