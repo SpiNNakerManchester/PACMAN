@@ -14,20 +14,40 @@
 
 # Our abbreviations/names
 SDP
-pacman
 
 # Our types
 AbstractEdge
 ApplicationEdge
 MachineEdge
+SDRAMMachineEdge
 AbstractEdgePartition
+AbstractSingleSourcePartition
 ApplicationEdgePartition
 MulticastEdgePartition
+AbstractSDRAMPartition
 AbstractVertex
 ApplicationVertex
 MachineVertex
 MulticastRoutingTable
 FPGAConnection
+ValidationError
+IPtagResource
+ReverseIPtagResource
+AbstractSDRAM
+BaseKeyAndMask
+RoutingInfo
+RoutingTree
+PlacementTuple
+
+# Python packages
+io
+sys
+pacman
+jsonschema
+
+# Others' types
+FileIO
 
 # Our special words
 defaultable
+reorderable
