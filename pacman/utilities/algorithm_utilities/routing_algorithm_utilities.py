@@ -337,7 +337,7 @@ def convert_a_route(
         incoming_link, route, targets_by_chip):
     """
     Converts the algorithm specific partition_route back to standard SpiNNaker
-    and ands it to the routing_tables.
+    and adds it to the `routing_tables`.
 
     :param MulticastRoutingTableByPartition routing_tables:
         SpiNNaker-format routing tables
