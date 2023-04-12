@@ -55,7 +55,7 @@ class FPGAConnection(NamedTuple):
         Get a list of concrete FPGA connections,
         where fpga_id and fpga_link_id are not `None`.
 
-        :rtype: iter(FPGAConnection)
+        :rtype: iterable(FPGAConnection)
         """
         ids = [self.fpga_id] if self.fpga_id is not None else FPGA_IDS
         links = ([self.fpga_link_id] if self.fpga_link_id is not None

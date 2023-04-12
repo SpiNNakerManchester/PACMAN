@@ -138,13 +138,15 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     def round_n_atoms(self, n_atoms, label="n_atoms"):
         """
-        Utility function to allow suoer-classes to make sure `n_atoms` is an
+        Utility function to allow suoerclasses to make sure `n_atoms` is an
         integer.
 
         :param n_atoms: Value convertible to int to be used for `n_atoms`
         :type n_atoms: int or float or numpy.
         :return: Number of atoms.
         :rtype: int
+        :raises PacmanInvalidParameterException:
+            If the value cannot be safely converted to an integer
         """
         if isinstance(n_atoms, int):
             return n_atoms

@@ -27,7 +27,7 @@ from spinn_utilities.progress_bar import ProgressBar
 
 class _Targets(object):
     """
-    A set of targets to be added to a route on a chip(xy).
+    A set of targets to be added to a route on a chip at coordinates (x,y).
     """
     __slots__ = ["__targets_by_source"]
 
@@ -544,7 +544,7 @@ def _find_target_xy(target_xys, routes, source_mappings):
 
 def _get_outgoing_mapping(app_vertex, partition_id):
     """
-    Gets a Mapping from xy sources to a list of (vertex, the vertex,
+    Gets a Mapping from x,y sources to a list of (vertex, the vertex,
     processor and link to follow to get to the vertex.
 
     For each tuple in the list either processor or link will be `None`.
@@ -568,7 +568,7 @@ def _get_outgoing_mapping(app_vertex, partition_id):
 
 def _get_all_xys(app_vertex):
     """
-    Gets the list of all the xy coordinates the vertexes machine vertices
+    Gets the list of all the x,y coordinates that the vertex's machine vertices
     are placed on.
 
     :param app_vertex:
@@ -659,10 +659,10 @@ def _find_reachable(source_xy, machine, allowed_xys, disallowed_xys):
 def _is_open_chip(xy, xys, visited, machine):
     """
     :param tuple(int, int) xy:
-    :param list(tuple(int, int) xys: List of legal xys
+    :param list(tuple(int, int) xys: List of legal coordinates
     :param set(tuple(int, int) visited:
     :param machine:
-    :return: True if the cooridnates point to an existing Chip not yet visited
+    :return: True if the coordinates point to an existing Chip not yet visited
     """
     return xy in xys and xy not in visited and machine.is_chip_at(*xy)
 
@@ -678,7 +678,7 @@ def _route_pre_to_post(
     :param str label:
     :param set(tuple(int, int)) all_source_xy:
     :param  set(tuple(int, int)) target_xys:
-    :return: the pre and post xy coordinates
+    :return: the pre- and post-vertex coordinates
     :rtype: tuple(tuple(int,int), tuple(int, int))
     """
     # Find a route from source to target
@@ -859,8 +859,8 @@ def _convert_a_route(
         If true, targets for the given source_vertex will be requested;
         If false all targets for matching chips will be used.
     :param bool ensure_all_source:
-        If true, ensures that all machine vertices of the source app vertex
-        are covered in routes that continue forward
+        If true, ensures that all machine vertices of the source application
+        vertex are covered in routes that continue forward
     """
 
     to_process = [(first_incoming_processor, first_incoming_link, first_route)]

@@ -30,7 +30,7 @@ ApplicationVertex
 MachineVertex
 MulticastRoutingTable
 FPGAConnection
-ValidationError
+IPTag
 IPtagResource
 ReverseIPtagResource
 AbstractSDRAM
@@ -38,6 +38,9 @@ BaseKeyAndMask
 RoutingInfo
 RoutingTree
 PlacementTuple
+
+ValidationError
+PacmanAlreadyExistsException
 
 # Python packages
 io
@@ -51,3 +54,5 @@ FileIO
 # Our special words
 defaultable
 reorderable
+mergable
+timestep
