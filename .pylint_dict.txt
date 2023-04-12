@@ -38,6 +38,7 @@ BaseKeyAndMask
 RoutingInfo
 RoutingTree
 PlacementTuple
+ChipAndCore
 
 ValidationError
 PacmanAlreadyExistsException
@@ -56,3 +57,5 @@ defaultable
 reorderable
 mergable
 timestep
+timesteps
+sdram

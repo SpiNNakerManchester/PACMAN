@@ -138,7 +138,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
     def round_n_atoms(self, n_atoms, label="n_atoms"):
         """
-        Utility function to allow suoerclasses to make sure `n_atoms` is an
+        Utility function to allow superclasses to make sure `n_atoms` is an
         integer.
 
         :param n_atoms: Value convertible to int to be used for `n_atoms`
@@ -230,12 +230,14 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
     def get_machine_fixed_key_and_mask(self, machine_vertex, partition_id):
         """
         Get a fixed key and mask for the given machine vertex and partition
-        identifier, or `None` if not fixed (the default).  If this doesn't
-        return `None`, get_fixed_key_and_mask must also not return `None`,
+        identifier, or `None` if not fixed (the default).
+
+        If this doesn't return `None`, :py:meth:`get_fixed_key_and_mask`
+        must also not return `None`,
         and the keys returned here must align with those such that for each
-        key:mask returned here, key & app_mask == app_key.  It is OK for
-        this to return `None` and get_fixed_key_and_mask to return not `None`
-        iff there is only one machine vertex.
+        ``key:mask`` returned here, ``key & app_mask == app_key``.  It is OK
+        for this to return `None` and :py:meth:`get_fixed_key_and_mask` to
+        return non-`None` if and only if there is only one machine vertex.
 
         :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
             A source machine vertex of this application vertex
