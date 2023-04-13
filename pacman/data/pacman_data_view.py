@@ -536,5 +536,3 @@ class PacmanDataView(MachineDataView):
         :rtype: int
         """
         return cls.__pacman_data._monitor_sdram
-
-
