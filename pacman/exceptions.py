@@ -62,6 +62,12 @@ class PacmanPlaceException(PacmanException):
     """
 
 
+class PacmanTooBigToPlace(PacmanException):
+    """
+    What is requested to place on a Singkle Chip is too big
+    """
+
+
 class PacmanPruneException(PacmanException):
     """
     Something went wrong with pruning.

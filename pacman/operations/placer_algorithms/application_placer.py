@@ -21,11 +21,13 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 
+from spinn_machine import Machine
+
 from pacman.data import PacmanDataView
 from pacman.model.placements import Placements, Placement
 from pacman.model.graphs import AbstractVirtual
 from pacman.exceptions import (
-    PacmanPlaceException, PacmanConfigurationException)
+    PacmanPlaceException, PacmanConfigurationException, PacmanTooBigToPlace)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -71,7 +73,7 @@ def place_application_graph(system_placements):
                     _place_error(
                         placements, system_placements, e,  plan_n_timesteps,
                         machine)
-                logger.debug(f"Starting placement from {next_chip_space}")
+                logger.info(f"Starting placement from {next_chip_space}")
 
                 placements_to_make = list()
 
@@ -109,13 +111,14 @@ def place_application_graph(system_placements):
                 # Now make the placements having confirmed all can be done
                 placements.add_placements(placements_to_make)
                 placed = True
-                logger.debug(f"Used {chips_attempted}")
+                logger.info(f"Used {chips_attempted}")
             except _SpaceExceededException:
                 # This might happen while exploring a space; this may not be
                 # fatal since the last space might have just been bound by
                 # existing placements, and there might be bigger spaces out
                 # there to use
-                logger.debug(f"Failed, saving {chips_attempted}")
+                _check_could_fit(app_vertex, vertices_to_place, sdram)
+                logger.info(f"Failed, saving {chips_attempted}")
                 spaces.save_chips(chips_attempted)
                 chips_attempted.clear()
 
@@ -202,6 +205,39 @@ def _place_error(
     raise PacmanPlaceException(
         f" {exception}."
         f" Report written to {report_file}.")
+
+
+def _check_could_fit(app_vertex, vertices_to_place, sdram):
+    max_sdram = (
+            Machine.DEFAULT_SDRAM_BYTES - PacmanDataView.get_monitor_sdram())
+    max_cores = (
+            Machine.DEFAULT_MAX_CORES_PER_CHIP - Machine.NON_USER_CORES -
+            PacmanDataView.get_monitor_cores())
+    n_cores = len(vertices_to_place)
+    if (sdram <= max_sdram and n_cores <= max_cores):
+        # should fit somewhere
+        return
+    message = f"{app_vertex} will not fit on any possible Chip " \
+              f"the reason is that {vertices_to_place} "
+    if (sdram > max_sdram):
+        message += f"requires {sdram} bytes but "
+        if (sdram > Machine.DEFAULT_SDRAM_BYTES):
+            message += f"a Chip only has {Machine.DEFAULT_SDRAM_BYTES} bytes"
+            raise PacmanTooBigToPlace(message)
+        message += f"after monitors only {max_sdram} bytes are available"
+        raise PacmanTooBigToPlace(message)
+    if n_cores > Machine.DEFAULT_MAX_CORES_PER_CHIP:
+        message += " is more vertices than the number of cores on a chip."
+        raise PacmanTooBigToPlace(message)
+    user_cores = Machine.DEFAULT_MAX_CORES_PER_CHIP - Machine.NON_USER_CORES
+    if n_cores > user_cores:
+        message += f"is more vertices than the user cores ({user_cores})" \
+                   f" available on a Chip"
+        raise PacmanTooBigToPlace(message)
+    message += f"is more vertices than the {max_cores} cores available on a " \
+               f"Chip once {PacmanDataView.get_monitor_cores()} " \
+               f"are reserved for monitors"
+    raise PacmanTooBigToPlace(message)
 
 
 def _next_colour():
