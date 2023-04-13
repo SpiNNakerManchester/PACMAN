@@ -14,6 +14,7 @@
 
 # Our abbreviations/names
 SDP
+NER
 
 # Our types
 AbstractEdge
@@ -37,6 +38,7 @@ AbstractSDRAM
 BaseKeyAndMask
 RoutingInfo
 RoutingTree
+RoutingTableEntry
 PlacementTuple
 ChipAndCore
 
@@ -52,6 +54,10 @@ jsonschema
 # Others' types
 FileIO
 
+# Python bits
+isinstance
+maxsize
+
 # Our special words
 defaultable
 reorderable
@@ -59,3 +65,9 @@ mergable
 timestep
 timesteps
 sdram
+precompressor
+precompressed
+precompression
+Navaridas
+obj
+subobj

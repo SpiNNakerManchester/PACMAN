@@ -656,15 +656,16 @@ def _find_reachable(source_xy, machine, allowed_xys, disallowed_xys):
     return visited
 
 
-def _is_open_chip(xy, xys, visited, machine):
+def _is_open_chip(xy, xy_set, visited, machine):
     """
-    :param tuple(int, int) xy:
-    :param list(tuple(int, int) xys: List of legal coordinates
+    :param tuple(int, int) xy: Coordinates
+    :param set(tuple(int, int) xy_set: List of legal coordinates
     :param set(tuple(int, int) visited:
-    :param machine:
+    :param ~spinn_machine.Machine machine:
     :return: True if the coordinates point to an existing Chip not yet visited
+    :rtype: bool
     """
-    return xy in xys and xy not in visited and machine.is_chip_at(*xy)
+    return xy in xy_set and xy not in visited and machine.is_chip_at(*xy)
 
 
 def _route_pre_to_post(
@@ -673,11 +674,11 @@ def _route_pre_to_post(
     """
     :param tuple(int, int) source_xy:
     :param tuple(int, int) dest_xy:
-    :param routes:
-    :param machine:
+    :param dict(tuple(int,int), RoutingTree) routes:
+    :param ~spinn_machine.Machine machine:
     :param str label:
     :param set(tuple(int, int)) all_source_xy:
-    :param  set(tuple(int, int)) target_xys:
+    :param set(tuple(int, int)) target_xys:
     :return: the pre- and post-vertex coordinates
     :rtype: tuple(tuple(int,int), tuple(int, int))
     """

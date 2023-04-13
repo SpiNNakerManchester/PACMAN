@@ -127,7 +127,8 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     @property
     def iptags(self):
         """
-        The IPtags used by this vertex if any.
+        The :py:class:`~spinn_machine.tags.IPTag`\\s used by this vertex,
+        if any.
 
         :rtype: iterable(~pacman.model.resources.IPtagResource)
         """
@@ -136,7 +137,8 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     @property
     def reverse_iptags(self):
         """
-        The reverse IPtags used by this vertex if any.
+        The :py:class:`~spinn_machine.tags.ReverseIPTag`\\s used by this
+        vertex, if any.
 
         :rtype: iterable(~pacman.model.resources.ReverseIPtagResource)
         """
