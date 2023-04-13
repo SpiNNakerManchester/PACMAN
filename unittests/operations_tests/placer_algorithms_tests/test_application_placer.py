@@ -133,13 +133,13 @@ def test_application_placer_late_fixed():
 def test_sdram_bigger_than_chip():
     unittest_setup()
     writer = PacmanDataWriter.mock()
-    _make_vertices(writer, 1, 1, 5, f"big_app_vertex",
+    _make_vertices(writer, 1, 1, 5, "big_app_vertex",
                    sdram=Machine.DEFAULT_SDRAM_BYTES + 24)
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace:
-       pass
+        pass
 
 
 def test_sdram_bigger_monitors():
@@ -154,29 +154,29 @@ def test_sdram_bigger_monitors():
                          sdram=Machine.DEFAULT_SDRAM_BYTES // 2 + 5)
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace:
-       pass
+        pass
 
 
 def test_more_cores_than_chip():
     unittest_setup()
     writer = PacmanDataWriter.mock()
-    _make_vertices(writer, 1, 1, 19, f"big_app_vertex")
+    _make_vertices(writer, 1, 1, 19, "big_app_vertex")
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace:
-       pass
+        pass
 
 
 def test_more_cores_than_user():
     unittest_setup()
     writer = PacmanDataWriter.mock()
-    _make_vertices(writer, 1, 1, 18, f"big_app_vertex")
+    _make_vertices(writer, 1, 1, 18, "big_app_vertex")
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace:
-       pass
+        pass
 
 
 def test_more_cores_with_monitor():
@@ -190,7 +190,7 @@ def test_more_cores_with_monitor():
         _check_could_fit("app_test", m_vertexs, 500000)
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace:
-       pass
+        pass
 
 
 def test_could_fit():
