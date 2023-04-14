@@ -165,7 +165,7 @@ def test_more_cores_than_chip():
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
-        assert ("number of cores on a chip" )
+        assert ("number of cores on a chip" in str(ex))
 
 
 def test_more_cores_than_user():
