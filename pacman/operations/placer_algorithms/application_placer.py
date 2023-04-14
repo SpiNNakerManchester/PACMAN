@@ -73,7 +73,7 @@ def place_application_graph(system_placements):
                     _place_error(
                         placements, system_placements, e,  plan_n_timesteps,
                         machine)
-                logger.info(f"Starting placement from {next_chip_space}")
+                logger.debug(f"Starting placement from {next_chip_space}")
 
                 placements_to_make = list()
 
@@ -111,14 +111,14 @@ def place_application_graph(system_placements):
                 # Now make the placements having confirmed all can be done
                 placements.add_placements(placements_to_make)
                 placed = True
-                logger.info(f"Used {chips_attempted}")
+                logger.debug(f"Used {chips_attempted}")
             except _SpaceExceededException:
                 # This might happen while exploring a space; this may not be
                 # fatal since the last space might have just been bound by
                 # existing placements, and there might be bigger spaces out
                 # there to use
                 _check_could_fit(app_vertex, vertices_to_place, sdram)
-                logger.info(f"Failed, saving {chips_attempted}")
+                logger.debug(f"Failed, saving {chips_attempted}")
                 spaces.save_chips(chips_attempted)
                 chips_attempted.clear()
 
