@@ -138,8 +138,8 @@ def test_sdram_bigger_than_chip():
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
-    except PacmanTooBigToPlace:
-        pass
+    except PacmanTooBigToPlace as ex:
+        assert("a Chip only has" in str(ex))
 
 
 def test_sdram_bigger_monitors():
@@ -153,8 +153,8 @@ def test_sdram_bigger_monitors():
         _check_could_fit("app_test", ["m_vertex]"],
                          sdram=Machine.DEFAULT_SDRAM_BYTES // 2 + 5)
         raise AssertionError("Error not raise")
-    except PacmanTooBigToPlace:
-        pass
+    except PacmanTooBigToPlace as ex:
+        assert("after monitors only" in str(ex))
 
 
 def test_more_cores_than_chip():
@@ -164,8 +164,8 @@ def test_more_cores_than_chip():
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
-    except PacmanTooBigToPlace:
-        pass
+    except PacmanTooBigToPlace as ex:
+        assert("number of cores on a chip" )
 
 
 def test_more_cores_than_user():
@@ -175,8 +175,8 @@ def test_more_cores_than_user():
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
-    except PacmanTooBigToPlace:
-        pass
+    except PacmanTooBigToPlace as ex:
+        assert("the user cores" in str(ex))
 
 
 def test_more_cores_with_monitor():
@@ -189,8 +189,8 @@ def test_more_cores_with_monitor():
     try:
         _check_could_fit("app_test", m_vertexs, 500000)
         raise AssertionError("Error not raise")
-    except PacmanTooBigToPlace:
-        pass
+    except PacmanTooBigToPlace as ex:
+        assert("reserved for monitors" in str(ex))
 
 
 def test_could_fit():

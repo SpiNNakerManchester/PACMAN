@@ -222,9 +222,10 @@ def _check_could_fit(app_vertex, vertices_to_place, sdram):
     if (sdram > max_sdram):
         message += f"requires {sdram} bytes but "
         if (sdram > Machine.DEFAULT_SDRAM_BYTES):
-            message += f"a Chip only has {Machine.DEFAULT_SDRAM_BYTES} bytes"
-            raise PacmanTooBigToPlace(message)
-        message += f"after monitors only {max_sdram} bytes are available"
+            message += f"a Chip only has {Machine.DEFAULT_SDRAM_BYTES} bytes "
+        else:
+            message += f"after monitors only {max_sdram} bytes are available "
+        message += "Lowering max_core_per_chip may resolve this."
         raise PacmanTooBigToPlace(message)
     if n_cores > Machine.DEFAULT_MAX_CORES_PER_CHIP:
         message += " is more vertices than the number of cores on a chip."
