@@ -13,7 +13,6 @@
 # limitations under the License.
 
 # Our abbreviations/names
-SDP
 NER
 
 # Our types
@@ -46,8 +45,6 @@ ValidationError
 PacmanAlreadyExistsException
 
 # Python packages
-io
-sys
 pacman
 jsonschema
 
@@ -55,15 +52,11 @@ jsonschema
 FileIO
 
 # Python bits
-isinstance
 maxsize
 
 # Our special words
-defaultable
 reorderable
 mergable
-timestep
-timesteps
 sdram
 precompressor
 precompressed
