@@ -18,6 +18,8 @@
 name: Python Actions
 
 on: [push]
+env:
+  BASE_PKG: pacman
 
 jobs:
   test:
@@ -25,8 +27,6 @@ jobs:
     strategy:
       matrix:
         python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
-    env:
-      BASE_PKG: pacman
 
     steps:
     - name: Set up Python ${{ matrix.python-version }}
@@ -41,7 +41,6 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
-        ref: spell-chucking
 
     - name: Install pip, etc
       uses: ./support/actions/python-tools
@@ -70,8 +69,6 @@ jobs:
       uses: ./support/actions/pylint
       with:
         package: ${{ env.BASE_PKG }}
-        exitcheck: 39
-        # Enable spell checking
         language: en_GB
 
   validate:
@@ -94,7 +91,6 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
-        ref: spell-chucking
     - name: Install pip, etc
       uses: ./support/actions/python-tools
     - name: Install Spinnaker Dependencies
