@@ -81,7 +81,7 @@ class Slice(collections.namedtuple('Slice',
 
     def get_slice(self, n):
         """
-        Get a slice in the n-th dimension.
+        Get a slice in the `n`'th dimension.
 
         :param int n: The 0-indexed dimension to get the shape of
         :type: slice

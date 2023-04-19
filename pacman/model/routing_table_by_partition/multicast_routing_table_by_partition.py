@@ -39,11 +39,11 @@ class MulticastRoutingTableByPartition(object):
         Adds a multicast routing path entry.
 
         :param MulticastRoutingTableByPartitionEntry entry: the entry to add
-        :param int router_x: the x coord of the router
-        :param int router_y: the y coord of the router
+        :param int router_x: the X coordinate of the router
+        :param int router_y: the Y coordinate of the router
         :param source_vertex: The source that will send via this entry
         :type source_vertex: ApplicationVertex or MachineVertex
-        :param str partition_id: The id of the partition being sent
+        :param str partition_id: The ID of the partition being sent
         """
 
         # update router_to_entries_map
@@ -99,8 +99,8 @@ class MulticastRoutingTableByPartition(object):
         """
         Get the set of multicast path entries assigned to this router.
 
-        :param int router_x: the x coord of the router
-        :param int router_y: the y coord of the router
+        :param int router_x: the X coordinate of the router
+        :param int router_y: the Y coordinate of the router
         :return: all router_path_entries for the router.
         :rtype: dict((ApplicationVertex or MachineVertex), str),
             MulticastRoutingTableByPartitionEntry)
@@ -116,8 +116,8 @@ class MulticastRoutingTableByPartition(object):
         :param source_vertex:
         :type source_vertex: ApplicationVertex or MachineVertex
         :param str partition_id:
-        :param int router_x: the x coord of the router
-        :param int router_y: the y coord of the router
+        :param int router_x: the X coordinate of the router
+        :param int router_y: the Y coordinate of the router
         :rtype: MulticastRoutingTableByPartitionEntry or None
         """
         entries = self.get_entries_for_router(router_x, router_y)

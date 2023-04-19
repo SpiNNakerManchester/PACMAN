@@ -62,7 +62,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     def set_governed_app_vertex(self, app_vertex):
         """
-        Sets a app vertex to be governed by this splitter object.
+        Sets a application vertex to be governed by this splitter object.
         Once set it can't be reset.
 
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
@@ -167,7 +167,8 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         """
         Gets the machine vertices which are recording this variable.
 
-        :param str variable_to_record: the variable to get machine verts for.
+        :param str variable_to_record:
+            the variable to get machine vertices for.
         :return: list of machine vertices
         :rtype: iterable(~pacman.model.graphs.machine.MachineVertex)
         """
@@ -180,7 +181,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     def get_same_chip_groups(self):
         """
-        Get a list of lists of vertices and sdram which must be
+        Get a list of lists of vertices and SDRAM which must be
         allocated on the same chip.  By default this returns a list of each
         machine vertex and its SDRAM; override if there are groups of
         machine vertices on the same chip.
