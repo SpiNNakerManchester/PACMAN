@@ -59,7 +59,7 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
 
 def is_equal_or_None(a, b):
     """
-    If a and b are both not `None`, return True iff they are equal,
+    If a and b are both not `None`, return True if and only if they are equal,
     otherwise return True.
 
     :rtype: bool
