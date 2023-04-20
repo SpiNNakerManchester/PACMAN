@@ -51,13 +51,20 @@ extensions = [
     'sphinx.ext.intersphinx'
 ]
 
+# Which version of other SpiNNaker docs do we refer to?
+spinnaker_doc_version = "latest"
+
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.8', None),
     'numpy': ("https://numpy.org/doc/1.20/", None),
     'jsonschema': (
         'https://python-jsonschema.readthedocs.io/en/stable/', None),
-    'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
-    'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None)}
+    'spinn_utilities': (
+        f'https://spinnutils.readthedocs.io/en/{spinnaker_doc_version}/',
+        None),
+    'spinn_machine': (
+        f'https://spinnmachine.readthedocs.io/en/{spinnaker_doc_version}/',
+        None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -366,6 +373,7 @@ autodoc_default_options = {
 }
 
 _package_base = "pacman"
+
 
 # Automatically called by sphinx at startup
 def setup(app):
