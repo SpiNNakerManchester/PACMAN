@@ -100,17 +100,17 @@ class _PairCompressor(AbstractCompressor):
        #. The array is split into 6 parts.
 
           #. 0 to _previous_pointer(-1): \
-                    Entries in buckets that have already been compressed
+            Entries in buckets that have already been compressed
           #. _previous_pointer to _write_pointer(-1): \
-                    Finished entries for the current bucket
+            Finished entries for the current bucket
           #. _write_pointer to left(-1): \
-                    Unused space due to previous merges
+            Unused space due to previous merges
           #. left to right: \
-                    Not yet finished entries from the current bucket
+            Not yet finished entries from the current bucket
           #. right(+ 1) to _remaining_index(-1): \
-                    Unused space due to previous merges
+            Unused space due to previous merges
           #. _remaining_index to max_index(-1): \
-                    Entries in buckets not yet compressed
+            Entries in buckets not yet compressed
 
     #. Step 3 use only the entries up to _write_pointer(-1)
 
@@ -372,7 +372,7 @@ class _PairCompressor(AbstractCompressor):
         returning a new table with possibly fewer entries
 
         The resulting table may be ordered or unordered depending on the
-        value of ordered passed into the init method.
+        value of ordered passed into the initialisation method.
         Ordered tables may be shorted than unordered ones.
 
         :param UnCompressedMulticastRoutingTable router_table:

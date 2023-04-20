@@ -100,7 +100,8 @@ class Slice(object):
         return slice(self._lo_atom, self._lo_atom + self._n_atoms)
 
     def get_slice(self, n):
-        """ Get a slice in the n-th dimension
+        """
+        Get a slice in the `n`'th dimension.
 
         :param int n: Must be 0
         :type: slice
