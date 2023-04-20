@@ -125,8 +125,8 @@ class PacmanDataView(MachineDataView):
             If there is an attempt to add the same vertex more than once
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
+        :raises SimulatorNotSetupException: If called before `sim.setup`
+        :raises SimulatorShutdownException: If called after `sim.end`
         """
         cls.check_valid_simulator()
         if cls.__pacman_data._graph is None:
@@ -154,8 +154,8 @@ class PacmanDataView(MachineDataView):
             one
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
+        :raises SimulatorNotSetupException: If called before `sim.setup`
+        :raises SimulatorShutdownException: If called after `sim.end`
         """
         cls.check_valid_simulator()
         if cls.__pacman_data._graph is None:

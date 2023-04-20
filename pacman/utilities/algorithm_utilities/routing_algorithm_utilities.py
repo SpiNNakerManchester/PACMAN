@@ -337,7 +337,7 @@ def convert_a_route(
         incoming_link, route, targets_by_chip):
     """
     Converts the algorithm specific partition_route back to standard SpiNNaker
-    and ands it to the routing_tables.
+    and adds it to the `routing_tables`.
 
     :param MulticastRoutingTableByPartition routing_tables:
         SpiNNaker-format routing tables
@@ -574,7 +574,7 @@ def vertex_xy_and_route(vertex):
     link to follow to get to the vertex.
 
     :param MachineVertex vertex:
-    :return: the xy coordinates of the target vertex mapped to a tuple of
+    :return: the (x,y) coordinates of the target vertex mapped to a tuple of
         the vertex, core and link.
         One of core or link is provided the other is `None`
     :rtype: tuple(tuple(int, int), tuple(MachineVertex, int, None)) or

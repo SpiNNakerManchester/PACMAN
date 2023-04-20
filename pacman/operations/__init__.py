@@ -13,5 +13,5 @@
 # limitations under the License.
 
 """
-The algorithms in the subpackages are generally :py:obj:`callable`.
+The algorithms in the sub-packages are generally :py:obj:`callable`.
 """

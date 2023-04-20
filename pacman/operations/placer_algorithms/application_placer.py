@@ -483,7 +483,7 @@ class _Spaces(object):
 
     def save_chips(self, chips):
         """
-        :param iter(Chip) chips:
+        :param iterable(Chip) chips:
         """
         self.__saved_chips.update(chips)
 
@@ -534,7 +534,7 @@ class _Space(object):
 
     def update(self, chips):
         """
-        :param iter(Chip) chips:
+        :param iterable(Chip) chips:
         """
         for chip in chips:
             if self.__on_same_board(chip):
