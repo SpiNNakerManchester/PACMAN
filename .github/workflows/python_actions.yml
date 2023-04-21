@@ -24,6 +24,7 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       matrix:
         python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
@@ -73,11 +74,10 @@ jobs:
 
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       matrix:
         python-version: ["3.8"]
-    env:
-      BASE_PKG: pacman
 
     steps:
     - name: Set up Python ${{ matrix.python-version }}
