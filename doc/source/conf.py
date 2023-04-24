@@ -51,13 +51,20 @@ extensions = [
     'sphinx.ext.intersphinx'
 ]
 
+# Which version of other SpiNNaker docs do we refer to?
+spinnaker_doc_version = "latest"
+
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.8', None),
     'numpy': ("https://numpy.org/doc/1.20/", None),
     'jsonschema': (
         'https://python-jsonschema.readthedocs.io/en/stable/', None),
-    'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
-    'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None)}
+    'spinn_utilities': (
+        f'https://spinnutils.readthedocs.io/en/{spinnaker_doc_version}/',
+        None),
+    'spinn_machine': (
+        f'https://spinnmachine.readthedocs.io/en/{spinnaker_doc_version}/',
+        None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -73,7 +80,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PACMAN'
-copyright = u'2014-2021'
+copyright = u'2014'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -293,7 +300,7 @@ texinfo_documents = [
 epub_title = u'PACMAN'
 epub_author = u''
 epub_publisher = u''
-epub_copyright = u'2014-2017'
+epub_copyright = u'2014'
 
 # The basename for the epub file. It defaults to the project name.
 # epub_basename = u'data_allocation'
@@ -366,6 +373,7 @@ autodoc_default_options = {
 }
 
 _package_base = "pacman"
+
 
 # Automatically called by sphinx at startup
 def setup(app):
