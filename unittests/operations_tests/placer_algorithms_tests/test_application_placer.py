@@ -18,9 +18,8 @@ from spinn_machine.virtual_machine import virtual_machine
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanTooBigToPlace)
-from pacman.model.partitioner_splitters.abstract_splitters import (
-    AbstractSplitterCommon)
-from pacman.model.partitioner_splitters import SplitterFixedLegacy
+from pacman.model.partitioner_splitters import (
+    SplitterFixedLegacy, AbstractSplitterCommon)
 from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph, _check_could_fit)
 from pacman.model.graphs.machine import SimpleMachineVertex
@@ -46,11 +45,11 @@ class TestSplitter(AbstractSplitterCommon):
             m_vertices = [
                 SimpleMachineVertex(
                     ConstantSDRAM(0),
-                    app_vertex=self._governed_app_vertex,
-                    label=f"{self._governed_app_vertex.label}_{i}")
+                    app_vertex=self.governed_app_vertex,
+                    label=f"{self.governed_app_vertex.label}_{i}")
                 for i in range(self.__n_machine_vertices)]
             for m_vertex in m_vertices:
-                self._governed_app_vertex.remember_machine_vertex(m_vertex)
+                self.governed_app_vertex.remember_machine_vertex(m_vertex)
             self.__same_chip_groups.append(
                 (m_vertices, ConstantSDRAM(self.__sdram)))
 
@@ -61,10 +60,10 @@ class TestSplitter(AbstractSplitterCommon):
         return None
 
     def get_out_going_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def get_in_coming_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def machine_vertices_for_recording(self, variable_to_record):
         return []

@@ -14,9 +14,9 @@
 
 """ test vertex used in many unit tests
 """
+from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
     LegacyPartitionerAPI)
-from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ConstantSDRAM
@@ -39,8 +39,7 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
 
     @overrides(LegacyPartitionerAPI.get_sdram_used_by_atoms)
     def get_sdram_used_by_atoms(self, vertex_slice):
-        return ConstantSDRAM(
-                self.get_sdram_usage_for_atoms(vertex_slice))
+        return ConstantSDRAM(self.get_sdram_usage_for_atoms(vertex_slice))
 
     def get_sdram_usage_for_atoms(self, vertex_slice):
         """

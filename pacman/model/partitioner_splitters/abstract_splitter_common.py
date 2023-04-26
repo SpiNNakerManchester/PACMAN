@@ -25,18 +25,6 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         "_governed_app_vertex",
     ]
 
-    FIX_ATOMS_RESET = (
-        "Illegal attempt to set fixed atoms per core to {} "
-        "as it was already set to {}")
-
-    MAX_BELOW_FIXED = (
-        "Illegal attempt to set max atoms per core to {} "
-        "as that is lower than the previously set fixed of {}")
-
-    FIXED_ABOVE_MAX = (
-        "Illegal attempt to set fixed atoms per core to {} "
-        "as that is above a previously set max atoms of {}")
-
     def __init__(self):
         self._governed_app_vertex = None
 

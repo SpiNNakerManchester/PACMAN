@@ -57,14 +57,15 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         :param splitter: The splitter object needed for this vertex.
             Leave as `None` to delegate the choice of splitter to the selector.
         :type splitter: None or
-            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
         # Need to set to None temporarily as add_constraint checks splitter
         self._splitter = None
         super().__init__(label)
         self._machine_vertices = OrderedSet()
-        # Use setter as there is extra work to do
-        self.splitter = splitter
+        if splitter:
+            # Use setter as there is extra work to do
+            self.splitter = splitter
         # Keep the name for simplicity but move to new internal representation
         self._max_atoms_per_dimension_per_core = max_atoms_per_core
         if isinstance(max_atoms_per_core, int):
@@ -83,8 +84,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
     @property
     def splitter(self):
         """
-        :rtype:
-            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
+        :rtype: ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
         return self._splitter
 
@@ -95,7 +95,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
         :param new_value: The new splitter object
         :type new_value:
-            ~pacman.model.partitioner_interfaces.AbstractSplitterPartitioner
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
         if self._splitter == new_value:
             return
