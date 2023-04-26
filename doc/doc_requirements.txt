@@ -12,5 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
--e git+https://github.com/SpiNNakerManchester/SpiNNUtils.git@master#egg=SpiNNUtilities
--e git+https://github.com/SpiNNakerManchester/SpiNNMachine.git@master#egg=SpiNNMachine
+-e git+https://github.com/SpiNNakerManchester/SpiNNUtils.git@7.0.0-a5#egg=SpiNNUtilities
+-e git+https://github.com/SpiNNakerManchester/SpiNNMachine.git@7.0.0-a5#egg=SpiNNMachine
