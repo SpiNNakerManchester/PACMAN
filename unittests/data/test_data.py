@@ -24,6 +24,7 @@ from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placement, Placements
+from pacman.model.resources import ConstantSDRAM, VariableSDRAM
 from pacman.model.routing_info import RoutingInfo
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition)
@@ -344,3 +345,17 @@ class TestSimulatorData(unittest.TestCase):
         self.assertTrue(PacmanDataView.get_requires_mapping())
         writer.hard_reset()
         self.assertTrue(PacmanDataView.get_requires_mapping())
+
+    def test_get_monitors(self):
+        writer = PacmanDataWriter.setup()
+        writer.set_plan_n_timesteps((45))
+        self.assertEqual(0, PacmanDataView.get_monitor_cores())
+        self.assertEqual(0, PacmanDataView.get_monitor_sdram())
+        writer.add_monitor_all_chips(SimpleMachineVertex(ConstantSDRAM(200)))
+        self.assertEqual(1, PacmanDataView.get_monitor_cores())
+        self.assertEqual(200, PacmanDataView.get_monitor_sdram())
+        writer.add_monitor_all_chips(SimpleMachineVertex(
+            VariableSDRAM(100, 10)))
+        self.assertEqual(2, PacmanDataView.get_monitor_cores())
+        target = 200 + 100 + 10 * 45
+        self.assertEqual(target, PacmanDataView.get_monitor_sdram())
