@@ -20,7 +20,7 @@ from spinn_utilities.abstract_base import (
 # @require_subclass(ApplicationVertex)
 class LegacyPartitionerAPI(object, metaclass=AbstractBase):
     """
-    API used by the vertices which dont have their own splitters but use
+    API used by the vertices which don't have their own splitters but use
     what master did before the self partitioning stuff came to be.
     """
     __slots__ = []

@@ -1,4 +1,4 @@
-# Copyright (c) 2014 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-The algorithms in the sub-packages are generally :py:obj:`callable`.
-"""
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "dkfellows"
+    reviewers:
+      - "rowleya"

@@ -38,14 +38,14 @@ def minimise(
 
         It is assumed that the input routing table is not in any particular
         order and may be reordered into ascending order of generality (number
-        of don't cares/Xs in the key-mask) without affecting routing
+        of don't cares/*X*\\s in the key-mask) without affecting routing
         correctness.  It is also assumed that if this table is unordered it is
         at least orthogonal (i.e., there are no two entries which would match
         the same key) and reorderable.
 
     :param list(Entry) routing_table:
         Routing entries to be merged.
-    :param bool use_timer_cut_off: flag for timing cutoff to be used.
+    :param bool use_timer_cut_off: flag for timing cut-off to be used.
     :param time_to_run_for_before_raising_exception:
         The time to run for in seconds before raising an exception
     :type time_to_run_for_before_raising_exception: int or None
@@ -86,7 +86,7 @@ def ordered_covering(
 
         It is assumed that the input routing table is not in any particular
         order and may be reordered into ascending order of generality (number
-        of don't cares/Xs in the key-mask) without affecting routing
+        of don't cares/*X*\\s in the key-mask) without affecting routing
         correctness.  It is also assumed that if this table is unordered it is
         at least orthogonal (i.e., there are no two entries which would match
         the same key) and reorderable.
@@ -163,14 +163,14 @@ def ordered_covering(
 
 def get_generality(key, mask):
     """
-    Count the number of Xs in the key-mask pair.
+    Count the number of *X*\\s in the key-mask pair.
 
-    For example, there are 32 Xs in ``0x00000000/0x00000000``::
+    For example, there are 32 *X*\\s in ``0x00000000/0x00000000``::
 
         >>> get_generality(0x0, 0x0)
         32
 
-    And no Xs in ``0xffffffff/0xffffffff``::
+    And no *X*\\s in ``0xffffffff/0xffffffff``::
 
         >>> get_generality(0xffffffff, 0xffffffff)
         0
@@ -528,12 +528,12 @@ def _refine_downcheck(merge, aliases, min_goodness):
     could just abandon the merge entirely, but a better solution is to attempt
     to reduce the merge such that it no longer covers any entries below it.
 
-    To do this we first identify the bits that ARE ``X`` s in the merged
-    key-mask but which are NOT ``X`` s in the entry that we're covering. For
+    To do this we first identify the bits that ARE *X*\\s in the merged
+    key-mask but which are NOT *X*\\s in the entry that we're covering. For
     this example this is the 3rd bit. We then look to remove from the merge any
-    entries which are either ``X`` s in this position OR have the same value as
+    entries which are either *X*\\s in this position OR have the same value as
     in this bit as the aliased entry. As the 4th entry in the table has an
-    ``X`` in this position we remove it, and as the 3rd entry has a ``1`` we
+    *X* in this position we remove it, and as the 3rd entry has a *1* we
     also remove it.  For this example we would then consider merging only the
     first two entries, leading to a new key-mask pair of ``000X1`` which can be
     safely inserted between ``00X00`` and ``XX1XX``::

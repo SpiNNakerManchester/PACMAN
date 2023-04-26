@@ -18,15 +18,16 @@
 name: Python Actions
 
 on: [push]
+env:
+  BASE_PKG: pacman
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       matrix:
         python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
-    env:
-      BASE_PKG: pacman
 
     steps:
     - name: Set up Python ${{ matrix.python-version }}
@@ -69,27 +70,50 @@ jobs:
       uses: ./support/actions/pylint
       with:
         package: ${{ env.BASE_PKG }}
-        exitcheck: 39
+        language: en_GB
+
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python-version: ["3.8"]
+
+    steps:
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Checkout SupportScripts
+      uses: actions/checkout@v3
+      with:
+        repository: SpiNNakerManchester/SupportScripts
+        path: support
+    - name: Install pip, etc
+      uses: ./support/actions/python-tools
+    - name: Install Spinnaker Dependencies
+      uses: ./support/actions/install-spinn-deps
+      with:
+        repositories: SpiNNUtils SpiNNMachine
+        install: true
+    - name: Run Install
+      uses: ./support/actions/run-install
 
     - name: Run rat copyright enforcement
-      if: matrix.python-version == 3.8
       uses: ./support/actions/check-copyrights
       with:
         config_file: rat_asl20.xml
-
-    #- name: Validate all XML
-    #  if: matrix.python-version == 3.8
-    #  uses: ./support/actions/validate-xml
-    #  with:
-    #    package: ${{ env.BASE_PKG }}
-
+    - name: Validate all XML
+      if: false
+      uses: ./support/actions/validate-xml
+      with:
+        package: ${{ env.BASE_PKG }}
     - name: Build documentation with sphinx
-      if: matrix.python-version == 3.8
       uses: ./support/actions/sphinx
       with:
         directory: doc/source
-
     - name: Validate CITATION.cff
-      if: matrix.python-version == 3.8
       uses: dieghernan/cff-validator@main
 
