@@ -64,7 +64,7 @@ class PacmanPlaceException(PacmanException):
 
 class PacmanTooBigToPlace(PacmanException):
     """
-    What is requested to place on a Singkle Chip is too big
+    What is requested to place on a Single Chip is too big
     """
 
 
