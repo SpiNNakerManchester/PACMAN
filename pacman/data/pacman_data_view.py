@@ -45,6 +45,8 @@ class _PacmanDataModel(object):
         "_placements",
         "_plan_n_timesteps",
         "_precompressed",
+        "_monitor_cores",
+        "_monitor_sdram",
         "_routing_infos",
         "_routing_table_by_partition",
         "_tags",
@@ -77,6 +79,8 @@ class _PacmanDataModel(object):
             self._graph.reset()
         self._placements = None
         self._precompressed = None
+        self._monitor_cores = 0
+        self._monitor_sdram = 0
         self._uncompressed = None
         self._routing_infos = None
         self._routing_table_by_partition = None
@@ -506,3 +510,29 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._routing_table_by_partition is None:
             raise cls._exception("routing_table_by_partition")
         return cls.__pacman_data._routing_table_by_partition
+
+    @classmethod
+    def get_monitor_cores(cls):
+        """
+        The number of cores on every Chip reported to be used by monitors.
+
+        Ethernet Chips may have more.
+
+        Does not include the system core reserved by the machine itself
+
+        :rtype: int
+        """
+        return cls.__pacman_data._monitor_cores
+
+    @classmethod
+    def get_monitor_sdram(cls):
+        """
+        The amount of sdram on every Chip reported to be used by monitors.
+
+        Ethernet Chips may have more.
+
+        Does not include the system sdram reserved by the machine itself
+
+        :rtype: int
+        """
+        return cls.__pacman_data._monitor_sdram
