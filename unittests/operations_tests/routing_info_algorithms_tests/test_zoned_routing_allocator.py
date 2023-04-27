@@ -11,17 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from spinn_utilities.overrides import overrides
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.operations.routing_info_allocator_algorithms.\
     zoned_routing_info_allocator import (flexible_allocate, global_allocate)
-from pacman.model.graphs.application import (
-    ApplicationEdge, ApplicationVertex)
+from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
-from pacman.model.partitioner_splitters.abstract_splitters import (
-    AbstractSplitterCommon)
-from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 
 
 class TestSplitter(AbstractSplitterCommon):
@@ -30,19 +28,19 @@ class TestSplitter(AbstractSplitterCommon):
         return 1
 
     def get_out_going_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def get_in_coming_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def machine_vertices_for_recording(self, variable_to_record):
-        return list(self._governed_app_vertex.machine_vertices)
+        return list(self.governed_app_vertex.machine_vertices)
 
     def get_out_going_slices(self):
-        return [m.slice for m in self._governed_app_vertex.machine_vertices]
+        return [m.slice for m in self.governed_app_vertex.machine_vertices]
 
     def get_in_coming_slices(self):
-        return [m.slice for m in self._governed_app_vertex.machine_vertices]
+        return [m.slice for m in self.governed_app_vertex.machine_vertices]
 
     def reset_called(self):
         pass

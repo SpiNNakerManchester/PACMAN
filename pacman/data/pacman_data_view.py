@@ -514,11 +514,10 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_monitor_cores(cls):
         """
-        The number of cores on every Chip reported to be used by monitors.
+        The number of cores on every chip reported to be used by monitors.
+        Ethernet-enabled chips may have more.
 
-        Ethernet Chips may have more.
-
-        Does not include the system core reserved by the machine itself
+        Does not include the system core reserved by the machine itself.
 
         :rtype: int
         """
@@ -527,11 +526,10 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_monitor_sdram(cls):
         """
-        The amount of sdram on every Chip reported to be used by monitors.
+        The amount of SDRAM on every chip reported to be used by monitors.
+        Ethernet-enabled chips may have more.
 
-        Ethernet Chips may have more.
-
-        Does not include the system sdram reserved by the machine itself
+        Does not include the system SDRAM reserved by the machine itself.
 
         :rtype: int
         """

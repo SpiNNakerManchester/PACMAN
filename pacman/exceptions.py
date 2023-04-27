@@ -64,7 +64,8 @@ class PacmanPlaceException(PacmanException):
 
 class PacmanTooBigToPlace(PacmanException):
     """
-    What is requested to place on a Single Chip is too big
+    A request by a splitter to put some vertices on a single chip cannot be
+    satisfied; not enough space is available.
     """
 
 
