@@ -21,7 +21,8 @@ from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationEdge,
     ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex, FPGAConnection)
 from pacman.model.graphs.machine import MulticastEdgePartition, MachineEdge
-from pacman.model.partitioner_splitters import SplitterExternalDevice
+from pacman.model.partitioner_splitters import (
+    SplitterExternalDevice, AbstractSplitterCommon)
 from pacman.utilities.utility_objs import ChipCounter
 from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
@@ -34,8 +35,6 @@ from pacman.operations.router_algorithms.ner_route import (
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     longest_dimension_first, get_app_partitions, vertex_xy,
     vertex_xy_and_route)
-from pacman.model.partitioner_splitters.abstract_splitters import (
-    AbstractSplitterCommon)
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placements, Placement
@@ -66,11 +65,11 @@ class TestSplitter(AbstractSplitterCommon):
     def create_machine_vertices(self, chip_counter):
         m_vertices = [
             SimpleMachineVertex(
-                ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
-                label=f"{self._governed_app_vertex.label}_{i}")
+                ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
+                label=f"{self.governed_app_vertex.label}_{i}")
             for i in range(self.__n_machine_vertices)]
         for m_vertex in m_vertices:
-            self._governed_app_vertex.remember_machine_vertex(m_vertex)
+            self.governed_app_vertex.remember_machine_vertex(m_vertex)
 
     def get_out_going_slices(self):
         return None
@@ -79,10 +78,10 @@ class TestSplitter(AbstractSplitterCommon):
         return None
 
     def get_out_going_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def get_in_coming_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def machine_vertices_for_recording(self, variable_to_record):
         return []
@@ -112,21 +111,21 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
         for i in range(self.__n_groups):
             incoming = [
                 SimpleMachineVertex(
-                    ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
-                    label=f"{self._governed_app_vertex.label}_{i}_{j}")
+                    ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
+                    label=f"{self.governed_app_vertex.label}_{i}_{j}")
                 for j in range(self.__n_incoming_machine_vertices)]
             outgoing = [
                 SimpleMachineVertex(
-                    ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
-                    label=f"{self._governed_app_vertex.label}_{i}_{j}")
+                    ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
+                    label=f"{self.governed_app_vertex.label}_{i}_{j}")
                 for j in range(self.__n_outgoing_machine_vertices)]
             self.__same_chip_groups.append(
                 (incoming + outgoing, ConstantSDRAM(0)))
             self.__outgoing_machine_vertices.extend(outgoing)
             for out in outgoing:
-                self._governed_app_vertex.remember_machine_vertex(out)
+                self.governed_app_vertex.remember_machine_vertex(out)
             for j in range(self.__n_incoming_machine_vertices):
-                self._governed_app_vertex.remember_machine_vertex(incoming[j])
+                self.governed_app_vertex.remember_machine_vertex(incoming[j])
                 self.__incoming_machine_vertices[j].append(incoming[j])
             if self.__internal_multicast:
                 if last_incoming is not None:
@@ -134,8 +133,7 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
                         in_part = MulticastEdgePartition(this_in, "internal")
                         self.__internal_multicast_partitions.append(in_part)
                         for last_in in last_incoming:
-                            in_part.add_edge(
-                                MachineEdge(this_in, last_in))
+                            in_part.add_edge(MachineEdge(this_in, last_in))
                 last_incoming = incoming
 
     def get_out_going_slices(self):
@@ -189,11 +187,11 @@ class TestOneToOneSplitter(AbstractSplitterCommon):
     def create_machine_vertices(self, chip_counter):
         m_vertices = [
             SimpleMachineVertex(
-                ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
-                label=f"{self._governed_app_vertex.label}_{i}")
+                ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
+                label=f"{self.governed_app_vertex.label}_{i}")
             for i in range(self.__n_machine_vertices)]
         for m_vertex in m_vertices:
-            self._governed_app_vertex.remember_machine_vertex(m_vertex)
+            self.governed_app_vertex.remember_machine_vertex(m_vertex)
 
     def get_out_going_slices(self):
         return None
@@ -202,10 +200,10 @@ class TestOneToOneSplitter(AbstractSplitterCommon):
         return None
 
     def get_out_going_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def get_in_coming_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def machine_vertices_for_recording(self, variable_to_record):
         return []
@@ -219,7 +217,7 @@ class TestOneToOneSplitter(AbstractSplitterCommon):
             (target, [source])
             for source, target in zip(
                 source_vertex.splitter.get_out_going_vertices(partition_id),
-                self._governed_app_vertex.machine_vertices)]
+                self.governed_app_vertex.machine_vertices)]
 
 
 class TestNearestEthernetSplitter(AbstractSplitterCommon):
@@ -233,9 +231,9 @@ class TestNearestEthernetSplitter(AbstractSplitterCommon):
         machine = PacmanDataView.get_machine()
         for chip in machine.ethernet_connected_chips:
             m_vertex = SimpleMachineVertex(
-                ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
-                label=f"{self._governed_app_vertex.label}_{chip.x}_{chip.y}")
-            self._governed_app_vertex.remember_machine_vertex(m_vertex)
+                ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
+                label=f"{self.governed_app_vertex.label}_{chip.x}_{chip.y}")
+            self.governed_app_vertex.remember_machine_vertex(m_vertex)
             self.__placements.add_placement(
                 Placement(m_vertex, chip.x, chip.y, 1))
             self.__m_vertex_by_ethernet[chip.x, chip.y] = m_vertex
@@ -247,10 +245,10 @@ class TestNearestEthernetSplitter(AbstractSplitterCommon):
         return None
 
     def get_out_going_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def get_in_coming_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def machine_vertices_for_recording(self, variable_to_record):
         return []

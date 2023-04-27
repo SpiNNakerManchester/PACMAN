@@ -175,17 +175,16 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def add_monitor_all_chips(self, vertex):
         """
-        Reports that a monitor has been added to every Chip.
+        Reports that a monitor has been added to every chip.
+        Should be called once for each monitor added to all chips.
+        Should not be called for monitors only added to Ethernet-enabled chips.
 
-        Should be called once for each monitor added to all Chips.
-
-        Should not be called for Ethernet only monitors.
-
-        Only affect is to change the numbers reported by the get_monitor
-        methods
+        Only affect is to change the numbers reported by the `get_monitor`
+        methods.
 
         :param ~pacman.model.graphs.machine.MachineVertex vertex:
-            One of the Vertcies added to each Core
+            One of the vertices added to each core, assumed to be typical of
+            all.
         """
         self.__pacman_data._monitor_cores += 1
         self.__pacman_data._monitor_sdram += \

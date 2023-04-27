@@ -12,8 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Legacy interfaces that vertices may implement to support splitters that work
+using the old model of partitioning.
+"""
+
 from .legacy_partitioner_api import LegacyPartitionerAPI
-from .abstract_splitter_partitioner import AbstractSplitterPartitioner
 
 __all__ = [
-    "AbstractSplitterPartitioner", "LegacyPartitionerAPI"]
+    "LegacyPartitionerAPI"]

@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 # Can't use this decorator: circular import problem
@@ -22,6 +21,11 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
     """
     API used by the vertices which don't have their own splitters but use
     what master did before the self partitioning stuff came to be.
+
+    .. warning::
+        Subclasses of this class must also be subclasses of
+        :py:class:`ApplicationVertex`. This is not enforced because of issues
+        with import order, but is required; PACMAN assumes it to be true.
     """
     __slots__ = []
 
@@ -36,8 +40,7 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def create_machine_vertex(
-            self, vertex_slice, sdram, label=None):
+    def create_machine_vertex(self, vertex_slice, sdram, label=None):
         """
         Create a machine vertex from this application vertex.
 
