@@ -13,44 +13,26 @@
 # limitations under the License.
 
 from pacman.data import PacmanDataView
-from pacman.model.partitioner_interfaces import AbstractSplitterPartitioner
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 
 def splitter_partitioner():
     """
-     :return:
-         The number of chips needed to satisfy this partitioning.
-     :rtype: int
-     :raise PacmanPartitionException:
-         If something goes wrong with the partitioning
-     """
-    partitioner = _SplitterPartitioner()
-    # pylint:disable=protected-access
-    return partitioner._run()
+    Call the splitter of each application vertex to create the machine vertices
+    needed.
 
-
-class _SplitterPartitioner(AbstractSplitterPartitioner):
-    """ Partitioner which hands the partitioning work to application vertices'\
-        splitter objects.
+    :return: The number of chips needed to satisfy this partitioning.
+    :rtype: int
+    :raise PacmanPartitionException:
+        If something goes wrong with the partitioning
     """
+    progress = ProgressBar(
+        PacmanDataView.get_n_vertices(), "Partitioning Graph")
 
-    __slots__ = []
+    # Partition one vertex at a time
+    chip_counter = ChipCounter()
+    for vertex in progress.over(PacmanDataView.iterate_vertices()):
+        vertex.splitter.create_machine_vertices(chip_counter)
 
-    # inherited from AbstractPartitionAlgorithm
-    def _run(self):
-        """
-        :rtype: int
-        :raise PacmanPartitionException:
-            If something goes wrong with the partitioning
-        """
-        progress = ProgressBar(
-            PacmanDataView.get_n_vertices(), "Partitioning Graph")
-
-        # Partition one vertex at a time
-        chip_counter = ChipCounter()
-        for vertex in progress.over(PacmanDataView.iterate_vertices()):
-            vertex.splitter.create_machine_vertices(chip_counter)
-
-        return chip_counter.n_chips
+    return chip_counter.n_chips

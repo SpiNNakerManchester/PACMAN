@@ -25,7 +25,8 @@ from spinn_utilities.timer import Timer
 def minimise(
         routing_table, use_timer_cut_off=False,
         time_to_run_for_before_raising_exception=None):
-    """Reduce the size of a routing table by merging together entries where \
+    """
+    Reduce the size of a routing table by merging together entries where
     possible and by removing any remaining default routes.
 
     .. warning::
@@ -37,14 +38,14 @@ def minimise(
 
         It is assumed that the input routing table is not in any particular
         order and may be reordered into ascending order of generality (number
-        of don't cares/Xs in the key-mask) without affecting routing
+        of don't cares/*X*\\s in the key-mask) without affecting routing
         correctness.  It is also assumed that if this table is unordered it is
         at least orthogonal (i.e., there are no two entries which would match
         the same key) and reorderable.
 
     :param list(Entry) routing_table:
         Routing entries to be merged.
-    :param bool use_timer_cut_off: flag for timing cutoff to be used.
+    :param bool use_timer_cut_off: flag for timing cut-off to be used.
     :param time_to_run_for_before_raising_exception:
         The time to run for in seconds before raising an exception
     :type time_to_run_for_before_raising_exception: int or None
@@ -72,7 +73,8 @@ def minimise(
 def ordered_covering(
         routing_table, target_length, aliases=None, no_raise=False,
         use_timer_cut_off=False, time_to_run_for=None):
-    """Reduce the size of a routing table by merging together entries where
+    """
+    Reduce the size of a routing table by merging together entries where
     possible.
 
     .. warning::
@@ -84,7 +86,7 @@ def ordered_covering(
 
         It is assumed that the input routing table is not in any particular
         order and may be reordered into ascending order of generality (number
-        of don't cares/Xs in the key-mask) without affecting routing
+        of don't cares/*X*\\s in the key-mask) without affecting routing
         correctness.  It is also assumed that if this table is unordered it is
         at least orthogonal (i.e., there are no two entries which would match
         the same key) and reorderable.
@@ -94,7 +96,7 @@ def ordered_covering(
     :param target_length:
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
-        possible. If None then the table will be made as small as possible.
+        possible. If `None` then the table will be made as small as possible.
     :type target_length: int or None
     :param aliases:
         Dictionary of which keys and masks in the routing table are
@@ -107,8 +109,8 @@ def ordered_covering(
     :param bool no_raise:
         If False (the default) then an error will be raised if the table cannot
         be minimised to be smaller than `target_length` and `target_length` is
-        not None. If True then a table will be returned regardless of the size
-        of the final table.
+        not `None`. If True then a table will be returned regardless of the
+        size of the final table.
     :return: new routing table, A new aliases dictionary.
     :rtype: tuple(list(Entry), dict(tuple(int,int), set(tuple(int,int))))
     :raises MinimisationFailedError:
@@ -160,14 +162,15 @@ def ordered_covering(
 
 
 def get_generality(key, mask):
-    """Count the number of Xs in the key-mask pair.
+    """
+    Count the number of *X*\\s in the key-mask pair.
 
-    For example, there are 32 Xs in ``0x00000000/0x00000000``::
+    For example, there are 32 *X*\\s in ``0x00000000/0x00000000``::
 
         >>> get_generality(0x0, 0x0)
         32
 
-    And no Xs in ``0xffffffff/0xffffffff``::
+    And no *X*\\s in ``0xffffffff/0xffffffff``::
 
         >>> get_generality(0xffffffff, 0xffffffff)
         0
@@ -224,7 +227,8 @@ def _get_best_merge(routing_table, aliases):
 
 
 def _get_all_merges(routing_table):
-    """ Get possible sets of entries to merge.
+    """
+    Get possible sets of entries to merge.
 
     :param Entry routing_table: Routing entries to be merged.
     :rtype: iterable(_Merge)
@@ -254,8 +258,9 @@ def _get_all_merges(routing_table):
 
 
 def _get_insertion_index(routing_table, generality):
-    """ Determine the index in the routing table where a new entry should be
-        inserted.
+    """
+    Determine the index in the routing table where a new entry should be
+    inserted.
 
     :param Entry routing_table: Routing entries to be merged.
     :param int generality:
@@ -292,7 +297,9 @@ def _get_insertion_index(routing_table, generality):
 
 
 class _Merge(object):
-    """Represents a potential merge of routing table entries. """
+    """
+    Represents a potential merge of routing table entries.
+    """
 
     _slots__ = [
         # Reference to the routing table against which the merge is defined.
@@ -416,7 +423,8 @@ class _Merge(object):
 
 
 def _refine_merge(merge, aliases, min_goodness):
-    """ Remove entries from a merge to generate a valid merge which may be
+    """
+    Remove entries from a merge to generate a valid merge which may be
     applied to the routing table.
 
     :param _Merge merge: Initial merge to refine.
@@ -520,12 +528,12 @@ def _refine_downcheck(merge, aliases, min_goodness):
     could just abandon the merge entirely, but a better solution is to attempt
     to reduce the merge such that it no longer covers any entries below it.
 
-    To do this we first identify the bits that ARE ``X`` s in the merged
-    key-mask but which are NOT ``X`` s in the entry that we're covering. For
+    To do this we first identify the bits that ARE *X*\\s in the merged
+    key-mask but which are NOT *X*\\s in the entry that we're covering. For
     this example this is the 3rd bit. We then look to remove from the merge any
-    entries which are either ``X`` s in this position OR have the same value as
+    entries which are either *X*\\s in this position OR have the same value as
     in this bit as the aliased entry. As the 4th entry in the table has an
-    ``X`` in this position we remove it, and as the 3rd entry has a ``1`` we
+    *X* in this position we remove it, and as the 3rd entry has a *1* we
     also remove it.  For this example we would then consider merging only the
     first two entries, leading to a new key-mask pair of ``000X1`` which can be
     safely inserted between ``00X00`` and ``XX1XX``::

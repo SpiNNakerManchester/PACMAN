@@ -17,7 +17,8 @@ from pacman.exceptions import PacmanConfigurationException
 
 
 class BaseKeyAndMask(object):
-    """ A Key and Mask to be used for routing.
+    """
+    A Key and Mask to be used for routing.
     """
 
     __slots__ = [
@@ -45,7 +46,8 @@ class BaseKeyAndMask(object):
 
     @property
     def key(self):
-        """ The base key
+        """
+        The base key.
 
         :rtype: int
         """
@@ -53,7 +55,8 @@ class BaseKeyAndMask(object):
 
     @property
     def key_combo(self):
-        """ The key combined with the mask
+        """
+        The key combined with the mask.
 
         :rtype: int
         """
@@ -61,7 +64,8 @@ class BaseKeyAndMask(object):
 
     @property
     def mask(self):
-        """ The mask
+        """
+        The mask.
 
         :rtype: int
         """
@@ -77,7 +81,7 @@ class BaseKeyAndMask(object):
         return not self.__eq__(other)
 
     def __repr__(self):
-        return "KeyAndMask:{}:{}".format(hex(self._base_key), hex(self._mask))
+        return f"KeyAndMask:0x{self._base_key:x}:0x{self._mask:x}"
 
     def __str__(self):
         return self.__repr__()
@@ -87,7 +91,8 @@ class BaseKeyAndMask(object):
 
     @property
     def n_keys(self):
-        """ The total number of keys that can be generated given the mask
+        """
+        The total number of keys that can be generated given the mask.
 
         :rtype: int
         """
@@ -102,7 +107,8 @@ class BaseKeyAndMask(object):
         return 2 ** len(zeros)
 
     def get_keys(self, key_array=None, offset=0, n_keys=None):
-        """ Get the ordered list of keys that the combination allows
+        """
+        Get the ordered list of keys that the combination allows.
 
         :param ~numpy.ndarray(int) key_array:
             Optional array into which the returned keys will be placed

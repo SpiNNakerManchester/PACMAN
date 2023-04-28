@@ -17,7 +17,8 @@ from pacman.model.graphs import AbstractEdge
 
 
 class MachineEdge(AbstractEdge):
-    """ A simple implementation of a machine edge.
+    """
+    A simple implementation of a machine edge.
     """
 
     __slots__ = [
@@ -33,8 +34,10 @@ class MachineEdge(AbstractEdge):
 
     def __init__(self, pre_vertex, post_vertex, label=None):
         """
-        :param MachineVertex pre_vertex: The vertex at the start of the edge.
-        :param MachineVertex post_vertex: The vertex at the end of the edge.
+        :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
+            The vertex at the start of the edge.
+        :param ~pacman.model.graphs.machine.MachineVertex post_vertex:
+            The vertex at the end of the edge.
         :param label: The name of the edge.
         :type label: str or None
         """
@@ -50,7 +53,8 @@ class MachineEdge(AbstractEdge):
     @property
     @overrides(AbstractEdge.pre_vertex, extend_doc=False)
     def pre_vertex(self):
-        """ The vertex at the start of the edge.
+        """
+        The vertex at the start of the edge.
 
         :rtype: ~pacman.model.graphs.machine.MachineVertex
         """
@@ -59,7 +63,8 @@ class MachineEdge(AbstractEdge):
     @property
     @overrides(AbstractEdge.post_vertex, extend_doc=False)
     def post_vertex(self):
-        """ The vertex at the end of the edge.
+        """
+        The vertex at the end of the edge.
 
         :rtype: ~pacman.model.graphs.machine.MachineVertex
         """
@@ -67,5 +72,5 @@ class MachineEdge(AbstractEdge):
 
     def __repr__(self):
         return (
-            "MachineEdge(pre_vertex={}, post_vertex={}, label={})".format(
-                self._pre_vertex, self._post_vertex, self.label))
+            f"MachineEdge(pre_vertex={self._pre_vertex}, "
+            f"post_vertex={self._post_vertex}, label={self.label})")

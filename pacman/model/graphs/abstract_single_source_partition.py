@@ -19,7 +19,8 @@ from pacman.model.graphs import AbstractEdgePartition
 
 class AbstractSingleSourcePartition(
         AbstractEdgePartition, metaclass=AbstractBase):
-    """ An edge partition that has a single source vertex.
+    """
+    An edge partition that has a single source vertex.
     """
     __slots__ = [
         # The vertex at the start of all the edges
@@ -41,10 +42,10 @@ class AbstractSingleSourcePartition(
 
     @property
     def pre_vertex(self):
-        """ The vertex at which all edges in this outgoing edge partition\
-            start.
+        """
+        The vertex at which all edges in this outgoing edge partition start.
 
-        :rtype: AbstractVertex
+        :rtype: ~pacman.model.graphs.AbstractVertex
         """
         return self._pre_vertex
 

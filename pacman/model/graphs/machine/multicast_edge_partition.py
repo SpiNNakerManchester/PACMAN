@@ -16,16 +16,18 @@ from pacman.model.graphs.machine.machine_edge import MachineEdge
 
 
 class MulticastEdgePartition(AbstractSingleSourcePartition):
-    """ A simple implementation of a machine edge partition that will \
-        communicate with SpiNNaker multicast packets. They have a common set \
-        of sources with the same semantics and so can share a single key.
+    """
+    A simple implementation of a machine edge partition that will
+    communicate with SpiNNaker multicast packets. They have a common set
+    of sources with the same semantics and so can share a single key.
     """
 
     __slots__ = ()
 
     def __init__(self, pre_vertex, identifier):
         """
-        :param pre_vertex: the pre vertex of this partition.
+        :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
+            the pre vertex of this partition.
         :param str identifier: The identifier of the partition
         """
         super().__init__(

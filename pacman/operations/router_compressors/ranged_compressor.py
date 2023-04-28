@@ -28,7 +28,6 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 def range_compressor(accept_overflow=True):
     """
-
     :param MulticastRoutingTables router_tables:
     :param bool accept_overflow:
         A flag which should only be used in testing to stop raising an
@@ -74,7 +73,8 @@ class RangeCompressor(object):
         self._entries = None
 
     def compress_table(self, uncompressed):
-        """ Compresses all the entries for a single table.
+        """
+        Compresses all the entries for a single table.
 
         Compressed the entries for this unordered table
         returning a new table with possibly fewer entries

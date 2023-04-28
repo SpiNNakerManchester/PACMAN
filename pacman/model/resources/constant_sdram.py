@@ -17,7 +17,8 @@ from .abstract_sdram import AbstractSDRAM
 
 
 class ConstantSDRAM(AbstractSDRAM):
-    """ Represents an amount of SDRAM used  on a chip in the machine.
+    """
+    Represents an amount of SDRAM used  on a chip in the machine.
 
     This is used when the amount of SDRAM needed is not effected by runtime
     """
@@ -75,5 +76,4 @@ class ConstantSDRAM(AbstractSDRAM):
 
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps, indent="", preamble="", target=None):
-        print(indent, preamble, "Constant {} bytes".format(self._sdram),
-              file=target)
+        print(indent, preamble, f"Constant {self._sdram} bytes", file=target)

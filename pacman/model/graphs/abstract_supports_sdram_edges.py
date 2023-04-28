@@ -17,16 +17,21 @@ from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 # Can't use this decorator: circular import problem
 # @require_subclass(MachineVertex)
 class AbstractSupportsSDRAMEdges(object, metaclass=AbstractBase):
-    """ Marks a machine vertex that can have SDRAM edges attached to it.
+    """
+    Marks a machine vertex that can have SDRAM edges attached to it.
     """
 
     __slots__ = []
 
     @abstractmethod
     def sdram_requirement(self, sdram_machine_edge):
-        """ Asks a machine vertex for the sdram requirement it needs.
+        """
+        Asks a machine vertex for the SDRAM requirement it needs.
 
-        :param sdram_machine_edge: The SDRAM edge in question
-        :return: the size in bytes this vertex needs for the SDRAM edge
+        :param sdram_machine_edge:
+            The SDRAM edge in question
+        :type sdram_machine_edge:
+            ~pacman.model.graphs.machine.SDRAMMachineEdge
+        :return: The size in bytes this vertex needs for the SDRAM edge.
         :rtype: int (most likely a multiple of 4)
         """

@@ -34,11 +34,10 @@ REPORTS_DIRNAME = "reports"
 
 class PacmanDataWriter(MachineDataWriter, PacmanDataView):
     """
-    See UtilsDataWriter
+    See :py:class:`spinn_utilities.data.UtilsDataWriter`.
 
     This class is designed to only be used directly within the PACMAN
-    repository unittests as all methods are available to subclasses
-
+    repository unit tests as all methods are available to subclasses.
     """
     __pacman_data = _PacmanDataModel()
     __slots__ = []
@@ -65,7 +64,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_placements(self, placements):
         """
-        Set the placements
+        Set the placements.
 
         :param Placements placements:
         :raises TypeError: if the placements is not a Placements
@@ -76,7 +75,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_routing_infos(self, routing_infos):
         """
-        Set the routing_infos
+        Set the routing_infos.
 
         :param RoutingInfo routing_infos:
         :raises TypeError: if the routing_infos is not a RoutingInfo
@@ -87,7 +86,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_tags(self, tags):
         """
-        Set the tags
+        Set the tags.
 
         :param Tags tags:
         :raises TypeError: if the tags is not a Tags
@@ -98,7 +97,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_uncompressed(self, router_tables):
         """
-        Sets the uncompressed router_tables value
+        Sets the uncompressed `router_tables` value.
 
         :param MulticastRoutingTables router_tables: new value
         :raises TypeError:
@@ -111,7 +110,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_precompressed(self, router_tables):
         """
-        Sets the precompressed router_tables value
+        Sets the precompressed `router_tables` value.
 
         :param MulticastRoutingTables router_tables: new value
         :raises TypeError:
@@ -124,12 +123,12 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_plan_n_timesteps(self, plan_n_timesteps):
         """
-        Sets the plan_n_timestep. Use None for run forever
+        Sets the `plan_n_timestep`. Use `None` for run forever.
 
         :param plan_n_timesteps:
         :type plan_n_timesteps: int or None
-        :raises TypeError: if the plan_n_timesteps are not an int or None
-        :raises PacmanConfigurationException: On a megative plan_n_timesteps
+        :raises TypeError: if the plan_n_timesteps are not an int or `None`
+        :raises PacmanConfigurationException: On a negative plan_n_timesteps
         """
         if plan_n_timesteps is not None:
             if not isinstance(plan_n_timesteps, int):
@@ -142,7 +141,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_routing_table_by_partition(self, routing_table_by_partition):
         """
-        Sets the _routing_table_by_partition
+        Sets the `_routing_table_by_partition`.
 
         :param MulticastRoutingTableByPartition routing_table_by_partition:
             raises TypeError: if routing_table_by_partition is no a
@@ -173,3 +172,20 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             raise PacmanConfigurationException(
                 "This call is only expected if requires mapping is True")
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
+
+    def add_monitor_all_chips(self, vertex):
+        """
+        Reports that a monitor has been added to every chip.
+        Should be called once for each monitor added to all chips.
+        Should not be called for monitors only added to Ethernet-enabled chips.
+
+        Only affect is to change the numbers reported by the `get_monitor`
+        methods.
+
+        :param ~pacman.model.graphs.machine.MachineVertex vertex:
+            One of the vertices added to each core, assumed to be typical of
+            all.
+        """
+        self.__pacman_data._monitor_cores += 1
+        self.__pacman_data._monitor_sdram += \
+            vertex.sdram_required.get_total_sdram(self.get_plan_n_timestep())

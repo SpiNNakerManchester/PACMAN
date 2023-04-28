@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common.slice import Slice
 from .application_virtual_vertex import ApplicationVirtualVertex
 
 
 class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
-    """ A virtual application vertex on a SpiNNaker Link.
+    """
+    A virtual application vertex on a SpiNNaker Link.
     """
 
     __slots__ = [
@@ -56,15 +58,18 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
 
     @property
     def spinnaker_link_id(self):
-        """ The SpiNNaker link to which this device is connected
+        """
+        The SpiNNaker link to which this device is connected.
+
         :rtype: int
         """
         return self._spinnaker_link_id
 
     @property
     def board_address(self):
-        """ The board to which this device is connected, or None for the
-            default board
+        """
+        The board to which this device is connected, or `None` for the
+        default board.
 
         :rtype: str or None
         """
@@ -72,28 +77,32 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
 
     @property
     def n_machine_vertices(self):
-        """ The number of machine vertices to create
+        """
+        The number of machine vertices to create.
 
         :rtype: int
         """
         return self._n_machine_vertices
 
     def get_incoming_slice(self, index):
-        """ Get the slice to be given to the connection
+        """
+        Get the slice to be given to the connection.
 
         :param int index:
             The index of the connection, for when n_machine_vertices > 1
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
-        atoms_per_slice = self.n_atoms // self._n_machine_vertices
+        atoms_per_slice = int(math.ceil(
+            self._n_atoms / self._n_machine_vertices))
         low_atom = atoms_per_slice * index
         hi_atom = (atoms_per_slice * (index + 1)) - 1
         hi_atom = min((hi_atom, self.n_atoms - 1))
         return Slice(low_atom, hi_atom)
 
     def get_outgoing_slice(self):
-        """ Get the slice to be given to the outgoing connection
+        """
+        Get the slice to be given to the outgoing connection.
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
@@ -113,3 +122,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
             raise NotImplementedError("This vertex doesn't have outgoing data")
         return machine.get_spinnaker_link_with_id(
             self._spinnaker_link_id, self._board_address)
+
+    @overrides(ApplicationVirtualVertex.get_max_atoms_per_core)
+    def get_max_atoms_per_core(self):
+        return int(math.ceil(self._n_atoms / self._n_machine_vertices))

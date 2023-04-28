@@ -16,10 +16,11 @@ from pacman.data import PacmanDataView
 
 
 class ChipCounter(object):
-    """ A counter of how many chips are needed to hold machine vertices.
-        This does not look at the fixed_locations of the vertices at all.
-        The value produced will be a (hopefully) worst-case estimate and should
-        not be used to decide failure in terms of space!
+    """
+    A counter of how many chips are needed to hold machine vertices.
+    This does not look at the fixed_locations of the vertices at all.
+    The value produced will be a (hopefully) worst-case estimate and should
+    not be used to decide failure in terms of space!
     """
 
     __slots__ = [
@@ -57,4 +58,7 @@ class ChipCounter(object):
 
     @property
     def n_chips(self):
+        """
+        :rtype: int
+        """
         return self.__n_chips

@@ -12,18 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pacman.model.partitioner_splitters.abstract_splitters import (
-    AbstractSplitterCommon)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex)
 from pacman.model.graphs.machine import (
     MachineFPGAVertex, MachineSpiNNakerLinkVertex)
-from pacman.exceptions import PacmanConfigurationException,\
-    PacmanNotExistException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanNotExistException)
+from .abstract_splitter_common import AbstractSplitterCommon
 
 
 class SplitterExternalDevice(AbstractSplitterCommon):
+    """
+    A splitter for handling external devices.
+    """
 
     __slots__ = [
         # Machine vertices that will send packets into the network
@@ -35,6 +37,13 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         # Slice of outgoing vertex (which really doesn't matter here)
         "__outgoing_slice"
     ]
+
+    def __init__(self):
+        super().__init__()
+        self.__incoming_vertices = list()
+        self.__incoming_slices = list()
+        self.__outgoing_vertex = None
+        self.__outgoing_slice = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -104,7 +113,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
-        app_vertex = self._governed_app_vertex
+        app_vertex = self.governed_app_vertex
         for vertex in self.__incoming_vertices:
             # machine_graph.add_vertex(vertex)
             chip_counter.add_core(vertex.sdram_required)

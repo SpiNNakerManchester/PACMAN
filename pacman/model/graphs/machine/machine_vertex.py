@@ -20,7 +20,8 @@ from pacman.utilities.utility_calls import get_n_bits_for_fields
 
 
 class MachineVertex(AbstractVertex, metaclass=AbstractBase):
-    """ A machine graph vertex.
+    """
+    A machine graph vertex.
     """
 
     __slots__ = ["_app_vertex", "_index", "_vertex_slice"]
@@ -32,15 +33,16 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :type label: str or None
         :param app_vertex:
             The application vertex that caused this machine vertex to be
-            created. If None, there is no such application vertex.
-        :type app_vertex: ApplicationVertex or None
+            created. If `None`, there is no such application vertex.
+        :type app_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex or None
         :param vertex_slice:
             The slice of the application vertex that this machine vertex
             implements.
-        :type vertex_slice: Slice or None
+        :type vertex_slice: ~pacman.model.graphs.common.Slice or None
         :raises PacmanValueError: If the slice of the machine_vertex is too big
         :raise AttributeError:
-            If a not None app_vertex is not an ApplicationVertex
+            If a not-`None` app_vertex is not an ApplicationVertex
         """
         if label is None:
             label = str(type(self))
@@ -55,27 +57,30 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
     @property
     def app_vertex(self):
-        """ The application vertex that caused this machine vertex to be
-            created. If None, there is no such application vertex.
+        """
+        The application vertex that caused this machine vertex to be
+        created. If `None`, there is no such application vertex.
 
-        :rtype: ApplicationVertex or None
+        :rtype: ~pacman.model.graphs.application.ApplicationVertex or None
         """
         return self._app_vertex
 
     @property
     def vertex_slice(self):
-        """ The slice of the application vertex that this machine vertex
-            implements.
+        """
+        The slice of the application vertex that this machine vertex
+        implements.
 
-        :rtype: Slice
+        :rtype: ~pacman.model.graphs.common.Slice
         """
         return self._vertex_slice
 
     def get_n_keys_for_partition(self, partition_id):
-        """ Get the number of keys required by the given partition of edges.
+        """
+        Get the number of keys required by the given partition of edges.
 
-        :param str partition_id: The identifier of the partition
-            partition_id param is only used by some MachineVertex clases
+        :param str partition_id: The identifier of the partition; the
+            partition_id param is only used by some MachineVertex subclasses
         :return: The number of keys required
         :rtype: int
         """
@@ -84,8 +89,9 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
     @property
     def index(self):
-        """ The index into the collection of machine vertices for an
-            application vertex.
+        """
+        The index into the collection of machine vertices for an
+        application vertex.
 
         :rtype: int
         """
@@ -93,8 +99,9 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
     @index.setter
     def index(self, value):
-        """ The index into the collection of machine vertices for an
-            application vertex.
+        """
+        The index into the collection of machine vertices for an
+        application vertex.
         """
         self._index = value
 
@@ -104,14 +111,15 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
     def __repr__(self):
         if self.get_fixed_location():
-            return f"MachineVertex({self.label}, " \
-                   f"at{self.get_fixed_location()})"
+            return (f"MachineVertex({self.label}, "
+                    f"at{self.get_fixed_location()})")
         else:
             return f"MachineVertex({self.label})"
 
     @abstractproperty
     def sdram_required(self):
-        """ The sdram required by the vertex
+        """
+        The SDRAM space required by the vertex.
 
         :rtype: ~pacman.model.resources.AbstractSDRAM
         """
@@ -119,35 +127,30 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     @property
     def iptags(self):
         """
-        The iptags used by this vertex if any.
+        The :py:class:`~spinn_machine.tags.IPTag`\\s used by this vertex,
+        if any.
 
-        :rtype: iterable(IPtagResource)
+        :rtype: iterable(~pacman.model.resources.IPtagResource)
         """
         return []
 
     @property
     def reverse_iptags(self):
         """
-        The reverse iptags used by this vertex if any.
+        The :py:class:`~spinn_machine.tags.ReverseIPTag`\\s used by this
+        vertex, if any.
 
-        :rtype: iterable(ReverseIPtagResource)
+        :rtype: iterable(~pacman.model.resources.ReverseIPtagResource)
         """
         return []
 
     @overrides(AbstractVertex.get_fixed_location)
     def get_fixed_location(self):
         """
-        The x, y and possibly p the vertex MUST be placed on.
-
-        Typically NONE! Does not have the value of a normal placememts.
-
-        If the Machine vertex has no fixed_location
-        but does have an app_vertex, app_vertex.fixed_location is used.
-        If both have a fixed_location the app level is ignored!
-
-        Used instead of ChipAndCoreConstraint
-
-        :rtype: None or ChipAndCore
+        .. note::
+            If the Machine vertex has no `fixed_location`
+            but does have an `app_vertex`, `app_vertex.fixed_location` is used.
+            If both have a `fixed_location` the app level is ignored!
         """
         if self._fixed_location:
             return self._fixed_location

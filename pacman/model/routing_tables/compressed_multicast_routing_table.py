@@ -17,7 +17,8 @@ from spinn_utilities.overrides import overrides
 
 
 class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
-    """ Represents a compressed routing table for a chip.
+    """
+    Represents a compressed routing table for a chip.
     """
 
     __slots__ = [
@@ -58,11 +59,11 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
                 self.add_multicast_routing_entry(multicast_routing_entry)
 
     def add_multicast_routing_entry(self, multicast_routing_entry):
-        """ Adds a routing entry to this table
+        """
+        Adds a routing entry to this table.
 
-        :param multicast_routing_entry: The route to add
-        :type multicast_routing_entry:
-            ~spinn_machine.MulticastRoutingEntry
+        :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
+            The route to add
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing
             entry with the same key-mask combination already exists
         """
@@ -114,8 +115,8 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     def __repr__(self):
         entry_string = ""
         for entry in self._multicast_routing_entries:
-            entry_string += "{}\n".format(entry)
-        return "{}:{}\n\n{}".format(self._x, self._y, entry_string)
+            entry_string += f"{entry}\n"
+        return f"{self._x}:{self._y}\n\n{entry_string}"
 
     @overrides(AbstractMulticastRoutingTable.__hash__)
     def __hash__(self):

@@ -44,16 +44,22 @@ the git repository:
 To install as a development version which all users will then be able to use,
 run the following where the code has been extracted:
 
-    sudo python setup.py develop
+    sudo pip install -e .
 
 To install as a development version for only yourself, run:
 
-    python setup.py develop --user
+    pip install -e . --user
 
 To install as a development version in a `virtualenv`, with the `virutalenv`
 enabled, run:
 
-    python setup.py develop
+    pip install -e .
+
+Test Installation
+=================
+To be able to run the unitests add [Test] to the pip installs above
+
+    pip install -e .[Test]
 
 Documentation
 =============

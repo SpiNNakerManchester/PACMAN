@@ -31,7 +31,7 @@ class Entry(object):
         self.spinnaker_route = spinnaker_route
 
     def __str__(self):
-        return "{} {} {}".format(self.key, self.mask, self.spinnaker_route)
+        return f"{self.key} {self.mask} {self.spinnaker_route}"
 
     def __eq__(self, other):
         if not isinstance(other, Entry):

@@ -23,8 +23,9 @@ from pacman.model.graphs.machine import (
 
 class DestinationSegmentedSDRAMMachinePartition(
         AbstractSingleSourcePartition, AbstractSDRAMPartition):
-    """ An SDRAM partition that gives each edge its own slice of memory from a\
-        contiguous block. The edges all have the same source vertex.
+    """
+    An SDRAM partition that gives each edge its own slice of memory from a
+    contiguous block. The edges all have the same source vertex.
     """
     __slots__ = [
         # The sdram base address for this partition.
@@ -49,7 +50,7 @@ class DestinationSegmentedSDRAMMachinePartition(
     def sdram_base_address(self, new_value):
         if len(self.edges) == 0:
             raise PartitionMissingEdgesException(
-                "Partition {} has no edges".format(self))
+                f"Partition {self} has no edges")
         self._sdram_base_address = new_value
         for edge in self.edges:
             edge.sdram_base_address = new_value

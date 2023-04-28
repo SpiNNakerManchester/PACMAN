@@ -81,7 +81,8 @@ class TestApplicationGraphModel(unittest.TestCase):
         self.assertIsInstance(vertex, SimpleMachineVertex)
 
     def test_new_create_vertex_from_vertex_check_resources(self):
-        """ check that the creation of a vertex means that the resources
+        """
+        check that the creation of a vertex means that the resources
         calculated by the vertex is the same as what the
         vertex says (given same sizes)
 

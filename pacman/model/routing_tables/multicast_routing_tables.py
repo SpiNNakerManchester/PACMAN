@@ -15,13 +15,14 @@
 import json
 import gzip
 from pacman.exceptions import PacmanAlreadyExistsException
-from .uncompressed_multicast_routing_table import \
-    UnCompressedMulticastRoutingTable
+from .uncompressed_multicast_routing_table import (
+    UnCompressedMulticastRoutingTable)
 from spinn_machine import MulticastRoutingEntry
 
 
 class MulticastRoutingTables(object):
-    """ Represents the multicast routing tables for a number of chips.
+    """
+    Represents the multicast routing tables for a number of chips.
     """
 
     __slots__ = [
@@ -46,18 +47,19 @@ class MulticastRoutingTables(object):
                 self.add_routing_table(routing_table)
 
     def add_routing_table(self, routing_table):
-        """ Add a routing table
+        """
+        Add a routing table.
 
         :param MulticastRoutingTable routing_table: a routing table to add
-        :rtype: None
         :raise PacmanAlreadyExistsException:
             If a routing table already exists for the chip
         """
         if (routing_table.x, routing_table.y) in self._routing_tables_by_chip:
             raise PacmanAlreadyExistsException(
-                "The Routing table for chip {}:{} already exists in this "
-                "collection and therefore is deemed an error to re-add it"
-                .format(routing_table.x, routing_table.y), str(routing_table))
+                "The Routing table for chip "
+                f"{routing_table.x}:{routing_table.y} already exists in this "
+                "collection and therefore is deemed an error to re-add it",
+                str(routing_table))
         self._routing_tables_by_chip[(routing_table.x, routing_table.y)] = \
             routing_table
         self._max_number_of_entries = max(
@@ -65,19 +67,19 @@ class MulticastRoutingTables(object):
 
     @property
     def routing_tables(self):
-        """ The routing tables stored within
+        """
+        The routing tables stored within.
 
         :return: an iterable of routing tables
         :rtype: iterable(MulticastRoutingTable)
-        :raise None: does not raise any known exceptions
         """
         return self._routing_tables_by_chip.values()
 
     @property
     def max_number_of_entries(self):
         """
-        The maximumn number of multi-cast routing entries there are in any\
-            multicast routing table
+        The maximum number of multicast routing entries there are in any
+        multicast routing table.
 
         Will return zero if there are no routing tables
 
@@ -86,18 +88,19 @@ class MulticastRoutingTables(object):
         return self._max_number_of_entries
 
     def get_routing_table_for_chip(self, x, y):
-        """ Get a routing table for a particular chip
+        """
+        Get a routing table for a particular chip.
 
-        :param int x: The x-coordinate of the chip
-        :param int y: The y-coordinate of the chip
-        :return: The routing table, or None if no such table exists
+        :param int x: The X-coordinate of the chip
+        :param int y: The Y-coordinate of the chip
+        :return: The routing table, or `None` if no such table exists
         :rtype: MulticastRoutingTable or None
-        :raise None: No known exceptions are raised
         """
         return self._routing_tables_by_chip.get((x, y), None)
 
     def __iter__(self):
-        """ Iterator for the multicast routing tables stored within
+        """
+        Iterator for the multicast routing tables stored within.
 
         :return: iterator of multicast_routing_table
         """
