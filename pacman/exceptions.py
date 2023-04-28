@@ -62,6 +62,13 @@ class PacmanPlaceException(PacmanException):
     """
 
 
+class PacmanTooBigToPlace(PacmanException):
+    """
+    A request by a splitter to put some vertices on a single chip cannot be
+    satisfied; not enough space is available.
+    """
+
+
 class PacmanPruneException(PacmanException):
     """
     Something went wrong with pruning.

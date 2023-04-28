@@ -172,3 +172,20 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             raise PacmanConfigurationException(
                 "This call is only expected if requires mapping is True")
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
+
+    def add_monitor_all_chips(self, vertex):
+        """
+        Reports that a monitor has been added to every chip.
+        Should be called once for each monitor added to all chips.
+        Should not be called for monitors only added to Ethernet-enabled chips.
+
+        Only affect is to change the numbers reported by the `get_monitor`
+        methods.
+
+        :param ~pacman.model.graphs.machine.MachineVertex vertex:
+            One of the vertices added to each core, assumed to be typical of
+            all.
+        """
+        self.__pacman_data._monitor_cores += 1
+        self.__pacman_data._monitor_sdram += \
+            vertex.sdram_required.get_total_sdram(self.get_plan_n_timestep())
