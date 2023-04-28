@@ -40,8 +40,10 @@ def place_application_graph(system_placements):
 
     .. note::
         app_graph must have been partitioned
-    """
 
+    :param Placements system_placements:
+        The placements of cores doing system tasks
+    """
     # Track the placements and  space
     placements = Placements(system_placements)
     # board_colours = dict()
@@ -61,9 +63,7 @@ def place_application_graph(system_placements):
         while not placed:
             chips_attempted = list()
             try:
-
                 same_chip_groups = app_vertex.splitter.get_same_chip_groups()
-
                 if not same_chip_groups:
                     placed = True
                     break
@@ -72,9 +72,9 @@ def place_application_graph(system_placements):
                 try:
                     next_chip_space, space = spaces.get_next_chip_and_space()
                 except PacmanPlaceException as e:
-                    _place_error(
+                    raise _place_error(
                         placements, system_placements, e,  plan_n_timesteps,
-                        machine)
+                        machine) from e
                 logger.debug(f"Starting placement from {next_chip_space}")
 
                 placements_to_make = list()
@@ -97,7 +97,7 @@ def place_application_graph(system_placements):
                         continue
 
                     # Try to find a chip with space; this might result in a
-                    # SpaceExceededException
+                    # _SpaceExceededException
                     while not next_chip_space.is_space(n_cores, sdram):
                         next_chip_space = spaces.get_next_chip_space(
                             space, last_chip_space)
@@ -139,7 +139,7 @@ def _place_error(
     :param PacmanPlaceException exception:
     :param int plan_n_timesteps:
     :param Machine machine:
-    :raises PacmanPlaceException:
+    :rtype: PacmanPlaceException
     """
     unplaceable = list()
     vertex_count = 0
@@ -212,9 +212,9 @@ def _place_error(
     if get_config_bool("Reports", "draw_placements_on_error"):
         _draw_placements(placements, system_placements)
 
-    raise PacmanPlaceException(
+    return PacmanPlaceException(
         f" {exception}."
-        f" Report written to {report_file}.") from exception
+        f" Report written to {report_file}.")
 
 
 def _check_could_fit(app_vertex, vertices_to_place, sdram):
@@ -466,6 +466,7 @@ class _Spaces(object):
         :param _Space space:
         :param _ChipWithSpace last_chip_space:
         :rtype: _ChipWithSpace
+        :raises _SpaceExceededException:
         """
         # If we are reporting a used chip, update with reachable chips
         if last_chip_space is not None:

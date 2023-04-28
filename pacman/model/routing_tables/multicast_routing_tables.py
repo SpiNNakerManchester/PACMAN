@@ -23,6 +23,10 @@ from spinn_machine import MulticastRoutingEntry
 class MulticastRoutingTables(object):
     """
     Represents the multicast routing tables for a number of chips.
+
+    .. note::
+        The tables in an instance of this class should be either all
+        uncompressed tables, or all compressed tables.
     """
 
     __slots__ = [
@@ -34,7 +38,7 @@ class MulticastRoutingTables(object):
 
     def __init__(self, routing_tables=None):
         """
-        :param iterable(MulticastRoutingTable) routing_tables:
+        :param iterable(AbstractMulticastRoutingTable) routing_tables:
             The routing tables to add
         :raise PacmanAlreadyExistsException:
             If any two routing tables are for the same chip
@@ -50,7 +54,8 @@ class MulticastRoutingTables(object):
         """
         Add a routing table.
 
-        :param MulticastRoutingTable routing_table: a routing table to add
+        :param AbstractMulticastRoutingTable routing_table:
+            a routing table to add
         :raise PacmanAlreadyExistsException:
             If a routing table already exists for the chip
         """
@@ -71,7 +76,7 @@ class MulticastRoutingTables(object):
         The routing tables stored within.
 
         :return: an iterable of routing tables
-        :rtype: iterable(MulticastRoutingTable)
+        :rtype: iterable(AbstractMulticastRoutingTable)
         """
         return self._routing_tables_by_chip.values()
 
@@ -94,7 +99,7 @@ class MulticastRoutingTables(object):
         :param int x: The X-coordinate of the chip
         :param int y: The Y-coordinate of the chip
         :return: The routing table, or `None` if no such table exists
-        :rtype: MulticastRoutingTable or None
+        :rtype: AbstractMulticastRoutingTable or None
         """
         return self._routing_tables_by_chip.get((x, y), None)
 
@@ -103,6 +108,7 @@ class MulticastRoutingTables(object):
         Iterator for the multicast routing tables stored within.
 
         :return: iterator of multicast_routing_table
+        :rtype: iterable(AbstractMulticastRoutingTable)
         """
         return iter(self._routing_tables_by_chip.values())
 

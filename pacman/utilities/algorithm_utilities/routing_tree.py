@@ -92,8 +92,7 @@ class RoutingTree(object):
 
         :rtype: iterable(tuple(int, RoutingTree or MachineVertex))
         """
-        for child in self._children:
-            yield child
+        yield from self._children
 
     def append_child(self, child):
         """
@@ -123,8 +122,7 @@ class RoutingTree(object):
 
         for _route, obj in self._children:
             if isinstance(obj, RoutingTree):
-                for subchild in obj:
-                    yield subchild
+                yield from obj
             else:
                 yield obj
 

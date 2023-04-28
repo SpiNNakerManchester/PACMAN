@@ -31,6 +31,12 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class AbstractCompressor(object):
+    """
+    Basic model of a router table compressor.
+
+    .. note::
+        Not all compressors use this model.
+    """
 
     __slots__ = [
         # String of problems detected. Must be "" to finish
@@ -46,8 +52,10 @@ class AbstractCompressor(object):
         self._accept_overflow = accept_overflow
         self._problems = ""
 
-    def _run(self):
+    def compress_all_tables(self):
         """
+        Apply compression to all uncompressed tables.
+
         :rtype: MulticastRoutingTables
         """
         router_tables = PacmanDataView.get_precompressed()
@@ -63,12 +71,12 @@ class AbstractCompressor(object):
         :param UnCompressedMulticastRoutingTable router_table:
             Original routing table for a single chip
         :return: Raw compressed routing table entries for the same chip
-        :rtype: list(Entry)
+        :rtype: list(RTEntry)
         """
 
     def compress_tables(self, router_tables, progress):
         """
-        Compress all the unordered routing tables.
+        Compress the given unordered routing tables.
 
         Tables who start of smaller than target_length are not compressed
 

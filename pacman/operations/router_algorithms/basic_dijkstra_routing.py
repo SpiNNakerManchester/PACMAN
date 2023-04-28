@@ -72,8 +72,7 @@ def basic_dijkstra_routing(
         If something goes wrong with the routing
     """
     router = _BasicDijkstraRouting(bw_per_route_entry, max_bw)
-    # pylint:disable=protected-access
-    return router._run()
+    return router.route_all_partitions()
 
 
 class _BasicDijkstraRouting(object):
@@ -100,7 +99,7 @@ class _BasicDijkstraRouting(object):
         self._bw_per_route_entry = bw_per_route_entry
         self._max_bw = max_bw
 
-    def _run(self):
+    def route_all_partitions(self):
         """
         Find routes between the edges with the allocated information,
         placed in the given places

@@ -182,8 +182,7 @@ class ApplicationGraph(object):
         """
         for partitions in \
                 self._outgoing_edge_partitions_by_pre_vertex.values():
-            for partition in partitions:
-                yield partition
+            yield from partitions
 
     @property
     def n_outgoing_edge_partitions(self):

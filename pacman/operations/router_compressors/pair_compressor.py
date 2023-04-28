@@ -11,11 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import functools
 from spinn_machine import Machine
 from pacman.exceptions import PacmanElementAllocationException
 from .abstract_compressor import AbstractCompressor
-from .entry import Entry
+from .entry import RTEntry
 
 
 def pair_compressor(ordered=True, accept_overflow=False, verify=False):
@@ -27,9 +27,8 @@ def pair_compressor(ordered=True, accept_overflow=False, verify=False):
     :rtype: MulticastRoutingTables
     """
     compressor = _PairCompressor(ordered, accept_overflow)
-    # pylint:disable=protected-access
-    compressed = compressor._run()
-    # TODO currenly normal pari compressor does not verify lengths
+    compressed = compressor.compress_all_tables()
+    # TODO currently normal pair compressor does not verify lengths
     if verify:
         verify_lengths(compressed)
     return compressed
@@ -168,9 +167,10 @@ class _PairCompressor(AbstractCompressor):
         self._routes_frequency = None
         self._routes_count = None
 
-    def _compare_routes(self, route_a, route_b):
+    def _compare_entries(self, route_a_entry, route_b_entry):
         """
-        Compares two routes for sorting based on the frequency of each route.
+        Compares two entries for sorting based on the frequency of each entry's
+        SpiNNaker route.
 
         The assumption here is that self._routes has been sorted with the
         highest frequency at the top of the tables.
@@ -180,11 +180,13 @@ class _PairCompressor(AbstractCompressor):
         For two different routes but with the same frequency order is based on
         the (currently arbitrary) order they are in the self._routes table
 
-        :param int route_a:
-        :param int route_b:
+        :param RTEntry route_a_entry:
+        :param RTEntry route_b_entry:
         :return: ordering value (-1, 0, 1)
         :rtype: int
         """
+        route_a = route_a_entry.spinnaker_route
+        route_b = route_b_entry.spinnaker_route
         if route_a == route_b:
             return 0
         for i in range(self._routes_count):
@@ -193,100 +195,6 @@ class _PairCompressor(AbstractCompressor):
             if self._routes[i] == route_b:
                 return -1
         raise PacmanElementAllocationException("Sorting error")
-
-    def _three_way_partition_table(self, low, high):
-        """
-        Partitions the entries between low and high into three parts
-
-        based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
-
-        :param int low: Inclusive Lowest index to consider
-        :param int high: Inclusive Highest index to consider
-        :return: (last_index of lower, last_index_of_middle)
-        :rtype: tuple(int,int)
-        """
-        check = low + 1
-        pivot = self._all_entries[low].spinnaker_route
-        while check <= high:
-            compare = self._compare_routes(
-                self._all_entries[check].spinnaker_route, pivot)
-            if compare < 0:
-                temp = self._all_entries[low]
-                self._all_entries[low] = self._all_entries[check]
-                self._all_entries[check] = temp
-                low += 1
-                check += 1
-            elif compare > 0:
-                temp = self._all_entries[high]
-                self._all_entries[high] = self._all_entries[check]
-                self._all_entries[check] = temp
-                high -= 1
-            else:
-                check += 1
-        return low, check
-
-    def _quicksort_table(self, low, high):
-        """
-        Sorts the entries in place based on frequency of their route
-
-        :param int low: Inclusive lowest index to consider
-        :param int high: Inclusive highest index to consider
-        """
-        if low < high:
-            left, right = self._three_way_partition_table(low, high)
-            self._quicksort_table(low, left - 1)
-            self._quicksort_table(right, high)
-
-    def _swap_routes(self, index_a, index_b):
-        """
-        Helper function to swap *both* the routes and routes frequency tables
-
-        :param int index_a:
-        :param int index_b:
-        """
-        temp = self._routes_frequency[index_a]
-        self._routes_frequency[index_a] = self._routes_frequency[index_b]
-        self._routes_frequency[index_b] = temp
-        temp = self._routes[index_a]
-        self._routes[index_a] = self._routes[index_b]
-        self._routes[index_b] = temp
-
-    def _three_way_partition_routes(self, low, high):
-        """
-        Partitions the routes and frequencies into three parts.
-
-        based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
-
-        :param int low: Lowest index to consider
-        :param int high: Highest index to consider
-        :return: (last_index of lower, last_index_of_middle)
-        :rtype: tuple(int,int)
-        """
-        check = low + 1
-        pivot = self._routes_frequency[low]
-        while check <= high:
-            if self._routes_frequency[check] > pivot:
-                self._swap_routes(low, check)
-                low += 1
-                check += 1
-            elif self._routes_frequency[check] < pivot:
-                self._swap_routes(high, check)
-                high -= 1
-            else:
-                check += 1
-        return low, check
-
-    def _quicksort_routes(self, low, high):
-        """
-        Sorts the routes in place based on frequency.
-
-        :param int low: Inclusive lowest index to consider
-        :param int high: Inclusive highest index to consider
-        """
-        if low < high:
-            left, right = self._three_way_partition_routes(low, high)
-            self._quicksort_routes(low, left - 1)
-            self._quicksort_routes(right, high)
 
     def _find_merge(self, left, index):
         """
@@ -297,7 +205,7 @@ class _PairCompressor(AbstractCompressor):
 
         If no intersect detected entry[left] is replaced with the merge
 
-        :param int left: Index of Entry to merge and replace if possible
+        :param int left: Index of entry to merge and replace if possible
         :param int index: Index of entry to merge with
         :return: True if and only if a merge was found and done
         :rtype: bool
@@ -317,7 +225,7 @@ class _PairCompressor(AbstractCompressor):
                     self._all_entries[check].mask,
                     m_key, m_mask):
                 return False
-        self._all_entries[left] = Entry(
+        self._all_entries[left] = RTEntry(
             m_key, m_mask, defaultable,
             self._all_entries[left].spinnaker_route)
         return True
@@ -352,10 +260,11 @@ class _PairCompressor(AbstractCompressor):
             #    self._all_entries[left] = None
             self._write_index += 1
 
-    def update_frequency(self, route):
+    def _update_frequency(self, entry):
         """
-        :param int route:
+        :param ~spinn_machine.MulticastRoutingEntry entry:
         """
+        route = entry.spinnaker_route
         for i in range(self._routes_count):
             if self._routes[i] == route:
                 self._routes_frequency[i] += 1
@@ -378,23 +287,25 @@ class _PairCompressor(AbstractCompressor):
         :param UnCompressedMulticastRoutingTable router_table:
             Original Routing table for a single chip
         :return: Compressed routing table for the same chip
-        :rtype: list(Entry)
+        :rtype: list(RTEntry)
         """
-
         # Split the entries into buckets based on spinnaker_route
         self._all_entries = []
         self._routes_count = 0
         # Imitate creating fixed size arrays
-        self._routes = Machine.ROUTER_ENTRIES * [None]
-        self._routes_frequency = Machine.ROUTER_ENTRIES * [None]
+        self._routes = router_table.number_of_entries * [None]
+        self._routes_frequency = router_table.number_of_entries * [0]
 
         for entry in router_table.multicast_routing_entries:
             self._all_entries.append(
-                Entry.from_MulticastRoutingEntry(entry))
-            self.update_frequency(entry.spinnaker_route)
+                RTEntry.from_MulticastRoutingEntry(entry))
+            self._update_frequency(entry)
 
-        self._quicksort_routes(0, self._routes_count - 1)
-        self._quicksort_table(0, len(self._all_entries) - 1)
+        # Use built-in sorting; much simpler
+        self._routes_frequency, self._routes = zip(*sorted(
+            zip(self._routes_frequency, self._routes),
+            key=lambda x: -x[0]))
+        self._all_entries.sort(key=functools.cmp_to_key(self._compare_entries))
 
         self._write_index = 0
         self._max_index = len(self._all_entries) - 1
@@ -447,9 +358,9 @@ class _PairCompressor(AbstractCompressor):
 
         The assumption is that they both have the same known spinnaker_route
 
-        :param ~pacman.operations.router_compressors.Entry entry1:
+        :param ~pacman.operations.router_compressors.RTEntry entry1:
             Key, Mask, defaultable from the first entry
-        :param ~pacman.operations.router_compressors.Entry entry2:
+        :param ~pacman.operations.router_compressors.RTEntry entry2:
             Key, Mask, defaultable from the second entry
         :return: Key, Mask, defaultable from merged entry
         :rtype: tuple(int, int, bool)

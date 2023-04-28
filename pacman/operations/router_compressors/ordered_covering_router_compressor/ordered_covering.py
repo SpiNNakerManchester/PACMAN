@@ -14,7 +14,7 @@
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_machine import Machine
-from pacman.operations.router_compressors import Entry
+from pacman.operations.router_compressors import RTEntry
 from pacman.exceptions import MinimisationFailedError
 from .remove_default_routes import remove_default_routes
 from pacman.utilities.constants import FULL_MASK
@@ -43,14 +43,14 @@ def minimise(
         at least orthogonal (i.e., there are no two entries which would match
         the same key) and reorderable.
 
-    :param list(Entry) routing_table:
+    :param list(RTEntry) routing_table:
         Routing entries to be merged.
     :param bool use_timer_cut_off: flag for timing cut-off to be used.
     :param time_to_run_for_before_raising_exception:
         The time to run for in seconds before raising an exception
     :type time_to_run_for_before_raising_exception: int or None
     :return: The compressed table entries
-    :rtype: list(Entry)
+    :rtype: list(RTEntry)
     :raises MinimisationFailedError:
         If the smallest table that can be produced is larger than
         ``target_length``.
@@ -91,7 +91,7 @@ def ordered_covering(
         at least orthogonal (i.e., there are no two entries which would match
         the same key) and reorderable.
 
-    :param list(Entry) routing_table:
+    :param list(RTEntry) routing_table:
         Routing entries to be merged.
     :param target_length:
         Target length of the routing table; the minimisation procedure will
@@ -112,7 +112,7 @@ def ordered_covering(
         not `None`. If True then a table will be returned regardless of the
         size of the final table.
     :return: new routing table, A new aliases dictionary.
-    :rtype: tuple(list(Entry), dict(tuple(int,int), set(tuple(int,int))))
+    :rtype: tuple(list(RTEntry), dict(tuple(int,int), set(tuple(int,int))))
     :raises MinimisationFailedError:
         If the smallest table that can be produced is larger than
         ``target_length``.
@@ -188,7 +188,7 @@ def _get_best_merge(routing_table, aliases):
     Inspect all possible merges for the routing table and return the merge
     which would combine the greatest number of entries.
 
-    :param Entry routing_table: Routing entries to be merged.
+    :param RTEntry routing_table: Routing entries to be merged.
     :param aliases:
         Dictionary of which keys and masks in the routing table are
         combinations of other (now removed) keys and masks; this allows us to
@@ -230,7 +230,7 @@ def _get_all_merges(routing_table):
     """
     Get possible sets of entries to merge.
 
-    :param Entry routing_table: Routing entries to be merged.
+    :param RTEntry routing_table: Routing entries to be merged.
     :rtype: iterable(_Merge)
     """
     # Memorise entries that have been considered as part of a merge
@@ -262,7 +262,7 @@ def _get_insertion_index(routing_table, generality):
     Determine the index in the routing table where a new entry should be
     inserted.
 
-    :param Entry routing_table: Routing entries to be merged.
+    :param RTEntry routing_table: Routing entries to be merged.
     :param int generality:
     """
     # We insert before blocks of equivalent generality, so decrement the given
@@ -388,7 +388,7 @@ class _Merge(object):
         aliases = dict(aliases)
 
         # Get the new entry
-        new_entry = Entry(
+        new_entry = RTEntry(
             spinnaker_route=self.routing_table[
                 next(iter(self.entries))].spinnaker_route,
             key=self.key, mask=self.mask, defaultable=self.defaultable

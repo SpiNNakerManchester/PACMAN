@@ -33,8 +33,7 @@ def fixed_route_router(destination_class):
     :raises PacmanAlreadyExistsException:
     """
     router = _FixedRouteRouter(destination_class)
-    # pylint:disable=protected-access
-    return router._run()
+    return router.build_fixed_routes()
 
 
 class _FixedRouteRouter(object):
@@ -52,7 +51,7 @@ class _FixedRouteRouter(object):
         self._destination_class = destination_class
         self._fixed_route_tables = dict()
 
-    def _run(self):
+    def build_fixed_routes(self):
         """
         Runs the fixed route generator for all boards on machine.
 
@@ -62,23 +61,21 @@ class _FixedRouteRouter(object):
         :raises PacmanRoutingException:
         :raises PacmanAlreadyExistsException:
         """
-        progress = ProgressBar(
-            len(self._machine.ethernet_connected_chips),
-            "Generating fixed router routes")
-
         # handle per board
-        for ethernet_chip in progress.over(
-                self._machine.ethernet_connected_chips):
-            self._do_fixed_routing(ethernet_chip)
+        with ProgressBar(len(self._machine.ethernet_connected_chips),
+                         "Generating fixed router routes") as progress:
+            for ethernet_chip in progress.over(
+                    self._machine.ethernet_connected_chips):
+                self._route_board(ethernet_chip)
         return self._fixed_route_tables
 
-    def _do_fixed_routing(self, ethernet_connected_chip):
+    def _route_board(self, ethernet_connected_chip):
         """
         Handles this board through the quick routing process, based on a
         predefined routing table.
 
         :param ~spinn_machine.Chip ethernet_connected_chip:
-            the Ethernet connected chip
+            the Ethernet connected chip identifying the board
         :raises PacmanRoutingException:
         :raises PacmanAlreadyExistsException:
         """
@@ -128,12 +125,11 @@ class _FixedRouteRouter(object):
         :param list(int) processor_ids:
         :raises PacmanAlreadyExistsException:
         """
-        fixed_route_entry = FixedRouteEntry(
-            link_ids=link_ids, processor_ids=processor_ids)
         if key in self._fixed_route_tables:
             raise PacmanAlreadyExistsException(
                 "fixed route entry", str(key))
-        self._fixed_route_tables[key] = fixed_route_entry
+        self._fixed_route_tables[key] = FixedRouteEntry(
+            link_ids=link_ids, processor_ids=processor_ids)
 
     def __locate_destination(self, chip):
         """
@@ -145,10 +141,8 @@ class _FixedRouteRouter(object):
         :rtype: int
         :raises PacmanConfigurationException: if no placement processor found
         """
-        x = chip.x
-        y = chip.y
         for placement in PacmanDataView.iterate_placements_by_xy_and_type(
-                x, y, self._destination_class):
+                chip.x, chip.y, self._destination_class):
             return placement.p
         raise PacmanConfigurationException(
-            f"no destination vertex found on Ethernet chip {x}:{y}")
+            f"no destination vertex found on Ethernet chip {chip.x}:{chip.y}")

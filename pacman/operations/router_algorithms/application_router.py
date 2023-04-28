@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import deque, defaultdict
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_table_by_partition import (
@@ -21,8 +23,6 @@ from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     vertex_xy_and_route)
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 from pacman.model.graphs.application import ApplicationVertex
-from collections import deque, defaultdict
-from spinn_utilities.progress_bar import ProgressBar
 
 
 class _Targets(object):
@@ -533,7 +533,8 @@ def _find_target_xy(target_xys, routes, source_mappings):
     """
     Find a target chip to use from the set of target chips.
 
-    :param set(tuple(int, int)) target_xys: The chips in the target
+    :param set(tuple(int, int)) target_xys:
+        The chips in the target; must not be empty
     :param dict(tuple(int,int),RoutingTree) routes: The routes in existence
     :param source_mappings: The sources mapped to their routes
     :type source_mappings: dict(tuple(int, int),
@@ -661,6 +662,7 @@ def _find_reachable(source_xy, machine, allowed_xys, disallowed_xys):
     :param Machine machine:
     :param set(tuple(int,int)) allowed_xys:
     :param set(tuple(int,int)) disallowed_xys:
+    :rtype: set(tuple(int,int))
     """
     xys_to_explore = deque([source_xy])
     visited = set()
@@ -791,7 +793,7 @@ def _path_without_errors(source_xy, nodes, machine):
 def _path_without_loops(start_xy, nodes):
     """
     :param tuple(int, int) start_xy:
-    :param list(tuple(int,int)) nodes:
+    :param list(tuple(int,tuple(int,int))) nodes:
     :rtype: list(tuple(int,int))
     """
     seen_nodes = {start_xy: 0}
@@ -829,6 +831,12 @@ def _xy(node):
 
 
 def _find_path(source_xy, target_xy, machine):
+    """
+    :param tuple(int,int) source_xy:
+    :param tuple(int,int) target_xy:
+    :param Machine machine:
+    :rtype: list(tuple(int,tuple(int,int)))
+    """
     xys_to_explore = deque([(source_xy, list())])
     visited = set()
     while xys_to_explore:

@@ -58,7 +58,8 @@ def range_compressor(accept_overflow=True):
 
 class RangeCompressor(object):
     """
-
+    A compressor based on ranges.
+    Use via :py:func:`range_compressor`.
     """
 
     __slots__ = [
@@ -82,7 +83,7 @@ class RangeCompressor(object):
         :param UnCompressedMulticastRoutingTable uncompressed:
             Original Routing table for a single chip
         :return: Compressed routing table for the same chip
-        :rtype: list(Entry)
+        :rtype: AbstractMulticastRoutingTable
         """
         # Check you need to compress
         if not get_config_bool(
@@ -155,62 +156,54 @@ class RangeCompressor(object):
         return (entry.routing_entry_key | ~entry.mask) & 0xFFFFFFFF
 
     def _merge_range(self, first, last):
-        # With a range of 1 just use the existing
-        if first == last:
-            self._compressed.add_multicast_routing_entry(self._entries[first])
-            return
+        while True:
+            # With a range of 1 just use the existing
+            if first == last:
+                self._compressed.add_multicast_routing_entry(
+                    self._entries[first])
+                return
 
-        # Find the points the range must cover
-        first_point = self._get_key(first)
-        last_point = self._get_endpoint(last)
-        # Find the points the range may NOT go into
-        pre_point = self._get_endpoint(first-1)
-        post_point = self._get_key(last+1)
-
-        # find the power big enough to include the first and last enrty
-        dif = last_point - first_point
-        power = self.next_power(dif)
-
-        # Find the start range cutoffs
-        low_cut = first_point // power * power
-        high_cut = low_cut + power
-
-        # If that does not cover all try one power higher
-        if high_cut < last_point:
-            power <<= 1
-            low_cut = first_point // power * power
-            high_cut = low_cut + power
-
-        # The power is too big if it touches the entry before or after
-        while power > 1 and (low_cut < pre_point or high_cut > post_point):
-            power >>= 1
-            low_cut = first_point // power * power
-            high_cut = low_cut + power
-
-        # The range may now not cover all the index so reduce the indexes
-        full_last = last
-        while high_cut <= last_point:
-            last -= 1
+            # Find the points the range must cover
+            first_point = self._get_key(first)
             last_point = self._get_endpoint(last)
+            # Find the points the range may NOT go into
+            pre_point = self._get_endpoint(first - 1)
+            post_point = self._get_key(last + 1)
 
-        # make the new router entry
-        new_mask = 2 ** 32 - power
-        route = self._entries[first].spinnaker_route
-        new_entry = MulticastRoutingEntry(
-            low_cut, new_mask,  spinnaker_route=route)
-        self._compressed.add_multicast_routing_entry(new_entry)
+            # find the power big enough to include the first and last entry
+            dif = last_point - first_point
+            power = 1 if dif < 1 else 1 << ((dif - 1).bit_length())
 
-        # Do any indexes skip from before
-        if full_last != last:
-            self._merge_range(last + 1, full_last)
+            # Find the start range cutoffs
+            low_cut = first_point // power * power
+            high_cut = low_cut + power
 
-    @staticmethod
-    def next_power(number):
-        power = 1
-        while power < number:
-            power *= 2
-        return power
+            # If that does not cover all try one power higher
+            if high_cut < last_point:
+                power <<= 1
+                low_cut = first_point // power * power
+                high_cut = low_cut + power
 
-    @staticmethod
-    def cut_off(key, power):
-        return key // power * power
+            # The power is too big if it touches the entry before or after
+            while power > 1 and (low_cut < pre_point or high_cut > post_point):
+                power >>= 1
+                low_cut = first_point // power * power
+                high_cut = low_cut + power
+
+            # The range may now not cover all the index so reduce the indexes
+            full_last = last
+            while high_cut <= last_point:
+                last -= 1
+                last_point = self._get_endpoint(last)
+
+            # make the new router entry
+            new_mask = 2 ** 32 - power
+            route = self._entries[first].spinnaker_route
+            self._compressed.add_multicast_routing_entry(MulticastRoutingEntry(
+                low_cut, new_mask,  spinnaker_route=route))
+
+            # Check if we're done
+            if full_last == last:
+                return
+            # Loop to do any indexes skip from before
+            first, last = last + 1, full_last

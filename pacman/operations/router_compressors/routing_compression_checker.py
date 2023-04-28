@@ -31,39 +31,40 @@ def codify(route, length=32):
     Whenever a mask bit is zero the list of covered keys is doubled to
     include both the key with a zero and a one at that place.
 
-    :param ~spinn_machine.MulticastRoutingEntry route: single routing Entry
+    :param ~spinn_machine.MulticastRoutingEntry route: single routing entry
     :param int length: length in bits of the key and mask (defaults to 32)
     :return: set of routing_keys covered by this route
     :rtype: str
     """
     mask = route.mask
     key = route.routing_entry_key
-    code = ""
-    # Check each bit in the mask
-    for i in range(length):
-        bit_value = 2**i
-        # If the mask bit is zero then both zero and one acceptable
-        if mask & bit_value:
-            code = str(int(key & bit_value != 0)) + code
-        else:
-            # Safety key 1 with mask 0 is an error
-            assert key & bit_value == 0, (
-                f"Bit {i} on the mask:{bin(mask)} is 0 "
-                f"but 1 in the key:{bin(key)}")
-            code = WILDCARD + code
-    return code
+    # Check for validity: key 1 with mask 0 is an error
+    bad = key & ~mask
+    if bad:
+        logger.error(
+            "Bit {} on the mask:{} is 0 but 1 in the key:{}",
+            # Magic to find first set bit: See
+            # https://stackoverflow.com/a/36059264/301832
+            (bad & -bad).bit_length(), bin(mask), bin(key))
+
+    # Check each bit in the mask; use bit from key if so, else WILDCARD
+    return "".join(
+        str(int(key & bit != 0) if (mask & bit) else WILDCARD)
+        for bit in map(lambda i: 1 << i, reversed(range(length))))
 
 
 def codify_table(table, length=32):
     """
-    :param MulticastRoutingTable table:
+    Apply :py:func:`codify` to all entries in a table.
+
+    :param AbstractMulticastRoutingTable table:
     :param int length:
+    :return: mapping from codified route to routing entry
     :rtype: dict(str, ~spinn_machine.MulticastRoutingEntry)
     """
-    code_dict = dict()
-    for route in table.multicast_routing_entries:
-        code_dict[codify(route, length)] = route
-    return code_dict
+    return {
+        codify(route, length): route
+        for route in table.multicast_routing_entries}
 
 
 def covers(o_code, c_code):
@@ -85,8 +86,8 @@ def covers(o_code, c_code):
 
 def calc_remainders(o_code, c_code):
     """
-    :param str o_code:
-    :param str c_code:
+    :param str o_code: Codified original route
+    :param str c_code: Codified compressed route
     :rtype: list(str)
     """
     if o_code == c_code:
@@ -106,10 +107,10 @@ def calc_remainders(o_code, c_code):
 def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
     """
     :param ~spinn_machine.MulticastRoutingEntry o_route: the original route
-    :param dict compressed_dict:
-    :param str o_code:
-    :param int start:
-    :param ~io.FileIO f:
+    :param dict compressed_dict: Compressed routes
+    :param str o_code: Codified original route (if known)
+    :param int start: Starting index in compressed routes
+    :param ~io.FileIO f: Where to write (part of) the route report
     """
     if o_code is None:
         o_code = codify(o_route)
@@ -135,9 +136,8 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
                     raise PacmanRoutingException(
                         f"Compressed route {c_route} while original route "
                         f"{o_route} but has a different defaultable value.")
-                else:
-                    compare_route(o_route, compressed_dict, o_code=o_code,
-                                  start=i + 1, f=f)
+                compare_route(o_route, compressed_dict, o_code=o_code,
+                              start=i + 1, f=f)
             else:
                 remainders = calc_remainders(o_code, c_code)
                 for remainder in remainders:
@@ -153,8 +153,10 @@ def compare_tables(original, compressed):
     """
     Compares the two tables without generating any output.
 
-    :param MulticastRoutingTable original: The original routing tables
-    :param MulticastRoutingTable compressed: The compressed routing tables.
+    :param UnCompressedMulticastRoutingTable original:
+        The original routing tables
+    :param CompressedMulticastRoutingTable compressed:
+        The compressed routing tables.
         Which will be considered in order.
     :raises: PacmanRoutingException if there is any error
     """

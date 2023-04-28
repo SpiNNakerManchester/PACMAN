@@ -14,7 +14,7 @@
 
 import logging
 from spinn_utilities.log import FormatAdapter
-from pacman.operations.router_compressors import (AbstractCompressor, Entry)
+from pacman.operations.router_compressors import (AbstractCompressor, RTEntry)
 from .ordered_covering import minimise
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -27,8 +27,7 @@ def ordered_covering_compressor():
     :rtype: MulticastRoutingTables
     """
     compressor = _OrderedCoveringCompressor()
-    # pylint:disable=protected-access
-    return compressor._run()
+    return compressor.compress_all_tables()
 
 
 class _OrderedCoveringCompressor(AbstractCompressor):
@@ -44,16 +43,9 @@ class _OrderedCoveringCompressor(AbstractCompressor):
     def compress_table(self, router_table):
         """
         :param UnCompressedMulticastRoutingTable router_table:
-        :rtype: list(Entry)
+        :rtype: list(RTEntry)
         """
-        # convert to rig inspired format
-        entries = list()
-
-        # handle entries
-        for router_entry in router_table.multicast_routing_entries:
-            # Add the new entry
-            entries.append(Entry.from_MulticastRoutingEntry(router_entry))
-
         # compress the router entries
-        compressed_router_table_entries = minimise(entries)
-        return compressed_router_table_entries
+        return minimise(list(map(
+            RTEntry.from_MulticastRoutingEntry,
+            router_table.multicast_routing_entries)))

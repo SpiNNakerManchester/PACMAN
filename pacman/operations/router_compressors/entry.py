@@ -15,7 +15,21 @@
 from spinn_machine import MulticastRoutingEntry
 
 
-class Entry(object):
+class RTEntry(object):
+    """
+    The internal representation of router table entries used by the router
+    table compressors. Essentially a tuple and compacted version of
+    :py:class:`~spinn_machine.MulticastRoutingEntry`.
+
+    :ivar key: The key
+    :vartype key: int
+    :ivar mask: The mask
+    :vartype mask: int
+    :ivar defaultable: Whether the route may be handled by default routing
+    :vartype defaultable: bool
+    :ivar spinnaker_route: The route
+    :vartype spinnaker_route: int
+    """
     __slots__ = ["key", "mask", "defaultable", "spinnaker_route"]
 
     def __init__(self, key, mask, defaultable, spinnaker_route):
@@ -34,7 +48,7 @@ class Entry(object):
         return f"{self.key} {self.mask} {self.spinnaker_route}"
 
     def __eq__(self, other):
-        if not isinstance(other, Entry):
+        if not isinstance(other, RTEntry):
             return False
         return (self.key == other.key and self.mask == other.mask and
                 self.spinnaker_route == other.spinnaker_route)
@@ -43,11 +57,11 @@ class Entry(object):
     def from_MulticastRoutingEntry(mre):
         """
         :param ~spinn_machine.MulticastRoutingEntry mre:
-        :rtype: Entry
+        :rtype: RTEntry
         """
         # Yes I know using _params is ugly but this is for speed
         # pylint:disable=protected-access
-        return Entry(
+        return RTEntry(
             mre._routing_entry_key, mre._mask, mre._defaultable,
             mre._spinnaker_route)
 
