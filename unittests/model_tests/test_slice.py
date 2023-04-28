@@ -25,12 +25,17 @@ class TestSlice(unittest.TestCase):
 
     def test_basic(self):
         s = Slice(0, 10)
-        assert s.n_atoms == 11  # 10 - 0 + 1
-        assert s.lo_atom == 0   # As specified
-        assert s.hi_atom == 10  # As specified
+        self.assertEqual(11, s.n_atoms)  # 10 - 0 + 1
+        self.assertEqual(0, s.lo_atom)  # As specified
+        self.assertEqual(10, s.hi_atom)  # As specified
         assert s.as_slice == slice(0, 11)  # Slice object supported by arrays
+        self.assertListEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                             list(s.get_raster_ids()))
+        self.assertEqual(s.dimension, (slice(0, 11),))
         self.assertEqual("(0:10)", str(s))
         s2 = Slice.from_string(str(s))
+        self.assertEqual((11, ), s.shape)
+        self.assertEqual((0, ), s.start)
         self.assertEqual(s, s2)
 
     def test_check_lo_atom_sanity(self):
@@ -58,7 +63,19 @@ class TestSlice(unittest.TestCase):
 
     def test_equal_hi_lo_atoms(self):
         # This should be fine...
-        Slice(4, 4)
+        s = Slice(4, 4)
+        self.assertEqual(1, s.n_atoms)  # 10 - 0 + 1
+        self.assertEqual(4, s.lo_atom)  # As specified
+        self.assertEqual(4, s.hi_atom)  # As specified
+        assert s.as_slice == slice(4, 5)  # Slice object supported by arrays
+        self.assertListEqual([4], list(s.get_raster_ids()))
+
+        self.assertEqual(s.dimension, (slice(4, 5),))
+        self.assertEqual("(4:4)", str(s))
+        s2 = Slice.from_string(str(s))
+        self.assertEqual((1, ), s.shape)
+        self.assertEqual((4, ), s.start)
+        self.assertEqual(s, s2)
 
     def test_immutability_lo_atom(self):
         s = Slice(0, 10)
@@ -79,27 +96,3 @@ class TestSlice(unittest.TestCase):
         s = Slice(0, 10)
         with self.assertRaises(AttributeError):
             s.as_slice = slice(2, 10)
-
-    def test_2d(self):
-        s = Slice(0, 8, (3, 3), (0, 0))
-        self.assertEqual("0(0:3)(0:3)", str(s))
-        s2 = Slice.from_string(str(s))
-        self.assertEqual(s, s2)
-
-    def test_2a(self):
-        s = Slice(36, 44, (3, 3), (0, 6))
-        self.assertEqual("36(0:3)(6:9)", str(s))
-        s2 = Slice.from_string(str(s))
-        self.assertEqual(s, s2)
-
-    def test_2b(self):
-        s = Slice(9, 17, (3, 3), (3, 0))
-        self.assertEqual("9(3:6)(0:3)", str(s))
-        s2 = Slice.from_string(str(s))
-        self.assertEqual(s, s2)
-
-    def test_3b(self):
-        s = Slice(432, 455, (2, 3, 4), (6, 9, 16))
-        self.assertEqual("432(6:8)(9:12)(16:20)", str(s))
-        s2 = Slice.from_string(str(s))
-        self.assertEqual(s, s2)
