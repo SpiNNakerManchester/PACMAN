@@ -1,4 +1,4 @@
-# Copyright (c) 2014 The University of Manchester
+# Copyright (c) 2023 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,19 +58,23 @@ class MDSlice(Slice):
         self._atoms_shape = atoms_shape
 
     @property
+    @overrides(Slice.hi_atom)
     def hi_atom(self):
         raise NotImplementedError(
             "hi_atom does not work for multi dimensional slices")
 
     @property
+    @overrides(Slice.shape)
     def shape(self):
         return self._shape
 
     @property
+    @overrides(Slice.start)
     def start(self):
         return self._start
 
     @property
+    @overrides(Slice.shape)
     def as_slice(self):
         raise NotImplementedError(
             "as slice does not work for multi dimensional slices")
@@ -88,7 +92,8 @@ class MDSlice(Slice):
                              " dimensions") from exc
 
     @property
-    def slices(self):
+    @overrides(Slice.dimension)
+    def dimension(self):
         """ Get slices for every dimension
 
         :rtype: tuple(slice)
@@ -96,6 +101,7 @@ class MDSlice(Slice):
         return tuple(self.get_slice(n) for n in range(len(self.shape)))
 
     @property
+    @overrides(Slice.end)
     def end(self):
         """ The end positions of the slice in each dimension
         """
@@ -105,16 +111,8 @@ class MDSlice(Slice):
     def get_ids_as_slice_or_list(self):
         return self.get_raster_ids()
 
-    def get_raster_ids(self, atoms_shape=None):
-        """ Get the IDs of the atoms in the slice as they would appear in a
-            "raster scan" of the atoms over the whole shape.
-
-        :param tuple(int) atoms_shape:
-            The size of each dimension of the whole shape
-        :return: A list of the global raster IDs of the atoms in this slice
-        """
-        if atoms_shape is not None:
-            assert (self._atoms_shape == atoms_shape)
+    @overrides(Slice.get_raster_ids)
+    def get_raster_ids(self):
         slices = tuple(self.get_slice(n)
                        for n in reversed(range(len(self.start))))
         ids = numpy.arange(numpy.prod(self._atoms_shape)).reshape(
@@ -123,7 +121,7 @@ class MDSlice(Slice):
 
     def __str__(self):
         value = ""
-        for a_slice in self.slices:
+        for a_slice in self.dimension:
             value += f"({a_slice.start}:{a_slice.stop})"
         return f"{self.lo_atom}{self._atoms_shape}{value}"
 
@@ -132,17 +130,14 @@ class MDSlice(Slice):
             return False
         if not super().__eq__(other):
             return False
-        if self._atoms_shape != other._atoms_shape:
-            return False
-        if self._shape != other.shape:
-            return False
-        return self._start == other.start
+        return self._atoms_shape == other._atoms_shape
 
     def __hash__(self):
-        return hash((self._lo_atom, self._n_atoms, self._shape, self._start,
-                     self._atoms_shape))
+        # Slices will generally only be hashed in sets for the same Vertex
+        return self._lo_atom
 
     @classmethod
+    @overrides(Slice.from_string)
     def from_string(cls, as_str):
         if as_str[0] == "(":
             return Slice.from_string(as_str)

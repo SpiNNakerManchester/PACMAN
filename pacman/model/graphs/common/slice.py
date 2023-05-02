@@ -111,8 +111,11 @@ class Slice(object):
         raise IndexError(f"{n} is invalid for a 1 dimension Slice ")
 
     @property
-    def slices(self):
-        """ Get slices for every dimension
+    def dimension(self):
+        """ Get directions or edges as slices for every dimension
+
+        This is the width and if available height, depth ect of the Slice/Grid
+        as represented as slices form the origin along in that direction.
 
         :rtype: tuple(slice, ...)
         """
@@ -134,17 +137,32 @@ class Slice(object):
         """
         return slice(self._lo_atom, self._lo_atom + self._n_atoms)
 
-    def get_raster_ids(self, atoms_shape=None):
+    def get_raster_ids(self):
         """ Get the IDs of the atoms in the slice as they would appear in a
             "raster scan" of the atoms over the whole shape.
 
-        :param tuple(int) atoms_shape:
-            The size of each dimension of the whole shape
         :return: A list of the global raster IDs of the atoms in this slice
         """
         return numpy.array(range(self._lo_atom, self._lo_atom + self._n_atoms))
 
     def __str__(self):
+        return (f"({self.lo_atom}:{self.hi_atom})")
+
+    def __eq__(self, other):
+        if not isinstance(other, Slice):
+            return False
+        if self._lo_atom != other.lo_atom:
+            return False
+        # These checks are mainly to comparing to an extended slice
+        if self.shape != other.shape:
+            return False
+        if self.start != other.start:
+            return False
+        return self._n_atoms == other.n_atoms
+
+    def __hash__(self):
+        # Slices will generally only be hashed in sets for the same Vertex
+        return self._lo_atom
         return (f"({self.lo_atom}:{self.hi_atom})")
 
     def __eq__(self, other):

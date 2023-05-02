@@ -112,6 +112,37 @@ def get_single_dimension_slices(app_vertex):
         lo_atom = hi_atom + 1
         hi_atom = min(app_vertex.n_atoms - 1, (lo_atom + total_on_core) - 1)
         vertex_slice = Slice(lo_atom, hi_atom)
+        vertex_slice = MDSlice(
+            lo_atom, hi_atom, tuple(n_on_core), tuple(start),
+            app_vertex.atoms_shape)
+        slices.append(vertex_slice)
+
+    return slices
+
+
+def get_single_dimension_slices(app_vertex):
+    """ Get the single dimension slices of an application vertex
+        such that each is sized to the maximum atoms per dimension per core
+        except the last which might be smaller in one or more dimensions
+
+    :param ApplicationVertex app_vertex: The vertex to get the slices of
+    """
+    # If there is only one slice, get that
+    if app_vertex.n_atoms < app_vertex.get_max_atoms_per_core():
+        return [Slice(0, app_vertex.n_atoms - 1)]
+
+    total_on_core = app_vertex.get_max_atoms_per_dimension_per_core()[0]
+
+    n_vertices = math.ceil(app_vertex.n_atoms / total_on_core)
+
+    # Run over all the vertices and create slices for them
+    slices = list()
+    hi_atom = -1
+    for _ in range(n_vertices):
+        # Make a slice
+        lo_atom = hi_atom + 1
+        hi_atom = min(app_vertex.n_atoms - 1, (lo_atom + total_on_core) - 1)
+        vertex_slice = Slice(lo_atom, hi_atom)
         slices.append(vertex_slice)
 
     return slices
