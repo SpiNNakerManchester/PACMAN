@@ -33,9 +33,15 @@ def get_multidimensional_slices(app_vertex):
     atoms_per_core = app_vertex.get_max_atoms_per_dimension_per_core()
     n_atoms = app_vertex.atoms_shape
     if len(atoms_per_core) != len(n_atoms):
-        raise PacmanConfigurationException(
-            "The length of atoms_per_core doesn't match the number of"
-            " dimensions")
+        if len(atoms_per_core) == 1:
+            sides = round(atoms_per_core[0] ** (1.0 / len(n_atoms)))
+            if sides ** len(n_atoms) > atoms_per_core[0]:
+                sides -= 1
+            atoms_per_core = (sides,) * len(n_atoms)
+        else:
+            raise PacmanConfigurationException(
+                "The length of atoms_per_core doesn't match the number of"
+                " dimensions")
 
     if len(app_vertex.atoms_shape) == 1:
         return get_single_dimension_slices(app_vertex)
