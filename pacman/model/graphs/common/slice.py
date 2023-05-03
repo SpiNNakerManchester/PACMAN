@@ -163,17 +163,6 @@ class Slice(object):
     def __hash__(self):
         # Slices will generally only be hashed in sets for the same Vertex
         return self._lo_atom
-        return (f"({self.lo_atom}:{self.hi_atom})")
-
-    def __eq__(self, other):
-        if not isinstance(other, Slice):
-            return False
-        if self._lo_atom != other.lo_atom:
-            return False
-        return self._n_atoms == other.n_atoms
-
-    def __hash__(self):
-        return hash((self._lo_atom, self._n_atoms))
 
     @classmethod
     def from_string(cls, as_str):

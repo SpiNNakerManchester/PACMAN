@@ -37,7 +37,7 @@ class TestSlice(unittest.TestCase):
         self.assertEqual((11, ), s.shape)
         self.assertEqual((0, ), s.start)
         self.assertEqual(s, s2)
-        target = list(range(0,20))[s.as_slice]
+        target = list(range(0, 20))[s.as_slice]
         self.assertListEqual(target, list(s.get_raster_ids()))
 
     def test_check_lo_atom_sanity(self):
