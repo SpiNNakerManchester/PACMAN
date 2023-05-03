@@ -27,7 +27,6 @@ class TestSlice(unittest.TestCase):
         s = MDSlice(0, 8, (3, 3), (0, 0), (6, 6))
         self.assertEqual(9, s.n_atoms)  # 10 - 0 + 1
         self.assertEqual(0, s.lo_atom)  # As specified
-        self.assertEqual(8, s.hi_atom)  # As specified
         self.assertEqual((3, 3), s.shape)
         self.assertEqual((0, 0), s.start)
         self.assertListEqual([0, 1, 2, 6, 7, 8, 12, 13, 14],
@@ -41,7 +40,6 @@ class TestSlice(unittest.TestCase):
         s = MDSlice(36, 44, (3, 3), (0, 6), (6, 12))
         self.assertEqual(9, s.n_atoms)  # 10 - 0 + 1
         self.assertEqual(36, s.lo_atom)  # As specified
-        self.assertEqual(44, s.hi_atom)  # As specified
         self.assertEqual((3, 3), s.shape)
         self.assertEqual((0, 6), s.start)
         self.assertEqual(s.dimension, (slice(0, 3), slice(6, 9)))
@@ -53,7 +51,6 @@ class TestSlice(unittest.TestCase):
         s = MDSlice(9, 17, (3, 3), (3, 0), (6, 12))
         self.assertEqual(9, s.n_atoms)  # 10 - 0 + 1
         self.assertEqual(9, s.lo_atom)  # As specified
-        self.assertEqual(17, s.hi_atom)  # As specified
         self.assertEqual((3, 3), s.shape)
         self.assertEqual((3, 0), s.start)
         self.assertEqual(s.dimension, (slice(3, 6), slice(0, 3)))
@@ -67,7 +64,6 @@ class TestSlice(unittest.TestCase):
         s = MDSlice(432, 455, (2, 3, 4), (6, 9, 16), (9, 15, 20))
         self.assertEqual(24, s.n_atoms)  # 10 - 0 + 1
         self.assertEqual(432, s.lo_atom)  # As specified
-        self.assertEqual(455, s.hi_atom)  # As specified
         self.assertEqual((2, 3, 4), s.shape)
         self.assertEqual((6, 9, 16), s.start)
         self.assertEqual(s.dimension,
