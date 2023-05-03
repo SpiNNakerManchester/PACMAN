@@ -74,7 +74,7 @@ class MDSlice(Slice):
         return self._start
 
     @property
-    @overrides(Slice.shape)
+    @overrides(Slice.as_slice)
     def as_slice(self):
         raise NotImplementedError(
             "as slice does not work for multi dimensional slices")
