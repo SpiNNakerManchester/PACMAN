@@ -17,32 +17,26 @@ from pacman.exceptions import PacmanValueError, PacmanTypeError
 
 
 class Slice(object):
-    """ Represents a Simple Single Dimensional slice of a vertex.
+    """
+    Represents a simple single-dimensional slice of a vertex.
 
-    :attr int lo_atom: The lowest atom represented in the slice.
-    :attr int hi_atom: The highest atom represented in the slice.
-    :attr int n_atoms: The number of atoms represented by the slice.
-    :attr slice as_slice: This slice represented as a `slice` object (for
-        use in indexing lists, arrays, etc.)
-    :attr tuple(int,...) shape: The shape of the atoms over multiple
-        dimensions.  By default the shape will be 1-dimensional.
-    :attr tuple(int,...) start: The start coordinates of the slice.  By default
-        this will be lo_atom in 1 dimension.
+    .. note::
+        Multi-dimensional slices are supported by :py:class:`MDSlice`.
     """
 
     __slots__ = ["_lo_atom", "_n_atoms"]
 
     def __init__(self, lo_atom, hi_atom):
-        """ Create a new Slice object.
-
+        """
         :param int lo_atom: Index of the lowest atom to represent.
         :param int hi_atom: Index of the highest atom to represent.
+        :raises PacmanTypeError: If non-integer arguments are used.
         :raises PacmanValueError: If the bounds of the slice are invalid.
         """
         if not isinstance(lo_atom, int):
-            raise PacmanTypeError("lo atom needs to be a int")
+            raise PacmanTypeError("lo_atom needs to be a int")
         if not isinstance(hi_atom, int):
-            raise PacmanTypeError("hi atom needs to be a int")
+            raise PacmanTypeError("hi_atom needs to be a int")
 
         if lo_atom < 0:
             raise PacmanValueError('lo_atom < 0')
@@ -56,45 +50,67 @@ class Slice(object):
 
     @property
     def lo_atom(self):
+        """
+        The lowest atom represented in the slice.
+
+        :rtype: int
+        """
         return self._lo_atom
 
     @property
     def hi_atom(self):
         """
-        Returns the high atom where possible.
+        The highest atom represented in the slice.
 
         .. note::
-            Use of this method is NOT recommended
-            It fails for multi dimensional slices and may be removed
+            Use of this method is *not* recommended.
+            It fails for multi-dimensional slices and may be removed
 
-        :return: The highest atom form a 1 D Slice ONLY
+        :rtype: int
         """
         return self._lo_atom + self._n_atoms - 1
 
     @property
     def n_atoms(self):
+        """
+        The number of atoms represented by the slice.
+
+        :rtype: int
+        """
         return self._n_atoms
 
     @property
     def shape(self):
+        """
+        The shape of the atoms over multiple dimensions.
+        By default the shape will be 1-dimensional.
+
+        :rtype: tuple(int,...)
+        """
         return (self._n_atoms, )
 
     @property
     def start(self):
+        """
+        The start coordinates of the slice.
+        By default this will be `lo_atom` in 1 dimension.
+
+        :rtype: tuple(int,...)
+        """
         return (self._lo_atom,)
 
     @property
     def as_slice(self):
         """
-        Converts the Slice to a standard slice object IF Possible
+        Converts the Slice to a standard slice object *if possible.*
 
         .. note::
-            Use of this method is NOT recommended
-            It fails for multi dimensional slices and may be removed
+            Use of this method is *not* recommended.
+            It fails for multi-dimensional slices and may be removed.
 
-        :return: a standard builtin slice object
+        :return: a standard built-in slice object
         :rtype: slice
-        :raises NotImplementedError: If called on a Multi Dimensional slice
+        :raises NotImplementedError: If called on a multi-dimensional slice
         """
         # slice for accessing arrays of values
         return slice(self._lo_atom, self._lo_atom + self._n_atoms)
@@ -112,10 +128,12 @@ class Slice(object):
 
     @property
     def dimension(self):
-        """ Get directions or edges as slices for every dimension
+        """
+        Get directions or edges as slices for every dimension
 
-        This is the width and if available height, depth ect of the Slice/Grid
-        as represented as slices form the origin along in that direction.
+        This is the width and if available height, depth, etc., of the
+        Slice/Grid as represented as slices form the origin along in that
+        direction.
 
         :rtype: tuple(slice, ...)
         """
@@ -123,25 +141,30 @@ class Slice(object):
 
     @property
     def end(self):
-        """ The end positions of the slice in each dimension
+        """
+        The end positions of the slice in each dimension
+
+        :rtype: tuple(int, ...)
         """
         return tuple(self._lo_atom + self._n_atoms)
 
     def get_ids_as_slice_or_list(self):
         """
-        Returns the ids as a builtin slice if possible \
-        otherwise as a list of ids
+        Returns the IDs as a built-in slice if possible,
+        otherwise as a list of IDs.
 
-        :return: a slice or list of ids
+        :return: a slice or list of IDs
         :rtype: slice or list(int)
         """
         return slice(self._lo_atom, self._lo_atom + self._n_atoms)
 
     def get_raster_ids(self):
-        """ Get the IDs of the atoms in the slice as they would appear in a
-            "raster scan" of the atoms over the whole shape.
+        """
+        Get the IDs of the atoms in the slice as they would appear in a
+        "raster scan" of the atoms over the whole shape.
 
         :return: A list of the global raster IDs of the atoms in this slice
+        :rtype: ~numpy.ndarray
         """
         return numpy.array(range(self._lo_atom, self._lo_atom + self._n_atoms))
 
@@ -166,6 +189,12 @@ class Slice(object):
 
     @classmethod
     def from_string(cls, as_str):
+        """
+        Convert the string form of a :py:class:`Slice` into an object instance.
+
+        :param str as_str: The string to parse
+        :rtype: Slice
+        """
         if as_str[0] != "(":
             raise NotImplementedError("Please use MDSlice method")
 
