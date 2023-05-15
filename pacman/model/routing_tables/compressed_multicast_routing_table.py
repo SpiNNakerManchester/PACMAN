@@ -19,6 +19,8 @@ from spinn_utilities.overrides import overrides
 class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     """
     Represents a compressed routing table for a chip.
+    Compressed tables have a maximum size, ensuring that they fit in the
+    hardware available.
     """
 
     __slots__ = [

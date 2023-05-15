@@ -27,6 +27,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     """
     Represents a uncompressed routing table for a chip.
+    Uncompressed tables have no maximum size, but may not be deployable to
+    hardware without being compressed.
     """
 
     __slots__ = [

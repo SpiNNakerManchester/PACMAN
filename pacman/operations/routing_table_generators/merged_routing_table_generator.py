@@ -114,6 +114,14 @@ def __mask_has_holes(mask):
 
 
 def __merged_keys_and_masks(entries, routing_info):
+    """
+    :param entries:
+    :type entries:
+        list(tuple(AbstractVertex, str,
+        ~spinn_machine.MulticastRoutingEntry, VertexRoutingInfo))
+    :param RoutingInfo routing_info:
+    :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
+    """
     if not entries:
         return
     (vertex, part_id, entry, r_info) = entries[0]
@@ -128,7 +136,6 @@ def __merged_keys_and_masks(entries, routing_info):
 
 
 class _IteratorWithNext(object):
-
     def __init__(self, iterable):
         self.__iterator = iter(iterable)
         try:

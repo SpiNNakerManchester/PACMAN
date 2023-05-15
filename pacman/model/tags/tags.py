@@ -37,7 +37,6 @@ class Tags(object):
     ]
 
     def __init__(self):
-
         # Mapping of (board address, tag) to IPTag
         self._ip_tags = dict()
 

@@ -284,7 +284,6 @@ def _route_source_to_target(
         target_xy = xy
         overlaps = None
     else:
-
         # Find all coordinates for chips (xy) that are in the target
         target_xys = _get_all_xys(target)
 
@@ -767,7 +766,6 @@ def _path_without_errors(source_xy, nodes, machine):
     pos = 0
     new_nodes = list()
     while pos < len(nodes):
-
         # While the route is working, move forwards and copy
         while (pos < len(nodes) and _is_ok(c_xy, nodes[pos], machine)):
             new_nodes.append(nodes[pos])

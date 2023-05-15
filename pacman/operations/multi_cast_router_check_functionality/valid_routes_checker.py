@@ -281,7 +281,6 @@ def _recursive_trace_to_destinations(
             _is_dest(processor_values, current_router, reached_placements)
         # only goes to new chip
         for link_id in chip_links:
-
             # locate next chips router
             machine_router = PacmanDataView.get_chip_at(chip_x, chip_y).router
             link = machine_router.get_link(link_id)

@@ -62,7 +62,7 @@ class TestBasic(unittest.TestCase):
         writer.set_placements(place_application_graph(system_placements))
         writer.set_routing_table_by_partition(route_application_graph())
         allocator = ZonedRoutingInfoAllocator()
-        writer.set_routing_infos(allocator.__call__([], flexible=False))
+        writer.set_routing_infos(allocator.allocate([]))
 
     def test_empty(self):
         writer = PacmanDataWriter.mock()

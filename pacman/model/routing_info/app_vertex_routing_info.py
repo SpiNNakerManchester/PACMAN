@@ -22,6 +22,9 @@ logger = logging.getLogger(__name__)
 
 
 class AppVertexRoutingInfo(VertexRoutingInfo):
+    """
+    Routing information for an application vertex.
+    """
 
     __slots__ = [
         "__app_vertex",
@@ -30,16 +33,33 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         "__max_machine_index"]
 
     def __init__(
-            self, keys_and_masks, partition_id, app_vertex, machine_mask,
+            self, key_and_mask, partition_id, app_vertex, machine_mask,
             n_bits_atoms, max_machine_index):
-        super(AppVertexRoutingInfo, self).__init__(
-            keys_and_masks, partition_id)
+        """
+        :param BaseKeyAndMask key_and_mask:
+        :param str partition_id:
+        :param ApplicationVertex app_vertex:
+        :param int machine_mask:
+        :param int n_bits_atoms:
+        :param int max_machine_index:
+        """
+        super().__init__(key_and_mask, partition_id)
         self.__app_vertex = app_vertex
         self.__machine_mask = machine_mask
         self.__n_bits_atoms = n_bits_atoms
         self.__max_machine_index = max_machine_index
 
     def merge_machine_entries(self, entries):
+        """
+        Merge the machine entries.
+
+        :param entries:
+            The entries to merge
+        :type entries:
+            list(tuple(MachineVertex, str,
+            ~spinn_machine.MulticastRoutingEntry, VertexRoutingInfo))
+        :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
+        """
         n_entries = len(entries)
         (_, _, _, last_r_info) = entries[-1]
         is_last = last_r_info.index == self.__max_machine_index
@@ -96,7 +116,6 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
 
         :rtype: int
         """
-
         return self.__machine_mask
 
     @property

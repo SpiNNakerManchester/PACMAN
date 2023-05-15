@@ -17,6 +17,9 @@ from spinn_utilities.abstract_base import (
 
 
 class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
+    """
+    A multicast routing table. May be compressed or uncompressed.
+    """
 
     @abstractproperty
     def x(self):

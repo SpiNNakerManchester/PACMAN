@@ -24,6 +24,9 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SplitterOneToOneLegacy(AbstractSplitterCommon):
+    """
+    A one-to-one splitter for legacy vertices.
+    """
 
     __slots__ = [
         "_machine_vertex",

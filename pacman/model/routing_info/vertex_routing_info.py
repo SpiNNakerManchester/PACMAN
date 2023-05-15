@@ -34,11 +34,9 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     def __init__(self, key_and_mask, partition_id):
         """
-        :param iterable(BaseKeyAndMask) keys_and_masks:
+        :param BaseKeyAndMask key_and_mask:
             The keys allocated to the machine partition
         :param str partition_id: The partition to set the keys for
-        :param MachineVertex machine_vertex: The vertex to set the keys for
-        :param int index: The index of the machine vertex
         """
         assert isinstance(key_and_mask, BaseKeyAndMask)
         self.__key_and_mask = key_and_mask

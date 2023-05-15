@@ -31,16 +31,15 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
         "__index"
     ]
 
-    def __init__(self, keys_and_masks, partition_id, machine_vertex, index):
+    def __init__(self, key_and_mask, partition_id, machine_vertex, index):
         """
-        :param iterable(BaseKeyAndMask) keys_and_masks:
-            The keys allocated to the machine partition
+        :param BaseKeyAndMask key_and_mask:
+            The key allocated to the machine partition
         :param str partition_id: The partition to set the keys for
         :param MachineVertex machine_vertex: The vertex to set the keys for
         :param int index: The index of the machine vertex
         """
-        super(MachineVertexRoutingInfo, self).__init__(
-            keys_and_masks, partition_id)
+        super().__init__(key_and_mask, partition_id)
         self.__machine_vertex = machine_vertex
         self.__index = index
 

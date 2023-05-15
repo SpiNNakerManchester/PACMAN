@@ -177,7 +177,6 @@ def _ner_route(vector_to_nodes):
     progress_bar = ProgressBar(len(partitions), "Routing")
 
     for partition in progress_bar.over(partitions):
-
         source = partition.pre_vertex
         post_vertices_by_source = defaultdict(OrderedSet)
         for edge in partition.edges:

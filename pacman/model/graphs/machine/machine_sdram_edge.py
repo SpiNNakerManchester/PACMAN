@@ -17,6 +17,10 @@ from pacman.exceptions import PacmanConfigurationException
 
 
 class SDRAMMachineEdge(MachineEdge):
+    """
+    An edge that transfers information via a shared SDRAM area. This implies
+    that it must be between two machine vertices placed on the same chip.
+    """
 
     __slots__ = [
         # The sdram size of this edge.

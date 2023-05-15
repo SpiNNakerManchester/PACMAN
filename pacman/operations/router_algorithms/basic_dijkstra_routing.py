@@ -295,7 +295,6 @@ class _BasicDijkstraRouting(object):
                 if (neighbour is not None and
                         not (neighbour.destination_x == x_source and
                              neighbour.destination_y == y_source)):
-
                     # These variables change with every look at a new neighbour
                     self._update_neighbour(
                         tables, neighbour, current,

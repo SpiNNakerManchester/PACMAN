@@ -55,6 +55,7 @@ class RoutingInfo(object):
         :param AbstractVertex vertex: The vertex to search for
         :param str partition_id:
             The ID of the partition for which to get the routing information
+        :rtype: VertexRoutingInfo
         """
         return self._info.get((vertex, partition_id))
 
@@ -68,8 +69,9 @@ class RoutingInfo(object):
         :return: The routing key of the partition
         :rtype: int
         """
-        if (vertex, partition_id) in self._info:
-            return self._info[(vertex, partition_id)].key
+        key = (vertex, partition_id)
+        if key in self._info:
+            return self._info[key].key
         return None
 
     def __iter__(self):
