@@ -20,10 +20,9 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
     Common base class for vertex splitters, defining some utility methods.
     """
 
-    __slots__ = [
+    __slots__ = (
         # the app vertex this splitter governs.
-        "_governed_app_vertex",
-    ]
+        "_governed_app_vertex", )
 
     def __init__(self):
         self._governed_app_vertex = None

@@ -43,21 +43,20 @@ def get_app_partitions():
             `vertex.splitter.get_internal_multicast_partitions` for details.
     :rtype: list(ApplicationEdgePartition)
     """
-
     # Find all partitions that need to be dealt with
     # Make a copy which we can edit
     partitions = list(PacmanDataView.iterate_partitions())
-    sources = set(p.pre_vertex for p in partitions)
+    sources = frozenset(p.pre_vertex for p in partitions)
 
     # Convert internal partitions to self-connected partitions
     for v in PacmanDataView.iterate_vertices():
         internal_partitions = v.splitter.get_internal_multicast_partitions()
         if v not in sources and internal_partitions:
-            part_ids = set(p.identifier for p in internal_partitions)
-            for identifier in part_ids:
+            # Use dict.fromkeys to guarantee order
+            for identifier in dict.fromkeys(
+                    p.identifier for p in internal_partitions):
                 # Add a partition with no edges to identify this as internal
-                app_part = ApplicationEdgePartition(identifier, v)
-                partitions.append(app_part)
+                partitions.append(ApplicationEdgePartition(identifier, v))
     return partitions
 
 
@@ -103,7 +102,7 @@ def avoid_dead_links(root):
     # all disconnected subtrees being connected, the result is a fully
     # connected tree.
     for parent, child in broken_links:
-        child_chips = set(c.chip for c in lookup[child])
+        child_chips = frozenset(c.chip for c in lookup[child])
 
         # Try to reconnect broken links to any other part of the tree
         # (excluding this broken subtree itself since that would create a
@@ -201,19 +200,17 @@ def _copy_and_disconnect_tree(root):
         if new_parent is None:
             # This is the root node
             new_root = new_node
-        else:
-            if new_node is not new_parent:
-                # If this node is not dead, check connectivity to parent
-                # node (no reason to check connectivity between a dead node
-                # and its parent).
-                if _is_linked(
-                        new_parent.chip, new_node.chip, direction, machine):
-                    # Is connected via working link
-                    new_parent.append_child((direction, new_node))
-                else:
-                    # Link to parent is dead (or original parent was dead and
-                    # the new parent is not adjacent)
-                    broken_links.add((new_parent.chip, new_node.chip))
+        elif new_node is not new_parent:
+            # If this node is not dead, check connectivity to parent
+            # node (no reason to check connectivity between a dead node
+            # and its parent).
+            if _is_linked(new_parent.chip, new_node.chip, direction, machine):
+                # Is connected via working link
+                new_parent.append_child((direction, new_node))
+            else:
+                # Link to parent is dead (or original parent was dead and
+                # the new parent is not adjacent)
+                broken_links.add((new_parent.chip, new_node.chip))
 
         # Copy children
         for child_direction, child in old_node.children:
@@ -537,19 +534,19 @@ def get_targets_by_chip(vertices):
     :param list(MachineVertex) vertices: The vertices to target
     :param Placements placements: Where the vertices are placed
     :return: A dict of (x, y) to target (cores, links)
-    :rtype: dict((int, int), (list, list))
+    :rtype: dict(tuple(int, int), tuple(set(int), set(int)))
     """
     by_chip = defaultdict(lambda: (set(), set()))
     for vertex in vertices:
-        x, y = vertex_xy(vertex)
+        coords = vertex_xy(vertex)
         if isinstance(vertex, AbstractVirtual):
             # Sinks with route-to-endpoint restriction must be routed
             # in the according directions.
             link = route_to_endpoint(vertex)
-            by_chip[x, y][1].add(link)
+            by_chip[coords][1].add(link)
         else:
             core = PacmanDataView.get_placement_of_vertex(vertex).p
-            by_chip[x, y][0].add(core)
+            by_chip[coords][0].add(core)
     return by_chip
 
 

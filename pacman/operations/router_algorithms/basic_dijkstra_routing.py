@@ -39,7 +39,7 @@ class _NodeInfo(object):
     :ivar list(float) bws:
     :ivar list(float) weights:
     """
-    __slots__ = ["neighbours", "bws", "weights"]
+    __slots__ = ("neighbours", "bws", "weights")
 
     def __init__(self):
         self.neighbours = list()
@@ -52,7 +52,7 @@ class _NodeInfo(object):
 
 
 class _DijkstraInfo(object):
-    __slots__ = ["activated", "cost"]
+    __slots__ = ("activated", "cost")
 
     def __init__(self):
         self.activated = False
@@ -82,16 +82,13 @@ class _BasicDijkstraRouting(object):
     Dijkstra shortest path algorithm.
     """
 
-    __slots__ = [
+    __slots__ = (
         # the routing path objects used to be returned to the work flow
         "_routing_paths",
-
         # parameter to control ...........
         "_bw_per_route_entry",
-
         # parameter to control ...........
-        "_max_bw"
-    ]
+        "_max_bw")
 
     def __init__(self, bw_per_route_entry, max_bw):
         # set up basic data structures

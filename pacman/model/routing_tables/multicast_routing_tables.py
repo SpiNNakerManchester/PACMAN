@@ -29,12 +29,11 @@ class MulticastRoutingTables(object):
         uncompressed tables, or all compressed tables.
     """
 
-    __slots__ = [
+    __slots__ = (
         # dict of (x,y) -> routing table
         "_routing_tables_by_chip",
         # maximum value for number_of_entries in all tables
-        "_max_number_of_entries"
-    ]
+        "_max_number_of_entries")
 
     def __init__(self, routing_tables=None):
         """

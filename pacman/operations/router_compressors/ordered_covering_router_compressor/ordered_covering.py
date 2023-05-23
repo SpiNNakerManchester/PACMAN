@@ -391,9 +391,8 @@ class _Merge(object):
         new_entry = RTEntry(
             spinnaker_route=self.routing_table[
                 next(iter(self.entries))].spinnaker_route,
-            key=self.key, mask=self.mask, defaultable=self.defaultable
-        )
-        aliases[(self.key, self.mask)] = our_aliases = set([])
+            key=self.key, mask=self.mask, defaultable=self.defaultable)
+        aliases[self.key, self.mask] = our_aliases = set()
 
         # Iterate through the old table copying entries acrosss
         insert = 0
@@ -662,6 +661,7 @@ def _refine_downcheck(merge, aliases, min_goodness):
             # record the new stringency and store which bits we need to set to
             # meet the constraint.
             n_settable = sum(1 for bit in all_bits if bit & settable)
+            # TODO: use int.bit_count() for above once 3.10 is min Py ver
             if n_settable <= most_stringent:
                 if n_settable < most_stringent:
                     most_stringent = n_settable
@@ -669,39 +669,39 @@ def _refine_downcheck(merge, aliases, min_goodness):
 
                 # Add this settable mask and the required values to the
                 # settables list.
-                bits_and_vals.update((bit, not (key & bit)) for bit in
-                                     all_bits if bit & settable)
+                bits_and_vals.update(
+                    (bit, not (key & bit))
+                    for bit in all_bits if bit & settable)
 
         if most_stringent == 0:
             # If are there any instances where we could not possibly change a
             # bit to avoid aliasing an entry we'll return an empty merge and
             # give up.
-            merge = _Merge(merge.routing_table, set())
+            merge = _Merge(merge.routing_table)
             break
-        else:
-            # Get the smallest number of entries to remove to modify the
-            # resultant key-mask to avoid covering a lower entry. Prefer to
-            # modify more significant bits of the key mask.
-            remove = set()  # Entries to remove
-            for bit, val in sorted(bits_and_vals, reverse=True):
-                working_remove = set()  # Holder for working remove set
 
-                for i in merge.entries:
-                    entry = merge.routing_table[i]
+        # Get the smallest number of entries to remove to modify the
+        # resultant key-mask to avoid covering a lower entry. Prefer to
+        # modify more significant bits of the key mask.
+        remove = set()  # Entries to remove
+        for bit, val in sorted(bits_and_vals, reverse=True):
+            working_remove = set()  # Holder for working remove set
 
-                    if ((not entry.mask & bit) or
-                            (bool(entry.key & bit) is (not val))):
-                        # If the entry has an X in this position then it will
-                        # need to be removed regardless of whether we want to
-                        # set a 0 or a 1 in this position, likewise it will
-                        # need to be removed if it is a 0 and we want a 1 or
-                        # vice-versa.
-                        working_remove.add(i)
+            for i in merge.entries:
+                entry = merge.routing_table[i]
+                if (not entry.mask & bit) or (
+                        bool(entry.key & bit) is (not val)):
+                    # If the entry has an X in this position then it will
+                    # need to be removed regardless of whether we want to
+                    # set a 0 or a 1 in this position, likewise it will
+                    # need to be removed if it is a 0 and we want a 1 or
+                    # vice-versa.
+                    working_remove.add(i)
 
-                # If the current remove set is empty or the new remove set is
-                # smaller update the remove set.
-                if not remove or len(working_remove) < len(remove):
-                    remove = working_remove
+            # If the current remove set is empty or the new remove set is
+            # smaller update the remove set.
+            if not remove or len(working_remove) < len(remove):
+                remove = working_remove
 
             # Remove the selected entries from the merge
             merge = _Merge(merge.routing_table, merge.entries - remove)
@@ -710,7 +710,7 @@ def _refine_downcheck(merge, aliases, min_goodness):
         # better than min goodness AND valid this `else` clause is not reached.
         # Ensure than an empty merge is returned if the above loop was aborted
         # early with a non-empty merge.
-        merge = _Merge(merge.routing_table, set())
+        merge = _Merge(merge.routing_table)
 
     return merge
 

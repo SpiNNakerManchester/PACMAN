@@ -26,7 +26,7 @@ class ApplicationGraph(object):
     An application-level abstraction of a graph.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The sets of edge partitions by pre-vertex
         "_outgoing_edge_partitions_by_pre_vertex",
         # The total number of outgoing edge partitions
@@ -34,8 +34,7 @@ class ApplicationGraph(object):
         # count of vertex which had a None or already used label
         "_unlabelled_vertex_count",
         # map between labels and vertex
-        "_vertex_by_label"
-    ]
+        "_vertex_by_label")
 
     def __init__(self):
         self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)

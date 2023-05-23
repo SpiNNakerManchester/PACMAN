@@ -23,10 +23,9 @@ class ConstantSDRAM(AbstractSDRAM):
     This is used when the amount of SDRAM needed is not effected by runtime
     """
 
-    __slots__ = [
+    __slots__ = (
         # The amount of SDRAM in bytes
-        "_sdram"
-    ]
+        "_sdram", )
 
     def __init__(self, sdram):
         """

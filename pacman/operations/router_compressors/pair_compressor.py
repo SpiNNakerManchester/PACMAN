@@ -133,7 +133,7 @@ class _PairCompressor(AbstractCompressor):
     (0 to _previous_pointer(-1)) are not considered for clash checking
     """
 
-    __slots__ = [
+    __slots__ = (
         # A list of all entries which may be sorted
         #   of entries represented as (key, mask, defautible)
         "_all_entries",
@@ -153,8 +153,7 @@ class _PairCompressor(AbstractCompressor):
         # List of the frequencies. Match index for index with routes
         "_routes_frequency",
         # Number of unique routes found so far
-        "_routes_count",
-    ]
+        "_routes_count")
 
     def __init__(self, ordered=True, accept_overflow=False):
         super().__init__(ordered, accept_overflow)

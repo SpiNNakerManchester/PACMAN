@@ -19,21 +19,17 @@ class ReverseIPtagResource(object):
     packets to it during execution.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The target port of the tag or None if this is to be assigned
         # elsewhere
         "_port",
-
         # The SDP port number to be used when constructing SDP packets from
         # the received UDP packets for this tag
         "_sdp_port",
-
         # A fixed tag ID to assign, or None if any tag is OK
-        "_tag"
-    ]
+        "_tag")
 
-    def __init__(
-            self, port=None, sdp_port=1, tag=None):
+    def __init__(self, port=None, sdp_port=1, tag=None):
         """
         :param port: The UDP port to listen to on the board for this tag
             or `None` for a default

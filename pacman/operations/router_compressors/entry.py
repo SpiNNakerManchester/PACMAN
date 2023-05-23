@@ -30,7 +30,7 @@ class RTEntry(object):
     :ivar spinnaker_route: The route
     :vartype spinnaker_route: int
     """
-    __slots__ = ["key", "mask", "defaultable", "spinnaker_route"]
+    __slots__ = ("key", "mask", "defaultable", "spinnaker_route")
 
     def __init__(self, key, mask, defaultable, spinnaker_route):
         """

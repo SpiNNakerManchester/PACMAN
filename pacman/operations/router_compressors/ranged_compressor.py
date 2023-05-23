@@ -62,12 +62,11 @@ class RangeCompressor(object):
     Use via :py:func:`range_compressor`.
     """
 
-    __slots__ = [
+    __slots__ = (
         # Router table to add merged rutes into
         "_compressed",
         # List of entries to be merged
-        "_entries"
-    ]
+        "_entries")
 
     def __init__(self):
         self._compressed = None

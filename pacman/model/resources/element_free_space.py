@@ -14,7 +14,7 @@
 
 
 class ElementFreeSpace(object):
-    __slots__ = ["_size", "_start_address"]
+    __slots__ = ("_size", "_start_address")
 
     def __init__(self, start_address, size):
         """

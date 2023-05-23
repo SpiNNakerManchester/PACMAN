@@ -23,7 +23,7 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractVirtual):
     A virtual vertex on a SpiNNaker Link.
     """
 
-    __slots__ = [
+    __slots__ = (
         "_spinnaker_link_id",
         "_board_address",
         "_linked_chip_coordinates",
@@ -31,7 +31,7 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractVirtual):
         "_virtual_chip_y",
         "_outgoing_keys_and_masks",
         "_incoming",
-        "_outgoing"]
+        "_outgoing")
 
     def __init__(
             self, spinnaker_link_id, board_address=None,

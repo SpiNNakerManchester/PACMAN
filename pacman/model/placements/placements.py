@@ -23,15 +23,14 @@ class Placements(object):
     The placements of vertices on the chips of the machine.
     """
 
-    __slots__ = [
+    __slots__ = (
         # dict of [(x,y)] -> dict of p->placement object. used for fast lookup
         # of a vertex given a set of coordinates
         "_placements",
 
         # dict of [machine_vertex] -> placement object. used for fast lookup of
         # the placement of a machine vertex.
-        "_machine_vertices",
-    ]
+        "_machine_vertices")
 
     def __init__(self, placements=None):
         """

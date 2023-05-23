@@ -21,16 +21,13 @@ class ApplicationEdge(AbstractEdge):
     A simple implementation of an application edge.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The edge at the start of the vertex
         "_pre_vertex",
-
         # The edge at the end of the vertex
         "_post_vertex",
-
         # The label
-        "_label"
-    ]
+        "_label")
 
     def __init__(self, pre_vertex, post_vertex, label=None):
         """

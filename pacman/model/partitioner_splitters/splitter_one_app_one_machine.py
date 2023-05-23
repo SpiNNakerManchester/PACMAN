@@ -27,7 +27,7 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon):
     """
     Splitter that handles :py:class:`AbstractOneAppOneMachineVertex` vertices.
     """
-    __slots__ = []
+    __slots__ = ()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):

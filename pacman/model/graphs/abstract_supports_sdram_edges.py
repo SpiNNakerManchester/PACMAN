@@ -21,7 +21,7 @@ class AbstractSupportsSDRAMEdges(object, metaclass=AbstractBase):
     Marks a machine vertex that can have SDRAM edges attached to it.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     @abstractmethod
     def sdram_requirement(self, sdram_machine_edge):

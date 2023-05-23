@@ -42,7 +42,7 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 
 
-def _ner_net(src, destinations, machine, vector_to_nodes):
+def _ner_net(src, destinations, vector_to_nodes):
     """
     Produce a shortest path tree for a given net using NER.
 
@@ -52,14 +52,14 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
         The coordinate (x, y) of the source vertex.
     :param iterable(tuple(int,int)) destinations:
         The coordinates of destination vertices.
-    :param ~spinn_machine.Machine machine:
-        machine for which routes are being generated
     :param vector_to_nodes: ??????????
     :return:
         A RoutingTree is produced rooted at the source and visiting all
         destinations but which does not contain any vertices etc.
     :rtype: RoutingTree
     """
+    machine = PacmanDataView.get_machine()
+
     # The radius to check for neighbours, and the total number of chips that
     # could appear in the radius
     radius = 20
@@ -130,7 +130,7 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
     return route[src]
 
 
-def _do_route(source_xy, post_vertexes, machine, vector_to_nodes):
+def _do_route(source_xy, post_vertexes, vector_to_nodes):
     """
     Routing algorithm based on Neighbour Exploring Routing (NER).
 
@@ -145,15 +145,14 @@ def _do_route(source_xy, post_vertexes, machine, vector_to_nodes):
 
     :param tuple(int,int) source_xy:
     :param iterable(MachineVertex) post_vertexes:
-    :param ~spinn_machine.Machine machine:
     :param vector_to_nodes:
     :return:
     :rtype: RoutingTree
     """
-    destinations = set(vertex_xy(post_vertex)
-                       for post_vertex in post_vertexes)
+    destinations = frozenset(
+        vertex_xy(post_vertex) for post_vertex in post_vertexes)
     # Generate routing tree (assuming a perfect machine)
-    root = _ner_net(source_xy, destinations, machine, vector_to_nodes)
+    root = _ner_net(source_xy, destinations, vector_to_nodes)
 
     # Fix routes to avoid dead chips/links
     if route_has_dead_links(root):
@@ -181,9 +180,8 @@ def _ner_route(vector_to_nodes):
         post_vertices_by_source = defaultdict(OrderedSet)
         for edge in partition.edges:
             splitter = edge.post_vertex.splitter
-            target_vertices = splitter.get_source_specific_in_coming_vertices(
-                source, partition.identifier)
-            for tgt, srcs in target_vertices:
+            for tgt, srcs in splitter.get_source_specific_in_coming_vertices(
+                    source, partition.identifier):
                 for src in srcs:
                     if isinstance(src, ApplicationVertex):
                         for s in src.splitter.get_out_going_vertices(
@@ -199,18 +197,14 @@ def _ner_route(vector_to_nodes):
                     post_vertices_by_source[in_part.pre_vertex].add(
                         edge.post_vertex)
 
-        machine = PacmanDataView.get_machine()
         for m_vertex in outgoing:
             post_vertexes = post_vertices_by_source[m_vertex]
             source_xy, (m_vertex, core, link) = vertex_xy_and_route(m_vertex)
-            routing_tree = _do_route(
-                source_xy, post_vertexes, machine, vector_to_nodes)
+            routing_tree = _do_route(source_xy, post_vertexes, vector_to_nodes)
             targets = get_targets_by_chip(post_vertexes)
             convert_a_route(
                 routing_tables, m_vertex, partition.identifier,
                 core, link, routing_tree, targets)
-
-    progress_bar.end()
 
     return routing_tables
 

@@ -26,13 +26,12 @@ class Field(object):
     Field object used in a field constraint for key allocation.
     """
 
-    __slots__ = [
+    __slots__ = (
         "_lo",
         "_hi",
         "_value",
         "_tag",
-        "_name"
-    ]
+        "_name")
 
     def __init__(self, lo, hi, value, tag=SUPPORTED_TAGS.ROUTING, name=None):
         """

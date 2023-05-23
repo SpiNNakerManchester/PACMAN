@@ -24,13 +24,11 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     (keys and masks).
     """
 
-    __slots__ = [
+    __slots__ = (
         # The keys allocated to the machine partition
         "__key_and_mask",
-
         # The partition identifier of the allocation
-        "__partition_id"
-    ]
+        "__partition_id")
 
     def __init__(self, key_and_mask, partition_id):
         """

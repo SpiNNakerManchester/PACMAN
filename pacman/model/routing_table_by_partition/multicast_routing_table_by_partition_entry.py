@@ -38,25 +38,26 @@ class MulticastRoutingTableByPartitionEntry(object):
     An entry in a path of a multicast route.
     """
 
-    __slots__ = [
+    __slots__ = (
         # Entry made up of bits as follows:
         # | IL = 6 bits | IP = 1 bit | OL = 6 bits | OP = 18 bits |
         # IL = incoming link id
         # IP = whether the source is a processor or not
         # OL = outgoing links
         # OP = outgoing processors
-        "_links_and_procs"
-    ]
+        "_links_and_procs", )
 
     def __init__(self, out_going_links, outgoing_processors,
                  incoming_processor=None, incoming_link=None):
         """
-        :param iterable(int) out_going_links:
+        :param out_going_links:
             the edges this path entry goes down, each of which is between
             0 and 5
-        :param iterable(int) outgoing_processors:
+        :type out_going_links: int or iterable(int) or None
+        :param outgoing_processors:
             the processors this path entry goes to, each of which is between
             0 and 17
+        :type outgoing_processors: int or iterable(int) or None
         :param int incoming_processor:
             the direction this entry came from (between 0 and 17)
         :param int incoming_link:
@@ -113,20 +114,20 @@ class MulticastRoutingTableByPartitionEntry(object):
         """
         The destination processors of the entry.
 
-        :rtype: set(int)
+        :rtype: frozenset(int)
         """
-        return set(i for i in range(_N_PROCS)
-                   if self._links_and_procs & (_OUTGOING_PROC_1 << i))
+        return frozenset(i for i in range(_N_PROCS)
+                         if self._links_and_procs & (_OUTGOING_PROC_1 << i))
 
     @property
     def link_ids(self):
         """
         The destination links of the entry.
 
-        :rtype: set(int)
+        :rtype: frozenset(int)
         """
-        return set(i for i in range(_N_LINKS)
-                   if self._links_and_procs & (_OUTGOING_LINK_1 << i))
+        return frozenset(i for i in range(_N_LINKS)
+                         if self._links_and_procs & (_OUTGOING_LINK_1 << i))
 
     @property
     def incoming_link(self):

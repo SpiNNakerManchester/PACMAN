@@ -38,14 +38,13 @@ class AbstractCompressor(object):
         Not all compressors use this model.
     """
 
-    __slots__ = [
+    __slots__ = (
         # String of problems detected. Must be "" to finish
         "_problems",
         # Flag to say if the results can be order dependent
         "_ordered",
         # Flag to say that results too large should be ignored
-        "_accept_overflow"
-    ]
+        "_accept_overflow")
 
     def __init__(self, ordered=True, accept_overflow=False):
         self._ordered = ordered

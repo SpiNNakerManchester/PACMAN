@@ -24,7 +24,8 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     A machine graph vertex.
     """
 
-    __slots__ = ["_app_vertex", "_index", "_vertex_slice"]
+    __slots__ = (
+        "_app_vertex", "_index", "_vertex_slice")
     _DEFAULT_SLICE = Slice(0, 0)
 
     def __init__(self, label=None, app_vertex=None, vertex_slice=None):

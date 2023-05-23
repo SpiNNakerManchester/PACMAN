@@ -20,9 +20,9 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
     """
     An application vertex that has a fixed singleton :py:class:`MachineVertex`.
     """
-    __slots__ = [
+    __slots__ = (
         # A pointer to the machine vertex set at init time
-        "_machine_vertex"]
+        "_machine_vertex", )
 
     def __init__(self, machine_vertex, label, n_atoms=1):
         """

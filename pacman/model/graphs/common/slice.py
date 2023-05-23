@@ -24,7 +24,7 @@ class Slice(object):
         Multi-dimensional slices are supported by :py:class:`MDSlice`.
     """
 
-    __slots__ = ["_lo_atom", "_n_atoms"]
+    __slots__ = ("_lo_atom", "_n_atoms")
 
     def __init__(self, lo_atom, hi_atom):
         """

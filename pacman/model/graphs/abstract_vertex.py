@@ -21,14 +21,13 @@ class AbstractVertex(object):
     A vertex in a graph.
     """
 
-    __slots__ = [
+    __slots__ = (
         # Indicates if the Vertex has been added to a graph
         "_added_to_graph",
         # Label for the vertex. Changable until added to graph
         "_label",
         # the x, y (and p) this vertex MUST be placed on
-        "_fixed_location"
-    ]
+        "_fixed_location")
 
     def __init__(self, label=None):
         """

@@ -30,10 +30,9 @@ class MultiRegionSDRAM(VariableSDRAM):
         :py:meth:`add_cost` and :py:meth:`merge`
     """
 
-    __slots__ = [
+    __slots__ = (
         # The regions of SDRAM, each of which is an AbstractSDRAM
-        "__regions"
-    ]
+        "__regions", )
 
     def __init__(self):
         super().__init__(0, 0)

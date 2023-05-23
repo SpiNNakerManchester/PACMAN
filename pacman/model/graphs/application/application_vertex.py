@@ -29,7 +29,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
     based on the resources that the vertex requires.
     """
 
-    __slots__ = [
+    __slots__ = (
         # List of machine verts associated with this app vertex
         "_machine_vertices",
 
@@ -43,7 +43,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         # the vertex has multiple dimensions, one or more of the dimensions
         # might have fewer atoms on the last core (e.g. the rectangle on the
         # last core of a 2D vertex might be smaller).
-        "_max_atoms_per_dimension_per_core"]
+        "_max_atoms_per_dimension_per_core")
 
     def __init__(self, label=None, max_atoms_per_core=None, splitter=None):
         """

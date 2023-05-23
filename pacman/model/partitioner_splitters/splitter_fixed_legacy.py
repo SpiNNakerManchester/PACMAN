@@ -28,7 +28,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
     Splitter for old-style vertices.
     """
 
-    __slots__ = ["__slices"]
+    __slots__ = ("__slices", )
 
     def __init__(self):
         super().__init__()

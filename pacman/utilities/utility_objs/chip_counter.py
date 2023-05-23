@@ -23,7 +23,7 @@ class ChipCounter(object):
     not be used to decide failure in terms of space!
     """
 
-    __slots__ = [
+    __slots__ = (
         # How many cores there are to be used on a chip
         "__n_cores_per_chip",
 
@@ -37,7 +37,7 @@ class ChipCounter(object):
         "__sdram_free",
 
         # The number of chips used, including the current one
-        "__n_chips"]
+        "__n_chips")
 
     def __init__(self, n_cores_per_chip=15, sdram_per_chip=100 * 1024 * 1024):
         self.__n_cores_per_chip = n_cores_per_chip

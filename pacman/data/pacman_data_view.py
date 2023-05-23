@@ -39,7 +39,7 @@ class _PacmanDataModel(object):
 
     __singleton = None
 
-    __slots__ = [
+    __slots__ = (
         # Data values cached
         "_graph",
         "_placements",
@@ -50,8 +50,7 @@ class _PacmanDataModel(object):
         "_routing_infos",
         "_routing_table_by_partition",
         "_tags",
-        "_uncompressed",
-    ]
+        "_uncompressed")
 
     def __new__(cls):
         if cls.__singleton:
@@ -106,7 +105,7 @@ class PacmanDataView(MachineDataView):
     """
 
     __pacman_data = _PacmanDataModel()
-    __slots__ = []
+    __slots__ = ()
 
     # graph methods
 

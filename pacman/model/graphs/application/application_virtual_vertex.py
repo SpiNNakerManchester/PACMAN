@@ -20,7 +20,7 @@ class ApplicationVirtualVertex(ApplicationVertex):
     An application vertex which is virtual.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     @abstractmethod
     def get_outgoing_link_data(self, machine):

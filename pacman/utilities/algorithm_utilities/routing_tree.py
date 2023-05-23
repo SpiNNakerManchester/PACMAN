@@ -41,7 +41,7 @@ class RoutingTree(object):
     #   object
     # * Storing the chip coordinate as two values (_chip_x and _chip_y) rather
     #   than a tuple saves 56 bytes per instance.
-    __slots__ = ["_chip_x", "_chip_y", "_children", "_label"]
+    __slots__ = ("_chip_x", "_chip_y", "_children", "_label")
 
     def __init__(self, chip, label=None):
         """

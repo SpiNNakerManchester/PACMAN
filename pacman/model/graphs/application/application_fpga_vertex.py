@@ -23,11 +23,11 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
     A virtual application vertex connected to one or more FPGA links.
     """
 
-    __slots__ = [
+    __slots__ = (
         "_n_atoms",
         "_incoming_fpga_connections",
         "_outgoing_fpga_connection",
-        "_n_machine_vertices_per_link"]
+        "_n_machine_vertices_per_link")
 
     def __init__(
             self, n_atoms, incoming_fpga_connections=None,

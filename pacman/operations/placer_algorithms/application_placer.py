@@ -395,9 +395,9 @@ def _store_on_chip(placements_to_make, vertices, sdram, next_chip_space):
 
 
 class _Spaces(object):
-    __slots__ = ["__machine", "__chips", "__next_chip", "__used_chips",
+    __slots__ = ("__machine", "__chips", "__next_chip", "__used_chips",
                  "__system_placements", "__placements", "__plan_n_timesteps",
-                 "__last_chip_space", "__saved_chips", "__restored_chips"]
+                 "__last_chip_space", "__saved_chips", "__restored_chips")
 
     def __init__(self, machine, placements, plan_n_timesteps):
         """
@@ -522,8 +522,8 @@ class _Spaces(object):
 
 
 class _Space(object):
-    __slots__ = ["__same_board_chips", "__remaining_chips",
-                 "__board_x", "__board_y", "__first_chip"]
+    __slots__ = ("__same_board_chips", "__remaining_chips",
+                 "__board_x", "__board_y", "__first_chip")
 
     def __init__(self, chip):
         self.__board_x = chip.nearest_ethernet_x
@@ -573,8 +573,7 @@ class _ChipWithSpace(object):
     """
     A chip with space for placement.
     """
-
-    __slots__ = ["chip", "cores", "sdram"]
+    __slots__ = ("chip", "cores", "sdram")
 
     def __init__(self, chip, used_processors, used_sdram):
         self.chip = chip

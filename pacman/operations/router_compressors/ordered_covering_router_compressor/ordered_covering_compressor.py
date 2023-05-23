@@ -34,8 +34,7 @@ class _OrderedCoveringCompressor(AbstractCompressor):
     """
     Compressor from rig that has been tied into the main tool chain stack.
     """
-
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(self):
         super().__init__(True)

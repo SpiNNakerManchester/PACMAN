@@ -18,19 +18,13 @@ class ChipAndCore(object):
     specific core on that chip.
     """
 
-    __slots__ = [
-        # the chip x coord in the SpiNNaker machine to which the machine
+    __slots__ = (
+        # the chip coords in the SpiNNaker machine to which the machine
         # vertex is placed
-        "_x",
-
-        # the chip y coord in the SpiNNaker machine to which the machine
-        # vertex is placed
-        "_y",
-
+        "_x", "_y",
         # The processor ID on chip (x,y) that this vertex is placed on within
         # the SpiNNaker machine; may be None
-        "_p",
-    ]
+        "_p")
 
     def __init__(self, x, y, p=None):
         """

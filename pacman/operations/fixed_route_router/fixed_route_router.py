@@ -42,9 +42,9 @@ class _FixedRouteRouter(object):
     board-local gatherer processors.
     """
 
-    __slots__ = [
+    __slots__ = (
         "_destination_class", "_fixed_route_tables",
-        "_machine"]
+        "_machine")
 
     def __init__(self, destination_class):
         self._machine = PacmanDataView.get_machine()
@@ -69,6 +69,8 @@ class _FixedRouteRouter(object):
                 self._route_board(ethernet_chip)
         return self._fixed_route_tables
 
+    __LINK_DIRECTIONS = (4, 3, 5, 2, 0, 1)
+
     def _route_board(self, ethernet_connected_chip):
         """
         Handles this board through the quick routing process, based on a
@@ -88,11 +90,11 @@ class _FixedRouteRouter(object):
         routed.add((eth_x, eth_y))
         to_route.remove((eth_x, eth_y))
 
-        while len(to_route) > 0:
+        while to_route:
             found = []
             for x, y in to_route:
                 # Check links starting with the most direct to 0,0
-                for link_id in [4, 3, 5, 2, 0, 1]:
+                for link_id in self.__LINK_DIRECTIONS:
                     # Get protential destination
                     destination = self._machine.xy_over_link(x, y, link_id)
                     # If it is useful
@@ -104,7 +106,7 @@ class _FixedRouteRouter(object):
                             self.__add_fixed_route_entry(key, [link_id], [])
                             found.append(key)
                             break
-            if len(found) == 0:
+            if not found:
                 raise PacmanRoutingException(
                     "Unable to do fixed point routing "
                     f"on {ethernet_connected_chip.ip_address}.")

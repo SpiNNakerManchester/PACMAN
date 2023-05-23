@@ -52,22 +52,25 @@ def remove_default_routes(table, target_length, check_for_aliases=True):
     if check_for_aliases:
         # Aliases cannot exist when all entries share the same mask and all
         # keys are unique.
-        if len(set(e.mask for e in table)) == 1 and \
-                len(table) == len(set(e.key for e in table)):
+        if len(frozenset(e.mask for e in table)) == 1 and \
+                len(table) == len(frozenset(e.key for e in table)):
             check_for_aliases = False
 
     # Generate a new table with default-route entries removed
-    new_table = list()
-    for i, entry in enumerate(table):
-        if not entry.defaultable:
-            # If the entry cannot be removed then add it to the table
-            new_table.append(entry)
-        elif check_for_aliases:
-            key, mask = entry.key, entry.mask
-            # If there is an intersect with a later entry we have to keep it
-            if any(intersect(key, mask, d.key, d.mask) for
-                    d in table[i + 1:]):
+    if not check_for_aliases:
+        # Optimised case: no alias check so just remove default-routed entries
+        new_table = [entry for entry in table if not entry.defaultable]
+    else:
+        new_table = list()
+        for i, entry in enumerate(table):
+            if not entry.defaultable:
+                # If the entry cannot be removed then add it to the table
                 new_table.append(entry)
+            else:
+                # If there is an intersect with a later entry we must keep it
+                if any(intersect(entry.key, entry.mask, d.key, d.mask) for
+                       d in table[i + 1:]):
+                    new_table.append(entry)
 
     if target_length and len(new_table) > target_length:
         raise MinimisationFailedError(

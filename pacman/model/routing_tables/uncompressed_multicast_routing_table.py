@@ -31,12 +31,9 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     hardware without being compressed.
     """
 
-    __slots__ = [
-        # The x-coordinate of the chip for which this is the routing table
-        "_x",
-
-        # The y-coordinate of the chip for which this is the routing tables
-        "_y",
+    __slots__ = (
+        # The coordinates of the chip for which this is the routing table
+        "_x", "_y",
 
         # dict of multicast routing entries.
         # (key, mask) -> multicast_routing_entry
@@ -44,8 +41,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
 
         # counter of how many entries in their multicast routing table are
         # defaultable
-        "_number_of_defaulted_routing_entries"
-    ]
+        "_number_of_defaulted_routing_entries")
 
     def __init__(self, x, y, multicast_routing_entries=None):
         """

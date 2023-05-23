@@ -27,12 +27,11 @@ class ConstantSDRAMMachinePartition(
     the partition must agree on how much memory is required.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The sdram base address for this partition.
         "_sdram_base_address",
         # The sdram size of every edge or None if no edge added.
-        "_sdram_size",
-    ]
+        "_sdram_size")
 
     def __init__(self, identifier, pre_vertex):
         super().__init__(

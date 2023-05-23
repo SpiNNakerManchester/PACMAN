@@ -22,12 +22,11 @@ class Application2DSpiNNakerLinkVertex(
     """
     """
 
-    __slots__ = [
+    __slots__ = (
         "__width",
         "__height",
         "__sub_width",
-        "__sub_height"
-    ]
+        "__sub_height")
 
     def __init__(
             self, width, height, sub_width, sub_height,

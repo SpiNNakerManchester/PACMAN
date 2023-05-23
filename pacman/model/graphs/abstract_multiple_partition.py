@@ -23,12 +23,11 @@ class AbstractMultiplePartition(AbstractEdgePartition):
     """
     An edge partition that has multiple source vertices.
     """
-    __slots__ = [
+    __slots__ = (
         # the vertices which send through this partition.
         "_pre_vertices",
         # the destinations of this outgoing partition.
-        "_destinations"
-    ]
+        "_destinations")
 
     def __init__(self, pre_vertices, identifier, allowed_edge_types):
         super().__init__(

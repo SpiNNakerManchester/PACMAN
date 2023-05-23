@@ -23,7 +23,7 @@ class MDSlice(Slice):
     Represents a multi-dimensional slice of a vertex.
     """
 
-    __slots__ = ["_shape", "_start", "_atoms_shape"]
+    __slots__ = ("_shape", "_start", "_atoms_shape")
 
     def __init__(self, lo_atom, hi_atom, shape, start, atoms_shape):
         """

@@ -22,12 +22,11 @@ class SDRAMMachineEdge(MachineEdge):
     that it must be between two machine vertices placed on the same chip.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The sdram size of this edge.
         "_sdram_size",
         # The sdram base address for this edge
-        "_sdram_base_address"
-    ]
+        "_sdram_base_address")
 
     def __init__(self, pre_vertex, post_vertex, label):
         if not isinstance(pre_vertex, AbstractSupportsSDRAMEdges):

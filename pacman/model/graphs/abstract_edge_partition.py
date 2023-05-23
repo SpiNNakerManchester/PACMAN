@@ -24,14 +24,13 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
     (depending on edge type).
     """
 
-    __slots__ = [
+    __slots__ = (
         # The partition identifier
         "_identifier",
         # The edges in the partition
         "_edges",
         # The type of edges to accept
-        "_allowed_edge_types"
-    ]
+        "_allowed_edge_types")
 
     def __init__(
             self, identifier, allowed_edge_types):

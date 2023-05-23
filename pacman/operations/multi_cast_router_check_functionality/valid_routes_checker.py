@@ -335,7 +335,7 @@ def _is_dest(processor_ids, current_router, reached_placements):
     """
     Collect processors to be removed.
 
-    :param list(int) processor_ids:
+    :param iterable(int) processor_ids:
         the processor IDs which the last router entry said the trace should
         visit
     :param MulticastRoutingTable current_router:

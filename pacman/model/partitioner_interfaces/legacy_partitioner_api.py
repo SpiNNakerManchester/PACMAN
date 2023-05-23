@@ -27,7 +27,7 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
         :py:class:`ApplicationVertex`. This is not enforced because of issues
         with import order, but is required; PACMAN assumes it to be true.
     """
-    __slots__ = []
+    __slots__ = ()
 
     @abstractmethod
     def get_sdram_used_by_atoms(self, vertex_slice):

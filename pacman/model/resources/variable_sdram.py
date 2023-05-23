@@ -24,12 +24,11 @@ class VariableSDRAM(AbstractSDRAM):
     This is where the usage increase as the run time increases
     """
 
-    __slots__ = [
+    __slots__ = (
         # The amount of SDRAM in bytes used no matter what
         "_fixed_sdram"
         # The amount of extra SDRAm used for each timestep
-        "_per_timestep_sdram"
-    ]
+        "_per_timestep_sdram")
 
     def __init__(self, fixed_sdram, per_timestep_sdram):
         """

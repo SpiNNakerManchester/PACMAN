@@ -26,11 +26,11 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     Routing information for an application vertex.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__app_vertex",
         "__machine_mask",
         "__n_bits_atoms",
-        "__max_machine_index"]
+        "__max_machine_index")
 
     def __init__(
             self, key_and_mask, partition_id, app_vertex, machine_mask,

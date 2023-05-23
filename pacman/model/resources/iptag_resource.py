@@ -19,25 +19,21 @@ class IPtagResource(object):
     you during execution.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The host IP address that will receive the data from this tag
         "_ip_address",
-
         # the port number that data from this tag will be sent to, or None
         # if the port is to be assigned elsewhere
         "_port",
-
         # a boolean flag that indicates if the SDP headers are
         # stripped before transmission of data
         "_strip_sdp",
-
         #  A fixed tag ID to assign, or None if any tag is OK
         "_tag",
 
         # the identifier that states what type of data is being transmitted
         # through this IP tag
-        "_traffic_identifier"
-    ]
+        "_traffic_identifier")
 
     def __init__(
             self, ip_address, port, strip_sdp, tag=None,

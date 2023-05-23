@@ -28,10 +28,10 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
     A one-to-one splitter for legacy vertices.
     """
 
-    __slots__ = [
+    __slots__ = (
         "_machine_vertex",
         "_vertex_slice",
-        "_sdram"]
+        "_sdram")
 
     def __init__(self):
         super().__init__()

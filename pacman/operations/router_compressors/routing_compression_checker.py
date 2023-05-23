@@ -107,7 +107,8 @@ def calc_remainders(o_code, c_code):
 def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
     """
     :param ~spinn_machine.MulticastRoutingEntry o_route: the original route
-    :param dict compressed_dict: Compressed routes
+    :param dict(str, ~spinn_machine.MulticastRoutingEntry) compressed_dict:
+        Compressed routes
     :param str o_code: Codified original route (if known)
     :param int start: Starting index in compressed routes
     :param ~io.FileIO f: Where to write (part of) the route report
@@ -122,15 +123,13 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
             if f is not None:
                 f.write(f"\t\t{format_route(c_route)}\n")
             if o_route.processor_ids != c_route.processor_ids:
-                if set(o_route.processor_ids) != set(c_route.processor_ids):
-                    raise PacmanRoutingException(
-                        f"Compressed route {c_route} covers original route "
-                        f"{o_route} but has a different processor_ids.")
+                raise PacmanRoutingException(
+                    f"Compressed route {c_route} covers original route "
+                    f"{o_route} but has a different processor_ids.")
             if o_route.link_ids != c_route.link_ids:
-                if set(o_route.link_ids) != set(c_route.link_ids):
-                    raise PacmanRoutingException(
-                        f"Compressed route {c_route} covers original route "
-                        f"{o_route} but has a different link_ids.")
+                raise PacmanRoutingException(
+                    f"Compressed route {c_route} covers original route "
+                    f"{o_route} but has a different link_ids.")
             if not o_route.defaultable and c_route.defaultable:
                 if o_route == c_route:
                     raise PacmanRoutingException(

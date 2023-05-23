@@ -23,14 +23,14 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
     A virtual vertex on an FPGA link.
     """
 
-    __slots__ = [
+    __slots__ = (
         "_fpga_id",
         "_fpga_link_id",
         "_board_address",
         "_linked_chip_coordinates",
         "_outgoing_keys_and_masks",
         "_incoming",
-        "_outgoing"]
+        "_outgoing")
 
     def __init__(
             self, fpga_id, fpga_link_id, board_address=None,

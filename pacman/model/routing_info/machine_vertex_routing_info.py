@@ -21,15 +21,13 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
     information (keys and masks).
     """
 
-    __slots__ = [
-
+    __slots__ = (
         # The machine vertex that the keys are allocated to
         "__machine_vertex",
 
         # The index of the machine vertex within the range of the application
         # vertex
-        "__index"
-    ]
+        "__index")
 
     def __init__(self, key_and_mask, partition_id, machine_vertex, index):
         """

@@ -27,10 +27,9 @@ class DestinationSegmentedSDRAMMachinePartition(
     An SDRAM partition that gives each edge its own slice of memory from a
     contiguous block. The edges all have the same source vertex.
     """
-    __slots__ = [
+    __slots__ = (
         # The sdram base address for this partition.
-        "_sdram_base_address",
-    ]
+        "_sdram_base_address", )
 
     def __init__(self, identifier, pre_vertex):
         super().__init__(

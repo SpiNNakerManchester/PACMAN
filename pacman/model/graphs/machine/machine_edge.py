@@ -21,16 +21,13 @@ class MachineEdge(AbstractEdge):
     A simple implementation of a machine edge.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The vertex at the start of the edge
         "_pre_vertex",
-
         # The vertex at the end of the edge
         "_post_vertex",
-
         # The label of the edge
-        "_label"
-    ]
+        "_label")
 
     def __init__(self, pre_vertex, post_vertex, label=None):
         """

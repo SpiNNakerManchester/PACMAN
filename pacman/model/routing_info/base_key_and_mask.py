@@ -21,13 +21,11 @@ class BaseKeyAndMask(object):
     A Key and Mask to be used for routing.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The routing key
         "_base_key",
-
         # The routing mask
-        "_mask"
-    ]
+        "_mask")
 
     def __init__(self, base_key, mask):
         """

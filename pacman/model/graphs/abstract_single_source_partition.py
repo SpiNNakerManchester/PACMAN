@@ -22,10 +22,9 @@ class AbstractSingleSourcePartition(
     """
     An edge partition that has a single source vertex.
     """
-    __slots__ = [
+    __slots__ = (
         # The vertex at the start of all the edges
-        "_pre_vertex"
-    ]
+        "_pre_vertex", )
 
     def __init__(
             self, pre_vertex, identifier, allowed_edge_types):

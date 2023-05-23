@@ -40,7 +40,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
     repository unit tests as all methods are available to subclasses.
     """
     __pacman_data = _PacmanDataModel()
-    __slots__ = []
+    __slots__ = ()
 
     @overrides(MachineDataWriter._mock)
     def _mock(self):

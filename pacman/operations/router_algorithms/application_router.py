@@ -29,7 +29,7 @@ class _Targets(object):
     """
     A set of targets to be added to a route on a chip at coordinates (x,y).
     """
-    __slots__ = ["__targets_by_source"]
+    __slots__ = ("__targets_by_source", )
 
     def __init__(self):
         self.__targets_by_source = defaultdict(lambda: (list(), list()))
@@ -170,8 +170,7 @@ def route_application_graph():
 
         # Pick a place within the source that we can route from.  Note that
         # this might not end up being the actual source in the end.
-        source_mappings = _get_outgoing_mapping(
-            source, partition.identifier)
+        source_mappings = _get_outgoing_mapping(source, partition.identifier)
 
         # No source mappings?  Nothing to route then!
         if not source_mappings:

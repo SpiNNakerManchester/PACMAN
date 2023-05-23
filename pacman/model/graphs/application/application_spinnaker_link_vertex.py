@@ -23,13 +23,13 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
     A virtual application vertex on a SpiNNaker Link.
     """
 
-    __slots__ = [
+    __slots__ = (
         "_n_atoms",
         "_spinnaker_link_id",
         "_board_address",
         "_n_machine_vertices",
         "_incoming",
-        "_outgoing"]
+        "_outgoing")
 
     def __init__(
             self, n_atoms, spinnaker_link_id, board_address=None, label=None,

@@ -77,7 +77,7 @@ class ZonedRoutingInfoAllocator(object):
     will a very high number of atoms.
     """
 
-    __slots__ = [
+    __slots__ = (
         # A list of vertices and partitions to allocate
         "__vertex_partitions",
         # For each App vertex / Partition name zone keep track of the number of
@@ -99,8 +99,7 @@ class ZonedRoutingInfoAllocator(object):
         # Set of app_part indexes used by fixed
         "__fixed_used",
         # True if all partitions are fixed
-        "__all_fixed"
-    ]
+        "__all_fixed")
     __FROZEN = frozenset()
 
     def __init__(self, flexible=False):
@@ -115,7 +114,7 @@ class ZonedRoutingInfoAllocator(object):
         self.__atom_bits_per_app_part = dict()
         self.__flexible = flexible
         self.__fixed_partitions = dict()
-        self.__fixed_used = set()
+        self.__fixed_used = self.__FROZEN
         self.__all_fixed = True
 
     def allocate(self, extra_allocations):
@@ -309,8 +308,7 @@ class ZonedRoutingInfoAllocator(object):
             # Generate all possible combinations of keys for the remaining
             # mask
             for k, n_keys in get_key_ranges(key, mask):
-                for i in range(n_keys):
-                    self.__fixed_used.add(k + i)
+                self.__fixed_used.update(range(k, k + n_keys))
 
     def __allocate_all_fixed(self):
         routing_infos = RoutingInfo()
