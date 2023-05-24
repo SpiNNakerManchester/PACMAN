@@ -66,23 +66,23 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
         self._verify_sub_size()
 
     @property
-    @overrides(Abstract2DDeviceVertex._width)
-    def _width(self):
+    @overrides(Abstract2DDeviceVertex.width)
+    def width(self):
         return self.__width
 
     @property
-    @overrides(Abstract2DDeviceVertex._height)
-    def _height(self):
+    @overrides(Abstract2DDeviceVertex.height)
+    def height(self):
         return self.__height
 
     @property
-    @overrides(Abstract2DDeviceVertex._sub_width)
-    def _sub_width(self):
+    @overrides(Abstract2DDeviceVertex.sub_width)
+    def sub_width(self):
         return self.__sub_width
 
     @property
-    @overrides(Abstract2DDeviceVertex._sub_height)
-    def _sub_height(self):
+    @overrides(Abstract2DDeviceVertex.sub_height)
+    def sub_height(self):
         return self.__sub_height
 
     @property

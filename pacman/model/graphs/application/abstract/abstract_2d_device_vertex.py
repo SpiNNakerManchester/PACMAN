@@ -38,7 +38,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     """
 
     @abstractproperty
-    def _width(self):
+    def width(self):
         """
         The width of the device.
 
@@ -46,7 +46,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
 
     @abstractproperty
-    def _height(self):
+    def height(self):
         """
         The height of the device.
 
@@ -54,7 +54,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
 
     @abstractproperty
-    def _sub_width(self):
+    def sub_width(self):
         """
         The width of the sub-rectangles to divide the input into.
 
@@ -62,7 +62,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
 
     @abstractproperty
-    def _sub_height(self):
+    def sub_height(self):
         """
         The height of the sub-rectangles to divide the input into.
 
@@ -78,20 +78,20 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         Ensure the sub width and height are within restrictions.
         """
-        if not is_power_of_2(self._sub_width):
+        if not is_power_of_2(self.sub_width):
             raise PacmanConfigurationException(
-                f"sub_width ({self._sub_width}) must be a power of 2")
-        if not is_power_of_2(self._sub_height):
+                f"sub_width ({self.sub_width}) must be a power of 2")
+        if not is_power_of_2(self.sub_height):
             raise PacmanConfigurationException(
-                f"sub_height ({self._sub_height}) must be a power of 2")
-        if self._sub_width > self._width:
+                f"sub_height ({self.sub_height}) must be a power of 2")
+        if self.sub_width > self.width:
             raise PacmanConfigurationException(
-                f"sub_width ({self._sub_width}) must not be greater than "
-                f"width ({self._width})")
-        if self._sub_height > self._height:
+                f"sub_width ({self.sub_width}) must not be greater than "
+                f"width ({self.width})")
+        if self.sub_height > self.height:
             raise PacmanConfigurationException(
-                f"sub_height ({self._sub_height}) must not be greater than "
-                f"height ({self._height})")
+                f"sub_height ({self.sub_height}) must not be greater than "
+                f"height ({self.height})")
 
     @property
     def _n_sub_rectangles(self):
@@ -100,8 +100,8 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
 
         :rtype: int
         """
-        return (int(math.ceil(self._width / self._sub_width)) *
-                int(math.ceil(self._height / self._sub_height)))
+        return (int(math.ceil(self.width / self.sub_width)) *
+                int(math.ceil(self.height / self.sub_height)))
 
     def _sub_square_from_index(self, index):
         """
@@ -111,7 +111,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         :rtype: tuple(int, int)
         """
         n_squares_per_row = int(math.ceil(
-            self._width / self._sub_width))
+            self.width / self.sub_width))
         x_index = index % n_squares_per_row
         y_index = index // n_squares_per_row
 
@@ -126,13 +126,13 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         :rtype: Slice
         """
         x_index, y_index = self._sub_square_from_index(index)
-        lo_atom_x = x_index * self._sub_width
-        lo_atom_y = y_index * self._sub_height
-        n_atoms_per_subsquare = self._sub_width * self._sub_height
+        lo_atom_x = x_index * self.sub_width
+        lo_atom_y = y_index * self.sub_height
+        n_atoms_per_subsquare = self.sub_width * self.sub_height
         lo_atom = index * n_atoms_per_subsquare
         hi_atom = (lo_atom + n_atoms_per_subsquare) - 1
         return MDSlice(
-            lo_atom, hi_atom, (self._sub_width, self._sub_height),
+            lo_atom, hi_atom, (self.sub_width, self.sub_height),
             (lo_atom_x, lo_atom_y), self.atoms_shape)
 
     def _get_key_and_mask(self, base_key, index):
@@ -172,7 +172,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
 
         :rtype: int
         """
-        return get_n_bits(self._width)
+        return get_n_bits(self.width)
 
     @property
     def _y_bits(self):
@@ -181,7 +181,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
 
         :rtype: int
         """
-        return get_n_bits(self._height)
+        return get_n_bits(self.height)
 
     @property
     def _sub_x_bits(self):
@@ -190,7 +190,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
 
         :rtype: int
         """
-        n_per_row = int(math.ceil(self._width / self._sub_width))
+        n_per_row = int(math.ceil(self.width / self.sub_width))
         return get_n_bits(n_per_row)
 
     @property
@@ -200,7 +200,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
 
         :rtype: int
         """
-        n_per_col = int(math.ceil(self._height / self._sub_height))
+        n_per_col = int(math.ceil(self.height / self.sub_height))
         return get_n_bits(n_per_col)
 
     @property
