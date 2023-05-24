@@ -15,7 +15,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.overrides import overrides
 import math
 from pacman.exceptions import PacmanConfigurationException
-from pacman.utilities.utility_calls import get_n_bits
+from pacman.utilities.utility_calls import get_n_bits, is_power_of_2
 from pacman.utilities.constants import BITS_IN_KEY
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.graphs.application import ApplicationVertex
@@ -74,23 +74,14 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def atoms_shape(self):
         pass
 
-    def __is_power_of_2(self, v):
-        """
-        Determine if a value is a power of 2.
-
-        :param int v: The value to test
-        :rtype: bool
-        """
-        return (v & (v - 1) == 0) and (v != 0)
-
     def _verify_sub_size(self):
         """
         Ensure the sub width and height are within restrictions.
         """
-        if not self.__is_power_of_2(self._sub_width):
+        if not is_power_of_2(self._sub_width):
             raise PacmanConfigurationException(
                 f"sub_width ({self._sub_width}) must be a power of 2")
-        if not self.__is_power_of_2(self._sub_height):
+        if not is_power_of_2(self._sub_height):
             raise PacmanConfigurationException(
                 f"sub_height ({self._sub_height}) must be a power of 2")
         if self._sub_width > self._width:

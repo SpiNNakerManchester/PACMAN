@@ -177,3 +177,13 @@ def get_keys(base_key, vertex_slice, n_extra_bits=0):
     """
     indices = numpy.arange(0, vertex_slice.n_atoms) << n_extra_bits
     return base_key + indices
+
+
+def is_power_of_2(v):
+    """
+    Determine if a value is a power of 2.
+
+    :param int v: The value to test
+    :rtype: bool
+    """
+    return (v & (v - 1) == 0) and (v != 0)
