@@ -71,54 +71,52 @@ class _FixedRouteRouter(object):
 
     __LINK_DIRECTIONS = (4, 3, 5, 2, 0, 1)
 
-    def _route_board(self, ethernet_connected_chip):
+    def _route_board(self, ethernet_chip):
         """
         Handles this board through the quick routing process, based on a
         predefined routing table.
 
-        :param ~spinn_machine.Chip ethernet_connected_chip:
-            the Ethernet connected chip identifying the board
+        :param ~spinn_machine.Chip ethernet_chip:
+            the Ethernet-connected chip identifying the board
         :raises PacmanRoutingException:
         :raises PacmanAlreadyExistsException:
         """
-        eth_x = ethernet_connected_chip.x
-        eth_y = ethernet_connected_chip.y
+        eth_x, eth_y = ethernet_chip.x, ethernet_chip.y
+        root = (eth_x, eth_y)
 
         to_route = set(
             self._machine.get_existing_xys_by_ethernet(eth_x, eth_y))
-        routed = set()
-        routed.add((eth_x, eth_y))
-        to_route.remove((eth_x, eth_y))
+
+        # create terminal fixed route entry
+        # locate where to put data on ethernet chip
+        processor_id = self.__locate_destination(ethernet_chip)
+        # build entry and add to table and add to tables
+        self.__add_fixed_route_entry(root, [], [processor_id])
+        routed = {root}
+        to_route.remove(root)
+        found = set()
 
         while to_route:
-            found = []
-            for x, y in to_route:
+            # Make routes to already-routed chips
+            for key in to_route:
+                x, y = key
                 # Check links starting with the most direct to 0,0
                 for link_id in self.__LINK_DIRECTIONS:
-                    # Get protential destination
-                    destination = self._machine.xy_over_link(x, y, link_id)
-                    # If it is useful
-                    if destination in routed:
-                        # check it actually exits
-                        if self._machine.is_link_at(x, y, link_id):
-                            # build entry and add to table and add to tables
-                            key = (x, y)
-                            self.__add_fixed_route_entry(key, [link_id], [])
-                            found.append(key)
-                            break
+                    # If potential destination is useful and exists
+                    if self._machine.xy_over_link(x, y, link_id) in routed \
+                            and self._machine.is_link_at(x, y, link_id):
+                        # build entry and add to table and add to tables
+                        self.__add_fixed_route_entry(key, [link_id], [])
+                        found.add(key)
+                        break
             if not found:
+                # Chip not reachable from board root via on-board links
                 raise PacmanRoutingException(
                     "Unable to do fixed point routing "
-                    f"on {ethernet_connected_chip.ip_address}.")
-            for key in found:
-                to_route.remove(key)
-                routed.add(key)
-
-        # create final fixed route entry
-        # locate where to put data on ethernet chip
-        processor_id = self.__locate_destination(ethernet_connected_chip)
-        # build entry and add to table and add to tables
-        self.__add_fixed_route_entry((eth_x, eth_y), [], [processor_id])
+                    f"on {ethernet_chip.ip_address}.")
+            to_route -= found
+            routed |= found
+            found.clear()
 
     def __add_fixed_route_entry(self, key, link_ids, processor_ids):
         """

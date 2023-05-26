@@ -97,10 +97,9 @@ class _Targets(object):
         :param str partition_id:
         :rtype: bool
         """
-        for m_vert in vertex.splitter.get_out_going_vertices(partition_id):
-            if m_vert in self.__targets_by_source:
-                return True
-        return False
+        return any(
+            vtx in self.__targets_by_source
+            for vtx in vertex.splitter.get_out_going_vertices(partition_id))
 
     def __replace_app_vertex(self, vertex, partition_id):
         """
@@ -110,8 +109,8 @@ class _Targets(object):
         cores = self.__targets_by_source[vertex][0]
         links = self.__targets_by_source[vertex][1]
         del self.__targets_by_source[vertex]
-        for m_vertex in vertex.splitter.get_out_going_vertices(partition_id):
-            self.__targets_by_source[m_vertex] = (cores, links)
+        for vtx in vertex.splitter.get_out_going_vertices(partition_id):
+            self.__targets_by_source[vtx] = (cores, links)
 
     def __add_m_vertices(self, vertex, partition_id, core, link):
         """
@@ -120,8 +119,8 @@ class _Targets(object):
         :param int core:
         :param int link:
         """
-        for m_vertex in vertex.splitter.get_out_going_vertices(partition_id):
-            self.__add_source(m_vertex, core, link)
+        for vtx in vertex.splitter.get_out_going_vertices(partition_id):
+            self.__add_source(vtx, core, link)
 
     def __add_source(self, source, core, link):
         """
@@ -204,7 +203,6 @@ def route_application_graph():
                     machine, source, source_xy, all_source_xys,
                     source_mappings, source_edge_xys, target, targets,
                     partition, routes)
-
             # If self-connected
             else:
                 self_connected = True
@@ -716,10 +714,10 @@ def _route_pre_to_post(
     # in the source group, or a already in the route
     nodes = nodes_fixed
     route_pre = source_xy
-    for i, (_direction, (x, y)) in reversed(list(enumerate(nodes))):
-        if _in_group((x, y), all_source_xy) or (x, y) in routes:
+    for i, (_direction, xy) in reversed(list(enumerate(nodes))):
+        if _in_group(xy, all_source_xy) or xy in routes:
             nodes = nodes[i + 1:]
-            route_pre = (x, y)
+            route_pre = xy
             break
 
     # If we found one not in the route, create a new entry for it
@@ -729,10 +727,10 @@ def _route_pre_to_post(
     # Start from the start and move forwards until we find a chip in
     # the target group
     route_post = dest_xy
-    for i, (_direction, (x, y)) in enumerate(nodes):
-        if (x, y) in target_xys:
+    for i, (_direction, xy) in enumerate(nodes):
+        if xy in target_xys:
             nodes = nodes[:i + 1]
-            route_post = (x, y)
+            route_post = xy
             break
 
     # Convert nodes to routes and add to existing routes
@@ -816,10 +814,8 @@ def _is_ok(coord, node, machine):
     """
     c_x, c_y = coord
     direction, (n_x, n_y) = node
-    if machine.is_link_at(c_x, c_y, direction):
-        if machine.is_chip_at(n_x, n_y):
-            return True
-    return False
+    return machine.is_link_at(c_x, c_y, direction) \
+        and machine.is_chip_at(n_x, n_y)
 
 
 def _xy(node):

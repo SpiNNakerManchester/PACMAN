@@ -179,9 +179,8 @@ class _BasicDijkstraRouting(object):
                 self._reset_tables(tables)
                 tables[source_xy].activated = True
                 tables[source_xy].cost = 0
-                x, y = source_xy
                 self._propagate_costs_until_reached_destinations(
-                    tables, node_info, dest_chips[m_vertex], x, y)
+                    tables, node_info, dest_chips[m_vertex], source_xy)
 
             for xy in destinations[m_vertex]:
                 dest_cores, dest_links = destinations[m_vertex][xy]
@@ -220,10 +219,9 @@ class _BasicDijkstraRouting(object):
         """
         # Holds all the information about nodes within one full run of
         # Dijkstra's algorithm
-        tables = dict()
-        for chip in PacmanDataView.get_machine().chips:
-            tables[chip.x, chip.y] = _DijkstraInfo()
-        return tables
+        return {
+            (chip.x, chip.y): _DijkstraInfo
+            for chip in PacmanDataView.get_machine().chips}
 
     def _update_all_weights(self, nodes_info):
         """
@@ -261,7 +259,7 @@ class _BasicDijkstraRouting(object):
             tables[key] = _DijkstraInfo()
 
     def _propagate_costs_until_reached_destinations(
-            self, tables, nodes_info, dest_chips, x_source, y_source):
+            self, tables, nodes_info, dest_chips, source):
         """
         Propagate the weights till the destination nodes of the source
         nodes are retraced.
@@ -271,14 +269,13 @@ class _BasicDijkstraRouting(object):
         :param dict(tuple(int,int),_NodeInfo) nodes_info:
             the dictionary object for the nodes inside a route scope
         :param set(tuple(int,int)) dest_chips:
-        :param int x_source:
-        :param int y_source:
+        :param tuple(int,int) source:
         :raise PacmanRoutingException:
             when the destination node could not be reached from this source
             node
         """
         dest_chips_to_find = set(dest_chips)
-        source = (x_source, y_source)
+        (x_source, y_source) = source
         dest_chips_to_find.discard(source)
 
         current = source
@@ -310,16 +307,14 @@ class _BasicDijkstraRouting(object):
         :rtype: tuple(int,int)
         """
         # This is the lowest cost across ALL deactivated nodes in the graph.
-        lowest_cost = sys.maxsize
-        lowest = None
+        lowest_cost, lowest = sys.maxsize, None
 
         # Find the next node to be activated
         for key in tables:
             # Don't continue if the node hasn't even been touched yet
             if (tables[key].cost is not None and not tables[key].activated
                     and tables[key].cost < lowest_cost):
-                lowest_cost = tables[key].cost
-                lowest = key
+                lowest_cost, lowest = tables[key].cost, key
 
         # If there were no deactivated nodes with costs, but the destination
         # was not reached this iteration, raise an exception
@@ -447,7 +442,7 @@ class _BasicDijkstraRouting(object):
         # neighbour_xy is the 'old' coordinates since it is from the preceding
         # node. x and y are the 'new' coordinates since they are where the
         # router should send the packet to.
-        dec_direction = self._get_reverse_direction(neighbour_index)
+        dec_direction = (3, 4, 5, 0, 1, 2)[neighbour_index]
         made_an_entry = False
 
         neighbour_weight = nodes_info[neighbour_xy].weights[dec_direction]
@@ -457,8 +452,7 @@ class _BasicDijkstraRouting(object):
         if (neighbours_lowest_cost is not None and
                 self._close_enough(neighbours_lowest_cost, chip_sought_cost)):
             # build the multicast entry
-            entry = MulticastRoutingTableByPartitionEntry(
-                dec_direction, None)
+            entry = MulticastRoutingTableByPartitionEntry(dec_direction, None)
             previous_entry.incoming_link = neighbour_index
             # add entry for next hop going backwards into path
             self._routing_paths.add_path_entry(
@@ -480,27 +474,3 @@ class _BasicDijkstraRouting(object):
         :param float delta: How close values have to be to be "equal"
         """
         return abs(v1 - v2) < delta
-
-    @staticmethod
-    def _get_reverse_direction(neighbour_position):
-        """
-        Determine the direction of a link to go down.
-
-        :param int neighbour_position: the position the neighbour is at
-        :return: The position of the opposite link
-        :rtype: int
-        """
-
-        if neighbour_position == 0:
-            return 3
-        elif neighbour_position == 1:
-            return 4
-        elif neighbour_position == 2:
-            return 5
-        elif neighbour_position == 3:
-            return 0
-        elif neighbour_position == 4:
-            return 1
-        elif neighbour_position == 5:
-            return 2
-        return None
