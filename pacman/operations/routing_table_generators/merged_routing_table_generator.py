@@ -61,24 +61,32 @@ def __create_routing_table(x, y, partitions_in_table, routing_info):
         if r_info is None:
             raise PacmanRoutingException(
                 f"Missing Routing information for {vertex}, {part_id}")
+        app_r_info = None
+        if not isinstance(vertex, ApplicationVertex):
+            app_r_info = routing_info.get_routing_info_from_pre_vertex(
+                vertex.app_vertex, part_id)
         entries = [(vertex, part_id, entry, r_info)]
-        while __match(iterator, vertex, part_id, r_info, entry, routing_info):
+        while __match(iterator, vertex, part_id, r_info, entry, routing_info,
+                      app_r_info):
             (vertex, part_id), entry = iterator.pop()
             r_info = routing_info.get_routing_info_from_pre_vertex(
                 vertex, part_id)
             entries.append((vertex, part_id, entry, r_info))
 
         # Now attempt to merge sources together as much as possible
-        for entry in __merged_keys_and_masks(entries, routing_info):
+        for entry in __merged_keys_and_masks(app_r_info, entries):
             table.add_multicast_routing_entry(entry)
 
     return table
 
 
-def __match(iterator, vertex, part_id, r_info, entry, routing_info):
+def __match(
+        iterator, vertex, part_id, r_info, entry, routing_info, app_r_info):
     if not iterator.has_next:
         return False
     if isinstance(vertex, ApplicationVertex):
+        return False
+    if r_info.mask != app_r_info.machine_mask:
         return False
     (next_vertex, next_part_id), next_entry = iterator.peek()
     if isinstance(next_vertex, ApplicationVertex):
@@ -113,17 +121,15 @@ def __mask_has_holes(mask):
     return (inv_mask & (inv_mask - 1)) != 0
 
 
-def __merged_keys_and_masks(entries, routing_info):
+def __merged_keys_and_masks(app_r_info, entries):
     if not entries:
         return
-    (vertex, part_id, entry, r_info) = entries[0]
+    (vertex, _, entry, r_info) = entries[0]
     if isinstance(vertex, ApplicationVertex) or len(entries) == 1:
         yield MulticastRoutingEntry(
             r_info.key, r_info.mask, defaultable=entry.defaultable,
             spinnaker_route=entry.spinnaker_route)
     else:
-        app_r_info = routing_info.get_routing_info_from_pre_vertex(
-            vertex.app_vertex, part_id)
         yield from app_r_info.merge_machine_entries(entries)
 
 
