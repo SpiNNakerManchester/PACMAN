@@ -47,6 +47,9 @@ class _PacmanDataModel(object):
         "_precompressed",
         "_monitor_cores",
         "_monitor_sdram",
+        "_n_boards_required",
+        "_n_chips_required",
+        "_n_chips_in_graph",
         "_routing_infos",
         "_routing_table_by_partition",
         "_tags",
@@ -69,6 +72,8 @@ class _PacmanDataModel(object):
         self._graph = ApplicationGraph()
         # set at the start of every run
         self._plan_n_timesteps = None
+        self._n_boards_required = None
+        self._n_chips_required = None
         self._hard_reset()
 
     def _hard_reset(self):
@@ -81,6 +86,7 @@ class _PacmanDataModel(object):
         self._precompressed = None
         self._monitor_cores = 0
         self._monitor_sdram = 0
+        self._n_chips_in_graph = None
         self._uncompressed = None
         self._routing_infos = None
         self._routing_table_by_partition = None
@@ -534,3 +540,68 @@ class PacmanDataView(MachineDataView):
         :rtype: int
         """
         return cls.__pacman_data._monitor_sdram
+
+    # n_boards/chips required
+
+    @classmethod
+    def has_n_boards_required(cls):
+        """
+        Reports if a user has sets the number of boards requested during setup.
+
+        :rtype: bool
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If n_boards_required is not set or set to `None`
+        """
+        return cls.__pacman_data._n_boards_required is not None
+
+    @classmethod
+    def get_n_boards_required(cls):
+        """
+        Gets the number of boards requested by the user during setup if known.
+
+        Guaranteed to be positive
+
+        :rtype: int
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the n_boards_required is currently unavailable
+        """
+        if cls.__pacman_data._n_boards_required is None:
+            raise cls._exception("n_boards_requiredr")
+        return cls.__pacman_data._n_boards_required
+
+    @classmethod
+    def get_n_chips_needed(cls):
+        """
+        Gets the number of chips needed, if set.
+
+        This will be the number of chips requested by the user during setup,
+        even if this is less that what the partitioner reported.
+
+        If the partitioner has run and the user has not specified a number,
+        this will be what the partitioner requested.
+
+        Guaranteed to be positive if set
+
+        :rtype: int
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If data for n_chips_needed is not available
+        """
+        if cls.__pacman_data._n_chips_required:
+            return cls.__pacman_data._n_chips_required
+        if cls.__pacman_data._n_chips_in_graph:
+            return cls.__pacman_data._n_chips_in_graph
+        raise cls._exception("n_chips_requiredr")
+
+    @classmethod
+    def has_n_chips_needed(cls):
+        """
+        Detects if the number of chips needed has been set.
+
+        This will be the number of chips requested by the use during setup or
+        what the partitioner requested.
+
+        :rtype: bool
+        """
+        if cls.__pacman_data._n_chips_required is not None:
+            return True
+        return cls.__pacman_data._n_chips_in_graph is not None
