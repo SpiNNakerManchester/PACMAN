@@ -605,3 +605,20 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._n_chips_required is not None:
             return True
         return cls.__pacman_data._n_chips_in_graph is not None
+
+    @classmethod
+    def get_chips_boards_required_str(cls):
+        """
+        Gets a String to say what was required
+        :return:
+        """
+        if cls.__pacman_data._n_boards_required:
+            return (f"Setup asked for "
+                    f"{cls.__pacman_data._n_boards_required} Boards")
+        if cls.__pacman_data._n_chips_required:
+            return (f"Setup asked for "
+                    f"{cls.__pacman_data._n_chips_required} Chips")
+        if cls.__pacman_data._n_chips_in_graph:
+            return (f"Graph requires "
+                    f"{cls.__pacman_data._n_chips_in_graph} Chips")
+        return "No requirements known"

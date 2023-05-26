@@ -368,19 +368,27 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             self.assertIsNone(PacmanDataView.get_n_chips_needed())
         self.assertFalse(PacmanDataView.has_n_chips_needed())
-
+        # check always works
+        self.assertEqual("No requirements known",
+                         PacmanDataView.get_chips_boards_required_str())
         # required higher than in graph
         writer.set_n_required(None, 20)
         self.assertFalse(PacmanDataView.has_n_boards_required())
         self.assertEqual(20, PacmanDataView.get_n_chips_needed())
+        self.assertIn("20 Chips",
+                      PacmanDataView.get_chips_boards_required_str())
         writer.set_n_chips_in_graph(15)
         self.assertFalse(PacmanDataView.has_n_boards_required())
         self.assertEqual(20, PacmanDataView.get_n_chips_needed())
+        self.assertIn("20 Chips",
+                      PacmanDataView.get_chips_boards_required_str())
 
         # required higher than in graph
         writer.set_n_chips_in_graph(25)
         self.assertFalse(PacmanDataView.has_n_boards_required())
         self.assertEqual(20, PacmanDataView.get_n_chips_needed())
+        self.assertIn("20 Chips",
+                      PacmanDataView.get_chips_boards_required_str())
 
         # reset does not remove required
         writer.start_run()
@@ -388,6 +396,8 @@ class TestSimulatorData(unittest.TestCase):
         writer.hard_reset()
         self.assertFalse(PacmanDataView.has_n_boards_required())
         self.assertEqual(20, PacmanDataView.get_n_chips_needed())
+        self.assertIn("20 Chips",
+                      PacmanDataView.get_chips_boards_required_str())
 
         writer = PacmanDataWriter.setup()
         self.assertFalse(PacmanDataView.has_n_boards_required())
@@ -396,6 +406,8 @@ class TestSimulatorData(unittest.TestCase):
         # in graph only
         writer.set_n_chips_in_graph(25)
         self.assertEqual(25, PacmanDataView.get_n_chips_needed())
+        self.assertIn("25 Chips",
+                      PacmanDataView.get_chips_boards_required_str())
 
         # reset clears in graph
         writer.start_run()
@@ -408,11 +420,15 @@ class TestSimulatorData(unittest.TestCase):
         writer.set_n_required(5, None)
         self.assertEqual(5, PacmanDataView.get_n_boards_required())
         self.assertFalse(PacmanDataView.has_n_chips_needed())
+        self.assertIn("5 Boards",
+                      PacmanDataView.get_chips_boards_required_str())
 
         # boards does not hide in graph
         writer.set_n_chips_in_graph(40)
         self.assertEqual(5, PacmanDataView.get_n_boards_required())
         self.assertEqual(40, PacmanDataView.get_n_chips_needed())
+        self.assertIn("5 Boards",
+                      PacmanDataView.get_chips_boards_required_str())
 
         # reset does not clear required
         writer.start_run()
@@ -420,12 +436,16 @@ class TestSimulatorData(unittest.TestCase):
         writer.hard_reset()
         self.assertEqual(5, PacmanDataView.get_n_boards_required())
         self.assertFalse(PacmanDataView.has_n_chips_needed())
+        self.assertIn("5 Boards",
+                      PacmanDataView.get_chips_boards_required_str())
 
         # two Nones fine
         writer = PacmanDataWriter.setup()
         writer.set_n_required(None, None)
         self.assertFalse(PacmanDataView.has_n_boards_required())
         self.assertFalse(PacmanDataView.has_n_chips_needed())
+        self.assertEqual("No requirements known",
+                         PacmanDataView.get_chips_boards_required_str())
 
         # Ilegal calls
         with self.assertRaises(ValueError):

@@ -447,7 +447,8 @@ class _Spaces(object):
         except StopIteration:
             raise PacmanPlaceException(  # pylint: disable=raise-missing-from
                 f"No more chips to place on; {self.n_chips_used} of "
-                f"{self.__machine.n_chips} used")
+                f"{self.__machine.n_chips} used. "
+                f"{PacmanDataView.get_chips_boards_required_str()}")
 
     def __get_next_chip(self):
         """
