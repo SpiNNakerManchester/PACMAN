@@ -14,8 +14,9 @@
 """
 Collection of functions which together validate routes.
 """
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 import logging
+from typing import NamedTuple, List
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
@@ -27,14 +28,27 @@ from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     get_app_partitions)
 
-
 logger = FormatAdapter(logging.getLogger(__name__))
 range_masks = {FULL_MASK - ((2 ** i) - 1) for i in range(33)}
 
-# Define an internal class for placements
-PlacementTuple = namedtuple('PlacementTuple', 'x y p')
-# Define an internal class for failures
-_Failure = namedtuple('_Failure', 'router_x router_y keys source_mask')
+
+class PlacementTuple(NamedTuple):
+    """
+    A particular location in placement.
+    """
+    #: The X coordinate of the chip
+    x: int
+    #: The Y coordinate of the chip
+    y: int
+    #: The ID of the CPU core on the chip
+    p: int
+
+
+class _Failure(NamedTuple):
+    router_x: int
+    router_y: int
+    keys: List[int]
+    source_mask: int
 
 
 def validate_routes(placements, routing_tables):
@@ -50,7 +64,6 @@ def validate_routes(placements, routing_tables):
     :raises PacmanRoutingException: when either no routing table entry is
         found by the search on a given router, or a cycle is detected
     """
-
     # Find all partitions that need to be dealt with
     partitions = get_app_partitions()
     routing_infos = PacmanDataView.get_routing_infos()

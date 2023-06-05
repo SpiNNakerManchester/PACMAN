@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_machine.tags import IPTag, ReverseIPTag
@@ -25,9 +25,6 @@ _BOARD_PORTS = range(17896, 18000)
 
 # The set of tags available on any chip
 _CHIP_TAGS = range(1, 8)
-
-
-_Task = namedtuple("_Task", "constraint, board, tag, vertex, placement")
 
 
 def basic_tag_allocator():
