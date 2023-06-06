@@ -26,22 +26,23 @@ class DestinationVertex(object):
     pass
 
 
-def _get_destinations(machine, fixed_route_tables, source_x, source_y):
-    to_search = list([(source_x, source_y)])
+def _get_destinations(machine, fixed_route_tables, source):
+    to_search = [source]
     visited = set()
     destinations = set()
     while to_search:
-        x, y = to_search.pop()
-        assert (x, y) not in visited
-        entry = fixed_route_tables[x, y]
+        chip = to_search.pop()
+        assert chip not in visited
+        entry = fixed_route_tables[chip]
         for link in entry.link_ids:
-            assert machine.is_link_at(x, y, link)
-            chip = machine.get_chip_at(x, y)
+            assert machine.is_link_at(chip.x, chip.y, link)
             link_obj = chip.router.get_link(link)
-            to_search.append((link_obj.destination_x, link_obj.destination_y))
+
+            to_search.append(machine.get_chip_at(
+                link_obj.destination_x, link_obj.destination_y))
         for processor_id in entry.processor_ids:
-            destinations.add((x, y, processor_id))
-        visited.add((x, y))
+            destinations.add((chip.x, chip.y, processor_id))
+        visited.add(chip)
     return destinations
 
 
@@ -56,10 +57,9 @@ def _check_setup(width, height):
 
     fixed_route_tables = fixed_route_router(DestinationVertex)
 
-    for x, y in machine.chip_coordinates:
-        assert (x, y) in fixed_route_tables
-        chip = machine.get_chip_at(x, y)
-        destinations = _get_destinations(machine, fixed_route_tables, x, y)
+    for chip in machine.chips:
+        assert chip in fixed_route_tables
+        destinations = _get_destinations(machine, fixed_route_tables, chip)
         assert len(destinations) == 1
         assert (
             (chip.nearest_ethernet_x, chip.nearest_ethernet_y, 1)
