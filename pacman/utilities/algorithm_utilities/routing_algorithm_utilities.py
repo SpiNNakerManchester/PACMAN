@@ -553,16 +553,27 @@ def get_targets_by_chip(vertices):
 def vertex_xy(vertex):
     """
     :param MachineVertex vertex:
-    :param Placements placements:
-    :param ~spinn_machine.Machine machine:
     :rtype: tuple(int,int)
     """
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)
         return placement.x, placement.y
-    machine = PacmanDataView.get_machine()
-    link_data = vertex.get_link_data(machine)
+    link_data = vertex.get_link_data(PacmanDataView.get_machine())
     return link_data.connected_chip_x, link_data.connected_chip_y
+
+
+def vertex_chip(vertex):
+    """
+    :param MachineVertex vertex:
+    :rtype: ~spinn_machine.Chip
+    """
+    machine = PacmanDataView.get_machine()
+    if not isinstance(vertex, AbstractVirtual):
+        placement = PacmanDataView.get_placement_of_vertex(vertex)
+        return machine.get_chip_at(placement.x, placement.y)
+    link_data = vertex.get_link_data(machine)
+    return machine.get_chip_at(
+        link_data.connected_chip_x, link_data.connected_chip_y)
 
 
 def vertex_xy_and_route(vertex):

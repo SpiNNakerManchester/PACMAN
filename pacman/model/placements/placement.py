@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from pacman.data.pacman_data_view import PacmanDataView
 
 
 class Placement(object):
@@ -96,6 +97,15 @@ class Placement(object):
         :rtype: tuple(int,int)
         """
         return (self._x, self._y)
+
+    @property
+    def chip(self):
+        """
+        The chip of this placement.
+
+        :rtype: ~spinn_machine.Chip
+        """
+        return PacmanDataView.get_chip_at(self._x, self._y)
 
     def __eq__(self, other):
         if not isinstance(other, Placement):

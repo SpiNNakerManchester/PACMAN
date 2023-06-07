@@ -27,7 +27,7 @@ def fixed_route_router(destination_class):
     :param destination_class: the destination class to route packets to
     :type destination_class: type or tuple(type,...)
     :return: router tables for fixed route paths
-    :rtype: dict(tuple(int,int), ~spinn_machine.FixedRouteEntry)
+    :rtype: dict(~spinn_machine.Chip, ~spinn_machine.FixedRouteEntry)
     :raises PacmanConfigurationException: if no placement processor found
     :raises PacmanRoutingException:
     :raises PacmanAlreadyExistsException:
@@ -56,7 +56,7 @@ class _FixedRouteRouter(object):
         Runs the fixed route generator for all boards on machine.
 
         :return: router tables for fixed route paths
-        :rtype: dict(tuple(int,int), ~spinn_machine.FixedRouteEntry)
+        :rtype: dict(~spinn_machine.Chip, ~spinn_machine.FixedRouteEntry)
         :raises PacmanConfigurationException: if no placement processor found
         :raises PacmanRoutingException:
         :raises PacmanAlreadyExistsException:
