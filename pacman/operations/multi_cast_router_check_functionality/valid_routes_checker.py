@@ -222,7 +222,7 @@ def _start_trace_via_routing_tables(
     current_router_table = routing_tables.get_routing_table_for_chip(
         source_placement.x, source_placement.y)
     visited_routers = set()
-    visited_routers.add((current_router_table.x, current_router_table.y))
+    visited_routers.add(current_router_table.chip)
 
     # get src router
     entry = _locate_routing_entry(
@@ -271,7 +271,7 @@ def _recursive_trace_to_destinations(
     :param BaseKeyAndMask key_and_mask:
         the key and mask being used by the vertex which resides on the source
         placement
-    :param set(tuple(int,int)) visited_routers:
+    :param set(Chip) visited_routers:
         the list of routers which have been visited during this trace so far
     :param set(PlacementTuple) reached_placements:
         the placements reached during the trace
@@ -301,8 +301,7 @@ def _recursive_trace_to_destinations(
                 link.destination_x, link.destination_y)
 
             # check that we've not visited this router before
-            _check_visited_routers(
-                next_router.x, next_router.y, visited_routers)
+            _check_visited_routers(next_router.chip, visited_routers)
 
             # locate next entry
             entry = _locate_routing_entry(
@@ -326,22 +325,20 @@ def _recursive_trace_to_destinations(
         _is_dest(processor_values, current_router, reached_placements)
 
 
-def _check_visited_routers(chip_x, chip_y, visited_routers):
+def _check_visited_routers(chip, visited_routers):
     """
     Check if the trace has visited this router already.
 
-    :param int chip_x: the x coordinate of the chip being checked
-    :param int chip_y: the y coordinate of the chip being checked
-    :param set(tuple(int,int)) visited_routers: routers already visited
+    :param Chip chip: the chip being checked
+    :param set(Chip) visited_routers: routers already visited
     :raise PacmanRoutingException: when a router has been visited twice.
     """
-    visited_routers_router = (chip_x, chip_y)
-    if visited_routers_router in visited_routers:
+    if chip in visited_routers:
         raise PacmanRoutingException(
             "visited this router before, there is a cycle here. "
             f"The routers I've currently visited are {visited_routers} and "
-            f"the router i'm visiting is {visited_routers_router}")
-    visited_routers.add(visited_routers_router)
+            f"the router i'm visiting is ({chip.x},{chip.y})")
+    visited_routers.add(chip)
 
 
 def _is_dest(processor_ids, current_router, reached_placements):

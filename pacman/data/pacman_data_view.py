@@ -11,12 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
+from typing import Iterable, List, Optional, TypeVar, TYPE_CHECKING
 from spinn_utilities.log import FormatAdapter
 from spinn_machine.data import MachineDataView
 from pacman.exceptions import PacmanNotPlacedError
 from pacman.model.graphs.application import ApplicationGraph
+if TYPE_CHECKING:
+    from pacman.model.graphs import AbstractEdge
+    from pacman.model.graphs import AbstractVertex
+    from pacman.model.graphs import AbstractEdgePartition
+    from pacman.model.graphs.application import ApplicationEdgePartition
+    from pacman.model.graphs.machine import MachineVertex
+    from pacman.model.placements import Placement
+    from pacman.model.tags import Tags
+    from pacman.model.routing_info import RoutingInfo
+    from pacman.model.routing_tables import MulticastRoutingTables
+    from pacman.model.routing_table_by_partition import (
+        MulticastRoutingTableByPartition)
+
+    VTX = TypeVar("VTX", bound=AbstractVertex)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access
@@ -110,7 +125,7 @@ class PacmanDataView(MachineDataView):
     # graph methods
 
     @classmethod
-    def add_vertex(cls, vertex):
+    def add_vertex(cls, vertex: AbstractVertex):
         """
         Adds an Application vertex to the user graph.
 
@@ -134,7 +149,7 @@ class PacmanDataView(MachineDataView):
         cls.__pacman_data._graph.add_vertex(vertex)
 
     @classmethod
-    def add_edge(cls, edge, outgoing_edge_partition_name):
+    def add_edge(cls, edge: AbstractEdge, outgoing_edge_partition_name: str):
         """
         Adds an Application edge to the user graph.
 
@@ -144,7 +159,6 @@ class PacmanDataView(MachineDataView):
         :param str outgoing_edge_partition_name:
             The name of the edge partition to add the edge to; each edge
             partition is the partition of edges that start at the same vertex
-        :rtype: AbstractEdgePartition
         :raises PacmanConfigurationException:
             when both graphs contain vertices
         :raises PacmanInvalidParameterException:
@@ -163,7 +177,7 @@ class PacmanDataView(MachineDataView):
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
 
     @classmethod
-    def iterate_vertices(cls):
+    def iterate_vertices(cls) -> Iterable[AbstractVertex]:
         """
         The vertices in the user application graph.
 
@@ -179,7 +193,8 @@ class PacmanDataView(MachineDataView):
         return iter(cls.__pacman_data._graph.vertices)
 
     @classmethod
-    def get_vertices_by_type(cls, vertex_type):
+    def get_vertices_by_type(
+            cls, vertex_type: type[VTX]) -> Iterable[VTX]:
         """
         The application vertices in the graph of the specific type.
 
@@ -206,7 +221,7 @@ class PacmanDataView(MachineDataView):
                 yield vertex
 
     @classmethod
-    def get_n_vertices(cls):
+    def get_n_vertices(cls) -> int:
         """
         The number of vertices in the user application graph.
 
@@ -221,7 +236,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._graph.n_vertices
 
     @classmethod
-    def iterate_partitions(cls):
+    def iterate_partitions(cls) -> Iterable[ApplicationEdgePartition]:
         """
         The partitions in the user application graphs as an iterator.
 
@@ -236,7 +251,7 @@ class PacmanDataView(MachineDataView):
         return iter(cls.__pacman_data._graph.outgoing_edge_partitions)
 
     @classmethod
-    def get_n_partitions(cls):
+    def get_n_partitions(cls) -> int:
         """
         The partitions in the user application graph.
 
@@ -251,7 +266,8 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._graph.n_outgoing_edge_partitions
 
     @classmethod
-    def get_outgoing_edge_partitions_starting_at_vertex(cls, vertex):
+    def get_outgoing_edge_partitions_starting_at_vertex(
+            cls, vertex: AbstractVertex) -> Iterable[AbstractEdgePartition]:
         """
         Get all the edge partitions that start at the given vertex.
 
@@ -268,7 +284,7 @@ class PacmanDataView(MachineDataView):
             get_outgoing_edge_partitions_starting_at_vertex(vertex)
 
     @classmethod
-    def get_edges(cls):
+    def get_edges(cls) -> List[AbstractEdge]:
         """
         Get all the edges in the graph.
 
@@ -281,7 +297,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._graph.edges
 
     @classmethod
-    def get_n_machine_vertices(cls):
+    def get_n_machine_vertices(cls) -> int:
         """
         Gets the number of machine vertices via the application graph.
 
@@ -293,7 +309,7 @@ class PacmanDataView(MachineDataView):
                    for vertex in cls.__pacman_data._graph.vertices)
 
     @classmethod
-    def iterate_machine_vertices(cls):
+    def iterate_machine_vertices(cls) -> Iterable[MachineVertex]:
         """
         Iterate over the Machine vertices via the application graph.
 
@@ -307,7 +323,7 @@ class PacmanDataView(MachineDataView):
     # placements
 
     @classmethod
-    def iterate_placemements(cls):
+    def iterate_placemements(cls) -> Iterable[Placement]:
         """
         Iterates over the Placement objects.
 
@@ -320,7 +336,8 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._placements.placements
 
     @classmethod
-    def iterate_placements_by_vertex_type(cls, vertex_type):
+    def iterate_placements_by_vertex_type(
+            cls, vertex_type: type[VTX]) -> Iterable[Placement]:
         """
         Iterate over placements on any chip with this vertex_type.
 
@@ -335,7 +352,7 @@ class PacmanDataView(MachineDataView):
             iterate_placements_by_vertex_type(vertex_type)
 
     @classmethod
-    def iterate_placements_on_core(cls, x, y):
+    def iterate_placements_on_core(cls, x: int, y: int) -> Iterable[Placement]:
         """
         Iterate over placements with this x and y.
 
@@ -350,7 +367,9 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._placements.iterate_placements_on_core(x, y)
 
     @classmethod
-    def iterate_placements_by_xy_and_type(cls, x, y, vertex_type):
+    def iterate_placements_by_xy_and_type(
+            cls, x: int, y: int,
+            vertex_type: type[VTX]) -> Iterable[Placement]:
         """
         Iterate over placements with this x, y and type.
 
@@ -367,7 +386,7 @@ class PacmanDataView(MachineDataView):
             iterate_placements_by_xy_and_type(x, y, vertex_type)
 
     @classmethod
-    def get_n_placements(cls):
+    def get_n_placements(cls) -> int:
         """
         The number of placements.
 
@@ -380,7 +399,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._placements.n_placements
 
     @classmethod
-    def get_placement_of_vertex(cls, vertex):
+    def get_placement_of_vertex(cls, vertex: MachineVertex) -> Placement:
         """
         Return the placement information for a vertex.
 
@@ -402,7 +421,8 @@ class PacmanDataView(MachineDataView):
             raise PacmanNotPlacedError(vertex) from e
 
     @classmethod
-    def get_placement_on_processor(cls, x, y, p):
+    def get_placement_on_processor(
+            cls, x: int, y: int, p: int) -> MachineVertex:
         """
         Get the vertex on a specific processor, or raise an exception
         if the processor has not been allocated.
@@ -425,7 +445,7 @@ class PacmanDataView(MachineDataView):
     # routing_infos
 
     @classmethod
-    def get_routing_infos(cls):
+    def get_routing_infos(cls) -> RoutingInfo:
         """
         The routing information, if known.
 
@@ -439,7 +459,7 @@ class PacmanDataView(MachineDataView):
     # tags
 
     @classmethod
-    def get_tags(cls):
+    def get_tags(cls) -> Tags:
         """
         The Tags object if known.
 
@@ -454,7 +474,7 @@ class PacmanDataView(MachineDataView):
     # RoutingTables
 
     @classmethod
-    def get_uncompressed(cls):
+    def get_uncompressed(cls) -> MulticastRoutingTables:
         """
         Get the uncompressed routing tables.
 
@@ -468,7 +488,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._uncompressed
 
     @classmethod
-    def get_precompressed(cls):
+    def get_precompressed(cls) -> MulticastRoutingTables:
         """
         Get the pre-compressed routing tables.
 
@@ -486,7 +506,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._precompressed
 
     @classmethod
-    def get_plan_n_timestep(cls):
+    def get_plan_n_timestep(cls) -> Optional[int]:
         """
         The number of timesteps to plan for in an auto-pause-resume cycle.
 
@@ -498,7 +518,8 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._plan_n_timesteps
 
     @classmethod
-    def get_routing_table_by_partition(cls):
+    def get_routing_table_by_partition(
+            cls) -> MulticastRoutingTableByPartition:
         """
         The MulticastRoutingTableByPartition, if it has been set.
 
@@ -511,7 +532,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._routing_table_by_partition
 
     @classmethod
-    def get_monitor_cores(cls):
+    def get_monitor_cores(cls) -> int:
         """
         The number of cores on every chip reported to be used by monitors.
         Ethernet-enabled chips may have more.
@@ -523,7 +544,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._monitor_cores
 
     @classmethod
-    def get_monitor_sdram(cls):
+    def get_monitor_sdram(cls) -> int:
         """
         The amount of SDRAM on every chip reported to be used by monitors.
         Ethernet-enabled chips may have more.

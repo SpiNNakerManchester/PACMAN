@@ -14,6 +14,7 @@
 
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractproperty, abstractmethod)
+from pacman.data.pacman_data_view import PacmanDataView
 
 
 class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
@@ -36,6 +37,15 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+
+    @property
+    def chip(self):
+        """
+        The chip of this table.
+
+        :rtype: ~spinn_machine.Chip
+        """
+        return PacmanDataView.get_chip_at(self.x, self.y)
 
     @abstractproperty
     def multicast_routing_entries(self):
