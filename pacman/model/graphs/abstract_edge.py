@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+if TYPE_CHECKING:
+    from pacman.model.graphs.abstract_vertex import AbstractVertex
 
 
 class AbstractEdge(object, metaclass=AbstractBase):
@@ -22,7 +26,7 @@ class AbstractEdge(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractproperty
-    def label(self):
+    def label(self) -> Optional[str]:
         """
         The label of the edge.
 
@@ -30,7 +34,7 @@ class AbstractEdge(object, metaclass=AbstractBase):
         """
 
     @abstractproperty
-    def pre_vertex(self):
+    def pre_vertex(self) -> AbstractVertex:
         """
         The vertex at the start of the edge.
 
@@ -38,7 +42,7 @@ class AbstractEdge(object, metaclass=AbstractBase):
         """
 
     @abstractproperty
-    def post_vertex(self):
+    def post_vertex(self) -> AbstractVertex:
         """
         The vertex at the end of the edge.
 

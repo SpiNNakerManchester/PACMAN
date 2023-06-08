@@ -11,10 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+from typing import Iterable, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanAlreadyExistsException)
+if TYPE_CHECKING:
+    from .abstract_edge import AbstractEdge
+    from .abstract_vertex import AbstractVertex
 
 
 class AbstractEdgePartition(object, metaclass=AbstractBase):
@@ -33,7 +38,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         "_allowed_edge_types")
 
     def __init__(
-            self, identifier, allowed_edge_types):
+            self, identifier: str, allowed_edge_types: type):
         """
         :param str identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed
@@ -44,7 +49,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         self._allowed_edge_types = allowed_edge_types
         self._edges = OrderedSet()
 
-    def add_edge(self, edge):
+    def add_edge(self, edge: AbstractEdge):
         """
         Add an edge to the edge partition.
 
@@ -63,7 +68,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         self._edges.add(edge)
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         """
         The identifier of this edge partition.
 
@@ -72,7 +77,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         return self._identifier
 
     @property
-    def edges(self):
+    def edges(self) -> Iterable[AbstractEdge]:
         """
         The edges in this edge partition.
 
@@ -85,7 +90,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         return self._edges
 
     @property
-    def n_edges(self):
+    def n_edges(self) -> int:
         """
         The number of edges in the edge partition.
 
@@ -110,7 +115,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         return edge in self._edges
 
     @abstractproperty
-    def pre_vertices(self):
+    def pre_vertices(self) -> Iterable[AbstractVertex]:
         """
         The vertices associated with this partition.
 

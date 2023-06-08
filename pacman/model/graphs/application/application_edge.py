@@ -11,9 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractEdge
+if TYPE_CHECKING:
+    from pacman.model.graphs.application import ApplicationVertex
 
 
 class ApplicationEdge(AbstractEdge):
@@ -29,7 +32,8 @@ class ApplicationEdge(AbstractEdge):
         # The label
         "_label")
 
-    def __init__(self, pre_vertex, post_vertex, label=None):
+    def __init__(self, pre_vertex: ApplicationVertex,
+                 post_vertex: ApplicationVertex, label: Optional[str] = None):
         """
         :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:
             The application vertex at the start of the edge.
@@ -44,15 +48,15 @@ class ApplicationEdge(AbstractEdge):
 
     @property
     @overrides(AbstractEdge.label)
-    def label(self):
+    def label(self) -> Optional[str]:
         return self._label
 
     @property
     @overrides(AbstractEdge.pre_vertex)
-    def pre_vertex(self):
+    def pre_vertex(self) -> ApplicationVertex:
         return self._pre_vertex
 
     @property
     @overrides(AbstractEdge.post_vertex)
-    def post_vertex(self):
+    def post_vertex(self) -> ApplicationVertex:
         return self._post_vertex

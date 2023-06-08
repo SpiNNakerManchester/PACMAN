@@ -11,10 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractSingleSourcePartition
 from .application_edge import ApplicationEdge
+if TYPE_CHECKING:
+    from .application_vertex import ApplicationVertex
 
 
 class ApplicationEdgePartition(AbstractSingleSourcePartition):
@@ -26,7 +29,7 @@ class ApplicationEdgePartition(AbstractSingleSourcePartition):
 
     __slots__ = ()
 
-    def __init__(self, identifier, pre_vertex):
+    def __init__(self, identifier: str, pre_vertex: ApplicationVertex):
         """
         :param str identifier: The identifier of the partition
         :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:
@@ -37,6 +40,6 @@ class ApplicationEdgePartition(AbstractSingleSourcePartition):
             allowed_edge_types=ApplicationEdge)
 
     @overrides(AbstractSingleSourcePartition.add_edge)
-    def add_edge(self, edge):
+    def add_edge(self, edge: ApplicationEdge):
         super().add_edge(edge)
         edge.post_vertex.add_incoming_edge(edge, self)
