@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import Collection, Union
 import numpy
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanValueError
@@ -25,7 +26,9 @@ class MDSlice(Slice):
 
     __slots__ = ("_shape", "_start", "_atoms_shape")
 
-    def __init__(self, lo_atom, hi_atom, shape, start, atoms_shape):
+    def __init__(
+            self, lo_atom: int, hi_atom: int, shape: Collection[int],
+            start: Collection[int], atoms_shape: Collection[int]):
         """
         :param int lo_atom: Index of the lowest atom to represent.
         :param int hi_atom: Index of the highest atom to represent.
@@ -47,34 +50,34 @@ class MDSlice(Slice):
         if len(shape) != len(start):
             raise PacmanValueError(
                 "Both shape and start must have the same length")
-        self._shape = shape
-        self._start = start
-        self._atoms_shape = atoms_shape
+        self._shape = tuple(shape)
+        self._start = tuple(start)
+        self._atoms_shape = tuple(atoms_shape)
 
     @property
     @overrides(Slice.hi_atom)
-    def hi_atom(self):
+    def hi_atom(self) -> int:
         # Should go pop here
         return super().hi_atom
 
     @property
     @overrides(Slice.shape)
-    def shape(self):
+    def shape(self) -> Collection[int]:
         return self._shape
 
     @property
     @overrides(Slice.start)
-    def start(self):
+    def start(self) -> Collection[int]:
         return self._start
 
     @property
     @overrides(Slice.as_slice)
-    def as_slice(self):
+    def as_slice(self) -> slice:
         # Should go pop here
         return super().as_slice
 
     @overrides(Slice.get_slice, extend_doc=False)
-    def get_slice(self, n):
+    def get_slice(self, n: int) -> slice:
         """
         Get a slice in the `n`'th dimension
 
@@ -89,20 +92,20 @@ class MDSlice(Slice):
 
     @property
     @overrides(Slice.dimension)
-    def dimension(self):
+    def dimension(self) -> Collection[slice]:
         return tuple(self.get_slice(n) for n in range(len(self.shape)))
 
     @property
     @overrides(Slice.end)
-    def end(self):
+    def end(self) -> Collection[int]:
         return tuple((numpy.array(self.start) + numpy.array(self.shape)) - 1)
 
     @overrides(Slice.get_ids_as_slice_or_list)
-    def get_ids_as_slice_or_list(self):
+    def get_ids_as_slice_or_list(self) -> numpy.ndarray:
         return self.get_raster_ids()
 
     @overrides(Slice.get_raster_ids)
-    def get_raster_ids(self):
+    def get_raster_ids(self) -> numpy.ndarray:
         slices = tuple(self.get_slice(n)
                        for n in reversed(range(len(self.start))))
         ids = numpy.arange(numpy.prod(self._atoms_shape)).reshape(
@@ -128,7 +131,7 @@ class MDSlice(Slice):
 
     @classmethod
     @overrides(Slice.from_string, extend_doc=False)
-    def from_string(cls, as_str):
+    def from_string(cls, as_str: str) -> Union[MDSlice, Slice]:
         """
         Convert the string form of a :py:class:`MDSlice` into an object
         instance.

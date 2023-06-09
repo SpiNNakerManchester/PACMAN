@@ -11,14 +11,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+from typing import Generic, Iterable, TypeVar, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractEdgePartition
+if TYPE_CHECKING:
+    from .abstract_vertex import AbstractVertex
+    from .abstract_edge import AbstractEdge
+    V = TypeVar("V", bound=AbstractVertex)
+    E = TypeVar("E", bound=AbstractEdge)
+else:
+    V = TypeVar("V")
+    E = TypeVar("E")
 
 
 class AbstractSingleSourcePartition(
-        AbstractEdgePartition, metaclass=AbstractBase):
+        AbstractEdgePartition, Generic[V, E], metaclass=AbstractBase):
     """
     An edge partition that has a single source vertex.
     """
@@ -27,20 +37,20 @@ class AbstractSingleSourcePartition(
         "_pre_vertex", )
 
     def __init__(
-            self, pre_vertex, identifier, allowed_edge_types):
+            self, pre_vertex: V, identifier: str, allowed_edge_types: type[E]):
         super().__init__(
             identifier=identifier, allowed_edge_types=allowed_edge_types)
         self._pre_vertex = pre_vertex
 
     @overrides(AbstractEdgePartition.add_edge)
-    def add_edge(self, edge):
+    def add_edge(self, edge: E):
         super().add_edge(edge)
         if edge.pre_vertex != self._pre_vertex:
             raise PacmanConfigurationException(
                 "A partition can only contain edges with the same pre_vertex")
 
     @property
-    def pre_vertex(self):
+    def pre_vertex(self) -> V:
         """
         The vertex at which all edges in this outgoing edge partition start.
 
@@ -50,5 +60,5 @@ class AbstractSingleSourcePartition(
 
     @property
     @overrides(AbstractEdgePartition.pre_vertices)
-    def pre_vertices(self):
+    def pre_vertices(self) -> Iterable[V]:
         yield self.pre_vertex

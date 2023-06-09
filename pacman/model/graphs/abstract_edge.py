@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING
+from typing import Generic, Optional, TypeVar
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
-if TYPE_CHECKING:
-    from pacman.model.graphs.abstract_vertex import AbstractVertex
+from pacman.model.graphs.abstract_vertex import AbstractVertex
+V = TypeVar("V", bound=AbstractVertex)
 
 
-class AbstractEdge(object, metaclass=AbstractBase):
+class AbstractEdge(Generic[V], metaclass=AbstractBase):
     """
     A directed edge in a graph between two vertices.
     """
@@ -34,7 +34,7 @@ class AbstractEdge(object, metaclass=AbstractBase):
         """
 
     @abstractproperty
-    def pre_vertex(self) -> AbstractVertex:
+    def pre_vertex(self) -> V:
         """
         The vertex at the start of the edge.
 
@@ -42,7 +42,7 @@ class AbstractEdge(object, metaclass=AbstractBase):
         """
 
     @abstractproperty
-    def post_vertex(self) -> AbstractVertex:
+    def post_vertex(self) -> V:
         """
         The vertex at the end of the edge.
 

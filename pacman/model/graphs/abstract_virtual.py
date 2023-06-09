@@ -11,10 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import List, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.abstract_base import abstractmethod, abstractproperty
 from spinn_utilities.require_subclass import require_subclass
-from pacman.model.graphs.abstract_vertex import AbstractVertex
+from pacman.model.graphs import AbstractVertex
+if TYPE_CHECKING:
+    from spinn_machine import Machine
+    from spinn_machine.link_data_objects import AbstractLinkData
+    from pacman.model.routing_info import BaseKeyAndMask
 
 
 @require_subclass(AbstractVertex)
@@ -31,7 +36,7 @@ class AbstractVirtual(object):
     __slots__ = ()
 
     @abstractproperty
-    def board_address(self):
+    def board_address(self) -> Optional[str]:
         """
         The IP address of the board to which the device is connected,
         or ``None`` for the boot board, or when using linked chip
@@ -41,7 +46,7 @@ class AbstractVirtual(object):
         """
 
     @abstractproperty
-    def linked_chip_coordinates(self):
+    def linked_chip_coordinates(self) -> Optional[Tuple[int, int]]:
         """
         The coordinates of the chip to which the device is connected,
         or ``None`` for the boot board, or when using a board address.
@@ -50,7 +55,7 @@ class AbstractVirtual(object):
         """
 
     @abstractmethod
-    def outgoing_keys_and_masks(self):
+    def outgoing_keys_and_masks(self) -> Optional[List[BaseKeyAndMask]]:
         """
         Get the keys sent by the device or `None` if there aren't any
         explicitly defined.
@@ -59,7 +64,7 @@ class AbstractVirtual(object):
         """
 
     @abstractproperty
-    def incoming(self):
+    def incoming(self) -> bool:
         """
         Whether this device sends traffic into SpiNNaker.
 
@@ -67,7 +72,7 @@ class AbstractVirtual(object):
         """
 
     @abstractproperty
-    def outgoing(self):
+    def outgoing(self) -> bool:
         """
         Whether this device receives traffic from SpiNNaker.
 
@@ -75,7 +80,7 @@ class AbstractVirtual(object):
         """
 
     @abstractmethod
-    def get_link_data(self, machine):
+    def get_link_data(self, machine: Machine) -> AbstractLinkData:
         """
         Get link data from the machine.
 

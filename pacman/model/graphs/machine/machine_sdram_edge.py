@@ -11,9 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
 from pacman.exceptions import PacmanConfigurationException
+from .machine_vertex import MachineVertex
 
 
 class SDRAMMachineEdge(MachineEdge):
@@ -28,24 +30,26 @@ class SDRAMMachineEdge(MachineEdge):
         # The sdram base address for this edge
         "_sdram_base_address")
 
-    def __init__(self, pre_vertex, post_vertex, label):
+    def __init__(
+            self, pre_vertex: MachineVertex, post_vertex: MachineVertex,
+            label: str):
         if not isinstance(pre_vertex, AbstractSupportsSDRAMEdges):
             raise PacmanConfigurationException(
                 f"Pre-vertex {pre_vertex} doesn't support SDRAM edges")
         super().__init__(pre_vertex, post_vertex, label=label)
         self._sdram_size = pre_vertex.sdram_requirement(self)
-        self._sdram_base_address = None
+        self._sdram_base_address: Optional[int] = None
 
     @property
-    def sdram_size(self):
+    def sdram_size(self) -> int:
         return self._sdram_size
 
     @property
-    def sdram_base_address(self):
+    def sdram_base_address(self) -> Optional[int]:
         return self._sdram_base_address
 
     @sdram_base_address.setter
-    def sdram_base_address(self, new_value):
+    def sdram_base_address(self, new_value: int):
         self._sdram_base_address = new_value
 
     def __repr__(self):

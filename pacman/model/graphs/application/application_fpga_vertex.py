@@ -11,11 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from pacman.exceptions import PacmanInvalidParameterException
+from __future__ import annotations
+from typing import Iterable, List, Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
+from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs.common.slice import Slice
 from .application_virtual_vertex import ApplicationVirtualVertex
+if TYPE_CHECKING:
+    from spinn_machine.link_data_objects import FPGALinkData
+    from spinn_machine import Machine
+    from .fpga_connection import FPGAConnection
 
 
 class ApplicationFPGAVertex(ApplicationVirtualVertex):
@@ -30,9 +35,11 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         "_n_machine_vertices_per_link")
 
     def __init__(
-            self, n_atoms, incoming_fpga_connections=None,
-            outgoing_fpga_connection=None, label=None,
-            n_machine_vertices_per_link=1):
+            self, n_atoms: int,
+            incoming_fpga_connections: Optional[List[FPGAConnection]] = None,
+            outgoing_fpga_connection: Optional[FPGAConnection] = None,
+            label: Optional[str] = None,
+            n_machine_vertices_per_link: int = 1):
         """
         :param int n_atoms: The number of atoms in the vertex
         :param incoming_fpga_connections:
@@ -67,11 +74,11 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     @property
     @overrides(ApplicationVirtualVertex.n_atoms)
-    def n_atoms(self):
+    def n_atoms(self) -> int:
         return self._n_atoms
 
     @property
-    def n_machine_vertices_per_link(self):
+    def n_machine_vertices_per_link(self) -> int:
         """
         The number of machine vertices to create for each link of the FPGA.
 
@@ -79,7 +86,8 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         """
         return self._n_machine_vertices_per_link
 
-    def get_incoming_slice_for_link(self, link, index):
+    def get_incoming_slice_for_link(
+            self, link: FPGAConnection, index: int) -> Slice:
         """
         Get the slice to be given to the connection from the given link.
 
@@ -97,7 +105,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         hi_atom = min((hi_atom, self.n_atoms - 1))
         return Slice(low_atom, hi_atom)
 
-    def get_outgoing_slice(self):
+    def get_outgoing_slice(self) -> Slice:
         """
         Get the slice to be given to the outgoing connection.
 
@@ -106,7 +114,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         return Slice(0, self.n_atoms - 1)
 
     @property
-    def incoming_fpga_connections(self):
+    def incoming_fpga_connections(self) -> Iterable[FPGAConnection]:
         """
         The connections from one or more FPGAs that packets are expected
         to be received from for this device.
@@ -118,7 +126,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
                 yield from conn.expanded
 
     @property
-    def outgoing_fpga_connection(self):
+    def outgoing_fpga_connection(self) -> Optional[FPGAConnection]:
         """
         The connection to one FPGA via one link to which packets are sent
         to this device.
@@ -128,7 +136,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         return self._outgoing_fpga_connection
 
     @overrides(ApplicationVirtualVertex.get_outgoing_link_data)
-    def get_outgoing_link_data(self, machine):
+    def get_outgoing_link_data(self, machine: Machine) -> FPGALinkData:
         if self._outgoing_fpga_connection is None:
             raise NotImplementedError("This vertex doesn't have outgoing data")
         fpga = self._outgoing_fpga_connection

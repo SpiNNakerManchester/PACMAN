@@ -17,9 +17,12 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractEdge
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex
+    _MV = MachineVertex
+else:
+    _MV = object
 
 
-class MachineEdge(AbstractEdge):
+class MachineEdge(AbstractEdge[_MV]):
     """
     A simple implementation of a machine edge.
     """

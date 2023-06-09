@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, TYPE_CHECKING
+from typing import Collection, Generic, Iterable, TypeVar, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
@@ -20,9 +20,12 @@ from pacman.exceptions import (
 if TYPE_CHECKING:
     from .abstract_edge import AbstractEdge
     from .abstract_vertex import AbstractVertex
+    E = TypeVar("E", bound=AbstractEdge)
+else:
+    E = TypeVar("E")
 
 
-class AbstractEdgePartition(object, metaclass=AbstractBase):
+class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
     """
     A collection of edges which start at a single vertex which have the
     same semantics and so can share a single key or block of SDRAM
@@ -37,8 +40,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         # The type of edges to accept
         "_allowed_edge_types")
 
-    def __init__(
-            self, identifier: str, allowed_edge_types: type):
+    def __init__(self, identifier: str, allowed_edge_types: type[E]):
         """
         :param str identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed
@@ -49,7 +51,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         self._allowed_edge_types = allowed_edge_types
         self._edges = OrderedSet()
 
-    def add_edge(self, edge: AbstractEdge):
+    def add_edge(self, edge: E):
         """
         Add an edge to the edge partition.
 
@@ -77,7 +79,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         return self._identifier
 
     @property
-    def edges(self) -> Iterable[AbstractEdge]:
+    def edges(self) -> Collection[E]:
         """
         The edges in this edge partition.
 

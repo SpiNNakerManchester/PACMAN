@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional
+
 
 class ChipAndCore(object):
     """
@@ -26,7 +28,7 @@ class ChipAndCore(object):
         # the SpiNNaker machine; may be None
         "_p")
 
-    def __init__(self, x, y, p=None):
+    def __init__(self, x: int, y: int, p: Optional[int] = None):
         """
         :param int x: the x-coordinate of the chip
         :param int y: the y-coordinate of the chip
@@ -38,7 +40,7 @@ class ChipAndCore(object):
         self._p = None if p is None else int(p)
 
     @property
-    def x(self):
+    def x(self) -> int:
         """
         The X-coordinate of the chip.
 
@@ -47,7 +49,7 @@ class ChipAndCore(object):
         return self._x
 
     @property
-    def y(self):
+    def y(self) -> int:
         """
         The Y-coordinate of the chip.
 
@@ -56,7 +58,7 @@ class ChipAndCore(object):
         return self._y
 
     @property
-    def p(self):
+    def p(self) -> Optional[int]:
         """
         The processor on the chip, or `None` if that is not constrained.
 

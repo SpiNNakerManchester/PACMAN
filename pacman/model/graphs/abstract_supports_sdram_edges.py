@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
+if TYPE_CHECKING:
+    from pacman.model.graphs.machine import SDRAMMachineEdge
 
 
 # Can't use this decorator: circular import problem
@@ -24,7 +28,7 @@ class AbstractSupportsSDRAMEdges(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def sdram_requirement(self, sdram_machine_edge):
+    def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:
         """
         Asks a machine vertex for the SDRAM requirement it needs.
 

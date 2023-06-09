@@ -13,7 +13,10 @@
 # limitations under the License.
 
 import math
+from typing import Optional
 from spinn_utilities.overrides import overrides
+from spinn_machine import Machine
+from spinn_machine.link_data_objects import SpinnakerLinkData
 from pacman.model.graphs.common.slice import Slice
 from .application_virtual_vertex import ApplicationVirtualVertex
 
@@ -32,8 +35,10 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         "_outgoing")
 
     def __init__(
-            self, n_atoms, spinnaker_link_id, board_address=None, label=None,
-            n_machine_vertices=1, incoming=True, outgoing=True):
+            self, n_atoms: int, spinnaker_link_id: int,
+            board_address: Optional[str] = None, label: Optional[str] = None,
+            n_machine_vertices: int = 1,
+            incoming: bool = True, outgoing: bool = True):
         """
         :param int n_atoms: The number of atoms in the vertex
         :param int spinnaker_link_id:
@@ -53,11 +58,11 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
 
     @property
     @overrides(ApplicationVirtualVertex.n_atoms)
-    def n_atoms(self):
+    def n_atoms(self) -> int:
         return self._n_atoms
 
     @property
-    def spinnaker_link_id(self):
+    def spinnaker_link_id(self) -> int:
         """
         The SpiNNaker link to which this device is connected.
 
@@ -66,7 +71,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         return self._spinnaker_link_id
 
     @property
-    def board_address(self):
+    def board_address(self) -> Optional[str]:
         """
         The board to which this device is connected, or `None` for the
         default board.
@@ -76,7 +81,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         return self._board_address
 
     @property
-    def n_machine_vertices(self):
+    def n_machine_vertices(self) -> int:
         """
         The number of machine vertices to create.
 
@@ -84,7 +89,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         """
         return self._n_machine_vertices
 
-    def get_incoming_slice(self, index):
+    def get_incoming_slice(self, index: int) -> Slice:
         """
         Get the slice to be given to the connection.
 
@@ -100,7 +105,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         hi_atom = min((hi_atom, self.n_atoms - 1))
         return Slice(low_atom, hi_atom)
 
-    def get_outgoing_slice(self):
+    def get_outgoing_slice(self) -> Slice:
         """
         Get the slice to be given to the outgoing connection.
 
@@ -109,20 +114,20 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         return Slice(0, self.n_atoms - 1)
 
     @property
-    def incoming(self):
+    def incoming(self) -> bool:
         return self._incoming
 
     @property
-    def outgoing(self):
+    def outgoing(self) -> bool:
         return self._outgoing
 
     @overrides(ApplicationVirtualVertex.get_outgoing_link_data)
-    def get_outgoing_link_data(self, machine):
+    def get_outgoing_link_data(self, machine: Machine) -> SpinnakerLinkData:
         if not self._outgoing:
             raise NotImplementedError("This vertex doesn't have outgoing data")
         return machine.get_spinnaker_link_with_id(
             self._spinnaker_link_id, self._board_address)
 
     @overrides(ApplicationVirtualVertex.get_max_atoms_per_core)
-    def get_max_atoms_per_core(self):
+    def get_max_atoms_per_core(self) -> int:
         return int(math.ceil(self._n_atoms / self._n_machine_vertices))

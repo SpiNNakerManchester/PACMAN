@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from typing import NamedTuple
+from __future__ import annotations
+from typing import Iterable, NamedTuple, Optional, Tuple
 
 #: The range of FPGA ids
 FPGA_IDS = range(0, 3)
@@ -27,21 +27,21 @@ class FPGAConnection(NamedTuple):
     """
 
     #: The ID of the FPGA on the board (0, 1 or 2), or None for all of them
-    fpga_id: int
+    fpga_id: Optional[int]
 
     #: The ID of the link of the FPGA (0-15), or None for all of them
-    fpga_link_id: int
+    fpga_link_id: Optional[int]
 
     #: The IP address of the board with the FPGA, or None for the default board
     #: or if using chip_coords
-    board_address: str
+    board_address: Optional[str]
 
     #: The coordinates of the chip connected to the FPGA, or None for the
     #: default board or if using board_address
-    chip_coords: tuple
+    chip_coords: Optional[Tuple[int, int]]
 
     @property
-    def is_concrete(self):
+    def is_concrete(self) -> bool:
         """
         Whether the connection has the FPGA id and link id set.
 
@@ -50,7 +50,7 @@ class FPGAConnection(NamedTuple):
         return self.fpga_id is not None and self.fpga_link_id is not None
 
     @property
-    def expanded(self):
+    def expanded(self) -> Iterable[FPGAConnection]:
         """
         Get a list of concrete FPGA connections,
         where fpga_id and fpga_link_id are not `None`.
