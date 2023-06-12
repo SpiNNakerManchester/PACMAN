@@ -30,11 +30,11 @@ class VariableSDRAM(AbstractSDRAM):
         # The amount of extra SDRAm used for each timestep
         "_per_timestep_sdram")
 
-    def __init__(self, fixed_sdram, per_timestep_sdram):
+    def __init__(self, fixed_sdram: int, per_timestep_sdram: float):
         """
         :param fixed_sdram:
             The amount of SDRAM (in bytes) that represents static overhead
-        :type dtcm: int or numpy.integer
+        :type fixed_sdram: int or numpy.integer
         :param per_timestep_sdram:
             The amount of SDRAM (in bytes) required per timestep.
             Often represents the space to record a timestep.
@@ -44,10 +44,10 @@ class VariableSDRAM(AbstractSDRAM):
         self._per_timestep_sdram = float(per_timestep_sdram)
 
     @overrides(AbstractSDRAM.get_total_sdram)
-    def get_total_sdram(self, n_timesteps):
+    def get_total_sdram(self, n_timesteps: int) -> int:
         if n_timesteps is not None:
-            return (self._fixed_sdram +
-                    self._per_timestep_sdram * n_timesteps)
+            return int(self._fixed_sdram +
+                       self._per_timestep_sdram * n_timesteps)
         if self._per_timestep_sdram == 0:
             return self._fixed_sdram
         raise PacmanConfigurationException(
@@ -55,12 +55,12 @@ class VariableSDRAM(AbstractSDRAM):
 
     @property
     @overrides(AbstractSDRAM.fixed)
-    def fixed(self):
+    def fixed(self) -> int:
         return self._fixed_sdram
 
     @property
     @overrides(AbstractSDRAM.per_timestep)
-    def per_timestep(self):
+    def per_timestep(self) -> float:
         return self._per_timestep_sdram
 
     def __add__(self, other):

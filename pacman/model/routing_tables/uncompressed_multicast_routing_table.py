@@ -15,6 +15,7 @@
 import csv
 import gzip
 import logging
+from typing import Any, Dict, Iterable
 from spinn_utilities.log import FormatAdapter
 from spinn_machine import MulticastRoutingEntry
 from pacman.exceptions import PacmanAlreadyExistsException
@@ -43,7 +44,9 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         # defaultable
         "_number_of_defaulted_routing_entries")
 
-    def __init__(self, x, y, multicast_routing_entries=None):
+    def __init__(
+            self, x: int, y: int,
+            multicast_routing_entries: Iterable[MulticastRoutingEntry] = ()):
         """
         :param int x:
             The x-coordinate of the chip for which this is the routing table
@@ -59,13 +62,13 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         self._x = x
         self._y = y
         self._number_of_defaulted_routing_entries = 0
-        self._entries_by_key_mask = dict()
+        self._entries_by_key_mask: Dict = dict()
 
-        if multicast_routing_entries is not None:
-            for multicast_routing_entry in multicast_routing_entries:
-                self.add_multicast_routing_entry(multicast_routing_entry)
+        for multicast_routing_entry in multicast_routing_entries:
+            self.add_multicast_routing_entry(multicast_routing_entry)
 
-    def add_multicast_routing_entry(self, multicast_routing_entry):
+    def add_multicast_routing_entry(
+            self, multicast_routing_entry: MulticastRoutingEntry):
         """
         Adds a routing entry to this table.
 
@@ -97,12 +100,12 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
 
     @property
     @overrides(AbstractMulticastRoutingTable.x)
-    def x(self):
+    def x(self) -> int:
         return self._x
 
     @property
     @overrides(AbstractMulticastRoutingTable.y)
-    def y(self):
+    def y(self) -> int:
         return self._y
 
     @property
@@ -112,16 +115,16 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
 
     @property
     @overrides(AbstractMulticastRoutingTable.number_of_entries)
-    def number_of_entries(self):
+    def number_of_entries(self) -> int:
         return len(self._entries_by_key_mask)
 
     @property
     @overrides(AbstractMulticastRoutingTable.number_of_defaultable_entries)
-    def number_of_defaultable_entries(self):
+    def number_of_defaultable_entries(self) -> int:
         return self._number_of_defaulted_routing_entries
 
     @overrides(AbstractMulticastRoutingTable.__eq__)
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, UnCompressedMulticastRoutingTable):
             return False
         if self._x != other.x and self._y != other.y:
@@ -129,22 +132,22 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         return self._entries_by_key_mask == other._entries_by_key_mask
 
     @overrides(AbstractMulticastRoutingTable.__ne__)
-    def __ne__(self, other):
+    def __ne__(self, other: Any) -> bool:
         return not self.__eq__(other)
 
     @overrides(AbstractMulticastRoutingTable.__repr__)
-    def __repr__(self):
-        entry_string = ""
-        for entry in self.multicast_routing_entries:
-            entry_string += f"{entry}\n"
-        return f"{self._x}:{self._y}\n\n{entry_string}"
+    def __repr__(self) -> str:
+        entry_string = "\n".join(
+            str(entry) for entry in self.multicast_routing_entries)
+        return f"{self._x}:{self._y}\n\n{entry_string}\n"
 
     @overrides(AbstractMulticastRoutingTable.__hash__)
-    def __hash__(self):
+    def __hash__(self) -> int:
         return id(self)
 
 
-def _from_csv_file(csvfile):
+def _from_csv_file(
+        csvfile: Iterable[str]) -> UnCompressedMulticastRoutingTable:
     table_reader = csv.reader(csvfile)
     table = UnCompressedMulticastRoutingTable(0, 0)
     for row in table_reader:
@@ -166,7 +169,7 @@ def _from_csv_file(csvfile):
     return table
 
 
-def from_csv(file_name):
+def from_csv(file_name: str) -> UnCompressedMulticastRoutingTable:
     if file_name.endswith(".gz"):
         with gzip.open(file_name, mode="rt", newline='') as csvfile:
             return _from_csv_file(csvfile)

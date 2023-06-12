@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from pacman.data import PacmanDataView
+from pacman.model.resources.abstract_sdram import AbstractSDRAM
 
 
 class ChipCounter(object):
@@ -39,14 +40,16 @@ class ChipCounter(object):
         # The number of chips used, including the current one
         "__n_chips")
 
-    def __init__(self, n_cores_per_chip=15, sdram_per_chip=100 * 1024 * 1024):
+    def __init__(
+            self, n_cores_per_chip: int = 15,
+            sdram_per_chip: int = 100 * 1024 * 1024):
         self.__n_cores_per_chip = n_cores_per_chip
         self.__sdram_per_chip = sdram_per_chip
         self.__cores_free = 0
         self.__sdram_free = 0
         self.__n_chips = 0
 
-    def add_core(self, resources):
+    def add_core(self, resources: AbstractSDRAM):
         sdram = resources.get_total_sdram(
             PacmanDataView.get_plan_n_timestep())
         if self.__cores_free == 0 or self.__sdram_free < sdram:
@@ -57,7 +60,7 @@ class ChipCounter(object):
         self.__sdram_free -= sdram
 
     @property
-    def n_chips(self):
+    def n_chips(self) -> int:
         """
         :rtype: int
         """

@@ -23,7 +23,13 @@ verified and more accurately represents the problem at hand.
 Based on
 https://github.com/project-rig/rig/blob/master/rig/place_and_route/routing_tree.py
 """
+from __future__ import annotations
 from collections import deque
+from typing import (
+    Deque, Iterable, Iterator, List, Optional, Set, Tuple, Union,
+    TYPE_CHECKING)
+if TYPE_CHECKING:
+    from pacman.model.graphs.machine import MachineVertex
 
 
 class RoutingTree(object):
@@ -43,21 +49,22 @@ class RoutingTree(object):
     #   than a tuple saves 56 bytes per instance.
     __slots__ = ("_chip_x", "_chip_y", "_children", "_label")
 
-    def __init__(self, chip, label=None):
+    def __init__(self, chip: Tuple[int, int], label: Optional[str] = None):
         """
         :param tuple(int,int) chip:
             The chip the route is currently passing through.
         """
         self._chip_x, self._chip_y = chip
-        self._children = []
+        self._children: List[
+            Tuple[int, Union[RoutingTree, MachineVertex]]] = []
         self._label = label
 
     @property
-    def label(self):
+    def label(self) -> Optional[str]:
         return self._label
 
     @property
-    def chip(self):
+    def chip(self) -> Tuple[int, int]:
         """
         The chip the route is currently passing through.
 
@@ -66,7 +73,8 @@ class RoutingTree(object):
         return (self._chip_x, self._chip_y)
 
     @property
-    def children(self):
+    def children(self) -> Iterable[
+            Tuple[int, Union[RoutingTree, MachineVertex]]]:
         """
         A :py:class:`iterable` of the next steps in the route represented by a
         (route, object) tuple.
@@ -94,14 +102,16 @@ class RoutingTree(object):
         """
         yield from self._children
 
-    def append_child(self, child):
+    def append_child(
+            self, child: Tuple[int, Union[RoutingTree, MachineVertex]]):
         """
         :param child:
         :type child: tuple(int, RoutingTree or MachineVertex)
         """
         self._children.append(child)
 
-    def remove_child(self, child):
+    def remove_child(
+            self, child: Tuple[int, Union[RoutingTree, MachineVertex]]):
         """
         :param child:
         :type child: tuple(int, RoutingTree or MachineVertex)
@@ -109,10 +119,10 @@ class RoutingTree(object):
         self._children.remove(child)
 
     @property
-    def is_leaf(self):
+    def is_leaf(self) -> bool:
         return not self._children
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Union[RoutingTree, MachineVertex]]:
         """
         Iterate over this node and then all its children, recursively and in
         no specific order. This iterator iterates over the child *objects*
@@ -126,13 +136,14 @@ class RoutingTree(object):
             else:
                 yield obj
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<RoutingTree at {} with {} {}>".format(
             self.chip,
             len(self._children),
             "child" if len(self._children) == 1 else "children")
 
-    def traverse(self):
+    def traverse(self) -> Iterable[
+            Tuple[Optional[int], Tuple[int, int], Set[int]]]:
         """
         Traverse the tree yielding the direction taken to a node, the
         coordinates of that node and the directions leading from the Node.
@@ -147,13 +158,14 @@ class RoutingTree(object):
         # A queue of (direction, node) to visit. The direction is the Links
         # entry which describes the direction in which we last moved to reach
         # the node (or None for the root).
-        to_visit = deque([(None, self)])
+        to_visit: Deque[
+            Tuple[Optional[int], RoutingTree]] = deque(((None, self), ))
         while to_visit:
             direction, node = to_visit.popleft()
 
             # Determine the set of directions we must travel to reach the
             # children
-            out_directions = set()
+            out_directions: Set[int] = set()
             # pylint:disable=protected-access
             for child_direction, child in node._children:
                 # Note that if the direction is unspecified, we simply

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional
 
 
 class IPtagResource(object):
@@ -18,7 +19,6 @@ class IPtagResource(object):
     Represents the ability to have a SpiNNaker machine send messages to
     you during execution.
     """
-
     __slots__ = (
         # The host IP address that will receive the data from this tag
         "_ip_address",
@@ -36,8 +36,9 @@ class IPtagResource(object):
         "_traffic_identifier")
 
     def __init__(
-            self, ip_address, port, strip_sdp, tag=None,
-            traffic_identifier="DEFAULT"):
+            self, ip_address: str, port: int, strip_sdp: bool,
+            tag: Optional[int] = None,
+            traffic_identifier: str = "DEFAULT"):
         """
         :param str ip_address:
             The IP address of the host that will receive data from this tag
@@ -59,7 +60,7 @@ class IPtagResource(object):
         self._traffic_identifier = traffic_identifier
 
     @property
-    def ip_address(self):
+    def ip_address(self) -> str:
         """
         The IP address to assign to the tag.
 
@@ -68,7 +69,7 @@ class IPtagResource(object):
         return self._ip_address
 
     @property
-    def port(self):
+    def port(self) -> int:
         """
         The port of the tag.
 
@@ -77,14 +78,14 @@ class IPtagResource(object):
         return self._port
 
     @property
-    def traffic_identifier(self):
+    def traffic_identifier(self) -> str:
         """
         The traffic identifier for this IP tag.
         """
         return self._traffic_identifier
 
     @property
-    def strip_sdp(self):
+    def strip_sdp(self) -> bool:
         """
         Whether SDP headers should be stripped for this tag.
 
@@ -93,7 +94,7 @@ class IPtagResource(object):
         return self._strip_sdp
 
     @property
-    def tag(self):
+    def tag(self) -> Optional[int]:
         """
         The tag required, or `None` if any tag is OK.
 

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
+from typing import Dict, List, Optional
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import Chip, FixedRouteEntry
 from pacman.data import PacmanDataView
@@ -20,7 +20,7 @@ from pacman.exceptions import (
     PacmanRoutingException)
 
 
-def fixed_route_router(destination_class):
+def fixed_route_router(destination_class: type) -> Dict[Chip, FixedRouteEntry]:
     """
     Runs the fixed route generator for all boards on machine.
 
@@ -46,12 +46,12 @@ class _FixedRouteRouter(object):
         "_destination_class", "_fixed_route_tables",
         "_machine")
 
-    def __init__(self, destination_class):
+    def __init__(self, destination_class: type):
         self._machine = PacmanDataView.get_machine()
         self._destination_class = destination_class
-        self._fixed_route_tables = dict()
+        self._fixed_route_tables: Dict[Chip, FixedRouteEntry] = dict()
 
-    def build_fixed_routes(self):
+    def build_fixed_routes(self) -> Dict[Chip, FixedRouteEntry]:
         """
         Runs the fixed route generator for all boards on machine.
 
@@ -120,7 +120,8 @@ class _FixedRouteRouter(object):
             return self._machine.get_chip_at(x, y)
         return None
 
-    def __add_fixed_route_entry(self, key: Chip, link_ids, processor_ids):
+    def __add_fixed_route_entry(
+            self, key: Chip, link_ids: List[int], processor_ids: List[int]):
         """
         :param tuple(int,int) key:
         :param list(int) link_ids:
@@ -133,7 +134,7 @@ class _FixedRouteRouter(object):
         self._fixed_route_tables[key] = FixedRouteEntry(
             link_ids=link_ids, processor_ids=processor_ids)
 
-    def __locate_destination(self, chip):
+    def __locate_destination(self, chip: Chip) -> int:
         """
         Locate destination vertex on an (Ethernet-connected) chip to send
         fixed data to.

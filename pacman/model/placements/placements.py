@@ -13,9 +13,12 @@
 # limitations under the License.
 
 from collections import defaultdict
+from typing import Dict, Iterable, Tuple
 from pacman.exceptions import (
     PacmanAlreadyPlacedError, PacmanNotPlacedError,
     PacmanProcessorAlreadyOccupiedError, PacmanProcessorNotOccupiedError)
+from .placement import Placement
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
 
 class Placements(object):
@@ -32,7 +35,7 @@ class Placements(object):
         # the placement of a machine vertex.
         "_machine_vertices")
 
-    def __init__(self, placements=None):
+    def __init__(self, placements: Iterable[Placement] = ()):
         """
         :param iterable(Placement) placements: Any initial placements
         :raise PacmanAlreadyPlacedError:
@@ -40,13 +43,14 @@ class Placements(object):
         :raise PacmanProcessorAlreadyOccupiedError:
             If two placements are made to the same processor.
         """
-        self._placements = defaultdict(dict)
-        self._machine_vertices = dict()
-        if placements is not None:
+        self._placements: Dict[Tuple[int, int], Dict[int, Placement]] = \
+            defaultdict(dict)
+        self._machine_vertices: Dict[MachineVertex, Placement] = dict()
+        if placements:
             self.add_placements(placements)
 
     @property
-    def n_placements(self):
+    def n_placements(self) -> int:
         """
         The number of placements.
 
@@ -54,7 +58,7 @@ class Placements(object):
         """
         return len(self._machine_vertices)
 
-    def add_placements(self, placements):
+    def add_placements(self, placements: Iterable[Placement]):
         """
         Add some placements.
 
@@ -63,7 +67,7 @@ class Placements(object):
         for placement in placements:
             self.add_placement(placement)
 
-    def add_placement(self, placement):
+    def add_placement(self, placement: Placement):
         """
         Add a placement.
 
@@ -83,7 +87,7 @@ class Placements(object):
         self._placements[x, y][p] = placement
         self._machine_vertices[placement.vertex] = placement
 
-    def get_placement_on_processor(self, x, y, p):
+    def get_placement_on_processor(self, x: int, y: int, p: int) -> Placement:
         """
         Get the placement on a specific processor, or raises an exception
         if the processor has not been allocated.
@@ -101,7 +105,7 @@ class Placements(object):
         except KeyError as e:
             raise PacmanProcessorNotOccupiedError((x, y, p)) from e
 
-    def is_vertex_placed(self, vertex):
+    def is_vertex_placed(self, vertex: MachineVertex) -> bool:
         """
         Determine if a vertex has been placed.
 
@@ -110,7 +114,7 @@ class Placements(object):
         """
         return vertex in self._machine_vertices
 
-    def get_placement_of_vertex(self, vertex):
+    def get_placement_of_vertex(self, vertex: MachineVertex) -> Placement:
         """
         Return the placement information for a vertex.
 
@@ -124,7 +128,7 @@ class Placements(object):
         except KeyError as e:
             raise PacmanNotPlacedError(vertex) from e
 
-    def is_processor_occupied(self, x, y, p):
+    def is_processor_occupied(self, x: int, y: int, p: int) -> bool:
         """
         Determine if a processor has a vertex on it.
 
@@ -133,9 +137,10 @@ class Placements(object):
         :param int p: Index of processor.
         :return bool: Whether the processor has an assigned vertex.
         """
-        return (x, y) in self._placements and p in self._placements[x, y]
+        return (pr := self._placements.get((x, y))) is not None and p in pr
 
-    def iterate_placements_on_core(self, x, y):
+    def iterate_placements_on_core(
+            self, x: int, y: int) -> Iterable[Placement]:
         """
         Iterate over placements with this x and y.
 
@@ -145,7 +150,8 @@ class Placements(object):
         """
         return self._placements[x, y].values()
 
-    def iterate_placements_by_xy_and_type(self, x, y, vertex_type):
+    def iterate_placements_by_xy_and_type(
+            self, x: int, y: int, vertex_type: type) -> Iterable[Placement]:
         """
         Iterate over placements with this x, y and this vertex_type.
 
@@ -158,7 +164,8 @@ class Placements(object):
             if isinstance(placement.vertex, vertex_type):
                 yield placement
 
-    def iterate_placements_by_vertex_type(self, vertex_type):
+    def iterate_placements_by_vertex_type(
+            self, vertex_type: type) -> Iterable[Placement]:
         """
         Iterate over placements on any chip with this vertex_type.
 
@@ -169,7 +176,7 @@ class Placements(object):
             if isinstance(placement.vertex, vertex_type):
                 yield placement
 
-    def n_placements_on_chip(self, x, y):
+    def n_placements_on_chip(self, x: int, y: int) -> int:
         """
         The number of placements on the given chip.
 
@@ -182,7 +189,7 @@ class Placements(object):
         return len(self._placements[x, y])
 
     @property
-    def placements(self):
+    def placements(self) -> Iterable[Placement]:
         """
         All of the placements.
 
@@ -191,7 +198,7 @@ class Placements(object):
         """
         return iter(self._machine_vertices.values())
 
-    def placements_on_chip(self, x, y):
+    def placements_on_chip(self, x: int, y: int) -> Iterable[Placement]:
         """
         Get the placements on a specific chip.
 
@@ -202,7 +209,7 @@ class Placements(object):
         return self._placements[x, y].values()
 
     @property
-    def chips_with_placements(self):
+    def chips_with_placements(self) -> Iterable[Tuple[int, int]]:
         """
         The chips with placements on them.
 
@@ -210,17 +217,14 @@ class Placements(object):
         """
         return self._placements.keys()
 
-    def __repr__(self):
-        output = ""
-        for placement in self._placements:
-            output += placement.__repr__()
-        return output
+    def __repr__(self) -> str:
+        return "".join(repr(placement) for placement in self._placements)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[Placement]:
         """
         An iterator for the placements object within.
         """
         return iter(self._machine_vertices.values())
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._machine_vertices)

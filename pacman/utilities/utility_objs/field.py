@@ -14,6 +14,7 @@
 
 from enum import Enum
 import uuid
+from typing import Optional
 
 
 class SUPPORTED_TAGS(Enum):
@@ -33,7 +34,10 @@ class Field(object):
         "_tag",
         "_name")
 
-    def __init__(self, lo, hi, value, tag=SUPPORTED_TAGS.ROUTING, name=None):
+    def __init__(
+            self, lo: int, hi: int, value: int,
+            tag: SUPPORTED_TAGS = SUPPORTED_TAGS.ROUTING,
+            name: Optional[str] = None):
         """
         :param int lo: the low bit in the routing table entry for this field
         :param int hi: the high bit in the routing table entry for this field
@@ -47,10 +51,10 @@ class Field(object):
         self._hi = hi
         self._value = value
         self._tag = tag
-        self._name = uuid.uuid4() if name is None else name
+        self._name = str(uuid.uuid4()) if name is None else name
 
     @property
-    def lo(self):
+    def lo(self) -> int:
         """
         The low bit in the routing table entry for this field.
 
@@ -59,7 +63,7 @@ class Field(object):
         return self._lo
 
     @property
-    def hi(self):
+    def hi(self) -> int:
         """
         The high bit in the routing table entry for this field.
 
@@ -68,7 +72,7 @@ class Field(object):
         return self._hi
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         The field name.
 
@@ -77,11 +81,11 @@ class Field(object):
         return self._name
 
     @name.setter
-    def name(self, new_value):
+    def name(self, new_value: str):
         self._name = new_value
 
     @property
-    def value(self):
+    def value(self) -> int:
         """
         The value to store in this field.
 
@@ -90,11 +94,11 @@ class Field(object):
         return self._value
 
     @value.setter
-    def value(self, new_value):
+    def value(self, new_value: int):
         self._value = new_value
 
     @property
-    def tag(self):
+    def tag(self) -> SUPPORTED_TAGS:
         """
         The field tag.
 
@@ -103,7 +107,7 @@ class Field(object):
         return self._tag
 
     @tag.setter
-    def tag(self, new_value):
+    def tag(self, new_value: SUPPORTED_TAGS):
         self._tag = new_value
 
     def __repr__(self):

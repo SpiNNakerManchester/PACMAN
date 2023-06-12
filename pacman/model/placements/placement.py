@@ -11,7 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Any, Tuple
+from spinn_machine import Chip
 from pacman.data.pacman_data_view import PacmanDataView
+from pacman.model.graphs.machine import MachineVertex
 
 
 class Placement(object):
@@ -30,7 +33,7 @@ class Placement(object):
         # the SpiNNaker machine
         "_p")
 
-    def __init__(self, vertex, x, y, p):
+    def __init__(self, vertex: MachineVertex, x: int, y: int, p: int):
         """
         :param MachineVertex vertex: The vertex that has been placed
         :param int x:
@@ -45,7 +48,7 @@ class Placement(object):
         self._p = p
 
     @property
-    def vertex(self):
+    def vertex(self) -> MachineVertex:
         """
         The vertex that was placed.
 
@@ -54,7 +57,7 @@ class Placement(object):
         return self._vertex
 
     @property
-    def x(self):
+    def x(self) -> int:
         """
         The X-coordinate of the chip where the vertex is placed.
 
@@ -63,7 +66,7 @@ class Placement(object):
         return self._x
 
     @property
-    def y(self):
+    def y(self) -> int:
         """
         The Y-coordinate of the chip where the vertex is placed.
 
@@ -72,7 +75,7 @@ class Placement(object):
         return self._y
 
     @property
-    def p(self):
+    def p(self) -> int:
         """
         The ID of the processor of the chip where the vertex is placed.
 
@@ -81,7 +84,7 @@ class Placement(object):
         return self._p
 
     @property
-    def location(self):
+    def location(self) -> Tuple[int, int, int]:
         """
         The (x,y,p) tuple that represents the location of this placement.
 
@@ -90,7 +93,7 @@ class Placement(object):
         return (self._x, self._y, self._p)
 
     @property
-    def xy(self):
+    def xy(self) -> Tuple[int, int]:
         """
         The (x,y) tuple that represents the chip of this placement.
 
@@ -99,7 +102,7 @@ class Placement(object):
         return (self._x, self._y)
 
     @property
-    def chip(self):
+    def chip(self) -> Chip:
         """
         The chip of this placement.
 
@@ -107,18 +110,18 @@ class Placement(object):
         """
         return PacmanDataView.get_chip_at(self._x, self._y)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Placement):
             return False
         return (self._x == other.x and self._y == other.y and
                 self._p == other.p and self._vertex == other.vertex)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self._x, self._y, self._p, self._vertex))
 
-    def __ne__(self, other):
+    def __ne__(self, other: Any) -> bool:
         return not self.__eq__(other)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"Placement(vertex={self._vertex}, "
                 f"x={self._x}, y={self._y}, p={self._p})")

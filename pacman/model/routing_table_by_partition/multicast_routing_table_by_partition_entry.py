@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+import logging
+from typing import FrozenSet, Iterable, Optional, Union
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
-import logging
 
 log = FormatAdapter(logging.getLogger(__name__))
 
@@ -47,8 +48,10 @@ class MulticastRoutingTableByPartitionEntry(object):
         # OP = outgoing processors
         "_links_and_procs", )
 
-    def __init__(self, out_going_links, outgoing_processors,
-                 incoming_processor=None, incoming_link=None):
+    def __init__(self, out_going_links: Union[int, Iterable[int], None],
+                 outgoing_processors: Union[int, Iterable[int], None],
+                 incoming_processor: Optional[int] = None,
+                 incoming_link: Optional[int] = None):
         """
         :param out_going_links:
             the edges this path entry goes down, each of which is between
@@ -85,32 +88,32 @@ class MulticastRoutingTableByPartitionEntry(object):
         elif incoming_link is not None:
             self.__set_incoming_link(incoming_link)
 
-    def __set_incoming_link(self, link):
+    def __set_incoming_link(self, link: int):
         if link > _N_LINKS:
             raise ValueError(f"Link {link} > {_N_LINKS}")
         # Add one so that 0 means not set
         self._links_and_procs |= (link + 1) << _INCOMING_LINK_SHIFT
 
-    def __set_incoming_proc(self, proc):
+    def __set_incoming_proc(self, proc: int):
         if proc > _N_PROCS:
             raise ValueError(f"Processor {proc} > {_N_PROCS}")
         # Add one so that 0 means not set
         self._links_and_procs |= (proc + 1) << _INCOMING_PROC_SHIFT
 
-    def __set_outgoing_links(self, links):
+    def __set_outgoing_links(self, links: Iterable[int]):
         for link in links:
             if link > _N_LINKS:
                 raise ValueError(f"Link {link} > {_N_LINKS}")
             self._links_and_procs |= _OUTGOING_LINK_1 << link
 
-    def __set_outgoing_procs(self, procs):
+    def __set_outgoing_procs(self, procs: Iterable[int]):
         for proc in procs:
             if proc > _N_PROCS:
                 raise ValueError(f"Processor {proc} > {_N_PROCS}")
             self._links_and_procs |= _OUTGOING_PROC_1 << proc
 
     @property
-    def processor_ids(self):
+    def processor_ids(self) -> FrozenSet[int]:
         """
         The destination processors of the entry.
 
@@ -120,7 +123,7 @@ class MulticastRoutingTableByPartitionEntry(object):
                          if self._links_and_procs & (_OUTGOING_PROC_1 << i))
 
     @property
-    def link_ids(self):
+    def link_ids(self) -> FrozenSet[int]:
         """
         The destination links of the entry.
 
@@ -130,7 +133,7 @@ class MulticastRoutingTableByPartitionEntry(object):
                          if self._links_and_procs & (_OUTGOING_LINK_1 << i))
 
     @property
-    def incoming_link(self):
+    def incoming_link(self) -> Optional[int]:
         """
         The source link for this path entry.
 
@@ -144,7 +147,7 @@ class MulticastRoutingTableByPartitionEntry(object):
         return link - 1
 
     @incoming_link.setter
-    def incoming_link(self, incoming_link):
+    def incoming_link(self, incoming_link: int):
         if self.incoming_processor is not None:
             raise PacmanConfigurationException(
                 f"Entry already has an incoming processor "
@@ -156,7 +159,7 @@ class MulticastRoutingTableByPartitionEntry(object):
         self.__set_incoming_link(incoming_link)
 
     @property
-    def incoming_processor(self):
+    def incoming_processor(self) -> Optional[int]:
         """
         The source processor.
 
@@ -170,7 +173,7 @@ class MulticastRoutingTableByPartitionEntry(object):
         return proc - 1
 
     @incoming_processor.setter
-    def incoming_processor(self, incoming_processor):
+    def incoming_processor(self, incoming_processor: int):
         if self.incoming_link is not None:
             raise PacmanConfigurationException(
                 f"Entry already has an incoming link {self.incoming_link}")
@@ -181,7 +184,7 @@ class MulticastRoutingTableByPartitionEntry(object):
         self.__set_incoming_proc(incoming_processor)
 
     @property
-    def defaultable(self):
+    def defaultable(self) -> bool:
         """
         The defaultable status of the entry.
 
@@ -211,7 +214,8 @@ class MulticastRoutingTableByPartitionEntry(object):
             "The two MulticastRoutingTableByPartitionEntry have "
             "different " + name + "s, and so can't be merged")
 
-    def merge_entry(self, other):
+    def merge_entry(self, other: MulticastRoutingTableByPartitionEntry) -> \
+            MulticastRoutingTableByPartitionEntry:
         """
         Merges the another entry with this one and returns a new
         MulticastRoutingTableByPartitionEntry
@@ -250,18 +254,19 @@ class MulticastRoutingTableByPartitionEntry(object):
         entry._links_and_procs = self._links_and_procs | other._links_and_procs
         return entry
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{}:{}:{}:{{{}}}:{{{}}}".format(
             self.incoming_link, self.incoming_processor,
             self.defaultable,
             ", ".join(map(str, self.link_ids)),
             ", ".join(map(str, self.processor_ids)))
 
-    def has_same_route(self, entry):
+    def has_same_route(
+            self, entry: MulticastRoutingTableByPartitionEntry) -> bool:
         # pylint:disable=protected-access
         return ((self._links_and_procs & _COMPARE_MASK) ==
                 (entry._links_and_procs & _COMPARE_MASK))
 
     @property
-    def spinnaker_route(self):
+    def spinnaker_route(self) -> int:
         return self._links_and_procs & _SPINNAKER_ROUTE_MASK

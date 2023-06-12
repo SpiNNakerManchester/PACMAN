@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import Any, Optional, TextIO
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 
@@ -22,7 +23,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
     """
 
     @abstractmethod
-    def get_total_sdram(self, n_timesteps):
+    def get_total_sdram(self, n_timesteps: int) -> int:
         """
         The total SDRAM.
 
@@ -31,7 +32,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def __add__(self, other):
+    def __add__(self, other: AbstractSDRAM) -> AbstractSDRAM:
         """
         Combines this SDRAM resource with the other one and creates a new one.
 
@@ -41,7 +42,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def __sub__(self, other):
+    def __sub__(self, other: AbstractSDRAM) -> AbstractSDRAM:
         """
         Creates a new SDRAM which is this one less the other.
 
@@ -51,7 +52,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def sub_from(self, other):
+    def sub_from(self, other: AbstractSDRAM) -> AbstractSDRAM:
         """
         Creates a new SDRAM which is the other less this one.
 
@@ -61,13 +62,13 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
 
     @abstractproperty
-    def fixed(self):
+    def fixed(self) -> int:
         """
         The fixed SDRAM cost.
         """
 
     @abstractproperty
-    def per_timestep(self):
+    def per_timestep(self) -> float:
         """
         The extra SDRAM cost for each additional timestep.
 
@@ -75,7 +76,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
             May well be zero.
         """
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, AbstractSDRAM):
             return False
         if other.fixed != self.fixed:
@@ -83,7 +84,8 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         return other.per_timestep == self.per_timestep
 
     @abstractmethod
-    def report(self, timesteps, indent="", preamble="", target=None):
+    def report(self, timesteps: int, indent: str = "", preamble: str = "",
+               target: Optional[TextIO] = None):
         """
         Writes a description of this SDRAM to the target.
 

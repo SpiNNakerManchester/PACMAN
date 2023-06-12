@@ -11,8 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from .vertex_routing_info import VertexRoutingInfo
 from spinn_utilities.overrides import overrides
+if TYPE_CHECKING:
+    from .base_key_and_mask import BaseKeyAndMask
+    from pacman.model.graphs.machine import MachineVertex
 
 
 class MachineVertexRoutingInfo(VertexRoutingInfo):
@@ -29,7 +34,8 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
         # vertex
         "__index")
 
-    def __init__(self, key_and_mask, partition_id, machine_vertex, index):
+    def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str,
+                 machine_vertex: MachineVertex, index: int):
         """
         :param BaseKeyAndMask key_and_mask:
             The key allocated to the machine partition
@@ -42,7 +48,7 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
         self.__index = index
 
     @property
-    def machine_vertex(self):
+    def machine_vertex(self) -> MachineVertex:
         """
         The machine vertex.
 
@@ -52,11 +58,11 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
 
     @property
     @overrides(VertexRoutingInfo.vertex)
-    def vertex(self):
+    def vertex(self) -> MachineVertex:
         return self.__machine_vertex
 
     @property
-    def index(self):
+    def index(self) -> int:
         """
         The index of the vertex.
 

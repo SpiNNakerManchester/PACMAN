@@ -27,7 +27,7 @@ class ConstantSDRAM(AbstractSDRAM):
         # The amount of SDRAM in bytes
         "_sdram", )
 
-    def __init__(self, sdram):
+    def __init__(self, sdram: int):
         """
         :param sdram: The amount of SDRAM in bytes
         :type sdram: int or ~numpy.int64
@@ -35,17 +35,17 @@ class ConstantSDRAM(AbstractSDRAM):
         self._sdram = int(sdram)
 
     @overrides(AbstractSDRAM.get_total_sdram)
-    def get_total_sdram(self, n_timesteps):  # @UnusedVariable
+    def get_total_sdram(self, n_timesteps) -> int:  # @UnusedVariable
         return self._sdram
 
     @property
     @overrides(AbstractSDRAM.fixed)
-    def fixed(self):
+    def fixed(self) -> int:
         return self._sdram
 
     @property
     @overrides(AbstractSDRAM.per_timestep)
-    def per_timestep(self):
+    def per_timestep(self) -> float:
         return 0
 
     def __add__(self, other):

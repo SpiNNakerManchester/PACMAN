@@ -11,10 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+from typing import Dict
+from spinn_utilities.overrides import overrides
 from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
 from .variable_sdram import VariableSDRAM
-from spinn_utilities.overrides import overrides
+_RegionKey = int
 
 
 class MultiRegionSDRAM(VariableSDRAM):
@@ -34,9 +37,9 @@ class MultiRegionSDRAM(VariableSDRAM):
         # The regions of SDRAM, each of which is an AbstractSDRAM
         "__regions", )
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(0, 0)
-        self.__regions = {}
+        self.__regions: Dict[_RegionKey, AbstractSDRAM] = {}
 
     @property
     def regions(self):
@@ -47,7 +50,8 @@ class MultiRegionSDRAM(VariableSDRAM):
         """
         return self.__regions
 
-    def add_cost(self, region, fixed_sdram, per_timestep_sdram=0):
+    def add_cost(self, region: _RegionKey, fixed_sdram: int,
+                 per_timestep_sdram: int = 0):
         """
         Adds the cost for the specified region.
 
@@ -60,6 +64,7 @@ class MultiRegionSDRAM(VariableSDRAM):
         """
         self._fixed_sdram += fixed_sdram
         self._per_timestep_sdram += per_timestep_sdram
+        sdram: AbstractSDRAM
         if per_timestep_sdram:
             sdram = VariableSDRAM(int(fixed_sdram), int(per_timestep_sdram))
         else:
@@ -69,7 +74,7 @@ class MultiRegionSDRAM(VariableSDRAM):
         else:
             self.__regions[region] = sdram
 
-    def nest(self, region, other):
+    def nest(self, region: _RegionKey, other: AbstractSDRAM):
         """
         Combines the other SDRAM cost, in a nested fashion.
 
@@ -87,18 +92,18 @@ class MultiRegionSDRAM(VariableSDRAM):
         self._per_timestep_sdram += other.per_timestep
         if region in self.__regions:
             if isinstance(other, MultiRegionSDRAM):
-                if isinstance(self.__regions[region], MultiRegionSDRAM):
-                    self.__regions[region].merge(other)
+                r = self.__regions[region]
+                if isinstance(r, MultiRegionSDRAM):
+                    r.merge(other)
                 else:
-                    old = self.__regions[region]
-                    other.add_cost(region, old.fixed, old.per_timestep)
+                    other.add_cost(region, r.fixed, r.per_timestep)
                     self.__regions[region] = other
             else:
                 self.__regions[region] += other
         else:
             self.__regions[region] = other
 
-    def merge(self, other):
+    def merge(self, other: MultiRegionSDRAM):
         """
         Combines the other SDRAM costs keeping the region mappings.
 
