@@ -11,27 +11,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
 import os
+from typing import Iterable, List, Optional, Set, Tuple, cast
 
 from spinn_utilities.config_holder import get_config_bool, get_config_str
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 
-from spinn_machine import Machine
+from spinn_machine import Machine, Chip
 
 from pacman.data import PacmanDataView
 from pacman.model.placements import Placements, Placement
 from pacman.model.graphs import AbstractVirtual
+from pacman.model.graphs.machine import MachineVertex
 from pacman.exceptions import (
     PacmanPlaceException, PacmanConfigurationException, PacmanTooBigToPlace)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def place_application_graph(system_placements):
+def place_application_graph(system_placements: Placements) -> Placements:
     """
     Perform placement of an application graph on the machine.
 
@@ -74,10 +76,10 @@ def place_application_graph(system_placements):
                         plan_n_timesteps) from e
                 logger.debug(f"Starting placement from {next_chip_space}")
 
-                placements_to_make = list()
+                placements_to_make: List = list()
 
                 # Go through the groups
-                last_chip_space = None
+                last_chip_space: Optional[_ChipWithSpace] = None
                 for vertices, sdram in same_chip_groups:
                     vertices_to_place = [
                         vertex
@@ -314,7 +316,9 @@ def _do_fixed_location(vertices, sdram, placements, next_chip_space):
     return True
 
 
-def _store_on_chip(placements_to_make, vertices, sdram, next_chip_space):
+def _store_on_chip(
+        placements_to_make: List[Placement], vertices: List[MachineVertex],
+        sdram: int, next_chip_space: _ChipWithSpace):
     """
     :param list(Placement) placements_to_make:
     :param list(MachineVertex) vertices:
@@ -333,9 +337,9 @@ class _Spaces(object):
                  "__system_placements", "__placements", "__plan_n_timesteps",
                  "__last_chip_space", "__saved_chips", "__restored_chips")
 
-    def __init__(self, placements, plan_n_timesteps):
+    def __init__(
+            self, placements: Placements, plan_n_timesteps: Optional[int]):
         """
-        :param Machine machine:
         :param Placements placements:
         :param int plan_n_timesteps:
         """
@@ -344,8 +348,8 @@ class _Spaces(object):
         self.__plan_n_timesteps = plan_n_timesteps
         self.__chips = iter(self.__chip_order())
         self.__next_chip = next(self.__chips)
-        self.__used_chips = set()
-        self.__last_chip_space = None
+        self.__used_chips: Set[Chip] = set()
+        self.__last_chip_space: Optional[_ChipWithSpace] = None
         self.__saved_chips = OrderedSet()
         self.__restored_chips = OrderedSet()
 
@@ -366,9 +370,10 @@ class _Spaces(object):
                 if chip:
                     yield chip
 
-    def __cores_and_sdram(self, chip):
+    def __cores_and_sdram(self, chip: Chip) -> Tuple[Set[int], int]:
         """
         :param Chip chip:
+        :return cores, sdram
         :rtype: tuple(int, int)
         """
         on_chip = self.__placements.placements_on_chip(chip.x, chip.y)
@@ -378,7 +383,7 @@ class _Spaces(object):
                 self.__plan_n_timesteps) for p in on_chip)
         return cores_used, sdram_used
 
-    def get_next_chip_and_space(self):
+    def get_next_chip_and_space(self) -> Tuple[_ChipWithSpace, _Space]:
         """
         :rtype: (_ChipWithSpace, _Space)
         """
@@ -400,7 +405,7 @@ class _Spaces(object):
                 f"No more chips to place on; {self.n_chips_used} of "
                 f"{self.__machine.n_chips} used")
 
-    def __get_next_chip(self):
+    def __get_next_chip(self) -> Chip:
         """
         :rtype: Chip
         :raises: StopIteration
@@ -413,7 +418,9 @@ class _Spaces(object):
             self.__next_chip = next(self.__chips)
         return self.__next_chip
 
-    def get_next_chip_space(self, space, last_chip_space):
+    def get_next_chip_space(
+            self, space: _Space,
+            last_chip_space: Optional[_ChipWithSpace]) -> _ChipWithSpace:
         """
         :param _Space space:
         :param _ChipWithSpace last_chip_space:
@@ -439,7 +446,7 @@ class _Spaces(object):
         return self.__last_chip_space
 
     @property
-    def n_chips_used(self):
+    def n_chips_used(self) -> int:
         """
         The number of chips used.
 
@@ -447,12 +454,12 @@ class _Spaces(object):
         """
         return len(self.__used_chips)
 
-    def __usable_from_chip(self, chip):
+    def __usable_from_chip(self, chip: Chip) -> Set[Chip]:
         """
         :param Chip chip:
         :rtype set(Chip)
         """
-        chips = OrderedSet()
+        chips = cast(Set[Chip], OrderedSet())
         for link in chip.router.links:
             chip_coords = (link.destination_x, link.destination_y)
             target_chip = self.__machine.get_chip_at(*chip_coords)
@@ -460,13 +467,13 @@ class _Spaces(object):
                 chips.add(target_chip)
         return chips
 
-    def save_chips(self, chips):
+    def save_chips(self, chips: Iterable[Chip]):
         """
         :param iterable(Chip) chips:
         """
         self.__saved_chips.update(chips)
 
-    def restore_chips(self):
+    def restore_chips(self) -> None:
         for chip in self.__saved_chips:
             self.__used_chips.remove(chip)
             self.__restored_chips.add(chip)
@@ -477,22 +484,23 @@ class _Space(object):
     __slots__ = ("__same_board_chips", "__remaining_chips",
                  "__board_x", "__board_y", "__first_chip")
 
-    def __init__(self, chip):
+    def __init__(self, chip: Chip):
         self.__board_x = chip.nearest_ethernet_x
         self.__board_y = chip.nearest_ethernet_y
         self.__same_board_chips = OrderedSet()
         self.__remaining_chips = OrderedSet()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.__same_board_chips) + len(self.__remaining_chips)
 
-    def __on_same_board(self, chip):
+    def __on_same_board(self, chip: Chip) -> bool:
         return (chip.nearest_ethernet_x == self.__board_x and
                 chip.nearest_ethernet_y == self.__board_y)
 
-    def pop(self):
+    def pop(self) -> Chip:
         """
         :rtype: Chip
+        :raise: StopIteration
         """
         if self.__same_board_chips:
             return self.__same_board_chips.pop(last=False)
@@ -510,7 +518,7 @@ class _Space(object):
             return next_chip
         raise StopIteration
 
-    def update(self, chips):
+    def update(self, chips: Iterable[Chip]):
         """
         :param iterable(Chip) chips:
         """
@@ -527,7 +535,8 @@ class _ChipWithSpace(object):
     """
     __slots__ = ("chip", "cores", "sdram")
 
-    def __init__(self, chip, used_processors, used_sdram):
+    def __init__(
+            self, chip: Chip, used_processors: Set[int], used_sdram: int):
         self.chip = chip
         self.cores = set(p.processor_id for p in chip.processors
                          if not p.is_monitor)
@@ -535,20 +544,20 @@ class _ChipWithSpace(object):
         self.sdram = chip.sdram - used_sdram
 
     @property
-    def x(self):
+    def x(self) -> int:
         return self.chip.x
 
     @property
-    def y(self):
+    def y(self) -> int:
         return self.chip.y
 
-    def is_space(self, n_cores, sdram):
+    def is_space(self, n_cores: int, sdram: int) -> bool:
         return len(self.cores) >= n_cores and self.sdram >= sdram
 
-    def use_sdram(self, sdram):
+    def use_sdram(self, sdram: int):
         self.sdram -= sdram
 
-    def use_next_core(self):
+    def use_next_core(self) -> int:
         core = next(iter(self.cores))
         self.cores.remove(core)
         return core

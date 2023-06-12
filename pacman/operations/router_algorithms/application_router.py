@@ -13,7 +13,10 @@
 # limitations under the License.
 
 from collections import deque, defaultdict
+from typing import (
+    Deque, Dict, Iterable, List, Optional, Set, Tuple, Union)
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_machine import Machine
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_table_by_partition import (
@@ -23,6 +26,12 @@ from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     vertex_xy_and_route)
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.machine import MachineVertex, MulticastEdgePartition
+_AnyVertex = Union[ApplicationVertex, MachineVertex]
+_XY = Tuple[int, int]
+_Node = Tuple[int, _XY]
+_OptInt = Optional[int]
+_MappedSrc = Tuple[_AnyVertex, _OptInt, _OptInt]
 
 
 class _Targets(object):
@@ -31,10 +40,12 @@ class _Targets(object):
     """
     __slots__ = ("__targets_by_source", )
 
-    def __init__(self):
-        self.__targets_by_source = defaultdict(lambda: (list(), list()))
+    def __init__(self) -> None:
+        self.__targets_by_source: Dict[
+            _AnyVertex, Tuple[List[int], List[int]]] = defaultdict(
+                lambda: (list(), list()))
 
-    def ensure_source(self, source_vertex):
+    def ensure_source(self, source_vertex: _AnyVertex):
         """
         Ensure that a source exists, even if it targets nothing.
 
@@ -45,7 +56,8 @@ class _Targets(object):
             self.__targets_by_source[source_vertex] = (list(), list())
 
     def add_sources_for_target(
-            self, core, link, source_vertices, partition_id):
+            self, core: _OptInt, link: _OptInt,
+            source_vertices: List[_AnyVertex], partition_id: str):
         """
         Add a set of vertices that target a given core or link.
 
@@ -69,7 +81,8 @@ class _Targets(object):
                 self.__add_source(vertex, core, link)
 
     def add_machine_sources_for_target(
-            self, core, link, source_vertices, partition_id):
+            self, core: _OptInt, link: _OptInt,
+            source_vertices: List[_AnyVertex], partition_id: str):
         """
         Add a set of machine vertices that target a given core or link.
 
@@ -91,17 +104,21 @@ class _Targets(object):
                     self.__replace_app_vertex(vertex.app_vertex, partition_id)
                 self.__add_source(vertex, core, link)
 
-    def __is_m_vertex(self, vertex, partition_id):
+    def __is_m_vertex(
+            self, vertex: ApplicationVertex, partition_id: str) -> bool:
         """
         :param ApplicationVertex vertex:
         :param str partition_id:
         :rtype: bool
         """
+        if not vertex.has_splitter:
+            return False
         return any(
             vtx in self.__targets_by_source
             for vtx in vertex.splitter.get_out_going_vertices(partition_id))
 
-    def __replace_app_vertex(self, vertex, partition_id):
+    def __replace_app_vertex(
+            self, vertex: ApplicationVertex, partition_id: str):
         """
         :param ApplicationVertex vertex:
         :param str partition_id:
@@ -112,7 +129,9 @@ class _Targets(object):
         for vtx in vertex.splitter.get_out_going_vertices(partition_id):
             self.__targets_by_source[vtx] = (cores, links)
 
-    def __add_m_vertices(self, vertex, partition_id, core, link):
+    def __add_m_vertices(
+            self, vertex: ApplicationVertex, partition_id: str,
+            core: _OptInt, link: _OptInt):
         """
         :param ApplicationVertex vertex:
         :param str partition_id:
@@ -122,19 +141,21 @@ class _Targets(object):
         for vtx in vertex.splitter.get_out_going_vertices(partition_id):
             self.__add_source(vtx, core, link)
 
-    def __add_source(self, source, core, link):
+    def __add_source(self, source: _AnyVertex, core: _OptInt, link: _OptInt):
         """
         :param AbstractVertex source:
         :param int core:
         :param int link:
         """
+        tgt = self.__targets_by_source[source]
         if core is not None:
-            self.__targets_by_source[source][0].append(core)
+            tgt[0].append(core)
         if link is not None:
-            self.__targets_by_source[source][1].append(link)
+            tgt[1].append(link)
 
     @property
-    def targets_by_source(self):
+    def targets_by_source(self) -> Iterable[
+            Tuple[_AnyVertex, Tuple[List[int], List[int]]]]:
         """
         List of (source, (list of cores, list of links)) to target.
 
@@ -143,7 +164,8 @@ class _Targets(object):
         """
         return self.__targets_by_source.items()
 
-    def get_targets_for_source(self, vertex):
+    def get_targets_for_source(self, vertex: _AnyVertex) -> Tuple[
+            _AnyVertex, Tuple[List[int], List[int]]]:
         """
         Get the cores and links for a specific source.
 
@@ -153,7 +175,7 @@ class _Targets(object):
         return vertex, self.__targets_by_source[vertex]
 
 
-def route_application_graph():
+def route_application_graph() -> MulticastRoutingTableByPartition:
     """
     Route the current application graph.
     """
@@ -165,7 +187,7 @@ def route_application_graph():
     progress = ProgressBar(len(partitions), "Routing")
     for partition in progress.over(partitions):
         # Store the source vertex of the partition
-        source = partition.pre_vertex
+        source: ApplicationVertex = partition.pre_vertex
 
         # Pick a place within the source that we can route from.  Note that
         # this might not end up being the actual source in the end.
@@ -180,18 +202,18 @@ def route_application_graph():
         all_source_xys = _get_all_xys(source)
 
         # Keep track of the source edge chips
-        source_edge_xys = set()
+        source_edge_xys: Set[_XY] = set()
 
         # Keep track of which chips (xys) we have visited with routes for this
         # partition to ensure no looping
-        routes = dict()
+        routes: Dict[_XY, RoutingTree] = dict()
 
         # Keep track of cores or links to target on specific chips (xys)
-        targets = defaultdict(_Targets)
+        targets: Dict[_XY, _Targets] = defaultdict(_Targets)
 
         # Remember if we see a self-connection
         self_connected = False
-        self_xys = set()
+        self_xys: Set[_XY] = set()
 
         for edge in partition.edges:
             # Store the target vertex
@@ -234,8 +256,13 @@ def route_application_graph():
 
 
 def _route_source_to_target(
-        machine, source, source_xy, all_source_xys, source_mappings,
-        source_edge_xys, target, targets, partition, routes):
+        machine: Machine, source: ApplicationVertex,
+        source_xy: _XY, all_source_xys: Set[_XY],
+        source_mappings: Dict[_XY, List[_MappedSrc]],
+        source_edge_xys: Set[_XY], target: ApplicationVertex,
+        targets: Dict[_XY, _Targets],
+        partition: MulticastEdgePartition,
+        routes: Dict[_XY, RoutingTree]):
     """
     Route from a source to a single application vertex target that is not
     the same as the source.
@@ -243,7 +270,7 @@ def _route_source_to_target(
     :param Machine machine: The machine to route on
     :param ApplicationVertex source: The source application vertex
     :param tuple(int,int) source_xy: A chip chosen in the source to route from
-    :param list(tuple(int,int) all_source_xys: All source chips
+    :param set(tuple(int,int) all_source_xys: All source chips
     :param source_mappings: The sources mapped to their routes
     :type source_mappings: dict(tuple(int, int),
         list(tuple(MachineVertex, int,  None) or
@@ -254,7 +281,7 @@ def _route_source_to_target(
     :param ApplicationVertex target: The target application vertex
     :param dict(tuple(int,int),_Targets) targets:
         The set of actual targets to be added on chips (updated here)
-    :param OutgoingEdgePartition partition: The partition being routed
+    :param MulticastEdgePartition partition: The partition being routed
     :param dict(tuple(int,int), RoutingTree) routes:
         The routes made by chip (updated here)
     """
@@ -275,9 +302,10 @@ def _route_source_to_target(
 
         real_target_xys.add(xy)
 
+    target_xys: Set[_XY]
     # If there is just one real target, use that directly
     if len(real_target_xys) == 1:
-        target_xys = [xy]
+        target_xys = set([xy])
         target_xy = xy
         overlaps = None
     else:
@@ -306,8 +334,10 @@ def _route_source_to_target(
 
 
 def _route_single_source_to_target(
-        machine, source_edge_xys, source_edge_xy, source_mappings,
-        target_edge_xy, target_xys, real_target_xys, routes):
+        machine: Machine, source_edge_xys: Set[_XY], source_edge_xy: _XY,
+        source_mappings: Dict[_XY, List[_MappedSrc]], target_edge_xy: _XY,
+        target_xys: Set[_XY], real_target_xys: Set[_XY],
+        routes: Dict[_XY, RoutingTree]):
     """
     Route from a single source connection point to all targets from the
     target edge chip.
@@ -342,8 +372,9 @@ def _route_single_source_to_target(
 
 
 def _route_multiple_source_to_target(
-        machine, source_edge_xys, target_edge_xy, target_xys,
-        real_target_xys, routes, overlaps):
+        machine: Machine, source_edge_xys: Set[_XY], target_edge_xy: _XY,
+        target_xys: Set[_XY], real_target_xys: Set[_XY],
+        routes: Dict[_XY, RoutingTree], overlaps: Set[_XY]):
     """
     Route from multiple source connection points to all target chips.
 
@@ -390,19 +421,21 @@ def _route_multiple_source_to_target(
         real_target_xys, "Target to Targets")
 
 
-def _route_source_to_source(source, partition, targets, self_xys):
+def _route_source_to_source(
+        source: ApplicationVertex, partition: MulticastEdgePartition,
+        targets: Dict[_XY, _Targets], self_xys: Set[_XY]):
     """
     Routes the source to itself.
 
     :param ApplicationVertex source: The source vertex to route
-    :param OutgoingEdgePartition partition: The partition being routed
+    :param MulticastEdgePartition partition: The partition being routed
     :param dict(tuple(int,int),_Targets) targets: Actual targets on the chips
     :param set(tuple(int,int)) self_xys:
         The coordinates of chips that are targets
     """
     # Add the targets of the sources
     target_vertices = source.splitter.get_source_specific_in_coming_vertices(
-            source, partition.identifier)
+        source, partition.identifier)
     for tgt, srcs in target_vertices:
         xy, (_vertex, core, link) = vertex_xy_and_route(tgt)
         targets[xy].add_machine_sources_for_target(
@@ -410,7 +443,9 @@ def _route_source_to_source(source, partition, targets, self_xys):
         self_xys.add(xy)
 
 
-def _route_internal(internal, targets, self_xys):
+def _route_internal(
+        internal: Iterable[MulticastEdgePartition],
+        targets: Dict[_XY, _Targets], self_xys: Set[_XY]):
     """
     Route internal multicast edges.
 
@@ -429,13 +464,17 @@ def _route_internal(internal, targets, self_xys):
 
 
 def _make_source_to_target_routes(
-        source, partition, source_edge_xys, source_mappings, targets,
-        routing_tables, routes):
+        source: ApplicationVertex, partition: MulticastEdgePartition,
+        source_edge_xys: Set[_XY],
+        source_mappings: Dict[_XY, List[_MappedSrc]],
+        targets: Dict[_XY, _Targets],
+        routing_tables: MulticastRoutingTableByPartition,
+        routes: Dict[_XY, RoutingTree]):
     """
     Convert the routes from source to targets into routing table entries.
 
     :param ApplicationVertex source: The source application vertex
-    :param OutgoingEdgePartition partition: The partition to route
+    :param MulticastEdgePartition partition: The partition to route
     :param set(tuple(int,int)) source_edge_xys:
         Set of chips that routes are currently going outward from the source
     :param source_mappings: The sources mapped to their routes
@@ -463,8 +502,12 @@ def _make_source_to_target_routes(
 
 
 def _make_source_to_source_routes(
-        all_source_xys, source_edge_xys, self_xys, source_mappings,
-        machine, partition, routing_tables, targets):
+        all_source_xys: Set[_XY], source_edge_xys: Set[_XY],
+        self_xys: Set[_XY],
+        source_mappings: Dict[_XY, List[_MappedSrc]],
+        machine: Machine, partition: MulticastEdgePartition,
+        routing_tables: MulticastRoutingTableByPartition,
+        targets: Dict[_XY, _Targets]):
     """
     Convert the routes from the source vertices themselves when the source
     is self-connected.
@@ -478,13 +521,13 @@ def _make_source_to_source_routes(
         list(tuple(MachineVertex, int,  None) or
         tuple(MachineVertex, None, int)))
     :param Machine machine: The machine to route on
-    :param OutgoingEdgePartition partition: The partition to route
+    :param MulticastEdgePartition partition: The partition to route
     :param MulticastRoutingTableByPartition routing_tables: The tables to write
     :param dict(tuple(int,int),_Targets) targets:
         The target end-points of the routes
     """
     for xy in source_mappings:
-        source_routes = dict()
+        source_routes: Dict[_XY, RoutingTree] = dict()
         _route_to_xys(
             xy, all_source_xys, machine, source_routes,
             source_edge_xys.union(self_xys),
@@ -497,8 +540,10 @@ def _make_source_to_source_routes(
 
 
 def _make_source_to_source_edge_routes(
-        all_source_xys, source_edge_xys, source_mappings, machine, partition,
-        routing_tables):
+        all_source_xys: Set[_XY], source_edge_xys: Iterable[_XY],
+        source_mappings: Dict[_XY, List[_MappedSrc]],
+        machine: Machine, partition: MulticastEdgePartition,
+        routing_tables: MulticastRoutingTableByPartition):
     """
     Convert the routes from the source vertices to the edge vertices when
     the source is not self-connected.
@@ -511,21 +556,24 @@ def _make_source_to_source_edge_routes(
         list(tuple(MachineVertex, int,  None) or
         tuple(MachineVertex, None, int)))
     :param Machine machine: The machine to route on
-    :param OutgoingEdgePartition partition: The partition to route
+    :param MulticastEdgePartition partition: The partition to route
     :param MulticastRoutingTableByPartition routing_tables: The tables to write
     """
     for xy in source_mappings:
-        source_routes = dict()
+        source_routes: Dict[_XY, RoutingTree] = dict()
         _route_to_xys(
             xy, all_source_xys, machine, source_routes,
             source_edge_xys, "Sources to source")
         for vertex, processor, link in source_mappings[xy]:
             _convert_a_route(
                 routing_tables, vertex, partition.identifier,
-                processor, link, source_routes[xy])
+                processor, link, source_routes[xy], dict())
 
 
-def _find_target_xy(target_xys, routes, source_mappings):
+def _find_target_xy(
+        target_xys: Set[_XY], routes: Dict[_XY, RoutingTree],
+        source_mappings: Dict[_XY, List[_MappedSrc]]) -> Tuple[
+            _XY, Optional[Set[_XY]]]:
     """
     Find a target chip to use from the set of target chips.
 
@@ -557,7 +605,9 @@ def _find_target_xy(target_xys, routes, source_mappings):
     return xy, None  # pylint:disable=undefined-loop-variable
 
 
-def _get_outgoing_mapping(app_vertex, partition_id):
+def _get_outgoing_mapping(
+        app_vertex: ApplicationVertex, partition_id: str) -> Dict[
+            _XY, List[_MappedSrc]]:
     """
     Gets a Mapping from x,y sources to a list of (vertex, the vertex,
     processor and link to follow to get to the vertex.
@@ -570,7 +620,7 @@ def _get_outgoing_mapping(app_vertex, partition_id):
         list(tuple(MachineVertex, int,  None) or
              tuple(MachineVertex, None, int)))
     """
-    outgoing_mapping = defaultdict(list)
+    outgoing_mapping: Dict[_XY, List[_MappedSrc]] = defaultdict(list)
     for m_vertex in app_vertex.splitter.get_out_going_vertices(partition_id):
         xy, route = vertex_xy_and_route(m_vertex)
         outgoing_mapping[xy].append(route)
@@ -581,7 +631,7 @@ def _get_outgoing_mapping(app_vertex, partition_id):
     return outgoing_mapping
 
 
-def _get_all_xys(app_vertex):
+def _get_all_xys(app_vertex: ApplicationVertex) -> Set[_XY]:
     """
     Gets the list of all the x,y coordinates that the vertex's machine vertices
     are placed on.
@@ -593,7 +643,9 @@ def _get_all_xys(app_vertex):
             for m_vertex in app_vertex.machine_vertices}
 
 
-def _route_to_xys(first_xy, all_xys, machine, routes, targets, label):
+def _route_to_xys(
+        first_xy: _XY, all_xys: Set[_XY], machine: Machine,
+        routes: Dict[_XY, RoutingTree], targets: Iterable[_XY], label: str):
     """
     :param tuple(int, int) first_xy:
     :param list(tuple(int, int)) all_xys:
@@ -603,7 +655,8 @@ def _route_to_xys(first_xy, all_xys, machine, routes, targets, label):
     :param str label:
     """
     # Keep a queue of xy to visit, list of (parent xy, link from parent)
-    xys_to_explore = deque([(first_xy, list())])
+    xys_to_explore: Deque[Tuple[_XY, List[Tuple[_XY, int]]]] = deque(
+        [(first_xy, list())])
     visited = set()
     targets_to_visit = set(targets)
     while xys_to_explore:
@@ -647,7 +700,9 @@ def _route_to_xys(first_xy, all_xys, machine, routes, targets, label):
             f"Not visited {targets_to_visit}")
 
 
-def _find_reachable(source_xy, machine, allowed_xys, disallowed_xys):
+def _find_reachable(
+        source_xy: _XY, machine: Machine, allowed_xys: Set[_XY],
+        disallowed_xys: Set[_XY]) -> Set[_XY]:
     """
     Find a set of chips that can be reached from a source only via the
     allowed chips, but not looking at the disallowed chips.  A chip in
@@ -677,7 +732,9 @@ def _find_reachable(source_xy, machine, allowed_xys, disallowed_xys):
     return visited
 
 
-def _is_open_chip(xy, xy_set, visited, machine):
+def _is_open_chip(
+        xy: _XY, xy_set: Set[_XY], visited: Set[_XY],
+        machine: Machine) -> bool:
     """
     :param tuple(int, int) xy: Coordinates
     :param set(tuple(int, int) xy_set: List of legal coordinates
@@ -690,8 +747,9 @@ def _is_open_chip(xy, xy_set, visited, machine):
 
 
 def _route_pre_to_post(
-        source_xy, dest_xy, routes, machine, label, all_source_xy,
-        target_xys):
+        source_xy: _XY, dest_xy: _XY, routes: Dict[_XY, RoutingTree],
+        machine: Machine, label: str, all_source_xy: Set[_XY],
+        target_xys: Set[_XY]) -> Tuple[_XY, _XY]:
     """
     :param tuple(int, int) source_xy:
     :param tuple(int, int) dest_xy:
@@ -715,7 +773,7 @@ def _route_pre_to_post(
     nodes = nodes_fixed
     route_pre = source_xy
     for i, (_direction, xy) in reversed(list(enumerate(nodes))):
-        if _in_group(xy, all_source_xy) or xy in routes:
+        if xy in all_source_xy or xy in routes:
             nodes = nodes[i + 1:]
             route_pre = xy
             break
@@ -752,7 +810,9 @@ def _route_pre_to_post(
     return route_pre, route_post
 
 
-def _path_without_errors(source_xy, nodes, machine):
+def _path_without_errors(
+        source_xy: _XY, nodes: List[_Node],
+        machine: Machine) -> List[_Node]:
     """
     :param tuple(int, int) source_xy:
     :param  list(tuple(int,tuple(int, int))) nodes:
@@ -785,7 +845,7 @@ def _path_without_errors(source_xy, nodes, machine):
     return _path_without_loops(source_xy, new_nodes)
 
 
-def _path_without_loops(start_xy, nodes):
+def _path_without_loops(start_xy: _XY, nodes: List[_Node]) -> List[_Node]:
     """
     :param tuple(int, int) start_xy:
     :param list(tuple(int,tuple(int,int))) nodes:
@@ -805,7 +865,7 @@ def _path_without_loops(start_xy, nodes):
     return nodes
 
 
-def _is_ok(coord, node, machine):
+def _is_ok(coord: _XY, node: _Node, machine: Machine):
     """
     :param tuple(int, int) coord:
     :param tuple(int,tuple(int, int)) node:
@@ -818,19 +878,21 @@ def _is_ok(coord, node, machine):
         and machine.is_chip_at(n_x, n_y)
 
 
-def _xy(node):
-    _, (x, y) = node
-    return (x, y)
+def _xy(node: _Node) -> _XY:
+    _, xy = node
+    return xy
 
 
-def _find_path(source_xy, target_xy, machine):
+def _find_path(
+        source_xy: _XY, target_xy: _XY, machine: Machine) -> List[_Node]:
     """
     :param tuple(int,int) source_xy:
     :param tuple(int,int) target_xy:
     :param Machine machine:
     :rtype: list(tuple(int,tuple(int,int)))
     """
-    xys_to_explore = deque([(source_xy, list())])
+    xys_to_explore: Deque[Tuple[_XY, List[_Node]]] = deque(
+        [(source_xy, list())])
     visited = set()
     while xys_to_explore:
         xy, path = xys_to_explore.popleft()
@@ -845,24 +907,21 @@ def _find_path(source_xy, target_xy, machine):
         for link in range(6):
             x, y = xy
             if machine.is_link_at(x, y, link):
-                next_xy = machine.xy_over_link(x, y, link)
-                if _is_open_chip(next_xy, [next_xy], visited, machine):
+                next_xy: _XY = machine.xy_over_link(x, y, link)
+                if _is_open_chip(next_xy, set((next_xy,)), visited, machine):
                     new_path = list(path)
                     new_path.append((link, next_xy))
                     xys_to_explore.append((next_xy, new_path))
     raise PacmanRoutingException(f"No path from {source_xy} to {target_xy}")
 
 
-def _in_group(item, group):
-    if group is None:
-        return False
-    return item in group
-
-
 def _convert_a_route(
-        routing_tables, source_vertex, partition_id, first_incoming_processor,
-        first_incoming_link, first_route, targets=None,
-        use_source_for_targets=False, ensure_all_source=False):
+        routing_tables: MulticastRoutingTableByPartition,
+        source_vertex: _AnyVertex, partition_id: str,
+        first_incoming_processor: _OptInt, first_incoming_link: _OptInt,
+        first_route: RoutingTree, targets: Dict[_XY, _Targets],
+        use_source_for_targets: bool = False,
+        ensure_all_source: bool = False):
     """
     Convert the algorithm specific partition_route back to SpiNNaker and
     adds it to the routing_tables.
@@ -875,7 +934,6 @@ def _convert_a_route(
     :type incoming_processor: int or None
     :param incoming_link: link this link came from
     :type incoming_link: int or None
-    :param RoutingTree route: algorithm specific format of the route
     :param targets:
         Targets for each chip.  When present for a chip, the route links and
         cores are added to each entry in the targets.
@@ -887,22 +945,26 @@ def _convert_a_route(
         If true, ensures that all machine vertices of the source application
         vertex are covered in routes that continue forward
     """
-    to_process = [(first_incoming_processor, first_incoming_link, first_route)]
+    to_process: List[Tuple[_OptInt, _OptInt, RoutingTree]] = [
+        (first_incoming_processor, first_incoming_link, first_route)]
     while to_process:
         incoming_processor, incoming_link, route = to_process.pop()
         x, y = route.chip
 
-        processor_ids = list()
-        link_ids = list()
+        processor_ids: List[int] = list()
+        link_ids: List[int] = list()
         for (link, next_hop) in route.children:
             if link is not None:
                 link_ids.append(link)
                 next_incoming_link = (link + 3) % 6
             if next_hop is not None:
+                assert isinstance(next_hop, RoutingTree)
                 to_process.append((None, next_incoming_link, next_hop))
 
-        if targets is not None and (x, y) in targets:
+        if (x, y) in targets:
             chip_targets = targets[x, y]
+            targets_by_source: Iterable[
+                Tuple[_AnyVertex, Tuple[List[int], List[int]]]]
             if use_source_for_targets:
                 targets_by_source = [
                     chip_targets.get_targets_for_source(source_vertex)]
@@ -911,7 +973,7 @@ def _convert_a_route(
 
             # We must ensure that all machine vertices of an app vertex
             # are covered!
-            machine_vertex_sources = set()
+            machine_vertex_sources: Set[MachineVertex] = set()
             app_vertex_source = False
             for (source, (add_cores, add_links)) in targets_by_source:
                 if isinstance(source, ApplicationVertex):
@@ -927,6 +989,7 @@ def _convert_a_route(
 
             # Now check the coverage of Application and machine vertices
             if ensure_all_source and not app_vertex_source:
+                assert isinstance(source_vertex, ApplicationVertex)
                 for m_vert in source_vertex.splitter.get_out_going_vertices(
                         partition_id):
                     if m_vert not in machine_vertex_sources:
@@ -945,7 +1008,10 @@ def _convert_a_route(
 
 
 def _add_routing_entry(
-        first_route, routing_tables, entry, x, y, source, partition_id):
+        first_route: RoutingTree,
+        routing_tables: MulticastRoutingTableByPartition,
+        entry: MulticastRoutingTableByPartitionEntry,
+        x: int, y: int, source: _AnyVertex, partition_id: str):
     try:
         routing_tables.add_path_entry(entry, x, y, source, partition_id)
     except Exception as e:
@@ -954,8 +1020,9 @@ def _add_routing_entry(
         raise e
 
 
-def _print_path(first_route):
-    to_process = [("", None, first_route)]
+def _print_path(first_route: RoutingTree):
+    to_process: List[Tuple[str, _OptInt, RoutingTree]] = [
+        ("", None, first_route)]
     last_is_leaf = False
     line = ""
     visited = set()
@@ -984,6 +1051,7 @@ def _print_path(first_route):
         else:
             last_is_leaf = False
             for direction, next_route in route.children:
+                assert isinstance(next_route, RoutingTree)
                 to_process.append((prefix, direction, next_route))
 
         visited.add(route.chip)

@@ -17,9 +17,10 @@ import math
 import os
 import logging
 import numpy
-from typing import Optional
+from typing import Any, Dict, Optional
 from spinn_utilities.log import FormatAdapter
 from pacman.data import PacmanDataView
+from pacman.model.placements import Placements
 logger = FormatAdapter(logging.getLogger(__name__))
 _exception: Optional[ImportError] = None
 try:
@@ -48,7 +49,8 @@ def _next_colour():
 
 
 def draw_placements(
-        placements, system_placements, filename="placements_error.png"):
+        placements: Placements, system_placements: Placements,
+        filename: str = "placements_error.png"):
     """
     Draw the placements as a PNG in the specified file.
 
@@ -68,8 +70,8 @@ def draw_placements(
 
     # Colour the boards by placements
     unused = (0.5, 0.5, 0.5, 1.0)
-    vertex_colours = defaultdict(_next_colour)
-    board_colours = dict()
+    vertex_colours: Dict[Any, Any] = defaultdict(_next_colour)
+    board_colours: Dict[Any, Any] = dict()
     machine = PacmanDataView.get_machine()
     for x, y in machine.chip_coordinates:
         if (placements.n_placements_on_chip(x, y) ==

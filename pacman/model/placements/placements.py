@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Dict, Iterable, Tuple
+from typing import Dict, Iterable, Iterator, Tuple
 from pacman.exceptions import (
     PacmanAlreadyPlacedError, PacmanNotPlacedError,
     PacmanProcessorAlreadyOccupiedError, PacmanProcessorNotOccupiedError)
@@ -220,7 +220,7 @@ class Placements(object):
     def __repr__(self) -> str:
         return "".join(repr(placement) for placement in self._placements)
 
-    def __iter__(self) -> Iterable[Placement]:
+    def __iter__(self) -> Iterator[Placement]:
         """
         An iterator for the placements object within.
         """

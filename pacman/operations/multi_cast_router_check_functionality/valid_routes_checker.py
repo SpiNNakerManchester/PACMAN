@@ -16,10 +16,11 @@ Collection of functions which together validate routes.
 """
 from collections import defaultdict
 import logging
-from typing import NamedTuple, List
+from typing import Dict, NamedTuple, Iterable, List, Set, cast
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
+from spinn_machine import Chip, MulticastRoutingEntry
 from pacman.data import PacmanDataView
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanRoutingException)
@@ -27,6 +28,11 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     get_app_partitions)
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.placements import Placements, Placement
+from pacman.model.routing_info import BaseKeyAndMask
+from pacman.model.routing_tables import (
+    AbstractMulticastRoutingTable, MulticastRoutingTables)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 range_masks = {FULL_MASK - ((2 ** i) - 1) for i in range(33)}
@@ -51,7 +57,8 @@ class _Failure(NamedTuple):
     source_mask: int
 
 
-def validate_routes(placements, routing_tables):
+def validate_routes(
+        placements: Placements, routing_tables: MulticastRoutingTables):
     """
     Go though the placements given and check that the routing entries
     within the routing tables support reach the correction destinations
@@ -73,7 +80,8 @@ def validate_routes(placements, routing_tables):
         source = partition.pre_vertex
 
         # Destination cores by source machine vertices
-        destinations = defaultdict(OrderedSet)
+        destinations: Dict[MachineVertex, Set[PlacementTuple]] = defaultdict(
+            lambda: cast(Set, OrderedSet()))
 
         for edge in partition.edges:
             target = edge.post_vertex
@@ -114,13 +122,16 @@ def validate_routes(placements, routing_tables):
                 m_vertex, partition.identifier)
 
             # search for these destinations
-            _search_route(
-                placement, destinations[m_vertex], r_info.key_and_mask,
-                routing_tables, m_vertex.vertex_slice.n_atoms)
+            if r_info:
+                _search_route(
+                    placement, destinations[m_vertex], r_info.key_and_mask,
+                    routing_tables, m_vertex.vertex_slice.n_atoms)
 
 
-def _search_route(source_placement, dest_placements, key_and_mask,
-                  routing_tables, n_atoms):
+def _search_route(
+        source_placement: Placement, dest_placements: Iterable[PlacementTuple],
+        key_and_mask: BaseKeyAndMask, routing_tables: MulticastRoutingTables,
+        n_atoms: int):
     """
     Locate if the routing tables work for the source to desks as defined.
 
@@ -132,8 +143,6 @@ def _search_route(source_placement, dest_placements, key_and_mask,
         the key and mask associated with this set of edges
     :param MulticastRoutingTables routing_tables:
     :param int n_atoms: the number of atoms going through this path
-    :param bool is_continuous:
-        whether the keys and atoms mapping is continuous
     :raise PacmanRoutingException:
         when the trace completes and there are still destinations not visited
     """
@@ -141,9 +150,9 @@ def _search_route(source_placement, dest_placements, key_and_mask,
         for dest in dest_placements:
             logger.debug("[{}:{}:{}]", dest.x, dest.y, dest.p)
 
-    located_destinations = set()
+    located_destinations: Set[PlacementTuple] = set()
 
-    failed_to_cover_all_keys_routers = list()
+    failed_to_cover_all_keys_routers: List[_Failure] = list()
 
     _start_trace_via_routing_tables(
         source_placement, key_and_mask, located_destinations, routing_tables,
@@ -203,8 +212,10 @@ def _search_route(source_placement, dest_placements, key_and_mask,
 
 
 def _start_trace_via_routing_tables(
-        source_placement, key_and_mask, reached_placements, routing_tables,
-        n_atoms, failed_to_cover_all_keys_routers):
+        source_placement: Placement, key_and_mask: BaseKeyAndMask,
+        reached_placements: Set[PlacementTuple],
+        routing_tables: MulticastRoutingTables, n_atoms: int,
+        failed_to_cover_all_keys_routers: List[_Failure]):
     """
     Start the trace, by using the source placement's router and tracing
     from the route.
@@ -221,7 +232,9 @@ def _start_trace_via_routing_tables(
     """
     current_router_table = routing_tables.get_routing_table_for_chip(
         source_placement.x, source_placement.y)
-    visited_routers = set()
+    if current_router_table is None:
+        return
+    visited_routers: Set[Chip] = set()
     visited_routers.add(current_router_table.chip)
 
     # get src router
@@ -235,7 +248,9 @@ def _start_trace_via_routing_tables(
         failed_to_cover_all_keys_routers)
 
 
-def _check_all_keys_hit_entry(entry, n_atoms, base_key):
+def _check_all_keys_hit_entry(
+        entry: MulticastRoutingEntry, n_atoms: int,
+        base_key: int) -> List[int]:
     """
     :param ~spinn_machine.MulticastRoutingEntry entry:
         routing entry discovered
@@ -254,9 +269,12 @@ def _check_all_keys_hit_entry(entry, n_atoms, base_key):
 
 # locates the next dest position to check
 def _recursive_trace_to_destinations(
-        entry, current_router, chip_x, chip_y, key_and_mask, visited_routers,
-        reached_placements, routing_tables, n_atoms,
-        failed_to_cover_all_keys_routers):
+        entry: MulticastRoutingEntry,
+        current_router: AbstractMulticastRoutingTable,
+        chip_x: int, chip_y: int, key_and_mask: BaseKeyAndMask,
+        visited_routers: Set[Chip], reached_placements: Set[PlacementTuple],
+        routing_tables: MulticastRoutingTables, n_atoms: int,
+        failed_to_cover_all_keys_routers: List[_Failure]):
     """
     Recursively search though routing tables until no more entries are
     registered with this key.
@@ -264,7 +282,7 @@ def _recursive_trace_to_destinations(
     :param ~spinn_machine.MulticastRoutingEntry entry:
         the original entry used by the first router which resides on the
         source placement chip.
-    :param MulticastRoutingTable current_router:
+    :param AbstractMulticastRoutingTable current_router:
         the router currently being visited during the trace
     :param int chip_x: the x coordinate of the chip being considered
     :param int chip_y: the y coordinate of the chip being considered
@@ -282,7 +300,6 @@ def _recursive_trace_to_destinations(
     :param list(_Failure) failed_to_cover_all_keys_routers:
         list of failed routers for all keys
     """
-
     # determine where the route takes us
     chip_links = entry.link_ids
     processor_values = entry.processor_ids
@@ -299,6 +316,8 @@ def _recursive_trace_to_destinations(
             link = machine_router.get_link(link_id)
             next_router = routing_tables.get_routing_table_for_chip(
                 link.destination_x, link.destination_y)
+            if next_router is None:
+                continue
 
             # check that we've not visited this router before
             _check_visited_routers(next_router.chip, visited_routers)
@@ -325,7 +344,7 @@ def _recursive_trace_to_destinations(
         _is_dest(processor_values, current_router, reached_placements)
 
 
-def _check_visited_routers(chip, visited_routers):
+def _check_visited_routers(chip: Chip, visited_routers: Set[Chip]):
     """
     Check if the trace has visited this router already.
 
@@ -341,14 +360,16 @@ def _check_visited_routers(chip, visited_routers):
     visited_routers.add(chip)
 
 
-def _is_dest(processor_ids, current_router, reached_placements):
+def _is_dest(processor_ids: Iterable[int],
+             current_router: AbstractMulticastRoutingTable,
+             reached_placements: Set[PlacementTuple]):
     """
     Collect processors to be removed.
 
     :param iterable(int) processor_ids:
         the processor IDs which the last router entry said the trace should
         visit
-    :param MulticastRoutingTable current_router:
+    :param AbstractMulticastRoutingTable current_router:
         the current router being used in the trace
     :param set(PlacementTuple) reached_placements:
         the placements to which the trace visited
@@ -358,11 +379,13 @@ def _is_dest(processor_ids, current_router, reached_placements):
         reached_placements.add(PlacementTuple(dest_x, dest_y, processor_id))
 
 
-def _locate_routing_entry(current_router, key, n_atoms):
+def _locate_routing_entry(
+        current_router: AbstractMulticastRoutingTable, key: int,
+        n_atoms: int) -> MulticastRoutingEntry:
     """
     Locate the entry from the router based off the edge.
 
-    :param MulticastRoutingTable current_router:
+    :param AbstractMulticastRoutingTable current_router:
         the current router being used in the trace
     :param int key: the key being used by the source placement
     :param int n_atoms: the number of atoms

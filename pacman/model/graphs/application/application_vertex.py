@@ -96,11 +96,23 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             return f"ApplicationVertex({self.label})"
 
     @property
-    def splitter(self) -> Optional[AbstractSplitterCommon]:
+    def has_splitter(self) -> bool:
+        """
+        Whether this vertex currently has a splitter defined.
+        """
+        return self._splitter is not None
+
+    @property
+    def splitter(self) -> AbstractSplitterCommon:
         """
         :rtype: ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
-        return self._splitter
+        s = self._splitter
+        if s is None:
+            raise PacmanConfigurationException(
+                f"The splitter object on {self._label} has not yet had "
+                "a splitter set.")
+        return s
 
     @splitter.setter
     def splitter(self, new_value: AbstractSplitterCommon):

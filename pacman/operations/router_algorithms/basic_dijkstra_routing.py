@@ -15,7 +15,7 @@
 import logging
 import sys
 from collections import defaultdict
-from typing import Dict, Tuple, Set, Optional, List, Iterable, Union
+from typing import Dict, Tuple, Set, Optional, List, Iterable, cast
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
@@ -29,6 +29,7 @@ from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationEdgePartition)
 from pacman.model.graphs.machine import MachineVertex
+_OptInt = Optional[int]
 
 logger = FormatAdapter(logging.getLogger(__name__))
 infinity = float("inf")
@@ -56,9 +57,9 @@ class _NodeInfo(object):
 class _DijkstraInfo(object):
     __slots__ = ("activated", "cost")
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.activated = False
-        self.cost = None
+        self.cost: Optional[float] = None
 
 
 class _DestInfo:
@@ -130,8 +131,8 @@ class _BasicDijkstraRouting(object):
         return self._routing_paths
 
     @staticmethod
-    def __vertex_and_route(tgt) -> Tuple[Chip, Union[
-            Tuple[MachineVertex, int, None], Tuple[MachineVertex, None, int]]]:
+    def __vertex_and_route(tgt) -> Tuple[
+            Chip, Tuple[MachineVertex, _OptInt, _OptInt]]:
         xy, details = vertex_xy_and_route(tgt)
         chip = PacmanDataView.get_machine().get_chip_at(*xy)
         return chip, details
@@ -176,8 +177,8 @@ class _BasicDijkstraRouting(object):
                             destinations[src][dst].links.add(link)
                         dest_chips[src].add(dst)
 
-        outgoing = OrderedSet(source.splitter.get_out_going_vertices(
-            partition.identifier))
+        outgoing = cast(Set, OrderedSet(source.splitter.get_out_going_vertices(
+            partition.identifier)))
         for in_part in source.splitter.get_internal_multicast_partitions():
             if in_part.identifier == partition.identifier:
                 outgoing.add(in_part.pre_vertex)
@@ -191,14 +192,14 @@ class _BasicDijkstraRouting(object):
                     dest_chips[in_part.pre_vertex].add(dst)
 
         for m_vertex in outgoing:
-            source, (m_vertex, core, link) = self.__vertex_and_route(m_vertex)
+            src, (m_vertex, core, link) = self.__vertex_and_route(m_vertex)
             if dest_chips[m_vertex]:
                 self._update_all_weights(node_info)
                 self._reset_tables(tables)
-                tables[source].activated = True
-                tables[source].cost = 0
+                tables[src].activated = True
+                tables[src].cost = 0
                 self._propagate_costs_until_reached_destinations(
-                    tables, node_info, dest_chips[m_vertex], source)
+                    tables, node_info, dest_chips[m_vertex], src)
 
             for dst, info in destinations[m_vertex].items():
                 self._retrace_back_to_source(
@@ -323,14 +324,16 @@ class _BasicDijkstraRouting(object):
         :rtype: tuple(int,int)
         """
         # This is the lowest cost across ALL deactivated nodes in the graph.
-        lowest_cost, lowest = sys.maxsize, None
+        lowest_cost: float = sys.maxsize
+        lowest: Optional[Chip] = None
 
         # Find the next node to be activated
         for key in tables:
+            cost = tables[key].cost
             # Don't continue if the node hasn't even been touched yet
-            if (tables[key].cost is not None and not tables[key].activated
-                    and tables[key].cost < lowest_cost):
-                lowest_cost, lowest = tables[key].cost, key
+            if (cost is not None and not tables[key].activated
+                    and cost < lowest_cost):
+                lowest_cost, lowest = cost, key
 
         # If there were no deactivated nodes with costs, but the destination
         # was not reached this iteration, raise an exception
@@ -370,6 +373,7 @@ class _BasicDijkstraRouting(object):
                 " graph: remove non-existent neighbours")
 
         chip_cost = tables[current].cost
+        assert chip_cost is not None
         neighbour_cost = tables[neighbour_chip].cost
 
         # Only try to update if the neighbour_chip is within the graph and the
@@ -390,7 +394,7 @@ class _BasicDijkstraRouting(object):
             self, dest: Chip, dest_info: _DestInfo,
             tables: Dict[Chip, _DijkstraInfo],
             nodes_info: Dict[Chip, _NodeInfo],
-            source_processor: Optional[int], source_link: Optional[int],
+            source_processor: _OptInt, source_link: _OptInt,
             pre_vertex, partition_id) -> None:
         """
         :param Placement dest: Destination placement
@@ -470,7 +474,9 @@ class _BasicDijkstraRouting(object):
         made_an_entry = False
 
         neighbour_weight = nodes_info[neighbour].weights[dec_direction]
-        chip_sought_cost = tables[dest].cost - neighbour_weight
+        chip_sought_cost = tables[dest].cost
+        assert chip_sought_cost is not None
+        chip_sought_cost -= neighbour_weight
         neighbours_lowest_cost = tables[neighbour].cost
 
         if neighbours_lowest_cost is not None and (

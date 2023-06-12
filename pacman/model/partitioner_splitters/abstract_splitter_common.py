@@ -38,7 +38,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
     def __str__(self):
         try:
             return (
-                f"{type(self).__name__} on {self._governed_app_vertex.label}")
+                f"{type(self).__name__} on {self.__governed_app_vertex.label}")
         except AttributeError:
             return f"{type(self).__name__} has no governed_app_vertex"
 

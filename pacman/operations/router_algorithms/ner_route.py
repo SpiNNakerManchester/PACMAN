@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
 """
 Neighbour Exploring Routing (NER) algorithm from J. Navaridas et al.
 
@@ -26,7 +27,7 @@ https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/utils.p
 """
 
 import functools
-
+from typing import Callable, Dict, Iterable, List, Set, Tuple, cast
 from collections import defaultdict
 
 from spinn_utilities.progress_bar import ProgressBar
@@ -40,9 +41,13 @@ from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     least_busy_dimension_first, get_app_partitions, vertex_xy_and_route)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
+_XY = Tuple[int, int]
+_Vec = Tuple[int, int, int]
 
 
-def _ner_net(src, destinations, vector_to_nodes):
+def _ner_net(src: _XY, destinations: Iterable[_XY],
+             vector_to_nodes: Callable[[_Vec, _XY], List[Tuple[int, _XY]]]
+             ) -> RoutingTree:
     """
     Produce a shortest path tree for a given net using NER.
 
@@ -104,7 +109,7 @@ def _ner_net(src, destinations, vector_to_nodes):
             neighbour = src
 
         # Find the shortest vector from the neighbour to this destination
-        vector = machine.get_vector(neighbour, destination)
+        vector: _Vec = machine.get_vector(neighbour, destination)
 
         # The route may inadvertently pass through an
         # already connected node. If the route is allowed to pass through that
@@ -130,7 +135,9 @@ def _ner_net(src, destinations, vector_to_nodes):
     return route[src]
 
 
-def _do_route(source_xy, post_vertexes, vector_to_nodes):
+def _do_route(source_xy: _XY, post_vertexes: Iterable[MachineVertex],
+              vector_to_nodes: Callable[[_Vec, _XY], List[Tuple[int, _XY]]]
+              ) -> RoutingTree:
     """
     Routing algorithm based on Neighbour Exploring Routing (NER).
 
@@ -161,7 +168,9 @@ def _do_route(source_xy, post_vertexes, vector_to_nodes):
     return root
 
 
-def _ner_route(vector_to_nodes):
+def _ner_route(
+        vector_to_nodes: Callable[[_Vec, _XY], List[Tuple[int, _XY]]]
+        ) -> MulticastRoutingTableByPartition:
     """
     Performs routing using rig algorithm.
 
@@ -177,7 +186,8 @@ def _ner_route(vector_to_nodes):
 
     for partition in progress_bar.over(partitions):
         source = partition.pre_vertex
-        post_vertices_by_source = defaultdict(OrderedSet)
+        post_vertices_by_source: Dict[MachineVertex, Set[MachineVertex]] = \
+            defaultdict(lambda: cast(Set, OrderedSet()))
         for edge in partition.edges:
             splitter = edge.post_vertex.splitter
             for tgt, srcs in splitter.get_source_specific_in_coming_vertices(
@@ -209,7 +219,7 @@ def _ner_route(vector_to_nodes):
     return routing_tables
 
 
-def ner_route():
+def ner_route() -> MulticastRoutingTableByPartition:
     """
     basic NER router.
 
@@ -219,13 +229,13 @@ def ner_route():
     return _ner_route(longest_dimension_first)
 
 
-def ner_route_traffic_aware():
+def ner_route_traffic_aware() -> MulticastRoutingTableByPartition:
     """
     traffic-aware NER router.
 
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition
     """
-    traffic = defaultdict(lambda: 0)
+    traffic: Dict[_XY, int] = defaultdict(int)
     return _ner_route(
         functools.partial(least_busy_dimension_first, traffic))

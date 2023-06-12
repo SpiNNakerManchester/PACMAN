@@ -23,7 +23,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
     """
 
     @abstractmethod
-    def get_total_sdram(self, n_timesteps: int) -> int:
+    def get_total_sdram(self, n_timesteps: Optional[int]) -> int:
         """
         The total SDRAM.
 

@@ -14,7 +14,7 @@
 from collections import deque, defaultdict
 import heapq
 import itertools
-from typing import Deque, Dict, List, Optional, Set, Tuple
+from typing import Deque, Dict, Iterable, List, Optional, Set, Tuple
 from .routing_tree import RoutingTree
 from spinn_machine import Machine, Chip
 from pacman.data import PacmanDataView
@@ -26,7 +26,7 @@ from pacman.model.graphs import AbstractVertex, AbstractVirtual
 from pacman.model.graphs.application import (
     ApplicationEdgePartition, ApplicationVertex)
 from pacman.model.graphs.machine import MachineVertex
-_Coord = Tuple[int, int]  # Type of (x, y)
+_XY = Tuple[int, int]  # Type of (x, y)
 
 
 def get_app_partitions() -> List[ApplicationEdgePartition]:
@@ -157,8 +157,8 @@ def avoid_dead_links(root: RoutingTree) -> RoutingTree:
 
 
 def _copy_and_disconnect_tree(root: RoutingTree) -> Tuple[
-        RoutingTree, Dict[_Coord, RoutingTree],
-        Set[Tuple[_Coord, _Coord]]]:
+        RoutingTree, Dict[_XY, RoutingTree],
+        Set[Tuple[_XY, _XY]]]:
     """
     Copy a RoutingTree (containing nothing but RoutingTrees), disconnecting
     nodes which are not connected in the machine.
@@ -189,11 +189,11 @@ def _copy_and_disconnect_tree(root: RoutingTree) -> Tuple[
     new_root: Optional[RoutingTree] = None
 
     # Lookup for copied routing tree {(x, y): RoutingTree, ...}
-    new_lookup: Dict[_Coord, RoutingTree] = {}
+    new_lookup: Dict[_XY, RoutingTree] = {}
 
     # List of missing connections in the copied routing tree [(new_parent,
     # new_child), ...]
-    broken_links: Set[Tuple[_Coord, _Coord]] = set()
+    broken_links: Set[Tuple[_XY, _XY]] = set()
 
     # A queue [(new_parent, direction, old_node), ...]
     to_visit: Deque[
@@ -237,8 +237,8 @@ def _copy_and_disconnect_tree(root: RoutingTree) -> Tuple[
     return new_root, new_lookup, broken_links
 
 
-def a_star(sink: _Coord, heuristic_source: _Coord,
-           sources: Set[_Coord]) -> List[Tuple[int, _Coord]]:
+def a_star(sink: _XY, heuristic_source: _XY,
+           sources: Set[_XY]) -> List[Tuple[int, _XY]]:
     """
     Use A* to find a path from any of the sources to the sink.
 
@@ -273,7 +273,7 @@ def a_star(sink: _Coord, heuristic_source: _Coord,
     # 1) the node has been visited and 2) which node we hopped from (and the
     # direction used) to reach previous_node.  This is a dummy value if the
     # node is the sink.
-    visited: Dict[_Coord, Tuple[int, _Coord]] = {sink: (-1, (-1, -1))}
+    visited: Dict[_XY, Tuple[int, _XY]] = {sink: (-1, (-1, -1))}
 
     # The node which the tree will be reconnected to
     selected_source = None
@@ -327,7 +327,7 @@ def a_star(sink: _Coord, heuristic_source: _Coord,
     return path
 
 
-def _is_linked(source: _Coord, target: _Coord, direction: int,
+def _is_linked(source: _XY, target: _XY, direction: int,
                machine: Machine) -> bool:
     """
     :param tuple(int,int) source:
@@ -354,7 +354,7 @@ def convert_a_route(
         source_vertex: AbstractVertex, partition_id: str,
         incoming_processor: Optional[int], incoming_link: Optional[int],
         route_tree: RoutingTree,
-        targets_by_chip: Dict[_Coord, Tuple[List[int], List[int]]]):
+        targets_by_chip: Dict[_XY, Tuple[Set[int], Set[int]]]):
     """
     Converts the algorithm specific partition_route back to standard SpiNNaker
     and adds it to the `routing_tables`.
@@ -399,7 +399,7 @@ def convert_a_route(
 
 def longest_dimension_first(
         vector: Tuple[int, int, int],
-        start: _Coord) -> List[Tuple[int, _Coord]]:
+        start: _XY) -> List[Tuple[int, _XY]]:
     """
     List the (x, y) steps on a longest-dimension first route.
 
@@ -419,8 +419,8 @@ def longest_dimension_first(
 
 
 def least_busy_dimension_first(
-        traffic: Dict[_Coord, int], vector: Tuple[int, int, int],
-        start: _Coord) -> List[Tuple[int, _Coord]]:
+        traffic: Dict[_XY, int], vector: Tuple[int, int, int],
+        start: _XY) -> List[Tuple[int, _XY]]:
     """
     List the (x, y) steps on a route that goes through the least busy
     routes first.
@@ -459,7 +459,7 @@ def least_busy_dimension_first(
 
 
 def vector_to_nodes(
-        dm_vector: List[_Coord], start: _Coord) -> List[Tuple[int, _Coord]]:
+        dm_vector: List[_XY], start: _XY) -> List[Tuple[int, _XY]]:
     """
     Convert a vector to a set of nodes.
 
@@ -516,8 +516,8 @@ def vector_to_nodes(
 
 
 def nodes_to_trees(
-        nodes: List[Tuple[int, _Coord]], start: _Coord,
-        route: Dict[_Coord, RoutingTree]):
+        nodes: List[Tuple[int, _XY]], start: _XY,
+        route: Dict[_XY, RoutingTree]):
     """
     Convert a list of nodes into routing trees, adding them to existing routes.
 
@@ -541,7 +541,7 @@ def nodes_to_trees(
 
 
 def most_direct_route(
-        source: _Coord, dest: _Coord, machine: Machine) -> RoutingTree:
+        source: _XY, dest: _XY, machine: Machine) -> RoutingTree:
     """
     Find the most direct route from source to target on the machine.
 
@@ -552,7 +552,7 @@ def most_direct_route(
     """
     vector = machine.get_vector(source, dest)
     nodes = longest_dimension_first(vector, source)
-    route: Dict[_Coord, RoutingTree] = dict()
+    route: Dict[_XY, RoutingTree] = dict()
     nodes_to_trees(nodes, source, route)
     root = route[source]
     if route_has_dead_links(root):
@@ -561,8 +561,8 @@ def most_direct_route(
 
 
 def get_targets_by_chip(
-        vertices: List[MachineVertex]) -> Dict[
-            _Coord, Tuple[Set[int], Set[int]]]:
+        vertices: Iterable[MachineVertex]) -> Dict[
+            _XY, Tuple[Set[int], Set[int]]]:
     """
     Get the target links and cores on the relevant chips.
 
@@ -570,7 +570,7 @@ def get_targets_by_chip(
     :return: A dict of (x, y) to target (cores, links)
     :rtype: dict(tuple(int, int), tuple(set(int), set(int)))
     """
-    by_chip: Dict[_Coord, Tuple[Set[int], Set[int]]] = defaultdict(
+    by_chip: Dict[_XY, Tuple[Set[int], Set[int]]] = defaultdict(
         lambda: (set(), set()))
     for vertex in vertices:
         coords = vertex_xy(vertex)
@@ -585,7 +585,7 @@ def get_targets_by_chip(
     return by_chip
 
 
-def vertex_xy(vertex: MachineVertex) -> _Coord:
+def vertex_xy(vertex: MachineVertex) -> _XY:
     """
     :param MachineVertex vertex:
     :rtype: tuple(int,int)
@@ -612,7 +612,7 @@ def vertex_chip(vertex: MachineVertex) -> Chip:
 
 
 def vertex_xy_and_route(vertex: MachineVertex) -> Tuple[
-        _Coord, Tuple[MachineVertex, Optional[int], Optional[int]]]:
+        _XY, Tuple[MachineVertex, Optional[int], Optional[int]]]:
     """
     Get the non-virtual chip coordinates, the vertex, and processor or
     link to follow to get to the vertex.
