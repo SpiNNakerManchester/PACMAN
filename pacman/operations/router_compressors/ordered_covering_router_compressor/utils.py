@@ -18,7 +18,7 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/utils.py
 """
 
 
-def intersect(key_a, mask_a, key_b, mask_b):
+def intersect(key_a: int, mask_a: int, key_b: int, mask_b: int) -> bool:
     """
     Return if key-mask pairs intersect (i.e., would both match some of the
     same keys).

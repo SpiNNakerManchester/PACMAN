@@ -18,6 +18,7 @@ based on https://github.com/project-rig/
 
 from abc import abstractmethod
 import logging
+from typing import List
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
@@ -26,6 +27,8 @@ from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import MinimisationFailedError
+from pacman.model.routing_tables import UnCompressedMulticastRoutingTable
+from .entry import RTEntry
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -46,12 +49,12 @@ class AbstractCompressor(object):
         # Flag to say that results too large should be ignored
         "_accept_overflow")
 
-    def __init__(self, ordered=True, accept_overflow=False):
+    def __init__(self, ordered: bool = True, accept_overflow: bool = False):
         self._ordered = ordered
         self._accept_overflow = accept_overflow
         self._problems = ""
 
-    def compress_all_tables(self):
+    def compress_all_tables(self) -> MulticastRoutingTables:
         """
         Apply compression to all uncompressed tables.
 
@@ -65,7 +68,9 @@ class AbstractCompressor(object):
         return self.compress_tables(router_tables, progress)
 
     @abstractmethod
-    def compress_table(self, router_table):
+    def compress_table(
+            self, router_table: UnCompressedMulticastRoutingTable) -> List[
+                RTEntry]:
         """
         :param UnCompressedMulticastRoutingTable router_table:
             Original routing table for a single chip
@@ -73,7 +78,9 @@ class AbstractCompressor(object):
         :rtype: list(RTEntry)
         """
 
-    def compress_tables(self, router_tables, progress):
+    def compress_tables(
+            self, router_tables: MulticastRoutingTables,
+            progress: ProgressBar) -> MulticastRoutingTables:
         """
         Compress the given unordered routing tables.
 

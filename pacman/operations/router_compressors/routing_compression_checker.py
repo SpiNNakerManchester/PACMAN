@@ -13,8 +13,13 @@
 # limitations under the License.
 
 import logging
+from typing import Dict, List, Optional, TextIO
 from spinn_utilities.log import FormatAdapter
+from spinn_machine import MulticastRoutingEntry
 from pacman.exceptions import PacmanRoutingException
+from pacman.model.routing_tables import (
+    AbstractMulticastRoutingTable, CompressedMulticastRoutingTable,
+    UnCompressedMulticastRoutingTable)
 from pacman.utilities.algorithm_utilities.routes_format import format_route
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -22,7 +27,7 @@ WILDCARD = "*"
 LINE_FORMAT = "0x{:08X} 0x{:08X} 0x{:08X} {: <7s} {}\n"
 
 
-def codify(route, length=32):
+def codify(route: MulticastRoutingEntry, length: int = 32) -> str:
     """
     This method discovers all the routing keys covered by this route.
 
@@ -53,7 +58,9 @@ def codify(route, length=32):
         for bit in map(lambda i: 1 << i, reversed(range(length))))
 
 
-def codify_table(table, length=32):
+def codify_table(
+        table: AbstractMulticastRoutingTable, length: int = 32) -> Dict[
+            str, MulticastRoutingEntry]:
     """
     Apply :py:func:`codify` to all entries in a table.
 
@@ -67,7 +74,7 @@ def codify_table(table, length=32):
         for route in table.multicast_routing_entries}
 
 
-def covers(o_code, c_code):
+def covers(o_code: str, c_code: str) -> bool:
     """
     :param str o_code:
     :param str c_code:
@@ -84,7 +91,7 @@ def covers(o_code, c_code):
     return True
 
 
-def calc_remainders(o_code, c_code):
+def calc_remainders(o_code: str, c_code: str) -> List[str]:
     """
     :param str o_code: Codified original route
     :param str c_code: Codified compressed route
@@ -104,7 +111,11 @@ def calc_remainders(o_code, c_code):
     return remainders
 
 
-def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
+def compare_route(
+        o_route: MulticastRoutingEntry,
+        compressed_dict: Dict[str, MulticastRoutingEntry],
+        o_code: Optional[str] = None, start: int = 0,
+        f: Optional[TextIO] = None):
     """
     :param ~spinn_machine.MulticastRoutingEntry o_route: the original route
     :param dict(str, ~spinn_machine.MulticastRoutingEntry) compressed_dict:
@@ -148,7 +159,9 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
         raise PacmanRoutingException(f"No route found {o_route}")
 
 
-def compare_tables(original, compressed):
+def compare_tables(
+        original: UnCompressedMulticastRoutingTable,
+        compressed: CompressedMulticastRoutingTable):
     """
     Compares the two tables without generating any output.
 

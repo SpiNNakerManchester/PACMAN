@@ -14,7 +14,7 @@
 
 import json
 import gzip
-from typing import Dict, Iterable, Iterator, List, Optional, Tuple
+from typing import Collection, Dict, Iterable, Iterator, List, Optional, Tuple
 from pacman.exceptions import PacmanAlreadyExistsException
 from .abstract_multicast_routing_table import AbstractMulticastRoutingTable
 from .uncompressed_multicast_routing_table import (
@@ -73,7 +73,7 @@ class MulticastRoutingTables(object):
             self._max_number_of_entries, routing_table.number_of_entries)
 
     @property
-    def routing_tables(self) -> Iterable[AbstractMulticastRoutingTable]:
+    def routing_tables(self) -> Collection[AbstractMulticastRoutingTable]:
         """
         The routing tables stored within.
 

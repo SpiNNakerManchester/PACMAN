@@ -20,15 +20,15 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import Machine, MulticastRoutingEntry
 from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
-    CompressedMulticastRoutingTable, MulticastRoutingTables)
+    CompressedMulticastRoutingTable, MulticastRoutingTables,
+    AbstractMulticastRoutingTable, UnCompressedMulticastRoutingTable)
 from pacman.exceptions import MinimisationFailedError
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def range_compressor(accept_overflow=True):
+def range_compressor(accept_overflow: bool = True) -> MulticastRoutingTables:
     """
-    :param MulticastRoutingTables router_tables:
     :param bool accept_overflow:
         A flag which should only be used in testing to stop raising an
         exception if result is too big
@@ -39,6 +39,7 @@ def range_compressor(accept_overflow=True):
     else:
         message = "Compressing tables using Range Compressor"
     router_tables = PacmanDataView.get_uncompressed()
+    assert router_tables is not None
     progress = ProgressBar(len(router_tables.routing_tables), message)
     compressor = RangeCompressor()
     compressed_tables = MulticastRoutingTables()
@@ -61,18 +62,16 @@ class RangeCompressor(object):
     A compressor based on ranges.
     Use via :py:func:`range_compressor`.
     """
-
+    # pylint: disable=attribute-defined-outside-init
     __slots__ = (
         # Router table to add merged rutes into
         "_compressed",
         # List of entries to be merged
         "_entries")
 
-    def __init__(self):
-        self._compressed = None
-        self._entries = None
-
-    def compress_table(self, uncompressed):
+    def compress_table(
+            self, uncompressed: UnCompressedMulticastRoutingTable
+            ) -> AbstractMulticastRoutingTable:
         """
         Compresses all the entries for a single table.
 
@@ -118,7 +117,7 @@ class RangeCompressor(object):
         # return the results as a list
         return self._compressed
 
-    def _validate(self):
+    def _validate(self) -> bool:
         for i in range(len(self._entries)):
             if self._get_endpoint(i) >= self._get_key(i+1):
                 logger.warning(
@@ -126,7 +125,7 @@ class RangeCompressor(object):
                 return False
         return True
 
-    def _get_key(self, index):
+    def _get_key(self, index: int) -> int:
         """
         Gets routing_entry_key for entry index with support for index overflow
 
@@ -139,14 +138,13 @@ class RangeCompressor(object):
         entry = self._entries[index]
         return entry.routing_entry_key & entry.mask
 
-    def _get_endpoint(self, index):
+    def _get_endpoint(self, index: int) -> int:
         """
         Get the end of the range covered by entry index's key and mask
 
         With support for index underflow
 
         :param index:
-        :return:
         """
         if index < 0:
             return 0
@@ -154,7 +152,7 @@ class RangeCompressor(object):
         # return the key plus the mask flipping ones and zeros
         return (entry.routing_entry_key | ~entry.mask) & 0xFFFFFFFF
 
-    def _merge_range(self, first, last):
+    def _merge_range(self, first: int, last: int):
         while True:
             # With a range of 1 just use the existing
             if first == last:

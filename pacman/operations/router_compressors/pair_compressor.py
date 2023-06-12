@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import functools
-from spinn_machine import Machine
+from typing import List, Tuple, cast
+from spinn_machine import Machine, MulticastRoutingEntry
 from pacman.exceptions import PacmanElementAllocationException
 from .abstract_compressor import AbstractCompressor
 from .entry import RTEntry
+from pacman.model.routing_tables import (
+    MulticastRoutingTables, UnCompressedMulticastRoutingTable)
 
 
-def pair_compressor(ordered=True, accept_overflow=False, verify=False):
+def pair_compressor(
+        ordered: bool = True, accept_overflow: bool = False,
+        verify: bool = False):
     """
     :param bool accept_overflow:
         A flag which should only be used in testing to stop raising an
@@ -34,7 +39,7 @@ def pair_compressor(ordered=True, accept_overflow=False, verify=False):
     return compressed
 
 
-def verify_lengths(compressed):
+def verify_lengths(compressed: MulticastRoutingTables):
     """
     :param MulticastRoutingTables compressed:
     :raises PacmanElementAllocationException:
@@ -155,18 +160,19 @@ class _PairCompressor(AbstractCompressor):
         # Number of unique routes found so far
         "_routes_count")
 
-    def __init__(self, ordered=True, accept_overflow=False):
+    def __init__(self, ordered: bool = True, accept_overflow: bool = False):
         super().__init__(ordered, accept_overflow)
-        self._all_entries = None
-        self._write_index = None
-        self._max_index = None
-        self._previous_index = None
-        self._remaining_index = None
-        self._routes = None
-        self._routes_frequency = None
-        self._routes_count = None
+        self._all_entries: List[RTEntry] = []
+        self._write_index = 0
+        self._max_index = 0
+        self._previous_index = 0
+        self._remaining_index = 0
+        self._routes: List[RTEntry] = []
+        self._routes_frequency: List[int] = []
+        self._routes_count = 0
 
-    def _compare_entries(self, route_a_entry, route_b_entry):
+    def _compare_entries(
+            self, route_a_entry: RTEntry, route_b_entry: RTEntry) -> int:
         """
         Compares two entries for sorting based on the frequency of each entry's
         SpiNNaker route.
@@ -195,7 +201,7 @@ class _PairCompressor(AbstractCompressor):
                 return -1
         raise PacmanElementAllocationException("Sorting error")
 
-    def _find_merge(self, left, index):
+    def _find_merge(self, left: int, index: int) -> bool:
         """
         Attempt to find a merge between the left entry and the index entry.
 
@@ -229,7 +235,7 @@ class _PairCompressor(AbstractCompressor):
             self._all_entries[left].spinnaker_route)
         return True
 
-    def _compress_by_route(self, left, right):
+    def _compress_by_route(self, left: int, right: int):
         """
         Compresses the entries between left and right.
 
@@ -259,7 +265,7 @@ class _PairCompressor(AbstractCompressor):
             #    self._all_entries[left] = None
             self._write_index += 1
 
-    def _update_frequency(self, entry):
+    def _update_frequency(self, entry: MulticastRoutingEntry):
         """
         :param ~spinn_machine.MulticastRoutingEntry entry:
         """
@@ -272,7 +278,9 @@ class _PairCompressor(AbstractCompressor):
         self._routes_frequency[self._routes_count] = 1
         self._routes_count += 1
 
-    def compress_table(self, router_table):
+    def compress_table(
+            self, router_table: UnCompressedMulticastRoutingTable
+            ) -> List[RTEntry]:
         """
         Compresses all the entries for a single table.
 
@@ -301,9 +309,9 @@ class _PairCompressor(AbstractCompressor):
             self._update_frequency(entry)
 
         # Use built-in sorting; much simpler
-        self._routes_frequency, self._routes = zip(*sorted(
+        self._routes_frequency, self._routes = cast(Tuple, zip(*sorted(
             zip(self._routes_frequency, self._routes),
-            key=lambda x: -x[0]))
+            key=lambda x: -x[0])))
         self._all_entries.sort(key=functools.cmp_to_key(self._compare_entries))
 
         self._write_index = 0
@@ -325,7 +333,7 @@ class _PairCompressor(AbstractCompressor):
         return self._all_entries[0:self._write_index]
 
     @staticmethod
-    def intersect(key_a, mask_a, key_b, mask_b):
+    def intersect(key_a: int, mask_a: int, key_b: int, mask_b: int) -> bool:
         """
         Return if key-mask pairs intersect (i.e., would both match some of
         the same keys).
@@ -351,7 +359,7 @@ class _PairCompressor(AbstractCompressor):
         """
         return (key_a & mask_b) == (key_b & mask_a)
 
-    def merge(self, entry1, entry2):
+    def merge(self, entry1: RTEntry, entry2: RTEntry) -> Tuple[int, int, bool]:
         """
         Merges two entries/triples into one that covers both.
 
@@ -376,5 +384,5 @@ class _PairCompressor(AbstractCompressor):
         return key, mask, entry1.defaultable and entry2.defaultable
 
     @property
-    def ordered(self):
+    def ordered(self) -> bool:
         return self._ordered

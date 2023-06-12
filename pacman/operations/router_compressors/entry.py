@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 from spinn_machine import MulticastRoutingEntry
 
 
@@ -32,7 +32,8 @@ class RTEntry(object):
     """
     __slots__ = ("key", "mask", "defaultable", "spinnaker_route")
 
-    def __init__(self, key, mask, defaultable, spinnaker_route):
+    def __init__(self, key: int, mask: int, defaultable: bool,
+                 spinnaker_route: int):
         """
         :param int key:
         :param int mask:
@@ -54,7 +55,7 @@ class RTEntry(object):
                 self.spinnaker_route == other.spinnaker_route)
 
     @staticmethod
-    def from_MulticastRoutingEntry(mre):
+    def from_MulticastRoutingEntry(mre: MulticastRoutingEntry) -> RTEntry:
         """
         :param ~spinn_machine.MulticastRoutingEntry mre:
         :rtype: RTEntry
@@ -65,7 +66,7 @@ class RTEntry(object):
             mre._routing_entry_key, mre._mask, mre._defaultable,
             mre._spinnaker_route)
 
-    def to_MulticastRoutingEntry(self):
+    def to_MulticastRoutingEntry(self) -> MulticastRoutingEntry:
         """
         :rtype: ~spinn_machine.MulticastRoutingEntry
         """
