@@ -14,7 +14,7 @@
 from __future__ import annotations
 import logging
 import numpy
-from typing import Iterable, Optional, Tuple, Union, cast, TYPE_CHECKING
+from typing import Collection, Optional, Tuple, Union, cast, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.log import FormatAdapter
@@ -190,7 +190,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             label, n_atoms, f"int value expected for {label}")
 
     @property
-    def machine_vertices(self) -> Iterable[MachineVertex]:
+    def machine_vertices(self) -> Collection[MachineVertex]:
         """
         The machine vertices that this application vertex maps to.
 

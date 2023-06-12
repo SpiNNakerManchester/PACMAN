@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pacman.model.graphs.machine.machine_vertex import MachineVertex
 """
 Neighbour Exploring Routing (NER) algorithm from J. Navaridas et al.
 
@@ -41,13 +40,14 @@ from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     least_busy_dimension_first, get_app_partitions, vertex_xy_and_route)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
+from pacman.model.graphs.machine import MachineVertex
 _XY = Tuple[int, int]
 _Vec = Tuple[int, int, int]
+_V2N = Callable[[_Vec, _XY], List[Tuple[int, _XY]]]
 
 
 def _ner_net(src: _XY, destinations: Iterable[_XY],
-             vector_to_nodes: Callable[[_Vec, _XY], List[Tuple[int, _XY]]]
-             ) -> RoutingTree:
+             vector_to_nodes: _V2N) -> RoutingTree:
     """
     Produce a shortest path tree for a given net using NER.
 
@@ -57,7 +57,7 @@ def _ner_net(src: _XY, destinations: Iterable[_XY],
         The coordinate (x, y) of the source vertex.
     :param iterable(tuple(int,int)) destinations:
         The coordinates of destination vertices.
-    :param vector_to_nodes: ??????????
+    :param vector_to_nodes: How to get the nodes from a machine vector
     :return:
         A RoutingTree is produced rooted at the source and visiting all
         destinations but which does not contain any vertices etc.
@@ -136,8 +136,7 @@ def _ner_net(src: _XY, destinations: Iterable[_XY],
 
 
 def _do_route(source_xy: _XY, post_vertexes: Iterable[MachineVertex],
-              vector_to_nodes: Callable[[_Vec, _XY], List[Tuple[int, _XY]]]
-              ) -> RoutingTree:
+              vector_to_nodes: _V2N) -> RoutingTree:
     """
     Routing algorithm based on Neighbour Exploring Routing (NER).
 
@@ -168,9 +167,7 @@ def _do_route(source_xy: _XY, post_vertexes: Iterable[MachineVertex],
     return root
 
 
-def _ner_route(
-        vector_to_nodes: Callable[[_Vec, _XY], List[Tuple[int, _XY]]]
-        ) -> MulticastRoutingTableByPartition:
+def _ner_route(vector_to_nodes: _V2N) -> MulticastRoutingTableByPartition:
     """
     Performs routing using rig algorithm.
 

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+from typing import Dict, FrozenSet, Iterable, Set, Tuple, cast
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
@@ -20,13 +21,14 @@ from pacman.data import PacmanDataView
 from pacman.model.routing_info import (
     RoutingInfo, MachineVertexRoutingInfo, BaseKeyAndMask,
     AppVertexRoutingInfo)
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.utilities.utility_calls import (
     get_key_ranges, allocator_bits_needed)
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
-
+_XAlloc = Iterable[Tuple[ApplicationVertex, str]]
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
@@ -100,24 +102,27 @@ class ZonedRoutingInfoAllocator(object):
         "__fixed_used",
         # True if all partitions are fixed
         "__all_fixed")
-    __FROZEN = frozenset()
+    __FROZEN: FrozenSet = frozenset()
 
-    def __init__(self, flexible=False):
+    def __init__(self, flexible: bool = False):
         """
         :param bool flexible: Determines if flexible can be use.
             If False, global settings will be attempted
         """
-        self.__vertex_partitions = self.__FROZEN
+        self.__vertex_partitions: Set[Tuple[ApplicationVertex, str]] = cast(
+            Set, self.__FROZEN)
         self.__n_bits_atoms_and_mac = 0
         self.__n_bits_machine = 0
         self.__n_bits_atoms = 0
-        self.__atom_bits_per_app_part = dict()
+        self.__atom_bits_per_app_part: Dict[
+            Tuple[AbstractVertex, str], int] = dict()
         self.__flexible = flexible
-        self.__fixed_partitions = dict()
-        self.__fixed_used = self.__FROZEN
+        self.__fixed_partitions: Dict[
+            Tuple[str, AbstractVertex], BaseKeyAndMask] = dict()
+        self.__fixed_used: Set[int] = cast(Set, self.__FROZEN)
         self.__all_fixed = True
 
-    def allocate(self, extra_allocations):
+    def allocate(self, extra_allocations: _XAlloc) -> RoutingInfo:
         """
         Perform routing information allocation.
 
@@ -130,13 +135,14 @@ class ZonedRoutingInfoAllocator(object):
         :raise PacmanRouteInfoAllocationException:
             If something goes wrong with the allocation
         """
-        self.__vertex_partitions = OrderedSet(
+        self.__vertex_partitions = cast(Set, OrderedSet(
             (p.pre_vertex, p.identifier)
-            for p in PacmanDataView.iterate_partitions())
+            for p in PacmanDataView.iterate_partitions()))
         self.__vertex_partitions.update(extra_allocations)
         self.__vertex_partitions.update(
             (v, p.identifier)
             for v in PacmanDataView.iterate_vertices()
+            if isinstance(v, ApplicationVertex)
             for p in v.splitter.get_internal_multicast_partitions())
 
         self.__find_fixed()
@@ -148,7 +154,7 @@ class ZonedRoutingInfoAllocator(object):
 
         return self.__allocate()
 
-    def __find_fixed(self):
+    def __find_fixed(self) -> None:
         """
         Looks for FixedKeyAmdMask Constraints and keeps track of these.
 
@@ -201,7 +207,7 @@ class ZonedRoutingInfoAllocator(object):
                         identifier, vert] = app_key_and_mask
                 self.__fixed_partitions[identifier, pre] = app_key_and_mask
 
-    def __calculate_zones(self):
+    def __calculate_zones(self) -> None:
         """
         Computes the size for the zones.
 
@@ -239,7 +245,7 @@ class ZonedRoutingInfoAllocator(object):
             else:
                 self.__atom_bits_per_app_part[pre, identifier] = 0
 
-    def __check_zones(self):
+    def __check_zones(self) -> None:
         # See if it could fit even before considerding fixed
         app_part_bits = allocator_bits_needed(
             len(self.__atom_bits_per_app_part))
@@ -276,7 +282,7 @@ class ZonedRoutingInfoAllocator(object):
                 self.__n_bits_atoms_and_mac = \
                     self.__n_bits_machine + self.__n_bits_atoms
 
-    def __set_fixed_used(self):
+    def __set_fixed_used(self) -> None:
         """
         Block the use of ``AP`` indexes that would clash with fixed keys
         """
@@ -310,7 +316,7 @@ class ZonedRoutingInfoAllocator(object):
             for k, n_keys in get_key_ranges(key, mask):
                 self.__fixed_used.update(range(k, k + n_keys))
 
-    def __allocate_all_fixed(self):
+    def __allocate_all_fixed(self) -> RoutingInfo:
         routing_infos = RoutingInfo()
         progress = ProgressBar(
             len(self.__fixed_partitions), "Allocating routing keys")
@@ -327,7 +333,7 @@ class ZonedRoutingInfoAllocator(object):
                     key_and_mask, part_id, vertex, vertex.index))
         return routing_infos
 
-    def __allocate(self):
+    def __allocate(self) -> RoutingInfo:
         progress = ProgressBar(
             len(self.__vertex_partitions), "Allocating routing keys")
         routing_infos = RoutingInfo()
@@ -378,7 +384,7 @@ class ZonedRoutingInfoAllocator(object):
         return routing_infos
 
     @staticmethod
-    def __mask(bits):
+    def __mask(bits: int) -> int:
         """
         :param int bits:
         :rtype int:
@@ -386,7 +392,7 @@ class ZonedRoutingInfoAllocator(object):
         return FULL_MASK - ((2 ** bits) - 1)
 
 
-def flexible_allocate(extra_allocations):
+def flexible_allocate(extra_allocations: _XAlloc) -> RoutingInfo:
     """
     Allocated with fixed bits for the Application/Partition index but
     with the size of the atom and machine bit changing.
@@ -401,7 +407,7 @@ def flexible_allocate(extra_allocations):
     return ZonedRoutingInfoAllocator(True).allocate(extra_allocations)
 
 
-def global_allocate(extra_allocations):
+def global_allocate(extra_allocations: _XAlloc) -> RoutingInfo:
     """
     :param list(tuple(ApplicationVertex,str)) extra_allocations:
         Additional (vertex, partition identifier) pairs to allocate
