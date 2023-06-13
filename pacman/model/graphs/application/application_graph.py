@@ -155,7 +155,7 @@ class ApplicationGraph(object):
         """
         The edges in the graph.
 
-        :rtype: iterable(~pacman.model.graphs.AbstractEdge)
+        :rtype: iterable(~pacman.model.graphs.application.ApplicationEdge)
         """
         return [
             cast(ApplicationEdge, edge)

@@ -13,18 +13,18 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-from typing import Iterable, List, Optional, TypeVar, TYPE_CHECKING
+from typing import Iterable, Optional, TypeVar, TYPE_CHECKING
 from spinn_utilities.log import FormatAdapter
 from spinn_machine.data import MachineDataView
 from pacman.exceptions import PacmanNotPlacedError
 from pacman.model.graphs.application import ApplicationGraph
 if TYPE_CHECKING:
-    from pacman.model.graphs import AbstractEdge
-    from pacman.model.graphs import AbstractVertex
-    from pacman.model.graphs import AbstractEdgePartition
-    from pacman.model.graphs.application import ApplicationEdgePartition
+    from pacman.model.graphs import (
+        AbstractEdgePartition, AbstractVertex)
+    from pacman.model.graphs.application import (
+        ApplicationEdge, ApplicationEdgePartition, ApplicationVertex)
     from pacman.model.graphs.machine import MachineVertex
-    from pacman.model.placements import Placement
+    from pacman.model.placements import Placement, Placements
     from pacman.model.tags import Tags
     from pacman.model.routing_info import RoutingInfo
     from pacman.model.routing_tables import MulticastRoutingTables
@@ -52,7 +52,7 @@ class _PacmanDataModel(object):
     What data is held where and how can change without notice.
     """
 
-    __singleton = None
+    __singleton: Optional[_PacmanDataModel] = None
 
     __slots__ = (
         # Data values cached
@@ -67,41 +67,41 @@ class _PacmanDataModel(object):
         "_tags",
         "_uncompressed")
 
-    def __new__(cls):
-        if cls.__singleton:
+    def __new__(cls) -> _PacmanDataModel:
+        if cls.__singleton is not None:
             return cls.__singleton
-        # pylint: disable=protected-access
         obj = object.__new__(cls)
         cls.__singleton = obj
         obj._clear()
         return obj
 
-    def _clear(self):
+    def _clear(self) -> None:
         """
         Clears out all data.
         """
         self._graph = ApplicationGraph()
         # set at the start of every run
-        self._plan_n_timesteps = None
+        self._plan_n_timesteps: Optional[int] = None
         self._hard_reset()
 
-    def _hard_reset(self):
+    def _hard_reset(self) -> None:
         """
         Clears out all data that should change after a reset and graph change.
         """
         if self._graph:
             self._graph.reset()
-        self._placements = None
-        self._precompressed = None
-        self._monitor_cores = 0
-        self._monitor_sdram = 0
-        self._uncompressed = None
-        self._routing_infos = None
-        self._routing_table_by_partition = None
-        self._tags = None
+        self._placements: Optional[Placements] = None
+        self._precompressed: Optional[MulticastRoutingTables] = None
+        self._monitor_cores: int = 0
+        self._monitor_sdram: int = 0
+        self._uncompressed: Optional[MulticastRoutingTables] = None
+        self._routing_infos: Optional[RoutingInfo] = None
+        self._routing_table_by_partition: Optional[
+            MulticastRoutingTableByPartition] = None
+        self._tags: Optional[Tags] = None
         self._soft_reset()
 
-    def _soft_reset(self):
+    def _soft_reset(self) -> None:
         """
         Clears timing and other data that should changed every reset.
         """
@@ -125,7 +125,7 @@ class PacmanDataView(MachineDataView):
     # graph methods
 
     @classmethod
-    def add_vertex(cls, vertex: AbstractVertex):
+    def add_vertex(cls, vertex: ApplicationVertex):
         """
         Adds an Application vertex to the user graph.
 
@@ -149,7 +149,8 @@ class PacmanDataView(MachineDataView):
         cls.__pacman_data._graph.add_vertex(vertex)
 
     @classmethod
-    def add_edge(cls, edge: AbstractEdge, outgoing_edge_partition_name: str):
+    def add_edge(
+            cls, edge: ApplicationEdge, outgoing_edge_partition_name: str):
         """
         Adds an Application edge to the user graph.
 
@@ -267,7 +268,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_outgoing_edge_partitions_starting_at_vertex(
-            cls, vertex: AbstractVertex) -> Iterable[AbstractEdgePartition]:
+            cls, vertex: ApplicationVertex) -> Iterable[AbstractEdgePartition]:
         """
         Get all the edge partitions that start at the given vertex.
 
@@ -284,7 +285,7 @@ class PacmanDataView(MachineDataView):
             get_outgoing_edge_partitions_starting_at_vertex(vertex)
 
     @classmethod
-    def get_edges(cls) -> List[AbstractEdge]:
+    def get_edges(cls) -> Iterable[ApplicationEdge]:
         """
         Get all the edges in the graph.
 
@@ -422,7 +423,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_placement_on_processor(
-            cls, x: int, y: int, p: int) -> MachineVertex:
+            cls, x: int, y: int, p: int) -> Placement:
         """
         Get the vertex on a specific processor, or raise an exception
         if the processor has not been allocated.

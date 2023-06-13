@@ -13,9 +13,11 @@
 # limitations under the License.
 
 import logging
+from typing import List
 from spinn_utilities.log import FormatAdapter
 from pacman.operations.router_compressors import (AbstractCompressor, RTEntry)
 from .ordered_covering import minimise
+from pacman.model.routing_tables import UnCompressedMulticastRoutingTable
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -36,10 +38,12 @@ class _OrderedCoveringCompressor(AbstractCompressor):
     """
     __slots__ = ()
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(True)
 
-    def compress_table(self, router_table):
+    def compress_table(
+            self, router_table: UnCompressedMulticastRoutingTable
+            ) -> List[RTEntry]:
         """
         :param UnCompressedMulticastRoutingTable router_table:
         :rtype: list(RTEntry)

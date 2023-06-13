@@ -16,12 +16,15 @@
 based on
 https://github.com/project-rig/rig/blob/master/rig/routing_table/remove_default_routes.py
 """
-
+from typing import List, Optional
 from .utils import intersect
+from pacman.operations.router_compressors.entry import RTEntry
 from pacman.exceptions import MinimisationFailedError
 
 
-def remove_default_routes(table, target_length, check_for_aliases=True):
+def remove_default_routes(
+        table: List[RTEntry], target_length: Optional[int],
+        check_for_aliases: bool = True) -> List[RTEntry]:
     """
     Remove from the routing table any entries which could be replaced by
     default routing.
