@@ -54,8 +54,8 @@ class MDSlice(Slice):
     @property
     @overrides(Slice.hi_atom)
     def hi_atom(self):
-        # Should go pop here
-        return super().hi_atom
+        raise NotImplementedError(
+            "hi_atom does not work for multi dimensional slices")
 
     @property
     @overrides(Slice.shape)
@@ -70,8 +70,8 @@ class MDSlice(Slice):
     @property
     @overrides(Slice.as_slice)
     def as_slice(self):
-        # Should go pop here
-        return super().as_slice
+        raise NotImplementedError(
+            "as slice does not work for multi dimensional slices")
 
     @overrides(Slice.get_slice, extend_doc=False)
     def get_slice(self, n):
