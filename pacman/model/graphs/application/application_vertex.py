@@ -171,6 +171,25 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """
         return self._machine_vertices
 
+    def __check_atoms_per_core(self):
+        if (len(self._max_atoms_per_dimension_per_core) !=
+                len(self.atoms_shape)):
+            raise ValueError(
+                f"On application vertex {self}, the number of dimensions in"
+                " the maximum number of atoms per core "
+                f" {self._max_atoms_per_dimension_per_core} must be the same"
+                " number of dimensions as that of the vertex shape"
+                f" {self.atoms_shape}")
+        if len(self.atoms_shape) > 1:
+            for maxi, dim in zip(self._max_atoms_per_dimension_per_core,
+                                 self.atoms_shape):
+                if (dim / maxi) != (dim // maxi):
+                    raise ValueError(
+                        f"On application vertex {self} each dimension of the"
+                        f" vertex shape {self.atoms_shape} must be divisible"
+                        " by the maximum number of atoms per core in that"
+                        f" dimension {self._max_atoms_per_dimension_per_core}")
+
     def get_max_atoms_per_core(self):
         """
         Gets the maximum number of atoms per core, which is either the
@@ -181,6 +200,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """
         if self._max_atoms_per_dimension_per_core is None:
             return self.n_atoms
+        self.__check_atoms_per_core()
         return int(numpy.prod(self._max_atoms_per_dimension_per_core))
 
     def get_max_atoms_per_dimension_per_core(self):
@@ -193,6 +213,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """
         if self._max_atoms_per_dimension_per_core is None:
             return self.atoms_shape
+        self.__check_atoms_per_core()
         return self._max_atoms_per_dimension_per_core
 
     def set_max_atoms_per_dimension_per_core(self, new_value):
@@ -212,11 +233,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         self._max_atoms_per_dimension_per_core = new_value
         if isinstance(new_value, int):
             self._max_atoms_per_dimension_per_core = (new_value, )
-        if (len(self._max_atoms_per_dimension_per_core) !=
-                len(self.atoms_shape)):
-            raise ValueError(
-                "The number of dimensions of new_value must be the same as the"
-                " number of dimensions of atoms_shape")
+        self.__check_atoms_per_core()
 
     def reset(self):
         """
