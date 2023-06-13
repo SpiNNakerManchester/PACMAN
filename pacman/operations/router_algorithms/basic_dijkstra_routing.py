@@ -15,7 +15,7 @@
 import logging
 import sys
 from collections import defaultdict
-from typing import Dict, Tuple, Set, Optional, List, Iterable, cast
+from typing import Dict, Tuple, Set, Optional, List, Iterable
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
@@ -177,8 +177,8 @@ class _BasicDijkstraRouting(object):
                             destinations[src][dst].links.add(link)
                         dest_chips[src].add(dst)
 
-        outgoing = cast(Set, OrderedSet(source.splitter.get_out_going_vertices(
-            partition.identifier)))
+        outgoing: OrderedSet[MachineVertex] = OrderedSet(
+            source.splitter.get_out_going_vertices(partition.identifier))
         for in_part in source.splitter.get_internal_multicast_partitions():
             if in_part.identifier == partition.identifier:
                 outgoing.add(in_part.pre_vertex)

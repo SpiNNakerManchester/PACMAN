@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Collection, Dict, Generic, Iterable, Set, TypeVar, cast
+from typing import Collection, Dict, Generic, Iterable, TypeVar
 from collections import defaultdict
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
@@ -20,7 +20,6 @@ from pacman.model.graphs import (
     AbstractVertex, AbstractEdge, AbstractEdgePartition)
 V = TypeVar("V", bound=AbstractVertex)
 E = TypeVar("E", bound=AbstractEdge)
-_EDGE_SET = Set[E]
 
 
 class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
@@ -38,13 +37,12 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
             allowed_edge_types: type[E]):
         super().__init__(
             identifier=identifier, allowed_edge_types=allowed_edge_types)
-        self._pre_vertices: Dict[V, Set[E]] = dict()
-        self._destinations: Dict[V, Set[E]] = defaultdict(
-            lambda: cast(_EDGE_SET, OrderedSet()))
+        self._pre_vertices: Dict[V, OrderedSet[E]] = dict()
+        self._destinations: Dict[V, OrderedSet[E]] = defaultdict(OrderedSet)
 
         # hard code dict of lists so that only these are acceptable.
         for pre_vertex in pre_vertices:
-            self._pre_vertices[pre_vertex] = cast(_EDGE_SET, OrderedSet())
+            self._pre_vertices[pre_vertex] = OrderedSet()
 
         # handle clones
         if len(self._pre_vertices.keys()) != len(pre_vertices):

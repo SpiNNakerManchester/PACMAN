@@ -73,7 +73,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         # Need to set to None temporarily as add_constraint checks splitter
         self._splitter = None
         super().__init__(label)
-        self._machine_vertices = OrderedSet()
+        self._machine_vertices: OrderedSet[MachineVertex] = OrderedSet()
         if splitter:
             # Use setter as there is extra work to do
             self.splitter = splitter

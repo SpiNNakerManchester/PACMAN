@@ -109,8 +109,8 @@ class ZonedRoutingInfoAllocator(object):
         :param bool flexible: Determines if flexible can be use.
             If False, global settings will be attempted
         """
-        self.__vertex_partitions: Set[Tuple[ApplicationVertex, str]] = cast(
-            Set, self.__FROZEN)
+        self.__vertex_partitions: OrderedSet[
+            Tuple[ApplicationVertex, str]] = OrderedSet()
         self.__n_bits_atoms_and_mac = 0
         self.__n_bits_machine = 0
         self.__n_bits_atoms = 0
@@ -135,9 +135,9 @@ class ZonedRoutingInfoAllocator(object):
         :raise PacmanRouteInfoAllocationException:
             If something goes wrong with the allocation
         """
-        self.__vertex_partitions = cast(Set, OrderedSet(
+        self.__vertex_partitions = OrderedSet(
             (p.pre_vertex, p.identifier)
-            for p in PacmanDataView.iterate_partitions()))
+            for p in PacmanDataView.iterate_partitions())
         self.__vertex_partitions.update(extra_allocations)
         self.__vertex_partitions.update(
             (v, p.identifier)

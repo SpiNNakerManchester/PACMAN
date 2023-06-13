@@ -49,7 +49,7 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
         """
         self._identifier = identifier
         self._allowed_edge_types = allowed_edge_types
-        self._edges = OrderedSet()
+        self._edges: OrderedSet[E] = OrderedSet()
 
     def add_edge(self, edge: E):
         """

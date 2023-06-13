@@ -178,7 +178,7 @@ class PacmanDataView(MachineDataView):
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
 
     @classmethod
-    def iterate_vertices(cls) -> Iterable[AbstractVertex]:
+    def iterate_vertices(cls) -> Iterable[ApplicationVertex]:
         """
         The vertices in the user application graph.
 

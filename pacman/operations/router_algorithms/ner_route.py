@@ -26,7 +26,7 @@ https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/utils.p
 """
 
 import functools
-from typing import Callable, Dict, Iterable, List, Set, Tuple, cast
+from typing import Callable, Dict, Iterable, List, Tuple
 from collections import defaultdict
 
 from spinn_utilities.progress_bar import ProgressBar
@@ -183,8 +183,8 @@ def _ner_route(vector_to_nodes: _V2N) -> MulticastRoutingTableByPartition:
 
     for partition in progress_bar.over(partitions):
         source = partition.pre_vertex
-        post_vertices_by_source: Dict[MachineVertex, Set[MachineVertex]] = \
-            defaultdict(lambda: cast(Set, OrderedSet()))
+        post_vertices_by_source: Dict[
+            MachineVertex, OrderedSet[MachineVertex]] = defaultdict(OrderedSet)
         for edge in partition.edges:
             splitter = edge.post_vertex.splitter
             for tgt, srcs in splitter.get_source_specific_in_coming_vertices(
@@ -195,8 +195,8 @@ def _ner_route(vector_to_nodes: _V2N) -> MulticastRoutingTableByPartition:
                                 partition.identifier):
                             post_vertices_by_source[s].add(tgt)
 
-        outgoing = OrderedSet(source.splitter.get_out_going_vertices(
-            partition.identifier))
+        outgoing: OrderedSet[MachineVertex] = OrderedSet(
+            source.splitter.get_out_going_vertices(partition.identifier))
         for in_part in source.splitter.get_internal_multicast_partitions():
             if in_part.identifier == partition.identifier:
                 outgoing.add(in_part.pre_vertex)

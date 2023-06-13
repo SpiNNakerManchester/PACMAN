@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Collection, Optional, cast
+from typing import Collection, Optional
 from spinn_utilities.overrides import overrides
-from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanConfigurationException, PartitionMissingEdgesException)
 from pacman.model.graphs import AbstractMultiplePartition
@@ -51,7 +50,7 @@ class SourceSegmentedSDRAMMachinePartition(
         """
         :rtype: SDRAMMachineEdge
         """
-        return cast(OrderedSet, self._pre_vertices[pre_vertex]).peek()
+        return self._pre_vertices[pre_vertex].peek()
 
     @property
     def sdram_base_address(self) -> Optional[int]:

@@ -16,7 +16,7 @@ Collection of functions which together validate routes.
 """
 from collections import defaultdict
 import logging
-from typing import Dict, NamedTuple, Iterable, List, Set, cast
+from typing import Dict, NamedTuple, Iterable, List, Set
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
@@ -80,8 +80,8 @@ def validate_routes(
         source = partition.pre_vertex
 
         # Destination cores by source machine vertices
-        destinations: Dict[MachineVertex, Set[PlacementTuple]] = defaultdict(
-            lambda: cast(Set, OrderedSet()))
+        destinations: Dict[MachineVertex, OrderedSet[PlacementTuple]] = \
+            defaultdict(OrderedSet)
 
         for edge in partition.edges:
             target = edge.post_vertex
@@ -101,11 +101,11 @@ def validate_routes(
                         destinations[src].add(PlacementTuple(
                             x=place.x, y=place.y, p=place.p))
 
-        outgoing = OrderedSet(source.splitter.get_out_going_vertices(
-            partition.identifier))
+        outgoing: OrderedSet[MachineVertex] = OrderedSet(
+            source.splitter.get_out_going_vertices(partition.identifier))
         internal = source.splitter.get_internal_multicast_partitions()
         for in_part in internal:
-            if in_part.partition_id == partition.identifier:
+            if in_part.identifier == partition.identifier:
                 outgoing.add(in_part.pre_vertex)
                 for edge in in_part.edges:
                     place = placements.get_placement_of_vertex(
@@ -120,12 +120,13 @@ def validate_routes(
             placement = placements.get_placement_of_vertex(m_vertex)
             r_info = routing_infos.get_routing_info_from_pre_vertex(
                 m_vertex, partition.identifier)
+            m_slice = m_vertex.vertex_slice
 
             # search for these destinations
-            if r_info:
+            if r_info and m_slice:
                 _search_route(
                     placement, destinations[m_vertex], r_info.key_and_mask,
-                    routing_tables, m_vertex.vertex_slice.n_atoms)
+                    routing_tables, m_slice.n_atoms)
 
 
 def _search_route(
