@@ -36,8 +36,8 @@ class IPtagResource(object):
         "_traffic_identifier")
 
     def __init__(
-            self, ip_address: str, port: int, strip_sdp: bool,
-            tag: Optional[int] = None,
+            self, ip_address: Optional[str], port: Optional[int],
+            strip_sdp: bool, tag: Optional[int] = None,
             traffic_identifier: str = "DEFAULT"):
         """
         :param str ip_address:
@@ -60,7 +60,7 @@ class IPtagResource(object):
         self._traffic_identifier = traffic_identifier
 
     @property
-    def ip_address(self) -> str:
+    def ip_address(self) -> Optional[str]:
         """
         The IP address to assign to the tag.
 
@@ -69,7 +69,7 @@ class IPtagResource(object):
         return self._ip_address
 
     @property
-    def port(self) -> int:
+    def port(self) -> Optional[int]:
         """
         The port of the tag.
 

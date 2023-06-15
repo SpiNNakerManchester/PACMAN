@@ -19,8 +19,7 @@ from spinn_machine.data import MachineDataView
 from pacman.exceptions import PacmanNotPlacedError
 from pacman.model.graphs.application import ApplicationGraph
 if TYPE_CHECKING:
-    from pacman.model.graphs import (
-        AbstractEdgePartition, AbstractVertex)
+    from pacman.model.graphs import AbstractEdgePartition
     from pacman.model.graphs.application import (
         ApplicationEdge, ApplicationEdgePartition, ApplicationVertex)
     from pacman.model.graphs.machine import MachineVertex
@@ -31,7 +30,7 @@ if TYPE_CHECKING:
     from pacman.model.routing_table_by_partition import (
         MulticastRoutingTableByPartition)
 
-    VTX = TypeVar("VTX", bound=AbstractVertex)
+    VTX = TypeVar("VTX")
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access

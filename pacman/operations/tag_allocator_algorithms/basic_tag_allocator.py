@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Tuple, List, Dict
+from typing import Tuple, List, Dict, Union
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import Chip, Machine
 from spinn_machine.tags import IPTag, ReverseIPTag
@@ -84,8 +84,9 @@ def basic_tag_allocator() -> Tags:
 
 
 def __get_chip_and_tag(
-        iptag: IPtagResource, eth_chip: Chip, machine: Machine,
-        tags_available: Dict[Chip, List[int]]) -> Tuple[Chip, int]:
+        iptag: Union[IPtagResource, ReverseIPtagResource], eth_chip: Chip,
+        machine: Machine, tags_available: Dict[Chip, List[int]]
+        ) -> Tuple[Chip, int]:
     tags_on_chip = tags_available[eth_chip]
     tag = iptag.tag
     if tag is not None:
