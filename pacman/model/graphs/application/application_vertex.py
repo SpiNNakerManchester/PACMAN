@@ -14,7 +14,10 @@
 from __future__ import annotations
 import logging
 import numpy
-from typing import Collection, Optional, Tuple, Union, cast, TYPE_CHECKING
+from typing import (
+    Collection, Generic, Optional, Tuple, TypeVar, Union,
+    cast, TYPE_CHECKING)
+from typing_extensions import Self
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.log import FormatAdapter
@@ -27,10 +30,13 @@ if TYPE_CHECKING:
     from pacman.model.routing_info import BaseKeyAndMask
     from .application_edge import ApplicationEdge
     from .application_edge_partition import ApplicationEdgePartition
+    _MV = TypeVar("_MV", bound=MachineVertex)
+else:
+    _MV = TypeVar("_MV")
 logger = FormatAdapter(logging.getLogger(__file__))
 
 
-class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
+class ApplicationVertex(AbstractVertex, Generic[_MV], metaclass=AbstractBase):
     """
     A vertex that can be broken down into a number of smaller vertices
     based on the resources that the vertex requires.
@@ -56,7 +62,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             self, label: Optional[str] = None,
             max_atoms_per_core: Union[
                 int, Tuple[int], Tuple[int, int], None] = None,
-            splitter: Optional[AbstractSplitterCommon] = None):
+            splitter: Optional[AbstractSplitterCommon[Self]] = None):
         """
         :param str label: The optional name of the vertex.
         :param max_atoms_per_core: The max number of atoms that can be
@@ -73,7 +79,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         # Need to set to None temporarily as add_constraint checks splitter
         self._splitter = None
         super().__init__(label)
-        self._machine_vertices: OrderedSet[MachineVertex] = OrderedSet()
+        self._machine_vertices: OrderedSet[_MV] = OrderedSet()
         if splitter:
             # Use setter as there is extra work to do
             self.splitter = splitter
@@ -103,7 +109,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         return self._splitter is not None
 
     @property
-    def splitter(self) -> AbstractSplitterCommon:
+    def splitter(self) -> AbstractSplitterCommon[Self]:
         """
         :rtype: ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
@@ -115,7 +121,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         return s
 
     @splitter.setter
-    def splitter(self, new_value: AbstractSplitterCommon):
+    def splitter(self, new_value: AbstractSplitterCommon[Self]):
         """
         Sets the splitter object. Does not allow repeated settings.
 
@@ -132,7 +138,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         self._splitter = new_value
         self._splitter.set_governed_app_vertex(self)
 
-    def remember_machine_vertex(self, machine_vertex: MachineVertex):
+    def remember_machine_vertex(self, machine_vertex: _MV):
         """
         Adds the machine vertex to the iterable returned by machine_vertices
 
@@ -190,7 +196,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             label, n_atoms, f"int value expected for {label}")
 
     @property
-    def machine_vertices(self) -> Collection[MachineVertex]:
+    def machine_vertices(self) -> Collection[_MV]:
         """
         The machine vertices that this application vertex maps to.
 
