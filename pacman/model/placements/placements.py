@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Dict, Iterable, Iterator, Tuple
+from typing import Dict, Iterable, Iterator
+from spinn_utilities.typing.coords import XY
 from pacman.exceptions import (
     PacmanAlreadyPlacedError, PacmanNotPlacedError,
     PacmanProcessorAlreadyOccupiedError, PacmanProcessorNotOccupiedError)
@@ -43,8 +44,7 @@ class Placements(object):
         :raise PacmanProcessorAlreadyOccupiedError:
             If two placements are made to the same processor.
         """
-        self._placements: Dict[Tuple[int, int], Dict[int, Placement]] = \
-            defaultdict(dict)
+        self._placements: Dict[XY, Dict[int, Placement]] = defaultdict(dict)
         self._machine_vertices: Dict[MachineVertex, Placement] = dict()
         if placements:
             self.add_placements(placements)
@@ -209,7 +209,7 @@ class Placements(object):
         return self._placements[x, y].values()
 
     @property
-    def chips_with_placements(self) -> Iterable[Tuple[int, int]]:
+    def chips_with_placements(self) -> Iterable[XY]:
         """
         The chips with placements on them.
 

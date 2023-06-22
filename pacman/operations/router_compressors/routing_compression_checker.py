@@ -17,9 +17,7 @@ from typing import Dict, List, Optional, TextIO
 from spinn_utilities.log import FormatAdapter
 from spinn_machine import MulticastRoutingEntry
 from pacman.exceptions import PacmanRoutingException
-from pacman.model.routing_tables import (
-    AbstractMulticastRoutingTable, CompressedMulticastRoutingTable,
-    UnCompressedMulticastRoutingTable)
+from pacman.model.routing_tables import AbstractMulticastRoutingTable
 from pacman.utilities.algorithm_utilities.routes_format import format_route
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -160,8 +158,8 @@ def compare_route(
 
 
 def compare_tables(
-        original: UnCompressedMulticastRoutingTable,
-        compressed: CompressedMulticastRoutingTable):
+        original: AbstractMulticastRoutingTable,
+        compressed: AbstractMulticastRoutingTable):
     """
     Compares the two tables without generating any output.
 

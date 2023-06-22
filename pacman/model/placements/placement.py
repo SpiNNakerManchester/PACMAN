@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Tuple
+from typing import Any
+from spinn_utilities.typing.coords import XY, XYP
 from spinn_machine import Chip
 from pacman.data.pacman_data_view import PacmanDataView
 from pacman.model.graphs.machine import MachineVertex
@@ -84,7 +85,7 @@ class Placement(object):
         return self._p
 
     @property
-    def location(self) -> Tuple[int, int, int]:
+    def location(self) -> XYP:
         """
         The (x,y,p) tuple that represents the location of this placement.
 
@@ -93,7 +94,7 @@ class Placement(object):
         return (self._x, self._y, self._p)
 
     @property
-    def xy(self) -> Tuple[int, int]:
+    def xy(self) -> XY:
         """
         The (x,y) tuple that represents the chip of this placement.
 

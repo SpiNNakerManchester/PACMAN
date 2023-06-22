@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Optional, Tuple, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVirtual
 from pacman.model.resources import ConstantSDRAM
 from .machine_vertex import MachineVertex
 if TYPE_CHECKING:
+    from spinn_utilities.typing.coords import XY
     from spinn_machine import Machine
     from spinn_machine.link_data_objects import FPGALinkData
     from pacman.model.graphs.application import ApplicationVertex
@@ -42,7 +43,7 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
     def __init__(
             self, fpga_id: int, fpga_link_id: int,
             board_address: Optional[str] = None,
-            linked_chip_coordinates: Optional[Tuple[int, int]] = None,
+            linked_chip_coordinates: Optional[XY] = None,
             label: Optional[str] = None,
             app_vertex: Optional[ApplicationVertex] = None,
             vertex_slice: Optional[Slice] = None,
@@ -79,7 +80,7 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
 
     @property
     @overrides(AbstractVirtual.linked_chip_coordinates)
-    def linked_chip_coordinates(self) -> Optional[Tuple[int, int]]:
+    def linked_chip_coordinates(self) -> Optional[XY]:
         return self._linked_chip_coordinates
 
     @overrides(AbstractVirtual.outgoing_keys_and_masks)

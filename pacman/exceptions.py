@@ -24,7 +24,7 @@ class PacmanInvalidParameterException(PacmanException):
     A parameter has an invalid value.
     """
 
-    def __init__(self, parameter, value, problem):
+    def __init__(self, parameter: str, value: str, problem: str):
         """
         :param str parameter: The name of the parameter
         :param str value: The value of the parameter
@@ -40,7 +40,7 @@ class PacmanAlreadyExistsException(PacmanException):
     Something already exists and that adding another would be a conflict.
     """
 
-    def __init__(self, item_type, item_id):
+    def __init__(self, item_type: str, item_id: str):
         """
         :param str item_type: The type of the item that already exists
         :param str item_id: The ID of the item which is in conflict

@@ -14,6 +14,7 @@
 
 import logging
 import sys
+from typing import cast
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
@@ -44,7 +45,8 @@ def range_compressor(accept_overflow: bool = True) -> MulticastRoutingTables:
     compressor = RangeCompressor()
     compressed_tables = MulticastRoutingTables()
     for table in progress.over(router_tables.routing_tables):
-        new_table = compressor.compress_table(table)
+        new_table = compressor.compress_table(cast(
+            UnCompressedMulticastRoutingTable, table))
         if (new_table.number_of_entries > Machine.ROUTER_ENTRIES and
                 not accept_overflow):
             raise MinimisationFailedError(

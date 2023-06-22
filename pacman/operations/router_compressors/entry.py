@@ -29,8 +29,10 @@ class RTEntry(object):
     :vartype defaultable: bool
     :ivar spinnaker_route: The route
     :vartype spinnaker_route: int
+    :ivar key_mask: The key,mask pair
+    :vartype key_mask: tuple(int,int)
     """
-    __slots__ = ("key", "mask", "defaultable", "spinnaker_route")
+    __slots__ = ("key", "mask", "defaultable", "spinnaker_route", "key_mask")
 
     def __init__(self, key: int, mask: int, defaultable: bool,
                  spinnaker_route: int):
@@ -44,6 +46,7 @@ class RTEntry(object):
         self.mask = mask
         self.defaultable = defaultable
         self.spinnaker_route = spinnaker_route
+        self.key_mask = (key, mask)
 
     def __str__(self):
         return f"{self.key} {self.mask} {self.spinnaker_route}"

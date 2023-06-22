@@ -34,7 +34,9 @@ _OptInt = Optional[int]
 logger = FormatAdapter(logging.getLogger(__name__))
 infinity = float("inf")
 
+#: Assumed bandwidth cost per entry.
 BW_PER_ROUTE_ENTRY = 0.01
+#: Maximum bandwidth of a link.
 MAX_BW = 250
 
 
@@ -70,19 +72,17 @@ class _DestInfo:
         self.links: Set[int] = set()
 
 
-def basic_dijkstra_routing(
-        bw_per_route_entry=BW_PER_ROUTE_ENTRY, max_bw=MAX_BW):
+def basic_dijkstra_routing():
     """
     Find routes between the edges with the allocated information,
     placed in the given places
 
-    :param bool use_progress_bar: whether to show a progress bar
     :return: The discovered routes
     :rtype: MulticastRoutingTables
     :raise PacmanRoutingException:
         If something goes wrong with the routing
     """
-    router = _BasicDijkstraRouting(bw_per_route_entry, max_bw)
+    router = _BasicDijkstraRouting()
     return router.route_all_partitions()
 
 
@@ -95,19 +95,13 @@ class _BasicDijkstraRouting(object):
 
     __slots__ = (
         # the routing path objects used to be returned to the work flow
-        "_routing_paths",
-        # parameter to control ...........
-        "_bw_per_route_entry",
-        # parameter to control ...........
-        "_max_bw")
+        "_routing_paths", )
 
-    def __init__(self, bw_per_route_entry, max_bw):
+    def __init__(self) -> None:
         # set up basic data structures
         self._routing_paths = MulticastRoutingTableByPartition()
-        self._bw_per_route_entry = bw_per_route_entry
-        self._max_bw = max_bw
 
-    def route_all_partitions(self):
+    def route_all_partitions(self) -> MulticastRoutingTableByPartition:
         """
         Find routes between the edges with the allocated information,
         placed in the given places

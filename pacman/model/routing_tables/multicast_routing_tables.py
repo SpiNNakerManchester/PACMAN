@@ -14,7 +14,10 @@
 
 import json
 import gzip
-from typing import Collection, Dict, Iterable, Iterator, List, Optional, Tuple
+from typing import (
+    Collection, Dict, Iterable, Iterator, Optional, Union, cast)
+from spinn_utilities.typing.coords import XY
+from spinn_utilities.typing.json import JsonObjectArray
 from pacman.exceptions import PacmanAlreadyExistsException
 from .abstract_multicast_routing_table import AbstractMulticastRoutingTable
 from .uncompressed_multicast_routing_table import (
@@ -46,7 +49,7 @@ class MulticastRoutingTables(object):
             If any two routing tables are for the same chip
         """
         self._routing_tables_by_chip: Dict[
-            Tuple[int, int], AbstractMulticastRoutingTable] = dict()
+            XY, AbstractMulticastRoutingTable] = dict()
         self._max_number_of_entries = 0
 
         for routing_table in routing_tables:
@@ -116,7 +119,7 @@ class MulticastRoutingTables(object):
         return iter(self._routing_tables_by_chip.values())
 
 
-def to_json(router_table: MulticastRoutingTables) -> List:
+def to_json(router_table: MulticastRoutingTables) -> JsonObjectArray:
     return [
         {
             "x": routing_table.x,
@@ -133,20 +136,22 @@ def to_json(router_table: MulticastRoutingTables) -> List:
         for routing_table in router_table]
 
 
-def from_json(j_router) -> MulticastRoutingTables:
+def from_json(j_router: Union[str, JsonObjectArray]) -> MulticastRoutingTables:
     if isinstance(j_router, str):
         if j_router.endswith(".gz"):
             with gzip.open(j_router) as j_file:
-                j_router = json.load(j_file)
+                j_router = cast(JsonObjectArray, json.load(j_file))
         else:
             with open(j_router, encoding="utf-8") as j_file:
-                j_router = json.load(j_file)
+                j_router = cast(JsonObjectArray, json.load(j_file))
 
     tables = MulticastRoutingTables()
     for j_table in j_router:
-        table = UnCompressedMulticastRoutingTable(j_table["x"], j_table["y"])
+        x = cast(int, j_table["x"])
+        y = cast(int, j_table["y"])
+        table = UnCompressedMulticastRoutingTable(x, y)
         tables.add_routing_table(table)
-        for j_entry in j_table["entries"]:
+        for j_entry in cast(JsonObjectArray, j_table["entries"]):
             table.add_multicast_routing_entry(MulticastRoutingEntry(
                 j_entry["key"], j_entry["mask"],
                 defaultable=j_entry["defaultable"],

@@ -15,6 +15,7 @@ import math
 from typing import Tuple
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.overrides import overrides
+from spinn_utilities.typing.coords import XY
 from pacman.exceptions import PacmanConfigurationException
 from pacman.utilities.utility_calls import get_n_bits
 from pacman.utilities.constants import BITS_IN_KEY
@@ -113,7 +114,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return (int(math.ceil(self._width / self._sub_width)) *
                 int(math.ceil(self._height / self._sub_height)))
 
-    def _sub_square_from_index(self, index: int) -> Tuple[int, int]:
+    def _sub_square_from_index(self, index: int) -> XY:
         """
         Work out the x and y components of the index.
 

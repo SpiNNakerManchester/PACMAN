@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Optional, Tuple, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING
 from spinn_utilities.abstract_base import abstractmethod, abstractproperty
 from spinn_utilities.require_subclass import require_subclass
 from pacman.model.graphs import AbstractVertex
 if TYPE_CHECKING:
+    from spinn_utilities.typing.coords import XY
     from spinn_machine import Machine
     from spinn_machine.link_data_objects import AbstractLinkData
     from pacman.model.routing_info import BaseKeyAndMask
@@ -46,7 +47,7 @@ class AbstractVirtual(object):
         """
 
     @abstractproperty
-    def linked_chip_coordinates(self) -> Optional[Tuple[int, int]]:
+    def linked_chip_coordinates(self) -> Optional[XY]:
         """
         The coordinates of the chip to which the device is connected,
         or ``None`` for the boot board, or when using a board address.

@@ -27,10 +27,12 @@ https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/utils.p
 
 import functools
 from typing import Callable, Dict, Iterable, List, Tuple
+from typing_extensions import TypeAlias
 from collections import defaultdict
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
+from spinn_utilities.typing.coords import XY
 from pacman.data import PacmanDataView
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition)
@@ -41,12 +43,11 @@ from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 from pacman.model.graphs.machine import MachineVertex
-_XY = Tuple[int, int]
-_Vec = Tuple[int, int, int]
-_V2N = Callable[[_Vec, _XY], List[Tuple[int, _XY]]]
+_Vec: TypeAlias = Tuple[int, int, int]
+_V2N: TypeAlias = Callable[[_Vec, XY], List[Tuple[int, XY]]]
 
 
-def _ner_net(src: _XY, destinations: Iterable[_XY],
+def _ner_net(src: XY, destinations: Iterable[XY],
              vector_to_nodes: _V2N) -> RoutingTree:
     """
     Produce a shortest path tree for a given net using NER.
@@ -135,7 +136,7 @@ def _ner_net(src: _XY, destinations: Iterable[_XY],
     return route[src]
 
 
-def _do_route(source_xy: _XY, post_vertexes: Iterable[MachineVertex],
+def _do_route(source_xy: XY, post_vertexes: Iterable[MachineVertex],
               vector_to_nodes: _V2N) -> RoutingTree:
     """
     Routing algorithm based on Neighbour Exploring Routing (NER).
@@ -233,6 +234,5 @@ def ner_route_traffic_aware() -> MulticastRoutingTableByPartition:
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition
     """
-    traffic: Dict[_XY, int] = defaultdict(int)
-    return _ner_route(
-        functools.partial(least_busy_dimension_first, traffic))
+    traffic: Dict[XY, int] = defaultdict(int)
+    return _ner_route(functools.partial(least_busy_dimension_first, traffic))

@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, NamedTuple, Optional, Tuple
+from typing import Iterable, NamedTuple, Optional
+from spinn_utilities.typing.coords import XY
 
 #: The range of FPGA ids
 FPGA_IDS = range(0, 3)
@@ -38,7 +39,7 @@ class FPGAConnection(NamedTuple):
 
     #: The coordinates of the chip connected to the FPGA, or None for the
     #: default board or if using board_address
-    chip_coords: Optional[Tuple[int, int]]
+    chip_coords: Optional[XY]
 
     @property
     def is_concrete(self) -> bool:

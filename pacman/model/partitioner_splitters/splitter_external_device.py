@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import List, Optional, Union
+from typing_extensions import TypeAlias
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex)
@@ -24,7 +25,8 @@ from pacman.model.graphs.application import FPGAConnection
 from pacman.utilities.utility_objs import ChipCounter
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
-_Allowed = Union[ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex]
+_Allowed: TypeAlias = Union[
+    ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex]
 
 
 class SplitterExternalDevice(AbstractSplitterCommon):

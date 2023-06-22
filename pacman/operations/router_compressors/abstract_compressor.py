@@ -18,7 +18,7 @@ based on https://github.com/project-rig/
 
 from abc import abstractmethod
 import logging
-from typing import List
+from typing import List, cast
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
@@ -104,7 +104,8 @@ class AbstractCompressor(object):
             if table.number_of_entries < target_length:
                 new_table = table
             else:
-                compressed_table = self.compress_table(table)
+                compressed_table = self.compress_table(cast(
+                    UnCompressedMulticastRoutingTable, table))
 
                 new_table = CompressedMulticastRoutingTable(table.x, table.y)
 

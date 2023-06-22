@@ -14,6 +14,7 @@
 from __future__ import annotations
 import logging
 from typing import Dict, Iterator, Optional, Tuple, TYPE_CHECKING
+from spinn_utilities.typing.coords import XY
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs.machine import MachineVertex
@@ -36,7 +37,7 @@ class MulticastRoutingTableByPartition(object):
         "_router_to_entries_map", )
 
     def __init__(self) -> None:
-        self._router_to_entries_map: Dict[Tuple[int, int], Dict[
+        self._router_to_entries_map: Dict[XY, Dict[
             Tuple[AbstractVertex, str],
             MulticastRoutingTableByPartitionEntry]] = dict()
 
@@ -87,7 +88,7 @@ class MulticastRoutingTableByPartition(object):
                     "Error merging entries on %s for %s", key, source_key)
                 raise e
 
-    def get_routers(self) -> Iterator[Tuple[int, int]]:
+    def get_routers(self) -> Iterator[XY]:
         """
         Get the coordinates of all stored routers.
 

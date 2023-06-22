@@ -28,6 +28,7 @@ from collections import deque
 from typing import (
     Deque, Iterable, Iterator, List, Optional, Set, Tuple, Union,
     TYPE_CHECKING)
+from spinn_utilities.typing.coords import XY
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex
 
@@ -49,7 +50,7 @@ class RoutingTree(object):
     #   than a tuple saves 56 bytes per instance.
     __slots__ = ("_chip_x", "_chip_y", "_children", "_label")
 
-    def __init__(self, chip: Tuple[int, int], label: Optional[str] = None):
+    def __init__(self, chip: XY, label: Optional[str] = None):
         """
         :param tuple(int,int) chip:
             The chip the route is currently passing through.
@@ -64,7 +65,7 @@ class RoutingTree(object):
         return self._label
 
     @property
-    def chip(self) -> Tuple[int, int]:
+    def chip(self) -> XY:
         """
         The chip the route is currently passing through.
 
@@ -142,8 +143,7 @@ class RoutingTree(object):
             len(self._children),
             "child" if len(self._children) == 1 else "children")
 
-    def traverse(self) -> Iterable[
-            Tuple[Optional[int], Tuple[int, int], Set[int]]]:
+    def traverse(self) -> Iterable[Tuple[Optional[int], XY, Set[int]]]:
         """
         Traverse the tree yielding the direction taken to a node, the
         coordinates of that node and the directions leading from the Node.
