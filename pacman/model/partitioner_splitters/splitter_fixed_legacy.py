@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-from typing import List
+from typing import Generic, List, TypeVar
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
@@ -26,9 +26,10 @@ from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_objs import ChipCounter
 
 logger = FormatAdapter(logging.getLogger(__name__))
+_V = TypeVar("_V", bound=ApplicationVertex)
 
 
-class SplitterFixedLegacy(AbstractSplitterCommon[ApplicationVertex]):
+class SplitterFixedLegacy(AbstractSplitterCommon[_V], Generic[_V]):
     """
     Splitter for old-style vertices.
     """
@@ -41,7 +42,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon[ApplicationVertex]):
         self.__lp = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
-    def set_governed_app_vertex(self, app_vertex: ApplicationVertex):
+    def set_governed_app_vertex(self, app_vertex: _V):
         if not isinstance(app_vertex, LegacyPartitionerAPI):
             raise PacmanConfigurationException(
                 f"{self} is not a LegacyPartitionerAPI")

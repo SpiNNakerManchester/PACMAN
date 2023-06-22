@@ -23,21 +23,19 @@ from pacman.utilities.utility_objs import ChipCounter
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from .abstract_splitter_common import AbstractSplitterCommon
-V = TypeVar("V", bound=MachineVertex)
+MV = TypeVar("MV", bound=MachineVertex)
+AV = TypeVar("AV", bound=AbstractOneAppOneMachineVertex)
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class SplitterOneAppOneMachine(
-        AbstractSplitterCommon[AbstractOneAppOneMachineVertex[V]],
-        Generic[V]):
+class SplitterOneAppOneMachine(AbstractSplitterCommon[AV], Generic[AV, MV]):
     """
     Splitter that handles :py:class:`AbstractOneAppOneMachineVertex` vertices.
     """
     __slots__ = ()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
-    def set_governed_app_vertex(
-            self, app_vertex: AbstractOneAppOneMachineVertex[V]):
+    def set_governed_app_vertex(self, app_vertex: AV):
         if not isinstance(app_vertex, AbstractOneAppOneMachineVertex):
             raise PacmanConfigurationException(
                 f"The vertex {app_vertex.label} cannot be supported by the "
@@ -59,15 +57,15 @@ class SplitterOneAppOneMachine(
         return [self._governed_app_vertex.machine_vertex.vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, partition_id: str) -> List[V]:
+    def get_out_going_vertices(self, partition_id: str) -> List[MV]:
         return [self._governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, partition_id: str) -> List[V]:
+    def get_in_coming_vertices(self, partition_id: str) -> List[MV]:
         return [self._governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
-    def machine_vertices_for_recording(self, variable_to_record) -> List[V]:
+    def machine_vertices_for_recording(self, variable_to_record) -> List[MV]:
         return [self._governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.reset_called)
