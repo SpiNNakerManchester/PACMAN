@@ -116,9 +116,7 @@ class _FixedRouteRouter(object):
 
     def __get_chip_over_link(self, chip: Chip, link_id: int) -> Optional[Chip]:
         x, y = self._machine.xy_over_link(chip.x, chip.y, link_id)
-        if self._machine.is_chip_at(x, y):
-            return self._machine.get_chip_at(x, y)
-        return None
+        return self._machine.get_chip_at(x, y)
 
     def __add_fixed_route_entry(
             self, key: Chip, link_ids: List[int], processor_ids: List[int]):
