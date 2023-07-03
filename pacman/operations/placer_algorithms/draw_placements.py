@@ -16,36 +16,27 @@ from collections import defaultdict
 import math
 import os
 import logging
-import numpy
-from typing import Any, Dict, Optional
+import random
+from typing import Dict, Optional
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.typing.coords import XY
 from pacman.data import PacmanDataView
+from pacman.model.graphs import AbstractVertex
 from pacman.model.placements import Placements
+from ._spinner_api import spinner_api, Colour
+
 logger = FormatAdapter(logging.getLogger(__name__))
-_exception: Optional[ImportError] = None
-try:
-    # spinner as graphical library so
-    # pylint: disable=import-error
-    from spinner.scripts.contexts import PNGContextManager
-    from spinner.diagrams.machine_map import (
-        get_machine_map_aspect_ratio, draw_machine_map)
-    from spinner import board
-except ImportError as _e:
-    PNGContextManager = None
-    get_machine_map_aspect_ratio, draw_machine_map = None, None
-    board = None
-    _exception = _e
 
 
-def _next_colour():
+def _next_colour() -> Colour:
     """
     Get the next (random) RGBA colour to use for a vertex for placement
     drawings.
 
     :rtype: tuple(float, float, float, float)
     """
-    return tuple(numpy.concatenate(
-        (numpy.random.choice(range(256), size=3) / 256, [1.0])))
+    return (
+        random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1.0)
 
 
 def draw_placements(
@@ -61,17 +52,19 @@ def draw_placements(
     :param str filename:
         Name of file to make. Should have a ``.png`` suffix by convention.
     """
-    if _exception:
+    if isinstance(spinner_api, ImportError):
         logger.exception(
             "Unable to draw placements as no spinner install found",
-            exc_info=_exception)
+            exc_info=spinner_api)
         return
     report_file = os.path.join(PacmanDataView.get_run_dir_path(), filename)
 
     # Colour the boards by placements
-    unused = (0.5, 0.5, 0.5, 1.0)
-    vertex_colours: Dict[Any, Any] = defaultdict(_next_colour)
-    board_colours: Dict[Any, Any] = dict()
+    unused: Colour = (0.5, 0.5, 0.5, 1.0)
+    vertex_colours: Dict[Optional[AbstractVertex], Colour] = defaultdict(
+        _next_colour)
+    vertex_colours[None] = unused
+    board_colours: Dict[XY, Colour] = dict()
     machine = PacmanDataView.get_machine()
     for x, y in machine.chip_coordinates:
         if (placements.n_placements_on_chip(x, y) ==
@@ -89,12 +82,13 @@ def draw_placements(
     # Compute dimensions
     w = math.ceil(machine.width / 12)
     h = math.ceil(machine.height / 12)
-    aspect_ratio = get_machine_map_aspect_ratio(w, h)
+    aspect_ratio = spinner_api.aspect_ratio(w, h)
     image_width = 10000
     image_height = int(image_width * aspect_ratio)
 
-    hex_boards = board.create_torus(w, h)
-    with PNGContextManager(report_file, image_width, image_height) as ctx:
-        draw_machine_map(
+    hex_boards = spinner_api.create_torus(w, h)
+    with spinner_api.png_context_manager(
+            report_file, image_width, image_height) as ctx:
+        spinner_api.draw(
             ctx, image_width, image_height, machine.width, machine.height,
-            hex_boards, dict(), board_colours, include_boards)
+            hex_boards, {}, board_colours, include_boards)

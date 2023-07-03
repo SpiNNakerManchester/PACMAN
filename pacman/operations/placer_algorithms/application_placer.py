@@ -459,18 +459,16 @@ class _Spaces(object):
         """
         return len(self.__used_chips)
 
-    def __usable_from_chip(self, chip: Chip) -> OrderedSet[Chip]:
+    def __usable_from_chip(self, chip: Chip) -> Iterable[Chip]:
         """
         :param Chip chip:
         :rtype set(Chip)
         """
-        chips: OrderedSet[Chip] = OrderedSet()
         for link in chip.router.links:
-            chip_coords = (link.destination_x, link.destination_y)
-            target_chip = self.__machine.get_chip_at(*chip_coords)
-            if target_chip not in self.__used_chips:
-                chips.add(target_chip)
-        return chips
+            target = self.__machine.get_chip_at(
+                link.destination_x, link.destination_y)
+            if target is not None and target not in self.__used_chips:
+                yield target
 
     def save_chips(self, chips: Iterable[Chip]):
         """
