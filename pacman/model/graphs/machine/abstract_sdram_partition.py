@@ -19,6 +19,7 @@ class AbstractSDRAMPartition(object, metaclass=AbstractBase):
     """
     An edge partition that contains SDRAM edges.
     """
+    __slots__ = ()
 
     @abstractmethod
     def total_sdram_requirements(self) -> int:
@@ -27,6 +28,17 @@ class AbstractSDRAMPartition(object, metaclass=AbstractBase):
 
         :return: int
         """
+
+    @property
+    @abstractmethod
+    def sdram_base_address(self) -> int:
+        """
+        The base address of the SDRAM piece used for communication.
+        """
+
+    @sdram_base_address.setter
+    def sdram_base_address(self, new_value: int):
+        raise NotImplementedError
 
     @abstractmethod
     def get_sdram_base_address_for(self, vertex: MachineVertex) -> int:

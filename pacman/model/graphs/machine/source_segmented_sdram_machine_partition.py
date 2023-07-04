@@ -53,10 +53,13 @@ class SourceSegmentedSDRAMMachinePartition(
         return self._pre_vertices[pre_vertex].peek()
 
     @property
-    def sdram_base_address(self) -> Optional[int]:
+    def sdram_base_address(self) -> int:
         """
         :rtype: int
         """
+        if self._sdram_base_address is None:
+            raise PacmanConfigurationException(
+                "SDRAM base address not yet set")
         return self._sdram_base_address
 
     @sdram_base_address.setter

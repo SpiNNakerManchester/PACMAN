@@ -72,6 +72,7 @@ class ConstantSDRAMMachinePartition(
         return self._sdram_size
 
     @property
+    @overrides(AbstractSDRAMPartition.sdram_base_address)
     def sdram_base_address(self) -> int:
         if self._sdram_base_address is None:
             raise PartitionMissingEdgesException(self.__missing_edge_msg())

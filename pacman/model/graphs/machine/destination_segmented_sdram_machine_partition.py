@@ -43,7 +43,11 @@ class DestinationSegmentedSDRAMMachinePartition(
         return sum(edge.sdram_size for edge in self.edges)
 
     @property
-    def sdram_base_address(self) -> Optional[int]:
+    @overrides(AbstractSDRAMPartition.sdram_base_address)
+    def sdram_base_address(self) -> int:
+        if self._sdram_base_address is None:
+            raise PacmanConfigurationException(
+                "SDRAM base address not yet set")
         return self._sdram_base_address
 
     @sdram_base_address.setter
