@@ -18,7 +18,7 @@ from pacman.exceptions import PacmanElementAllocationException
 from .abstract_compressor import AbstractCompressor
 from .entry import RTEntry
 from pacman.model.routing_tables import (
-    MulticastRoutingTables, UnCompressedMulticastRoutingTable)
+    MulticastRoutingTables, AbstractMulticastRoutingTable)
 
 
 def pair_compressor(
@@ -279,7 +279,7 @@ class _PairCompressor(AbstractCompressor):
         self._routes_count += 1
 
     def compress_table(
-            self, router_table: UnCompressedMulticastRoutingTable
+            self, router_table: AbstractMulticastRoutingTable
             ) -> List[RTEntry]:
         """
         Compresses all the entries for a single table.

@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Iterable, Generic, List, Optional, Tuple, TypeVar, Union
+from typing import (
+    Iterable, Generic, List, Optional, Sequence, Tuple, TypeVar, Union)
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationVertex
@@ -140,9 +141,10 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         """
 
     def get_source_specific_in_coming_vertices(
-            self, source_vertex: ApplicationVertex, partition_id: str) -> List[
-                Tuple[MachineVertex,
-                      List[Union[MachineVertex, ApplicationVertex]]]]:
+            self, source_vertex: ApplicationVertex,
+            partition_id: str) -> Sequence[Tuple[
+                MachineVertex, Sequence[
+                    Union[MachineVertex, ApplicationVertex]]]]:
         """
         Get machine post-vertices for a given source.
 

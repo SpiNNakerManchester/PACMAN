@@ -60,7 +60,7 @@ class _Targets(object):
 
     def add_sources_for_target(
             self, core: _OptInt, link: _OptInt,
-            source_vertices: List[_AnyVertex], partition_id: str):
+            source_vertices: Iterable[_AnyVertex], partition_id: str):
         """
         Add a set of vertices that target a given core or link.
 
@@ -85,7 +85,7 @@ class _Targets(object):
 
     def add_machine_sources_for_target(
             self, core: _OptInt, link: _OptInt,
-            source_vertices: List[_AnyVertex], partition_id: str):
+            source_vertices: Iterable[_AnyVertex], partition_id: str):
         """
         Add a set of machine vertices that target a given core or link.
 
@@ -293,7 +293,7 @@ def _route_source_to_target(
         source, partition.identifier)
 
     # Add all the targets for the route
-    real_target_xys = set()
+    real_target_xys: Set[XY] = set()
     for tgt, srcs in target_vertices:
         xy, (_vertex, core, link) = vertex_xy_and_route(tgt)
         if xy in source_mappings:
