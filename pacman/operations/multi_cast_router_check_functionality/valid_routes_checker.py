@@ -315,6 +315,8 @@ def _recursive_trace_to_destinations(
             # locate next chips router
             machine_router = PacmanDataView.get_chip_at(chip_x, chip_y).router
             link = machine_router.get_link(link_id)
+            if link is None:
+                continue
             next_router = routing_tables.get_routing_table_for_chip(
                 link.destination_x, link.destination_y)
             if next_router is None:

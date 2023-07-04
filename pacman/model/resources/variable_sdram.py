@@ -26,7 +26,7 @@ class VariableSDRAM(AbstractSDRAM):
 
     __slots__ = (
         # The amount of SDRAM in bytes used no matter what
-        "_fixed_sdram"
+        "_fixed_sdram",
         # The amount of extra SDRAm used for each timestep
         "_per_timestep_sdram")
 

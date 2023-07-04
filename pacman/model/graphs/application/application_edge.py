@@ -17,12 +17,9 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractEdge
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
-    _AV = ApplicationVertex
-else:
-    _AV = object
 
 
-class ApplicationEdge(AbstractEdge[_AV]):
+class ApplicationEdge(AbstractEdge['ApplicationVertex']):
     """
     A simple implementation of an application edge.
     """

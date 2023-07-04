@@ -123,7 +123,7 @@ class ApplicationGraph(object):
         partition.add_edge(edge)
         return partition
 
-    def _check_edge(self, edge):
+    def _check_edge(self, edge: ApplicationEdge):
         """
         Add an edge to the graph.
 

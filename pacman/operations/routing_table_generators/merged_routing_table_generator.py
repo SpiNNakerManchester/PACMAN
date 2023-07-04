@@ -162,27 +162,28 @@ def __merged_keys_and_masks(
                     cast(Any, entries))
 
 
-_E = TypeVar("_E")
+#: :meta private:
+E = TypeVar("E")
 
 
-class _IteratorWithNext(Generic[_E]):
-    def __init__(self, iterable: Iterable[_E]):
+class _IteratorWithNext(Generic[E]):
+    def __init__(self, iterable: Iterable[E]):
         self.__iterator = iter(iterable)
         try:
-            self.__next: Optional[_E] = next(self.__iterator)
+            self.__next: Optional[E] = next(self.__iterator)
             self.__has_next = True
         except StopIteration:
             self.__next = None
             self.__has_next = False
 
-    def peek(self) -> Optional[_E]:
+    def peek(self) -> Optional[E]:
         return self.__next
 
     @property
     def has_next(self) -> bool:
         return self.__has_next
 
-    def pop(self) -> _E:
+    def pop(self) -> E:
         if not self.__has_next:
             raise StopIteration
         nxt = self.__next

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-from typing import Iterable, Optional, TypeVar, TYPE_CHECKING
+from typing import Iterable, Optional, Type, TypeVar, TYPE_CHECKING
 from spinn_utilities.log import FormatAdapter
 from spinn_machine.data import MachineDataView
 from pacman.exceptions import PacmanNotPlacedError
@@ -30,6 +30,8 @@ if TYPE_CHECKING:
     from pacman.model.routing_table_by_partition import (
         MulticastRoutingTableByPartition)
 
+    #: Type of a vertex. Can't be constrained for messy reasons.
+    #: :meta private:
     VTX = TypeVar("VTX")
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -194,7 +196,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_vertices_by_type(
-            cls, vertex_type: type[VTX]) -> Iterable[VTX]:
+            cls, vertex_type: Type[VTX]) -> Iterable[VTX]:
         """
         The application vertices in the graph of the specific type.
 
@@ -337,7 +339,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def iterate_placements_by_vertex_type(
-            cls, vertex_type: type[VTX]) -> Iterable[Placement]:
+            cls, vertex_type: Type[VTX]) -> Iterable[Placement]:
         """
         Iterate over placements on any chip with this vertex_type.
 
@@ -369,7 +371,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def iterate_placements_by_xy_and_type(
             cls, x: int, y: int,
-            vertex_type: type[VTX]) -> Iterable[Placement]:
+            vertex_type: Type[VTX]) -> Iterable[Placement]:
         """
         Iterate over placements with this x, y and type.
 

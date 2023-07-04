@@ -153,7 +153,7 @@ def from_json(j_router: Union[str, JsonObjectArray]) -> MulticastRoutingTables:
         tables.add_routing_table(table)
         for j_entry in cast(JsonObjectArray, j_table["entries"]):
             table.add_multicast_routing_entry(MulticastRoutingEntry(
-                j_entry["key"], j_entry["mask"],
-                defaultable=j_entry["defaultable"],
-                spinnaker_route=j_entry["spinnaker_route"]))
+                cast(int, j_entry["key"]), cast(int, j_entry["mask"]),
+                defaultable=cast(bool, j_entry["defaultable"]),
+                spinnaker_route=cast(int, j_entry["spinnaker_route"])))
     return tables

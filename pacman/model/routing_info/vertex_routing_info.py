@@ -14,7 +14,7 @@
 from typing import Optional, Union
 import numpy
 from pacman.exceptions import PacmanConfigurationException
-from spinn_utilities.abstract_base import abstractproperty, AbstractBase
+from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 from .base_key_and_mask import BaseKeyAndMask
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
@@ -101,7 +101,8 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         return self.__partition_id
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def vertex(self) -> Union[ApplicationVertex, MachineVertex]:
         """
         The vertex of the information.

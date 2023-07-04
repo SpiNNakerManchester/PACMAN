@@ -66,19 +66,19 @@ class ChipAndCore(object):
         """
         return self._p
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self._p is None:
             return f"X:{self._x},Y{self._y}"
         else:
             return f"X:{self._x},Y:{self._y},P:{self._p}"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if not isinstance(other, ChipAndCore):
             return False
         return (self._x, self._y, self._p) == (other.x, other.y, other.p)
 
-    def __ne__(self, other):
+    def __ne__(self, other) -> bool:
         return not self.__eq__(other)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self._x, self._y, self._p))

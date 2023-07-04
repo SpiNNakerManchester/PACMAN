@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Collection, Generic, Iterable, TypeVar, TYPE_CHECKING
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from typing import (
+    Collection, Generic, Tuple, Type, TypeVar, Union, TYPE_CHECKING)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanAlreadyExistsException)
 if TYPE_CHECKING:
-    from .abstract_edge import AbstractEdge
+    from .abstract_edge import AbstractEdge  # @UnusedImport
     from .abstract_vertex import AbstractVertex
-    E = TypeVar("E", bound=AbstractEdge)
-else:
-    E = TypeVar("E")
+#: :meta private:
+E = TypeVar("E", bound='AbstractEdge')
 
 
 class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
@@ -40,7 +40,8 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
         # The type of edges to accept
         "_allowed_edge_types")
 
-    def __init__(self, identifier: str, allowed_edge_types: type[E]):
+    def __init__(self, identifier: str,
+                 allowed_edge_types: Union[Type[E], Tuple[Type[E], ...]]):
         """
         :param str identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed
@@ -116,8 +117,9 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
         """
         return edge in self._edges
 
-    @abstractproperty
-    def pre_vertices(self) -> Iterable[AbstractVertex]:
+    @property
+    @abstractmethod
+    def pre_vertices(self) -> Collection[AbstractVertex]:
         """
         The vertices associated with this partition.
 

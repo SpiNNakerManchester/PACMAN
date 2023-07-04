@@ -17,10 +17,9 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 if TYPE_CHECKING:
-    from pacman.model.graphs.machine import MachineVertex
-    V = TypeVar("V", bound=MachineVertex)
-else:
-    V = TypeVar("V")
+    from pacman.model.graphs.machine import MachineVertex  # @UnusedImport
+#: :meta private:
+V = TypeVar("V", bound='MachineVertex')
 
 
 class AbstractOneAppOneMachineVertex(ApplicationVertex, Generic[V]):
@@ -42,7 +41,7 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex, Generic[V]):
         super().remember_machine_vertex(machine_vertex)
 
     @overrides(ApplicationVertex.remember_machine_vertex)
-    def remember_machine_vertex(self, machine_vertex: MachineVertex):
+    def remember_machine_vertex(self, machine_vertex: V):
         assert (machine_vertex == self._machine_vertex)
 
     @property

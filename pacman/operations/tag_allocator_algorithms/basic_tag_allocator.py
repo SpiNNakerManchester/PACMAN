@@ -62,9 +62,9 @@ def basic_tag_allocator() -> Tags:
         PacmanDataView.get_n_placements(), "Allocating tags")
     machine = PacmanDataView.get_machine()
     for placement in progress.over(PacmanDataView.iterate_placemements()):
-        place_chip = machine.get_chip_at(placement.x, placement.y)
-        eth_chip = machine.get_chip_at(place_chip.nearest_ethernet_x,
-                                       place_chip.nearest_ethernet_y)
+        place_chip = machine[placement.x, placement.y]
+        eth_chip = machine[place_chip.nearest_ethernet_x,
+                           place_chip.nearest_ethernet_y]
         for iptag in placement.vertex.iptags:
             alloc_chip, tag = __get_chip_and_tag(
                 iptag, eth_chip, machine, tags_available)

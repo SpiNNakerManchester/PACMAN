@@ -12,37 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-from typing import Generic, List, TypeVar
+from typing import Generic, List, Optional
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities import\
     get_multidimensional_slices
-from .abstract_splitter_common import AbstractSplitterCommon
+from .abstract_splitter_common import AbstractSplitterCommon, V
 from pacman.model.graphs.machine import MachineVertex
-from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_objs import ChipCounter
 
 logger = FormatAdapter(logging.getLogger(__name__))
-_V = TypeVar("_V", bound=ApplicationVertex)
 
 
-class SplitterFixedLegacy(AbstractSplitterCommon[_V], Generic[_V]):
+class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
     """
     Splitter for old-style vertices.
+
+    .. note::
+        Only to be used with :py:class:`ApplicationVertex` objects that also
+        implement :py:class:`LegacyPartitionerAPI`.
     """
 
     __slots__ = ("__slices", "__lp")
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.__slices = None
-        self.__lp = None
+        self.__slices: Optional[List[Slice]] = None
+        self.__lp: Optional[LegacyPartitionerAPI] = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
-    def set_governed_app_vertex(self, app_vertex: _V):
+    def set_governed_app_vertex(self, app_vertex: V):
         if not isinstance(app_vertex, LegacyPartitionerAPI):
             raise PacmanConfigurationException(
                 f"{self} is not a LegacyPartitionerAPI")
@@ -63,11 +65,11 @@ class SplitterFixedLegacy(AbstractSplitterCommon[_V], Generic[_V]):
         return list(self._governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
-    def get_out_going_slices(self):
+    def get_out_going_slices(self) -> List[Slice]:
         return self.__fixed_slices
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
-    def get_in_coming_slices(self):
+    def get_in_coming_slices(self) -> List[Slice]:
         return self.__fixed_slices
 
     @property
@@ -80,6 +82,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon[_V], Generic[_V]):
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter):
         app_vertex = self._governed_app_vertex
+        assert self.__lp is not None, "app vertex is not set"
         for vertex_slice in self.__fixed_slices:
             sdram = self.__lp.get_sdram_used_by_atoms(vertex_slice)
             chip_counter.add_core(sdram)

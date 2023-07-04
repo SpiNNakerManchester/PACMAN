@@ -137,9 +137,13 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     @overrides(ApplicationVirtualVertex.get_outgoing_link_data)
     def get_outgoing_link_data(self, machine: Machine) -> FPGALinkData:
-        if self._outgoing_fpga_connection is None:
-            raise NotImplementedError("This vertex doesn't have outgoing data")
         fpga = self._outgoing_fpga_connection
+        if fpga is None:
+            raise NotImplementedError("This vertex doesn't have outgoing data")
+        if not fpga.is_concrete:
+            raise NotImplementedError(
+                "This vertex doesn't have a concrete outgoing link")
+        assert fpga.fpga_id is not None and fpga.fpga_link_id is not None
         return machine.get_fpga_link_with_id(
             fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
             fpga.chip_coords)

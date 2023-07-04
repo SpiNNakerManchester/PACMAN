@@ -56,7 +56,7 @@ def params(request):
     return request.param
 
 
-class TestSplitter(AbstractSplitterCommon):
+class MockSplitter(AbstractSplitterCommon):
 
     def __init__(self, n_machine_vertices):
         super().__init__()
@@ -90,7 +90,7 @@ class TestSplitter(AbstractSplitterCommon):
         pass
 
 
-class TestMultiInputSplitter(AbstractSplitterCommon):
+class MockMultiInputSplitter(AbstractSplitterCommon):
 
     def __init__(self, n_incoming_machine_vertices,
                  n_outgoing_machine_vertices, n_groups,
@@ -178,7 +178,7 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
         return self.__same_chip_groups
 
 
-class TestOneToOneSplitter(AbstractSplitterCommon):
+class MockOneToOneSplitter(AbstractSplitterCommon):
 
     def __init__(self, n_machine_vertices):
         super().__init__()
@@ -220,7 +220,7 @@ class TestOneToOneSplitter(AbstractSplitterCommon):
                 self.governed_app_vertex.machine_vertices)]
 
 
-class TestNearestEthernetSplitter(AbstractSplitterCommon):
+class MockNearestEthernetSplitter(AbstractSplitterCommon):
 
     def __init__(self):
         super().__init__()
@@ -272,9 +272,9 @@ class TestNearestEthernetSplitter(AbstractSplitterCommon):
         return self.__placements
 
 
-class TestAppVertex(ApplicationVertex):
+class MockAppVertex(ApplicationVertex):
     def __init__(self, n_atoms, label):
-        super(TestAppVertex, self).__init__(label)
+        super(MockAppVertex, self).__init__(label)
         self.__n_atoms = n_atoms
 
     @property
@@ -283,24 +283,24 @@ class TestAppVertex(ApplicationVertex):
 
 
 def _make_vertices(writer, n_atoms, n_machine_vertices, label):
-    vertex = TestAppVertex(n_atoms, label)
-    vertex.splitter = TestSplitter(n_machine_vertices)
+    vertex = MockAppVertex(n_atoms, label)
+    vertex.splitter = MockSplitter(n_machine_vertices)
     writer.add_vertex(vertex)
     vertex.splitter.create_machine_vertices(None)
     return vertex
 
 
 def _make_one_to_one_vertices(writer, n_atoms, n_machine_vertices, label):
-    vertex = TestAppVertex(n_atoms, label)
-    vertex.splitter = TestOneToOneSplitter(n_machine_vertices)
+    vertex = MockAppVertex(n_atoms, label)
+    vertex.splitter = MockOneToOneSplitter(n_machine_vertices)
     writer.add_vertex(vertex)
     vertex.splitter.create_machine_vertices(None)
     return vertex
 
 
 def _make_ethernet_vertices(writer, n_atoms, label):
-    vertex = TestAppVertex(n_atoms, label)
-    vertex.splitter = TestNearestEthernetSplitter()
+    vertex = MockAppVertex(n_atoms, label)
+    vertex.splitter = MockNearestEthernetSplitter()
     writer.add_vertex(vertex)
     vertex.splitter.create_machine_vertices(None)
     return vertex
@@ -309,8 +309,8 @@ def _make_ethernet_vertices(writer, n_atoms, label):
 def _make_vertices_split(
         writer, n_atoms, n_incoming, n_outgoing, n_groups, label,
         internal_multicast=False):
-    vertex = TestAppVertex(n_atoms, label)
-    vertex.splitter = TestMultiInputSplitter(
+    vertex = MockAppVertex(n_atoms, label)
+    vertex.splitter = MockMultiInputSplitter(
         n_incoming, n_outgoing, n_groups, internal_multicast)
     writer.add_vertex(vertex)
     vertex.splitter.create_machine_vertices(None)

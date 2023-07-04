@@ -48,11 +48,11 @@ class _NodeInfo(object):
     __slots__ = ("neighbours", "weights")
 
     def __init__(self) -> None:
-        self.neighbours: List[Link] = list()
+        self.neighbours: List[Optional[Link]] = list()
         self.weights: List[float] = list()
 
     @property
-    def neighweights(self) -> Iterable[Tuple[Link, float]]:
+    def neighweights(self) -> Iterable[Tuple[Optional[Link], float]]:
         return zip(self.neighbours, self.weights)
 
 
@@ -128,8 +128,7 @@ class _BasicDijkstraRouting(object):
     def __vertex_and_route(tgt) -> Tuple[
             Chip, Tuple[MachineVertex, _OptInt, _OptInt]]:
         xy, details = vertex_xy_and_route(tgt)
-        chip = PacmanDataView.get_machine().get_chip_at(*xy)
-        return chip, details
+        return PacmanDataView.get_chip_at(*xy), details
 
     def _route(self, partition: ApplicationEdgePartition,
                node_info: Dict[Chip, _NodeInfo],
@@ -339,11 +338,8 @@ class _BasicDijkstraRouting(object):
 
     @staticmethod
     def __get_neighbour_destination(neighbour: Link) -> Optional[Chip]:
-        m = PacmanDataView.get_machine()
-        if m.is_chip_at(neighbour.destination_x, neighbour.destination_y):
-            return m.get_chip_at(
-                neighbour.destination_x, neighbour.destination_y)
-        return None
+        return PacmanDataView.get_machine().get_chip_at(
+            neighbour.destination_x, neighbour.destination_y)
 
     def _update_neighbour(
             self, tables: Dict[Chip, _DijkstraInfo], neighbour: Link,

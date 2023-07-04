@@ -14,6 +14,7 @@
 
 from contextlib import AbstractContextManager
 from dataclasses import dataclass
+import platform
 from typing import Any, Callable, Dict, List, NewType, Union, Tuple
 from spinn_utilities.typing.coords import XY
 
@@ -38,17 +39,29 @@ class Spinner:
          Dict[XY, Colour], List[XY]], None]
     create_torus: Callable[[int, int], _Boards]
 
+    @staticmethod
+    def import_api() -> 'Spinner':
+        # spinner as graphical library so
+        # pylint: disable=import-error
+
+        # Depends on Cairo, which is virtually never there on Windows.
+        # We could catch the OSError, but that's very noisy in this case
+        if platform.platform().lower().startswith("windows"):
+            raise ImportError("SpiNNer not supported on Windows")
+
+        from spinner.scripts.contexts import (  # type: ignore
+            PNGContextManager)
+        from spinner.diagrams.machine_map import (  # type: ignore
+            get_machine_map_aspect_ratio, draw_machine_map)
+        from spinner.board import create_torus  # type: ignore
+        return Spinner(PNGContextManager, get_machine_map_aspect_ratio,
+                       draw_machine_map, create_torus)
+
 
 #: Either we get the API to SpiNNer, or we have an error
 spinner_api: Union[Spinner, ImportError]
 
 try:
-    # spinner as graphical library so
-    # pylint: disable=import-error
-    from spinner.scripts.contexts import PNGContextManager as _PCM
-    from spinner.diagrams.machine_map import (
-        get_machine_map_aspect_ratio as _ar, draw_machine_map as _draw)
-    from spinner.board import create_torus as _ct
-    _spinner_api = Spinner(_PCM, _ar, _draw, _ct)
+    spinner_api = Spinner.import_api()
 except ImportError as _e:
     spinner_api = _e

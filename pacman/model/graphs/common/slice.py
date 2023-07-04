@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Tuple, Union
+from typing import Tuple, Union
 import numpy
 from pacman.exceptions import PacmanValueError, PacmanTypeError
 
@@ -81,7 +81,7 @@ class Slice(object):
         return self._n_atoms
 
     @property
-    def shape(self) -> Tuple[int]:
+    def shape(self) -> Tuple[int, ...]:
         """
         The shape of the atoms over multiple dimensions.
         By default the shape will be 1-dimensional.
@@ -91,14 +91,14 @@ class Slice(object):
         return (self._n_atoms, )
 
     @property
-    def start(self) -> Tuple[int]:
+    def start(self) -> Tuple[int, ...]:
         """
         The start coordinates of the slice.
         By default this will be `lo_atom` in 1 dimension.
 
         :rtype: tuple(int,...)
         """
-        return (self._lo_atom,)
+        return (self._lo_atom, )
 
     @property
     def as_slice(self) -> slice:
@@ -128,7 +128,7 @@ class Slice(object):
         raise IndexError(f"{n} is invalid for a 1 dimension Slice ")
 
     @property
-    def dimension(self) -> Tuple[slice]:
+    def dimension(self) -> Tuple[slice, ...]:
         """
         Get directions or edges as slices for every dimension
 
@@ -141,7 +141,7 @@ class Slice(object):
         return (slice(self._lo_atom, self._lo_atom + self._n_atoms), )
 
     @property
-    def end(self) -> Tuple[int]:
+    def end(self) -> Tuple[int, ...]:
         """
         The end positions of the slice in each dimension
 
@@ -149,7 +149,7 @@ class Slice(object):
         """
         return (self._lo_atom + self._n_atoms, )
 
-    def get_ids_as_slice_or_list(self) -> Union[slice, List[int]]:
+    def get_ids_as_slice_or_list(self) -> Union[slice, numpy.ndarray]:
         """
         Returns the IDs as a built-in slice if possible,
         otherwise as a list of IDs.

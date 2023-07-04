@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Generic, List, Optional, TypeVar
+from typing import Generic, List, TypeVar
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
@@ -23,7 +23,9 @@ from pacman.utilities.utility_objs import ChipCounter
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from .abstract_splitter_common import AbstractSplitterCommon
+#: :meta private:
 MV = TypeVar("MV", bound=MachineVertex)
+#: :meta private:
 AV = TypeVar("AV", bound=AbstractOneAppOneMachineVertex)
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -49,12 +51,16 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon[AV], Generic[AV, MV]):
             self._governed_app_vertex.machine_vertex.sdram_required)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
-    def get_out_going_slices(self) -> List[Optional[Slice]]:
-        return [self._governed_app_vertex.machine_vertex.vertex_slice]
+    def get_out_going_slices(self) -> List[Slice]:
+        if self._governed_app_vertex.machine_vertex.vertex_slice:
+            return [self._governed_app_vertex.machine_vertex.vertex_slice]
+        return []
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
-    def get_in_coming_slices(self) -> List[Optional[Slice]]:
-        return [self._governed_app_vertex.machine_vertex.vertex_slice]
+    def get_in_coming_slices(self) -> List[Slice]:
+        if self._governed_app_vertex.machine_vertex.vertex_slice:
+            return [self._governed_app_vertex.machine_vertex.vertex_slice]
+        return []
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id: str) -> List[MV]:

@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Generic, Iterable, TypeVar, TYPE_CHECKING
+from typing import (
+    Generic, Iterable, Tuple, Type, TypeVar, Union, TYPE_CHECKING)
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractEdgePartition
 if TYPE_CHECKING:
-    from .abstract_vertex import AbstractVertex
-    from .abstract_edge import AbstractEdge
-    V = TypeVar("V", bound=AbstractVertex)
-    E = TypeVar("E", bound=AbstractEdge)
-else:
-    V = TypeVar("V")
-    E = TypeVar("E")
+    from .abstract_vertex import AbstractVertex  # @UnusedImport
+    from .abstract_edge import AbstractEdge  # @UnusedImport
+#: :meta private:
+V = TypeVar("V", bound='AbstractVertex')
+#: :meta private:
+E = TypeVar("E", bound='AbstractEdge')
 
 
 class AbstractSingleSourcePartition(
@@ -37,7 +37,8 @@ class AbstractSingleSourcePartition(
         "_pre_vertex", )
 
     def __init__(
-            self, pre_vertex: V, identifier: str, allowed_edge_types: type[E]):
+            self, pre_vertex: V, identifier: str,
+            allowed_edge_types: Union[Type[E], Tuple[Type[E], ...]]):
         super().__init__(
             identifier=identifier, allowed_edge_types=allowed_edge_types)
         self._pre_vertex = pre_vertex

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import List, Optional, TYPE_CHECKING
-from spinn_utilities.abstract_base import abstractmethod, abstractproperty
+from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.require_subclass import require_subclass
 from pacman.model.graphs import AbstractVertex
 if TYPE_CHECKING:
@@ -36,7 +36,8 @@ class AbstractVirtual(object):
 
     __slots__ = ()
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def board_address(self) -> Optional[str]:
         """
         The IP address of the board to which the device is connected,
@@ -46,7 +47,8 @@ class AbstractVirtual(object):
         :rtype: str or None
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def linked_chip_coordinates(self) -> Optional[XY]:
         """
         The coordinates of the chip to which the device is connected,
@@ -64,7 +66,8 @@ class AbstractVirtual(object):
         :rtype: list(~pacman.model.routing_info.BaseKeyAndMask) or None
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def incoming(self) -> bool:
         """
         Whether this device sends traffic into SpiNNaker.
@@ -72,7 +75,8 @@ class AbstractVirtual(object):
         :rtype: bool
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def outgoing(self) -> bool:
         """
         Whether this device receives traffic from SpiNNaker.

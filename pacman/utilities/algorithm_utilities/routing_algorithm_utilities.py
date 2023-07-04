@@ -600,10 +600,9 @@ def vertex_chip(vertex: MachineVertex) -> Chip:
     machine = PacmanDataView.get_machine()
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)
-        return machine.get_chip_at(placement.x, placement.y)
+        return machine[placement.x, placement.y]
     link_data = vertex.get_link_data(machine)
-    return machine.get_chip_at(
-        link_data.connected_chip_x, link_data.connected_chip_y)
+    return machine[link_data.connected_chip_x, link_data.connected_chip_y]
 
 
 def vertex_xy_and_route(vertex: MachineVertex) -> Tuple[

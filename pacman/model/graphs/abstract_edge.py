@@ -13,8 +13,10 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import Generic, Optional, TypeVar
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
-from pacman.model.graphs.abstract_vertex import AbstractVertex
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from .abstract_vertex import AbstractVertex
+
+#: :meta private:
 V = TypeVar("V", bound=AbstractVertex)
 
 
@@ -25,7 +27,8 @@ class AbstractEdge(Generic[V], metaclass=AbstractBase):
 
     __slots__ = ()
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def label(self) -> Optional[str]:
         """
         The label of the edge.
@@ -33,7 +36,8 @@ class AbstractEdge(Generic[V], metaclass=AbstractBase):
         :rtype: str
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def pre_vertex(self) -> V:
         """
         The vertex at the start of the edge.
@@ -41,7 +45,8 @@ class AbstractEdge(Generic[V], metaclass=AbstractBase):
         :rtype: ~pacman.model.graphs.AbstractVertex
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def post_vertex(self) -> V:
         """
         The vertex at the end of the edge.

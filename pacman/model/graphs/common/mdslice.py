@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Collection, Union
+from typing import Tuple, Union
 import numpy
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanValueError
@@ -27,8 +27,8 @@ class MDSlice(Slice):
     __slots__ = ("_shape", "_start", "_atoms_shape")
 
     def __init__(
-            self, lo_atom: int, hi_atom: int, shape: Collection[int],
-            start: Collection[int], atoms_shape: Collection[int]):
+            self, lo_atom: int, hi_atom: int, shape: Tuple[int, ...],
+            start: Tuple[int, ...], atoms_shape: Tuple[int, ...]):
         """
         :param int lo_atom: Index of the lowest atom to represent.
         :param int hi_atom: Index of the highest atom to represent.
@@ -62,12 +62,12 @@ class MDSlice(Slice):
 
     @property
     @overrides(Slice.shape)
-    def shape(self) -> Collection[int]:
+    def shape(self) -> Tuple[int, ...]:
         return self._shape
 
     @property
     @overrides(Slice.start)
-    def start(self) -> Collection[int]:
+    def start(self) -> Tuple[int, ...]:
         return self._start
 
     @property
@@ -92,12 +92,12 @@ class MDSlice(Slice):
 
     @property
     @overrides(Slice.dimension)
-    def dimension(self) -> Collection[slice]:
+    def dimension(self) -> Tuple[slice, ...]:
         return tuple(self.get_slice(n) for n in range(len(self.shape)))
 
     @property
     @overrides(Slice.end)
-    def end(self) -> Collection[int]:
+    def end(self) -> Tuple[int, ...]:
         return tuple((numpy.array(self.start) + numpy.array(self.shape)) - 1)
 
     @overrides(Slice.get_ids_as_slice_or_list)
@@ -112,20 +112,20 @@ class MDSlice(Slice):
             tuple(reversed(self._atoms_shape)))
         return ids[slices].flatten()
 
-    def __str__(self):
+    def __str__(self) -> str:
         value = ""
         for a_slice in self.dimension:
             value += f"({a_slice.start}:{a_slice.stop})"
         return f"{self.lo_atom}{self._atoms_shape}{value}"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if not isinstance(other, MDSlice):
             return False
         if not super().__eq__(other):
             return False
         return self._atoms_shape == other._atoms_shape
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         # Slices will generally only be hashed in sets for the same Vertex
         return self._lo_atom
 

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import Iterable, Optional, TYPE_CHECKING
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
@@ -126,7 +126,8 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         else:
             return f"MachineVertex({self.label})"
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def sdram_required(self) -> AbstractSDRAM:
         """
         The SDRAM space required by the vertex.

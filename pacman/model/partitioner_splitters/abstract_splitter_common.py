@@ -20,6 +20,9 @@ from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import (
     MachineVertex, MulticastEdgePartition, AbstractSDRAMPartition)
 from pacman.model.resources import AbstractSDRAM
+
+#: The type of vertex that we split.
+#: :meta private:
 V = TypeVar("V", bound=ApplicationVertex)
 
 

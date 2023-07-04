@@ -13,14 +13,14 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import Any, Optional, TextIO
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class AbstractSDRAM(object, metaclass=AbstractBase):
     """
     Represents an amount of SDRAM used on a chip in the machine.
     """
+    __slots__ = ()
 
     @abstractmethod
     def get_total_sdram(self, n_timesteps: Optional[int]) -> int:
@@ -61,13 +61,15 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         :rtype: AbstractSDRAM
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def fixed(self) -> int:
         """
         The fixed SDRAM cost.
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def per_timestep(self) -> float:
         """
         The extra SDRAM cost for each additional timestep.

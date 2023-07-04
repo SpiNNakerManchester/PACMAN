@@ -167,7 +167,7 @@ class _PairCompressor(AbstractCompressor):
         self._max_index = 0
         self._previous_index = 0
         self._remaining_index = 0
-        self._routes: List[RTEntry] = []
+        self._routes: List[int] = []
         self._routes_frequency: List[int] = []
         self._routes_count = 0
 
@@ -300,7 +300,7 @@ class _PairCompressor(AbstractCompressor):
         self._all_entries = []
         self._routes_count = 0
         # Imitate creating fixed size arrays
-        self._routes = router_table.number_of_entries * [None]
+        self._routes = router_table.number_of_entries * [0]
         self._routes_frequency = router_table.number_of_entries * [0]
 
         for entry in router_table.multicast_routing_entries:
@@ -309,9 +309,11 @@ class _PairCompressor(AbstractCompressor):
             self._update_frequency(entry)
 
         # Use built-in sorting; much simpler
-        self._routes_frequency, self._routes = cast(Tuple, zip(*sorted(
-            zip(self._routes_frequency, self._routes),
-            key=lambda x: -x[0])))
+        self._routes_frequency, self._routes = cast(
+            Tuple[List[int], List[int]],
+            zip(*sorted(
+                zip(self._routes_frequency, self._routes),
+                key=lambda x: -x[0])))
         self._all_entries.sort(key=functools.cmp_to_key(self._compare_entries))
 
         self._write_index = 0

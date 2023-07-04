@@ -131,7 +131,10 @@ def place_application_graph(system_placements: Placements) -> Placements:
     return placements
 
 
-def _place_error(placements, system_placements, exception, plan_n_timesteps):
+def _place_error(
+        placements: Placements, system_placements: Placements,
+        exception: Exception,
+        plan_n_timesteps: Optional[int]) -> PacmanPlaceException:
     """
     :param Placements placements:
     :param Placements system_placements:
@@ -204,7 +207,7 @@ def _place_error(placements, system_placements, exception, plan_n_timesteps):
             n_placed = placements.n_placements_on_chip(x, y)
             system_placed = system_placements.n_placements_on_chip(x, y)
             if n_placed - system_placed == 0:
-                n_procs = machine.get_chip_at(x, y).n_user_processors
+                n_procs = machine[x, y].n_user_processors
                 f.write(f"    {x}, {y} ({n_procs - system_placed}"
                         " free cores)\n")
 
@@ -277,12 +280,10 @@ def _do_fixed_location(
     :rtype: bool
     :raise PacmanConfigurationException:
     """
-    x = None
-    y = None
     for vertex in vertices:
-        if vertex.get_fixed_location():
-            x = vertex.get_fixed_location().x
-            y = vertex.get_fixed_location().y
+        loc = vertex.get_fixed_location()
+        if loc:
+            x, y = loc.x, loc.y
             break
     else:
         return False
@@ -299,15 +300,14 @@ def _do_fixed_location(
     next_cores = iter(cores)
     for vertex in vertices:
         next_core = None
-        if vertex.get_fixed_location():
-            fixed = vertex.get_fixed_location()
-            if fixed.p is not None:
-                if fixed.p not in next_cores:
-                    raise PacmanConfigurationException(
-                        f"Core {fixed.p} on {x}, {y} not available to "
-                        f"place {vertex} on")
-                next_core = fixed.p
-        if next_core is None:
+        fixed = vertex.get_fixed_location()
+        if fixed and fixed.p is not None:
+            if fixed.p not in next_cores:
+                raise PacmanConfigurationException(
+                    f"Core {fixed.p} on {x}, {y} not available to "
+                    f"place {vertex} on")
+            next_core = fixed.p
+        else:
             try:
                 next_core = next(next_cores)
             except StopIteration:
@@ -465,9 +465,8 @@ class _Spaces(object):
         :rtype set(Chip)
         """
         for link in chip.router.links:
-            target = self.__machine.get_chip_at(
-                link.destination_x, link.destination_y)
-            if target is not None and target not in self.__used_chips:
+            target = self.__machine[link.destination_x, link.destination_y]
+            if target not in self.__used_chips:
                 yield target
 
     def save_chips(self, chips: Iterable[Chip]):

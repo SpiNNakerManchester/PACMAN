@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Any, Iterable
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractproperty, abstractmethod)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_machine import Chip
 from pacman.data.pacman_data_view import PacmanDataView
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
@@ -24,7 +23,8 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
     A multicast routing table. May be compressed or uncompressed.
     """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def x(self) -> int:
         """
         The X-coordinate of the chip of this table.
@@ -32,7 +32,8 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def y(self) -> int:
         """
         The Y-coordinate of the chip of this table.
@@ -49,7 +50,8 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         """
         return PacmanDataView.get_chip_at(self.x, self.y)
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def multicast_routing_entries(self) -> Iterable[MulticastRoutingEntry]:
         """
         The multicast routing entries in the table.
@@ -57,7 +59,8 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def number_of_entries(self) -> int:
         """
         The number of multicast routing entries there are in the
@@ -66,7 +69,8 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def number_of_defaultable_entries(self) -> int:
         """
         The number of multicast routing entries that are set to be

@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Collection, Dict, Generic, Iterable, TypeVar
+from typing import Collection, Dict, Generic, Tuple, Type, TypeVar, Union
 from collections import defaultdict
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException, PacmanValueError
 from pacman.model.graphs import (
     AbstractVertex, AbstractEdge, AbstractEdgePartition)
+#: :meta private:
 V = TypeVar("V", bound=AbstractVertex)
+#: :meta private:
 E = TypeVar("E", bound=AbstractEdge)
 
 
@@ -35,7 +37,7 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
 
     def __init__(
             self, pre_vertices: Collection[V], identifier: str,
-            allowed_edge_types: type[E]):
+            allowed_edge_types: Union[Type[E], Tuple[Type[E], ...]]):
         super().__init__(
             identifier=identifier, allowed_edge_types=allowed_edge_types)
         self._pre_vertices: Dict[V, OrderedSet[E]] = dict()
@@ -57,7 +59,7 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
             raise PacmanValueError(
                 f"The edge {edge} is not allowed in this outgoing partition")
 
-        super(AbstractMultiplePartition, self).add_edge(edge)
+        super().add_edge(edge)
 
         # update
         self._pre_vertices[edge.pre_vertex].add(edge)
@@ -65,5 +67,5 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
 
     @property
     @overrides(AbstractEdgePartition.pre_vertices)
-    def pre_vertices(self) -> Iterable[V]:
+    def pre_vertices(self) -> Collection[V]:
         return self._pre_vertices.keys()

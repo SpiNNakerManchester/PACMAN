@@ -15,10 +15,9 @@ from __future__ import annotations
 import logging
 import numpy
 from typing import (
-    Collection, Generic, Optional, Tuple, TypeVar, Union,
-    cast, TYPE_CHECKING)
+    Collection, Generic, Optional, Tuple, TypeVar, Union, TYPE_CHECKING)
 from typing_extensions import Self
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import (
@@ -30,13 +29,12 @@ if TYPE_CHECKING:
     from pacman.model.routing_info import BaseKeyAndMask
     from .application_edge import ApplicationEdge
     from .application_edge_partition import ApplicationEdgePartition
-    _MV = TypeVar("_MV", bound=MachineVertex)
-else:
-    _MV = TypeVar("_MV")
+#: :meta private:
+MV = TypeVar("MV", bound='MachineVertex')
 logger = FormatAdapter(logging.getLogger(__file__))
 
 
-class ApplicationVertex(AbstractVertex, Generic[_MV], metaclass=AbstractBase):
+class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
     """
     A vertex that can be broken down into a number of smaller vertices
     based on the resources that the vertex requires.
@@ -60,8 +58,7 @@ class ApplicationVertex(AbstractVertex, Generic[_MV], metaclass=AbstractBase):
 
     def __init__(
             self, label: Optional[str] = None,
-            max_atoms_per_core: Union[
-                int, Tuple[int], Tuple[int, int], None] = None,
+            max_atoms_per_core: Union[int, Tuple[int, ...], None] = None,
             splitter: Optional[AbstractSplitterCommon[Self]] = None):
         """
         :param str label: The optional name of the vertex.
@@ -79,13 +76,12 @@ class ApplicationVertex(AbstractVertex, Generic[_MV], metaclass=AbstractBase):
         # Need to set to None temporarily as add_constraint checks splitter
         self._splitter = None
         super().__init__(label)
-        self._machine_vertices: OrderedSet[_MV] = OrderedSet()
+        self._machine_vertices: OrderedSet[MV] = OrderedSet()
         if splitter:
             # Use setter as there is extra work to do
             self.splitter = splitter
         # Keep the name for simplicity but move to new internal representation
-        self._max_atoms_per_dimension_per_core: Union[
-            Tuple[int], Tuple[int, int], None]
+        self._max_atoms_per_dimension_per_core: Optional[Tuple[int, ...]]
         if isinstance(max_atoms_per_core, int):
             self._max_atoms_per_dimension_per_core = (max_atoms_per_core, )
         else:
@@ -138,7 +134,7 @@ class ApplicationVertex(AbstractVertex, Generic[_MV], metaclass=AbstractBase):
         self._splitter = new_value
         self._splitter.set_governed_app_vertex(self)
 
-    def remember_machine_vertex(self, machine_vertex: _MV):
+    def remember_machine_vertex(self, machine_vertex: MV):
         """
         Adds the machine vertex to the iterable returned by machine_vertices
 
@@ -149,7 +145,7 @@ class ApplicationVertex(AbstractVertex, Generic[_MV], metaclass=AbstractBase):
         self._machine_vertices.add(machine_vertex)
 
     @property
-    def atoms_shape(self) -> Union[Tuple[int], Tuple[int, int]]:
+    def atoms_shape(self) -> Tuple[int, ...]:
         """
         The "shape" of the atoms in the vertex i.e. how the atoms are split
         between the dimensions of the vertex.  By default everything is
@@ -160,7 +156,8 @@ class ApplicationVertex(AbstractVertex, Generic[_MV], metaclass=AbstractBase):
         """
         return (self.n_atoms,)
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def n_atoms(self) -> int:
         """
         The number of atoms in the vertex.
@@ -196,7 +193,7 @@ class ApplicationVertex(AbstractVertex, Generic[_MV], metaclass=AbstractBase):
             label, n_atoms, f"int value expected for {label}")
 
     @property
-    def machine_vertices(self) -> Collection[_MV]:
+    def machine_vertices(self) -> Collection[MV]:
         """
         The machine vertices that this application vertex maps to.
 
@@ -216,7 +213,7 @@ class ApplicationVertex(AbstractVertex, Generic[_MV], metaclass=AbstractBase):
             return self.n_atoms
         return int(numpy.prod(self._max_atoms_per_dimension_per_core))
 
-    def get_max_atoms_per_dimension_per_core(self) -> tuple:
+    def get_max_atoms_per_dimension_per_core(self) -> Tuple[int, ...]:
         """
         Gets the maximum number of atoms per dimension per core.  This
         will return a tuple with a number for each dimension of the vertex,
@@ -226,10 +223,10 @@ class ApplicationVertex(AbstractVertex, Generic[_MV], metaclass=AbstractBase):
         """
         if self._max_atoms_per_dimension_per_core is None:
             return self.atoms_shape
-        return cast(tuple, self._max_atoms_per_dimension_per_core)
+        return self._max_atoms_per_dimension_per_core
 
     def set_max_atoms_per_dimension_per_core(
-            self, new_value: Union[int, Tuple[int], Tuple[int, int]]):
+            self, new_value: Union[None, int, Tuple[int, ...]]):
         """
         Set the maximum number of atoms per dimension per core.
 
@@ -244,14 +241,14 @@ class ApplicationVertex(AbstractVertex, Generic[_MV], metaclass=AbstractBase):
         :type new_value: None or int or tuple(int,...)
         """
         if isinstance(new_value, int):
-            self._max_atoms_per_dimension_per_core = (new_value, )
+            mapdpc: Optional[Tuple[int, ...]] = (new_value, )
         else:
-            self._max_atoms_per_dimension_per_core = new_value
-        if (len(self._max_atoms_per_dimension_per_core) !=
-                len(self.atoms_shape)):
+            mapdpc = new_value
+        if mapdpc is not None and len(mapdpc) != len(self.atoms_shape):
             raise ValueError(
                 "The number of dimensions of new_value must be the same as the"
                 " number of dimensions of atoms_shape")
+        self._max_atoms_per_dimension_per_core = mapdpc
 
     def reset(self) -> None:
         """

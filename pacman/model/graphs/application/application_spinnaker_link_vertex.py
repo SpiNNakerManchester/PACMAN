@@ -125,8 +125,10 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
     def get_outgoing_link_data(self, machine: Machine) -> SpinnakerLinkData:
         if not self._outgoing:
             raise NotImplementedError("This vertex doesn't have outgoing data")
-        return machine.get_spinnaker_link_with_id(
+        link = machine.get_spinnaker_link_with_id(
             self._spinnaker_link_id, self._board_address)
+        assert link is not None, f"no link data for {self} on {machine}"
+        return link
 
     @overrides(ApplicationVirtualVertex.get_max_atoms_per_core)
     def get_max_atoms_per_core(self) -> int:

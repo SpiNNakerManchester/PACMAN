@@ -13,7 +13,7 @@
 # limitations under the License.
 import math
 from typing import Tuple
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
 from spinn_utilities.typing.coords import XY
 from pacman.exceptions import PacmanConfigurationException
@@ -39,7 +39,8 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         override `_key_shift`.
     """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _width(self) -> int:
         """
         The width of the device.
@@ -47,7 +48,8 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _height(self) -> int:
         """
         The height of the device.
@@ -55,7 +57,8 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _sub_width(self) -> int:
         """
         The width of the sub-rectangles to divide the input into.
@@ -63,7 +66,8 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _sub_height(self) -> int:
         """
         The height of the sub-rectangles to divide the input into.
@@ -71,7 +75,8 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     @overrides(ApplicationVertex.atoms_shape)
     def atoms_shape(self):
         pass
@@ -85,7 +90,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         return (v & (v - 1) == 0) and (v != 0)
 
-    def _verify_sub_size(self):
+    def _verify_sub_size(self) -> None:
         """
         Ensure the sub width and height are within restrictions.
         """

@@ -17,13 +17,11 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractSingleSourcePartition
 from .application_edge import ApplicationEdge
 if TYPE_CHECKING:
-    from .application_vertex import ApplicationVertex as AV
-else:
-    AV = object
+    from .application_vertex import ApplicationVertex
 
 
 class ApplicationEdgePartition(
-        AbstractSingleSourcePartition[AV, ApplicationEdge]):
+        AbstractSingleSourcePartition['ApplicationVertex', ApplicationEdge]):
     """
     A simple implementation of an application edge partition that will
     communicate using SpiNNaker multicast packets. They have the same
@@ -32,7 +30,7 @@ class ApplicationEdgePartition(
 
     __slots__ = ()
 
-    def __init__(self, identifier: str, pre_vertex: AV):
+    def __init__(self, identifier: str, pre_vertex: ApplicationVertex):
         """
         :param str identifier: The identifier of the partition
         :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:
