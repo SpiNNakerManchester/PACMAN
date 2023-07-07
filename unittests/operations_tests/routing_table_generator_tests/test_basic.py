@@ -34,7 +34,7 @@ from pacman_test_objects import SimpleTestVertex
 class TestBasic(unittest.TestCase):
 
     def setUp(self):
-        unittest_setup()
+        unittest_setup(board_type=1)
 
     def create_graphs3(self, writer):
         v1 = SimpleTestVertex(

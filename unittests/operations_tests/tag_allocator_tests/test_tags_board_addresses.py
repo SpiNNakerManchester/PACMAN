@@ -29,7 +29,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
     """ Tests for ip tags on different boards
     """
     def setUp(self):
-        unittest_setup()
+        unittest_setup(board_type=1)
 
     def test_ip_tags(self):
         writer = PacmanDataWriter.mock()

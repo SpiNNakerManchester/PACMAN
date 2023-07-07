@@ -36,7 +36,7 @@ from pacman_test_objects import SimpleTestVertex
 class TestMerged(unittest.TestCase):
 
     def setUp(self):
-        unittest_setup()
+        unittest_setup(board_type=1)
 
     def create_graphs1(self, writer):
         v1 = SimpleTestVertex(

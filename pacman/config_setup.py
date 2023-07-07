@@ -14,29 +14,42 @@
 
 import os
 from spinn_utilities.config_holder import (
-    add_default_cfg, clear_cfg_files)
+    add_default_cfg, clear_cfg_files, get_config_str)
 from spinn_machine.config_setup import add_spinn_machine_cfg
 from pacman.data.pacman_data_writer import PacmanDataWriter
 
 BASE_CONFIG_FILE = "pacman.cfg"
 
 
-def unittest_setup():
+def unittest_setup(board_type=None):
     """
     Resets the configurations so only the local default configuration is
     included.
 
     .. note::
         This file should only be called from `PACMAN/unittests`
+
+    :param board_type: Value to say how to confuire the system.
+        This includes defining what a VirtualMachine would be
+        Can be 1 for Spin1 boards, 2 for Spin2 boards or
+        None if the test do not depend on knowing the board type.
+    :type board_type: None or int
     """
     clear_cfg_files(True)
-    add_pacman_cfg()
     PacmanDataWriter.mock()
+    add_pacman_cfg(board_type)
+    get_config_str("Mapping", "placer_start_chip")
 
 
-def add_pacman_cfg():
+def add_pacman_cfg(board_type):
     """
     Add the local configuration and all dependent configuration files.
+
+    :param board_type: Value to say how to confuire the system.
+        This includes defining what a VirtualMachine would be
+        Can be 1 for Spin1 boards, 2 for Spin2 boards or
+        None if the test do not depend on knowing the board type.
+    :type board_type: None or int
     """
-    add_spinn_machine_cfg()  # This add its dependencies too
     add_default_cfg(os.path.join(os.path.dirname(__file__), BASE_CONFIG_FILE))
+    add_spinn_machine_cfg(board_type)  # This add its dependencies too
