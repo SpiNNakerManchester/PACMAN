@@ -13,8 +13,7 @@
 # limitations under the License.
 
 import os
-from spinn_utilities.config_holder import (
-    add_default_cfg, clear_cfg_files, get_config_str)
+from spinn_utilities.config_holder import add_default_cfg, clear_cfg_files
 from spinn_machine.config_setup import add_spinn_machine_cfg
 from pacman.data.pacman_data_writer import PacmanDataWriter
 
