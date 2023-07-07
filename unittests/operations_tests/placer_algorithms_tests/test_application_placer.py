@@ -134,7 +134,7 @@ def test_sdram_bigger_than_chip():
     writer = PacmanDataWriter.mock()
     chip_sdram = get_config_int("Machine", "max_sdram_allowed_per_chip")
     _make_vertices(writer, 1, 1, 5, "big_app_vertex",
-                   sdram=chip_sdram  + 24)
+                   sdram=chip_sdram + 24)
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")

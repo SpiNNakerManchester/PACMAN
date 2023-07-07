@@ -21,7 +21,7 @@ from pacman.data.pacman_data_writer import PacmanDataWriter
 BASE_CONFIG_FILE = "pacman.cfg"
 
 
-def unittest_setup(board_type=None):
+def unittest_setup(*, board_type=None):
     """
     Resets the configurations so only the local default configuration is
     included.
@@ -38,7 +38,6 @@ def unittest_setup(board_type=None):
     clear_cfg_files(True)
     PacmanDataWriter.mock()
     add_pacman_cfg(board_type)
-    get_config_str("Mapping", "placer_start_chip")
 
 
 def add_pacman_cfg(board_type):
