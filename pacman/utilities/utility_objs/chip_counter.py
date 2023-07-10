@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from spinn_utilities.config_holder import get_config_int
 from pacman.data import PacmanDataView
 
 
@@ -39,9 +40,10 @@ class ChipCounter(object):
         # The number of chips used, including the current one
         "__n_chips"]
 
-    def __init__(self, n_cores_per_chip=15, sdram_per_chip=100 * 1024 * 1024):
+    def __init__(self, n_cores_per_chip=15):
         self.__n_cores_per_chip = n_cores_per_chip
-        self.__sdram_per_chip = sdram_per_chip
+        self.__sdram_per_chip = get_config_int(
+            "Machine", "max_sdram_allowed_per_chip")
         self.__cores_free = 0
         self.__sdram_free = 0
         self.__n_chips = 0
