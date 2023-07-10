@@ -30,6 +30,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         :param int n_timesteps: number of timesteps to cost for
         :return:
         """
+        raise NotImplementedError
 
     @abstractmethod
     def __add__(self, other: AbstractSDRAM) -> AbstractSDRAM:
@@ -40,6 +41,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         :return: a New AbstractSDRAM
         :rtype: AbstractSDRAM
         """
+        raise NotImplementedError
 
     @abstractmethod
     def __sub__(self, other: AbstractSDRAM) -> AbstractSDRAM:
@@ -50,6 +52,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         :return: a New AbstractSDRAM
         :rtype: AbstractSDRAM
         """
+        raise NotImplementedError
 
     @abstractmethod
     def sub_from(self, other: AbstractSDRAM) -> AbstractSDRAM:
@@ -60,6 +63,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         :return: a New AbstractSDRAM
         :rtype: AbstractSDRAM
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -67,6 +71,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
         The fixed SDRAM cost.
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -77,6 +82,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         .. warning::
             May well be zero.
         """
+        raise NotImplementedError
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, AbstractSDRAM):
@@ -98,3 +104,4 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         :param file target: Where to write the output.
             ``None`` is standard print
         """
+        raise NotImplementedError

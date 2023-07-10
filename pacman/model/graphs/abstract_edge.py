@@ -35,6 +35,7 @@ class AbstractEdge(Generic[V], metaclass=AbstractBase):
 
         :rtype: str
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -44,6 +45,7 @@ class AbstractEdge(Generic[V], metaclass=AbstractBase):
 
         :rtype: ~pacman.model.graphs.AbstractVertex
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -53,3 +55,4 @@ class AbstractEdge(Generic[V], metaclass=AbstractBase):
 
         :rtype: ~pacman.model.graphs.AbstractVertex
         """
+        raise NotImplementedError

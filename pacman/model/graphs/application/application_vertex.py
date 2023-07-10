@@ -164,6 +164,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
 
         :rtype: int
         """
+        raise NotImplementedError
 
     def round_n_atoms(
             self, n_atoms: Union[int, float], label: str = "n_atoms") -> int:

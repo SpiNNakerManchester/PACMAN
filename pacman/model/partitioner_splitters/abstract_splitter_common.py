@@ -93,6 +93,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         :param ~pacman.utilities.utility_objs.ChipCounter chip_counter:
             counter of used chips
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_out_going_slices(self) -> List[Slice]:
@@ -102,6 +103,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         :return: list of Slices
         :rtype: list(~pacman.model.graphs.common.Slice)
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_in_coming_slices(self) -> List[Slice]:
@@ -111,6 +113,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         :return: list of Slices
         :rtype: list(~pacman.model.graphs.common.Slice)
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_out_going_vertices(self, partition_id: str) -> List[MachineVertex]:
@@ -123,6 +126,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         :param str partition_id: The identifier of the outgoing partition
         :rtype: list(~pacman.model.graphs.machine.MachineVertex)
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_in_coming_vertices(self, partition_id: str) -> List[MachineVertex]:
@@ -139,6 +143,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         :param str partition_id: The identifier of the incoming partition
         :rtype: list(~pacman.model.graphs.machine.MachineVertex)
         """
+        raise NotImplementedError
 
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
@@ -182,12 +187,14 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         :return: list of machine vertices
         :rtype: iterable(~pacman.model.graphs.machine.MachineVertex)
         """
+        raise NotImplementedError
 
     @abstractmethod
     def reset_called(self):
         """
         Reset the splitter to be as if it has not operated a splitting yet.
         """
+        raise NotImplementedError
 
     def get_same_chip_groups(self) -> List[
             Tuple[List[MachineVertex], AbstractSDRAM]]:

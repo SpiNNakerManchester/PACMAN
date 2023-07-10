@@ -33,3 +33,4 @@ class ApplicationVirtualVertex(ApplicationVertex):
             The machine to get the link data from
         :rtype: ~spinn_machine.link_data_objects.AbstractLinkData
         """
+        raise NotImplementedError

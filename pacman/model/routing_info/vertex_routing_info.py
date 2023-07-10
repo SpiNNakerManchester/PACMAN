@@ -109,3 +109,4 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
         :rtype: ApplicationVertex or MachineVertex
         """
+        raise NotImplementedError

@@ -77,6 +77,7 @@ class AbstractCompressor(object):
         :return: Raw compressed routing table entries for the same chip
         :rtype: list(RTEntry)
         """
+        raise NotImplementedError
 
     def compress_tables(
             self, router_tables: MulticastRoutingTables,

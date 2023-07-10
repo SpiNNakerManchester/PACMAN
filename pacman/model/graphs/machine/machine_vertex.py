@@ -134,6 +134,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
         :rtype: ~pacman.model.resources.AbstractSDRAM
         """
+        raise NotImplementedError
 
     @property
     def iptags(self) -> Iterable[IPtagResource]:

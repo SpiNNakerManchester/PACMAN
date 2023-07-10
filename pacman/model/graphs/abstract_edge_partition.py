@@ -130,3 +130,4 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
 
         :rtype: iterable(~pacman.model.graphs.AbstractVertex)
         """
+        raise NotImplementedError

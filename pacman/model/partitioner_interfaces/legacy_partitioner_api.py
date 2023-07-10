@@ -43,6 +43,7 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
             the low value of atoms to calculate resources from
         :rtype: ~pacman.model.resources.AbstractSDRAM
         """
+        raise NotImplementedError
 
     @abstractmethod
     def create_machine_vertex(
@@ -60,6 +61,7 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
         :return: The created machine vertex
         :rtype: ~pacman.model.graphs.machine.MachineVertex
         """
+        raise NotImplementedError
 
     @staticmethod
     def abstract_methods() -> FrozenSet[str]:

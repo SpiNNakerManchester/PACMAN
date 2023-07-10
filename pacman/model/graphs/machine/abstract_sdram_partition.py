@@ -28,6 +28,7 @@ class AbstractSDRAMPartition(object, metaclass=AbstractBase):
 
         :return: int
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -35,6 +36,7 @@ class AbstractSDRAMPartition(object, metaclass=AbstractBase):
         """
         The base address of the SDRAM piece used for communication.
         """
+        raise NotImplementedError
 
     @sdram_base_address.setter
     def sdram_base_address(self, new_value: int):
@@ -51,6 +53,7 @@ class AbstractSDRAMPartition(object, metaclass=AbstractBase):
         :return: the SDRAM address for this vertex
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_sdram_size_of_region_for(self, vertex: MachineVertex) -> int:
@@ -62,3 +65,4 @@ class AbstractSDRAMPartition(object, metaclass=AbstractBase):
         :return: the SDRAM size for this vertex
         :rtype: int
         """
+        raise NotImplementedError

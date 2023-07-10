@@ -39,3 +39,4 @@ class AbstractSupportsSDRAMEdges(object, metaclass=AbstractBase):
         :return: The size in bytes this vertex needs for the SDRAM edge.
         :rtype: int (most likely a multiple of 4)
         """
+        raise NotImplementedError

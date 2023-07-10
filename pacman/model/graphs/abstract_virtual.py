@@ -46,6 +46,7 @@ class AbstractVirtual(object):
 
         :rtype: str or None
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -56,6 +57,7 @@ class AbstractVirtual(object):
 
         :rtype: tuple(int, int) or None
         """
+        raise NotImplementedError
 
     @abstractmethod
     def outgoing_keys_and_masks(self) -> Optional[List[BaseKeyAndMask]]:
@@ -65,6 +67,7 @@ class AbstractVirtual(object):
 
         :rtype: list(~pacman.model.routing_info.BaseKeyAndMask) or None
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -74,6 +77,7 @@ class AbstractVirtual(object):
 
         :rtype: bool
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -83,6 +87,7 @@ class AbstractVirtual(object):
 
         :rtype: bool
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_link_data(self, machine: Machine) -> AbstractLinkData:
@@ -93,3 +98,4 @@ class AbstractVirtual(object):
             The machine to get the data from
         :rtype: ~spinn_machine.link_data_objects.AbstractLinkData
         """
+        raise NotImplementedError

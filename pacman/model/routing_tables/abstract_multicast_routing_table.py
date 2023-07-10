@@ -31,6 +31,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -40,6 +41,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @property
     def chip(self) -> Chip:
@@ -58,6 +60,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
         :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -68,6 +71,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -78,19 +82,23 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
     def __eq__(self, other: Any) -> bool:
         """equals method"""
+        raise NotImplementedError
 
-    @abstractmethod
     def __ne__(self, other: Any) -> bool:
-        """ not equals method"""
+        return not self.__eq__(other)
 
     @abstractmethod
     def __hash__(self) -> int:
         """hash"""
+        raise NotImplementedError
 
     @abstractmethod
     def __repr__(self) -> str:
-        """repr"""
+        entry_string = "\n".join(
+            str(entry) for entry in self.multicast_routing_entries)
+        return f"{self.x}:{self.y}\n\n{entry_string}\n"

@@ -131,16 +131,6 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
             return False
         return self._entries_by_key_mask == other._entries_by_key_mask
 
-    @overrides(AbstractMulticastRoutingTable.__ne__)
-    def __ne__(self, other: Any) -> bool:
-        return not self.__eq__(other)
-
-    @overrides(AbstractMulticastRoutingTable.__repr__)
-    def __repr__(self) -> str:
-        entry_string = "\n".join(
-            str(entry) for entry in self.multicast_routing_entries)
-        return f"{self._x}:{self._y}\n\n{entry_string}\n"
-
     @overrides(AbstractMulticastRoutingTable.__hash__)
     def __hash__(self) -> int:
         return id(self)

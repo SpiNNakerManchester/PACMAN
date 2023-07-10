@@ -47,6 +47,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -56,6 +57,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -65,6 +67,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -78,8 +81,8 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     @property
     @abstractmethod
     @overrides(ApplicationVertex.atoms_shape)
-    def atoms_shape(self):
-        pass
+    def atoms_shape(self) -> Tuple[int, ...]:
+        raise NotImplementedError
 
     def __is_power_of_2(self, v: int) -> bool:
         """

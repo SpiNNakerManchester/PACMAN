@@ -108,17 +108,6 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         return self._multicast_routing_entries == \
             other.multicast_routing_entries
 
-    @overrides(AbstractMulticastRoutingTable.__ne__)
-    def __ne__(self, other: Any) -> bool:
-        return not self.__eq__(other)
-
-    @overrides(AbstractMulticastRoutingTable.__repr__)
-    def __repr__(self) -> str:
-        entry_string = ""
-        for entry in self._multicast_routing_entries:
-            entry_string += f"{entry}\n"
-        return f"{self._x}:{self._y}\n\n{entry_string}"
-
     @overrides(AbstractMulticastRoutingTable.__hash__)
     def __hash__(self) -> int:
         return id(self)
