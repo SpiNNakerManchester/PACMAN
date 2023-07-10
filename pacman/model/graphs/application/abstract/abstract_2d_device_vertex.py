@@ -77,6 +77,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
