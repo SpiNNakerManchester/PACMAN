@@ -85,8 +85,7 @@ class _OrderedCoveringCompressor(AbstractCompressor):
         # Compress the router entries
         table, _ = ordered_covering(
             routing_table=routing_table, target_length=self.__target_length,
-            aliases={}, no_raise=True, use_timer_cut_off=False,
-            time_to_run_for=None)
+            aliases={}, no_raise=True, time_to_run_for=None)
         # Strip the defaultable routes
         return remove_default_routes(table, self.__target_length)
 
@@ -94,7 +93,7 @@ class _OrderedCoveringCompressor(AbstractCompressor):
 def ordered_covering(
         routing_table: List[RTEntry], target_length: Optional[int],
         aliases: _Aliases, *, no_raise: bool = False,
-        use_timer_cut_off: bool = False, time_to_run_for: Optional[int] = None
+        time_to_run_for: Optional[float] = None
         ) -> Tuple[List[RTEntry], _Aliases]:
     """
     Reduce the size of a routing table by merging together entries where
@@ -135,6 +134,9 @@ def ordered_covering(
         be minimised to be smaller than `target_length` and `target_length` is
         not `None`. If True then a table will be returned regardless of the
         size of the final table.
+    :param float time_to_run_for:
+        If supplied, a maximum number of seconds to run for before giving an
+        error. May only be obeyed approximately.
     :return: new routing table, A new _aliases dictionary.
     :rtype: tuple(list(RTEntry), dict(tuple(int,int), set(tuple(int,int))))
     :raises MinimisationFailedError:
@@ -164,7 +166,7 @@ def ordered_covering(
         routing_table = merge.apply(aliases)
 
         # control for limiting the search
-        if use_timer_cut_off:
+        if time_to_run_for is not None:
             diff = timer.take_sample()
             if diff.total_seconds() >= time_to_run_for:
                 raise MinimisationFailedError(

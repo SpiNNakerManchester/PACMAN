@@ -160,7 +160,10 @@ class TestPartition(unittest.TestCase):
         e2 = SDRAMMachineEdge(v2, v3, "foo")
         part.add_edge(e2)
         self.assertEqual(2, len(part.edges))
-        self.assertIsNone(part.sdram_base_address)
+        self.assertIsNone(part._sdram_base_address)
+        with self.assertRaises(PacmanConfigurationException):
+            # Can't read the address until it is set
+            _ = part.sdram_base_address
         self.assertIsNone(part.get_sdram_base_address_for(v1))
         part.sdram_base_address = 100
         self.assertEqual(100, part.sdram_base_address)
