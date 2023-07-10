@@ -97,7 +97,6 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         """hash"""
         raise NotImplementedError
 
-    @abstractmethod
     def __repr__(self) -> str:
         entry_string = "\n".join(
             str(entry) for entry in self.multicast_routing_entries)
