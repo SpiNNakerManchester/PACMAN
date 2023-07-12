@@ -228,7 +228,7 @@ def _check_could_fit(app_vertex, vertices_to_place, sdram):
     max_sdram = (
             Machine.DEFAULT_SDRAM_BYTES - PacmanDataView.get_monitor_sdram())
     max_cores = (
-            version.max_cores_per_chip - Machine.NON_USER_CORES -
+            version.max_cores_per_chip - version.n_non_user_cores -
             PacmanDataView.get_monitor_cores())
     n_cores = len(vertices_to_place)
     if sdram <= max_sdram and n_cores <= max_cores:
@@ -248,7 +248,7 @@ def _check_could_fit(app_vertex, vertices_to_place, sdram):
     if n_cores > version.max_cores_per_chip:
         message += " is more vertices than the number of cores on a chip."
         raise PacmanTooBigToPlace(message)
-    user_cores = version.max_cores_per_chip - Machine.NON_USER_CORES
+    user_cores = version.max_cores_per_chip - version.n_non_user_cores
     if n_cores > user_cores:
         message += (
             f"is more vertices than the user cores ({user_cores}) "
