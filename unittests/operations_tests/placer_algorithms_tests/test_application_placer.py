@@ -132,8 +132,9 @@ def test_application_placer_late_fixed():
 def test_sdram_bigger_than_chip():
     unittest_setup()
     writer = PacmanDataWriter.mock()
+    max_sdram = writer.get_machine_version().max_sdram_per_chip
     _make_vertices(writer, 1, 1, 5, "big_app_vertex",
-                   sdram=Machine.DEFAULT_SDRAM_BYTES + 24)
+                   sdram=max_sdram + 24)
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
@@ -144,13 +145,12 @@ def test_sdram_bigger_than_chip():
 def test_sdram_bigger_monitors():
     unittest_setup()
     writer = PacmanDataWriter.mock()
-    monitor = SimpleMachineVertex(
-                    ConstantSDRAM(Machine.DEFAULT_SDRAM_BYTES // 2))
+    max_sdram = writer.get_machine_version().max_sdram_per_chip
+    monitor = SimpleMachineVertex(ConstantSDRAM(max_sdram // 2))
     # This is purely an info call so test check directly
     writer.add_monitor_all_chips(monitor)
     try:
-        _check_could_fit("app_test", ["m_vertex]"],
-                         sdram=Machine.DEFAULT_SDRAM_BYTES // 2 + 5)
+        _check_could_fit("app_test", ["m_vertex]"], sdram=max_sdram // 2 + 5)
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
         assert ("after monitors only" in str(ex))
