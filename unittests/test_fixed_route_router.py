@@ -80,6 +80,7 @@ def _check_setup(width, height):
      (True, True)])
 def test_all_working(width, height,  with_down_links, with_down_chips):
     unittest_setup()
+    set_config("Machine", "version", 5)
     temp_machine = virtual_machine(width=width, height=height)
     down_links = None
     if with_down_links:
@@ -101,6 +102,7 @@ def test_all_working(width, height,  with_down_links, with_down_chips):
 
 def test_unreachable():
     unittest_setup()
+    set_config("Machine", "version", 5)
     set_config("Machine", "down_chips", "0,2:1,3:1,4")
     with pytest.raises(PacmanRoutingException):
         _check_setup(8, 8)

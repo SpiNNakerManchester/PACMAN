@@ -226,7 +226,7 @@ def _check_could_fit(app_vertex, vertices_to_place, sdram):
     """
     version = PacmanDataView.get_machine_version()
     max_sdram = (
-            Machine.DEFAULT_SDRAM_BYTES - PacmanDataView.get_monitor_sdram())
+            version.max_sdram_per_chip - PacmanDataView.get_monitor_sdram())
     max_cores = (
             version.max_cores_per_chip - version.n_non_user_cores -
             PacmanDataView.get_monitor_cores())
@@ -239,8 +239,8 @@ def _check_could_fit(app_vertex, vertices_to_place, sdram):
         f"the reason is that {vertices_to_place} ")
     if sdram > max_sdram:
         message += f"requires {sdram} bytes but "
-        if sdram > Machine.DEFAULT_SDRAM_BYTES:
-            message += f"a Chip only has {Machine.DEFAULT_SDRAM_BYTES} bytes "
+        if sdram > version.max_sdram_per_chip:
+            message += f"a Chip only has {version.max_sdram_per_chip} bytes "
         else:
             message += f"after monitors only {max_sdram} bytes are available "
         message += "Lowering max_core_per_chip may resolve this."
