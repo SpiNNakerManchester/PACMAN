@@ -14,6 +14,7 @@
 from __future__ import annotations
 from typing import Tuple, Union
 import numpy
+from numpy.typing import NDArray
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanValueError
 from .slice import Slice
@@ -105,7 +106,7 @@ class MDSlice(Slice):
         return self.get_raster_ids()
 
     @overrides(Slice.get_raster_ids)
-    def get_raster_ids(self) -> numpy.ndarray:
+    def get_raster_ids(self) -> NDArray[numpy.integer]:
         slices = tuple(self.get_slice(n)
                        for n in reversed(range(len(self.start))))
         ids = numpy.arange(numpy.prod(self._atoms_shape)).reshape(

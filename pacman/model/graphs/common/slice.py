@@ -14,6 +14,7 @@
 from __future__ import annotations
 from typing import Tuple, Union
 import numpy
+from numpy.typing import NDArray
 from pacman.exceptions import PacmanValueError, PacmanTypeError
 
 
@@ -159,7 +160,7 @@ class Slice(object):
         """
         return slice(self._lo_atom, self._lo_atom + self._n_atoms)
 
-    def get_raster_ids(self) -> numpy.ndarray:
+    def get_raster_ids(self) -> NDArray[numpy.integer]:
         """
         Get the IDs of the atoms in the slice as they would appear in a
         "raster scan" of the atoms over the whole shape.
