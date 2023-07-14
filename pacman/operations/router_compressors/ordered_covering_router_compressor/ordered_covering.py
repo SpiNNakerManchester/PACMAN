@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.config_holder import get_config_bool
-from spinn_machine import Machine
-from pacman.data import PacmanDataView
 from pacman.operations.router_compressors import Entry
 from pacman.exceptions import MinimisationFailedError
 from .remove_default_routes import remove_default_routes
@@ -24,7 +21,7 @@ from spinn_utilities.timer import Timer
 
 
 def minimise(
-        routing_table, use_timer_cut_off=False,
+        routing_table, target_length, use_timer_cut_off=False,
         time_to_run_for_before_raising_exception=None):
     """
     Reduce the size of a routing table by merging together entries where
@@ -46,6 +43,7 @@ def minimise(
 
     :param list(Entry) routing_table:
         Routing entries to be merged.
+    :param int target_length: How far to compress
     :param bool use_timer_cut_off: flag for timing cut-off to be used.
     :param time_to_run_for_before_raising_exception:
         The time to run for in seconds before raising an exception
@@ -56,14 +54,6 @@ def minimise(
         If the smallest table that can be produced is larger than
         ``target_length``.
     """
-    if get_config_bool(
-            "Mapping", "router_table_compress_as_far_as_possible"):
-        # Compress as much as possible
-        target_length = None
-    else:
-        chip = PacmanDataView.get_chip_at(routing_table.x, routing_table .y)
-        target_length = chip.router.n_available_multicast_entries
-
     # Keep None values as that flags as much as possible
     table, _ = ordered_covering(
         routing_table=routing_table, target_length=target_length,
