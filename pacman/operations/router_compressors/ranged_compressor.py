@@ -44,8 +44,9 @@ def range_compressor(accept_overflow=True):
     compressed_tables = MulticastRoutingTables()
     for table in progress.over(router_tables.routing_tables):
         new_table = compressor.compress_table(table)
-        if (new_table.number_of_entries > Machine.ROUTER_ENTRIES and
-                not accept_overflow):
+        chip = PacmanDataView.get_chip_at(table.x, table.y)
+        target = chip.router.n_available_multicast_entries
+        if (new_table.number_of_entries > target and not accept_overflow):
             raise MinimisationFailedError(
                 f"The routing table {table.x} {table.y} with "
                 f"{table.number_of_entries} entries after compression "
@@ -87,7 +88,9 @@ class RangeCompressor(object):
         # Check you need to compress
         if not get_config_bool(
                 "Mapping", "router_table_compress_as_far_as_possible"):
-            if uncompressed.number_of_entries < Machine.ROUTER_ENTRIES:
+            chip = PacmanDataView.get_chip_at(uncompressed.x, uncompressed.y)
+            target = chip.router.n_available_multicast_entries
+            if uncompressed.number_of_entries < target:
                 return uncompressed
 
         # Step 1 get the entries and make sure they are sorted by key

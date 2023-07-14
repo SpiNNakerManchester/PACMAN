@@ -14,6 +14,7 @@
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_machine import Machine
+from pacman.data import PacmanDataView
 from pacman.operations.router_compressors import Entry
 from pacman.exceptions import MinimisationFailedError
 from .remove_default_routes import remove_default_routes
@@ -60,7 +61,8 @@ def minimise(
         # Compress as much as possible
         target_length = None
     else:
-        target_length = Machine.ROUTER_ENTRIES
+        chip = PacmanDataView.get_chip_at(routing_table.x, routing_table .y)
+        target_length = chip.router.n_available_multicast_entries
 
     # Keep None values as that flags as much as possible
     table, _ = ordered_covering(

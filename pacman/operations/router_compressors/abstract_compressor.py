@@ -18,6 +18,9 @@ based on https://github.com/project-rig/
 
 from abc import abstractmethod
 import logging
+
+import sys
+
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
@@ -70,7 +73,7 @@ class AbstractCompressor(object):
         """
         Compress all the unordered routing tables.
 
-        Tables who start of smaller than target_length are not compressed
+        Tables who start of smaller than global_target are not compressed
 
         :param MulticastRoutingTables router_tables: Routing tables
         :param ~spinn_utilities.progress_bar.ProgressBar progress:
@@ -80,14 +83,12 @@ class AbstractCompressor(object):
         :raises MinimisationFailedError: on failure
         """
         compressed_tables = MulticastRoutingTables()
-        if get_config_bool(
-                "Mapping", "router_table_compress_as_far_as_possible"):
-            # Compress as much as possible
-            target_length = 0
-        else:
-            target_length = Machine.ROUTER_ENTRIES
+        as_needed = not(get_config_bool(
+            "Mapping", "router_table_compress_as_far_as_possible"))
         for table in progress.over(router_tables.routing_tables):
-            if table.number_of_entries < target_length:
+            chip = PacmanDataView.get_chip_at(table.x, table.y)
+            target = chip.router.n_available_multicast_entries
+            if as_needed and table.number_of_entries <= target:
                 new_table = table
             else:
                 compressed_table = self.compress_table(table)
@@ -97,7 +98,7 @@ class AbstractCompressor(object):
                 for entry in compressed_table:
                     new_table.add_multicast_routing_entry(
                         entry.to_MulticastRoutingEntry())
-                if new_table.number_of_entries > Machine.ROUTER_ENTRIES:
+                if new_table.number_of_entries > target:
                     self._problems += (
                         f"(x:{new_table.x},y:{new_table.y})="
                         f"{new_table.number_of_entries} ")
