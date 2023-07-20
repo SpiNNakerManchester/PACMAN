@@ -19,12 +19,9 @@ based on https://github.com/project-rig/
 from abc import abstractmethod
 import logging
 
-import sys
-
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import Machine
 from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
@@ -83,7 +80,7 @@ class AbstractCompressor(object):
         :raises MinimisationFailedError: on failure
         """
         compressed_tables = MulticastRoutingTables()
-        as_needed = not(get_config_bool(
+        as_needed = not (get_config_bool(
             "Mapping", "router_table_compress_as_far_as_possible"))
         for table in progress.over(router_tables.routing_tables):
             chip = PacmanDataView.get_chip_at(table.x, table.y)

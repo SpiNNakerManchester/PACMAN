@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_machine import Machine
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanElementAllocationException
 from .abstract_compressor import AbstractCompressor

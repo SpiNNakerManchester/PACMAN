@@ -23,8 +23,6 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 
-from spinn_machine import Machine
-
 from pacman.data import PacmanDataView
 from pacman.model.placements import Placements, Placement
 from pacman.model.graphs import AbstractVirtual
@@ -138,7 +136,7 @@ def _place_error(
     :param Placements system_placements:
     :param PacmanPlaceException exception:
     :param int plan_n_timesteps:
-    :param Machine machine:
+    :param ~spinn_machine.Machine machine:
     :raises PacmanPlaceException:
     """
     unplaceable = list()
@@ -333,7 +331,7 @@ def _do_fixed_location(vertices, sdram, placements, machine, next_chip_space):
     :param list(MachineVertex) vertices:
     :param int sdram:
     :param Placements placements:
-    :param Machine machine:
+    :param ~spinn_machine.Machine machine:
     :param _ChipWithSpace next_chip_space:
     :rtype: bool
     :raise PacmanConfigurationException:
@@ -402,7 +400,7 @@ class _Spaces(object):
 
     def __init__(self, machine, placements, plan_n_timesteps):
         """
-        :param Machine machine:
+        :param ~spinn_machine.Machine machine:
         :param Placements placements:
         :param int plan_n_timesteps:
         """
@@ -608,7 +606,7 @@ class _ChipWithSpace(object):
 
 def _chip_order(machine):
     """
-    :param Machine machine:
+    :param ~spinn_machine.Machine machine:
     :rtype: iterable(Chip)
     """
     s_x, s_y = get_config_str("Mapping", "placer_start_chip").split(",")

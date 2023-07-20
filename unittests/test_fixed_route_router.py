@@ -78,7 +78,8 @@ def _check_setup(width, height):
      (True, False),
      (False, True),
      (True, True)])
-def test_all_working(width, height,  version, with_down_links, with_down_chips):
+def test_all_working(
+        width, height,  version, with_down_links, with_down_chips):
     unittest_setup()
     set_config("Machine", "version", version)
     temp_machine = virtual_machine(width=width, height=height)
