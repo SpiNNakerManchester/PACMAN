@@ -87,13 +87,13 @@ class ConstantSDRAMMachinePartition(
             cast(E, edge).sdram_base_address = new_value
 
     @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
-    def get_sdram_base_address_for(self, vertex: V) -> int:
+    def get_sdram_base_address_for(self, vertex: MachineVertex) -> int:
         if self._sdram_base_address is None:
             raise PartitionMissingEdgesException(self.__missing_edge_msg())
         return self._sdram_base_address
 
     @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
-    def get_sdram_size_of_region_for(self, vertex: V) -> int:
+    def get_sdram_size_of_region_for(self, vertex: MachineVertex) -> int:
         if self._sdram_size is None:
             raise PartitionMissingEdgesException(self.__missing_edge_msg())
         return self._sdram_size

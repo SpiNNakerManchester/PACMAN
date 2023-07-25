@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import (
-    Generic, Iterable, Tuple, Type, TypeVar, Union, TYPE_CHECKING)
+    Generic, Sequence, Tuple, Type, TypeVar, Union, TYPE_CHECKING)
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
@@ -61,5 +61,5 @@ class AbstractSingleSourcePartition(
 
     @property
     @overrides(AbstractEdgePartition.pre_vertices)
-    def pre_vertices(self) -> Iterable[V]:
-        yield self.pre_vertex
+    def pre_vertices(self) -> Sequence[V]:
+        return (self.pre_vertex, )

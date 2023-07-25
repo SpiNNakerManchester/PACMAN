@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 from collections import defaultdict
-from typing import Dict, Iterable, Optional, cast
+from typing import Dict, Iterable, Optional, Sequence, cast
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from .application_edge_partition import ApplicationEdgePartition
@@ -150,7 +150,7 @@ class ApplicationGraph(object):
                 "Post-vertex must be known in graph")
 
     @property
-    def edges(self) -> Iterable[ApplicationEdge]:
+    def edges(self) -> Sequence[ApplicationEdge]:
         # pylint: disable=not-an-iterable
         # https://github.com/PyCQA/pylint/issues/3105
         """

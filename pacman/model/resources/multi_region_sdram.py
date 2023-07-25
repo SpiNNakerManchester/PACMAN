@@ -12,12 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Dict
+from enum import Enum
+import math
+import numpy
+from typing import Dict, Union
+from typing_extensions import TypeAlias
 from spinn_utilities.overrides import overrides
 from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
 from .variable_sdram import VariableSDRAM
-_RegionKey = int
+_RegionKey: TypeAlias = Union[int, str, Enum]
+_Value: TypeAlias = Union[int, float, numpy.integer, numpy.floating]
+
+
+def __round(value: _Value) -> int:
+    return math.ceil(value)
 
 
 class MultiRegionSDRAM(VariableSDRAM):
@@ -30,7 +39,7 @@ class MultiRegionSDRAM(VariableSDRAM):
         return a VariableSDRAM object without the regions data.
 
         To add extra SDRAM costs for the same core/placement use the methods
-        :py:meth:`add_cost` and :py:meth:`merge`
+        :py:meth:`add_cost` and :py:meth:`merge`.
     """
 
     __slots__ = (
@@ -50,8 +59,8 @@ class MultiRegionSDRAM(VariableSDRAM):
         """
         return self.__regions
 
-    def add_cost(self, region: _RegionKey, fixed_sdram: int,
-                 per_timestep_sdram: int = 0):
+    def add_cost(self, region: _RegionKey, fixed_sdram: _Value,
+                 per_timestep_sdram: _Value = 0):
         """
         Adds the cost for the specified region.
 
@@ -62,13 +71,14 @@ class MultiRegionSDRAM(VariableSDRAM):
         :param per_timestep_sdram: The variable cost for this region is any
         :type per_timestep_sdram: int or numpy.integer
         """
-        self._fixed_sdram += fixed_sdram
-        self._per_timestep_sdram += per_timestep_sdram
+        self._fixed_sdram += __round(fixed_sdram)
+        self._per_timestep_sdram += __round(per_timestep_sdram)
         sdram: AbstractSDRAM
         if per_timestep_sdram:
-            sdram = VariableSDRAM(int(fixed_sdram), int(per_timestep_sdram))
+            sdram = VariableSDRAM(
+                __round(fixed_sdram), __round(per_timestep_sdram))
         else:
-            sdram = ConstantSDRAM(int(fixed_sdram))
+            sdram = ConstantSDRAM(__round(fixed_sdram))
         if region in self.__regions:
             self.__regions[region] += sdram
         else:

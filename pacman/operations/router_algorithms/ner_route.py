@@ -26,7 +26,7 @@ https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/utils.p
 """
 
 import functools
-from typing import Callable, Dict, Iterable, List, Tuple
+from typing import Callable, Dict, Final, Iterable, List, Tuple
 from typing_extensions import TypeAlias
 from collections import defaultdict
 
@@ -45,6 +45,7 @@ from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 from pacman.model.graphs.machine import MachineVertex
 _Vec: TypeAlias = Tuple[int, int, int]
 _V2N: TypeAlias = Callable[[_Vec, XY], List[Tuple[int, XY]]]
+_Inf: Final = float("inf")
 
 
 def _ner_net(src: XY, destinations: Iterable[XY],
@@ -95,7 +96,7 @@ def _ner_net(src: XY, destinations: Iterable[XY],
             # This implementation scans the list of all route nodes created so
             # far and finds the closest node which is < radius hops.  This is
             # ~3x slower per iteration than the one above.
-            neighbour_distance = None
+            neighbour_distance = _Inf
             for candidate_neighbour in route:
                 distance = machine.get_vector_length(
                     candidate_neighbour, destination)

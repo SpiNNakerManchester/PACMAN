@@ -63,18 +63,18 @@ class VariableSDRAM(AbstractSDRAM):
     def per_timestep(self) -> float:
         return self._per_timestep_sdram
 
-    def __add__(self, other):
+    def __add__(self, other: AbstractSDRAM) -> 'VariableSDRAM':
         return VariableSDRAM(
             self._fixed_sdram + other.fixed,
             self._per_timestep_sdram + other.per_timestep)
 
-    def __sub__(self, other):
+    def __sub__(self, other: AbstractSDRAM) -> 'VariableSDRAM':
         return VariableSDRAM(
             self._fixed_sdram - other.fixed,
             self._per_timestep_sdram - other.per_timestep)
 
     @overrides(AbstractSDRAM.sub_from)
-    def sub_from(self, other):
+    def sub_from(self, other: AbstractSDRAM) -> 'VariableSDRAM':
         return VariableSDRAM(
             other.fixed - self._fixed_sdram,
             other.per_timestep - self._per_timestep_sdram)

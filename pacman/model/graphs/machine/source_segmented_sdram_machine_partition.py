@@ -14,7 +14,8 @@
 from typing import Collection, Optional
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
-    PacmanConfigurationException, PartitionMissingEdgesException)
+    PacmanConfigurationException, PartitionMissingEdgesException,
+    PacmanValueError)
 from pacman.model.graphs import AbstractMultiplePartition
 from pacman.model.graphs.machine import (
     AbstractSDRAMPartition, SDRAMMachineEdge, MachineVertex)
@@ -96,13 +97,25 @@ class SourceSegmentedSDRAMMachinePartition(
         # add
         super().add_edge(edge)
 
-    @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
-    def get_sdram_base_address_for(
-            self, vertex: MachineVertex) -> Optional[int]:
+    def is_sdram_base_address_defined(self, vertex: MachineVertex) -> bool:
+        """
+        Do we have a base address for the given vertex? If the edge does not
+        connect to the vertex, this is an error.
+        """
         if self._sdram_base_address is None:
-            return None
+            return False
+        return self.__peek_edge(vertex).sdram_base_address is not None
+
+    @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
+    def get_sdram_base_address_for(self, vertex: MachineVertex) -> int:
+        if self._sdram_base_address is None:
+            raise PacmanValueError("no base address set for SDRAM partition")
         if vertex in self._pre_vertices:
-            return self.__peek_edge(vertex).sdram_base_address
+            addr = self.__peek_edge(vertex).sdram_base_address
+            if addr is None:
+                raise PacmanValueError(
+                    f"no base address set for vertex {vertex.label}")
+            return addr
         else:
             return self._sdram_base_address
 

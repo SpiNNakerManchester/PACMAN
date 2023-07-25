@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-from typing import Iterable, Optional, Type, TypeVar, TYPE_CHECKING
+from typing import Iterable, Optional, Sequence, Type, TypeVar, TYPE_CHECKING
 from spinn_utilities.log import FormatAdapter
 from spinn_machine.data import MachineDataView
 from pacman.exceptions import PacmanNotPlacedError
@@ -286,7 +286,7 @@ class PacmanDataView(MachineDataView):
             get_outgoing_edge_partitions_starting_at_vertex(vertex)
 
     @classmethod
-    def get_edges(cls) -> Iterable[ApplicationEdge]:
+    def get_edges(cls) -> Sequence[ApplicationEdge]:
         """
         Get all the edges in the graph.
 

@@ -144,7 +144,7 @@ class TestPartition(unittest.TestCase):
             part.sdram_base_address = 10
         with self.assertRaises(Exception):
             part.get_sdram_size_of_region_for(v1)
-        self.assertIsNone(part.get_sdram_base_address_for(v1))
+        self.assertFalse(part.is_sdram_base_address_defined(v1))
         v3 = MockSupportsSDRAMEdges(ConstantSDRAM(12))
         v4 = MockSupportsSDRAMEdges(ConstantSDRAM(12))
         with self.assertRaises(PacmanConfigurationException):
@@ -164,7 +164,7 @@ class TestPartition(unittest.TestCase):
         with self.assertRaises(PacmanConfigurationException):
             # Can't read the address until it is set
             _ = part.sdram_base_address
-        self.assertIsNone(part.get_sdram_base_address_for(v1))
+        self.assertFalse(part.is_sdram_base_address_defined(v1))
         part.sdram_base_address = 100
         self.assertEqual(100, part.sdram_base_address)
         self.assertEqual(100, e1.sdram_base_address)

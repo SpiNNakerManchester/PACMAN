@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import (
-    Iterable, Generic, List, Optional, Sequence, Tuple, TypeVar, Union)
+    Iterable, Generic, Optional, Sequence, Tuple, TypeVar, Union)
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationVertex
@@ -96,7 +96,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_out_going_slices(self) -> List[Slice]:
+    def get_out_going_slices(self) -> Sequence[Slice]:
         """
         The slices of the output vertices.
 
@@ -106,7 +106,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_in_coming_slices(self) -> List[Slice]:
+    def get_in_coming_slices(self) -> Sequence[Slice]:
         """
         The slices of the input vertices.
 
@@ -116,7 +116,8 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_out_going_vertices(self, partition_id: str) -> List[MachineVertex]:
+    def get_out_going_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         """
         Get machine pre-vertices.
 
@@ -129,7 +130,8 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_in_coming_vertices(self, partition_id: str) -> List[MachineVertex]:
+    def get_in_coming_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         """
         Get machine post-vertices for a given partition.
 
@@ -196,8 +198,8 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def get_same_chip_groups(self) -> List[
-            Tuple[List[MachineVertex], AbstractSDRAM]]:
+    def get_same_chip_groups(self) -> Sequence[
+            Tuple[Sequence[MachineVertex], AbstractSDRAM]]:
         """
         Get a list of lists of vertices and SDRAM which must be
         allocated on the same chip.  By default this returns a list of each
@@ -211,7 +213,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
                 for v in self._governed_app_vertex.machine_vertices]
 
     def get_internal_multicast_partitions(
-            self) -> List[MulticastEdgePartition]:
+            self) -> Sequence[MulticastEdgePartition]:
         """
         Get edge partitions between machine vertices that are to be
         handled by Multicast.  Returns empty by default, override if there
@@ -221,7 +223,8 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         """
         return []
 
-    def get_internal_sdram_partitions(self) -> List[AbstractSDRAMPartition]:
+    def get_internal_sdram_partitions(
+            self) -> Sequence[AbstractSDRAMPartition]:
         """
         Get edge partitions between machine vertices that are to be
         handled by SDRAM.  Returns empty by default, override if there
