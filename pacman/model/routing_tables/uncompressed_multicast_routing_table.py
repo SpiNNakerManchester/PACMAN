@@ -15,7 +15,7 @@
 import csv
 import gzip
 import logging
-from typing import Any, Dict, Iterable
+from typing import Any, Collection, Dict, Iterable
 from spinn_utilities.log import FormatAdapter
 from spinn_machine import MulticastRoutingEntry
 from pacman.exceptions import PacmanAlreadyExistsException
@@ -110,7 +110,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
 
     @property
     @overrides(AbstractMulticastRoutingTable.multicast_routing_entries)
-    def multicast_routing_entries(self):
+    def multicast_routing_entries(self) -> Collection[MulticastRoutingEntry]:
         return self._entries_by_key_mask.values()
 
     @property

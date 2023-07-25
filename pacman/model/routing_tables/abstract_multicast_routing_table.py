@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Iterable
+from typing import Any, Collection
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_machine import Chip
 from pacman.data.pacman_data_view import PacmanDataView
@@ -54,7 +54,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def multicast_routing_entries(self) -> Iterable[MulticastRoutingEntry]:
+    def multicast_routing_entries(self) -> Collection[MulticastRoutingEntry]:
         """
         The multicast routing entries in the table.
 

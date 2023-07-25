@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Iterable, List
+from typing import Any, Collection, Iterable, List
 from pacman.model.routing_tables import AbstractMulticastRoutingTable
 from spinn_utilities.overrides import overrides
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
@@ -86,7 +86,7 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
 
     @property
     @overrides(AbstractMulticastRoutingTable.multicast_routing_entries)
-    def multicast_routing_entries(self) -> Iterable[MulticastRoutingEntry]:
+    def multicast_routing_entries(self) -> Collection[MulticastRoutingEntry]:
         return self._multicast_routing_entries
 
     @property
