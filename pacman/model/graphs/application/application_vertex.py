@@ -74,7 +74,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
         # Need to set to None temporarily as add_constraint checks splitter
-        self._splitter = None
+        self._splitter: Optional[AbstractSplitterCommon[Self]] = None
         super().__init__(label)
         self._machine_vertices: OrderedSet[MV] = OrderedSet()
         if splitter:
