@@ -23,8 +23,6 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 
-from spinn_machine import Machine
-
 from pacman.data import PacmanDataView
 from pacman.model.placements import Placements, Placement
 from pacman.model.graphs import AbstractVirtual
@@ -138,7 +136,7 @@ def _place_error(
     :param Placements system_placements:
     :param PacmanPlaceException exception:
     :param int plan_n_timesteps:
-    :param Machine machine:
+    :param ~spinn_machine.Machine machine:
     :raises PacmanPlaceException:
     """
     unplaceable = list()
@@ -224,10 +222,11 @@ def _check_could_fit(app_vertex, vertices_to_place, sdram):
     :param int sdram:
     :raises PacmanTooBigToPlace:
     """
+    version = PacmanDataView.get_machine_version()
     max_sdram = (
-            Machine.DEFAULT_SDRAM_BYTES - PacmanDataView.get_monitor_sdram())
+            version.max_sdram_per_chip - PacmanDataView.get_monitor_sdram())
     max_cores = (
-            Machine.DEFAULT_MAX_CORES_PER_CHIP - Machine.NON_USER_CORES -
+            version.max_cores_per_chip - version.n_non_user_cores -
             PacmanDataView.get_monitor_cores())
     n_cores = len(vertices_to_place)
     if sdram <= max_sdram and n_cores <= max_cores:
@@ -238,16 +237,16 @@ def _check_could_fit(app_vertex, vertices_to_place, sdram):
         f"the reason is that {vertices_to_place} ")
     if sdram > max_sdram:
         message += f"requires {sdram} bytes but "
-        if sdram > Machine.DEFAULT_SDRAM_BYTES:
-            message += f"a Chip only has {Machine.DEFAULT_SDRAM_BYTES} bytes "
+        if sdram > version.max_sdram_per_chip:
+            message += f"a Chip only has {version.max_sdram_per_chip} bytes "
         else:
             message += f"after monitors only {max_sdram} bytes are available "
         message += "Lowering max_core_per_chip may resolve this."
         raise PacmanTooBigToPlace(message)
-    if n_cores > Machine.DEFAULT_MAX_CORES_PER_CHIP:
+    if n_cores > version.max_cores_per_chip:
         message += " is more vertices than the number of cores on a chip."
         raise PacmanTooBigToPlace(message)
-    user_cores = Machine.DEFAULT_MAX_CORES_PER_CHIP - Machine.NON_USER_CORES
+    user_cores = version.max_cores_per_chip - version.n_non_user_cores
     if n_cores > user_cores:
         message += (
             f"is more vertices than the user cores ({user_cores}) "
@@ -332,7 +331,7 @@ def _do_fixed_location(vertices, sdram, placements, machine, next_chip_space):
     :param list(MachineVertex) vertices:
     :param int sdram:
     :param Placements placements:
-    :param Machine machine:
+    :param ~spinn_machine.Machine machine:
     :param _ChipWithSpace next_chip_space:
     :rtype: bool
     :raise PacmanConfigurationException:
@@ -401,7 +400,7 @@ class _Spaces(object):
 
     def __init__(self, machine, placements, plan_n_timesteps):
         """
-        :param Machine machine:
+        :param ~spinn_machine.Machine machine:
         :param Placements placements:
         :param int plan_n_timesteps:
         """
@@ -607,7 +606,7 @@ class _ChipWithSpace(object):
 
 def _chip_order(machine):
     """
-    :param Machine machine:
+    :param ~spinn_machine.Machine machine:
     :rtype: iterable(Chip)
     """
     s_x, s_y = get_config_str("Mapping", "placer_start_chip").split(",")

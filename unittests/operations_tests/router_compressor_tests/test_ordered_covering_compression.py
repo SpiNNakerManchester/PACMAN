@@ -16,6 +16,8 @@ import os
 import sys
 import unittest
 
+from spinn_utilities.config_holder import set_config
+from spinn_machine import virtual_machine
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
@@ -29,6 +31,7 @@ class TestOrderedCoveringCompressor(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
+        set_config("Machine", "version", 5)
 
     def test_oc_big(self):
         class_file = sys.modules[self.__module__].__file__
@@ -36,8 +39,9 @@ class TestOrderedCoveringCompressor(unittest.TestCase):
         j_router = os.path.join(path,
                                 "many_to_one.json.gz")
         original_tables = from_json(j_router)
-        PacmanDataWriter.mock().set_precompressed(
-            original_tables)
+        writer = PacmanDataWriter.mock()
+        writer.set_precompressed(original_tables)
+        writer.set_machine(virtual_machine(24, 24))
 
         compressed_tables = ordered_covering_compressor()
         for original in original_tables:
