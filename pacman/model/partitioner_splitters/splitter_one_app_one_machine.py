@@ -52,15 +52,11 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon[AV], Generic[AV, MV]):
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self) -> List[Slice]:
-        if self._governed_app_vertex.machine_vertex.vertex_slice:
-            return [self._governed_app_vertex.machine_vertex.vertex_slice]
-        return []
+        return [self._governed_app_vertex.machine_vertex.vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self) -> List[Slice]:
-        if self._governed_app_vertex.machine_vertex.vertex_slice:
-            return [self._governed_app_vertex.machine_vertex.vertex_slice]
-        return []
+        return [self._governed_app_vertex.machine_vertex.vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id: str) -> List[MV]:

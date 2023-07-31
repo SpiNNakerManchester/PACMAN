@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Generic, Optional, TypeVar, TYPE_CHECKING, cast
+from typing import Generic, Optional, TypeVar, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.common import Slice
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex  # @UnusedImport
 #: :meta private:
@@ -56,7 +55,7 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex, Generic[V]):
     @property
     @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self) -> int:
-        return cast(Slice, self._machine_vertex.vertex_slice).n_atoms
+        return self._machine_vertex.vertex_slice.n_atoms
 
     @overrides(ApplicationVertex.reset)
     def reset(self) -> None:

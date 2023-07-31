@@ -120,13 +120,12 @@ def validate_routes(
             placement = placements.get_placement_of_vertex(m_vertex)
             r_info = routing_infos.get_routing_info_from_pre_vertex(
                 m_vertex, partition.identifier)
-            m_slice = m_vertex.vertex_slice
 
             # search for these destinations
-            if r_info and m_slice:
+            if r_info:
                 _search_route(
                     placement, destinations[m_vertex], r_info.key_and_mask,
-                    routing_tables, m_slice.n_atoms)
+                    routing_tables, m_vertex.vertex_slice.n_atoms)
 
 
 def _search_route(
