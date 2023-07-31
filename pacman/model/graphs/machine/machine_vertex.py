@@ -76,7 +76,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return self._app_vertex
 
     @property
-    def vertex_slice(self) -> Optional[Slice]:
+    def vertex_slice(self) -> Slice:
         """
         The slice of the application vertex that this machine vertex
         implements.
