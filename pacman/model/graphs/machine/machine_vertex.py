@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, Optional, TYPE_CHECKING
+from typing import Iterable, Optional, final, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVertex
@@ -32,7 +32,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     """
 
     __slots__ = (
-        "_app_vertex", "_index", "_vertex_slice")
+        "_app_vertex", "_index", "__vertex_slice")
     _DEFAULT_SLICE = Slice(0, 0)
 
     def __init__(self, label: Optional[str] = None,
@@ -61,9 +61,9 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         self._app_vertex = app_vertex
         self._index: Optional[int] = None
         if vertex_slice is not None:
-            self._vertex_slice = vertex_slice
+            self.__vertex_slice = vertex_slice
         else:
-            self._vertex_slice = self._DEFAULT_SLICE
+            self.__vertex_slice = self._DEFAULT_SLICE
 
     @property
     def app_vertex(self) -> Optional[ApplicationVertex]:
@@ -76,6 +76,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return self._app_vertex
 
     @property
+    @final
     def vertex_slice(self) -> Slice:
         """
         The slice of the application vertex that this machine vertex
@@ -83,7 +84,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
-        return self._vertex_slice
+        return self.__vertex_slice
 
     def get_n_keys_for_partition(self, partition_id: str) -> int:
         """
@@ -95,7 +96,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :rtype: int
         """
         # pylint: disable=unused-argument
-        return 1 << get_n_bits_for_fields(self._vertex_slice.shape)
+        return 1 << get_n_bits_for_fields(self.__vertex_slice.shape)
 
     @property
     def index(self) -> int:
