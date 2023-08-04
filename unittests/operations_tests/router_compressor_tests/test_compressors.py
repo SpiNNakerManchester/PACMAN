@@ -69,6 +69,7 @@ class TestCompressor(unittest.TestCase):
         unittest_setup()
         set_config(
             "Mapping", "router_table_compress_as_far_as_possible", True)
+        set_config("Machine", "version", 5)
         writer = PacmanDataWriter.mock()
         writer.set_uncompressed(original_tables)
         writer.set_precompressed(original_tables)

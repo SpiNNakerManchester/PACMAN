@@ -18,12 +18,13 @@ from typing import (
 from typing_extensions import TypeAlias
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.timer import Timer
-from spinn_machine import Machine
-from pacman.model.routing_tables import UnCompressedMulticastRoutingTable
-from pacman.operations.router_compressors import (AbstractCompressor, RTEntry)
 from pacman.exceptions import MinimisationFailedError
 from pacman.utilities.constants import FULL_MASK
+from pacman.model.routing_tables import UnCompressedMulticastRoutingTable
+from pacman.operations.router_compressors import (AbstractCompressor, RTEntry)
 from .utils import intersect, remove_default_routes
+from pacman.model.routing_tables import MulticastRoutingTables
+from pacman.data.pacman_data_view import PacmanDataView
 #: A key,mask pair
 _KeyMask: TypeAlias = Tuple[int, int]
 #: A mapping from a key,mask pair to the things it aliases
@@ -34,7 +35,7 @@ _ROAliases: TypeAlias = Mapping[_KeyMask, FrozenSet[_KeyMask]]
 _all_bits = tuple(1 << i for i in range(32))
 
 
-def ordered_covering_compressor():
+def ordered_covering_compressor() -> MulticastRoutingTables:
     """
     Compressor from rig that has been tied into the main tool chain stack.
 
@@ -48,17 +49,10 @@ class _OrderedCoveringCompressor(AbstractCompressor):
     """
     Compressor from rig that has been tied into the main tool chain stack.
     """
-    __slots__ = ("__target_length", )
+    __slots__ = ()
 
     def __init__(self) -> None:
         super().__init__(True)
-        self.__target_length: Optional[int]
-        if get_config_bool(
-                "Mapping", "router_table_compress_as_far_as_possible"):
-            # Compress as much as possible
-            self.__target_length = None
-        else:
-            self.__target_length = Machine.ROUTER_ENTRIES
 
     def compress_table(
             self, router_table: UnCompressedMulticastRoutingTable
@@ -78,16 +72,23 @@ class _OrderedCoveringCompressor(AbstractCompressor):
             If the smallest table that can be produced is larger than
             the space usually available in a hardware router table.
         """
+        if get_config_bool(
+                "Mapping", "router_table_compress_as_far_as_possible"):
+            # Compress as much as possible
+            target_length: Optional[int] = None
+        else:
+            chip = PacmanDataView.get_chip_at(router_table.x, router_table.y)
+            target_length = chip.router.n_available_multicast_entries
         # Convert into a list of entries
         routing_table = list(map(
             RTEntry.from_MulticastRoutingEntry,
             router_table.multicast_routing_entries))
         # Compress the router entries
         table, _ = ordered_covering(
-            routing_table=routing_table, target_length=self.__target_length,
+            routing_table=routing_table, target_length=target_length,
             aliases={}, no_raise=True, time_to_run_for=None)
         # Strip the defaultable routes
-        return remove_default_routes(table, self.__target_length)
+        return remove_default_routes(table, target_length)
 
 
 def ordered_covering(
