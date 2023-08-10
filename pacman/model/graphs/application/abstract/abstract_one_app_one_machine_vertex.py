@@ -60,5 +60,5 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex, Generic[V]):
     @overrides(ApplicationVertex.reset)
     def reset(self) -> None:
         # Override, as we don't want to clear the machine vertices here!
-        if self.has_splitter:
+        if self._splitter is not None:
             self._splitter.reset_called()
