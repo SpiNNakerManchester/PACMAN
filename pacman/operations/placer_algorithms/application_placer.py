@@ -588,12 +588,9 @@ def _chip_order(machine: Machine) -> Iterable[Chip]:
     :rtype: iterable(Chip)
     """
     start = get_config_str("Mapping", "placer_start_chip")
-    if start is None:
-        s_x, s_y = 0, 0
-    else:
-        start_x, start_y = start.split(",")
-        s_x = int(start_x)
-        s_y = int(start_y)
+    start_x, start_y = start.split(",")
+    s_x = int(start_x)
+    s_y = int(start_y)
 
     for x in range(machine.width):
         for y in range(machine.height):
