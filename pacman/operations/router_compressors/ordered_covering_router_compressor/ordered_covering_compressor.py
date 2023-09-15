@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import logging
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
+from pacman.data import PacmanDataView
 from pacman.operations.router_compressors import (AbstractCompressor, Entry)
 from .ordered_covering import minimise
 
@@ -46,6 +48,14 @@ class _OrderedCoveringCompressor(AbstractCompressor):
         :param UnCompressedMulticastRoutingTable router_table:
         :rtype: list(Entry)
         """
+        if get_config_bool(
+                "Mapping", "router_table_compress_as_far_as_possible"):
+            # Compress as much as possible
+            target_length = None
+        else:
+            chip = PacmanDataView.get_chip_at(router_table.x, router_table.y)
+            target_length = chip.router.n_available_multicast_entries
+
         # convert to rig inspired format
         entries = list()
 
@@ -55,5 +65,5 @@ class _OrderedCoveringCompressor(AbstractCompressor):
             entries.append(Entry.from_MulticastRoutingEntry(router_entry))
 
         # compress the router entries
-        compressed_router_table_entries = minimise(entries)
+        compressed_router_table_entries = minimise(entries, target_length)
         return compressed_router_table_entries
