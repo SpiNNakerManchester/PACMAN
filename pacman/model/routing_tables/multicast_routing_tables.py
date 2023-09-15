@@ -28,8 +28,6 @@ class MulticastRoutingTables(object):
     __slots__ = [
         # dict of (x,y) -> routing table
         "_routing_tables_by_chip",
-        # maximum value for number_of_entries in all tables
-        "_max_number_of_entries"
     ]
 
     def __init__(self, routing_tables=None):
@@ -40,7 +38,6 @@ class MulticastRoutingTables(object):
             If any two routing tables are for the same chip
         """
         self._routing_tables_by_chip = dict()
-        self._max_number_of_entries = 0
 
         if routing_tables is not None:
             for routing_table in routing_tables:
@@ -62,8 +59,6 @@ class MulticastRoutingTables(object):
                 str(routing_table))
         self._routing_tables_by_chip[(routing_table.x, routing_table.y)] = \
             routing_table
-        self._max_number_of_entries = max(
-            self._max_number_of_entries, routing_table.number_of_entries)
 
     @property
     def routing_tables(self):
@@ -75,8 +70,7 @@ class MulticastRoutingTables(object):
         """
         return self._routing_tables_by_chip.values()
 
-    @property
-    def max_number_of_entries(self):
+    def get_max_number_of_entries(self):
         """
         The maximum number of multicast routing entries there are in any
         multicast routing table.
@@ -85,7 +79,26 @@ class MulticastRoutingTables(object):
 
         :rtype: int
         """
-        return self._max_number_of_entries
+        if self._routing_tables_by_chip:
+            return max(map((lambda x: x.number_of_entries),
+                           self._routing_tables_by_chip.values()))
+        else:
+            return 0
+
+    def get_total_number_of_entries(self):
+        """
+        The total number of multicast routing entries there are in all
+        multicast routing table.
+
+        Will return zero if there are no routing tables
+
+        :rtype: int
+        """
+        if self._routing_tables_by_chip:
+            return sum(map((lambda x: x.number_of_entries),
+                           self._routing_tables_by_chip.values()))
+        else:
+            return 0
 
     def get_routing_table_for_chip(self, x, y):
         """
