@@ -23,6 +23,8 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
     A multicast routing table. May be compressed or uncompressed.
     """
 
+    __slots__ = ()
+
     @property
     @abstractmethod
     def x(self) -> int:

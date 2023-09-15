@@ -56,7 +56,7 @@ def range_compressor(accept_overflow: bool = True) -> MulticastRoutingTables:
                 f"still has {new_table.number_of_entries} so will not fit")
         compressed_tables.add_routing_table(new_table)
     logger.info(f"Ranged compressor resulted with the largest table of size "
-                f"{compressed_tables.max_number_of_entries}")
+                f"{compressed_tables.get_max_number_of_entries()}")
     return compressed_tables
 
 
