@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_machine import Machine
+from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanElementAllocationException
 from .abstract_compressor import AbstractCompressor
 from .entry import Entry
@@ -43,7 +43,9 @@ def verify_lengths(compressed):
     """
     problems = ""
     for table in compressed:
-        if table.number_of_entries > Machine.ROUTER_ENTRIES:
+        chip = PacmanDataView.get_chip_at(table.x, table.y)
+        n_entries = chip.router.n_available_multicast_entries
+        if table.number_of_entries > n_entries:
             problems += f"(x:{table.x},y:{table.y})={table.number_of_entries} "
     if len(problems) > 0:
         raise PacmanElementAllocationException(
@@ -385,8 +387,10 @@ class _PairCompressor(AbstractCompressor):
         self._all_entries = []
         self._routes_count = 0
         # Imitate creating fixed size arrays
-        self._routes = Machine.ROUTER_ENTRIES * [None]
-        self._routes_frequency = Machine.ROUTER_ENTRIES * [None]
+        chip = PacmanDataView.get_chip_at(router_table.x, router_table.y)
+        n_routes = chip.router.n_available_multicast_entries
+        self._routes = n_routes * [None]
+        self._routes_frequency = n_routes * [None]
 
         for entry in router_table.multicast_routing_entries:
             self._all_entries.append(
