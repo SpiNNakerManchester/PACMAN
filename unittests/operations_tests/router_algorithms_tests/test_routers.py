@@ -1,27 +1,28 @@
 # Copyright (c) 2022 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 from spinn_utilities.timer import Timer
 from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
+from pacman.exceptions import PacmanRoutingException
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationEdge,
     ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex, FPGAConnection)
 from pacman.model.graphs.machine import MulticastEdgePartition, MachineEdge
-from pacman.model.partitioner_splitters import SplitterExternalDevice
+from pacman.model.partitioner_splitters import (
+    SplitterExternalDevice, AbstractSplitterCommon)
 from pacman.utilities.utility_objs import ChipCounter
 from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
@@ -34,8 +35,6 @@ from pacman.operations.router_algorithms.ner_route import (
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     longest_dimension_first, get_app_partitions, vertex_xy,
     vertex_xy_and_route)
-from pacman.model.partitioner_splitters.abstract_splitters import (
-    AbstractSplitterCommon)
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placements, Placement
@@ -66,11 +65,11 @@ class TestSplitter(AbstractSplitterCommon):
     def create_machine_vertices(self, chip_counter):
         m_vertices = [
             SimpleMachineVertex(
-                ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
-                label=f"{self._governed_app_vertex.label}_{i}")
+                ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
+                label=f"{self.governed_app_vertex.label}_{i}")
             for i in range(self.__n_machine_vertices)]
         for m_vertex in m_vertices:
-            self._governed_app_vertex.remember_machine_vertex(m_vertex)
+            self.governed_app_vertex.remember_machine_vertex(m_vertex)
 
     def get_out_going_slices(self):
         return None
@@ -79,10 +78,10 @@ class TestSplitter(AbstractSplitterCommon):
         return None
 
     def get_out_going_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def get_in_coming_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def machine_vertices_for_recording(self, variable_to_record):
         return []
@@ -112,21 +111,21 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
         for i in range(self.__n_groups):
             incoming = [
                 SimpleMachineVertex(
-                    ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
-                    label=f"{self._governed_app_vertex.label}_{i}_{j}")
+                    ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
+                    label=f"{self.governed_app_vertex.label}_{i}_{j}")
                 for j in range(self.__n_incoming_machine_vertices)]
             outgoing = [
                 SimpleMachineVertex(
-                    ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
-                    label=f"{self._governed_app_vertex.label}_{i}_{j}")
+                    ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
+                    label=f"{self.governed_app_vertex.label}_{i}_{j}")
                 for j in range(self.__n_outgoing_machine_vertices)]
             self.__same_chip_groups.append(
                 (incoming + outgoing, ConstantSDRAM(0)))
             self.__outgoing_machine_vertices.extend(outgoing)
             for out in outgoing:
-                self._governed_app_vertex.remember_machine_vertex(out)
+                self.governed_app_vertex.remember_machine_vertex(out)
             for j in range(self.__n_incoming_machine_vertices):
-                self._governed_app_vertex.remember_machine_vertex(incoming[j])
+                self.governed_app_vertex.remember_machine_vertex(incoming[j])
                 self.__incoming_machine_vertices[j].append(incoming[j])
             if self.__internal_multicast:
                 if last_incoming is not None:
@@ -134,8 +133,7 @@ class TestMultiInputSplitter(AbstractSplitterCommon):
                         in_part = MulticastEdgePartition(this_in, "internal")
                         self.__internal_multicast_partitions.append(in_part)
                         for last_in in last_incoming:
-                            in_part.add_edge(
-                                MachineEdge(this_in, last_in))
+                            in_part.add_edge(MachineEdge(this_in, last_in))
                 last_incoming = incoming
 
     def get_out_going_slices(self):
@@ -189,11 +187,11 @@ class TestOneToOneSplitter(AbstractSplitterCommon):
     def create_machine_vertices(self, chip_counter):
         m_vertices = [
             SimpleMachineVertex(
-                ConstantSDRAM(0), app_vertex=self._governed_app_vertex,
-                label=f"{self._governed_app_vertex.label}_{i}")
+                ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
+                label=f"{self.governed_app_vertex.label}_{i}")
             for i in range(self.__n_machine_vertices)]
         for m_vertex in m_vertices:
-            self._governed_app_vertex.remember_machine_vertex(m_vertex)
+            self.governed_app_vertex.remember_machine_vertex(m_vertex)
 
     def get_out_going_slices(self):
         return None
@@ -202,10 +200,10 @@ class TestOneToOneSplitter(AbstractSplitterCommon):
         return None
 
     def get_out_going_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def get_in_coming_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def machine_vertices_for_recording(self, variable_to_record):
         return []
@@ -219,7 +217,59 @@ class TestOneToOneSplitter(AbstractSplitterCommon):
             (target, [source])
             for source, target in zip(
                 source_vertex.splitter.get_out_going_vertices(partition_id),
-                self._governed_app_vertex.machine_vertices)]
+                self.governed_app_vertex.machine_vertices)]
+
+
+class TestNearestEthernetSplitter(AbstractSplitterCommon):
+
+    def __init__(self):
+        super().__init__()
+        self.__placements = Placements()
+        self.__m_vertex_by_ethernet = dict()
+
+    def create_machine_vertices(self, chip_counter):
+        machine = PacmanDataView.get_machine()
+        for chip in machine.ethernet_connected_chips:
+            m_vertex = SimpleMachineVertex(
+                ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
+                label=f"{self.governed_app_vertex.label}_{chip.x}_{chip.y}")
+            self.governed_app_vertex.remember_machine_vertex(m_vertex)
+            self.__placements.add_placement(
+                Placement(m_vertex, chip.x, chip.y, 1))
+            self.__m_vertex_by_ethernet[chip.x, chip.y] = m_vertex
+
+    def get_out_going_slices(self):
+        return None
+
+    def get_in_coming_slices(self):
+        return None
+
+    def get_out_going_vertices(self, partition_id):
+        return self.governed_app_vertex.machine_vertices
+
+    def get_in_coming_vertices(self, partition_id):
+        return self.governed_app_vertex.machine_vertices
+
+    def machine_vertices_for_recording(self, variable_to_record):
+        return []
+
+    def reset_called(self):
+        pass
+
+    def get_source_specific_in_coming_vertices(
+            self, source_vertex, partition_id):
+
+        m_vertex = next(iter(source_vertex.splitter.get_out_going_vertices(
+            partition_id)))
+        x, y = vertex_xy(m_vertex)
+        chip = PacmanDataView.get_chip_at(x, y)
+        target_m_vertex = self.__m_vertex_by_ethernet[
+            chip.nearest_ethernet_x, chip.nearest_ethernet_y]
+        return [(target_m_vertex, [source_vertex])]
+
+    @property
+    def placements(self):
+        return self.__placements
 
 
 class TestAppVertex(ApplicationVertex):
@@ -248,6 +298,14 @@ def _make_one_to_one_vertices(writer, n_atoms, n_machine_vertices, label):
     return vertex
 
 
+def _make_ethernet_vertices(writer, n_atoms, label):
+    vertex = TestAppVertex(n_atoms, label)
+    vertex.splitter = TestNearestEthernetSplitter()
+    writer.add_vertex(vertex)
+    vertex.splitter.create_machine_vertices(None)
+    return vertex
+
+
 def _make_vertices_split(
         writer, n_atoms, n_incoming, n_outgoing, n_groups, label,
         internal_multicast=False):
@@ -268,10 +326,10 @@ def _get_entry(routing_tables, x, y, source_vertex, partition_id, allow_none):
     if entry is None and app_entry is None:
         if allow_none:
             return None
-        raise Exception(
+        raise PacmanRoutingException(
             f"No entry found on {x}, {y} for {source_vertex}, {partition_id}")
     if entry is not None and app_entry is not None:
-        raise Exception(
+        raise PacmanRoutingException(
             f"App-entry and non-app-entry found on {x}, {y} for"
             f" {source_vertex}, {partition_id}: {app_entry}: {entry}")
     if app_entry is not None:
@@ -294,15 +352,15 @@ def _find_targets(
     while to_follow:
         x, y, next_to_follow = to_follow.pop()
         if not machine.is_chip_at(x, y):
-            raise Exception(
+            raise PacmanRoutingException(
                 f"Route goes through {x}, {y} but that doesn't exist!")
         if (x, y) in visited:
-            raise Exception(
+            raise PacmanRoutingException(
                 f"Potential loop found when going through {x}, {y}")
         visited.add((x, y))
         for p in next_to_follow.processor_ids:
             if (x, y, p) in found_targets:
-                raise Exception(
+                raise PacmanRoutingException(
                     f"Potential Loop found when adding routes at {x}, {y}")
             found_targets.add(((x, y), p, None))
         for link in next_to_follow.link_ids:
@@ -310,7 +368,7 @@ def _find_targets(
                 found_targets.add(((x, y), None, link))
             else:
                 if not machine.is_link_at(x, y, link):
-                    raise Exception(
+                    raise PacmanRoutingException(
                         f"Route from {source_vertex}, {partition_id} uses link"
                         f" {x}, {y}, {link} but that doesn't exist!")
                 next_x, next_y = machine.xy_over_link(x, y, link)
@@ -383,6 +441,7 @@ def _route_and_time(algorithm):
 def test_simple(params):
     algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, n_m_vertices, "source")
     target_vertex = _make_vertices(writer, 1000, n_m_vertices, "target")
@@ -396,6 +455,7 @@ def test_simple(params):
 def test_self(params):
     algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, n_m_vertices, "self")
     writer.add_edge(ApplicationEdge(source_vertex, source_vertex), "Test")
@@ -408,6 +468,7 @@ def test_self(params):
 def test_simple_self(params):
     algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, n_m_vertices, "source")
     target_vertex = _make_vertices(writer, 1000, n_m_vertices, "target")
@@ -423,6 +484,7 @@ def test_simple_self(params):
 def test_multi(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices(writer, 1000, n_m_vertices, f"app_vertex_{i}")
@@ -439,6 +501,7 @@ def test_multi(params):
 def test_multi_self(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices(writer, 1000, n_m_vertices, f"app_vertex_{i}")
@@ -454,6 +517,7 @@ def test_multi_self(params):
 def test_multi_split(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices_split(writer, 1000, 3, 2, n_m_vertices,
@@ -472,6 +536,7 @@ def test_multi_split(params):
 def test_multi_self_split(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices_split(writer, 1000, 3, 2, n_m_vertices,
@@ -489,6 +554,7 @@ def test_multi_self_split(params):
 def test_multi_down_chips_and_links(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices(writer, 1000, n_m_vertices, f"app_vertex_{i}")
@@ -544,6 +610,7 @@ def test_multi_down_chips_and_links(params):
 def test_internal_only(params):
     algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     _make_vertices_split(
         writer, 1000, 3, 2, 2, "app_vertex",
@@ -558,6 +625,7 @@ def test_internal_only(params):
 def test_internal_and_split(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices_split(
@@ -577,6 +645,7 @@ def test_internal_and_split(params):
 def test_spinnaker_link(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     in_device = ApplicationSpiNNakerLinkVertex(100, 0)
     in_device.splitter = SplitterExternalDevice()
@@ -600,6 +669,7 @@ def test_spinnaker_link(params):
 def test_fpga_link(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     in_device = ApplicationFPGAVertex(
         100, [FPGAConnection(0, 0, None, None)], None)
@@ -623,9 +693,32 @@ def test_fpga_link(params):
     _check_edges(routing_tables)
 
 
+def test_fpga_link_overlap(params):
+    algorithm, _n_vertices, _n_m_vertices = params
+    unittest_setup()
+    set_config("Machine", "version", 5)
+    writer = PacmanDataWriter.mock()
+    set_config("Machine", "down_chips", "6,1")
+    writer.set_machine(virtual_machine(12, 12))
+    in_device = ApplicationFPGAVertex(
+        100, [FPGAConnection(0, i, None, None) for i in range(15, 0, -2)],
+        None)
+    in_device.splitter = SplitterExternalDevice()
+    in_device.splitter.create_machine_vertices(ChipCounter())
+    writer.add_vertex(in_device)
+    app_vertex = _make_vertices(
+        writer, 1000, 60 * 16, "app_vertex")
+    writer.add_edge(ApplicationEdge(in_device, app_vertex), "Test")
+
+    writer.set_placements(place_application_graph(Placements()))
+    routing_tables = _route_and_time(algorithm)
+    _check_edges(routing_tables)
+
+
 def test_odd_case(params):
     algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     target_vertex = _make_vertices(writer, 200, 20, "app_vertex")
     delay_vertex = _make_one_to_one_vertices(writer, 200, 20, "delay_vtx")
@@ -655,32 +748,56 @@ def test_odd_case(params):
     _check_edges(routing_tables)
 
 
+def test_with_ethernet_system_placements(params):
+    # This is a test of LPG-style functionality, where an application vertex
+    # is placed on multiple ethernet chips, but the source is only connected
+    # to one of them
+    algorithm, _n_vertices, _n_m_vertices = params
+    unittest_setup()
+    set_config("Machine", "version", 5)
+    writer = PacmanDataWriter.mock()
+    writer.set_machine(virtual_machine(16, 16))
+    source_vertex = _make_vertices(writer, 200, 3, "app_vertex")
+    target_vertex = _make_ethernet_vertices(writer, 1, "eth_vertex")
+    writer.add_edge(ApplicationEdge(source_vertex, target_vertex), "Test")
+    placements = target_vertex.splitter.placements
+    chips_to_use = [(7, 8), (7, 7), (8, 7)]
+    for m_vertex, chip in zip(source_vertex.machine_vertices, chips_to_use):
+        placements.add_placement(Placement(m_vertex, chip[0], chip[1], 2))
+    writer.set_placements(placements)
+    routing_tables = _route_and_time(algorithm)
+    _check_edges(routing_tables)
+
+
 def _check_path(source, nodes_fixed, machine, target):
     c_x, c_y = source
     seen = set()
     for direction, (n_x, n_y) in nodes_fixed:
         if (c_x, c_y) in seen:
-            raise Exception(f"Loop detected at {c_x}, {c_y}: {nodes_fixed}")
+            raise PacmanRoutingException(
+                f"Loop detected at {c_x}, {c_y}: {nodes_fixed}")
         if not machine.is_chip_at(c_x, c_y):
-            raise Exception(
+            raise PacmanRoutingException(
                 f"Route through down chip {c_x}, {c_y}: {nodes_fixed}")
         if not machine.is_link_at(c_x, c_y, direction):
-            raise Exception(
+            raise PacmanRoutingException(
                 f"Route through down link {c_x}, {c_y}, {direction}:"
                 f" {nodes_fixed}")
         if not machine.xy_over_link(c_x, c_y, direction) == (n_x, n_y):
-            raise Exception(
+            raise PacmanRoutingException(
                 f"Invalid route from {c_x}, {c_y}, {direction} to {n_x}, {n_y}"
                 f": {nodes_fixed}")
         seen.add((c_x, c_y))
         c_x, c_y = n_x, n_y
 
     if (c_x, c_y) != target:
-        raise Exception(f"Route doesn't end at (5, 5): {nodes_fixed}")
+        raise PacmanRoutingException(
+            f"Route doesn't end at (5, 5): {nodes_fixed}")
 
 
 def test_route_around():
     unittest_setup()
+    set_config("Machine", "version", 5)
     # Take out all the chips around 3,3 except one then make a path that goes
     # through it
     #      3,4 4,4

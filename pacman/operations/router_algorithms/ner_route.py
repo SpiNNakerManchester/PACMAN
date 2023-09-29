@@ -1,23 +1,23 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""Neighbour Exploring Routing (NER) algorithm from J. Navaridas et al.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+Neighbour Exploring Routing (NER) algorithm from J. Navaridas et al.
 
-Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast routing,
+Algorithm reference: J. Navaridas et al. SpiNNaker: Enhanced multicast routing,
 Parallel Computing (2014).
 
-`http://dx.doi.org/10.1016/j.parco.2015.01.002`
+`https://dx.doi.org/10.1016/j.parco.2015.01.002`
 
 Based on
 https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/ner.py
@@ -43,7 +43,8 @@ from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 
 
 def _ner_net(src, destinations, machine, vector_to_nodes):
-    """ Produce a shortest path tree for a given net using NER.
+    """
+    Produce a shortest path tree for a given net using NER.
 
     This is the kernel of the NER algorithm.
 
@@ -130,11 +131,12 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
 
 
 def _do_route(source_xy, post_vertexes, machine, vector_to_nodes):
-    """ Routing algorithm based on Neighbour Exploring Routing (NER).
+    """
+    Routing algorithm based on Neighbour Exploring Routing (NER).
 
-    Algorithm refrence: J. Navaridas et al. SpiNNaker: Enhanced multicast
+    Algorithm reference: J. Navaridas et al. SpiNNaker: Enhanced multicast
     routing, Parallel Computing (2014).
-    http://dx.doi.org/10.1016/j.parco.2015.01.002
+    https://dx.doi.org/10.1016/j.parco.2015.01.002
 
     This algorithm attempts to use NER to generate routing trees for all nets
     and routes around broken links using A* graph search. If the system is
@@ -161,10 +163,11 @@ def _do_route(source_xy, post_vertexes, machine, vector_to_nodes):
 
 
 def _ner_route(vector_to_nodes):
-    """ Performs routing using rig algorithm
+    """
+    Performs routing using rig algorithm.
 
     :param vector_to_nodes:
-    :return:
+    :return: the routing tables
     :rtype: MulticastRoutingTableByPartition
     """
     routing_tables = MulticastRoutingTableByPartition()
@@ -214,7 +217,8 @@ def _ner_route(vector_to_nodes):
 
 
 def ner_route():
-    """ basic ner router
+    """
+    basic NER router.
 
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition
@@ -223,7 +227,8 @@ def ner_route():
 
 
 def ner_route_traffic_aware():
-    """ traffic-aware ner router
+    """
+    traffic-aware NER router.
 
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition

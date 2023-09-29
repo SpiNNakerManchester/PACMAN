@@ -1,40 +1,38 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
+from pacman.model.graphs.common import ChipAndCore
 
 
 class TestPlacementConstraints(unittest.TestCase):
-    """ Tester for pacman.model.constraints.placer_constraints
+    """ Tester for ChipAndCore
     """
 
     def setUp(self):
         unittest_setup()
 
     def test_chip_and_core_constraint(self):
-        c1 = ChipAndCoreConstraint(1, 2)
+        c1 = ChipAndCore(1, 2)
         self.assertEqual(c1.x, 1)
         self.assertEqual(c1.y, 2)
         self.assertEqual(c1.p, None)
-        self.assertEqual(c1.location, {"x": 1, "y": 2, "p": None})
-        self.assertEqual(c1, ChipAndCoreConstraint(1, 2))
-        self.assertEqual(str(c1), 'ChipAndCoreConstraint(x=1, y=2, p=None)')
-        c2 = ChipAndCoreConstraint(2, 1)
-        c3 = ChipAndCoreConstraint(1, 2, 3)
+        self.assertEqual(c1, ChipAndCore(1, 2))
+        self.assertEqual(str(c1), 'X:1,Y2')
+        c2 = ChipAndCore(2, 1)
+        c3 = ChipAndCore(1, 2, 3)
         self.assertNotEqual(c1, c2)
         self.assertNotEqual(c1, c3)
         self.assertNotEqual(c1, "1.2.3.4")

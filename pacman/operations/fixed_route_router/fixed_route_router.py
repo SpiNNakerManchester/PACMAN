@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import FixedRouteEntry
@@ -22,7 +21,8 @@ from pacman.exceptions import (
 
 
 def fixed_route_router(destination_class):
-    """ Runs the fixed route generator for all boards on machine
+    """
+    Runs the fixed route generator for all boards on machine.
 
     :param destination_class: the destination class to route packets to
     :type destination_class: type or tuple(type,...)
@@ -38,8 +38,9 @@ def fixed_route_router(destination_class):
 
 
 class _FixedRouteRouter(object):
-    """ Computes the fixed routes used to direct data out traffic to the
-        board-local gatherer processors.
+    """
+    Computes the fixed routes used to direct data out traffic to the
+    board-local gatherer processors.
     """
 
     __slots__ = [
@@ -52,7 +53,8 @@ class _FixedRouteRouter(object):
         self._fixed_route_tables = dict()
 
     def _run(self):
-        """ Runs the fixed route generator for all boards on machine
+        """
+        Runs the fixed route generator for all boards on machine.
 
         :return: router tables for fixed route paths
         :rtype: dict(tuple(int,int), ~spinn_machine.FixedRouteEntry)
@@ -71,8 +73,9 @@ class _FixedRouteRouter(object):
         return self._fixed_route_tables
 
     def _do_fixed_routing(self, ethernet_connected_chip):
-        """ Handles this board through the quick routing process, based on a\
-            predefined routing table.
+        """
+        Handles this board through the quick routing process, based on a
+        predefined routing table.
 
         :param ~spinn_machine.Chip ethernet_connected_chip:
             the Ethernet connected chip
@@ -106,8 +109,8 @@ class _FixedRouteRouter(object):
                             break
             if len(found) == 0:
                 raise PacmanRoutingException(
-                    "Unable to do fixed point routing on {}.".format(
-                        ethernet_connected_chip.ip_address))
+                    "Unable to do fixed point routing "
+                    f"on {ethernet_connected_chip.ip_address}.")
             for key in found:
                 to_route.remove(key)
                 routed.add(key)
@@ -133,8 +136,9 @@ class _FixedRouteRouter(object):
         self._fixed_route_tables[key] = fixed_route_entry
 
     def __locate_destination(self, chip):
-        """ Locate destination vertex on (Ethernet-connected) chip to send
-            fixed data to
+        """
+        Locate destination vertex on an (Ethernet-connected) chip to send
+        fixed data to.
 
         :param ~spinn_machine.Chip chip:
         :return: processor ID as a int
@@ -143,9 +147,8 @@ class _FixedRouteRouter(object):
         """
         x = chip.x
         y = chip.y
-        for placement in PacmanDataView.iterate_placements_with_vertex_type(
+        for placement in PacmanDataView.iterate_placements_by_xy_and_type(
                 x, y, self._destination_class):
             return placement.p
         raise PacmanConfigurationException(
-            "no destination vertex found on Ethernet chip {}:{}".format(
-                chip.x, chip.y))
+            f"no destination vertex found on Ethernet chip {x}:{y}")

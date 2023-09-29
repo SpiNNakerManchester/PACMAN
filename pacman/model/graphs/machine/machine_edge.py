@@ -1,24 +1,24 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2016 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractEdge
 
 
 class MachineEdge(AbstractEdge):
-    """ A simple implementation of a machine edge.
+    """
+    A simple implementation of a machine edge.
     """
 
     __slots__ = [
@@ -34,8 +34,10 @@ class MachineEdge(AbstractEdge):
 
     def __init__(self, pre_vertex, post_vertex, label=None):
         """
-        :param MachineVertex pre_vertex: The vertex at the start of the edge.
-        :param MachineVertex post_vertex: The vertex at the end of the edge.
+        :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
+            The vertex at the start of the edge.
+        :param ~pacman.model.graphs.machine.MachineVertex post_vertex:
+            The vertex at the end of the edge.
         :param label: The name of the edge.
         :type label: str or None
         """
@@ -51,7 +53,8 @@ class MachineEdge(AbstractEdge):
     @property
     @overrides(AbstractEdge.pre_vertex, extend_doc=False)
     def pre_vertex(self):
-        """ The vertex at the start of the edge.
+        """
+        The vertex at the start of the edge.
 
         :rtype: ~pacman.model.graphs.machine.MachineVertex
         """
@@ -60,7 +63,8 @@ class MachineEdge(AbstractEdge):
     @property
     @overrides(AbstractEdge.post_vertex, extend_doc=False)
     def post_vertex(self):
-        """ The vertex at the end of the edge.
+        """
+        The vertex at the end of the edge.
 
         :rtype: ~pacman.model.graphs.machine.MachineVertex
         """
@@ -68,5 +72,5 @@ class MachineEdge(AbstractEdge):
 
     def __repr__(self):
         return (
-            "MachineEdge(pre_vertex={}, post_vertex={}, label={})".format(
-                self._pre_vertex, self._post_vertex, self.label))
+            f"MachineEdge(pre_vertex={self._pre_vertex}, "
+            f"post_vertex={self._post_vertex}, label={self.label})")

@@ -1,30 +1,31 @@
 # Copyright (c) 2021 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-from pacman.model.partitioner_splitters.abstract_splitters import (
-    AbstractSplitterCommon)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex)
 from pacman.model.graphs.machine import (
     MachineFPGAVertex, MachineSpiNNakerLinkVertex)
-from pacman.exceptions import PacmanConfigurationException,\
-    PacmanNotExistException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanNotExistException)
+from .abstract_splitter_common import AbstractSplitterCommon
 
 
 class SplitterExternalDevice(AbstractSplitterCommon):
+    """
+    A splitter for handling external devices.
+    """
 
     __slots__ = [
         # Machine vertices that will send packets into the network
@@ -37,6 +38,13 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         "__outgoing_slice"
     ]
 
+    def __init__(self):
+        super().__init__()
+        self.__incoming_vertices = list()
+        self.__incoming_slices = list()
+        self.__outgoing_vertex = None
+        self.__outgoing_slice = None
+
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         super(SplitterExternalDevice, self).set_governed_app_vertex(app_vertex)
@@ -48,23 +56,22 @@ class SplitterExternalDevice(AbstractSplitterCommon):
 
         if isinstance(app_vertex, ApplicationFPGAVertex):
             # This can have multiple FPGA connections per board
-            if app_vertex.incoming_fpga_connections:
+            for i in range(app_vertex.n_machine_vertices_per_link):
                 for fpga in app_vertex.incoming_fpga_connections:
-                    for i in range(app_vertex.n_machine_vertices_per_link):
-                        label = (
-                            f"Incoming Machine vertex {i} for"
-                            f" {app_vertex.label}"
-                            f":{fpga.fpga_id}:{fpga.fpga_link_id}"
-                            f":{fpga.board_address}:{fpga.chip_coords}")
-                        vertex_slice = app_vertex.get_incoming_slice_for_link(
-                            fpga, i)
-                        vertex = MachineFPGAVertex(
-                            fpga.fpga_id, fpga.fpga_link_id,
-                            fpga.board_address, fpga.chip_coords, label=label,
-                            app_vertex=app_vertex, vertex_slice=vertex_slice,
-                            incoming=True, outgoing=False)
-                        self.__incoming_vertices.append(vertex)
-                        self.__incoming_slices.append(vertex_slice)
+                    label = (
+                        f"Incoming Machine vertex {i} for"
+                        f" {app_vertex.label}"
+                        f":{fpga.fpga_id}:{fpga.fpga_link_id}"
+                        f":{fpga.board_address}:{fpga.chip_coords}")
+                    vertex_slice = app_vertex.get_incoming_slice_for_link(
+                        fpga, i)
+                    vertex = MachineFPGAVertex(
+                        fpga.fpga_id, fpga.fpga_link_id,
+                        fpga.board_address, fpga.chip_coords, label=label,
+                        app_vertex=app_vertex, vertex_slice=vertex_slice,
+                        incoming=True, outgoing=False)
+                    self.__incoming_vertices.append(vertex)
+                    self.__incoming_slices.append(vertex_slice)
             fpga = app_vertex.outgoing_fpga_connection
             if fpga is not None:
                 label = (
@@ -106,7 +113,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
-        app_vertex = self._governed_app_vertex
+        app_vertex = self.governed_app_vertex
         for vertex in self.__incoming_vertices:
             # machine_graph.add_vertex(vertex)
             chip_counter.add_core(vertex.sdram_required)

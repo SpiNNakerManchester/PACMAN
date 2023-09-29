@@ -1,28 +1,25 @@
-# Copyright (c) 2017-2020 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+from spinn_utilities.overrides import overrides
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.operations.routing_info_allocator_algorithms.\
     zoned_routing_info_allocator import (flexible_allocate, global_allocate)
-from pacman.model.graphs.application import (
-    ApplicationEdge, ApplicationVertex)
+from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
-from pacman.model.partitioner_splitters.abstract_splitters import (
-    AbstractSplitterCommon)
-from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 
 
 class TestSplitter(AbstractSplitterCommon):
@@ -31,19 +28,19 @@ class TestSplitter(AbstractSplitterCommon):
         return 1
 
     def get_out_going_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def get_in_coming_vertices(self, partition_id):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def machine_vertices_for_recording(self, variable_to_record):
-        return list(self._governed_app_vertex.machine_vertices)
+        return list(self.governed_app_vertex.machine_vertices)
 
     def get_out_going_slices(self):
-        return [m.slice for m in self._governed_app_vertex.machine_vertices]
+        return [m.slice for m in self.governed_app_vertex.machine_vertices]
 
     def get_in_coming_slices(self):
-        return [m.slice for m in self._governed_app_vertex.machine_vertices]
+        return [m.slice for m in self.governed_app_vertex.machine_vertices]
 
     def reset_called(self):
         pass
@@ -83,11 +80,10 @@ class TestAppVertex(ApplicationVertex):
 class TestMacVertex(MachineVertex):
 
     def __init__(
-            self, label=None, constraints=None, app_vertex=None,
+            self, label=None, app_vertex=None,
             vertex_slice=None, n_keys_required=None):
         super(TestMacVertex, self).__init__(
-            label=label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=vertex_slice)
+            label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__n_keys_required = n_keys_required
 
     def get_n_keys_for_partition(self, partition_id):
@@ -185,7 +181,9 @@ def create_graphs_only_fixed():
         label="out_mac_vertex", app_vertex=out_app_vertex)
     out_app_vertex.remember_machine_vertex(out_mac_vertex)
 
-    mac_vertex = TestMacVertex(label="mac_vertex", app_vertex=app_vertex)
+    mac_vertex = TestMacVertex(
+        label="mac_vertex", app_vertex=app_vertex,
+        n_keys_required={"Part0": 2, "Part1": 1})
     app_vertex.remember_machine_vertex(mac_vertex)
 
     PacmanDataView.add_edge(
@@ -214,11 +212,10 @@ def check_masks_all_the_same(routing_info, mask):
     seen_keys = set()
     for r_info in routing_info:
         if isinstance(r_info.vertex, MachineVertex):
-            assert len(r_info.keys_and_masks) == 1
-            assert (r_info.first_mask == mask or
+            assert (r_info.mask == mask or
                     r_info.machine_vertex.label == "RETINA")
-            assert r_info.first_key not in seen_keys
-            seen_keys.add(r_info.first_key)
+            assert r_info.key not in seen_keys
+            seen_keys.add(r_info.key)
 
 
 def check_fixed(m_vertex, part_id, key):

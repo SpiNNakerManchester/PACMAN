@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from .application_fpga_vertex import ApplicationFPGAVertex
 from pacman.model.graphs.application.abstract import Abstract2DDeviceVertex
@@ -19,7 +18,8 @@ from spinn_utilities.overrides import overrides
 
 
 class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
-    """ A device connected to an FPGA with input or output in two dimensions
+    """
+    A device connected to an FPGA with input or output in two dimensions.
     """
 
     __slots__ = [
@@ -32,9 +32,8 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
     def __init__(
             self, width, height, sub_width, sub_height,
             incoming_fpga_connections=None, outgoing_fpga_connection=None,
-            label=None, constraints=None):
+            label=None):
         """
-
         :param int width: The width of the vertex in atoms
         :param int height: The height of the vertex in atoms
         :param int sub_width:
@@ -43,17 +42,17 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
             The height of the sub-rectangle to break the vertex up into
         :param incoming_fpga_connections:
             The connections from one or more FPGAs that that packets are
-            expected to be received from for this device, or None if no
+            expected to be received from for this device, or `None` if no
             incoming traffic is expected from the device
-        :type incoming_fpga_connections: list(FPGAConnection) or None
+        :type incoming_fpga_connections:
+            list(~pacman.model.graphs.application.FPGAConnection) or None
         :param outgoing_fpga_connection:
             The connection to an FPGA that packets to be sent to this device
-            should be sent down, or None if no outgoing traffic is expected to
-            be sent to the device.
-        :type outgoing_fpga_connection: FPGAConnection or None
+            should be sent down, or `None` if no outgoing traffic is expected
+            to be sent to the device.
+        :type outgoing_fpga_connection:
+            ~pacman.model.graphs.application.FPGAConnection or None
         :param str label: The optional name of the vertex.
-        :param iterable(AbstractConstraint) constraints:
-            The optional initial constraints of the vertex.
         """
         # Set variables first as this lets us call properties
         self.__width = width
@@ -62,7 +61,7 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
         self.__sub_height = sub_height
         super(Application2DFPGAVertex, self).__init__(
             width * height, incoming_fpga_connections,
-            outgoing_fpga_connection, label, constraints,
+            outgoing_fpga_connection, label,
             n_machine_vertices_per_link=self._n_sub_rectangles)
         self._verify_sub_size()
 

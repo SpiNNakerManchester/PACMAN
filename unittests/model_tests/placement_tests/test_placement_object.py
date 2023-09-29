@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2015 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 """
 tests for placement
@@ -36,11 +35,17 @@ class TestPlacement(unittest.TestCase):
         test that creating a new placement puts stuff in the right place
         """
         subv = SimpleMachineVertex(None, "")
-        pl = Placement(subv, 0, 0, 1)
-        self.assertEqual(pl.x, 0)
-        self.assertEqual(pl.y, 0)
-        self.assertEqual(pl.p, 1)
+        pl = Placement(subv, 1, 2, 3)
+        self.assertEqual(pl.x, 1)
+        self.assertEqual(pl.y, 2)
+        self.assertEqual(pl.p, 3)
         self.assertEqual(subv, pl.vertex)
+        self.assertEqual((1, 2), pl.xy)
+        self.assertFalse(pl.__eq__("pl"))
+        pl2 = Placement(subv, 1, 2, 3)
+        self.assertEqual(pl, pl2)
+        self.assertEqual(hash(pl), hash(pl2))
+        self.assertFalse(pl != pl2)
 
     def test_create_new_placements_duplicate_vertex(self):
         """

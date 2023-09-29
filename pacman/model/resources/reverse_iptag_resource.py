@@ -1,22 +1,22 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2016 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 
 class ReverseIPtagResource(object):
-    """ Represents the ability to talk to a SpiNNaker machine by sending UDP\
-        packets to it during execution.
+    """
+    Represents the ability to talk to a SpiNNaker machine by sending UDP
+    packets to it during execution.
     """
 
     __slots__ = [
@@ -36,12 +36,12 @@ class ReverseIPtagResource(object):
             self, port=None, sdp_port=1, tag=None):
         """
         :param port: The UDP port to listen to on the board for this tag
-            or None for a default
+            or `None` for a default
         :type port: int or None
         :param int sdp_port:
             The SDP port number to be used when constructing SDP packets from
             the received UDP packets for this tag
-        :param tag: A fixed tag ID to assign, or None if any tag is OK
+        :param tag: A fixed tag ID to assign, or `None` if any tag is OK
         :type tag: int or None
         """
         self._port = port
@@ -50,7 +50,8 @@ class ReverseIPtagResource(object):
 
     @property
     def port(self):
-        """ The port of the tag
+        """
+        The port of the tag.
 
         :rtype: int
         """
@@ -58,8 +59,9 @@ class ReverseIPtagResource(object):
 
     @property
     def sdp_port(self):
-        """ The SDP port to use when constructing the SDP message from the\
-            received UDP message
+        """
+        The SDP port to use when constructing the SDP message from the
+        received UDP message.
 
         :rtype: int
         """
@@ -67,7 +69,8 @@ class ReverseIPtagResource(object):
 
     @property
     def tag(self):
-        """ The tag required, or None if any tag is OK
+        """
+        The tag required, or `None` if any tag is OK.
 
         :rtype: int or None
         """
@@ -81,12 +84,12 @@ class ReverseIPtagResource(object):
         return [self._port, self._sdp_port, self._tag]
 
     def __repr__(self):
-        return (
-            "ReverseIPTagResource(port={}, sdp_port={}, tag={})"
-            .format(self._port, self._sdp_port, self._tag)
-        )
+        return (f"ReverseIPTagResource(port={self._port}, "
+                f"sdp_port={self._sdp_port}, tag={self._tag})")
 
     def __eq__(self, other):
+        if not isinstance(other, ReverseIPtagResource):
+            return False
         return (self._port == other._port and
                 self._sdp_port == other._sdp_port and
                 self._tag == other._tag)

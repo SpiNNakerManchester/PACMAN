@@ -1,45 +1,34 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 import logging
-from pacman.exceptions import PacmanConfigurationException
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
-from pacman.model.partitioner_splitters.abstract_splitters import (
-    AbstractSplitterCommon)
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
-from pacman.utilities.algorithm_utilities\
-    .partition_algorithm_utilities import get_multidimensional_slices
+from pacman.exceptions import PacmanConfigurationException
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
+from pacman.utilities.algorithm_utilities.partition_algorithm_utilities import\
+    get_multidimensional_slices
+from .abstract_splitter_common import AbstractSplitterCommon
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SplitterFixedLegacy(AbstractSplitterCommon):
+    """
+    Splitter for old-style vertices.
+    """
 
     __slots__ = ["__slices"]
-
-    NOT_API_WARNING = (
-        "Your vertex is deprecated. Please add a Splitter or "
-        "inherit from the class in "
-        "pacman.model.partitioner_interfaces.legacy_partitioner_api")
-
-    NOT_SUITABLE_VERTEX_ERROR = (
-        "The vertex {} cannot be supported by the {} as"
-        " the vertex does not support the required method {} of "
-        "LegacyPartitionerAPI. Please inherit from the class in "
-        "pacman.model.partitioner_interfaces.legacy_partitioner_api and try "
-        "again.")
 
     def __init__(self):
         super().__init__()
@@ -47,28 +36,22 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
-        super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, LegacyPartitionerAPI):
-            for abstractmethod in LegacyPartitionerAPI.abstract_methods():
-                check = getattr(app_vertex, abstractmethod, None)
-                if not check:
-                    raise PacmanConfigurationException(
-                        self.NOT_SUITABLE_VERTEX_ERROR.format(
-                            app_vertex.label, type(self).__name__,
-                            abstractmethod))
-                logger.warning(self.NOT_API_WARNING)
+            raise PacmanConfigurationException(
+                f"{self} is not a LegacyPartitionerAPI")
+        super().set_governed_app_vertex(app_vertex)
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id):
-        return list(self._governed_app_vertex.machine_vertices)
+        return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(self, partition_id):
-        return list(self._governed_app_vertex.machine_vertices)
+        return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
-        return list(self._governed_app_vertex.machine_vertices)
+        return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
@@ -82,18 +65,18 @@ class SplitterFixedLegacy(AbstractSplitterCommon):
     def __fixed_slices(self):
         if self.__slices is None:
             self.__slices = get_multidimensional_slices(
-                self._governed_app_vertex)
+                self.governed_app_vertex)
         return self.__slices
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
-        app_vertex = self._governed_app_vertex
+        app_vertex = self.governed_app_vertex
         for vertex_slice in self.__fixed_slices:
             sdram = app_vertex.get_sdram_used_by_atoms(vertex_slice)
             chip_counter.add_core(sdram)
-            label = f"MachineVertex for {vertex_slice} of {app_vertex.label}"
+            label = f"{app_vertex.label}{vertex_slice}"
             machine_vertex = app_vertex.create_machine_vertex(
-                vertex_slice, sdram, label, app_vertex.constraints)
+                vertex_slice, sdram, label)
             app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.reset_called)

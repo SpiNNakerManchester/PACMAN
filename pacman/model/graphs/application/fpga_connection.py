@@ -1,17 +1,16 @@
-# Copyright (c) 2022 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from typing import NamedTuple
 
@@ -23,7 +22,8 @@ FPGA_LINK_IDS = range(0, 16)
 
 
 class FPGAConnection(NamedTuple):
-    """ A connection from or to an FPGA
+    """
+    A connection from or to an FPGA.
     """
 
     #: The ID of the FPGA on the board (0, 1 or 2), or None for all of them
@@ -42,7 +42,8 @@ class FPGAConnection(NamedTuple):
 
     @property
     def is_concrete(self):
-        """ Determine if the connection has the id and link id set
+        """
+        Whether the connection has the FPGA id and link id set.
 
         :rtype: bool
         """
@@ -50,10 +51,11 @@ class FPGAConnection(NamedTuple):
 
     @property
     def expanded(self):
-        """ Get a list of concrete FPGA connections,
-            where fpga_id and fpga_link_id are not None
+        """
+        Get a list of concrete FPGA connections,
+        where fpga_id and fpga_link_id are not `None`.
 
-        :rtype: iter(FPGAConnection)
+        :rtype: iterable(FPGAConnection)
         """
         ids = [self.fpga_id] if self.fpga_id is not None else FPGA_IDS
         links = ([self.fpga_link_id] if self.fpga_link_id is not None

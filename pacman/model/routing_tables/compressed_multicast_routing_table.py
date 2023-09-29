@@ -1,24 +1,24 @@
-# Copyright (c) 2019-2020 The University of Manchester
+# Copyright (c) 2014 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from pacman.model.routing_tables import AbstractMulticastRoutingTable
 from spinn_utilities.overrides import overrides
 
 
 class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
-    """ Represents a compressed routing table for a chip.
+    """
+    Represents a compressed routing table for a chip.
     """
 
     __slots__ = [
@@ -59,11 +59,11 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
                 self.add_multicast_routing_entry(multicast_routing_entry)
 
     def add_multicast_routing_entry(self, multicast_routing_entry):
-        """ Adds a routing entry to this table
+        """
+        Adds a routing entry to this table.
 
-        :param multicast_routing_entry: The route to add
-        :type multicast_routing_entry:
-            ~spinn_machine.MulticastRoutingEntry
+        :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
+            The route to add
         :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing
             entry with the same key-mask combination already exists
         """
@@ -115,8 +115,8 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     def __repr__(self):
         entry_string = ""
         for entry in self._multicast_routing_entries:
-            entry_string += "{}\n".format(entry)
-        return "{}:{}\n\n{}".format(self._x, self._y, entry_string)
+            entry_string += f"{entry}\n"
+        return f"{self._x}:{self._y}\n\n{entry_string}"
 
     @overrides(AbstractMulticastRoutingTable.__hash__)
     def __hash__(self):

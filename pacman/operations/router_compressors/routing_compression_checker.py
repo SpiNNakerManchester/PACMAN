@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import logging
 from spinn_utilities.log import FormatAdapter
@@ -29,7 +28,7 @@ def codify(route, length=32):
 
     Starts of with the assumption that the key is always covered.
 
-    Whenever a mask bit is zero the list of covered keys is doubled to\
+    Whenever a mask bit is zero the list of covered keys is doubled to
     include both the key with a zero and a one at that place.
 
     :param ~spinn_machine.MulticastRoutingEntry route: single routing Entry
@@ -48,9 +47,9 @@ def codify(route, length=32):
             code = str(int(key & bit_value != 0)) + code
         else:
             # Safety key 1 with mask 0 is an error
-            assert key & bit_value == 0, \
-                "Bit {} on the mask:{} is 0 but 1 in the key:{}".format(
-                    i, bin(mask), bin(key))
+            assert key & bit_value == 0, (
+                f"Bit {i} on the mask:{bin(mask)} is 0 "
+                f"but 1 in the key:{bin(key)}")
             code = WILDCARD + code
     return code
 
@@ -111,7 +110,6 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
     :param str o_code:
     :param int start:
     :param ~io.FileIO f:
-    :rtype: None
     """
     if o_code is None:
         o_code = codify(o_route)
@@ -121,23 +119,22 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
         if covers(o_code, c_code):
             c_route = compressed_dict[c_code]
             if f is not None:
-                f.write("\t\t{}\n".format(format_route(c_route)))
+                f.write(f"\t\t{format_route(c_route)}\n")
             if o_route.processor_ids != c_route.processor_ids:
                 if set(o_route.processor_ids) != set(c_route.processor_ids):
                     raise PacmanRoutingException(
-                        "Compressed route {} covers original route {} but has "
-                        "a different processor_ids.".format(c_route, o_route))
+                        f"Compressed route {c_route} covers original route "
+                        f"{o_route} but has a different processor_ids.")
             if o_route.link_ids != c_route.link_ids:
                 if set(o_route.link_ids) != set(c_route.link_ids):
                     raise PacmanRoutingException(
-                        "Compressed route {} covers original route {} but has "
-                        "a different link_ids.".format(c_route, o_route))
+                        f"Compressed route {c_route} covers original route "
+                        f"{o_route} but has a different link_ids.")
             if not o_route.defaultable and c_route.defaultable:
                 if o_route == c_route:
                     raise PacmanRoutingException(
-                        "Compressed route {} while original route {} but has "
-                        "a different defaultable value.".format(
-                            c_route, o_route))
+                        f"Compressed route {c_route} while original route "
+                        f"{o_route} but has a different defaultable value.")
                 else:
                     compare_route(o_route, compressed_dict, o_code=o_code,
                                   start=i + 1, f=f)
@@ -148,17 +145,17 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
                                   start=i + 1, f=f)
             return
     if not o_route.defaultable:
-        # print("No route found {}".format(o_route))
-        raise PacmanRoutingException("No route found {}".format(o_route))
+        # print(f"No route found {o_route}")
+        raise PacmanRoutingException(f"No route found {o_route}")
 
 
 def compare_tables(original, compressed):
-    """ Compares the two tables without generating any output
+    """
+    Compares the two tables without generating any output.
 
     :param MulticastRoutingTable original: The original routing tables
     :param MulticastRoutingTable compressed: The compressed routing tables.
         Which will be considered in order.
-    :rtype: None
     :raises: PacmanRoutingException if there is any error
     """
     compressed_dict = codify_table(compressed)

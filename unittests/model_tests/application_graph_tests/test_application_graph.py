@@ -1,21 +1,22 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2014 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import unittest
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from pacman_test_objects import SimpleTestVertex
 
 
@@ -46,6 +47,38 @@ class TestApplicationGraphModel(unittest.TestCase):
             graph.add_edge(edge, "foo")  # Any old partition label
         assert frozenset(verts) == frozenset(graph.vertices)
         assert frozenset(edges) == frozenset(graph.edges)
+        graph.reset()
+
+    def test_add_vertex(self):
+        graph = ApplicationGraph()
+        with self.assertRaises(PacmanInvalidParameterException):
+            graph.add_vertex("vertex")
+        vert1 = SimpleTestVertex(10, "Test", 256)
+        graph.add_vertex(vert1)
+        with self.assertRaises(PacmanAlreadyExistsException):
+            graph.add_vertex(vert1)
+        vert2 = SimpleTestVertex(10, "Test", 256)
+        self.assertNotEqual(vert1, vert2)
+        self.assertEqual(vert1.label, vert2.label)
+        graph.add_vertex(vert2)
+        self.assertNotEqual(vert1.label, vert2.label)
+        self.assertEqual(vert1, graph.vertex_by_label("Test"))
+
+    def test_add_edge(self):
+        graph = ApplicationGraph()
+        with self.assertRaises(PacmanInvalidParameterException):
+            graph.add_edge("edge", "spikes")
+        vert1 = SimpleTestVertex(10, "Vertex 1", 256)
+        vert2 = SimpleTestVertex(5, "Vertex 2", 256)
+        edge1 = ApplicationEdge(vert1, vert2, label="First edge")
+        self.assertEqual("First edge", edge1.label)
+        with self.assertRaises(PacmanInvalidParameterException):
+            graph.add_edge(edge1, "spikes")
+        graph.add_vertex(vert1)
+        with self.assertRaises(PacmanInvalidParameterException):
+            graph.add_edge(edge1, "spikes")
+        graph.add_vertex(vert2)
+        graph.add_edge(edge1, "spikes")
 
 
 if __name__ == '__main__':

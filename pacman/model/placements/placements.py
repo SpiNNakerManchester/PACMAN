@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2022 The University of Manchester
+# Copyright (c) 2014 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from collections import defaultdict
 from pacman.exceptions import (
@@ -20,7 +19,8 @@ from pacman.exceptions import (
 
 
 class Placements(object):
-    """ The placements of vertices on the chips of the machine.
+    """
+    The placements of vertices on the chips of the machine.
     """
 
     __slots__ = [
@@ -48,14 +48,16 @@ class Placements(object):
 
     @property
     def n_placements(self):
-        """ The number of placements
+        """
+        The number of placements.
 
         :rtype: int
         """
         return len(self._machine_vertices)
 
     def add_placements(self, placements):
-        """ Add some placements
+        """
+        Add some placements.
 
         :param iterable(Placement) placements: The placements to add
         """
@@ -63,7 +65,8 @@ class Placements(object):
             self.add_placement(placement)
 
     def add_placement(self, placement):
-        """ Add a placement
+        """
+        Add a placement.
 
         :param Placement placement: The placement to add
         :raise PacmanAlreadyPlacedError:
@@ -81,26 +84,10 @@ class Placements(object):
         self._placements[x, y][p] = placement
         self._machine_vertices[placement.vertex] = placement
 
-    def get_vertex_on_processor(self, x, y, p):
-        """ Return the vertex on a specific processor or raises an exception
-            if the processor has not been allocated
-
-        :param int x: the x coordinate of the chip
-        :param int y: the y coordinate of the chip
-        :param int p: the processor on the chip
-        :return: the vertex placed on the given processor
-        :rtype: MachineVertex
-        :raise PacmanProcessorNotOccupiedError:
-            If the processor is not occupied
-        """
-        try:
-            return self._placements[x, y][p].vertex
-        except KeyError as e:
-            raise PacmanProcessorNotOccupiedError((x, y, p)) from e
-
     def get_placement_on_processor(self, x, y, p):
-        """ Return the placement on a specific processor or raises an exception
-            if the processor has not been allocated
+        """
+        Get the placement on a specific processor, or raises an exception
+        if the processor has not been allocated.
 
         :param int x: the x coordinate of the chip
         :param int y: the y coordinate of the chip
@@ -116,7 +103,8 @@ class Placements(object):
             raise PacmanProcessorNotOccupiedError((x, y, p)) from e
 
     def is_vertex_placed(self, vertex):
-        """ Determine if a vertex has been placed
+        """
+        Determine if a vertex has been placed.
 
         :param MachineVertex vertex: The vertex to determine the status of
         :rtype: bool
@@ -124,7 +112,8 @@ class Placements(object):
         return vertex in self._machine_vertices
 
     def get_placement_of_vertex(self, vertex):
-        """ Return the placement information for a vertex
+        """
+        Return the placement information for a vertex.
 
         :param MachineVertex vertex: The vertex to find the placement of
         :return: The placement
@@ -137,7 +126,8 @@ class Placements(object):
             raise PacmanNotPlacedError(vertex) from e
 
     def is_processor_occupied(self, x, y, p):
-        """ Determine if a processor has a vertex on it
+        """
+        Determine if a processor has a vertex on it.
 
         :param int x: x coordinate of processor.
         :param int y: y coordinate of processor.
@@ -148,31 +138,45 @@ class Placements(object):
 
     def iterate_placements_on_core(self, x, y):
         """
-        Iterate over placements with this x, y and this type
+        Iterate over placements with this x and y.
 
         :param int x: x coordinate to find placements for.
         :param int y: y coordinate  to find placements for.
-        :rtype: Placement
+        :rtype: iterable(Placement)
         """
         return self._placements[x, y].values()
 
-    def iterate_placements_with_vertex_type(self, x, y, vertex_type):
+    def iterate_placements_by_xy_and_type(self, x, y, vertex_type):
         """
-        Iterate over placements with this x, y and this type
+        Iterate over placements with this x, y and this vertex_type.
 
         :param int x: x coordinate to find placements for.
         :param int y: y coordinate  to find placements for.
         :param class vertex_type: Class of vertex to find
-        :rtype: Placement
+        :rtype: iterable(Placement)
         """
         for placement in self._placements[x, y].values():
             if isinstance(placement.vertex, vertex_type):
                 yield placement
 
+    def iterate_placements_by_vertex_type(self, vertex_type):
+        """
+        Iterate over placements on any chip with this vertex_type.
+
+        :param class vertex_type: Class of vertex to find
+        :rtype: iterable(Placement)
+        """
+        for placement in self._machine_vertices.values():
+            if isinstance(placement.vertex, vertex_type):
+                yield placement
+
     def n_placements_on_chip(self, x, y):
-        """ The number of placements on the given chip
+        """
+        The number of placements on the given chip.
+
         :param int x: x coordinate of chip.
         :param int y: y coordinate of chip.
+        :rtype: int
         """
         if (x, y) not in self._placements:
             return 0
@@ -180,14 +184,17 @@ class Placements(object):
 
     @property
     def placements(self):
-        """ All of the placements
+        """
+        All of the placements.
+
         :return: iterable of placements
         :rtype: iterable(Placement)
         """
         return iter(self._machine_vertices.values())
 
     def placements_on_chip(self, x, y):
-        """ Get the placements on a specific chip
+        """
+        Get the placements on a specific chip.
 
         :param int x: The x-coordinate of the chip
         :param int y: The y-coordinate of the chip
@@ -197,7 +204,8 @@ class Placements(object):
 
     @property
     def chips_with_placements(self):
-        """ Get the chips with placements on them
+        """
+        The chips with placements on them.
 
         :rtype: iterable(tuple(int,int))
         """
@@ -210,7 +218,8 @@ class Placements(object):
         return output
 
     def __iter__(self):
-        """ An iterator for the placements object within
+        """
+        An iterator for the placements object within.
         """
         return iter(self._machine_vertices.values())
 

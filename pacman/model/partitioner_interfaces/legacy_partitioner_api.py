@@ -1,33 +1,38 @@
-# Copyright (c) 2019-2022 The University of Manchester
+# Copyright (c) 2019 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 # Can't use this decorator: circular import problem
 # @require_subclass(ApplicationVertex)
 class LegacyPartitionerAPI(object, metaclass=AbstractBase):
-    """ API used by the vertices which dont have their own splitters but use\
-        what master did before the self partitioning stuff came to be.
+    """
+    API used by the vertices which don't have their own splitters but use
+    what master did before the self partitioning stuff came to be.
+
+    .. warning::
+        Subclasses of this class must also be subclasses of
+        :py:class:`ApplicationVertex`. This is not enforced because of issues
+        with import order, but is required; PACMAN assumes it to be true.
     """
     __slots__ = []
 
     @abstractmethod
     def get_sdram_used_by_atoms(self, vertex_slice):
-        """ Get the separate sdram requirements for a range of atoms.
+        """
+        Get the separate SDRAM requirements for a range of atoms.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the low value of atoms to calculate resources from
@@ -35,34 +40,24 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def create_machine_vertex(
-            self, vertex_slice, sdram, label=None, constraints=None):
-        """ Create a machine vertex from this application vertex.
+    def create_machine_vertex(self, vertex_slice, sdram, label=None):
+        """
+        Create a machine vertex from this application vertex.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of atoms that the machine vertex will cover.
-        :param ~pacman.model.resourcesAbstractSDRAM sdram:
-            The sdram used by the machine vertex.
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The SDRAM used by the machine vertex.
         :param label: human readable label for the machine vertex
         :type label: str or None
-        :param constraints: Constraints to be passed on to the machine vertex.
-        :type constraints:
-            iterable(~pacman.model.constraints.AbstractConstraint)
         :return: The created machine vertex
         :rtype: ~pacman.model.graphs.machine.MachineVertex
         """
 
-    @abstractproperty
-    def n_atoms(self):
-        """ The number of atoms in the vertex
-
-        :return: The number of atoms
-        :rtype: int
-        """
-
     @staticmethod
     def abstract_methods():
-        """ Exposes the abstract methods and properties defined in this class.
+        """
+        Exposes the abstract methods and properties defined in this class.
 
         :rtype frozenset(str)
         """

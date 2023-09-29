@@ -1,43 +1,44 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2015 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-""" A collection of methods which support partitioning algorithms.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+A collection of methods which support partitioning algorithms.
 """
 
 import math
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.common import Slice
+from pacman.model.graphs.common import MDSlice, Slice
 
 
 def get_multidimensional_slices(app_vertex):
-    """ Get the multi-dimensional slices of an application vertex
-        such that each is sized to the maximum atoms per dimension per core
-        except the last which might be smaller in one or more dimensions
+    """
+    Get the multi-dimensional slices of an application vertex
+    such that each is sized to the maximum atoms per dimension per core
+    except the last, which might be smaller in one or more dimensions.
 
     :param ApplicationVertex app_vertex: The vertex to get the slices of
+    :return: The slices
+    :rtype: list(~pacman.model.graphs.common.Slice)
     """
-    # If there is only one slice, get that
-    if app_vertex.n_atoms < app_vertex.get_max_atoms_per_core():
-        return [Slice(0, app_vertex.n_atoms - 1, app_vertex.atoms_shape,
-                      tuple(0 for _ in app_vertex.atoms_shape))]
-
     atoms_per_core = app_vertex.get_max_atoms_per_dimension_per_core()
     n_atoms = app_vertex.atoms_shape
     if len(atoms_per_core) != len(n_atoms):
         raise PacmanConfigurationException(
             "The length of atoms_per_core doesn't match the number of"
             " dimensions")
+
+    if len(app_vertex.atoms_shape) == 1:
+        return get_single_dimension_slices(app_vertex)
 
     # Find out how many vertices we will create, keeping track of the
     # total atoms per core, and the numerator to divide by when working
@@ -74,8 +75,37 @@ def get_multidimensional_slices(app_vertex):
         # Make a slice and a vertex
         lo_atom = hi_atom + 1
         hi_atom = (lo_atom + total_on_core) - 1
-        vertex_slice = Slice(
-            lo_atom, hi_atom, tuple(n_on_core), tuple(start))
+        vertex_slice = MDSlice(
+            lo_atom, hi_atom, tuple(n_on_core), tuple(start),
+            app_vertex.atoms_shape)
+        slices.append(vertex_slice)
+
+    return slices
+
+
+def get_single_dimension_slices(app_vertex):
+    """ Get the single dimension slices of an application vertex
+        such that each is sized to the maximum atoms per dimension per core
+        except the last which might be smaller in one or more dimensions
+
+    :param ApplicationVertex app_vertex: The vertex to get the slices of
+    """
+    # If there is only one slice, get that
+    if app_vertex.n_atoms < app_vertex.get_max_atoms_per_core():
+        return [Slice(0, app_vertex.n_atoms - 1)]
+
+    total_on_core = app_vertex.get_max_atoms_per_dimension_per_core()[0]
+
+    n_vertices = math.ceil(app_vertex.n_atoms / total_on_core)
+
+    # Run over all the vertices and create slices for them
+    slices = list()
+    hi_atom = -1
+    for _ in range(n_vertices):
+        # Make a slice
+        lo_atom = hi_atom + 1
+        hi_atom = min(app_vertex.n_atoms - 1, (lo_atom + total_on_core) - 1)
+        vertex_slice = Slice(lo_atom, hi_atom)
         slices.append(vertex_slice)
 
     return slices

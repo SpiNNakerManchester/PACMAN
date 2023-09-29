@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2015 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from collections import defaultdict
 from spinn_machine.tags import IPTag, ReverseIPTag
@@ -20,7 +19,8 @@ from pacman.utilities import utility_calls
 
 
 class Tags(object):
-    """ Represents assigned IP Tag and Reverse IP Tags.
+    """
+    Represents assigned IP Tag and Reverse IP Tags.
     """
 
     __slots__ = [
@@ -54,7 +54,8 @@ class Tags(object):
         self._ports_assigned = set()
 
     def add_ip_tag(self, ip_tag, vertex):
-        """ Add an IP tag
+        """
+        Add an IP tag.
 
         :param ~spinn_machine.tags.IPTag ip_tag: The tag to add
         :param MachineVertex vertex:
@@ -78,7 +79,7 @@ class Tags(object):
                 raise PacmanInvalidParameterException(
                     "ip_tag", str(ip_tag),
                     "The tag specified has already been assigned with"
-                    " different properties: {}".format(existing_tag))
+                    f" different properties: {existing_tag}")
 
         if (ip_tag.board_address, ip_tag.tag) in self._reverse_ip_tags:
             raise PacmanInvalidParameterException(
@@ -97,7 +98,8 @@ class Tags(object):
                 existing_tag.port = ip_tag.port
 
     def add_reverse_ip_tag(self, reverse_ip_tag, vertex):
-        """ Add a reverse IP tag
+        """
+        Add a reverse IP tag.
 
         :param ~spinn_machine.tags.ReverseIPTag reverse_ip_tag: The tag to add
         :param MachineVertex vertex: The vertex by which the tag is to be used
@@ -136,7 +138,8 @@ class Tags(object):
 
     @property
     def ip_tags_vertices(self):
-        """ List the (IPTag, vertex) pairs stored
+        """
+        The list of (IPTag, vertex) pairs stored.
 
         :rtype: iterable(tuple(IPTag, MachineVertex))
         """
@@ -146,7 +149,8 @@ class Tags(object):
 
     @property
     def ip_tags(self):
-        """ The IP tags assigned
+        """
+        The IP tags assigned.
 
         :rtype: iterable(~spinn_machine.tags.IPTag)
         """
@@ -154,26 +158,30 @@ class Tags(object):
 
     @property
     def reverse_ip_tags(self):
-        """ The reverse IP tags assigned
+        """
+        The reverse IP tags assigned.
 
         :rtype: iterable(~spinn_machine.tags.ReverseIPTag)
         """
         return iter(self._reverse_ip_tags.values())
 
     def get_ip_tags_for_vertex(self, vertex):
-        """ Get the IP Tags assigned to a given machine vertex
+        """
+        Get the IP Tags assigned to a given machine vertex.
 
         :param MachineVertex vertex: The vertex to get the tags for
-        :return: An iterable of IPTag, or None if the vertex has no tags
+        :return: An iterable of IPTag, or `None` if the vertex has no tags
         :rtype: iterable(~spinn_machine.tags.IPTag) or None
         """
         return self._ip_tags_by_vertex.get(vertex, None)
 
     def get_reverse_ip_tags_for_vertex(self, vertex):
-        """ Get the Reverse IP Tags assigned to a given machine vertex
+        """
+        Get the Reverse IP Tags assigned to a given machine vertex.
 
         :param MachineVertex vertex: The vertex to get the tags for
-        :return: An iterable of ReverseIPTag, or None if the vertex has no tags
+        :return:
+            An iterable of ReverseIPTag, or `None` if the vertex has no tags
         :rtype: iterable(~spinn_machine.tags.ReverseIPTag) or None
         """
         return self._reverse_ip_tags_by_vertex.get(vertex, None)

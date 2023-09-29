@@ -1,24 +1,23 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import logging
 import sys
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import Machine, MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry
 from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
@@ -29,7 +28,6 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 def range_compressor(accept_overflow=True):
     """
-
     :param MulticastRoutingTables router_tables:
     :param bool accept_overflow:
         A flag which should only be used in testing to stop raising an
@@ -46,15 +44,16 @@ def range_compressor(accept_overflow=True):
     compressed_tables = MulticastRoutingTables()
     for table in progress.over(router_tables.routing_tables):
         new_table = compressor.compress_table(table)
-        if (new_table.number_of_entries > Machine.ROUTER_ENTRIES and
-                not accept_overflow):
+        chip = PacmanDataView.get_chip_at(table.x, table.y)
+        target = chip.router.n_available_multicast_entries
+        if (new_table.number_of_entries > target and not accept_overflow):
             raise MinimisationFailedError(
                 f"The routing table {table.x} {table.y} with "
                 f"{table.number_of_entries} entries after compression "
                 f"still has {new_table.number_of_entries} so will not fit")
         compressed_tables.add_routing_table(new_table)
     logger.info(f"Ranged compressor resulted with the largest table of size "
-                f"{compressed_tables.max_number_of_entries}")
+                f"{compressed_tables.get_max_number_of_entries()}")
     return compressed_tables
 
 
@@ -75,7 +74,8 @@ class RangeCompressor(object):
         self._entries = None
 
     def compress_table(self, uncompressed):
-        """ Compresses all the entries for a single table.
+        """
+        Compresses all the entries for a single table.
 
         Compressed the entries for this unordered table
         returning a new table with possibly fewer entries
@@ -88,7 +88,9 @@ class RangeCompressor(object):
         # Check you need to compress
         if not get_config_bool(
                 "Mapping", "router_table_compress_as_far_as_possible"):
-            if uncompressed.number_of_entries < Machine.ROUTER_ENTRIES:
+            chip = PacmanDataView.get_chip_at(uncompressed.x, uncompressed.y)
+            target = chip.router.n_available_multicast_entries
+            if uncompressed.number_of_entries < target:
                 return uncompressed
 
         # Step 1 get the entries and make sure they are sorted by key

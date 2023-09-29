@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 """
 based on https://github.com/project-rig/
@@ -19,10 +18,10 @@ based on https://github.com/project-rig/
 
 from abc import abstractmethod
 import logging
+
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import Machine
 from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
@@ -55,8 +54,7 @@ class AbstractCompressor(object):
         # create progress bar
         progress = ProgressBar(
             router_tables.routing_tables,
-            "Compressing routing Tables using {}".format(
-                self.__class__.__name__))
+            f"Compressing routing Tables using {self.__class__.__name__}")
         return self.compress_tables(router_tables, progress)
 
     @abstractmethod
@@ -69,9 +67,10 @@ class AbstractCompressor(object):
         """
 
     def compress_tables(self, router_tables, progress):
-        """ Compress all the unordered routing tables
+        """
+        Compress all the unordered routing tables.
 
-        Tables who start of smaller than target_length are not compressed
+        Tables who start of smaller than global_target are not compressed
 
         :param MulticastRoutingTables router_tables: Routing tables
         :param ~spinn_utilities.progress_bar.ProgressBar progress:
@@ -81,14 +80,12 @@ class AbstractCompressor(object):
         :raises MinimisationFailedError: on failure
         """
         compressed_tables = MulticastRoutingTables()
-        if get_config_bool(
-                "Mapping", "router_table_compress_as_far_as_possible"):
-            # Compress as much as possible
-            target_length = 0
-        else:
-            target_length = Machine.ROUTER_ENTRIES
+        as_needed = not (get_config_bool(
+            "Mapping", "router_table_compress_as_far_as_possible"))
         for table in progress.over(router_tables.routing_tables):
-            if table.number_of_entries < target_length:
+            chip = PacmanDataView.get_chip_at(table.x, table.y)
+            target = chip.router.n_available_multicast_entries
+            if as_needed and table.number_of_entries <= target:
                 new_table = table
             else:
                 compressed_table = self.compress_table(table)
@@ -98,9 +95,10 @@ class AbstractCompressor(object):
                 for entry in compressed_table:
                     new_table.add_multicast_routing_entry(
                         entry.to_MulticastRoutingEntry())
-                if new_table.number_of_entries > Machine.ROUTER_ENTRIES:
-                    self._problems += "(x:{},y:{})={} ".format(
-                        new_table.x, new_table.y, new_table.number_of_entries)
+                if new_table.number_of_entries > target:
+                    self._problems += (
+                        f"(x:{new_table.x},y:{new_table.y})="
+                        f"{new_table.number_of_entries} ")
 
             compressed_tables.add_routing_table(new_table)
 
@@ -108,7 +106,7 @@ class AbstractCompressor(object):
             if self._ordered and not self._accept_overflow:
                 raise MinimisationFailedError(
                     "The routing table after compression will still not fit"
-                    " within the machines router: {}".format(self._problems))
+                    f" within the machines router: {self._problems}")
             else:
                 logger.warning(self._problems)
         return compressed_tables

@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2022 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import unittest
 from pacman.config_setup import unittest_setup
@@ -33,7 +32,7 @@ class TestRoutingInfo(unittest.TestCase):
         pre_vertex = SimpleMachineVertex(ConstantSDRAM(0))
         key = 12345
         info = MachineVertexRoutingInfo(
-            [BaseKeyAndMask(key, FULL_MASK)], "Test", pre_vertex, 0)
+            BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
         routing_info = RoutingInfo()
         routing_info.add_routing_info(info)
 
@@ -57,14 +56,14 @@ class TestRoutingInfo(unittest.TestCase):
         assert next(iter(routing_info)) == info
 
         info2 = MachineVertexRoutingInfo(
-            [BaseKeyAndMask(key, FULL_MASK)], "Test", pre_vertex, 0)
+            BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
 
         with self.assertRaises(PacmanAlreadyExistsException):
             routing_info.add_routing_info(info2)
         assert info != info2
 
         info3 = MachineVertexRoutingInfo(
-            [BaseKeyAndMask(key, FULL_MASK)], "Test2", pre_vertex, 0)
+            BaseKeyAndMask(key, FULL_MASK), "Test2", pre_vertex, 0)
         routing_info.add_routing_info(info3)
         assert info != info3
         assert routing_info.get_routing_info_from_pre_vertex(
@@ -73,14 +72,6 @@ class TestRoutingInfo(unittest.TestCase):
                 pre_vertex, "Test")
         assert routing_info.get_routing_info_from_pre_vertex(
             pre_vertex, "Test2").get_keys().tolist() == [key]
-
-        info4 = MachineVertexRoutingInfo(
-            [BaseKeyAndMask(key, FULL_MASK),
-             BaseKeyAndMask(key * 2, FULL_MASK)], "Test4", pre_vertex, 0)
-        routing_info.add_routing_info(info4)
-
-        assert routing_info.get_routing_info_from_pre_vertex(
-            pre_vertex, "Test4").get_keys().tolist() == [key, key * 2]
 
     def test_base_key_and_mask(self):
         with self.assertRaises(PacmanConfigurationException):

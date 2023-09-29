@@ -1,57 +1,38 @@
-# Copyright (c) 2020-2021 The University of Manchester
+# Copyright (c) 2020 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from pacman.data import PacmanDataView
-from pacman.model.partitioner_interfaces import AbstractSplitterPartitioner
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 
 def splitter_partitioner():
     """
-     :return:
-         The number of chips needed to satisfy this partitioning.
-     :rtype: int
-     :raise PacmanPartitionException:
-         If something goes wrong with the partitioning
-     """
-    partitioner = _SplitterPartitioner()
-    # pylint:disable=protected-access
-    return partitioner._run()
+    Call the splitter of each application vertex to create the machine vertices
+    needed.
 
-
-class _SplitterPartitioner(AbstractSplitterPartitioner):
-    """ Partitioner which hands the partitioning work to application vertices'\
-        splitter objects.
+    :return: The number of chips needed to satisfy this partitioning.
+    :rtype: int
+    :raise PacmanPartitionException:
+        If something goes wrong with the partitioning
     """
+    progress = ProgressBar(
+        PacmanDataView.get_n_vertices(), "Partitioning Graph")
 
-    __slots__ = []
+    # Partition one vertex at a time
+    chip_counter = ChipCounter()
+    for vertex in progress.over(PacmanDataView.iterate_vertices()):
+        vertex.splitter.create_machine_vertices(chip_counter)
 
-    # inherited from AbstractPartitionAlgorithm
-    def _run(self):
-        """
-        :rtype: int
-        :raise PacmanPartitionException:
-            If something goes wrong with the partitioning
-        """
-        progress = ProgressBar(
-            PacmanDataView.get_n_vertices(), "Partitioning Graph")
-
-        # Partition one vertex at a time
-        chip_counter = ChipCounter()
-        for vertex in progress.over(PacmanDataView.iterate_vertices()):
-            vertex.splitter.create_machine_vertices(chip_counter)
-
-        return chip_counter.n_chips
+    return chip_counter.n_chips

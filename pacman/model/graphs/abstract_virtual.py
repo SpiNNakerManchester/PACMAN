@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2016 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from spinn_utilities.abstract_base import abstractmethod, abstractproperty
 from spinn_utilities.require_subclass import require_subclass
@@ -20,59 +19,67 @@ from pacman.model.graphs.abstract_vertex import AbstractVertex
 
 @require_subclass(AbstractVertex)
 class AbstractVirtual(object):
-    """ A vertex which exists outside of the machine, \
-        allowing a graph to formally participate in I/O.
+    """
+    A vertex which exists outside of the machine,
+    allowing a graph to formally participate in I/O.
 
     .. note::
         Everything that is an instance of ``AbstractVirtual`` is also an
-        instance of :py:class:`AbstractVertex`.
+        instance of :py:class:`~pacman.model.graphs.AbstractVertex`.
     """
 
     __slots__ = ()
 
     @abstractproperty
     def board_address(self):
-        """ The IP address of the board to which the device is connected,
-            or ``None`` for the boot board, or when using linked chip
-            coordinates.
+        """
+        The IP address of the board to which the device is connected,
+        or ``None`` for the boot board, or when using linked chip
+        coordinates.
 
         :rtype: str or None
         """
 
     @abstractproperty
     def linked_chip_coordinates(self):
-        """ The coordinates of the chip to which the device is connected,
-            or ``None`` for the boot board, or when using a board address.
+        """
+        The coordinates of the chip to which the device is connected,
+        or ``None`` for the boot board, or when using a board address.
 
         :rtype: tuple(int, int) or None
         """
 
     @abstractmethod
     def outgoing_keys_and_masks(self):
-        """ Get the keys sent by the device or None if there aren't any
-            explicitly defined.
+        """
+        Get the keys sent by the device or `None` if there aren't any
+        explicitly defined.
 
-        :rtype: list of KeyAndMask or None
+        :rtype: list(~pacman.model.routing_info.BaseKeyAndMask) or None
         """
 
     @abstractproperty
     def incoming(self):
-        """ Indicates if this device sends traffic into SpiNNaker
+        """
+        Whether this device sends traffic into SpiNNaker.
 
         :rtype: bool
         """
 
     @abstractproperty
     def outgoing(self):
-        """ Indicates if this device receives traffic from SpiNNaker
+        """
+        Whether this device receives traffic from SpiNNaker.
 
         :rtype: bool
         """
 
     @abstractmethod
     def get_link_data(self, machine):
-        """ Get link data from the machine
+        """
+        Get link data from the machine.
 
-        :param Machine machine: The machine to get the data from
-        :rtype: AbstractLinkData
+        :param ~spinn_machine.Machine machine:
+            The machine to get the data from
+        :rtype: ~spinn_machine.link_data_objects.AbstractLinkData
         """

@@ -1,45 +1,43 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2014 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from pacman.exceptions import PacmanAlreadyExistsException
 
 
 class RoutingInfo(object):
-    """ An association of machine vertices to a non-overlapping set of keys\
-        and masks.
+    """
+    An association of machine vertices to a non-overlapping set of keys
+    and masks.
     """
 
     __slots__ = [
-
         # Partition information indexed by edge pre vertex and partition ID\
         # name
         "_info"
     ]
 
     def __init__(self):
-
         # Partition information indexed by edge pre vertex and partition ID
         # name
         self._info = dict()
 
     def add_routing_info(self, info):
-        """ Add a routing information item
+        """
+        Add a routing information item.
 
         :param VertexRoutingInfo info:
             The routing information item to add
-        :rtype: None
         :raise PacmanAlreadyExistsException:
             If the partition is already in the set of edges
         """
@@ -51,30 +49,32 @@ class RoutingInfo(object):
         self._info[key] = info
 
     def get_routing_info_from_pre_vertex(self, vertex, partition_id):
-        """ Get routing information for a given partition_id from a vertex
+        """
+        Get routing information for a given partition_id from a vertex.
 
         :param AbstractVertex vertex: The vertex to search for
-        :param str partition_id:\
+        :param str partition_id:
             The ID of the partition for which to get the routing information
         """
         return self._info.get((vertex, partition_id))
 
     def get_first_key_from_pre_vertex(self, vertex, partition_id):
-        """ Get the first key for the partition starting at a vertex
+        """
+        Get the first key for the partition starting at a vertex.
 
         :param AbstractVertex vertex: The vertex which the partition starts at
-        :param str partition_id:\
+        :param str partition_id:
             The ID of the partition for which to get the routing information
         :return: The routing key of the partition
         :rtype: int
         """
-        key = (vertex, partition_id)
-        if key in self._info:
-            return self._info[key].keys_and_masks[0].key
+        if (vertex, partition_id) in self._info:
+            return self._info[(vertex, partition_id)].key
         return None
 
     def __iter__(self):
-        """ Gets an iterator for the routing information
+        """
+        Gets an iterator for the routing information.
 
         :return: a iterator of routing information
         """

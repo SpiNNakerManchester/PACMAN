@@ -1,24 +1,24 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 
 
 class AbstractSDRAM(object, metaclass=AbstractBase):
-    """ Represents an amount of SDRAM used on a chip in the machine.
+    """
+    Represents an amount of SDRAM used on a chip in the machine.
     """
 
     @abstractmethod
@@ -33,7 +33,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
     @abstractmethod
     def __add__(self, other):
         """
-        Combines this SDRAM resource with the other one and creates a new one
+        Combines this SDRAM resource with the other one and creates a new one.
 
         :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
@@ -42,7 +42,8 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
 
     @abstractmethod
     def __sub__(self, other):
-        """ Creates a new SDRAM which is this one less the other
+        """
+        Creates a new SDRAM which is this one less the other.
 
         :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
@@ -51,7 +52,8 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
 
     @abstractmethod
     def sub_from(self, other):
-        """ Creates a new SDRAM which is the other less this one
+        """
+        Creates a new SDRAM which is the other less this one.
 
         :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
@@ -60,12 +62,14 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
 
     @abstractproperty
     def fixed(self):
-        """ Returns the fixed SDRAM cost
+        """
+        The fixed SDRAM cost.
         """
 
     @abstractproperty
     def per_timestep(self):
-        """ Returns extra SDRAM cost for each additional timestep
+        """
+        The extra SDRAM cost for each additional timestep.
 
         .. warning::
             May well be zero.
@@ -80,7 +84,8 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
 
     @abstractmethod
     def report(self, timesteps, indent="", preamble="", target=None):
-        """ Writes a description of this SDRAM to the target.
+        """
+        Writes a description of this SDRAM to the target.
 
         :param int timesteps: Number of timesteps to do total cost for
         :param str indent: Text at the start of this and all children

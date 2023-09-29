@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2016 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from pacman.exceptions import PacmanInvalidParameterException
 from spinn_utilities.overrides import overrides
@@ -20,7 +19,8 @@ from .application_virtual_vertex import ApplicationVirtualVertex
 
 
 class ApplicationFPGAVertex(ApplicationVirtualVertex):
-    """ A virtual application vertex connected to one or more FPGA links
+    """
+    A virtual application vertex connected to one or more FPGA links.
     """
 
     __slots__ = [
@@ -31,29 +31,28 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     def __init__(
             self, n_atoms, incoming_fpga_connections=None,
-            outgoing_fpga_connection=None, label=None, constraints=None,
+            outgoing_fpga_connection=None, label=None,
             n_machine_vertices_per_link=1):
         """
-
         :param int n_atoms: The number of atoms in the vertex
         :param incoming_fpga_connections:
             The connections from one or more FPGAs that that packets are
-            expected to be received from for this device, or None if no
+            expected to be received from for this device, or `None` if no
             incoming traffic is expected from the device
-        :type incoming_fpga_connections: list(FPGAConnection) or None
+        :type incoming_fpga_connections:
+            list(~pacman.model.graphs.application.FPGAConnection) or None
         :param outgoing_fpga_connection:
             The connection to an FPGA that packets to be sent to this device
-            should be sent down, or None if no outgoing traffic is expected to
-            be sent to the device.
-        :type outgoing_fpga_connection: FPGAConnection or None
+            should be sent down, or `None` if no outgoing traffic is expected
+            to be sent to the device.
+        :type outgoing_fpga_connection:
+            ~pacman.model.graphs.application.FPGAConnection or None
         :param str label: The optional name of the vertex.
-        :param iterable(AbstractConstraint) constraints:
-            The optional initial constraints of the vertex.
         :param int n_machine_vertices_per_link:
             The optional number of machine vertices to create for each FPGA
             link (1 by default)
         """
-        super().__init__(label=label, constraints=constraints)
+        super().__init__(label=label)
         self._n_atoms = n_atoms
         self._incoming_fpga_connections = incoming_fpga_connections
         self._outgoing_fpga_connection = outgoing_fpga_connection
@@ -73,21 +72,25 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     @property
     def n_machine_vertices_per_link(self):
-        """ The number of machine vertices to create for each link of the FPGA
+        """
+        The number of machine vertices to create for each link of the FPGA.
+
         :rtype: int
         """
         return self._n_machine_vertices_per_link
 
     def get_incoming_slice_for_link(self, link, index):
-        """ Get the slice to be given to the connection from the given link
+        """
+        Get the slice to be given to the connection from the given link.
 
-        :param FPGAConnection link: The FPGA connection to get the slice for
+        :param ~pacman.model.graphs.application.FPGAConnection link:
+            The FPGA connection to get the slice for
         :param int index:
             The index of the connection on the FGPA link, for when
             n_machine_vertices_per_link > 1
-
         :rtype: ~pacman.model.graphs.common.Slice
         """
+        # pylint: disable=unused-argument
         atoms_per_slice = self.n_atoms // self._n_machine_vertices_per_link
         low_atom = atoms_per_slice * index
         hi_atom = (atoms_per_slice * (index + 1)) - 1
@@ -95,7 +98,8 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         return Slice(low_atom, hi_atom)
 
     def get_outgoing_slice(self):
-        """ Get the slice to be given to the outgoing connection
+        """
+        Get the slice to be given to the outgoing connection.
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
@@ -103,20 +107,23 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     @property
     def incoming_fpga_connections(self):
-        """ The connections from one or more FPGAs that packets are expected
-            to be received from for this device
-
-        :rtype: iter(FPGAConnection)
         """
-        for conn in self._incoming_fpga_connections:
-            yield from conn.expanded
+        The connections from one or more FPGAs that packets are expected
+        to be received from for this device.
+
+        :rtype: iterable(~pacman.model.graphs.application.FPGAConnection)
+        """
+        if self._incoming_fpga_connections:
+            for conn in self._incoming_fpga_connections:
+                yield from conn.expanded
 
     @property
     def outgoing_fpga_connection(self):
-        """ The connection to one FPGA via one link to which packets are sent
-            to this device.
+        """
+        The connection to one FPGA via one link to which packets are sent
+        to this device.
 
-        :rtype: FPGAConnection or None
+        :rtype: ~pacman.model.graphs.application.FPGAConnection or None
         """
         return self._outgoing_fpga_connection
 

@@ -1,111 +1,26 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2014 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import hashlib
 import numpy
 import math
-from pacman.exceptions import (
-    PacmanInvalidParameterException, PacmanValueError)
-
-
-def locate_constraints_of_type(constraints, constraint_type):
-    """ Locates all constraints of a given type out of a list
-
-    :param iterable(AbstractConstraint) constraints: The constraints to filter
-    :param type(AbstractConstraint) constraint_type:
-        The type of constraints to return
-    :return: The constraints of constraint_type that are found in the
-        constraints given
-    :rtype: iterable(AbstractConstraint)
-    """
-    return [c for c in constraints if isinstance(c, constraint_type)]
-
-
-def locate_first_constraint_of_type(constraints, constraint_type):
-    """ Locates the first constraint of a given type out of a list
-
-    :param iterable(AbstractConstraint) constraints:
-        The constraints to select from
-    :param type(AbstractConstraint) constraint_type:
-        The type of constraints to return
-    :return: The first constraint of `constraint_type` that was found in the
-        constraints given
-    :rtype: AbstractConstraint
-    :raises PacmanInvalidParameterException:
-        If no such constraint is present
-    """
-    for constraint in constraints:
-        if isinstance(constraint, constraint_type):
-            return constraint
-    raise PacmanInvalidParameterException(
-        "constraints", constraint_type.__class__,
-        "Constraints of this class are not present")
-
-
-def _is_constraint_supported(constraint, supported_constraints):
-    """
-    :param AbstractConstraint constraint:
-    :param list(type(AbstractConstraint)) supported_constraints:
-    :rtype: bool
-    """
-    return any(isinstance(constraint, supported_constraint)
-               for supported_constraint in supported_constraints)
-
-
-def check_algorithm_can_support_constraints(
-        constrained_vertices, supported_constraints, abstract_constraint_type):
-    """ Helper method to find out if an algorithm can support all the
-        constraints given the objects its expected to work on
-
-    :param list(AbstractVertex) constrained_vertices:
-        a list of constrained vertices which each has constraints given to the
-        algorithm
-    :param list(type(AbstractConstraint)) supported_constraints:
-        The constraints supported
-    :param type(AbstractConstraint) abstract_constraint_type:
-        The overall abstract c type supported
-    :raise PacmanInvalidParameterException:
-        When the algorithm cannot support the constraints demanded of it
-    """
-    for constrained_vertex in constrained_vertices:
-        for c in constrained_vertex.constraints:
-            if isinstance(c, abstract_constraint_type) and not \
-                    _is_constraint_supported(c, supported_constraints):
-                raise PacmanInvalidParameterException(
-                    "constraints", c.__class__,
-                    "Constraints of this class are not supported by this"
-                    " algorithm")
-
-
-def check_constrained_value(value, current_value):
-    """ Checks that the current value and a new value match
-
-    :param value: The value to check
-    :param current_value: The existing value
-    """
-    if not is_equal_or_None(current_value, value):
-        raise PacmanValueError(
-            "Multiple constraints with conflicting values")
-    if value is not None:
-        return value
-    return current_value
 
 
 def expand_to_bit_array(value):
-    """ Expand a 32-bit value in to an array of length 32 of uint8 values,
-        each of which is a 1 or 0
+    """
+    Expand a 32-bit value in to an array of length 32 of uint8 values,
+    each of which is a 1 or 0.
 
     :param int value: The value to expand
     :rtype: ~numpy.ndarray(uint8)
@@ -115,8 +30,9 @@ def expand_to_bit_array(value):
 
 
 def compress_from_bit_array(bit_array):
-    """ Compress a bit array of 32 uint8 values, where each is a 1 or 0,
-        into a 32-bit value
+    """
+    Compress a bit array of 32 uint8 values, where each is a 1 or 0,
+    into a 32-bit value.
 
     :param ~numpy.ndarray(uint8) bit_array: The array to compress
     :rtype: int
@@ -125,8 +41,9 @@ def compress_from_bit_array(bit_array):
 
 
 def compress_bits_from_bit_array(bit_array, bit_positions):
-    """ Compress specific positions from a bit array of 32 uint8 value,\
-        where is a 1 or 0, into a 32-bit value.
+    """
+    Compress specific positions from a bit array of 32 uint8 value,
+    where is a 1 or 0, into a 32-bit value.
 
     :param ~numpy.ndarray(uint8) bit_array:
         The array to extract the value from
@@ -141,8 +58,9 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
 
 
 def is_equal_or_None(a, b):
-    """ If a and b are both not None, return True iff they are equal,\
-        otherwise return True
+    """
+    If a and b are both not `None`, return True if and only if they are equal,
+    otherwise return True.
 
     :rtype: bool
     """
@@ -150,7 +68,8 @@ def is_equal_or_None(a, b):
 
 
 def is_single(iterable):
-    """ Test if there is exactly one item in the iterable
+    """
+    Test if there is exactly one item in the iterable.
 
     :rtype: bool
     """
@@ -169,7 +88,8 @@ def is_single(iterable):
 
 
 def md5(string):
-    """ Get the MD5 hash of the given string, which is UTF-8 encoded.
+    """
+    Get the MD5 hash of the given string, which is UTF-8 encoded.
 
     :param str string:
     :rtype: str
@@ -178,8 +98,9 @@ def md5(string):
 
 
 def get_key_ranges(key, mask):
-    """ Get a generator of base_key, n_keys pairs that represent ranges
-        allowed by the mask.
+    """
+    Get a generator of base_key, n_keys pairs that represent ranges
+    allowed by the mask.
 
     :param int key: The base key
     :param int mask: The mask
@@ -217,7 +138,8 @@ def get_key_ranges(key, mask):
 
 
 def get_n_bits(n_values):
-    """ Determine how many bits are required for the given number of values
+    """
+    Determine how many bits are required for the given number of values.
 
     :param int n_values: the number of values (starting at 0)
     :return: the number of bits required to express that many values
@@ -230,16 +152,20 @@ def get_n_bits(n_values):
     return int(math.ceil(math.log2(n_values)))
 
 
-def get_field_based_keys(key, vertex_slice):
-    """ Translate a vertex slice with potentially multiple dimensions into
-        a list of keys, one for each atom of the vertex, by putting the values
-        into fields of the keys based on the shape of the slice.
+def get_field_based_keys(key, vertex_slice, shift=0):
+    """
+    Translate a vertex slice with potentially multiple dimensions into
+    a list of keys, one for each atom of the vertex, by putting the values
+    into fields of the keys based on the shape of the slice.
 
     :param int key: The base key
     :param Slice vertex_slice: The slice to translate
+    :param int shift:
+        The left shift to apply to the atom key before adding to the key. Can
+        be used to make space for additional information at the bottom of the
+        key.
     :rtype: list(int)
     """
-
     # Find the size of field required for each coordinate, and the shift
     # required to get to this field position (the first field has a shift
     # of 0)
@@ -258,19 +184,28 @@ def get_field_based_keys(key, vertex_slice):
     # get the key
     keys = numpy.sum(numpy.left_shift(coords, shifts), axis=1)
 
+    # Do any final shifting as required (zero shift is valid but does nothing)
+    if shift:
+        keys = numpy.left_shift(keys, shift)
+
     # The final result is the above with the base key added
     return keys + key
 
 
-def get_field_based_index(base_key, vertex_slice):
-    """ Map field based keys back to indices
+def get_field_based_index(base_key, vertex_slice, shift=0):
+    """
+    Map field based keys back to indices.
 
     :param int base_key: The base key
     :param Slice vertex_slice: The slice to translate
+    :param int shift:
+        The left shift to apply to the atom key before adding to the key. Can
+        be used to make space for additional information at the bottom of the
+        key.
     :rtype: dict(int,int)
     """
     # Get the field based keys
-    field_based_keys = get_field_based_keys(base_key, vertex_slice)
+    field_based_keys = get_field_based_keys(base_key, vertex_slice, shift)
 
     # Inverse the index
     return {
@@ -280,10 +215,24 @@ def get_field_based_index(base_key, vertex_slice):
 
 
 def get_n_bits_for_fields(field_sizes):
-    """ Get the number of bits required for the fields in the vertex slice
+    """
+    Get the number of bits required for the fields in the vertex slice.
 
     :param iterable(int) field_sizes: The sizes each of the fields
     :rtype: int
     """
     field_size = [get_n_bits(n) for n in field_sizes]
     return sum(field_size)
+
+
+def allocator_bits_needed(size):
+    """
+    Get the bits needed for the routing info allocator.
+
+    :param int size: The size to calculate the number of bits for
+    :return: the number of bits required for that size
+    :rtype: int
+    """
+    if size == 0:
+        return 0
+    return int(math.ceil(math.log2(size)))

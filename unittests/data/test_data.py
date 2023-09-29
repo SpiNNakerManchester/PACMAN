@@ -1,17 +1,16 @@
-# Copyright (c) 2021-2022 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import unittest
 from spinn_utilities.exceptions import (
@@ -19,10 +18,13 @@ from spinn_utilities.exceptions import (
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
-from pacman.exceptions import PacmanConfigurationException
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanNotPlacedError)
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationEdge
-from pacman.model.placements import Placements
+from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.placements import Placement, Placements
+from pacman.model.resources import ConstantSDRAM, VariableSDRAM
 from pacman.model.routing_info import RoutingInfo
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition)
@@ -121,13 +123,91 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(SimulatorShutdownException):
             PacmanDataView.add_edge(ApplicationEdge(app1, app2), "new")
 
-    def test_placements(self):
+    def test_graph_safety_code(self):
+        writer = PacmanDataWriter.setup()
+        # there is always a graph so to hit safety code you need a hack
+        writer._PacmanDataWriter__pacman_data._graph = None
+        with self.assertRaises(DataNotYetAvialable):
+            writer.add_vertex(None)
+        with self.assertRaises(DataNotYetAvialable):
+            writer.add_edge(None, None)
+        with self.assertRaises(DataNotYetAvialable):
+            writer.iterate_vertices()
+        with self.assertRaises(DataNotYetAvialable):
+            list(writer.get_vertices_by_type(None))
+        with self.assertRaises(DataNotYetAvialable):
+            writer.get_n_vertices()
+        with self.assertRaises(DataNotYetAvialable):
+            writer.iterate_partitions()
+        with self.assertRaises(DataNotYetAvialable):
+            writer.get_n_partitions()
+        with self.assertRaises(DataNotYetAvialable):
+            writer.get_outgoing_edge_partitions_starting_at_vertex(None)
+        with self.assertRaises(DataNotYetAvialable):
+            writer.get_edges()
+        with self.assertRaises(DataNotYetAvialable):
+            writer.get_n_machine_vertices()
+        with self.assertRaises(DataNotYetAvialable):
+            list(writer.iterate_machine_vertices())
+
+    def test_graph_never_changes(self):
+        writer = PacmanDataWriter.setup()
+        # graph is hidden so need a hack to get it.
+        graph1 = writer._PacmanDataWriter__pacman_data._graph
+        writer.start_run()
+        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        self.assertEqual(id(graph1), id(graph2))
+        writer.finish_run()
+        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        self.assertEqual(id(graph1), id(graph2))
+        writer.soft_reset()
+        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        self.assertEqual(id(graph1), id(graph2))
+        writer.hard_reset()
+        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        self.assertEqual(id(graph1), id(graph2))
+        writer.start_run()
+        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        self.assertEqual(id(graph1), id(graph2))
+        writer.finish_run()
+        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        self.assertEqual(id(graph1), id(graph2))
+
+    def test_placements_safety_code(self):
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
+            writer.iterate_placemements()
+        with self.assertRaises(DataNotYetAvialable):
+            writer.iterate_placements_by_vertex_type(None)
+        with self.assertRaises(DataNotYetAvialable):
+            writer.iterate_placements_on_core(None, None)
+        with self.assertRaises(DataNotYetAvialable):
+            writer.iterate_placements_by_xy_and_type(None, None, None)
+        with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_n_placements()
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_placement_of_vertex(None)
+        with self.assertRaises(DataNotYetAvialable):
+            PacmanDataView.get_placement_on_processor(None, None, None)
+
+    def test_placements(self):
+        writer = PacmanDataWriter.setup()
         info = Placements([])
+        p1 = Placement(SimpleMachineVertex(None), 1, 2, 3)
+        info.add_placement(p1)
+        v2 = SimpleMachineVertex(None)
+        p2 = Placement(v2, 1, 2, 5)
+        info.add_placement(p2)
+        info.add_placement(Placement(SimpleMachineVertex(None), 2, 2, 3))
         writer.set_placements(info)
-        self.assertEqual(0, PacmanDataView.get_n_placements())
+        self.assertEqual(3, PacmanDataView.get_n_placements())
+        on12 = list(PacmanDataView.iterate_placements_on_core(1, 2))
+        self.assertEqual(on12, [p1, p2])
+        vertex = PacmanDataView.get_placement_on_processor(1, 2, 5).vertex
+        self.assertEqual(v2, vertex)
+        with self.assertRaises(PacmanNotPlacedError):
+            PacmanDataView.get_placement_of_vertex(SimpleMachineVertex(None))
+
         with self.assertRaises(TypeError):
             writer.set_placements("Bacon")
 
@@ -174,7 +254,7 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_uncompressed()
         with self.assertRaises(TypeError):
-            writer.set_precompressed()
+            writer.set_precompressed(None)
 
     def test_plan_n_timesteps(self):
         writer = PacmanDataWriter.setup()
@@ -265,3 +345,17 @@ class TestSimulatorData(unittest.TestCase):
         self.assertTrue(PacmanDataView.get_requires_mapping())
         writer.hard_reset()
         self.assertTrue(PacmanDataView.get_requires_mapping())
+
+    def test_get_monitors(self):
+        writer = PacmanDataWriter.setup()
+        writer.set_plan_n_timesteps((45))
+        self.assertEqual(0, PacmanDataView.get_monitor_cores())
+        self.assertEqual(0, PacmanDataView.get_monitor_sdram())
+        writer.add_monitor_all_chips(SimpleMachineVertex(ConstantSDRAM(200)))
+        self.assertEqual(1, PacmanDataView.get_monitor_cores())
+        self.assertEqual(200, PacmanDataView.get_monitor_sdram())
+        writer.add_monitor_all_chips(SimpleMachineVertex(
+            VariableSDRAM(100, 10)))
+        self.assertEqual(2, PacmanDataView.get_monitor_cores())
+        target = 200 + 100 + 10 * 45
+        self.assertEqual(target, PacmanDataView.get_monitor_sdram())

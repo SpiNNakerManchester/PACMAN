@@ -1,19 +1,19 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-"""An explicit representation of a routing tree in a machine.
+"""
+An explicit representation of a routing tree in a machine.
 
 This representation of a route explicitly describes a tree-structure and the
 complete path taken by a route. This is used during place and route in
@@ -27,11 +27,12 @@ from collections import deque
 
 
 class RoutingTree(object):
-    """ Explicitly defines a multicast route through a SpiNNaker machine.
+    """
+    Explicitly defines a multicast route through a SpiNNaker machine.
 
     Each instance represents a single hop in a route and recursively refers to
     following steps.
-    """  # noqa W605
+    """
 
     # A *lot* of instances of this data structure are created and so its memory
     # consumption is a sensitive matter. The following optimisations have been
@@ -47,7 +48,7 @@ class RoutingTree(object):
         :param tuple(int,int) chip:
             The chip the route is currently passing through.
         """
-        self.chip = chip
+        self._chip_x, self._chip_y = chip
         self._children = []
         self._label = label
 
@@ -57,41 +58,39 @@ class RoutingTree(object):
 
     @property
     def chip(self):
-        """ The chip the route is currently passing through.
+        """
+        The chip the route is currently passing through.
 
         :rtype: tuple(int,int)
         """
         return (self._chip_x, self._chip_y)
 
-    @chip.setter
-    def chip(self, chip):
-        self._chip_x, self._chip_y = chip
-
     @property
     def children(self):
         """
-        A :py:class:`iterable` of the next steps in the route represented by a\
+        A :py:class:`iterable` of the next steps in the route represented by a
         (route, object) tuple.
 
         .. note::
-
-            Up until Rig 1.5.1, this structure used :py:class:`set`\\ s to \
-            store children. This was changed to :py:class:`list`\\ s since \
-            sets incur a large memory overhead and in practice the set-like \
+            Up until Rig 1.5.1, this structure used :py:class:`set`\\ s to
+            store children. This was changed to :py:class:`list`\\ s since
+            sets incur a large memory overhead and in practice the set-like
             behaviour of the list of children is not useful.
 
-        The object indicates the intended destination of this step in the \
+        The object indicates the intended destination of this step in the
         route. It may be one of:
 
-        * :py:class:`RoutingTree` \
-          representing the continuation of the routing tree after following a \
+        * :py:class:`RoutingTree`
+          representing the continuation of the routing tree after following a
           given link.
-        * A vertex (i.e. some other Python object) when the route terminates \
-          at the supplied vertex. Note that the direction may be None and so \
-          additional logic may be required to determine what core to target to\
-          reach the vertex.
+        * A vertex (i.e. some other Python object) when the route terminates
+          at the supplied vertex.
 
-        :rtype: iterable(RoutingTree or MachineVertex)
+        .. note::
+            The direction may be `None` and so additional logic may be required
+            to determine what core to target to reach the vertex.
+
+        :rtype: iterable(tuple(int, RoutingTree or MachineVertex))
         """
         for child in self._children:
             yield child
@@ -99,14 +98,14 @@ class RoutingTree(object):
     def append_child(self, child):
         """
         :param child:
-        :type child: RoutingTree or MachineVertex
+        :type child: tuple(int, RoutingTree or MachineVertex)
         """
         self._children.append(child)
 
     def remove_child(self, child):
         """
         :param child:
-        :type child: RoutingTree or MachineVertex
+        :type child: tuple(int, RoutingTree or MachineVertex)
         """
         self._children.remove(child)
 
@@ -115,7 +114,8 @@ class RoutingTree(object):
         return not self._children
 
     def __iter__(self):
-        """Iterate over this node and then all its children, recursively and in
+        """
+        Iterate over this node and then all its children, recursively and in
         no specific order. This iterator iterates over the child *objects*
         (i.e. not the route part of the child tuple).
         """
@@ -135,11 +135,14 @@ class RoutingTree(object):
             "child" if len(self._children) == 1 else "children")
 
     def traverse(self):
-        """ Traverse the tree yielding the direction taken to a node, the
+        """
+        Traverse the tree yielding the direction taken to a node, the
         coordinates of that node and the directions leading from the Node.
 
-        :return: (direction, (x, y), set(route)) \
-            Direction taken to reach a Node in the tree, the (x, y) coordinate\
+        :return:
+            A sequence of (direction, (x, y), set(route)) describing the route
+            taken. At each step, we have the
+            direction taken to reach a Node in the tree, the (x, y) coordinate
             of that Node and routes leading to children of the Node.
         :rtype: iterable(tuple(int, tuple(int,int), set(int)))
         """
