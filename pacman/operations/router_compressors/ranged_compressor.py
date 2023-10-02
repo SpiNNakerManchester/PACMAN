@@ -17,7 +17,7 @@ import sys
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import Machine, MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry
 from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
@@ -44,15 +44,16 @@ def range_compressor(accept_overflow=True):
     compressed_tables = MulticastRoutingTables()
     for table in progress.over(router_tables.routing_tables):
         new_table = compressor.compress_table(table)
-        if (new_table.number_of_entries > Machine.ROUTER_ENTRIES and
-                not accept_overflow):
+        chip = PacmanDataView.get_chip_at(table.x, table.y)
+        target = chip.router.n_available_multicast_entries
+        if (new_table.number_of_entries > target and not accept_overflow):
             raise MinimisationFailedError(
                 f"The routing table {table.x} {table.y} with "
                 f"{table.number_of_entries} entries after compression "
                 f"still has {new_table.number_of_entries} so will not fit")
         compressed_tables.add_routing_table(new_table)
     logger.info(f"Ranged compressor resulted with the largest table of size "
-                f"{compressed_tables.max_number_of_entries}")
+                f"{compressed_tables.get_max_number_of_entries()}")
     return compressed_tables
 
 
@@ -87,7 +88,9 @@ class RangeCompressor(object):
         # Check you need to compress
         if not get_config_bool(
                 "Mapping", "router_table_compress_as_far_as_possible"):
-            if uncompressed.number_of_entries < Machine.ROUTER_ENTRIES:
+            chip = PacmanDataView.get_chip_at(uncompressed.x, uncompressed.y)
+            target = chip.router.n_available_multicast_entries
+            if uncompressed.number_of_entries < target:
                 return uncompressed
 
         # Step 1 get the entries and make sure they are sorted by key

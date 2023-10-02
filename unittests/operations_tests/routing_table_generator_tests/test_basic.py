@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import unittest
+from spinn_utilities.config_holder import set_config
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.application import ApplicationEdge
@@ -35,6 +36,7 @@ class TestBasic(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
+        set_config("Machine", "version", 5)
 
     def create_graphs3(self, writer):
         v1 = SimpleTestVertex(
@@ -68,7 +70,7 @@ class TestBasic(unittest.TestCase):
         writer = PacmanDataWriter.mock()
         self.make_infos(writer)
         data = basic_routing_table_generator()
-        self.assertEqual(0, data.max_number_of_entries)
+        self.assertEqual(0, data.get_max_number_of_entries())
         self.assertEqual(0, len(list(data.routing_tables)))
 
     def test_graph3_with_system(self):
@@ -79,5 +81,6 @@ class TestBasic(unittest.TestCase):
         system_plaements.add_placement(Placement(mv, 1, 2, 3))
         self.make_infos(writer, system_plaements)
         data = basic_routing_table_generator()
-        self.assertEqual(34, data.max_number_of_entries)
+        self.assertEqual(34, data.get_max_number_of_entries())
+        self.assertEqual(114, data.get_total_number_of_entries())
         self.assertEqual(4, len(list(data.routing_tables)))
