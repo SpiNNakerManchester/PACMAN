@@ -869,14 +869,14 @@ def _path_without_loops(start_xy: XY, nodes: List[_Node]) -> List[_Node]:
     return nodes
 
 
-def _is_ok(coord: XY, node: _Node, machine: Machine):
+def _is_ok(xy: XY, node: _Node, machine: Machine):
     """
-    :param tuple(int, int) coord:
+    :param tuple(int, int) xy:
     :param tuple(int,tuple(int, int)) node:
     :param ~spinn_machine.Machine machine:
     :rtype: bool
     """
-    c_x, c_y = coord
+    c_x, c_y = xy
     direction, (n_x, n_y) = node
     return machine.is_link_at(c_x, c_y, direction) \
         and machine.is_chip_at(n_x, n_y)
