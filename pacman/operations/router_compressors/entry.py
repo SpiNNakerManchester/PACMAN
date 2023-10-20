@@ -40,16 +40,16 @@ class Entry(object):
                 self.spinnaker_route == other.spinnaker_route)
 
     @staticmethod
-    def from_MulticastRoutingEntry(mre):
+    def from_MulticastRoutingEntry(source):
         """
-        :param ~spinn_machine.MulticastRoutingEntry mre:
+        :param ~spinn_machine.MulticastRoutingEntry source:
         :rtype: Entry
         """
         # Yes I know using _params is ugly but this is for speed
         # pylint:disable=protected-access
         return Entry(
-            mre._routing_entry_key, mre._mask, mre._defaultable,
-            mre._spinnaker_route)
+            source._routing_entry_key, source._mask, source._defaultable,
+            source._spinnaker_route)
 
     def to_MulticastRoutingEntry(self):
         """

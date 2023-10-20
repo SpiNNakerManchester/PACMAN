@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .field import Field, SUPPORTED_TAGS
 from .chip_counter import ChipCounter
 
-__all__ = ["Field", "SUPPORTED_TAGS", "ChipCounter"]
+__all__ = ["ChipCounter"]
