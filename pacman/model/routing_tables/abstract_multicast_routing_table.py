@@ -74,4 +74,4 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
     @abstractmethod
     def __repr__(self):
-        """repr"""
+        """ String representation of the table """

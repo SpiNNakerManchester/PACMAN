@@ -117,7 +117,7 @@ class Slice(object):
 
     def get_slice(self, n):
         """
-        Get a slice in the `n`'th dimension.
+        Get a slice in the `n`'Th dimension.
 
         :param int n: Must be 0
         :type: slice

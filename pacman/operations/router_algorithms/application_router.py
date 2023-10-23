@@ -808,14 +808,14 @@ def _path_without_loops(start_xy, nodes):
     return nodes
 
 
-def _is_ok(coord, node, machine):
+def _is_ok(xy, node, machine):
     """
-    :param tuple(int, int) coord:
+    :param tuple(int, int) xy:
     :param tuple(int,tuple(int, int)) node:
     :param ~spinn_machine.Machine machine:
     :rtype: bool
     """
-    c_x, c_y = coord
+    c_x, c_y = xy
     direction, (n_x, n_y) = node
     if machine.is_link_at(c_x, c_y, direction):
         if machine.is_chip_at(n_x, n_y):
