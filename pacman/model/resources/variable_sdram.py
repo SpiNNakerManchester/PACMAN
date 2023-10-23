@@ -35,7 +35,7 @@ class VariableSDRAM(AbstractSDRAM):
         """
         :param fixed_sdram:
             The amount of SDRAM (in bytes) that represents static overhead
-        :type dtcm: int or numpy.integer
+        :type fixed_sdram: int or numpy.integer
         :param per_timestep_sdram:
             The amount of SDRAM (in bytes) required per timestep.
             Often represents the space to record a timestep.
