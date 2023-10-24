@@ -34,11 +34,6 @@ MAX_BW = 250
 
 
 class _NodeInfo(object):
-    """
-    :ivar list(~spinn_machine.Link) neighbours:
-    :ivar list(float) bws:
-    :ivar list(float) weights:
-    """
     __slots__ = ["neighbours", "bws", "weights"]
 
     def __init__(self):
