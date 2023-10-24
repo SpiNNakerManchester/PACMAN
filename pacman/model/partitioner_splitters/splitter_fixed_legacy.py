@@ -53,16 +53,16 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id: str) -> List[MachineVertex]:
-        return list(self._governed_app_vertex.machine_vertices)
+        return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(self, partition_id: str) -> List[MachineVertex]:
-        return list(self._governed_app_vertex.machine_vertices)
+        return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(
             self, variable_to_record: str) -> List[MachineVertex]:
-        return list(self._governed_app_vertex.machine_vertices)
+        return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self) -> List[Slice]:
@@ -76,12 +76,12 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
     def __fixed_slices(self) -> List[Slice]:
         if self.__slices is None:
             self.__slices = get_multidimensional_slices(
-                self._governed_app_vertex)
+                self.governed_app_vertex)
         return self.__slices
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter):
-        app_vertex = self._governed_app_vertex
+        app_vertex = self.governed_app_vertex
         assert self.__lp is not None, "app vertex is not set"
         for vertex_slice in self.__fixed_slices:
             sdram = self.__lp.get_sdram_used_by_atoms(vertex_slice)
