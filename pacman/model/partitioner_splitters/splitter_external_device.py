@@ -120,7 +120,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter):
-        app_vertex = self._governed_app_vertex
+        app_vertex = self.governed_app_vertex
         for vertex in self.__incoming_vertices:
             # machine_graph.add_vertex(vertex)
             chip_counter.add_core(vertex.sdram_required)
