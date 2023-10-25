@@ -50,17 +50,13 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         return self.__str__()
 
     @property
-    def governed_app_vertex(self) -> Optional[V]:
+    def governed_app_vertex(self) -> V:
         """
         The app vertex to be governed by this splitter object.
         If `None`, not yet set.
 
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
-        return self.__governed_app_vertex
-
-    @property
-    def _governed_app_vertex(self) -> V:
         if self.__governed_app_vertex is None:
             raise PacmanConfigurationException(
                 "This splitter has no governing app vertex set")
@@ -80,7 +76,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
             return
         if self.__governed_app_vertex is not None:
             raise PacmanConfigurationException(
-                f"The app vertex {self._governed_app_vertex} is already"
+                f"The app vertex {self.__governed_app_vertex} is already"
                 f" governed by this splitter. ")
         self.__governed_app_vertex = app_vertex
         app_vertex.splitter = self
@@ -210,7 +206,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
             ~pacman.model.resources.AbstractSDRAM)
         """
         return [([v], v.sdram_required)
-                for v in self._governed_app_vertex.machine_vertices]
+                for v in self.__governed_app_vertex.machine_vertices]
 
     def get_internal_multicast_partitions(
             self) -> Sequence[MulticastEdgePartition]:
