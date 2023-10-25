@@ -22,16 +22,16 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
     __slots__ = [
         # the app vertex this splitter governs.
-        "_governed_app_vertex",
+        "__governed_app_vertex",
     ]
 
     def __init__(self):
-        self._governed_app_vertex = None
+        self.__governed_app_vertex = None
 
     def __str__(self):
         try:
             return (
-                f"{type(self).__name__} on {self._governed_app_vertex.label}")
+                f"{type(self).__name__} on {self.__governed_app_vertex.label}")
         except AttributeError:
             return f"{type(self).__name__} has no governed_app_vertex"
 
@@ -46,7 +46,10 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
 
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
-        return self._governed_app_vertex
+        if self.__governed_app_vertex is None:
+            raise PacmanConfigurationException(
+                "This splitter has no governing app vertex set")
+        return self.__governed_app_vertex
 
     def set_governed_app_vertex(self, app_vertex):
         """
@@ -58,13 +61,13 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         :raises PacmanConfigurationException:
             if the app vertex has already been set.
         """
-        if self._governed_app_vertex == app_vertex:
+        if self.__governed_app_vertex == app_vertex:
             return
-        if self._governed_app_vertex is not None:
+        if self.__governed_app_vertex is not None:
             raise PacmanConfigurationException(
-                f"The app vertex {self._governed_app_vertex} is already"
+                f"The app vertex {self.__governed_app_vertex} is already"
                 f" governed by this splitter. ")
-        self._governed_app_vertex = app_vertex
+        self.__governed_app_vertex = app_vertex
         app_vertex.splitter = self
 
     @abstractmethod
@@ -178,7 +181,7 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
             ~pacman.model.resources.AbstractSDRAM)
         """
         return [([v], v.sdram_required)
-                for v in self._governed_app_vertex.machine_vertices]
+                for v in self.__governed_app_vertex.machine_vertices]
 
     def get_internal_multicast_partitions(self):
         """
