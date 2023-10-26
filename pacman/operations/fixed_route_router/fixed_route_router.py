@@ -69,8 +69,6 @@ class _FixedRouteRouter(object):
                 self._route_board(ethernet_chip)
         return self._fixed_route_tables
 
-    __LINK_DIRECTIONS = (4, 3, 5, 2, 0, 1)
-
     def _route_board(self, ethernet_chip: Chip):
         """
         Handles this board through the quick routing process, based on a
@@ -87,17 +85,17 @@ class _FixedRouteRouter(object):
         # create terminal fixed route entry
         # locate where to put data on ethernet chip
         processor_id = self.__locate_destination(ethernet_chip)
-        # build entry and add to table and add to tables
+        # build entry and add to table
         self.__add_fixed_route_entry(ethernet_chip, [], [processor_id])
         routed = {ethernet_chip}
         to_route.remove(ethernet_chip)
-        found = set()
 
-        while to_route:
+        while len(to_route) > 0:
+            found = set()
             # Make routes to already-routed chips
             for chip in to_route:
                 # Check links starting with the most direct to 0,0
-                for link_id in self.__LINK_DIRECTIONS:
+                for link_id in (4, 3, 5, 2, 0, 1):
                     # If potential destination is useful and exists
                     if self.__get_chip_over_link(chip, link_id) in routed and (
                             self._machine.is_link_at(chip.x, chip.y, link_id)):
@@ -105,14 +103,13 @@ class _FixedRouteRouter(object):
                         self.__add_fixed_route_entry(chip, [link_id], [])
                         found.add(chip)
                         break
-            if not found:
-                # Chip not reachable from board root via on-board links
+            if len(found) == 0:
+                # No new routes found yet still have chips to route to
                 raise PacmanRoutingException(
                     "Unable to do fixed point routing "
                     f"on {ethernet_chip.ip_address}.")
             to_route -= found
             routed |= found
-            found.clear()
 
     def __get_chip_over_link(self, chip: Chip, link_id: int) -> Optional[Chip]:
         x, y = self._machine.xy_over_link(chip.x, chip.y, link_id)
