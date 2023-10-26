@@ -55,7 +55,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
 
     @property
     def governed_app_vertex(self) -> V:
-        return cast(LegacyPartitionerAPI, super().governed_app_vertex())
+        return cast(LegacyPartitionerAPI, super().governed_app_vertex)
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id: str) -> List[MachineVertex]:
