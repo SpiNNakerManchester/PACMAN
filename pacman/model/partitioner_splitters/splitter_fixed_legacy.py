@@ -12,17 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-from typing import Generic, List, Optional
+from typing import cast, Generic, List, Optional, TypeVar
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities import\
     get_multidimensional_slices
-from .abstract_splitter_common import AbstractSplitterCommon, V
+from .abstract_splitter_common import AbstractSplitterCommon
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_objs import ChipCounter
+
+V = TypeVar("V", bound=LegacyPartitionerAPI)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -50,6 +52,10 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
                 f"{self} is not a LegacyPartitionerAPI")
         super().set_governed_app_vertex(app_vertex)
         self.__lp = app_vertex
+
+    @property
+    def governed_app_vertex(self) -> V:
+        return cast(LegacyPartitionerAPI, super().governed_app_vertex())
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id: str) -> List[MachineVertex]:
