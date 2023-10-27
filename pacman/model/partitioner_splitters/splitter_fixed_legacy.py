@@ -19,12 +19,10 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities import\
     get_multidimensional_slices
-from .abstract_splitter_common import AbstractSplitterCommon
+from .abstract_splitter_common import AbstractSplitterCommon, V
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_objs import ChipCounter
-
-V = TypeVar("V", bound=LegacyPartitionerAPI)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -38,12 +36,11 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
         implement :py:class:`LegacyPartitionerAPI`.
     """
 
-    __slots__ = ("__slices", "__lp")
+    __slots__ = ("__slices")
 
     def __init__(self) -> None:
         super().__init__()
         self.__slices: Optional[List[Slice]] = None
-        self.__lp: Optional[LegacyPartitionerAPI] = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex: V):
@@ -51,11 +48,6 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
             raise PacmanConfigurationException(
                 f"{self} is not a LegacyPartitionerAPI")
         super().set_governed_app_vertex(app_vertex)
-        self.__lp = app_vertex
-
-    @property
-    def governed_app_vertex(self) -> V:
-        return cast(LegacyPartitionerAPI, super().governed_app_vertex)
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id: str) -> List[MachineVertex]:
@@ -88,12 +80,15 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter):
         app_vertex = self.governed_app_vertex
-        assert self.__lp is not None, "app vertex is not set"
+        # The typer needs to know the vertex implements LegacyPartitionerAPI
+        # We know is does because we checked when setting
+        lp = cast(LegacyPartitionerAPI, app_vertex)
+
         for vertex_slice in self.__fixed_slices:
-            sdram = self.__lp.get_sdram_used_by_atoms(vertex_slice)
+            sdram = lp.get_sdram_used_by_atoms(vertex_slice)
             chip_counter.add_core(sdram)
             label = f"{app_vertex.label}{vertex_slice}"
-            machine_vertex = self.__lp.create_machine_vertex(
+            machine_vertex = lp.create_machine_vertex(
                 vertex_slice, sdram, label)
             app_vertex.remember_machine_vertex(machine_vertex)
 
