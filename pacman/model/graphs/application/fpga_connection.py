@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, NamedTuple, Optional
+from typing import NamedTuple, Optional
 from spinn_utilities.typing.coords import XY
 
 #: The range of FPGA ids

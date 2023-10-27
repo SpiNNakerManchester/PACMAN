@@ -14,7 +14,6 @@
 from __future__ import annotations
 from typing import Iterable, List, Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
-from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs.common.slice import Slice
 from .application_virtual_vertex import ApplicationVirtualVertex
 if TYPE_CHECKING:
