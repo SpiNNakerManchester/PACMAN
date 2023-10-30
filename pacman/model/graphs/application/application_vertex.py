@@ -289,3 +289,57 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         :type partition:
             ~pacman.model.graphs.application.ApplicationEdgePartition
         """
+
+    def get_key_ordered_indices(self, indices=None):
+        """
+        Get indices of the vertex in the order that atoms appear when the
+        vertex is split into cores as determined by max_atoms_per_core.  When
+        a multi-dimensional vertex is split into cores, the atoms on each
+        vertex is not linear but rather a hyper-rectangle of the atoms, thus
+        the order of the atoms in the vertex as a whole is not the same as the
+        order of the vertex when scanning over the cores.
+
+        :param indices:
+            Optional subset of indices to convert.  If not provided all indices
+            will be converted.
+        :type indices: numpy.ndarray or None.
+        :rtype: numpy.ndarray
+        """
+        if indices is None:
+            indices = numpy.arange(self.n_atoms)
+        atoms_shape = self.atoms_shape
+        n_dims = len(atoms_shape)
+        if n_dims == 1:
+            return indices
+        atoms_per_core = self.get_max_atoms_per_dimension_per_core()
+        remainders = numpy.array(indices)
+        cum_per_core = 1
+        cum_cores_per_dim = 1
+        core_index = numpy.zeros(len(indices))
+        atom_index = numpy.zeros(len(indices))
+        for n in range(n_dims):
+            # Work out the global index in this dimension
+            global_index_d = remainders % atoms_shape[n]
+
+            # Work out the core index in this dimension
+            core_index_d = global_index_d // atoms_per_core[n]
+
+            # Update the core index by multiplying the current value by the
+            # last dimension size and then add the current dimension value
+            core_index += core_index_d * cum_cores_per_dim
+
+            # Work out the atom index on the core in this dimension
+            atom_index_d = global_index_d - (atoms_per_core[n] * core_index_d)
+
+            # Update the atom index by multiplying the current value by the
+            # last dimension size and then add the current dimension value
+            atom_index += atom_index_d * cum_per_core
+
+            # Update the remainders for next time based on the values in
+            # this dimension, and save the sizes for this dimension
+            remainders = remainders // atoms_shape[n]
+            cum_per_core *= atoms_per_core[n]
+            cum_cores_per_dim *= atoms_shape[n] / atoms_per_core[n]
+
+        return ((core_index * self.get_max_atoms_per_core()) +
+                atom_index).astype(numpy.uint32)

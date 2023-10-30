@@ -154,3 +154,28 @@ class MDSlice(Slice):
         return MDSlice(
             lo_atom, lo_atom + size - 1, tuple(shape), tuple(start),
             atoms_shape)
+
+    @overrides(Slice.get_relative_indices)
+    def get_relative_indices(self, app_vertex_indices):
+        n_dims = len(self._atoms_shape)
+        remainders = app_vertex_indices
+        last_per_core = 0
+        rel_index = numpy.zeros(len(app_vertex_indices))
+        for n in n_dims:
+            # Work out the index in this dimension
+            global_index_d = remainders % self._atoms_shape[n]
+
+            # Work out the index in this dimension relative to the core start
+            rel_index_d = global_index_d - self._starts[n]
+
+            # Update the total relative index using the position in this
+            # dimension
+            rel_index = (rel_index * last_per_core) + rel_index_d
+
+            # Prepare for next round of the loop by removing what we used
+            # of the global index and remembering the sizes in this
+            # dimension
+            remainders = remainders // self._atoms_shape[n]
+            last_per_core = self._shape[n]
+
+        return rel_index

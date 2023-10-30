@@ -202,3 +202,16 @@ class Slice(object):
         lo_atom = int(parts[0])
         hi_atom = int(parts[1])
         return Slice(lo_atom, hi_atom)
+
+    def get_relative_indices(self, app_vertex_indices):
+        """
+        Convert from global indices to slice-level indices.
+
+        Note that no checking is done on the given indices; they should be
+        within this slice!
+
+        :param numpy.ndarray app_vertex_indices:
+            The global application vertex indices to convert
+        :return The local core-level indices relative to this slice
+        """
+        return app_vertex_indices - self._lo_atom
