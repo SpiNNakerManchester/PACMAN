@@ -114,10 +114,13 @@ def check_md_math(neurons_per_cores, n_cores_per_d, do_print=False):
     n_cores = math.prod(n_cores_per_d)
     full_size = [neurons_per_cores[i] * n_cores_per_d[i] for i in
                  range(len(neurons_per_cores))]
+    if do_print:
+        print(f"{full_size=}")
     n_neurons = math.prod(full_size)
 
     pop_info = get_pop_info(neurons_per_core, n_cores)
-    print(pop_info)
+    if do_print:
+        print(pop_info)
 
     all_pynn_neuron_indexes = set()
     all_results = set()
@@ -150,4 +153,4 @@ def check_md_math(neurons_per_cores, n_cores_per_d, do_print=False):
 
 if __name__ == '__main__':
     check_md_math(
-        neurons_per_cores=[2, 3, 2], n_cores_per_d=[2, 3, 1], do_print=True)
+        neurons_per_cores=[2, 3, 2], n_cores_per_d=[3, 3, 1], do_print=True)
