@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import math
-import unittest
 
 
 def get_pop_info(n_neurons_per_core, n_cores):
@@ -151,4 +150,4 @@ def check_md_math(neurons_per_cores, n_cores_per_d, do_print=False):
 
 if __name__ == '__main__':
     check_md_math(
-        neurons_per_cores=[3, 3], n_cores_per_d=[2, 2], do_print=True)
+        neurons_per_cores=[2, 3, 2], n_cores_per_d=[2, 3, 1], do_print=True)
