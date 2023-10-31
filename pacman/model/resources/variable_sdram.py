@@ -53,8 +53,8 @@ class VariableSDRAM(AbstractSDRAM):
     @overrides(AbstractSDRAM.get_total_sdram)
     def get_total_sdram(self, n_timesteps: Optional[int]) -> int:
         if n_timesteps is not None:
-            return _ceil(self._fixed_sdram +
-                       self._per_timestep_sdram * n_timesteps)
+            return _ceil(
+                self._fixed_sdram + self._per_timestep_sdram * n_timesteps)
         if self._per_timestep_sdram == 0:
             return self._fixed_sdram
         raise PacmanConfigurationException(
