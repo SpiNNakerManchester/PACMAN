@@ -25,7 +25,7 @@ _RegionKey: TypeAlias = Union[int, str, Enum]
 _Value: TypeAlias = Union[int, float, numpy.integer, numpy.floating]
 
 
-def _round(value: _Value) -> int:
+def _ceil(value: _Value) -> int:
     return math.ceil(value)
 
 
@@ -71,14 +71,14 @@ class MultiRegionSDRAM(VariableSDRAM):
         :param per_timestep_sdram: The variable cost for this region is any
         :type per_timestep_sdram: int or numpy.integer
         """
-        self._fixed_sdram += _round(fixed_sdram)
-        self._per_timestep_sdram += _round(per_timestep_sdram)
+        self._fixed_sdram += _ceil(fixed_sdram)
+        self._per_timestep_sdram += _ceil(per_timestep_sdram)
         sdram: AbstractSDRAM
         if per_timestep_sdram:
             sdram = VariableSDRAM(
-                _round(fixed_sdram), _round(per_timestep_sdram))
+                _ceil(fixed_sdram), _ceil(per_timestep_sdram))
         else:
-            sdram = ConstantSDRAM(_round(fixed_sdram))
+            sdram = ConstantSDRAM(_ceil(fixed_sdram))
         if region in self.__regions:
             self.__regions[region] += sdram
         else:
