@@ -343,3 +343,41 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
 
         return ((core_index * self.get_max_atoms_per_core()) +
                 atom_index).astype(numpy.uint32)
+
+    def get_raster_ordered_indices(self, indices):
+        """
+        Convert indices from key order to raster order.
+
+        :param numpy.ndarray indices: The key-ordered indices to convert.
+        :rtype: numpy.ndarray
+        """
+        atoms_shape = self.atoms_shape
+        n_dims = len(atoms_shape)
+        if n_dims == 1:
+            return indices
+        atoms_per_core = self.get_max_atoms_per_dimension_per_core()
+        cores_per_dim = numpy.divide(atoms_shape, atoms_per_core)
+        cum_size = 1
+        global_index = numpy.zeros(len(indices))
+
+        # Work out the core indices and core-based atom indices
+        core_index_remainders = indices // self.get_max_atoms_per_core()
+        atom_index_remainders = indices % self.get_max_atoms_per_core()
+
+        for n in range(n_dims):
+            # Work out the core index and atom index in this dimension
+            core_index_d = core_index_remainders % cores_per_dim[n]
+            atom_index_d = atom_index_remainders % atoms_per_core[n]
+
+            # Use these to work out the global index in this dimension
+            global_index_d = (core_index_d * atoms_per_core[n]) + atom_index_d
+
+            # Update the global index with this dimension
+            global_index += global_index_d * cum_size
+
+            # Update the remainders and sizes for the next loop run
+            core_index_remainders = core_index_remainders // cores_per_dim[n]
+            atom_index_remainders = atom_index_remainders // atoms_per_core[n]
+            cum_size *= atoms_shape[n]
+
+        return global_index.astype(numpy.uint32)

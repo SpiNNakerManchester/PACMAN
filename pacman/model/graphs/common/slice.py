@@ -205,13 +205,26 @@ class Slice(object):
 
     def get_relative_indices(self, app_vertex_indices):
         """
-        Convert from global indices to slice-level indices.
+        Convert from raster indices to slice-level indices.
 
         Note that no checking is done on the given indices; they should be
         within this slice!
 
         :param numpy.ndarray app_vertex_indices:
-            The global application vertex indices to convert
+            The raster application vertex indices to convert
         :return: The local core-level indices relative to this slice
         """
         return app_vertex_indices - self._lo_atom
+
+    def get_raster_indices(self, relative_indices):
+        """
+        Convert from slice-level indices to raster indices.
+
+        Note that no checking is done on the given indices; they should be
+        within this slice!
+
+        :param numpy.ndarray relative_indices:
+            The local core-level indices relative to this slice
+        :return: The raster application vertex indices
+        """
+        return relative_indices + self._lo_atom

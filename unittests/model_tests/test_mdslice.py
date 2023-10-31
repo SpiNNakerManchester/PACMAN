@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import unittest
+import numpy
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.common import MDSlice
 
@@ -83,3 +84,11 @@ class TestSlice(unittest.TestCase):
         self.assertListEqual(list(range(2 * 3 * 2)),
                              list((s.get_relative_indices(
                                  s.get_raster_ids()))))
+
+    def test_get_raster_indices(self):
+        s = MDSlice(22, 89, (2, 3, 2), (4, 3, 0), (6, 9, 4))
+        # Going from a line over the core should come back to the raster
+        # indices
+        indices = numpy.arange(2 * 3 * 2)
+        self.assertListEqual(list(s.get_raster_indices(indices)),
+                             list(s.get_raster_ids()))

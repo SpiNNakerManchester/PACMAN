@@ -179,3 +179,27 @@ class MDSlice(Slice):
             cum_last_core *= self._shape[n]
 
         return rel_index.astype(numpy.uint32)
+
+    @overrides(Slice.get_raster_indices)
+    def get_raster_indices(self, relative_indices):
+        n_dims = len(self._atoms_shape)
+        remainders = relative_indices
+        cum_last_size = 1
+        global_index = numpy.zeros(len(relative_indices))
+        for n in range(n_dims):
+            # Work out the local index in this dimension
+            local_index_d = remainders % self._shape[n]
+
+            # Work out the global index in this dimension
+            global_index_d = local_index_d + self._start[n]
+
+            # Update the total global index using the position in this
+            # dimension
+            global_index += global_index_d * cum_last_size
+
+            # Prepare for next round of the loop by removing what we used
+            # of the local index and remembering the sizes in this dimension
+            remainders = remainders // self._shape[n]
+            cum_last_size *= self._atoms_shape[n]
+
+        return global_index

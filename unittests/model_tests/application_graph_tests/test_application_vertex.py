@@ -156,7 +156,16 @@ class TestApplicationGraphModel(unittest.TestCase):
         n_atoms = numpy.prod(size)
         vtx_2 = SimpleMDVertex((2, 3, 2), size)
         row_indices = vtx_2.get_key_ordered_indices(numpy.arange(n_atoms))
-        print(row_indices)
         test_array = numpy.zeros(n_atoms)
         test_array[row_indices] += 1
         assert all(numpy.equal(test_array, 1))
+
+    def test_get_raster_ordered_indices(self):
+        # Go forward to row indices then back to atoms
+        vtx = SimpleMDVertex((3, 4, 5), (9, 16, 25))
+        all_atoms = numpy.arange(9 * 16 * 25)
+        row_indices = vtx.get_key_ordered_indices(all_atoms)
+        atoms = vtx.get_raster_ordered_indices(row_indices)
+
+        # Should be the original list of atoms on reversal
+        assert numpy.array_equal(atoms, all_atoms)
