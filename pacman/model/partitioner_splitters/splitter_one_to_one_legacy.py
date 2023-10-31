@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import List, Optional
+from typing import Optional
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
