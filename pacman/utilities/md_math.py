@@ -109,17 +109,70 @@ def calc_neuron_index(neurons_per_cores, neuron_indexes):
     return neuron_index
 
 
+def targets_2d(n_neurons, neurons_per_cores, n_cores_per_d):
+    # Thinking form inner loop out
+    # do every x in a row on every core
+    # do the rows one at a time on every core
+    pynn_neuron_index = 0
+    target_core_indexes = [None] * n_neurons
+    target_neurons_indexes = [None] * n_neurons
+    for c_y in range(n_cores_per_d[1]):
+        cys = c_y * n_cores_per_d[0]
+        for n_y in range(neurons_per_cores[1]):
+            nys = n_y * neurons_per_cores[0]
+            for c_x in range(n_cores_per_d[0]):
+                for n_x in range(neurons_per_cores[0]):
+                    target_core_indexes[pynn_neuron_index] = cys + c_x
+                    target_neurons_indexes[pynn_neuron_index] = nys + n_x
+                    pynn_neuron_index += 1
+    return target_core_indexes, target_neurons_indexes
+
+
+def targets_3d(n_neurons, neurons_per_cores, n_cores_per_d):
+    # Thinking from inner loop out
+    # do every x in a row on every core
+    # do every row one a level one at a time on every core
+    # do this for every level on each core
+    pynn_neuron_index = 0
+    target_core_indexes = [None] * n_neurons
+    target_neurons_indexes = [None] * n_neurons
+    for c_z in range(n_cores_per_d[2]):
+        czs = c_z * n_cores_per_d[0] * n_cores_per_d[1]
+        for n_z in range(neurons_per_cores[2]):
+            nzs = n_z * neurons_per_cores[0] * neurons_per_cores[1]
+            for c_y in range(n_cores_per_d[1]):
+                cyzs = czs + c_y * n_cores_per_d[0]
+                for n_y in range(neurons_per_cores[1]):
+                    nyzs = nzs + n_y * neurons_per_cores[0]
+                    for c_x in range(n_cores_per_d[0]):
+                        for n_x in range(neurons_per_cores[0]):
+                            target_core_indexes[pynn_neuron_index] = cyzs + c_x
+                            target_neurons_indexes[
+                                pynn_neuron_index] = nyzs + n_x
+                            pynn_neuron_index += 1
+    return target_core_indexes, target_neurons_indexes
+
+
+def targets(n_neurons, neurons_per_cores, n_cores_per_d):
+    if len(neurons_per_cores) == 2:
+        return targets_2d(n_neurons, neurons_per_cores, n_cores_per_d)
+    if len(neurons_per_cores) == 3:
+        return targets_3d(n_neurons, neurons_per_cores, n_cores_per_d)
+    return None, None
+
+
 def check_md_math(neurons_per_cores, n_cores_per_d, do_print=False):
-    neurons_per_core = math.prod(neurons_per_cores)
-    n_cores = math.prod(n_cores_per_d)
     full_size = [neurons_per_cores[i] * n_cores_per_d[i] for i in
                  range(len(neurons_per_cores))]
-    target_core_indexes, target_neurons_indexes = targets(
-        neurons_per_cores, n_cores_per_d)
-
     if do_print:
         print(f"{full_size=}")
+
+    neurons_per_core = math.prod(neurons_per_cores)
+    n_cores = math.prod(n_cores_per_d)
     n_neurons = math.prod(full_size)
+
+    target_core_indexes, target_neurons_indexes = targets(
+        n_neurons, neurons_per_cores, n_cores_per_d)
 
     pop_info = get_pop_info(neurons_per_core, n_cores)
     if do_print:
@@ -150,35 +203,14 @@ def check_md_math(neurons_per_cores, n_cores_per_d, do_print=False):
         all_pynn_neuron_indexes.add(as_tuple)
         assert (core_index, neuron_index) not in all_results
         all_results.add((core_index, neuron_index))
-        print(f"{target_core_indexes[pynn_neuron_index]=}, "
-              f"{target_neurons_indexes[pynn_neuron_index]=}")
         assert (0 <= core_index < n_cores)
-        assert target_core_indexes[pynn_neuron_index] == core_index
         assert (0 <= neuron_index < neurons_per_core)
-        assert target_neurons_indexes[pynn_neuron_index] == neuron_index
-
-
-def targets(neurons_per_cores, n_cores_per_d):
-    full_size = [neurons_per_cores[i] * n_cores_per_d[i] for i in
-                 range(len(neurons_per_cores))]
-    n_neurons = math.prod(full_size)
-
-    pynn_neuron_index = 0
-    target_core_indexes = [None] * n_neurons
-    target_neurons_indexes = [None] * n_neurons
-    for c_y in range(n_cores_per_d[1]):
-        for n_y in range(neurons_per_cores[1]):
-            for c_x in range(n_cores_per_d[0]):
-                for n_x in range(neurons_per_cores[0]):
-                    target_core_indexes[pynn_neuron_index] = \
-                        c_y * n_cores_per_d[0] + c_x
-                    target_neurons_indexes[pynn_neuron_index] = \
-                        n_y * neurons_per_cores[0] + n_x
-                    pynn_neuron_index += 1
-    return target_core_indexes, target_neurons_indexes
+        if target_core_indexes is not None:
+            assert target_core_indexes[pynn_neuron_index] == core_index
+            assert target_neurons_indexes[pynn_neuron_index] == neuron_index
 
 
 if __name__ == '__main__':
     check_md_math(
-        neurons_per_cores=[4, 3], n_cores_per_d=[4, 2], do_print=True)
+        neurons_per_cores=[4, 3, 2], n_cores_per_d=[4, 2, 3], do_print=True)
 
