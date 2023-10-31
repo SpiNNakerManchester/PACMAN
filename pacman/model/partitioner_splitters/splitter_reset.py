@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from pacman.data import PacmanDataView
-from pacman.model.graphs.application import ApplicationVertex
 
 
 def splitter_reset() -> None:
