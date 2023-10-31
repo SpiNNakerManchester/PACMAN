@@ -80,17 +80,16 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                     self.__incoming_slices.append(vertex_slice)
             fpga = app_vertex.outgoing_fpga_connection
             if fpga is not None:
-                if fpga.fpga_id is not None and fpga.fpga_link_id is not None:
-                    label = (
-                        f"Outgoing Machine vertex for {app_vertex.label}"
-                        f":{fpga.fpga_id}:{fpga.fpga_link_id}"
-                        f":{fpga.board_address}:{fpga.chip_coords}")
-                    self.__outgoing_slice = app_vertex.get_outgoing_slice()
-                    self.__outgoing_vertex = MachineFPGAVertex(
-                        fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
-                        fpga.chip_coords, app_vertex=app_vertex, label=label,
-                        vertex_slice=self.__outgoing_slice,
-                        incoming=False, outgoing=True)
+                label = (
+                    f"Outgoing Machine vertex for {app_vertex.label}"
+                    f":{fpga.fpga_id}:{fpga.fpga_link_id}"
+                    f":{fpga.board_address}:{fpga.chip_coords}")
+                self.__outgoing_slice = app_vertex.get_outgoing_slice()
+                self.__outgoing_vertex = MachineFPGAVertex(
+                    fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
+                    fpga.chip_coords, app_vertex=app_vertex, label=label,
+                    vertex_slice=self.__outgoing_slice,
+                    incoming=False, outgoing=True)
 
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
             # So far this only handles one connection in total
