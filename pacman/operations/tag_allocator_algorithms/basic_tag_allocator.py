@@ -97,7 +97,8 @@ def __get_chip_and_tag(
         return __find_tag_chip(machine, tags_available, tag), tag
     else:
         if tags_on_chip:
-            return eth_chip, tags_on_chip.pop(0)
+            # pop from back so automatic allocation starts with highest
+            return eth_chip, tags_on_chip.pop()
         return __find_free_tag(machine, tags_available)
 
 
