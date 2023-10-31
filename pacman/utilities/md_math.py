@@ -213,4 +213,3 @@ def check_md_math(neurons_per_cores, n_cores_per_d, do_print=False):
 if __name__ == '__main__':
     check_md_math(
         neurons_per_cores=[4, 3, 2], n_cores_per_d=[4, 2, 3], do_print=True)
-
