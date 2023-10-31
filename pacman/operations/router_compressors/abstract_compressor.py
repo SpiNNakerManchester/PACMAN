@@ -27,7 +27,7 @@ from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import MinimisationFailedError
 from pacman.model.routing_tables import UnCompressedMulticastRoutingTable
-from .entry import RTEntry
+from .rt_entry import RTEntry
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
