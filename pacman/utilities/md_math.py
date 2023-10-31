@@ -161,6 +161,15 @@ def targets(n_neurons, neurons_per_cores, n_cores_per_d):
     return None, None
 
 
+def index_to_indexes(index, shape):
+    indexes = [None] * len(shape)
+    remainder = index
+    for d in range(len(shape)):
+        indexes[d] = remainder % shape[d]
+        remainder = remainder // shape[d]
+    return indexes
+
+
 def check_md_math(neurons_per_cores, n_cores_per_d, do_print=False):
     full_size = [neurons_per_cores[i] * n_cores_per_d[i] for i in
                  range(len(neurons_per_cores))]
@@ -192,6 +201,7 @@ def check_md_math(neurons_per_cores, n_cores_per_d, do_print=False):
         neuron_index = calc_neuron_index(neurons_per_cores, neuron_indexes)
         key = get_key(pop_info, 13, core_index, neuron_index)
         row_k = key_to_row(key, pop_info)
+
         row_index = (core_index * neurons_per_core) + neuron_index
         if do_print:
             print(f"{pynn_neuron_index=}, {pynn_neuron_indexes=}, "
@@ -209,7 +219,18 @@ def check_md_math(neurons_per_cores, n_cores_per_d, do_print=False):
             assert target_core_indexes[pynn_neuron_index] == core_index
             assert target_neurons_indexes[pynn_neuron_index] == neuron_index
 
+        core_index2 = row_index // neurons_per_core
+        neuron_index2 = row_index % neurons_per_core
+        assert core_index == core_index2
+        assert neuron_index == neuron_index2
+
+        neuron_indexes2 = index_to_indexes(neuron_index2, neurons_per_cores)
+        assert neuron_indexes2 == neuron_indexes
+        core_indexes2 = index_to_indexes(core_index2, n_cores_per_d)
+        assert core_indexes2 == core_indexes
+
+
 
 if __name__ == '__main__':
     check_md_math(
-        neurons_per_cores=[4, 3, 2], n_cores_per_d=[4, 2, 3], do_print=True)
+        neurons_per_cores=[3, 4, 2], n_cores_per_d=[2, 3, 4], do_print=True)
