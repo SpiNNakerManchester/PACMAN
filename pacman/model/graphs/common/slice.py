@@ -212,6 +212,6 @@ class Slice(object):
 
         :param numpy.ndarray app_vertex_indices:
             The global application vertex indices to convert
-        :return The local core-level indices relative to this slice
+        :return: The local core-level indices relative to this slice
         """
         return app_vertex_indices - self._lo_atom
