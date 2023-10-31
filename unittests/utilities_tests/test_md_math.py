@@ -18,11 +18,17 @@ from pacman.utilities.md_math import check_md_math
 
 class TestMD_Math(unittest.TestCase):
 
-    def test_doc(self):
-        check_md_math(neurons_per_cores=[3, 3], n_cores_per_d=[2, 2])
+    def test_singelton(self):
+        check_md_math(neurons_per_cores=[1], cores_per_size=[1])
+
+    def test_1d(self):
+        check_md_math(neurons_per_cores=[3], cores_per_size=[5])
+
+    def test_2d(self):
+        check_md_math(neurons_per_cores=[3, 3], cores_per_size=[2, 2])
 
     def test_3d(self):
-        check_md_math(neurons_per_cores=[2, 3, 4], n_cores_per_d=[4, 5, 3])
+        check_md_math(neurons_per_cores=[2, 3, 4], cores_per_size=[4, 5, 3])
 
 
 if __name__ == '__main__':

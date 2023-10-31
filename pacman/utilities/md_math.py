@@ -51,62 +51,26 @@ def key_to_row(key, pop_info):
     return (core_index * pop_info["neurons_per_core"]) + neuron_index
 
 
-def calc_pynn_neuron_indexes(pynn_neuron_index, full_size):
-    n_dimensions = len(full_size)
-    pynn_neuron_indexes = [None] * n_dimensions
-
-    # Work out the position of the neuron in each dimension
-    remainder = pynn_neuron_index
-    for n in range(n_dimensions):
-        pynn_neuron_indexes[n] = remainder % full_size[n]
-        remainder = remainder // full_size[n]
-    return pynn_neuron_indexes
-
-
-def calc_core_indexes(pynn_neuron_indexes, neurons_per_cores):
+def pynn_to_core_and_neuron_indexes(pynn_neuron_indexes, neurons_per_cores):
     n_dimensions = len(neurons_per_cores)
     core_indexes = [None] * n_dimensions
-
-    # Work out which core the neuron is on in each dimension
-    for n in range(n_dimensions):
-        core_indexes[n] = pynn_neuron_indexes[n] // neurons_per_cores[n]
-    return core_indexes
-
-
-def calc_core_index(core_indexes, full_size, neurons_per_cores):
-    n_dimensions = len(core_indexes)
-
-    # Work out the core index
-    core_index = 0
-    cum_cores_per_size = 1
-    for n in range(n_dimensions):
-        core_index += cum_cores_per_size * core_indexes[n]
-        cores_per_size = full_size[n] // neurons_per_cores[n]
-        cum_cores_per_size *= cores_per_size
-    return core_index
-
-
-def calc_neuron_indexes(pynn_neuron_indexes, neurons_per_cores, core_indexes):
-    n_dimensions = len(core_indexes)
     neuron_indexes = [None] * n_dimensions
 
-    # Work out the neuron index on this core in each dimension
+    # Work out the core and neuron index on this core in each dimension
     for n in range(n_dimensions):
-        neuron_indexes[n] = \
-            pynn_neuron_indexes[n] - (neurons_per_cores[n] * core_indexes[n])
-    return neuron_indexes
+        core_indexes[n] = pynn_neuron_indexes[n] // neurons_per_cores[n]
+        neuron_indexes[n] = pynn_neuron_indexes[n] % neurons_per_cores[n]
+    return core_indexes, neuron_indexes
 
 
-def calc_neuron_index(neurons_per_cores, neuron_indexes):
-    n_dimensions = len(neuron_indexes)
-
-    # Work out the neuron index on this core
-    neuron_index = 0
-    cum_per_core = 1
+def core_and_neuron_to_pynn_indexes(
+        core_indexes, neuron_indexes, neurons_per_cores):
+    n_dimensions = len(neurons_per_cores)
+    pynn_indexes = [None] * n_dimensions
     for n in range(n_dimensions):
-        neuron_index += cum_per_core * neuron_indexes[n]
-        cum_per_core *= neurons_per_cores[n]
-    return neuron_index
+        pynn_indexes[n] = \
+            core_indexes[n] * neurons_per_cores[n] + neuron_indexes[n]
+    return pynn_indexes
 
 
 def targets_2d(n_neurons, neurons_per_cores, n_cores_per_d):
@@ -161,6 +125,16 @@ def targets(n_neurons, neurons_per_cores, n_cores_per_d):
     return None, None
 
 
+def indexes_to_index(indexes, shape):
+    # Work out the neuron index on this core
+    neuron_index = 0
+    cum_per_core = 1
+    for n in range(len(indexes)):
+        neuron_index += cum_per_core * indexes[n]
+        cum_per_core *= shape[n]
+    return neuron_index
+
+
 def index_to_indexes(index, shape):
     indexes = [None] * len(shape)
     remainder = index
@@ -170,18 +144,18 @@ def index_to_indexes(index, shape):
     return indexes
 
 
-def check_md_math(neurons_per_cores, n_cores_per_d, do_print=False):
-    full_size = [neurons_per_cores[i] * n_cores_per_d[i] for i in
-                 range(len(neurons_per_cores))]
+def check_md_math(neurons_per_cores, cores_per_size, do_print=False):
+    full_sizes = [neurons_per_cores[i] * cores_per_size[i]
+                  for i in range(len(neurons_per_cores))]
     if do_print:
-        print(f"{full_size=}")
+        print(f"{full_sizes=}")
 
     neurons_per_core = math.prod(neurons_per_cores)
-    n_cores = math.prod(n_cores_per_d)
-    n_neurons = math.prod(full_size)
+    n_cores = math.prod(cores_per_size)
+    n_neurons = math.prod(full_sizes)
 
     target_core_indexes, target_neurons_indexes = targets(
-        n_neurons, neurons_per_cores, n_cores_per_d)
+        n_neurons, neurons_per_cores, cores_per_size)
 
     pop_info = get_pop_info(neurons_per_core, n_cores)
     if do_print:
@@ -190,15 +164,11 @@ def check_md_math(neurons_per_cores, n_cores_per_d, do_print=False):
     all_pynn_neuron_indexes = set()
     all_results = set()
     for pynn_neuron_index in range(n_neurons):
-        pynn_neuron_indexes = calc_pynn_neuron_indexes(
-            pynn_neuron_index, full_size)
-        core_indexes = calc_core_indexes(
+        pynn_neuron_indexes = index_to_indexes(pynn_neuron_index, full_sizes)
+        core_indexes, neuron_indexes = pynn_to_core_and_neuron_indexes(
             pynn_neuron_indexes, neurons_per_cores)
-        core_index = calc_core_index(
-            core_indexes, full_size,  neurons_per_cores)
-        neuron_indexes = calc_neuron_indexes(
-            pynn_neuron_indexes, neurons_per_cores, core_indexes)
-        neuron_index = calc_neuron_index(neurons_per_cores, neuron_indexes)
+        core_index = indexes_to_index(core_indexes, cores_per_size)
+        neuron_index = indexes_to_index(neuron_indexes, neurons_per_cores)
         key = get_key(pop_info, 13, core_index, neuron_index)
         row_k = key_to_row(key, pop_info)
 
@@ -226,11 +196,14 @@ def check_md_math(neurons_per_cores, n_cores_per_d, do_print=False):
 
         neuron_indexes2 = index_to_indexes(neuron_index2, neurons_per_cores)
         assert neuron_indexes2 == neuron_indexes
-        core_indexes2 = index_to_indexes(core_index2, n_cores_per_d)
+        core_indexes2 = index_to_indexes(core_index2, cores_per_size)
         assert core_indexes2 == core_indexes
 
+        pynn_neuron_indexes2 = core_and_neuron_to_pynn_indexes(
+            core_indexes2, neuron_indexes2, neurons_per_cores)
+        assert pynn_neuron_indexes2 == pynn_neuron_indexes
 
 
 if __name__ == '__main__':
     check_md_math(
-        neurons_per_cores=[3, 4, 2], n_cores_per_d=[2, 3, 4], do_print=True)
+        neurons_per_cores=[3, 4, 2], cores_per_size=[2, 3, 4], do_print=True)
