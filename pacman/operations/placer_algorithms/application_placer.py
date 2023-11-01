@@ -567,22 +567,3 @@ class _ChipWithSpace(object):
 
     def __repr__(self):
         return f"({self.x}, {self.y})"
-
-
-def _chip_order(machine: Machine) -> Iterable[Chip]:
-    """
-    :param ~spinn_machine.Machine machine:
-    :rtype: iterable(Chip)
-    """
-    start = get_config_str("Mapping", "placer_start_chip")
-    start_x, start_y = start.split(",")
-    s_x = int(start_x)
-    s_y = int(start_y)
-
-    for x in range(machine.width):
-        for y in range(machine.height):
-            c_x = (x + s_x) % machine.width
-            c_y = (y + s_y) % machine.height
-            chip = machine.get_chip_at(c_x, c_y)
-            if chip:
-                yield chip
