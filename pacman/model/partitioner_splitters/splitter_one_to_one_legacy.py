@@ -34,7 +34,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon[ApplicationVertex]):
         "_vertex_slice",
         "_sdram"]
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._machine_vertex: Optional[MachineVertex] = None
         self._vertex_slice: Optional[Slice] = None
