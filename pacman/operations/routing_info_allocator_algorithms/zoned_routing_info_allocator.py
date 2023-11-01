@@ -342,39 +342,47 @@ class ZonedRoutingInfoAllocator(object):
             while app_part_index in self.__fixed_used:
                 app_part_index += 1
             # Get a list of machine vertices ordered by pre-slice
-            machine_vertices = sorted(
-                pre.splitter.get_out_going_vertices(identifier),
-                key=lambda x: x.vertex_slice.lo_atom)
+            splitter = pre.splitter
+            machine_vertices = list(splitter.get_out_going_vertices(
+                identifier))
             if not machine_vertices:
                 continue
-
+            machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
             n_bits_atoms = self.__atom_bits_per_app_part[pre, identifier]
             if self.__flexible:
                 n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
-            elif n_bits_atoms <= self.__n_bits_atoms:
-                # Ok it fits use global sizes
-                n_bits_atoms = self.__n_bits_atoms
-                n_bits_machine = self.__n_bits_machine
             else:
-                # Nope need more bits! Use the flexible approach here
-                n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
+                if n_bits_atoms <= self.__n_bits_atoms:
+                    # Ok it fits use global sizes
+                    n_bits_atoms = self.__n_bits_atoms
+                    n_bits_machine = self.__n_bits_machine
+                else:
+                    # Nope need more bits! Use the flexible approach here
+                    n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
 
-            for m_idx, m_vtx in enumerate(machine_vertices):
-                key_and_mask = self.__fixed_partitions.get((identifier, m_vtx))
-                if not key_and_mask:
-                    key_and_mask = BaseKeyAndMask(
-                        ((app_part_index << n_bits_machine) | m_idx)
-                        << n_bits_atoms,
-                        self.__mask(n_bits_atoms))
+            for machine_index, machine_vertex in enumerate(machine_vertices):
+                key = (identifier, machine_vertex)
+                if key in self.__fixed_partitions:
+                    # Ignore zone calculations and just use fixed
+                    key_and_mask = self.__fixed_partitions[key]
+                else:
+                    mask = self.__mask(n_bits_atoms)
+                    key = app_part_index
+                    key = (key << n_bits_machine) | machine_index
+                    key = key << n_bits_atoms
+                    key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
                 routing_infos.add_routing_info(MachineVertexRoutingInfo(
-                    key_and_mask, identifier, m_vtx, m_idx))
+                    key_and_mask, identifier, machine_vertex,
+                    machine_index))
 
             # Add application-level routing information
-            key_and_mask = self.__fixed_partitions.get((identifier, pre))
-            if not key_and_mask:
-                key_and_mask = BaseKeyAndMask(
-                    app_part_index << (n_bits_atoms + n_bits_machine),
-                    self.__mask(n_bits_atoms + n_bits_machine))
+            key = (identifier, pre)
+            if key in self.__fixed_partitions:
+                key_and_mask = self.__fixed_partitions[key]
+            else:
+                key = app_part_index << (n_bits_atoms + n_bits_machine)
+                mask = self.__mask(n_bits_atoms + n_bits_machine)
+                key_and_mask = BaseKeyAndMask(key, mask)
             routing_infos.add_routing_info(AppVertexRoutingInfo(
                 key_and_mask, identifier, pre,
                 self.__mask(n_bits_atoms), n_bits_atoms,
