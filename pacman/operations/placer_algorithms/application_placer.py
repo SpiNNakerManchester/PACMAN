@@ -140,12 +140,7 @@ def _place_error(
     :param Placements system_placements:
     :param PacmanPlaceException exception:
     :param int plan_n_timesteps:
-<<<<<<< HEAD
     :rtype: PacmanPlaceException
-=======
-    :param ~spinn_machine.Machine machine:
-    :raises PacmanPlaceException:
->>>>>>> refs/heads/master
     """
     unplaceable = list()
     vertex_count = 0
@@ -282,10 +277,6 @@ def _do_fixed_location(
     :param list(MachineVertex) vertices:
     :param int sdram:
     :param Placements placements:
-<<<<<<< HEAD
-=======
-    :param ~spinn_machine.Machine machine:
->>>>>>> refs/heads/master
     :param _ChipWithSpace next_chip_space:
     :rtype: bool
     :raise PacmanConfigurationException:
@@ -355,10 +346,6 @@ class _Spaces(object):
     def __init__(
             self, placements: Placements, plan_n_timesteps: Optional[int]):
         """
-<<<<<<< HEAD
-=======
-        :param ~spinn_machine.Machine machine:
->>>>>>> refs/heads/master
         :param Placements placements:
         :param int plan_n_timesteps:
         """
