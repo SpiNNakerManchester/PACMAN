@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import functools
 from typing import List, Tuple, cast
 from spinn_machine import MulticastRoutingEntry
 from pacman.data import PacmanDataView
@@ -24,15 +25,17 @@ from .rt_entry import RTEntry
 
 def pair_compressor(
         ordered: bool = True, accept_overflow: bool = False,
-        verify: bool = False):
+        verify: bool = False, c_sort=False):
     """
     :param bool accept_overflow:
         A flag which should only be used in testing to stop raising an
         exception if result is too big
     :param bool verify: If set to true will verify the length before returning
+    :param bool c_sort; If set will use the slower quicksort as it is
+        implemented in c/ on cores
     :rtype: MulticastRoutingTables
     """
-    compressor = _PairCompressor(ordered, accept_overflow)
+    compressor = _PairCompressor(ordered, accept_overflow, c_sort)
     compressed = compressor.compress_all_tables()
     # TODO currently normal pair compressor does not verify lengths
     if verify:
@@ -145,6 +148,8 @@ class _PairCompressor(AbstractCompressor):
         # A list of all entries which may be sorted
         #   of entries represented as (key, mask, defautible)
         "_all_entries",
+        # flag ot use slower quicksort as it is implemented in c/ on cores
+        "_c_sort",
         # The next index to write a merged/unmergable entry to
         "_write_index",
         # Inclusive index of last entry in the array (len in python)
@@ -163,9 +168,11 @@ class _PairCompressor(AbstractCompressor):
         # Number of unique routes found so far
         "_routes_count")
 
-    def __init__(self, ordered: bool = True, accept_overflow: bool = False):
+    def __init__(self, ordered: bool = True, accept_overflow: bool = False,
+                 c_sort: bool = False):
         super().__init__(ordered, accept_overflow)
         self._all_entries: List[RTEntry] = []
+        self._c_sort = c_sort
         self._write_index = 0
         self._max_index = 0
         self._previous_index = 0
@@ -173,6 +180,28 @@ class _PairCompressor(AbstractCompressor):
         self._routes: List[int] = []
         self._routes_frequency: List[int] = []
         self._routes_count = 0
+
+    def _compare_entries(
+            self, route_a_entry: RTEntry, route_b_entry: RTEntry) -> int:
+        """
+        Compares two entries for sorting based on the frequency of each entry's
+        SpiNNaker route.
+
+        The assumption here is that self._routes has been sorted with the
+        highest frequency at the top of the tables.
+
+        So stop as soon as 1 of the routes is found.
+
+        For two different routes but with the same frequency order is based on
+        the (currently arbitrary) order they are in the self._routes table
+
+        :param RTEntry route_a_entry:
+        :param RTEntry route_b_entry:
+        :return: ordering value (-1, 0, 1)
+        :rtype: int
+        """
+        return self._compare_routes(route_a_entry.spinnaker_route,
+                                    route_b_entry.spinnaker_route)
 
     def _compare_routes(self, route_a: int, route_b: int):
         """
@@ -404,9 +433,20 @@ class _PairCompressor(AbstractCompressor):
                 RTEntry.from_MulticastRoutingEntry(entry))
             self._update_frequency(entry)
 
-        # There are faster pythonic ways to sort but this is how c does it!
-        self._quicksort_routes(0, self._routes_count - 1)
-        self._quicksort_table(0, len(self._all_entries) - 1)
+        if self._c_sort:
+            # emulate how it is done in C/ on cores
+            self._quicksort_routes(0, self._routes_count - 1)
+            self._quicksort_table(0, len(self._all_entries) - 1)
+
+        else:
+            # Use built-in sorting; much simpler
+            self._routes_frequency, self._routes = cast(
+                Tuple[List[int], List[int]],
+                zip(*sorted(
+                    zip(self._routes_frequency, self._routes),
+                    key=lambda x: -x[0])))
+            self._all_entries.sort(key=functools.cmp_to_key(
+                self._compare_entries))
 
         self._write_index = 0
         self._max_index = len(self._all_entries) - 1
