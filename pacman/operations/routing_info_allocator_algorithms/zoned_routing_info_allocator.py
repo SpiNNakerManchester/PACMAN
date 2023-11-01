@@ -361,10 +361,10 @@ class ZonedRoutingInfoAllocator(object):
                     n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
 
             for machine_index, machine_vertex in enumerate(machine_vertices):
-                key = (identifier, machine_vertex)
-                if key in self.__fixed_partitions:
+                id_mv = (identifier, machine_vertex)
+                if id_mv in self.__fixed_partitions:
                     # Ignore zone calculations and just use fixed
-                    key_and_mask = self.__fixed_partitions[key]
+                    key_and_mask = self.__fixed_partitions[id_mv]
                 else:
                     mask = self.__mask(n_bits_atoms)
                     key = app_part_index
@@ -376,9 +376,9 @@ class ZonedRoutingInfoAllocator(object):
                     machine_index))
 
             # Add application-level routing information
-            key = (identifier, pre)
-            if key in self.__fixed_partitions:
-                key_and_mask = self.__fixed_partitions[key]
+            id_pr = (identifier, pre)
+            if id_pr in self.__fixed_partitions:
+                key_and_mask = self.__fixed_partitions[id_pr]
             else:
                 key = app_part_index << (n_bits_atoms + n_bits_machine)
                 mask = self.__mask(n_bits_atoms + n_bits_machine)
