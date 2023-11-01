@@ -12,9 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
+import numpy
+from typing import Optional, Union
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from .abstract_sdram import AbstractSDRAM
+
+
+def _ceil(value: Union[int, float, numpy.integer, numpy.floating]) -> int:
+    return math.ceil(value)
 
 
 class VariableSDRAM(AbstractSDRAM):
@@ -24,14 +31,13 @@ class VariableSDRAM(AbstractSDRAM):
     This is where the usage increase as the run time increases
     """
 
-    __slots__ = [
+    __slots__ = (
         # The amount of SDRAM in bytes used no matter what
-        "_fixed_sdram"
+        "_fixed_sdram",
         # The amount of extra SDRAm used for each timestep
-        "_per_timestep_sdram"
-    ]
+        "_per_timestep_sdram")
 
-    def __init__(self, fixed_sdram, per_timestep_sdram):
+    def __init__(self, fixed_sdram: int, per_timestep_sdram: float):
         """
         :param fixed_sdram:
             The amount of SDRAM (in bytes) that represents static overhead
@@ -45,10 +51,10 @@ class VariableSDRAM(AbstractSDRAM):
         self._per_timestep_sdram = float(per_timestep_sdram)
 
     @overrides(AbstractSDRAM.get_total_sdram)
-    def get_total_sdram(self, n_timesteps):
+    def get_total_sdram(self, n_timesteps: Optional[int]) -> int:
         if n_timesteps is not None:
-            return (self._fixed_sdram +
-                    self._per_timestep_sdram * n_timesteps)
+            return _ceil(
+                self._fixed_sdram + self._per_timestep_sdram * n_timesteps)
         if self._per_timestep_sdram == 0:
             return self._fixed_sdram
         raise PacmanConfigurationException(
@@ -56,26 +62,26 @@ class VariableSDRAM(AbstractSDRAM):
 
     @property
     @overrides(AbstractSDRAM.fixed)
-    def fixed(self):
+    def fixed(self) -> int:
         return self._fixed_sdram
 
     @property
     @overrides(AbstractSDRAM.per_timestep)
-    def per_timestep(self):
+    def per_timestep(self) -> float:
         return self._per_timestep_sdram
 
-    def __add__(self, other):
+    def __add__(self, other: AbstractSDRAM) -> 'VariableSDRAM':
         return VariableSDRAM(
             self._fixed_sdram + other.fixed,
             self._per_timestep_sdram + other.per_timestep)
 
-    def __sub__(self, other):
+    def __sub__(self, other: AbstractSDRAM) -> 'VariableSDRAM':
         return VariableSDRAM(
             self._fixed_sdram - other.fixed,
             self._per_timestep_sdram - other.per_timestep)
 
     @overrides(AbstractSDRAM.sub_from)
-    def sub_from(self, other):
+    def sub_from(self, other: AbstractSDRAM) -> 'VariableSDRAM':
         return VariableSDRAM(
             other.fixed - self._fixed_sdram,
             other.per_timestep - self._per_timestep_sdram)

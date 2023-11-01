@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import Tuple, Union
 import numpy
+from numpy.typing import NDArray
 from pacman.exceptions import PacmanValueError, PacmanTypeError
 
 
@@ -24,9 +26,9 @@ class Slice(object):
         Multi-dimensional slices are supported by :py:class:`MDSlice`.
     """
 
-    __slots__ = ["_lo_atom", "_n_atoms"]
+    __slots__ = ("_lo_atom", "_n_atoms")
 
-    def __init__(self, lo_atom, hi_atom):
+    def __init__(self, lo_atom: int, hi_atom: int):
         """
         :param int lo_atom: Index of the lowest atom to represent.
         :param int hi_atom: Index of the highest atom to represent.
@@ -49,7 +51,7 @@ class Slice(object):
         self._n_atoms = hi_atom - lo_atom + 1
 
     @property
-    def lo_atom(self):
+    def lo_atom(self) -> int:
         """
         The lowest atom represented in the slice.
 
@@ -58,7 +60,7 @@ class Slice(object):
         return self._lo_atom
 
     @property
-    def hi_atom(self):
+    def hi_atom(self) -> int:
         """
         The highest atom represented in the slice.
 
@@ -71,7 +73,7 @@ class Slice(object):
         return self._lo_atom + self._n_atoms - 1
 
     @property
-    def n_atoms(self):
+    def n_atoms(self) -> int:
         """
         The number of atoms represented by the slice.
 
@@ -80,7 +82,7 @@ class Slice(object):
         return self._n_atoms
 
     @property
-    def shape(self):
+    def shape(self) -> Tuple[int, ...]:
         """
         The shape of the atoms over multiple dimensions.
         By default the shape will be 1-dimensional.
@@ -90,17 +92,17 @@ class Slice(object):
         return (self._n_atoms, )
 
     @property
-    def start(self):
+    def start(self) -> Tuple[int, ...]:
         """
         The start coordinates of the slice.
         By default this will be `lo_atom` in 1 dimension.
 
         :rtype: tuple(int,...)
         """
-        return (self._lo_atom,)
+        return (self._lo_atom, )
 
     @property
-    def as_slice(self):
+    def as_slice(self) -> slice:
         """
         Converts the Slice to a standard slice object *if possible.*
 
@@ -115,7 +117,7 @@ class Slice(object):
         # slice for accessing arrays of values
         return slice(self._lo_atom, self._lo_atom + self._n_atoms)
 
-    def get_slice(self, n):
+    def get_slice(self, n: int) -> slice:
         """
         Get a slice in the `n`'Th dimension.
 
@@ -127,7 +129,7 @@ class Slice(object):
         raise IndexError(f"{n} is invalid for a 1 dimension Slice ")
 
     @property
-    def dimension(self):
+    def dimension(self) -> Tuple[slice, ...]:
         """
         Get directions or edges as slices for every dimension
 
@@ -140,15 +142,15 @@ class Slice(object):
         return (slice(self._lo_atom, self._lo_atom + self._n_atoms), )
 
     @property
-    def end(self):
+    def end(self) -> Tuple[int, ...]:
         """
         The end positions of the slice in each dimension
 
         :rtype: tuple(int, ...)
         """
-        return tuple(self._lo_atom + self._n_atoms)
+        return (self._lo_atom + self._n_atoms, )
 
-    def get_ids_as_slice_or_list(self):
+    def get_ids_as_slice_or_list(self) -> Union[slice, numpy.ndarray]:
         """
         Returns the IDs as a built-in slice if possible,
         otherwise as a list of IDs.
@@ -158,7 +160,7 @@ class Slice(object):
         """
         return slice(self._lo_atom, self._lo_atom + self._n_atoms)
 
-    def get_raster_ids(self):
+    def get_raster_ids(self) -> NDArray[numpy.integer]:
         """
         Get the IDs of the atoms in the slice as they would appear in a
         "raster scan" of the atoms over the whole shape.
@@ -188,7 +190,7 @@ class Slice(object):
         return self._lo_atom
 
     @classmethod
-    def from_string(cls, as_str):
+    def from_string(cls, as_str: str) -> Slice:
         """
         Convert the string form of a :py:class:`Slice` into an object instance.
 

@@ -11,9 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
-from spinn_utilities.overrides import overrides
 import math
+from typing import Tuple
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.overrides import overrides
+from spinn_utilities.typing.coords import XY
 from pacman.exceptions import PacmanConfigurationException
 from pacman.utilities.utility_calls import get_n_bits
 from pacman.utilities.constants import BITS_IN_KEY
@@ -37,44 +39,53 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         override `_key_shift`.
     """
 
-    @abstractproperty
-    def _width(self):
+    @property
+    @abstractmethod
+    def _width(self) -> int:
         """
         The width of the device.
 
         :rtype: int
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def _height(self):
+    @property
+    @abstractmethod
+    def _height(self) -> int:
         """
         The height of the device.
 
         :rtype: int
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def _sub_width(self):
+    @property
+    @abstractmethod
+    def _sub_width(self) -> int:
         """
         The width of the sub-rectangles to divide the input into.
 
         :rtype: int
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def _sub_height(self):
+    @property
+    @abstractmethod
+    def _sub_height(self) -> int:
         """
         The height of the sub-rectangles to divide the input into.
 
         :rtype: int
         """
+        raise NotImplementedError
 
-    @abstractproperty
+    @property
+    @abstractmethod
     @overrides(ApplicationVertex.atoms_shape)
-    def atoms_shape(self):
-        pass
+    def atoms_shape(self) -> Tuple[int, ...]:
+        raise NotImplementedError
 
-    def __is_power_of_2(self, v):
+    def __is_power_of_2(self, v: int) -> bool:
         """
         Determine if a value is a power of 2.
 
@@ -83,7 +94,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         return (v & (v - 1) == 0) and (v != 0)
 
-    def _verify_sub_size(self):
+    def _verify_sub_size(self) -> None:
         """
         Ensure the sub width and height are within restrictions.
         """
@@ -103,7 +114,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
                 f"height ({self._height})")
 
     @property
-    def _n_sub_rectangles(self):
+    def _n_sub_rectangles(self) -> int:
         """
         The number of sub-rectangles the device is made up of.
 
@@ -112,7 +123,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return (int(math.ceil(self._width / self._sub_width)) *
                 int(math.ceil(self._height / self._sub_height)))
 
-    def _sub_square_from_index(self, index):
+    def _sub_square_from_index(self, index: int) -> XY:
         """
         Work out the x and y components of the index.
 
@@ -127,7 +138,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         # Return the information
         return x_index, y_index
 
-    def _get_slice(self, index):
+    def _get_slice(self, index: int) -> MDSlice:
         """
         Get the slice for the given machine vertex index.
 
@@ -144,7 +155,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
             lo_atom, hi_atom, (self._sub_width, self._sub_height),
             (lo_atom_x, lo_atom_y), self.atoms_shape)
 
-    def _get_key_and_mask(self, base_key, index):
+    def _get_key_and_mask(self, base_key: int, index: int) -> BaseKeyAndMask:
         """
         Get the key and mask of the given machine vertex index.
 
@@ -160,7 +171,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return BaseKeyAndMask(key, self._mask)
 
     @property
-    def _mask(self):
+    def _mask(self) -> int:
         """
         The mask to be used for the key.
 
@@ -175,7 +186,8 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
                 (sub_x_mask << self._x_index_shift))
 
     @property
-    def _key_fields(self):
+    def _key_fields(self) -> Tuple[
+            Tuple[int, int, int, int], Tuple[int, int, int, int]]:
         """
         The fields in the key for X and Y.
 
@@ -186,7 +198,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
                 (0, self._height, self._source_y_mask, self._source_y_shift))
 
     @property
-    def _x_bits(self):
+    def _x_bits(self) -> int:
         """
         The number of bits to use for X.
 
@@ -195,7 +207,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return get_n_bits(self._width)
 
     @property
-    def _y_bits(self):
+    def _y_bits(self) -> int:
         """
         The number of bits to use for Y.
 
@@ -204,7 +216,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return get_n_bits(self._height)
 
     @property
-    def _sub_x_bits(self):
+    def _sub_x_bits(self) -> int:
         """
         The number of bits to use for the X coordinate of a sub-rectangle.
 
@@ -214,7 +226,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return get_n_bits(n_per_row)
 
     @property
-    def _sub_y_bits(self):
+    def _sub_y_bits(self) -> int:
         """
         The number of bits to use for the Y coordinate of a sub-rectangle.
 
@@ -224,7 +236,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return get_n_bits(n_per_col)
 
     @property
-    def _x_index_shift(self):
+    def _x_index_shift(self) -> int:
         """
         The shift to apply to the key to get the sub-X coordinate.
 
@@ -233,7 +245,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return self._source_x_shift + (self._x_bits - self._sub_x_bits)
 
     @property
-    def _y_index_shift(self):
+    def _y_index_shift(self) -> int:
         """
         The shift to apply to the key to get the sub-Y coordinate.
 
@@ -242,7 +254,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return self._source_y_shift + (self._y_bits - self._sub_y_bits)
 
     @property
-    def _source_x_mask(self):
+    def _source_x_mask(self) -> int:
         """
         The mask to apply to the key *before* shifting to get the
         X coordinate.
@@ -252,7 +264,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return (1 << self._x_bits) - 1
 
     @property
-    def _source_x_shift(self):
+    def _source_x_shift(self) -> int:
         """
         The shift to apply to the key *after* masking to get the
         X coordinate.
@@ -262,7 +274,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return 0
 
     @property
-    def _source_y_mask(self):
+    def _source_y_mask(self) -> int:
         """
         The mask to apply to the key *before* shifting to get the
         Y coordinate.
@@ -272,7 +284,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return ((1 << self._y_bits) - 1) << self._x_bits
 
     @property
-    def _source_y_shift(self):
+    def _source_y_shift(self) -> int:
         """
         The shift to apply to the key *after* masking to get the
         Y coordinate.
@@ -282,7 +294,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         return self._x_bits
 
     @property
-    def _key_shift(self):
+    def _key_shift(self) -> int:
         """
         The shift to apply to the key to get the base key.
 

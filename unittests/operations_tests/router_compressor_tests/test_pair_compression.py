@@ -32,7 +32,7 @@ class TestPairCompressor(unittest.TestCase):
         unittest_setup()
         set_config("Machine", "version", 5)
 
-    def test_pair_big(self):
+    def do_pair_big(self, c_sort):
         class_file = sys.modules[self.__module__].__file__
         path = os.path.dirname(os.path.abspath(class_file))
         j_router = os.path.join(path, "many_to_one.json.gz")
@@ -41,8 +41,14 @@ class TestPairCompressor(unittest.TestCase):
         writer.set_precompressed(original_tables)
         writer.set_machine(virtual_machine(24, 24))
 
-        compressed_tables = pair_compressor()
+        compressed_tables = pair_compressor(c_sort=c_sort)
         for original in original_tables:
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)
             compare_tables(original, compressed)
+
+    def test_pair_big_c_sort(self):
+        self.do_pair_big(True)
+
+    def test_pair_big_python_sort(self):
+        self.do_pair_big(False)
