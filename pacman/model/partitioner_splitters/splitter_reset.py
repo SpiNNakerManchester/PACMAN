@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from pacman.data import PacmanDataView
-from pacman.model.graphs.application import ApplicationVertex
 
 
 def splitter_reset() -> None:
@@ -21,5 +20,5 @@ def splitter_reset() -> None:
     Performs resetting of splitters to indicate a new phase of operation.
     """
     for vertex in PacmanDataView.iterate_vertices():
-        if isinstance(vertex, ApplicationVertex) and vertex.has_splitter:
+        if vertex.has_splitter:
             vertex.splitter.reset_called()

@@ -11,28 +11,31 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import functools
 from typing import List, Tuple, cast
 from spinn_machine import MulticastRoutingEntry
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanElementAllocationException
-from .abstract_compressor import AbstractCompressor
-from .entry import RTEntry
 from pacman.model.routing_tables import (
     MulticastRoutingTables, AbstractMulticastRoutingTable)
+from .abstract_compressor import AbstractCompressor
+from .rt_entry import RTEntry
 
 
 def pair_compressor(
         ordered: bool = True, accept_overflow: bool = False,
-        verify: bool = False):
+        verify: bool = False, c_sort=False):
     """
     :param bool accept_overflow:
         A flag which should only be used in testing to stop raising an
         exception if result is too big
     :param bool verify: If set to true will verify the length before returning
+    :param bool c_sort: If set will use the slower quicksort as it is
+        implemented in c/ on cores
     :rtype: MulticastRoutingTables
     """
-    compressor = _PairCompressor(ordered, accept_overflow)
+    compressor = _PairCompressor(ordered, accept_overflow, c_sort)
     compressed = compressor.compress_all_tables()
     # TODO currently normal pair compressor does not verify lengths
     if verify:
@@ -145,6 +148,8 @@ class _PairCompressor(AbstractCompressor):
         # A list of all entries which may be sorted
         #   of entries represented as (key, mask, defautible)
         "_all_entries",
+        # flag ot use slower quicksort as it is implemented in c/ on cores
+        "_c_sort",
         # The next index to write a merged/unmergable entry to
         "_write_index",
         # Inclusive index of last entry in the array (len in python)
@@ -163,9 +168,11 @@ class _PairCompressor(AbstractCompressor):
         # Number of unique routes found so far
         "_routes_count")
 
-    def __init__(self, ordered: bool = True, accept_overflow: bool = False):
+    def __init__(self, ordered: bool = True, accept_overflow: bool = False,
+                 c_sort: bool = False):
         super().__init__(ordered, accept_overflow)
         self._all_entries: List[RTEntry] = []
+        self._c_sort = c_sort
         self._write_index = 0
         self._max_index = 0
         self._previous_index = 0
@@ -193,8 +200,26 @@ class _PairCompressor(AbstractCompressor):
         :return: ordering value (-1, 0, 1)
         :rtype: int
         """
-        route_a = route_a_entry.spinnaker_route
-        route_b = route_b_entry.spinnaker_route
+        return self._compare_routes(route_a_entry.spinnaker_route,
+                                    route_b_entry.spinnaker_route)
+
+    def _compare_routes(self, route_a: int, route_b: int):
+        """
+        Compares two routes for sorting based on the frequency of each route.
+
+        The assumption here is that self._routes has been sorted with the
+        highest frequency at the top of the tables.
+
+        So stop as soon as 1 of the routes is found.
+
+        For two different routes but with the same frequency order is based on
+        the (currently arbitrary) order they are in the self._routes table
+
+        :param int route_a:
+        :param int route_b:
+        :return: ordering value (-1, 0, 1)
+        :rtype: int
+        """
         if route_a == route_b:
             return 0
         for i in range(self._routes_count):
@@ -203,6 +228,101 @@ class _PairCompressor(AbstractCompressor):
             if self._routes[i] == route_b:
                 return -1
         raise PacmanElementAllocationException("Sorting error")
+
+    def _three_way_partition_table(self, low: int, high: int):
+        """
+        Partitions the entries between low and high into three parts
+
+        based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
+
+        :param int low: Inclusive Lowest index to consider
+        :param int high: Inclusive Highest index to consider
+        :return: (last_index of lower, last_index_of_middle)
+        :rtype: tuple(int,int)
+        """
+        check = low + 1
+        pivot = self._all_entries[low].spinnaker_route
+        while check <= high:
+            compare = self._compare_routes(
+                self._all_entries[check].spinnaker_route, pivot)
+            if compare < 0:
+                temp = self._all_entries[low]
+                self._all_entries[low] = self._all_entries[check]
+                self._all_entries[check] = temp
+                low += 1
+                check += 1
+            elif compare > 0:
+                temp = self._all_entries[high]
+                self._all_entries[high] = self._all_entries[check]
+                self._all_entries[check] = temp
+                high -= 1
+            else:
+                check += 1
+        return low, check
+
+    def _quicksort_table(self, low: int, high: int):
+        """
+        Sorts the entries in place based on frequency of their route
+
+        :param int low: Inclusive lowest index to consider
+        :param int high: Inclusive highest index to consider
+        """
+        if low < high:
+            left, right = self._three_way_partition_table(low, high)
+            self._quicksort_table(low, left - 1)
+            self._quicksort_table(right, high)
+
+    def _swap_routes(self, index_a: int, index_b: int):
+        """
+        Helper function to swap *both* the routes and routes frequency tables
+
+        :param int index_a:
+        :param int index_b:
+        """
+        temp = self._routes_frequency[index_a]
+        self._routes_frequency[index_a] = self._routes_frequency[index_b]
+        self._routes_frequency[index_b] = temp
+        temp = self._routes[index_a]
+        self._routes[index_a] = self._routes[index_b]
+        self._routes[index_b] = temp
+
+    def _three_way_partition_routes(
+            self, low: int, high: int) -> Tuple[int, int]:
+        """
+        Partitions the routes and frequencies into three parts.
+
+        based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
+
+        :param int low: Lowest index to consider
+        :param int high: Highest index to consider
+        :return: (last_index of lower, last_index_of_middle)
+        :rtype: tuple(int,int)
+        """
+        check = low + 1
+        pivot = self._routes_frequency[low]
+        while check <= high:
+            if self._routes_frequency[check] > pivot:
+                self._swap_routes(low, check)
+                low += 1
+                check += 1
+            elif self._routes_frequency[check] < pivot:
+                self._swap_routes(high, check)
+                high -= 1
+            else:
+                check += 1
+        return low, check
+
+    def _quicksort_routes(self, low: int, high: int):
+        """
+        Sorts the routes in place based on frequency.
+
+        :param int low: Inclusive lowest index to consider
+        :param int high: Inclusive highest index to consider
+        """
+        if low < high:
+            left, right = self._three_way_partition_routes(low, high)
+            self._quicksort_routes(low, left - 1)
+            self._quicksort_routes(right, high)
 
     def _find_merge(self, left: int, index: int) -> bool:
         """
@@ -313,13 +433,20 @@ class _PairCompressor(AbstractCompressor):
                 RTEntry.from_MulticastRoutingEntry(entry))
             self._update_frequency(entry)
 
-        # Use built-in sorting; much simpler
-        self._routes_frequency, self._routes = cast(
-            Tuple[List[int], List[int]],
-            zip(*sorted(
-                zip(self._routes_frequency, self._routes),
-                key=lambda x: -x[0])))
-        self._all_entries.sort(key=functools.cmp_to_key(self._compare_entries))
+        if self._c_sort:
+            # emulate how it is done in C/ on cores
+            self._quicksort_routes(0, self._routes_count - 1)
+            self._quicksort_table(0, len(self._all_entries) - 1)
+
+        else:
+            # Use built-in sorting; much simpler
+            self._routes_frequency, self._routes = cast(
+                Tuple[List[int], List[int]],
+                zip(*sorted(
+                    zip(self._routes_frequency, self._routes),
+                    key=lambda x: -x[0])))
+            self._all_entries.sort(key=functools.cmp_to_key(
+                self._compare_entries))
 
         self._write_index = 0
         self._max_index = len(self._all_entries) - 1

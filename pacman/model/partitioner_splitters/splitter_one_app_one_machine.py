@@ -48,27 +48,27 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon[AV], Generic[AV, MV]):
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter):
         chip_counter.add_core(
-            self._governed_app_vertex.machine_vertex.sdram_required)
+            self.governed_app_vertex.machine_vertex.sdram_required)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self) -> List[Slice]:
-        return [self._governed_app_vertex.machine_vertex.vertex_slice]
+        return [self.governed_app_vertex.machine_vertex.vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self) -> List[Slice]:
-        return [self._governed_app_vertex.machine_vertex.vertex_slice]
+        return [self.governed_app_vertex.machine_vertex.vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id: str) -> List[MV]:
-        return [self._governed_app_vertex.machine_vertex]
+        return [self.governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(self, partition_id: str) -> List[MV]:
-        return [self._governed_app_vertex.machine_vertex]
+        return [self.governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record) -> List[MV]:
-        return [self._governed_app_vertex.machine_vertex]
+        return [self.governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):

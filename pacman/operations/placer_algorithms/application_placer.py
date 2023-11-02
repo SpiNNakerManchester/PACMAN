@@ -21,7 +21,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 
-from spinn_machine import Machine, Chip
+from spinn_machine import Chip
 
 from pacman.data import PacmanDataView
 from pacman.model.placements import Placements, Placement
@@ -140,12 +140,7 @@ def _place_error(
     :param Placements system_placements:
     :param PacmanPlaceException exception:
     :param int plan_n_timesteps:
-<<<<<<< HEAD
     :rtype: PacmanPlaceException
-=======
-    :param ~spinn_machine.Machine machine:
-    :raises PacmanPlaceException:
->>>>>>> refs/heads/master
     """
     unplaceable = list()
     vertex_count = 0
@@ -282,10 +277,6 @@ def _do_fixed_location(
     :param list(MachineVertex) vertices:
     :param int sdram:
     :param Placements placements:
-<<<<<<< HEAD
-=======
-    :param ~spinn_machine.Machine machine:
->>>>>>> refs/heads/master
     :param _ChipWithSpace next_chip_space:
     :rtype: bool
     :raise PacmanConfigurationException:
@@ -355,10 +346,6 @@ class _Spaces(object):
     def __init__(
             self, placements: Placements, plan_n_timesteps: Optional[int]):
         """
-<<<<<<< HEAD
-=======
-        :param ~spinn_machine.Machine machine:
->>>>>>> refs/heads/master
         :param Placements placements:
         :param int plan_n_timesteps:
         """
@@ -580,22 +567,3 @@ class _ChipWithSpace(object):
 
     def __repr__(self):
         return f"({self.x}, {self.y})"
-
-
-def _chip_order(machine: Machine) -> Iterable[Chip]:
-    """
-    :param ~spinn_machine.Machine machine:
-    :rtype: iterable(Chip)
-    """
-    start = get_config_str("Mapping", "placer_start_chip")
-    start_x, start_y = start.split(",")
-    s_x = int(start_x)
-    s_y = int(start_y)
-
-    for x in range(machine.width):
-        for y in range(machine.height):
-            c_x = (x + s_x) % machine.width
-            c_y = (y + s_y) % machine.height
-            chip = machine.get_chip_at(c_x, c_y)
-            if chip:
-                yield chip

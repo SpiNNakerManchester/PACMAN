@@ -47,12 +47,6 @@ class SourceSegmentedSDRAMMachinePartition(
         """
         return sum(edge.sdram_size for edge in self.edges)
 
-    def __peek_edge(self, pre_vertex: MachineVertex) -> SDRAMMachineEdge:
-        """
-        :rtype: SDRAMMachineEdge
-        """
-        return self._pre_vertices[pre_vertex].peek()
-
     @property
     def sdram_base_address(self) -> int:
         """
@@ -74,7 +68,7 @@ class SourceSegmentedSDRAMMachinePartition(
 
         for pre_vertex in self._pre_vertices.keys():
             # allocate for the pre_vertex
-            edge = self.__peek_edge(pre_vertex)
+            edge = self._pre_vertices[pre_vertex].peek()
             edge.sdram_base_address = new_value
             new_value += edge.sdram_size
 
@@ -104,14 +98,14 @@ class SourceSegmentedSDRAMMachinePartition(
         """
         if self._sdram_base_address is None:
             return False
-        return self.__peek_edge(vertex).sdram_base_address is not None
+        return self._pre_vertices[vertex].peek().sdram_base_address is not None
 
     @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
     def get_sdram_base_address_for(self, vertex: MachineVertex) -> int:
         if self._sdram_base_address is None:
             raise PacmanValueError("no base address set for SDRAM partition")
         if vertex in self._pre_vertices:
-            addr = self.__peek_edge(vertex).sdram_base_address
+            addr = self._pre_vertices[vertex].peek().sdram_base_address
             if addr is None:
                 raise PacmanValueError(
                     f"no base address set for vertex {vertex.label}")
@@ -122,6 +116,6 @@ class SourceSegmentedSDRAMMachinePartition(
     @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
     def get_sdram_size_of_region_for(self, vertex: MachineVertex) -> int:
         if vertex in self._pre_vertices:
-            return self.__peek_edge(vertex).sdram_size
+            return self._pre_vertices[vertex].peek().sdram_size
         else:
             return self.total_sdram_requirements()

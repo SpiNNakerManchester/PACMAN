@@ -19,7 +19,7 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/remove_default_
 """
 
 from typing import List, Optional
-from pacman.operations.router_compressors.entry import RTEntry
+from pacman.operations.router_compressors import RTEntry
 from pacman.exceptions import MinimisationFailedError
 
 

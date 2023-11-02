@@ -11,10 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
+
+import math
+import numpy
+from typing import Optional, Union
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from .abstract_sdram import AbstractSDRAM
+
+
+def _ceil(value: Union[int, float, numpy.integer, numpy.floating]) -> int:
+    return math.ceil(value)
 
 
 class VariableSDRAM(AbstractSDRAM):
@@ -46,8 +53,8 @@ class VariableSDRAM(AbstractSDRAM):
     @overrides(AbstractSDRAM.get_total_sdram)
     def get_total_sdram(self, n_timesteps: Optional[int]) -> int:
         if n_timesteps is not None:
-            return int(self._fixed_sdram +
-                       self._per_timestep_sdram * n_timesteps)
+            return _ceil(
+                self._fixed_sdram + self._per_timestep_sdram * n_timesteps)
         if self._per_timestep_sdram == 0:
             return self._fixed_sdram
         raise PacmanConfigurationException(

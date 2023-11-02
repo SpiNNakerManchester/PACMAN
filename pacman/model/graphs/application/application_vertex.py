@@ -257,8 +257,8 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         the splitter (if any).
         """
         self._machine_vertices = OrderedSet()
-        if self.has_splitter:
-            self.splitter.reset_called()
+        if self._splitter is not None:
+            self._splitter.reset_called()
 
     def get_machine_fixed_key_and_mask(
             self, machine_vertex: MachineVertex,
