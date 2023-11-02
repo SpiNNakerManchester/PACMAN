@@ -11,10 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from spinn_utilities.abstract_base import abstractmethod, abstractproperty
+from __future__ import annotations
+from typing import List, Optional, TYPE_CHECKING
+from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.require_subclass import require_subclass
-from pacman.model.graphs.abstract_vertex import AbstractVertex
+from pacman.model.graphs import AbstractVertex
+if TYPE_CHECKING:
+    from spinn_utilities.typing.coords import XY
+    from spinn_machine import Machine
+    from spinn_machine.link_data_objects import AbstractLinkData
+    from pacman.model.routing_info import BaseKeyAndMask
 
 
 @require_subclass(AbstractVertex)
@@ -30,8 +36,9 @@ class AbstractVirtual(object):
 
     __slots__ = ()
 
-    @abstractproperty
-    def board_address(self):
+    @property
+    @abstractmethod
+    def board_address(self) -> Optional[str]:
         """
         The IP address of the board to which the device is connected,
         or ``None`` for the boot board, or when using linked chip
@@ -39,43 +46,51 @@ class AbstractVirtual(object):
 
         :rtype: str or None
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def linked_chip_coordinates(self):
+    @property
+    @abstractmethod
+    def linked_chip_coordinates(self) -> Optional[XY]:
         """
         The coordinates of the chip to which the device is connected,
         or ``None`` for the boot board, or when using a board address.
 
         :rtype: tuple(int, int) or None
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def outgoing_keys_and_masks(self):
+    def outgoing_keys_and_masks(self) -> Optional[List[BaseKeyAndMask]]:
         """
         Get the keys sent by the device or `None` if there aren't any
         explicitly defined.
 
         :rtype: list(~pacman.model.routing_info.BaseKeyAndMask) or None
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def incoming(self):
+    @property
+    @abstractmethod
+    def incoming(self) -> bool:
         """
         Whether this device sends traffic into SpiNNaker.
 
         :rtype: bool
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def outgoing(self):
+    @property
+    @abstractmethod
+    def outgoing(self) -> bool:
         """
         Whether this device receives traffic from SpiNNaker.
 
         :rtype: bool
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_link_data(self, machine):
+    def get_link_data(self, machine: Machine) -> AbstractLinkData:
         """
         Get link data from the machine.
 
@@ -83,3 +98,4 @@ class AbstractVirtual(object):
             The machine to get the data from
         :rtype: ~spinn_machine.link_data_objects.AbstractLinkData
         """
+        raise NotImplementedError

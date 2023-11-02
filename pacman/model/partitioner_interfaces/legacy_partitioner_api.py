@@ -11,8 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import Optional, FrozenSet, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.model.resources import AbstractSDRAM
+from pacman.model.graphs.common import Slice
+if TYPE_CHECKING:
+    from pacman.model.graphs.machine import MachineVertex
 
 
 # Can't use this decorator: circular import problem
@@ -27,10 +32,10 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
         :py:class:`ApplicationVertex`. This is not enforced because of issues
         with import order, but is required; PACMAN assumes it to be true.
     """
-    __slots__ = []
+    __slots__ = ()
 
     @abstractmethod
-    def get_sdram_used_by_atoms(self, vertex_slice):
+    def get_sdram_used_by_atoms(self, vertex_slice: Slice) -> AbstractSDRAM:
         """
         Get the separate SDRAM requirements for a range of atoms.
 
@@ -38,9 +43,12 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
             the low value of atoms to calculate resources from
         :rtype: ~pacman.model.resources.AbstractSDRAM
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def create_machine_vertex(self, vertex_slice, sdram, label=None):
+    def create_machine_vertex(
+            self, vertex_slice: Slice, sdram: AbstractSDRAM,
+            label: Optional[str] = None) -> MachineVertex:
         """
         Create a machine vertex from this application vertex.
 
@@ -53,12 +61,14 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
         :return: The created machine vertex
         :rtype: ~pacman.model.graphs.machine.MachineVertex
         """
+        raise NotImplementedError
 
     @staticmethod
-    def abstract_methods():
+    def abstract_methods() -> FrozenSet[str]:
         """
         Exposes the abstract methods and properties defined in this class.
 
         :rtype frozenset(str)
         """
-        return LegacyPartitionerAPI.__abstractmethods__
+        return LegacyPartitionerAPI.\
+            __abstractmethods__  # type: ignore[attr-defined]

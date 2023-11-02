@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from typing import List, Optional, Union
+from typing_extensions import TypeAlias
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex)
@@ -20,6 +21,12 @@ from pacman.model.graphs.machine import (
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanNotExistException)
 from .abstract_splitter_common import AbstractSplitterCommon
+from pacman.model.graphs.application import FPGAConnection
+from pacman.utilities.utility_objs import ChipCounter
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.common import Slice
+_Allowed: TypeAlias = Union[
+    ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex]
 
 
 class SplitterExternalDevice(AbstractSplitterCommon):
@@ -27,7 +34,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
     A splitter for handling external devices.
     """
 
-    __slots__ = [
+    __slots__ = (
         # Machine vertices that will send packets into the network
         "__incoming_vertices",
         # Machine vertices that will receive packets from the network
@@ -35,19 +42,18 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         # Slices of incoming vertices (not exactly but hopefully close enough)
         "__incoming_slices",
         # Slice of outgoing vertex (which really doesn't matter here)
-        "__outgoing_slice"
-    ]
+        "__outgoing_slice")
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.__incoming_vertices = list()
-        self.__incoming_slices = list()
-        self.__outgoing_vertex = None
-        self.__outgoing_slice = None
+        self.__incoming_vertices: List[MachineVertex] = list()
+        self.__incoming_slices: List[Slice] = list()
+        self.__outgoing_vertex: Optional[MachineVertex] = None
+        self.__outgoing_slice: Optional[Slice] = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
-    def set_governed_app_vertex(self, app_vertex):
-        super(SplitterExternalDevice, self).set_governed_app_vertex(app_vertex)
+    def set_governed_app_vertex(self, app_vertex: _Allowed):
+        super().set_governed_app_vertex(app_vertex)
 
         self.__incoming_vertices = list()
         self.__incoming_slices = list()
@@ -55,6 +61,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         self.__outgoing_slice = None
 
         if isinstance(app_vertex, ApplicationFPGAVertex):
+            fpga: Optional[FPGAConnection]
             # This can have multiple FPGA connections per board
             for i in range(app_vertex.n_machine_vertices_per_link):
                 for fpga in app_vertex.incoming_fpga_connections:
@@ -65,12 +72,11 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                         f":{fpga.board_address}:{fpga.chip_coords}")
                     vertex_slice = app_vertex.get_incoming_slice_for_link(
                         fpga, i)
-                    vertex = MachineFPGAVertex(
+                    self.__incoming_vertices.append(MachineFPGAVertex(
                         fpga.fpga_id, fpga.fpga_link_id,
                         fpga.board_address, fpga.chip_coords, label=label,
                         app_vertex=app_vertex, vertex_slice=vertex_slice,
-                        incoming=True, outgoing=False)
-                    self.__incoming_vertices.append(vertex)
+                        incoming=True, outgoing=False))
                     self.__incoming_slices.append(vertex_slice)
             fpga = app_vertex.outgoing_fpga_connection
             if fpga is not None:
@@ -78,13 +84,12 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                     f"Outgoing Machine vertex for {app_vertex.label}"
                     f":{fpga.fpga_id}:{fpga.fpga_link_id}"
                     f":{fpga.board_address}:{fpga.chip_coords}")
-                vertex_slice = app_vertex.get_outgoing_slice()
-                vertex = MachineFPGAVertex(
+                self.__outgoing_slice = app_vertex.get_outgoing_slice()
+                self.__outgoing_vertex = MachineFPGAVertex(
                     fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
                     fpga.chip_coords, app_vertex=app_vertex, label=label,
-                    vertex_slice=vertex_slice, incoming=False, outgoing=True)
-                self.__outgoing_vertex = vertex
-                self.__outgoing_slice = vertex_slice
+                    vertex_slice=self.__outgoing_slice,
+                    incoming=False, outgoing=True)
 
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
             # So far this only handles one connection in total
@@ -93,12 +98,11 @@ class SplitterExternalDevice(AbstractSplitterCommon):
             if app_vertex.incoming:
                 for i in range(app_vertex.n_machine_vertices):
                     vertex_slice = app_vertex.get_incoming_slice(i)
-                    vertex = MachineSpiNNakerLinkVertex(
+                    self.__incoming_vertices.append(MachineSpiNNakerLinkVertex(
                         app_vertex.spinnaker_link_id, app_vertex.board_address,
                         None, label=label, app_vertex=app_vertex,
                         vertex_slice=vertex_slice, incoming=True,
-                        outgoing=False)
-                    self.__incoming_vertices.append(vertex)
+                        outgoing=False))
                     self.__incoming_slices.append(vertex_slice)
             if app_vertex.outgoing:
                 self.__outgoing_slice = app_vertex.get_outgoing_slice()
@@ -112,7 +116,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                 f"Unknown vertex type to splitter: {app_vertex}")
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, chip_counter):
+    def create_machine_vertices(self, chip_counter: ChipCounter):
         app_vertex = self.governed_app_vertex
         for vertex in self.__incoming_vertices:
             # machine_graph.add_vertex(vertex)
@@ -124,17 +128,17 @@ class SplitterExternalDevice(AbstractSplitterCommon):
             app_vertex.remember_machine_vertex(self.__outgoing_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
-    def get_in_coming_slices(self):
-        if self.__outgoing_vertex is None:
+    def get_in_coming_slices(self) -> List[Slice]:
+        if self.__outgoing_slice is None:
             return []
         return [self.__outgoing_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
-    def get_out_going_slices(self):
+    def get_out_going_slices(self) -> List[Slice]:
         return self.__incoming_slices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, partition_id):
+    def get_in_coming_vertices(self, partition_id: str) -> List[MachineVertex]:
         # Note, the incoming vertex is how to get packets into this device,
         # so we want to direct it at the outgoing vertex!
         if self.__outgoing_vertex is None:
@@ -144,7 +148,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         return [self.__outgoing_vertex]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, partition_id):
+    def get_out_going_vertices(self, partition_id: str) -> List[MachineVertex]:
         # Note, the outgoing vertex is how to get packets out of this device,
         # so we want to direct it at the incoming vertices!
         if not self.__incoming_vertices:
@@ -154,7 +158,8 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         return self.__incoming_vertices
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
-    def machine_vertices_for_recording(self, variable_to_record):
+    def machine_vertices_for_recording(
+            self, variable_to_record: str) -> List[MachineVertex]:
         return []
 
     @overrides(AbstractSplitterCommon.reset_called)

@@ -13,12 +13,15 @@
 # limitations under the License.
 
 import logging
+from typing import Iterable
 from spinn_utilities.log import FormatAdapter
+from spinn_machine import MulticastRoutingEntry
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def _reduce_route_value(processors_ids, link_ids):
+def _reduce_route_value(
+        processors_ids: Iterable[int], link_ids: Iterable[int]) -> int:
     """
     :param iterable(int) processors_ids:
     :param iterable(int) link_ids:
@@ -32,7 +35,8 @@ def _reduce_route_value(processors_ids, link_ids):
     return value
 
 
-def _expand_route_value(processors_ids, link_ids):
+def _expand_route_value(
+        processors_ids: Iterable[int], link_ids: Iterable[int]) -> str:
     """
     Convert a 32-bit route word into a string which lists the target cores
     and links.
@@ -52,7 +56,7 @@ def _expand_route_value(processors_ids, link_ids):
     return f"[{processors}] [{links}]"
 
 
-def format_route(entry):
+def format_route(entry: MulticastRoutingEntry) -> str:
     """
     How to render a single routing entry.
 
