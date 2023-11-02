@@ -26,11 +26,13 @@ https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/utils.p
 """
 
 import functools
-
+from typing import Callable, Dict, Final, Iterable, List, Tuple
+from typing_extensions import TypeAlias
 from collections import defaultdict
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
+from spinn_utilities.typing.coords import XY
 from pacman.data import PacmanDataView
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition)
@@ -40,9 +42,14 @@ from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     least_busy_dimension_first, get_app_partitions, vertex_xy_and_route)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
+from pacman.model.graphs.machine import MachineVertex
+_Vec: TypeAlias = Tuple[int, int, int]
+_V2N: TypeAlias = Callable[[_Vec, XY], List[Tuple[int, XY]]]
+_Inf: Final = float("inf")
 
 
-def _ner_net(src, destinations, machine, vector_to_nodes):
+def _ner_net(src: XY, destinations: Iterable[XY],
+             vector_to_nodes: _V2N) -> RoutingTree:
     """
     Produce a shortest path tree for a given net using NER.
 
@@ -52,14 +59,14 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
         The coordinate (x, y) of the source vertex.
     :param iterable(tuple(int,int)) destinations:
         The coordinates of destination vertices.
-    :param ~spinn_machine.Machine machine:
-        machine for which routes are being generated
-    :param vector_to_nodes: ??????????
+    :param vector_to_nodes: How to get the nodes from a machine vector
     :return:
         A RoutingTree is produced rooted at the source and visiting all
         destinations but which does not contain any vertices etc.
     :rtype: RoutingTree
     """
+    machine = PacmanDataView.get_machine()
+
     # The radius to check for neighbours, and the total number of chips that
     # could appear in the radius
     radius = 20
@@ -89,7 +96,7 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
             # This implementation scans the list of all route nodes created so
             # far and finds the closest node which is < radius hops.  This is
             # ~3x slower per iteration than the one above.
-            neighbour_distance = None
+            neighbour_distance = _Inf
             for candidate_neighbour in route:
                 distance = machine.get_vector_length(
                     candidate_neighbour, destination)
@@ -104,7 +111,7 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
             neighbour = src
 
         # Find the shortest vector from the neighbour to this destination
-        vector = machine.get_vector(neighbour, destination)
+        vector: _Vec = machine.get_vector(neighbour, destination)
 
         # The route may inadvertently pass through an
         # already connected node. If the route is allowed to pass through that
@@ -130,7 +137,8 @@ def _ner_net(src, destinations, machine, vector_to_nodes):
     return route[src]
 
 
-def _do_route(source_xy, post_vertexes, machine, vector_to_nodes):
+def _do_route(source_xy: XY, post_vertexes: Iterable[MachineVertex],
+              vector_to_nodes: _V2N) -> RoutingTree:
     """
     Routing algorithm based on Neighbour Exploring Routing (NER).
 
@@ -145,15 +153,14 @@ def _do_route(source_xy, post_vertexes, machine, vector_to_nodes):
 
     :param tuple(int,int) source_xy:
     :param iterable(MachineVertex) post_vertexes:
-    :param ~spinn_machine.Machine machine:
     :param vector_to_nodes:
     :return:
     :rtype: RoutingTree
     """
-    destinations = set(vertex_xy(post_vertex)
-                       for post_vertex in post_vertexes)
+    destinations = frozenset(
+        vertex_xy(post_vertex) for post_vertex in post_vertexes)
     # Generate routing tree (assuming a perfect machine)
-    root = _ner_net(source_xy, destinations, machine, vector_to_nodes)
+    root = _ner_net(source_xy, destinations, vector_to_nodes)
 
     # Fix routes to avoid dead chips/links
     if route_has_dead_links(root):
@@ -162,7 +169,7 @@ def _do_route(source_xy, post_vertexes, machine, vector_to_nodes):
     return root
 
 
-def _ner_route(vector_to_nodes):
+def _ner_route(vector_to_nodes: _V2N) -> MulticastRoutingTableByPartition:
     """
     Performs routing using rig algorithm.
 
@@ -177,22 +184,21 @@ def _ner_route(vector_to_nodes):
     progress_bar = ProgressBar(len(partitions), "Routing")
 
     for partition in progress_bar.over(partitions):
-
         source = partition.pre_vertex
-        post_vertices_by_source = defaultdict(OrderedSet)
+        post_vertices_by_source: Dict[
+            MachineVertex, OrderedSet[MachineVertex]] = defaultdict(OrderedSet)
         for edge in partition.edges:
             splitter = edge.post_vertex.splitter
-            target_vertices = splitter.get_source_specific_in_coming_vertices(
-                source, partition.identifier)
-            for tgt, srcs in target_vertices:
+            for tgt, srcs in splitter.get_source_specific_in_coming_vertices(
+                    source, partition.identifier):
                 for src in srcs:
                     if isinstance(src, ApplicationVertex):
                         for s in src.splitter.get_out_going_vertices(
                                 partition.identifier):
                             post_vertices_by_source[s].add(tgt)
 
-        outgoing = OrderedSet(source.splitter.get_out_going_vertices(
-            partition.identifier))
+        outgoing: OrderedSet[MachineVertex] = OrderedSet(
+            source.splitter.get_out_going_vertices(partition.identifier))
         for in_part in source.splitter.get_internal_multicast_partitions():
             if in_part.identifier == partition.identifier:
                 outgoing.add(in_part.pre_vertex)
@@ -200,23 +206,19 @@ def _ner_route(vector_to_nodes):
                     post_vertices_by_source[in_part.pre_vertex].add(
                         edge.post_vertex)
 
-        machine = PacmanDataView.get_machine()
         for m_vertex in outgoing:
             post_vertexes = post_vertices_by_source[m_vertex]
             source_xy, (m_vertex, core, link) = vertex_xy_and_route(m_vertex)
-            routing_tree = _do_route(
-                source_xy, post_vertexes, machine, vector_to_nodes)
+            routing_tree = _do_route(source_xy, post_vertexes, vector_to_nodes)
             targets = get_targets_by_chip(post_vertexes)
             convert_a_route(
                 routing_tables, m_vertex, partition.identifier,
                 core, link, routing_tree, targets)
 
-    progress_bar.end()
-
     return routing_tables
 
 
-def ner_route():
+def ner_route() -> MulticastRoutingTableByPartition:
     """
     basic NER router.
 
@@ -226,13 +228,12 @@ def ner_route():
     return _ner_route(longest_dimension_first)
 
 
-def ner_route_traffic_aware():
+def ner_route_traffic_aware() -> MulticastRoutingTableByPartition:
     """
     traffic-aware NER router.
 
     :return: a routing table by partition
     :rtype: MulticastRoutingTableByPartition
     """
-    traffic = defaultdict(lambda: 0)
-    return _ner_route(
-        functools.partial(least_busy_dimension_first, traffic))
+    traffic: Dict[XY, int] = defaultdict(int)
+    return _ner_route(functools.partial(least_busy_dimension_first, traffic))

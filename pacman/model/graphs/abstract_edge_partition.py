@@ -11,30 +11,37 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from __future__ import annotations
+from typing import (
+    Collection, Generic, Tuple, Type, TypeVar, Union, TYPE_CHECKING)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanInvalidParameterException, PacmanAlreadyExistsException)
+if TYPE_CHECKING:
+    from .abstract_edge import AbstractEdge  # @UnusedImport
+    from .abstract_vertex import AbstractVertex
+#: :meta private:
+E = TypeVar("E", bound='AbstractEdge')
 
 
-class AbstractEdgePartition(object, metaclass=AbstractBase):
+class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
     """
     A collection of edges which start at a single vertex which have the
     same semantics and so can share a single key or block of SDRAM
     (depending on edge type).
     """
 
-    __slots__ = [
+    __slots__ = (
         # The partition identifier
         "_identifier",
         # The edges in the partition
         "_edges",
         # The type of edges to accept
-        "_allowed_edge_types"
-    ]
+        "_allowed_edge_types")
 
-    def __init__(
-            self, identifier, allowed_edge_types):
+    def __init__(self, identifier: str,
+                 allowed_edge_types: Union[Type[E], Tuple[Type[E], ...]]):
         """
         :param str identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed
@@ -43,9 +50,9 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         """
         self._identifier = identifier
         self._allowed_edge_types = allowed_edge_types
-        self._edges = OrderedSet()
+        self._edges: OrderedSet[E] = OrderedSet()
 
-    def add_edge(self, edge):
+    def add_edge(self, edge: E):
         """
         Add an edge to the edge partition.
 
@@ -64,7 +71,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         self._edges.add(edge)
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         """
         The identifier of this edge partition.
 
@@ -73,7 +80,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         return self._identifier
 
     @property
-    def edges(self):
+    def edges(self) -> Collection[E]:
         """
         The edges in this edge partition.
 
@@ -86,7 +93,7 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         return self._edges
 
     @property
-    def n_edges(self):
+    def n_edges(self) -> int:
         """
         The number of edges in the edge partition.
 
@@ -110,8 +117,9 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
         """
         return edge in self._edges
 
-    @abstractproperty
-    def pre_vertices(self):
+    @property
+    @abstractmethod
+    def pre_vertices(self) -> Collection[AbstractVertex]:
         """
         The vertices associated with this partition.
 
@@ -122,3 +130,4 @@ class AbstractEdgePartition(object, metaclass=AbstractBase):
 
         :rtype: iterable(~pacman.model.graphs.AbstractVertex)
         """
+        raise NotImplementedError

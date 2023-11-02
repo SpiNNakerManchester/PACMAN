@@ -11,42 +11,46 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from collections import defaultdict
+from __future__ import annotations
 import logging
-import math
 import os
-import numpy
+from typing import Iterable, List, Optional, Set, Tuple
 
 from spinn_utilities.config_holder import get_config_bool, get_config_str
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 
+from spinn_machine import Chip
+
 from pacman.data import PacmanDataView
 from pacman.model.placements import Placements, Placement
 from pacman.model.graphs import AbstractVirtual
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.exceptions import (
     PacmanPlaceException, PacmanConfigurationException, PacmanTooBigToPlace)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def place_application_graph(system_placements):
+def place_application_graph(system_placements: Placements) -> Placements:
     """
     Perform placement of an application graph on the machine.
 
     .. note::
         app_graph must have been partitioned
+
+    :param Placements system_placements:
+        The placements of cores doing system tasks. This is what we start from.
+    :return: Placements for the application. *Includes the system placements.*
+    :rtype: Placements
     """
-
-    # Track the placements and  space
+    # Track the placements and space
     placements = Placements(system_placements)
-    # board_colours = dict()
 
-    machine = PacmanDataView.get_machine()
     plan_n_timesteps = PacmanDataView.get_plan_n_timestep()
-    spaces = _Spaces(machine, placements, plan_n_timesteps)
+    spaces = _Spaces(placements, plan_n_timesteps)
 
     # Go through the application graph by application vertex
     progress = ProgressBar(
@@ -59,9 +63,7 @@ def place_application_graph(system_placements):
         while not placed:
             chips_attempted = list()
             try:
-
                 same_chip_groups = app_vertex.splitter.get_same_chip_groups()
-
                 if not same_chip_groups:
                     placed = True
                     break
@@ -70,33 +72,33 @@ def place_application_graph(system_placements):
                 try:
                     next_chip_space, space = spaces.get_next_chip_and_space()
                 except PacmanPlaceException as e:
-                    _place_error(
-                        placements, system_placements, e,  plan_n_timesteps,
-                        machine)
+                    raise _place_error(
+                        placements, system_placements, e,
+                        plan_n_timesteps) from e
                 logger.debug(f"Starting placement from {next_chip_space}")
 
-                placements_to_make = list()
+                placements_to_make: List = list()
 
                 # Go through the groups
-                last_chip_space = None
+                last_chip_space: Optional[_ChipWithSpace] = None
                 for vertices, sdram in same_chip_groups:
-                    vertices_to_place = list()
-                    for vertex in vertices:
+                    vertices_to_place = [
+                        vertex
+                        for vertex in vertices
                         # No need to place virtual vertices
-                        if isinstance(vertex, AbstractVirtual):
-                            continue
-                        if not placements.is_vertex_placed(vertex):
-                            vertices_to_place.append(vertex)
-                    sdram = sdram.get_total_sdram(plan_n_timesteps)
+                        if not isinstance(vertex, AbstractVirtual)
+                        and not placements.is_vertex_placed(vertex)]
+                    actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
                     n_cores = len(vertices_to_place)
 
-                    if _do_fixed_location(vertices_to_place, sdram, placements,
-                                          machine, next_chip_space):
+                    # If this group has a fixed location, place it there
+                    if _do_fixed_location(vertices_to_place, actual_sdram,
+                                          placements, next_chip_space):
                         continue
 
                     # Try to find a chip with space; this might result in a
-                    # SpaceExceededException
-                    while not next_chip_space.is_space(n_cores, sdram):
+                    # _SpaceExceededException
+                    while not next_chip_space.is_space(n_cores, actual_sdram):
                         next_chip_space = spaces.get_next_chip_space(
                             space, last_chip_space)
                         last_chip_space = None
@@ -105,7 +107,7 @@ def place_application_graph(system_placements):
                     last_chip_space = next_chip_space
                     chips_attempted.append(next_chip_space.chip)
                     _store_on_chip(
-                        placements_to_make, vertices_to_place, sdram,
+                        placements_to_make, vertices_to_place, actual_sdram,
                         next_chip_space)
 
                 # Now make the placements having confirmed all can be done
@@ -117,27 +119,28 @@ def place_application_graph(system_placements):
                 # fatal since the last space might have just been bound by
                 # existing placements, and there might be bigger spaces out
                 # there to use
-                _check_could_fit(app_vertex, vertices_to_place, sdram)
+                _check_could_fit(app_vertex, vertices_to_place, actual_sdram)
                 logger.debug(f"Failed, saving {chips_attempted}")
                 spaces.save_chips(chips_attempted)
                 chips_attempted.clear()
 
     if get_config_bool("Reports", "draw_placements"):
-        _draw_placements(placements, system_placements)
+        from .draw_placements import draw_placements as dp
+        dp(placements, system_placements)
 
     return placements
 
 
 def _place_error(
-        placements, system_placements, exception, plan_n_timesteps,
-        machine):
+        placements: Placements, system_placements: Placements,
+        exception: Exception,
+        plan_n_timesteps: Optional[int]) -> PacmanPlaceException:
     """
     :param Placements placements:
     :param Placements system_placements:
     :param PacmanPlaceException exception:
     :param int plan_n_timesteps:
-    :param ~spinn_machine.Machine machine:
-    :raises PacmanPlaceException:
+    :rtype: PacmanPlaceException
     """
     unplaceable = list()
     vertex_count = 0
@@ -199,23 +202,27 @@ def _place_error(
 
         f.write("\n")
         f.write("Unused chips:\n")
+        machine = PacmanDataView.get_machine()
         for x, y in machine.chip_coordinates:
             n_placed = placements.n_placements_on_chip(x, y)
             system_placed = system_placements.n_placements_on_chip(x, y)
             if n_placed - system_placed == 0:
-                n_procs = machine.get_chip_at(x, y).n_user_processors
+                n_procs = machine[x, y].n_user_processors
                 f.write(f"    {x}, {y} ({n_procs - system_placed}"
                         " free cores)\n")
 
     if get_config_bool("Reports", "draw_placements_on_error"):
-        _draw_placements(placements, system_placements)
+        from .draw_placements import draw_placements as dp
+        dp(placements, system_placements)
 
-    raise PacmanPlaceException(
+    return PacmanPlaceException(
         f" {exception}."
-        f" Report written to {report_file}.") from exception
+        f" Report written to {report_file}.")
 
 
-def _check_could_fit(app_vertex, vertices_to_place, sdram):
+def _check_could_fit(
+        app_vertex: ApplicationVertex, vertices_to_place: List[MachineVertex],
+        sdram: int):
     """
     :param ApplicationVertex app_vertex:
     :param list(MachineVertex) vertices_to_place:
@@ -259,93 +266,30 @@ def _check_could_fit(app_vertex, vertices_to_place, sdram):
     raise PacmanTooBigToPlace(message)
 
 
-def _next_colour():
-    """
-    Get the next (random) RGBA colour to use for a vertex for placement
-    drawings.
-
-    :rtype: tuple(float, float, float, float)
-    """
-    return tuple(numpy.concatenate(
-        (numpy.random.choice(range(256), size=3) / 256, [1.0])))
-
-
-def _draw_placements(placements, system_placements):
-    """
-    :param Placements placements:
-    :param Placements system_placements:
-    """
-    try:
-        # spinner as graphical library so
-        # pylint: disable=import-error
-        from spinner.scripts.contexts import PNGContextManager
-        from spinner.diagrams.machine_map import (
-            get_machine_map_aspect_ratio, draw_machine_map)
-        from spinner import board
-    except ImportError:
-        logger.exception(
-            "Unable to draw placements as no spinner install found")
-        return
-
-    report_file = os.path.join(
-        PacmanDataView.get_run_dir_path(), "placements_error.png")
-
-    # Colour the boards by placements
-    unused = (0.5, 0.5, 0.5, 1.0)
-    vertex_colours = defaultdict(_next_colour)
-    board_colours = dict()
-    machine = PacmanDataView.get_machine()
-    for x, y in machine.chip_coordinates:
-        if (placements.n_placements_on_chip(x, y) ==
-                system_placements.n_placements_on_chip(x, y)):
-            board_colours[x, y] = unused
-            continue
-        for placement in placements.placements_on_chip(x, y):
-            if not system_placements.is_vertex_placed(placement.vertex):
-                board_colours[x, y] = \
-                    vertex_colours[placement.vertex.app_vertex]
-                break
-    include_boards = [
-        (chip.x, chip.y) for chip in machine.ethernet_connected_chips]
-
-    # Compute dimensions
-    w = math.ceil(machine.width / 12)
-    h = math.ceil(machine.height / 12)
-    aspect_ratio = get_machine_map_aspect_ratio(w, h)
-    image_width = 10000
-    image_height = int(image_width * aspect_ratio)
-
-    hex_boards = board.create_torus(w, h)
-    with PNGContextManager(report_file, image_width, image_height) as ctx:
-        draw_machine_map(
-            ctx, image_width, image_height, machine.width, machine.height,
-            hex_boards, dict(), board_colours, include_boards)
-
-
 class _SpaceExceededException(Exception):
     pass
 
 
-def _do_fixed_location(vertices, sdram, placements, machine, next_chip_space):
+def _do_fixed_location(
+        vertices: list[MachineVertex], sdram: int, placements: Placements,
+        next_chip_space: _ChipWithSpace) -> bool:
     """
     :param list(MachineVertex) vertices:
     :param int sdram:
     :param Placements placements:
-    :param ~spinn_machine.Machine machine:
     :param _ChipWithSpace next_chip_space:
     :rtype: bool
     :raise PacmanConfigurationException:
     """
-    x = None
-    y = None
     for vertex in vertices:
-        if vertex.get_fixed_location():
-            x = vertex.get_fixed_location().x
-            y = vertex.get_fixed_location().y
+        loc = vertex.get_fixed_location()
+        if loc:
+            x, y = loc.x, loc.y
             break
     else:
         return False
 
+    machine = PacmanDataView.get_machine()
     chip = machine.get_chip_at(x, y)
     if chip is None:
         raise PacmanConfigurationException(
@@ -357,15 +301,14 @@ def _do_fixed_location(vertices, sdram, placements, machine, next_chip_space):
     next_cores = iter(cores)
     for vertex in vertices:
         next_core = None
-        if vertex.get_fixed_location():
-            fixed = vertex.get_fixed_location()
-            if fixed.p is not None:
-                if fixed.p not in next_cores:
-                    raise PacmanConfigurationException(
-                        f"Core {fixed.p} on {x}, {y} not available to "
-                        f"place {vertex} on")
-                next_core = fixed.p
-        if next_core is None:
+        fixed = vertex.get_fixed_location()
+        if fixed and fixed.p is not None:
+            if fixed.p not in next_cores:
+                raise PacmanConfigurationException(
+                    f"Core {fixed.p} on {x}, {y} not available to "
+                    f"place {vertex} on")
+            next_core = fixed.p
+        else:
             try:
                 next_core = next(next_cores)
             except StopIteration:
@@ -379,7 +322,9 @@ def _do_fixed_location(vertices, sdram, placements, machine, next_chip_space):
     return True
 
 
-def _store_on_chip(placements_to_make, vertices, sdram, next_chip_space):
+def _store_on_chip(
+        placements_to_make: List[Placement], vertices: List[MachineVertex],
+        sdram: int, next_chip_space: _ChipWithSpace):
     """
     :param list(Placement) placements_to_make:
     :param list(MachineVertex) vertices:
@@ -394,29 +339,47 @@ def _store_on_chip(placements_to_make, vertices, sdram, next_chip_space):
 
 
 class _Spaces(object):
-    __slots__ = ["__machine", "__chips", "__next_chip", "__used_chips",
+    __slots__ = ("__machine", "__chips", "__next_chip", "__used_chips",
                  "__system_placements", "__placements", "__plan_n_timesteps",
-                 "__last_chip_space", "__saved_chips", "__restored_chips"]
+                 "__last_chip_space", "__saved_chips", "__restored_chips")
 
-    def __init__(self, machine, placements, plan_n_timesteps):
+    def __init__(
+            self, placements: Placements, plan_n_timesteps: Optional[int]):
         """
-        :param ~spinn_machine.Machine machine:
         :param Placements placements:
         :param int plan_n_timesteps:
         """
-        self.__machine = machine
+        self.__machine = PacmanDataView.get_machine()
         self.__placements = placements
         self.__plan_n_timesteps = plan_n_timesteps
-        self.__chips = iter(_chip_order(machine))
+        self.__chips = iter(self.__chip_order())
         self.__next_chip = next(self.__chips)
-        self.__used_chips = set()
-        self.__last_chip_space = None
-        self.__saved_chips = OrderedSet()
-        self.__restored_chips = OrderedSet()
+        self.__used_chips: Set[Chip] = set()
+        self.__last_chip_space: Optional[_ChipWithSpace] = None
+        self.__saved_chips: OrderedSet[Chip] = OrderedSet()
+        self.__restored_chips: OrderedSet[Chip] = OrderedSet()
 
-    def __cores_and_sdram(self, chip):
+    def __chip_order(self):
+        """
+        :param Machine machine:
+        :rtype: iterable(Chip)
+        """
+        s_x, s_y = get_config_str("Mapping", "placer_start_chip").split(",")
+        s_x = int(s_x)
+        s_y = int(s_y)
+
+        for x in range(self.__machine.width):
+            for y in range(self.__machine.height):
+                c_x = (x + s_x) % self.__machine.width
+                c_y = (y + s_y) % self.__machine.height
+                chip = self.__machine.get_chip_at(c_x, c_y)
+                if chip:
+                    yield chip
+
+    def __cores_and_sdram(self, chip: Chip) -> Tuple[Set[int], int]:
         """
         :param Chip chip:
+        :return cores, sdram
         :rtype: tuple(int, int)
         """
         on_chip = self.__placements.placements_on_chip(chip.x, chip.y)
@@ -426,7 +389,7 @@ class _Spaces(object):
                 self.__plan_n_timesteps) for p in on_chip)
         return cores_used, sdram_used
 
-    def get_next_chip_and_space(self):
+    def get_next_chip_and_space(self) -> Tuple[_ChipWithSpace, _Space]:
         """
         :rtype: (_ChipWithSpace, _Space)
         """
@@ -448,23 +411,27 @@ class _Spaces(object):
                 f"No more chips to place on; {self.n_chips_used} of "
                 f"{self.__machine.n_chips} used")
 
-    def __get_next_chip(self):
+    def __get_next_chip(self) -> Chip:
         """
         :rtype: Chip
+        :raises: StopIteration
         """
         while self.__restored_chips:
             chip = self.__restored_chips.pop(last=False)
             if chip not in self.__used_chips:
                 return chip
-        while (self.__next_chip in self.__used_chips):
+        while self.__next_chip in self.__used_chips:
             self.__next_chip = next(self.__chips)
         return self.__next_chip
 
-    def get_next_chip_space(self, space, last_chip_space):
+    def get_next_chip_space(
+            self, space: _Space,
+            last_chip_space: Optional[_ChipWithSpace]) -> _ChipWithSpace:
         """
         :param _Space space:
         :param _ChipWithSpace last_chip_space:
         :rtype: _ChipWithSpace
+        :raises _SpaceExceededException:
         """
         # If we are reporting a used chip, update with reachable chips
         if last_chip_space is not None:
@@ -485,7 +452,7 @@ class _Spaces(object):
         return self.__last_chip_space
 
     @property
-    def n_chips_used(self):
+    def n_chips_used(self) -> int:
         """
         The number of chips used.
 
@@ -493,26 +460,23 @@ class _Spaces(object):
         """
         return len(self.__used_chips)
 
-    def __usable_from_chip(self, chip):
+    def __usable_from_chip(self, chip: Chip) -> Iterable[Chip]:
         """
         :param Chip chip:
         :rtype set(Chip)
         """
-        chips = OrderedSet()
         for link in chip.router.links:
-            chip_coords = (link.destination_x, link.destination_y)
-            target_chip = self.__machine.get_chip_at(*chip_coords)
-            if target_chip not in self.__used_chips:
-                chips.add(target_chip)
-        return chips
+            target = self.__machine[link.destination_x, link.destination_y]
+            if target not in self.__used_chips:
+                yield target
 
-    def save_chips(self, chips):
+    def save_chips(self, chips: Iterable[Chip]):
         """
         :param iterable(Chip) chips:
         """
         self.__saved_chips.update(chips)
 
-    def restore_chips(self):
+    def restore_chips(self) -> None:
         for chip in self.__saved_chips:
             self.__used_chips.remove(chip)
             self.__restored_chips.add(chip)
@@ -520,25 +484,26 @@ class _Spaces(object):
 
 
 class _Space(object):
-    __slots__ = ["__same_board_chips", "__remaining_chips",
-                 "__board_x", "__board_y", "__first_chip"]
+    __slots__ = ("__same_board_chips", "__remaining_chips",
+                 "__board_x", "__board_y", "__first_chip")
 
-    def __init__(self, chip):
+    def __init__(self, chip: Chip):
         self.__board_x = chip.nearest_ethernet_x
         self.__board_y = chip.nearest_ethernet_y
-        self.__same_board_chips = OrderedSet()
-        self.__remaining_chips = OrderedSet()
+        self.__same_board_chips: OrderedSet[Chip] = OrderedSet()
+        self.__remaining_chips: OrderedSet[Chip] = OrderedSet()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.__same_board_chips) + len(self.__remaining_chips)
 
-    def __on_same_board(self, chip):
+    def __on_same_board(self, chip: Chip) -> bool:
         return (chip.nearest_ethernet_x == self.__board_x and
                 chip.nearest_ethernet_y == self.__board_y)
 
-    def pop(self):
+    def pop(self) -> Chip:
         """
         :rtype: Chip
+        :raise: StopIteration
         """
         if self.__same_board_chips:
             return self.__same_board_chips.pop(last=False)
@@ -556,7 +521,7 @@ class _Space(object):
             return next_chip
         raise StopIteration
 
-    def update(self, chips):
+    def update(self, chips: Iterable[Chip]):
         """
         :param iterable(Chip) chips:
         """
@@ -571,10 +536,10 @@ class _ChipWithSpace(object):
     """
     A chip with space for placement.
     """
+    __slots__ = ("chip", "cores", "sdram")
 
-    __slots__ = ["chip", "cores", "sdram"]
-
-    def __init__(self, chip, used_processors, used_sdram):
+    def __init__(
+            self, chip: Chip, used_processors: Set[int], used_sdram: int):
         self.chip = chip
         self.cores = set(p.processor_id for p in chip.processors
                          if not p.is_monitor)
@@ -582,41 +547,23 @@ class _ChipWithSpace(object):
         self.sdram = chip.sdram - used_sdram
 
     @property
-    def x(self):
+    def x(self) -> int:
         return self.chip.x
 
     @property
-    def y(self):
+    def y(self) -> int:
         return self.chip.y
 
-    def is_space(self, n_cores, sdram):
+    def is_space(self, n_cores: int, sdram: int) -> bool:
         return len(self.cores) >= n_cores and self.sdram >= sdram
 
-    def use_sdram(self, sdram):
+    def use_sdram(self, sdram: int):
         self.sdram -= sdram
 
-    def use_next_core(self):
+    def use_next_core(self) -> int:
         core = next(iter(self.cores))
         self.cores.remove(core)
         return core
 
     def __repr__(self):
         return f"({self.x}, {self.y})"
-
-
-def _chip_order(machine):
-    """
-    :param ~spinn_machine.Machine machine:
-    :rtype: iterable(Chip)
-    """
-    s_x, s_y = get_config_str("Mapping", "placer_start_chip").split(",")
-    s_x = int(s_x)
-    s_y = int(s_y)
-
-    for x in range(machine.width):
-        for y in range(machine.height):
-            c_x = (x + s_x) % machine.width
-            c_y = (y + s_y) % machine.height
-            chip = machine.get_chip_at(c_x, c_y)
-            if chip:
-                yield chip

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from typing import Any, Optional, Tuple
 import numpy
 from pacman.exceptions import PacmanConfigurationException
 
@@ -21,15 +21,13 @@ class BaseKeyAndMask(object):
     A Key and Mask to be used for routing.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The routing key
         "_base_key",
-
         # The routing mask
-        "_mask"
-    ]
+        "_mask")
 
-    def __init__(self, base_key, mask):
+    def __init__(self, base_key: int, mask: int):
         """
         :param int base_key: The routing key
         :param int mask: The routing mask
@@ -45,7 +43,7 @@ class BaseKeyAndMask(object):
                 f"key {hex(base_key)} together alters the key")
 
     @property
-    def key(self):
+    def key(self) -> int:
         """
         The base key.
 
@@ -54,7 +52,7 @@ class BaseKeyAndMask(object):
         return self._base_key
 
     @property
-    def key_combo(self):
+    def key_combo(self) -> int:
         """
         The key combined with the mask.
 
@@ -63,7 +61,7 @@ class BaseKeyAndMask(object):
         return self._base_key & self._mask
 
     @property
-    def mask(self):
+    def mask(self) -> int:
         """
         The mask.
 
@@ -71,26 +69,26 @@ class BaseKeyAndMask(object):
         """
         return self._mask
 
-    def __eq__(self, key_and_mask):
+    def __eq__(self, key_and_mask: Any) -> bool:
         if not isinstance(key_and_mask, BaseKeyAndMask):
             return False
         return (self._base_key == key_and_mask.key and
                 self._mask == key_and_mask.mask)
 
-    def __ne__(self, other):
+    def __ne__(self, other: Any) -> bool:
         return not self.__eq__(other)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"KeyAndMask:0x{self._base_key:x}:0x{self._mask:x}"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()
 
-    def __hash__(self):
-        return self.__repr__().__hash__()
+    def __hash__(self) -> int:
+        return self._base_key ^ self._mask
 
     @property
-    def n_keys(self):
+    def n_keys(self) -> int:
         """
         The total number of keys that can be generated given the mask.
 
@@ -106,7 +104,9 @@ class BaseKeyAndMask(object):
         # number of keys available from this mask size
         return 2 ** len(zeros)
 
-    def get_keys(self, key_array=None, offset=0, n_keys=None):
+    def get_keys(
+            self, key_array: Optional[numpy.ndarray] = None, offset: int = 0,
+            n_keys: Optional[int] = None) -> Tuple[numpy.ndarray, int]:
         """
         Get the ordered list of keys that the combination allows.
 
@@ -135,11 +135,13 @@ class BaseKeyAndMask(object):
             return key_array, 1
 
         # We now know how many values there are - 2^len(zeros)
-        max_n_keys = 2 ** len(zeros)
+        max_n_keys: int = 2 ** len(zeros)
         if key_array is not None and len(key_array) < max_n_keys:
             max_n_keys = len(key_array)
-        if n_keys is None or n_keys > max_n_keys:
+        if n_keys is None:
             n_keys = max_n_keys
+        else:
+            n_keys = min(n_keys, max_n_keys)
         if key_array is None:
             key_array = numpy.zeros(n_keys, dtype=">u4")
 

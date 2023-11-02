@@ -14,7 +14,12 @@
 
 import json
 import gzip
+from typing import (
+    Collection, Dict, Iterable, Iterator, Optional, Union, cast)
+from spinn_utilities.typing.coords import XY
+from spinn_utilities.typing.json import JsonObjectArray
 from pacman.exceptions import PacmanAlreadyExistsException
+from .abstract_multicast_routing_table import AbstractMulticastRoutingTable
 from .uncompressed_multicast_routing_table import (
     UnCompressedMulticastRoutingTable)
 from spinn_machine import MulticastRoutingEntry
@@ -23,31 +28,37 @@ from spinn_machine import MulticastRoutingEntry
 class MulticastRoutingTables(object):
     """
     Represents the multicast routing tables for a number of chips.
+
+    .. note::
+        The tables in an instance of this class should be either all
+        uncompressed tables, or all compressed tables.
     """
 
-    __slots__ = [
+    __slots__ = (
         # dict of (x,y) -> routing table
         "_routing_tables_by_chip",
-    ]
+    )
 
-    def __init__(self, routing_tables=None):
+    def __init__(self,
+                 routing_tables: Iterable[AbstractMulticastRoutingTable] = ()):
         """
-        :param iterable(MulticastRoutingTable) routing_tables:
+        :param iterable(AbstractMulticastRoutingTable) routing_tables:
             The routing tables to add
         :raise PacmanAlreadyExistsException:
             If any two routing tables are for the same chip
         """
-        self._routing_tables_by_chip = dict()
+        self._routing_tables_by_chip: Dict[
+            XY, AbstractMulticastRoutingTable] = dict()
 
-        if routing_tables is not None:
-            for routing_table in routing_tables:
-                self.add_routing_table(routing_table)
+        for routing_table in routing_tables:
+            self.add_routing_table(routing_table)
 
-    def add_routing_table(self, routing_table):
+    def add_routing_table(self, routing_table: AbstractMulticastRoutingTable):
         """
         Add a routing table.
 
-        :param MulticastRoutingTable routing_table: a routing table to add
+        :param AbstractMulticastRoutingTable routing_table:
+            a routing table to add
         :raise PacmanAlreadyExistsException:
             If a routing table already exists for the chip
         """
@@ -57,20 +68,20 @@ class MulticastRoutingTables(object):
                 f"{routing_table.x}:{routing_table.y} already exists in this "
                 "collection and therefore is deemed an error to re-add it",
                 str(routing_table))
-        self._routing_tables_by_chip[(routing_table.x, routing_table.y)] = \
+        self._routing_tables_by_chip[routing_table.x, routing_table.y] = \
             routing_table
 
     @property
-    def routing_tables(self):
+    def routing_tables(self) -> Collection[AbstractMulticastRoutingTable]:
         """
         The routing tables stored within.
 
         :return: an iterable of routing tables
-        :rtype: iterable(MulticastRoutingTable)
+        :rtype: iterable(AbstractMulticastRoutingTable)
         """
         return self._routing_tables_by_chip.values()
 
-    def get_max_number_of_entries(self):
+    def get_max_number_of_entries(self) -> int:
         """
         The maximum number of multicast routing entries there are in any
         multicast routing table.
@@ -85,7 +96,7 @@ class MulticastRoutingTables(object):
         else:
             return 0
 
-    def get_total_number_of_entries(self):
+    def get_total_number_of_entries(self) -> int:
         """
         The total number of multicast routing entries there are in all
         multicast routing table.
@@ -100,61 +111,63 @@ class MulticastRoutingTables(object):
         else:
             return 0
 
-    def get_routing_table_for_chip(self, x, y):
+    def get_routing_table_for_chip(
+            self, x: int, y: int) -> Optional[AbstractMulticastRoutingTable]:
         """
         Get a routing table for a particular chip.
 
         :param int x: The X-coordinate of the chip
         :param int y: The Y-coordinate of the chip
         :return: The routing table, or `None` if no such table exists
-        :rtype: MulticastRoutingTable or None
+        :rtype: AbstractMulticastRoutingTable or None
         """
-        return self._routing_tables_by_chip.get((x, y), None)
+        return self._routing_tables_by_chip.get((x, y))
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[AbstractMulticastRoutingTable]:
         """
         Iterator for the multicast routing tables stored within.
 
         :return: iterator of multicast_routing_table
+        :rtype: iterable(AbstractMulticastRoutingTable)
         """
         return iter(self._routing_tables_by_chip.values())
 
 
-def to_json(router_table):
-    json_list = []
-    for routing_table in router_table:
-        json_routing_table = dict()
-        json_routing_table["x"] = routing_table.x
-        json_routing_table["y"] = routing_table.y
-        entries = []
-        for entry in routing_table.multicast_routing_entries:
-            json_entry = dict()
-            json_entry["key"] = entry.routing_entry_key
-            json_entry["mask"] = entry.mask
-            json_entry["defaultable"] = entry.defaultable
-            json_entry["spinnaker_route"] = entry.spinnaker_route
-            entries.append(json_entry)
-        json_routing_table["entries"] = entries
-        json_list.append(json_routing_table)
-    return json_list
+def to_json(router_table: MulticastRoutingTables) -> JsonObjectArray:
+    return [
+        {
+            "x": routing_table.x,
+            "y": routing_table.y,
+            "entries": [
+                {
+                    "key": entry.routing_entry_key,
+                    "mask": entry.mask,
+                    "defaultable": entry.defaultable,
+                    "spinnaker_route": entry.spinnaker_route
+                }
+                for entry in routing_table.multicast_routing_entries]
+        }
+        for routing_table in router_table]
 
 
-def from_json(j_router):
+def from_json(j_router: Union[str, JsonObjectArray]) -> MulticastRoutingTables:
     if isinstance(j_router, str):
         if j_router.endswith(".gz"):
             with gzip.open(j_router) as j_file:
-                j_router = json.load(j_file)
+                j_router = cast(JsonObjectArray, json.load(j_file))
         else:
             with open(j_router, encoding="utf-8") as j_file:
-                j_router = json.load(j_file)
+                j_router = cast(JsonObjectArray, json.load(j_file))
 
     tables = MulticastRoutingTables()
     for j_table in j_router:
-        table = UnCompressedMulticastRoutingTable(j_table["x"], j_table["y"])
+        x = cast(int, j_table["x"])
+        y = cast(int, j_table["y"])
+        table = UnCompressedMulticastRoutingTable(x, y)
         tables.add_routing_table(table)
-        for j_entry in j_table["entries"]:
+        for j_entry in cast(JsonObjectArray, j_table["entries"]):
             table.add_multicast_routing_entry(MulticastRoutingEntry(
-                j_entry["key"], j_entry["mask"],
-                defaultable=j_entry["defaultable"],
-                spinnaker_route=j_entry["spinnaker_route"]))
+                cast(int, j_entry["key"]), cast(int, j_entry["mask"]),
+                defaultable=cast(bool, j_entry["defaultable"]),
+                spinnaker_route=cast(int, j_entry["spinnaker_route"])))
     return tables

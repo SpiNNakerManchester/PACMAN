@@ -143,16 +143,13 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/ordered_coverin
 Implementation API
 ==================
 """
-from .ordered_covering import get_generality, minimise, ordered_covering
-from .remove_default_routes import remove_default_routes
-from .ordered_covering_compressor import ordered_covering_compressor
-from .utils import intersect
+from .ordered_covering import (
+    get_generality, ordered_covering, ordered_covering_compressor)
+from .utils import intersect, remove_default_routes
 
 __all__ = (
     "get_generality",
     "intersect",
-    "minimise",
     "ordered_covering",
     "ordered_covering_compressor",
-    "remove_default_routes"
-    )
+    "remove_default_routes")

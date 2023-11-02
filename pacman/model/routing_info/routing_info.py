@@ -11,8 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import Dict, Iterator, Optional, Tuple, TYPE_CHECKING
 from pacman.exceptions import PacmanAlreadyExistsException
+if TYPE_CHECKING:
+    from .vertex_routing_info import VertexRoutingInfo
+    from pacman.model.graphs import AbstractVertex
 
 
 class RoutingInfo(object):
@@ -20,19 +24,15 @@ class RoutingInfo(object):
     An association of machine vertices to a non-overlapping set of keys
     and masks.
     """
+    __slots__ = ("_info", )
 
-    __slots__ = [
-        # Partition information indexed by edge pre vertex and partition ID\
+    def __init__(self) -> None:
+        # Partition information indexed by edge pre-vertex and partition ID
         # name
-        "_info"
-    ]
+        self._info: Dict[
+            Tuple[AbstractVertex, str], VertexRoutingInfo] = dict()
 
-    def __init__(self):
-        # Partition information indexed by edge pre vertex and partition ID
-        # name
-        self._info = dict()
-
-    def add_routing_info(self, info):
+    def add_routing_info(self, info: VertexRoutingInfo):
         """
         Add a routing information item.
 
@@ -48,17 +48,21 @@ class RoutingInfo(object):
 
         self._info[key] = info
 
-    def get_routing_info_from_pre_vertex(self, vertex, partition_id):
+    def get_routing_info_from_pre_vertex(
+            self, vertex: AbstractVertex,
+            partition_id: str) -> Optional[VertexRoutingInfo]:
         """
         Get routing information for a given partition_id from a vertex.
 
         :param AbstractVertex vertex: The vertex to search for
         :param str partition_id:
             The ID of the partition for which to get the routing information
+        :rtype: VertexRoutingInfo
         """
         return self._info.get((vertex, partition_id))
 
-    def get_first_key_from_pre_vertex(self, vertex, partition_id):
+    def get_first_key_from_pre_vertex(
+            self, vertex: AbstractVertex, partition_id: str) -> Optional[int]:
         """
         Get the first key for the partition starting at a vertex.
 
@@ -68,11 +72,12 @@ class RoutingInfo(object):
         :return: The routing key of the partition
         :rtype: int
         """
-        if (vertex, partition_id) in self._info:
-            return self._info[(vertex, partition_id)].key
+        key = (vertex, partition_id)
+        if key in self._info:
+            return self._info[key].key
         return None
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[VertexRoutingInfo]:
         """
         Gets an iterator for the routing information.
 
