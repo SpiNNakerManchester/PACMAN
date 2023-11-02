@@ -31,7 +31,7 @@ from pacman.utilities.utility_objs.chip_counter import ChipCounter
 from pacman_test_objects import SimpleTestVertex
 
 
-class TestSplitter(AbstractSplitterCommon):
+class MockSplitter(AbstractSplitterCommon):
 
     def __init__(self, n_groups, n_machine_vertices, sdram=0):
         super().__init__()
@@ -75,9 +75,9 @@ class TestSplitter(AbstractSplitterCommon):
         return self.__same_chip_groups
 
 
-class TestAppVertex(ApplicationVertex):
+class MockAppVertex(ApplicationVertex):
     def __init__(self, n_atoms, label):
-        super(TestAppVertex, self).__init__(label)
+        super().__init__(label)
         self.__n_atoms = n_atoms
 
     @property
@@ -87,8 +87,8 @@ class TestAppVertex(ApplicationVertex):
 
 def _make_vertices(
         writer, n_atoms, n_groups, n_machine_vertices, label, sdram=0):
-    vertex = TestAppVertex(n_atoms, label)
-    vertex.splitter = TestSplitter(n_groups, n_machine_vertices, sdram)
+    vertex = MockAppVertex(n_atoms, label)
+    vertex.splitter = MockSplitter(n_groups, n_machine_vertices, sdram)
     writer.add_vertex(vertex)
     vertex.splitter.create_machine_vertices(None)
     return vertex

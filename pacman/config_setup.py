@@ -21,7 +21,7 @@ from pacman.data.pacman_data_writer import PacmanDataWriter
 BASE_CONFIG_FILE = "pacman.cfg"
 
 
-def unittest_setup():
+def unittest_setup() -> None:
     """
     Resets the configurations so only the local default configuration is
     included.
@@ -34,7 +34,7 @@ def unittest_setup():
     PacmanDataWriter.mock()
 
 
-def add_pacman_cfg():
+def add_pacman_cfg() -> None:
     """
     Add the local configuration and all dependent configuration files.
     """

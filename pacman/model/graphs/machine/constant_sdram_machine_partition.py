@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Generic, Optional, Type, TypeVar, cast
 from pacman.model.graphs.machine import AbstractSDRAMPartition
 from pacman.model.graphs import AbstractSingleSourcePartition
 from spinn_utilities.overrides import overrides
@@ -18,27 +19,34 @@ from pacman.exceptions import (
     PacmanConfigurationException, PartitionMissingEdgesException,
     SDRAMEdgeSizeException)
 from pacman.model.graphs.machine import SDRAMMachineEdge
+from .machine_vertex import MachineVertex
+
+#: :meta private:
+V = TypeVar("V", bound=MachineVertex)
+#: :meta private:
+E = TypeVar("E", bound=SDRAMMachineEdge)
 
 
 class ConstantSDRAMMachinePartition(
-        AbstractSingleSourcePartition, AbstractSDRAMPartition):
+        AbstractSingleSourcePartition[V, E], Generic[V, E],
+        AbstractSDRAMPartition):
     """
     An SDRAM partition that uses a fixed amount of memory. The edges in
     the partition must agree on how much memory is required.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The sdram base address for this partition.
         "_sdram_base_address",
         # The sdram size of every edge or None if no edge added.
-        "_sdram_size",
-    ]
+        "_sdram_size")
 
-    def __init__(self, identifier, pre_vertex):
+    def __init__(self, identifier: str, pre_vertex: V):
         super().__init__(
-            pre_vertex, identifier, allowed_edge_types=SDRAMMachineEdge)
-        self._sdram_size = None
-        self._sdram_base_address = None
+            pre_vertex, identifier,
+            allowed_edge_types=cast(Type[E], SDRAMMachineEdge))
+        self._sdram_size: Optional[int] = None
+        self._sdram_base_address: Optional[int] = None
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge):
@@ -54,35 +62,38 @@ class ConstantSDRAMMachinePartition(
             raise PacmanConfigurationException(
                 "Illegal attempt to add an edge after sdram_base_address set")
 
-    def __missing_edge_msg(self):
+    def __missing_edge_msg(self) -> str:
         return f"Partition {self} has no edges"
 
     @overrides(AbstractSDRAMPartition.total_sdram_requirements)
-    def total_sdram_requirements(self):
+    def total_sdram_requirements(self) -> int:
         if self._sdram_size is None:
             raise PartitionMissingEdgesException(self.__missing_edge_msg())
         return self._sdram_size
 
     @property
-    def sdram_base_address(self):
-        if self._sdram_size is None:
+    @overrides(AbstractSDRAMPartition.sdram_base_address)
+    def sdram_base_address(self) -> int:
+        if self._sdram_base_address is None:
             raise PartitionMissingEdgesException(self.__missing_edge_msg())
         return self._sdram_base_address
 
     @sdram_base_address.setter
-    def sdram_base_address(self, new_value):
+    def sdram_base_address(self, new_value: int):
         if len(self.edges) == 0:
             raise PartitionMissingEdgesException(self.__missing_edge_msg())
         self._sdram_base_address = new_value
         for edge in self.edges:
-            edge.sdram_base_address = self._sdram_base_address
+            cast(E, edge).sdram_base_address = new_value
 
     @overrides(AbstractSDRAMPartition.get_sdram_base_address_for)
-    def get_sdram_base_address_for(self, vertex):
+    def get_sdram_base_address_for(self, vertex: MachineVertex) -> int:
+        if self._sdram_base_address is None:
+            raise PartitionMissingEdgesException(self.__missing_edge_msg())
         return self._sdram_base_address
 
     @overrides(AbstractSDRAMPartition.get_sdram_size_of_region_for)
-    def get_sdram_size_of_region_for(self, vertex):
+    def get_sdram_size_of_region_for(self, vertex: MachineVertex) -> int:
         if self._sdram_size is None:
             raise PartitionMissingEdgesException(self.__missing_edge_msg())
         return self._sdram_size

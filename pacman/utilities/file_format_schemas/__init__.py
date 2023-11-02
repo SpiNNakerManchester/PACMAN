@@ -19,9 +19,12 @@ A simple bit of support code for validation.
 import os
 import json
 import jsonschema
+from typing import Union
+from spinn_utilities.typing.json import JsonArray, JsonObject, JsonObjectArray
 
 
-def validate(json_obj, schema_filename):
+def validate(json_obj: Union[JsonArray, JsonObject, JsonObjectArray],
+             schema_filename: str) -> None:
     """
     Check that the given JSON object (or array) is valid against the
     given schema. The schema is given by filename relative to this package.

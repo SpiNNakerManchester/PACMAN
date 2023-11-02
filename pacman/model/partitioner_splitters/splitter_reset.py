@@ -15,10 +15,10 @@
 from pacman.data import PacmanDataView
 
 
-def splitter_reset():
+def splitter_reset() -> None:
     """
     Performs resetting of splitters to indicate a new phase of operation.
     """
     for vertex in PacmanDataView.iterate_vertices():
-        if vertex.splitter is not None:
+        if vertex.has_splitter:
             vertex.splitter.reset_called()

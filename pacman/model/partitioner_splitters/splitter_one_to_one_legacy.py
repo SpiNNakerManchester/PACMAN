@@ -13,28 +13,32 @@
 # limitations under the License.
 
 import logging
+from typing import Optional
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
+from pacman.model.resources import AbstractSDRAM
 from .abstract_splitter_common import AbstractSplitterCommon
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class SplitterOneToOneLegacy(AbstractSplitterCommon):
+class SplitterOneToOneLegacy(AbstractSplitterCommon[ApplicationVertex]):
 
     __slots__ = [
         "_machine_vertex",
         "_vertex_slice",
         "_sdram"]
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self._machine_vertex = None
-        self._vertex_slice = None
-        self._sdram = None
+        self._machine_vertex: Optional[MachineVertex] = None
+        self._vertex_slice: Optional[Slice] = None
+        self._sdram: Optional[AbstractSDRAM] = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -52,26 +56,32 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
+        assert self._sdram is not None
         chip_counter.add_core(self._sdram)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
+        assert self._vertex_slice is not None
         return [self._vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
+        assert self._vertex_slice is not None
         return [self._vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id):
+        assert self._machine_vertex is not None
         return [self._machine_vertex]
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(self, partition_id):
+        assert self._machine_vertex is not None
         return [self._machine_vertex]
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
+        assert self._machine_vertex is not None
         return [self._machine_vertex]
 
     @overrides(AbstractSplitterCommon.reset_called)
