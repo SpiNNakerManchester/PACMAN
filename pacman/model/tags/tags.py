@@ -11,11 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 from collections import defaultdict
+from typing import (
+    Dict, Iterable, Iterator, List, Optional, Set, Tuple, TYPE_CHECKING)
 from spinn_machine.tags import IPTag, ReverseIPTag
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.utilities import utility_calls
+if TYPE_CHECKING:
+    from pacman.model.graphs.machine import MachineVertex
 
 
 class Tags(object):
@@ -23,7 +27,7 @@ class Tags(object):
     Represents assigned IP Tag and Reverse IP Tags.
     """
 
-    __slots__ = [
+    __slots__ = (
         # Mapping of (board address, tag) to IPTag
         "_ip_tags",
         # Mapping of (board address, tag) to ReverseIPTag
@@ -33,27 +37,27 @@ class Tags(object):
         # Mapping of vertex to list of ReverseIPTag
         "_reverse_ip_tags_by_vertex",
         # Set of ports already assigned on a board
-        "_ports_assigned"
-    ]
+        "_ports_assigned")
 
-    def __init__(self):
-
+    def __init__(self) -> None:
         # Mapping of (board address, tag) to IPTag
-        self._ip_tags = dict()
+        self._ip_tags: Dict[Tuple[str, int], IPTag] = dict()
 
         # Mapping of (board address, tag) to ReverseIPTag
-        self._reverse_ip_tags = dict()
+        self._reverse_ip_tags: Dict[Tuple[str, int], ReverseIPTag] = dict()
 
         # Mapping of vertex to list of IPTag
-        self._ip_tags_by_vertex = defaultdict(list)
+        self._ip_tags_by_vertex: Dict[
+            MachineVertex, List[IPTag]] = defaultdict(list)
 
         # Mapping of vertex to list of ReverseIPTag
-        self._reverse_ip_tags_by_vertex = defaultdict(list)
+        self._reverse_ip_tags_by_vertex: Dict[
+            MachineVertex, List[ReverseIPTag]] = defaultdict(list)
 
         # Set of ports already assigned on a board
-        self._ports_assigned = set()
+        self._ports_assigned: Set[Tuple[str, int]] = set()
 
-    def add_ip_tag(self, ip_tag, vertex):
+    def add_ip_tag(self, ip_tag: IPTag, vertex: MachineVertex):
         """
         Add an IP tag.
 
@@ -71,7 +75,7 @@ class Tags(object):
                 "ip_tag", str(ip_tag), "Only add IP tags with this method.")
         existing_tag = None
         if (ip_tag.board_address, ip_tag.tag) in self._ip_tags:
-            existing_tag = self._ip_tags[(ip_tag.board_address, ip_tag.tag)]
+            existing_tag = self._ip_tags[ip_tag.board_address, ip_tag.tag]
             if (existing_tag.ip_address != ip_tag.ip_address or
                     not utility_calls.is_equal_or_None(
                         existing_tag.port, ip_tag.port) or
@@ -97,7 +101,8 @@ class Tags(object):
             if existing_tag.port is None and ip_tag.port is not None:
                 existing_tag.port = ip_tag.port
 
-    def add_reverse_ip_tag(self, reverse_ip_tag, vertex):
+    def add_reverse_ip_tag(
+            self, reverse_ip_tag: ReverseIPTag, vertex: MachineVertex):
         """
         Add a reverse IP tag.
 
@@ -137,7 +142,7 @@ class Tags(object):
                 (reverse_ip_tag.board_address, reverse_ip_tag.port))
 
     @property
-    def ip_tags_vertices(self):
+    def ip_tags_vertices(self) -> Iterable[Tuple[IPTag, MachineVertex]]:
         """
         The list of (IPTag, vertex) pairs stored.
 
@@ -148,7 +153,7 @@ class Tags(object):
                     for tag in tags]
 
     @property
-    def ip_tags(self):
+    def ip_tags(self) -> Iterator[IPTag]:
         """
         The IP tags assigned.
 
@@ -157,7 +162,7 @@ class Tags(object):
         return iter(self._ip_tags.values())
 
     @property
-    def reverse_ip_tags(self):
+    def reverse_ip_tags(self) -> Iterator[ReverseIPTag]:
         """
         The reverse IP tags assigned.
 
@@ -165,7 +170,8 @@ class Tags(object):
         """
         return iter(self._reverse_ip_tags.values())
 
-    def get_ip_tags_for_vertex(self, vertex):
+    def get_ip_tags_for_vertex(self, vertex: MachineVertex) -> Optional[
+            List[IPTag]]:
         """
         Get the IP Tags assigned to a given machine vertex.
 
@@ -173,9 +179,10 @@ class Tags(object):
         :return: An iterable of IPTag, or `None` if the vertex has no tags
         :rtype: iterable(~spinn_machine.tags.IPTag) or None
         """
-        return self._ip_tags_by_vertex.get(vertex, None)
+        return self._ip_tags_by_vertex.get(vertex)
 
-    def get_reverse_ip_tags_for_vertex(self, vertex):
+    def get_reverse_ip_tags_for_vertex(
+            self, vertex: MachineVertex) -> Optional[Iterable[ReverseIPTag]]:
         """
         Get the Reverse IP Tags assigned to a given machine vertex.
 
@@ -184,4 +191,4 @@ class Tags(object):
             An iterable of ReverseIPTag, or `None` if the vertex has no tags
         :rtype: iterable(~spinn_machine.tags.ReverseIPTag) or None
         """
-        return self._reverse_ip_tags_by_vertex.get(vertex, None)
+        return self._reverse_ip_tags_by_vertex.get(vertex)

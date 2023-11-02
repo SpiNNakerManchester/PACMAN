@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List, Optional
+from spinn_utilities.overrides import overrides
 from .application_fpga_vertex import ApplicationFPGAVertex
 from pacman.model.graphs.application.abstract import Abstract2DDeviceVertex
-from spinn_utilities.overrides import overrides
+from .fpga_connection import FPGAConnection
+from pacman.model.graphs.common import Slice
 
 
 class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
@@ -22,17 +25,17 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
     A device connected to an FPGA with input or output in two dimensions.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__width",
         "__height",
         "__sub_width",
-        "__sub_height"
-    ]
+        "__sub_height")
 
     def __init__(
-            self, width, height, sub_width, sub_height,
-            incoming_fpga_connections=None, outgoing_fpga_connection=None,
-            label=None):
+            self, width: int, height: int, sub_width: int, sub_height: int,
+            incoming_fpga_connections: Optional[List[FPGAConnection]] = None,
+            outgoing_fpga_connection: Optional[FPGAConnection] = None,
+            label: Optional[str] = None):
         """
         :param int width: The width of the vertex in atoms
         :param int height: The height of the vertex in atoms
@@ -59,7 +62,7 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
         self.__height = height
         self.__sub_width = sub_width
         self.__sub_height = sub_height
-        super(Application2DFPGAVertex, self).__init__(
+        super().__init__(
             width * height, incoming_fpga_connections,
             outgoing_fpga_connection, label,
             n_machine_vertices_per_link=self._n_sub_rectangles)
@@ -67,22 +70,22 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
 
     @property
     @overrides(Abstract2DDeviceVertex._width)
-    def _width(self):
+    def _width(self) -> int:
         return self.__width
 
     @property
     @overrides(Abstract2DDeviceVertex._height)
-    def _height(self):
+    def _height(self) -> int:
         return self.__height
 
     @property
     @overrides(Abstract2DDeviceVertex._sub_width)
-    def _sub_width(self):
+    def _sub_width(self) -> int:
         return self.__sub_width
 
     @property
     @overrides(Abstract2DDeviceVertex._sub_height)
-    def _sub_height(self):
+    def _sub_height(self) -> int:
         return self.__sub_height
 
     @property
@@ -91,5 +94,6 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
         return (self.__width, self.__height)
 
     @overrides(ApplicationFPGAVertex.get_incoming_slice_for_link)
-    def get_incoming_slice_for_link(self, link, index):
+    def get_incoming_slice_for_link(
+            self, link: FPGAConnection, index: int) -> Slice:
         return self._get_slice(index)

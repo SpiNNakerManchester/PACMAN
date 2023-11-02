@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional
+
 
 class ChipAndCore(object):
     """
@@ -18,21 +20,15 @@ class ChipAndCore(object):
     specific core on that chip.
     """
 
-    __slots__ = [
-        # the chip x coord in the SpiNNaker machine to which the machine
+    __slots__ = (
+        # the chip coords in the SpiNNaker machine to which the machine
         # vertex is placed
-        "_x",
-
-        # the chip y coord in the SpiNNaker machine to which the machine
-        # vertex is placed
-        "_y",
-
+        "_x", "_y",
         # The processor ID on chip (x,y) that this vertex is placed on within
         # the SpiNNaker machine; may be None
-        "_p",
-    ]
+        "_p")
 
-    def __init__(self, x, y, p=None):
+    def __init__(self, x: int, y: int, p: Optional[int] = None):
         """
         :param int x: the x-coordinate of the chip
         :param int y: the y-coordinate of the chip
@@ -44,7 +40,7 @@ class ChipAndCore(object):
         self._p = None if p is None else int(p)
 
     @property
-    def x(self):
+    def x(self) -> int:
         """
         The X-coordinate of the chip.
 
@@ -53,7 +49,7 @@ class ChipAndCore(object):
         return self._x
 
     @property
-    def y(self):
+    def y(self) -> int:
         """
         The Y-coordinate of the chip.
 
@@ -62,7 +58,7 @@ class ChipAndCore(object):
         return self._y
 
     @property
-    def p(self):
+    def p(self) -> Optional[int]:
         """
         The processor on the chip, or `None` if that is not constrained.
 
@@ -70,19 +66,19 @@ class ChipAndCore(object):
         """
         return self._p
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self._p is None:
             return f"X:{self._x},Y{self._y}"
         else:
             return f"X:{self._x},Y:{self._y},P:{self._p}"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if not isinstance(other, ChipAndCore):
             return False
         return (self._x, self._y, self._p) == (other.x, other.y, other.p)
 
-    def __ne__(self, other):
+    def __ne__(self, other) -> bool:
         return not self.__eq__(other)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self._x, self._y, self._p))

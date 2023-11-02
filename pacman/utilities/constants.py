@@ -25,11 +25,11 @@ BYTES_PER_WORD = 4
 #: The number of bytes used by SARK per memory allocation
 SARK_PER_MALLOC_SDRAM_USAGE = 2 * BYTES_PER_WORD
 
-EDGES = Enum(
-    value="EDGES",
-    names=[("EAST", 0),
-           ("NORTH_EAST", 1),
-           ("NORTH", 2),
-           ("WEST", 3),
-           ("SOUTH_WEST", 4),
-           ("SOUTH", 5)])
+
+class EDGES(Enum):
+    EAST = 0
+    NORTH_EAST = 1
+    NORTH = 2
+    WEST = 3
+    SOUTH_WEST = 4
+    SOUTH = 5

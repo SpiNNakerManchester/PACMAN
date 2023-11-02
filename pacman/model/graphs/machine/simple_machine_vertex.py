@@ -24,7 +24,7 @@ class SimpleMachineVertex(MachineVertex):
     minimal API. If a more complex Vertex is required consider the
     MockMachineVertex.
     """
-    __slots__ = ["_iptags", "_reverse_iptags", "_sdram"]
+    __slots__ = ("_iptags", "_reverse_iptags", "_sdram")
 
     def __init__(self, sdram, label=None,
                  app_vertex=None, vertex_slice=None, iptags=None,

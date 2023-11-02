@@ -11,20 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import Generic, Optional, TypeVar, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
+if TYPE_CHECKING:
+    from pacman.model.graphs.machine import MachineVertex  # @UnusedImport
+#: :meta private:
+V = TypeVar("V", bound='MachineVertex')
 
 
-class AbstractOneAppOneMachineVertex(ApplicationVertex):
+class AbstractOneAppOneMachineVertex(ApplicationVertex, Generic[V]):
     """
     An application vertex that has a fixed singleton :py:class:`MachineVertex`.
     """
-    __slots__ = [
+    __slots__ = (
         # A pointer to the machine vertex set at init time
-        "_machine_vertex"]
+        "_machine_vertex", )
 
-    def __init__(self, machine_vertex, label, n_atoms=1):
+    def __init__(self, machine_vertex: V, label: Optional[str],
+                 n_atoms: int = 1):
         """
         :param MachineVertex machine_vertex: The fixed machine vertex.
         :param str label: The optional name of the vertex.
@@ -34,11 +40,11 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
         super().remember_machine_vertex(machine_vertex)
 
     @overrides(ApplicationVertex.remember_machine_vertex)
-    def remember_machine_vertex(self, machine_vertex):
+    def remember_machine_vertex(self, machine_vertex: V):
         assert (machine_vertex == self._machine_vertex)
 
     @property
-    def machine_vertex(self):
+    def machine_vertex(self) -> V:
         """
         Provides access to the machine vertex at all times
 
@@ -48,11 +54,11 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex):
 
     @property
     @overrides(ApplicationVertex.n_atoms)
-    def n_atoms(self):
+    def n_atoms(self) -> int:
         return self._machine_vertex.vertex_slice.n_atoms
 
     @overrides(ApplicationVertex.reset)
-    def reset(self):
+    def reset(self) -> None:
         # Override, as we don't want to clear the machine vertices here!
         if self._splitter is not None:
             self._splitter.reset_called()

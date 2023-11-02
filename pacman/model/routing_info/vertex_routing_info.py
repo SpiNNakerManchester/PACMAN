@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from typing import Optional, Union
 import numpy
 from pacman.exceptions import PacmanConfigurationException
-from spinn_utilities.abstract_base import abstractproperty, AbstractBase
+from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 from .base_key_and_mask import BaseKeyAndMask
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.machine import MachineVertex
 
 
 class VertexRoutingInfo(object, metaclass=AbstractBase):
@@ -24,27 +26,23 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     (keys and masks).
     """
 
-    __slots__ = [
+    __slots__ = (
         # The keys allocated to the machine partition
         "__key_and_mask",
-
         # The partition identifier of the allocation
-        "__partition_id"
-    ]
+        "__partition_id")
 
-    def __init__(self, key_and_mask, partition_id):
+    def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str):
         """
-        :param iterable(BaseKeyAndMask) keys_and_masks:
+        :param BaseKeyAndMask key_and_mask:
             The keys allocated to the machine partition
         :param str partition_id: The partition to set the keys for
-        :param MachineVertex machine_vertex: The vertex to set the keys for
-        :param int index: The index of the machine vertex
         """
         assert isinstance(key_and_mask, BaseKeyAndMask)
         self.__key_and_mask = key_and_mask
         self.__partition_id = partition_id
 
-    def get_keys(self, n_keys=None):
+    def get_keys(self, n_keys: Optional[int] = None) -> numpy.ndarray:
         """
         Get the ordered list of individual keys allocated to the edge.
 
@@ -77,7 +75,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         return self.__key_and_mask
 
     @property
-    def key(self):
+    def key(self) -> int:
         """
         The first key (or only one if there is only one).
 
@@ -86,7 +84,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         return self.__key_and_mask.key
 
     @property
-    def mask(self):
+    def mask(self) -> int:
         """
         The first mask (or only one if there is only one).
 
@@ -95,7 +93,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         return self.__key_and_mask.mask
 
     @property
-    def partition_id(self):
+    def partition_id(self) -> str:
         """
         The identifier of the partition.
 
@@ -103,10 +101,12 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         return self.__partition_id
 
-    @abstractproperty
-    def vertex(self):
+    @property
+    @abstractmethod
+    def vertex(self) -> Union[ApplicationVertex, MachineVertex]:
         """
         The vertex of the information.
 
         :rtype: ApplicationVertex or MachineVertex
         """
+        raise NotImplementedError

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from spinn_utilities.abstract_base import abstractmethod
+from spinn_machine import Machine
+from spinn_machine.link_data_objects import AbstractLinkData
 from .application_vertex import ApplicationVertex
 
 
@@ -20,10 +22,10 @@ class ApplicationVirtualVertex(ApplicationVertex):
     An application vertex which is virtual.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     @abstractmethod
-    def get_outgoing_link_data(self, machine):
+    def get_outgoing_link_data(self, machine: Machine) -> AbstractLinkData:
         """
         Get the link data for outgoing connections from the machine.
 
@@ -31,3 +33,4 @@ class ApplicationVirtualVertex(ApplicationVertex):
             The machine to get the link data from
         :rtype: ~spinn_machine.link_data_objects.AbstractLinkData
         """
+        raise NotImplementedError
