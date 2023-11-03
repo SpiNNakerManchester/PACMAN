@@ -57,7 +57,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         self.__max_machine_index = max_machine_index
 
     def merge_machine_entries(self, entries: List[Tuple[
-            MachineVertex, str, MulticastRoutingEntry,
+            MulticastRoutingEntry,
             MachineVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:
         """
         Merge the machine entries.
@@ -65,17 +65,17 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         :param entries:
             The entries to merge
         :type entries:
-            list(tuple(MachineVertex, str,
-            ~spinn_machine.MulticastRoutingEntry, VertexRoutingInfo))
+            list(tuple(
+                ~spinn_machine.MulticastRoutingEntry, VertexRoutingInfo))
         :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
         """
         n_entries = len(entries)
-        (_, _, _, last_r_info) = entries[-1]
+        (_, last_r_info) = entries[-1]
         is_last = last_r_info.index == self.__max_machine_index
         i = 0
         while i < n_entries:
             # The maximum number of next entries
-            (_, _, entry, r_info) = entries[i]
+            (entry, r_info) = entries[i]
             next_entries = self.__n_sequential_entries(r_info.index, n_entries)
 
             # If that is OK, we can just use them
@@ -92,7 +92,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                 while entries_to_go > 0:
                     next_entries = 2 ** int(math.log2(entries_to_go))
                     mask = self.__group_mask(next_entries)
-                    (_, _, entry, r_info) = entries[i]
+                    (entry, r_info) = entries[i]
                     yield MulticastRoutingEntry(
                         r_info.key, mask,
                         defaultable=entry.defaultable,
