@@ -20,7 +20,8 @@ from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.routing_info import RoutingInfo, AppVertexRoutingInfo
+from pacman.model.routing_info import (
+    RoutingInfo, AppVertexRoutingInfo, MachineVertexRoutingInfo)
 from pacman.model.graphs import AbstractVertex
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartitionEntry)
@@ -83,19 +84,32 @@ def __create_routing_table(
             continue
         # Otherwise it has to be a machine vertex...
         assert isinstance(vertex, MachineVertex)
+        assert isinstance(r_info, MachineVertexRoutingInfo)
+
+        # If there is no application vertex, just add the entry
+        if vertex.app_vertex is None:
+            table.add_multicast_routing_entry(
+                MulticastRoutingEntry(
+                    r_info.key, r_info.mask, defaultable=entry.defaultable,
+                    spinnaker_route=entry.spinnaker_route))
+            continue
+
+        # This has to be AppVertexRoutingInfo!
         app_r_info = routing_info.get_routing_info_from_pre_vertex(
             vertex.app_vertex, part_id)
-        # And this has to be AppVertexRoutingInfo!
         assert isinstance(app_r_info, AppVertexRoutingInfo)
+
+        # Get the entries to merge
         entries: List[Tuple[
             MulticastRoutingTableByPartitionEntry,
-            AppVertexRoutingInfo]] = [(entry, r_info)]
+            MachineVertexRoutingInfo]] = [(entry, r_info)]
         while __match(iterator, vertex, part_id, r_info, entry, routing_info,
                       app_r_info):
             (vertex, part_id), entry = iterator.pop()
             r_info = routing_info.get_routing_info_from_pre_vertex(
                 vertex, part_id)
             if r_info is not None:
+                assert isinstance(r_info, MachineVertexRoutingInfo)
                 entries.append((entry, r_info))
 
         # Now attempt to merge sources together as much as possible
@@ -149,7 +163,7 @@ def __merged_keys_and_masks(
         app_r_info: AppVertexRoutingInfo,
         entries: List[Tuple[
             MulticastRoutingTableByPartitionEntry,
-            AppVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:
+            MachineVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:
     if not entries:
         return
     (entry, r_info) = entries[0]
