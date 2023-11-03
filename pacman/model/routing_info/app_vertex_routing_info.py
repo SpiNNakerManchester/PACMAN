@@ -21,7 +21,6 @@ from .vertex_routing_info import VertexRoutingInfo
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
     from pacman.model.routing_info import BaseKeyAndMask
-    from pacman.model.graphs.machine.machine_vertex import MachineVertex
     from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
 logger = logging.getLogger(__name__)
