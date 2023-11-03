@@ -17,7 +17,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 
-def splitter_partitioner():
+def splitter_partitioner() -> int:
     """
     Call the splitter of each application vertex to create the machine vertices
     needed.

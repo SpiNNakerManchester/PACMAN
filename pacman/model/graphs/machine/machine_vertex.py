@@ -11,12 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from __future__ import annotations
+from typing import Iterable, Optional, final, TYPE_CHECKING
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_calls import get_n_bits
+if TYPE_CHECKING:
+    from pacman.model.graphs.application import ApplicationVertex
+    from pacman.model.resources import AbstractSDRAM
+    from pacman.model.resources import IPtagResource
+    from pacman.model.resources import ReverseIPtagResource
+    from pacman.model.graphs.common import ChipAndCore
 
 
 class MachineVertex(AbstractVertex, metaclass=AbstractBase):
@@ -24,10 +31,13 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     A machine graph vertex.
     """
 
-    __slots__ = ["_app_vertex", "_index", "_vertex_slice"]
+    __slots__ = (
+        "_app_vertex", "_index", "__vertex_slice")
     _DEFAULT_SLICE = Slice(0, 0)
 
-    def __init__(self, label=None, app_vertex=None, vertex_slice=None):
+    def __init__(self, label: Optional[str] = None,
+                 app_vertex: Optional[ApplicationVertex] = None,
+                 vertex_slice: Optional[Slice] = None):
         """
         :param label: The optional name of the vertex
         :type label: str or None
@@ -49,14 +59,14 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         super().__init__(label)
         self._added_to_graph = False
         self._app_vertex = app_vertex
-        self._index = None
+        self._index: Optional[int] = None
         if vertex_slice is not None:
-            self._vertex_slice = vertex_slice
+            self.__vertex_slice = vertex_slice
         else:
-            self._vertex_slice = self._DEFAULT_SLICE
+            self.__vertex_slice = self._DEFAULT_SLICE
 
     @property
-    def app_vertex(self):
+    def app_vertex(self) -> Optional[ApplicationVertex]:
         """
         The application vertex that caused this machine vertex to be
         created. If `None`, there is no such application vertex.
@@ -66,16 +76,17 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return self._app_vertex
 
     @property
-    def vertex_slice(self):
+    @final
+    def vertex_slice(self) -> Slice:
         """
         The slice of the application vertex that this machine vertex
         implements.
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
-        return self._vertex_slice
+        return self.__vertex_slice
 
-    def get_n_keys_for_partition(self, partition_id):
+    def get_n_keys_for_partition(self, partition_id: str) -> int:
         """
         Get the number of keys required by the given partition of edges.
 
@@ -85,10 +96,10 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :rtype: int
         """
         # pylint: disable=unused-argument
-        return 1 << get_n_bits(self._vertex_slice.n_atoms)
+        return 1 << get_n_bits(self.__vertex_slice.n_atoms)
 
     @property
-    def index(self):
+    def index(self) -> int:
         """
         The index into the collection of machine vertices for an
         application vertex.
@@ -98,7 +109,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return self._index if self._index is not None else 0
 
     @index.setter
-    def index(self, value):
+    def index(self, value: int):
         """
         The index into the collection of machine vertices for an
         application vertex.
@@ -116,16 +127,18 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         else:
             return f"MachineVertex({self.label})"
 
-    @abstractproperty
-    def sdram_required(self):
+    @property
+    @abstractmethod
+    def sdram_required(self) -> AbstractSDRAM:
         """
         The SDRAM space required by the vertex.
 
         :rtype: ~pacman.model.resources.AbstractSDRAM
         """
+        raise NotImplementedError
 
     @property
-    def iptags(self):
+    def iptags(self) -> Iterable[IPtagResource]:
         """
         The :py:class:`~spinn_machine.tags.IPTag`\\s used by this vertex,
         if any.
@@ -135,7 +148,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return []
 
     @property
-    def reverse_iptags(self):
+    def reverse_iptags(self) -> Iterable[ReverseIPtagResource]:
         """
         The :py:class:`~spinn_machine.tags.ReverseIPTag`\\s used by this
         vertex, if any.
@@ -145,7 +158,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return []
 
     @overrides(AbstractVertex.get_fixed_location)
-    def get_fixed_location(self):
+    def get_fixed_location(self) -> Optional[ChipAndCore]:
         """
         .. note::
             If the Machine vertex has no `fixed_location`

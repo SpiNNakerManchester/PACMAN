@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 from collections import defaultdict
+from typing import Dict, Iterable, Optional, Sequence, cast
 from .application_edge import ApplicationEdge
 from .application_vertex import ApplicationVertex
 from .application_edge_partition import ApplicationEdgePartition
@@ -26,7 +27,7 @@ class ApplicationGraph(object):
     An application-level abstraction of a graph.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The sets of edge partitions by pre-vertex
         "_outgoing_edge_partitions_by_pre_vertex",
         # The total number of outgoing edge partitions
@@ -34,16 +35,17 @@ class ApplicationGraph(object):
         # count of vertex which had a None or already used label
         "_unlabelled_vertex_count",
         # map between labels and vertex
-        "_vertex_by_label"
-    ]
+        "_vertex_by_label")
 
-    def __init__(self):
-        self._outgoing_edge_partitions_by_pre_vertex = defaultdict(OrderedSet)
+    def __init__(self) -> None:
+        self._outgoing_edge_partitions_by_pre_vertex: Dict[
+            ApplicationVertex,
+            OrderedSet[ApplicationEdgePartition]] = defaultdict(OrderedSet)
         self._n_outgoing_edge_partitions = 0
         self._unlabelled_vertex_count = 0
-        self._vertex_by_label = dict()
+        self._vertex_by_label: Dict[str, ApplicationVertex] = dict()
 
-    def add_vertex(self, vertex):
+    def add_vertex(self, vertex: ApplicationVertex):
         """
         Add a vertex to the graph.
 
@@ -66,10 +68,10 @@ class ApplicationGraph(object):
                 raise PacmanAlreadyExistsException("vertex", vertex.label)
             vertex.set_label(vertex.label + self._label_postfix())
         vertex.addedToGraph()
-        self._vertex_by_label[vertex.label] = vertex
+        self._vertex_by_label[cast(str, vertex.label)] = vertex
 
     @property
-    def vertices(self):
+    def vertices(self) -> Iterable[ApplicationVertex]:
         """
         The vertices in the graph.
 
@@ -77,11 +79,11 @@ class ApplicationGraph(object):
         """
         return self._vertex_by_label.values()
 
-    def vertex_by_label(self, label):
+    def vertex_by_label(self, label: str) -> ApplicationVertex:
         return self._vertex_by_label[label]
 
     @property
-    def n_vertices(self):
+    def n_vertices(self) -> int:
         """
         The number of vertices in the graph.
 
@@ -89,7 +91,9 @@ class ApplicationGraph(object):
         """
         return len(self._vertex_by_label)
 
-    def add_edge(self, edge, outgoing_edge_partition_name):
+    def add_edge(
+            self, edge: ApplicationEdge,
+            outgoing_edge_partition_name: str) -> ApplicationEdgePartition:
         """
         Add an edge to the graph and its partition.
 
@@ -119,7 +123,7 @@ class ApplicationGraph(object):
         partition.add_edge(edge)
         return partition
 
-    def _check_edge(self, edge):
+    def _check_edge(self, edge: ApplicationEdge):
         """
         Add an edge to the graph.
 
@@ -146,20 +150,21 @@ class ApplicationGraph(object):
                 "Post-vertex must be known in graph")
 
     @property
-    def edges(self):
+    def edges(self) -> Sequence[ApplicationEdge]:
         # pylint: disable=not-an-iterable
         # https://github.com/PyCQA/pylint/issues/3105
         """
         The edges in the graph.
 
-        :rtype: iterable(~pacman.model.graphs.AbstractEdge)
+        :rtype: iterable(~pacman.model.graphs.application.ApplicationEdge)
         """
         return [
-            edge
+            cast(ApplicationEdge, edge)
             for partition in self.outgoing_edge_partitions
             for edge in partition.edges]
 
-    def _add_outgoing_edge_partition(self, edge_partition):
+    def _add_outgoing_edge_partition(
+            self, edge_partition: ApplicationEdgePartition):
         """
         Add an edge partition to the graph.
 
@@ -174,7 +179,7 @@ class ApplicationGraph(object):
         self._n_outgoing_edge_partitions += 1
 
     @property
-    def outgoing_edge_partitions(self):
+    def outgoing_edge_partitions(self) -> Iterable[ApplicationEdgePartition]:
         """
         The edge partitions in the graph.
 
@@ -182,11 +187,10 @@ class ApplicationGraph(object):
         """
         for partitions in \
                 self._outgoing_edge_partitions_by_pre_vertex.values():
-            for partition in partitions:
-                yield partition
+            yield from partitions
 
     @property
-    def n_outgoing_edge_partitions(self):
+    def n_outgoing_edge_partitions(self) -> int:
         """
         The number of outgoing edge partitions in the graph.
 
@@ -194,7 +198,9 @@ class ApplicationGraph(object):
         """
         return self._n_outgoing_edge_partitions
 
-    def get_outgoing_edge_partitions_starting_at_vertex(self, vertex):
+    def get_outgoing_edge_partitions_starting_at_vertex(
+            self, vertex: ApplicationVertex) -> Iterable[
+                ApplicationEdgePartition]:
         """
         Get all the edge partitions that start at the given vertex.
 
@@ -205,7 +211,9 @@ class ApplicationGraph(object):
         return self._outgoing_edge_partitions_by_pre_vertex[vertex]
 
     def get_outgoing_edge_partition_starting_at_vertex(
-            self, vertex, outgoing_edge_partition_name):
+            self, vertex: ApplicationVertex,
+            outgoing_edge_partition_name: str) -> Optional[
+                ApplicationEdgePartition]:
         """
         Get the given outgoing edge partition that starts at the
         given vertex, or `None` if no such edge partition exists.
@@ -226,13 +234,13 @@ class ApplicationGraph(object):
                 return partition
         return None
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Reset all the application vertices.
         """
         for vertex in self.vertices:
             vertex.reset()
 
-    def _label_postfix(self):
+    def _label_postfix(self) -> str:
         self._unlabelled_vertex_count += 1
         return str(self._unlabelled_vertex_count)

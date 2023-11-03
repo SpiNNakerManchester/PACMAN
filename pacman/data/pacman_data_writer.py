@@ -11,11 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
+from typing import Optional
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_machine.data.machine_data_writer import MachineDataWriter
+from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.placements import Placements
 from pacman.model.routing_info import RoutingInfo
 from pacman.model.routing_table_by_partition import (
@@ -39,30 +42,30 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
     This class is designed to only be used directly within the PACMAN
     repository unit tests as all methods are available to subclasses.
     """
-    __pacman_data = _PacmanDataModel()
-    __slots__ = []
+    __pacman_data: _PacmanDataModel = _PacmanDataModel()
+    __slots__ = ()
 
     @overrides(MachineDataWriter._mock)
-    def _mock(self):
+    def _mock(self) -> None:
         MachineDataWriter._mock(self)
         self.__pacman_data._clear()
 
     @overrides(MachineDataWriter._setup)
-    def _setup(self):
+    def _setup(self) -> None:
         MachineDataWriter._setup(self)
         self.__pacman_data._clear()
 
     @overrides(MachineDataWriter._hard_reset)
-    def _hard_reset(self):
+    def _hard_reset(self) -> None:
         MachineDataWriter._hard_reset(self)
         self.__pacman_data._hard_reset()
 
     @overrides(MachineDataWriter._soft_reset)
-    def _soft_reset(self):
+    def _soft_reset(self) -> None:
         MachineDataWriter._soft_reset(self)
         self.__pacman_data._soft_reset()
 
-    def set_placements(self, placements):
+    def set_placements(self, placements: Placements):
         """
         Set the placements.
 
@@ -73,7 +76,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             raise TypeError("placements should be a Placements")
         self.__pacman_data._placements = placements
 
-    def set_routing_infos(self, routing_infos):
+    def set_routing_infos(self, routing_infos: RoutingInfo):
         """
         Set the routing_infos.
 
@@ -84,7 +87,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             raise TypeError("routing_infos should be a RoutingInfo")
         self.__pacman_data._routing_infos = routing_infos
 
-    def set_tags(self, tags):
+    def set_tags(self, tags: Tags):
         """
         Set the tags.
 
@@ -95,7 +98,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             raise TypeError("tags should be a Tags")
         self.__pacman_data._tags = tags
 
-    def set_uncompressed(self, router_tables):
+    def set_uncompressed(self, router_tables: MulticastRoutingTables):
         """
         Sets the uncompressed `router_tables` value.
 
@@ -108,7 +111,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
                 "router_tables should be a MulticastRoutingTables")
         self.__pacman_data._uncompressed = router_tables
 
-    def set_precompressed(self, router_tables):
+    def set_precompressed(self, router_tables: MulticastRoutingTables):
         """
         Sets the precompressed `router_tables` value.
 
@@ -121,7 +124,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
                 "router_tables should be a MulticastRoutingTables")
         self.__pacman_data._precompressed = router_tables
 
-    def set_plan_n_timesteps(self, plan_n_timesteps):
+    def set_plan_n_timesteps(self, plan_n_timesteps: Optional[int]):
         """
         Sets the `plan_n_timestep`. Use `None` for run forever.
 
@@ -139,7 +142,9 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
                     f"must not be negative")
         self.__pacman_data._plan_n_timesteps = plan_n_timesteps
 
-    def set_routing_table_by_partition(self, routing_table_by_partition):
+    def set_routing_table_by_partition(
+            self, routing_table_by_partition:
+            MulticastRoutingTableByPartition):
         """
         Sets the `_routing_table_by_partition`.
 
@@ -156,7 +161,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             routing_table_by_partition
 
     @classmethod
-    def add_vertex(cls, vertex):
+    def add_vertex(cls, vertex: ApplicationVertex):
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
         if not cls.get_requires_mapping():
@@ -165,7 +170,8 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         cls.__pacman_data._graph.add_vertex(vertex)
 
     @classmethod
-    def add_edge(cls, edge, outgoing_edge_partition_name):
+    def add_edge(cls, edge: ApplicationEdge,
+                 outgoing_edge_partition_name: str):
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
         if not cls.get_requires_mapping():
@@ -173,7 +179,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
                 "This call is only expected if requires mapping is True")
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
 
-    def add_monitor_all_chips(self, vertex):
+    def add_monitor_all_chips(self, vertex: MachineVertex):
         """
         Reports that a monitor has been added to every chip.
         Should be called once for each monitor added to all chips.

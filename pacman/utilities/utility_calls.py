@@ -13,11 +13,13 @@
 # limitations under the License.
 
 import hashlib
-import numpy
 import math
+from typing import Any, Iterable, Tuple
+import numpy
+from pacman.model.graphs.common import Slice
 
 
-def expand_to_bit_array(value):
+def expand_to_bit_array(value: int) -> numpy.ndarray:
     """
     Expand a 32-bit value in to an array of length 32 of uint8 values,
     each of which is a 1 or 0.
@@ -29,7 +31,7 @@ def expand_to_bit_array(value):
         numpy.asarray([value], dtype=">u4").view(dtype="uint8"))
 
 
-def compress_from_bit_array(bit_array):
+def compress_from_bit_array(bit_array: numpy.ndarray) -> int:
     """
     Compress a bit array of 32 uint8 values, where each is a 1 or 0,
     into a 32-bit value.
@@ -40,7 +42,8 @@ def compress_from_bit_array(bit_array):
     return numpy.packbits(bit_array).view(dtype=">u4")[0].item()
 
 
-def compress_bits_from_bit_array(bit_array, bit_positions):
+def compress_bits_from_bit_array(
+        bit_array: numpy.ndarray, bit_positions: numpy.ndarray) -> int:
     """
     Compress specific positions from a bit array of 32 uint8 value,
     where is a 1 or 0, into a 32-bit value.
@@ -57,7 +60,7 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
     return compress_from_bit_array(expanded_value)
 
 
-def is_equal_or_None(a, b):
+def is_equal_or_None(a: Any, b: Any) -> bool:
     """
     If a and b are both not `None`, return True if and only if they are equal,
     otherwise return True.
@@ -67,7 +70,7 @@ def is_equal_or_None(a, b):
     return (a is None or b is None or a == b)
 
 
-def is_single(iterable):
+def is_single(iterable: Iterable[Any]) -> bool:
     """
     Test if there is exactly one item in the iterable.
 
@@ -87,7 +90,7 @@ def is_single(iterable):
     return False
 
 
-def md5(string):
+def md5(string: str) -> str:
     """
     Get the MD5 hash of the given string, which is UTF-8 encoded.
 
@@ -97,7 +100,7 @@ def md5(string):
     return hashlib.md5(string.encode()).hexdigest()
 
 
-def get_key_ranges(key, mask):
+def get_key_ranges(key: int, mask: int) -> Iterable[Tuple[int, int]]:
     """
     Get a generator of base_key, n_keys pairs that represent ranges
     allowed by the mask.
@@ -137,7 +140,7 @@ def get_key_ranges(key, mask):
         yield compress_from_bit_array(generated_key), n_keys
 
 
-def get_n_bits(n_values):
+def get_n_bits(n_values: int) -> int:
     """
     Determine how many bits are required for the given number of values.
 
@@ -152,7 +155,7 @@ def get_n_bits(n_values):
     return int(math.ceil(math.log2(n_values)))
 
 
-def allocator_bits_needed(size):
+def allocator_bits_needed(size: int) -> int:
     """
     Get the bits needed for the routing info allocator.
 
@@ -165,7 +168,9 @@ def allocator_bits_needed(size):
     return int(math.ceil(math.log2(size)))
 
 
-def get_keys(base_key, vertex_slice, n_extra_bits=0):
+def get_keys(
+        base_key: int, vertex_slice: Slice,
+        n_extra_bits: int = 0) -> numpy.ndarray:
     """
     Get the keys for a given vertex slice.
 
@@ -179,7 +184,7 @@ def get_keys(base_key, vertex_slice, n_extra_bits=0):
     return base_key + indices
 
 
-def is_power_of_2(v):
+def is_power_of_2(v: int) -> bool:
     """
     Determine if a value is a power of 2.
 

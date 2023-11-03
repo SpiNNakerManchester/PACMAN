@@ -13,8 +13,11 @@
 # limitations under the License.
 
 import logging
+from typing import Dict, List, Optional, TextIO
 from spinn_utilities.log import FormatAdapter
+from spinn_machine import MulticastRoutingEntry
 from pacman.exceptions import PacmanRoutingException
+from pacman.model.routing_tables import AbstractMulticastRoutingTable
 from pacman.utilities.algorithm_utilities.routes_format import format_route
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -22,7 +25,7 @@ WILDCARD = "*"
 LINE_FORMAT = "0x{:08X} 0x{:08X} 0x{:08X} {: <7s} {}\n"
 
 
-def codify(route, length=32):
+def codify(route: MulticastRoutingEntry, length: int = 32) -> str:
     """
     This method discovers all the routing keys covered by this route.
 
@@ -31,42 +34,45 @@ def codify(route, length=32):
     Whenever a mask bit is zero the list of covered keys is doubled to
     include both the key with a zero and a one at that place.
 
-    :param ~spinn_machine.MulticastRoutingEntry route: single routing Entry
+    :param ~spinn_machine.MulticastRoutingEntry route: single routing entry
     :param int length: length in bits of the key and mask (defaults to 32)
     :return: set of routing_keys covered by this route
     :rtype: str
     """
     mask = route.mask
     key = route.routing_entry_key
-    code = ""
-    # Check each bit in the mask
-    for i in range(length):
-        bit_value = 2**i
-        # If the mask bit is zero then both zero and one acceptable
-        if mask & bit_value:
-            code = str(int(key & bit_value != 0)) + code
-        else:
-            # Safety key 1 with mask 0 is an error
-            assert key & bit_value == 0, (
-                f"Bit {i} on the mask:{bin(mask)} is 0 "
-                f"but 1 in the key:{bin(key)}")
-            code = WILDCARD + code
-    return code
+    # Check for validity: key 1 with mask 0 is an error
+    bad = key & ~mask
+    if bad:
+        logger.error(
+            "Bit {} on the mask:{} is 0 but 1 in the key:{}",
+            # Magic to find first set bit: See
+            # https://stackoverflow.com/a/36059264/301832
+            (bad & -bad).bit_length(), bin(mask), bin(key))
+
+    # Check each bit in the mask; use bit from key if so, else WILDCARD
+    return "".join(
+        str(int(key & bit != 0) if (mask & bit) else WILDCARD)
+        for bit in map(lambda i: 1 << i, reversed(range(length))))
 
 
-def codify_table(table, length=32):
+def codify_table(
+        table: AbstractMulticastRoutingTable, length: int = 32) -> Dict[
+            str, MulticastRoutingEntry]:
     """
-    :param MulticastRoutingTable table:
+    Apply :py:func:`codify` to all entries in a table.
+
+    :param AbstractMulticastRoutingTable table:
     :param int length:
+    :return: mapping from codified route to routing entry
     :rtype: dict(str, ~spinn_machine.MulticastRoutingEntry)
     """
-    code_dict = dict()
-    for route in table.multicast_routing_entries:
-        code_dict[codify(route, length)] = route
-    return code_dict
+    return {
+        codify(route, length): route
+        for route in table.multicast_routing_entries}
 
 
-def covers(o_code, c_code):
+def covers(o_code: str, c_code: str) -> bool:
     """
     :param str o_code:
     :param str c_code:
@@ -83,10 +89,10 @@ def covers(o_code, c_code):
     return True
 
 
-def calc_remainders(o_code, c_code):
+def calc_remainders(o_code: str, c_code: str) -> List[str]:
     """
-    :param str o_code:
-    :param str c_code:
+    :param str o_code: Codified original route
+    :param str c_code: Codified compressed route
     :rtype: list(str)
     """
     if o_code == c_code:
@@ -103,13 +109,18 @@ def calc_remainders(o_code, c_code):
     return remainders
 
 
-def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
+def compare_route(
+        o_route: MulticastRoutingEntry,
+        compressed_dict: Dict[str, MulticastRoutingEntry],
+        o_code: Optional[str] = None, start: int = 0,
+        f: Optional[TextIO] = None):
     """
     :param ~spinn_machine.MulticastRoutingEntry o_route: the original route
-    :param dict compressed_dict:
-    :param str o_code:
-    :param int start:
-    :param ~io.FileIO f:
+    :param dict(str, ~spinn_machine.MulticastRoutingEntry) compressed_dict:
+        Compressed routes
+    :param str o_code: Codified original route (if known)
+    :param int start: Starting index in compressed routes
+    :param ~io.FileIO f: Where to write (part of) the route report
     """
     if o_code is None:
         o_code = codify(o_route)
@@ -121,23 +132,20 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
             if f is not None:
                 f.write(f"\t\t{format_route(c_route)}\n")
             if o_route.processor_ids != c_route.processor_ids:
-                if set(o_route.processor_ids) != set(c_route.processor_ids):
-                    raise PacmanRoutingException(
-                        f"Compressed route {c_route} covers original route "
-                        f"{o_route} but has a different processor_ids.")
+                raise PacmanRoutingException(
+                    f"Compressed route {c_route} covers original route "
+                    f"{o_route} but has a different processor_ids.")
             if o_route.link_ids != c_route.link_ids:
-                if set(o_route.link_ids) != set(c_route.link_ids):
-                    raise PacmanRoutingException(
-                        f"Compressed route {c_route} covers original route "
-                        f"{o_route} but has a different link_ids.")
+                raise PacmanRoutingException(
+                    f"Compressed route {c_route} covers original route "
+                    f"{o_route} but has a different link_ids.")
             if not o_route.defaultable and c_route.defaultable:
                 if o_route == c_route:
                     raise PacmanRoutingException(
                         f"Compressed route {c_route} while original route "
                         f"{o_route} but has a different defaultable value.")
-                else:
-                    compare_route(o_route, compressed_dict, o_code=o_code,
-                                  start=i + 1, f=f)
+                compare_route(o_route, compressed_dict, o_code=o_code,
+                              start=i + 1, f=f)
             else:
                 remainders = calc_remainders(o_code, c_code)
                 for remainder in remainders:
@@ -149,12 +157,16 @@ def compare_route(o_route, compressed_dict, o_code=None, start=0, f=None):
         raise PacmanRoutingException(f"No route found {o_route}")
 
 
-def compare_tables(original, compressed):
+def compare_tables(
+        original: AbstractMulticastRoutingTable,
+        compressed: AbstractMulticastRoutingTable):
     """
     Compares the two tables without generating any output.
 
-    :param MulticastRoutingTable original: The original routing tables
-    :param MulticastRoutingTable compressed: The compressed routing tables.
+    :param UnCompressedMulticastRoutingTable original:
+        The original routing tables
+    :param CompressedMulticastRoutingTable compressed:
+        The compressed routing tables.
         Which will be considered in order.
     :raises: PacmanRoutingException if there is any error
     """

@@ -11,25 +11,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
 import numpy
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from typing import (
+    Collection, Generic, Optional, Tuple, TypeVar, Union, TYPE_CHECKING)
+from typing_extensions import Self
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.model.graphs import AbstractVertex
+if TYPE_CHECKING:
+    from pacman.model.partitioner_splitters import AbstractSplitterCommon
+    from pacman.model.graphs.machine import MachineVertex
+    from pacman.model.routing_info import BaseKeyAndMask
+    from .application_edge import ApplicationEdge
+    from .application_edge_partition import ApplicationEdgePartition
+#: :meta private:
+MV = TypeVar("MV", bound='MachineVertex')
 logger = FormatAdapter(logging.getLogger(__file__))
 
 
-class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
+class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
     """
     A vertex that can be broken down into a number of smaller vertices
     based on the resources that the vertex requires.
     """
 
-    __slots__ = [
+    __slots__ = (
         # List of machine verts associated with this app vertex
         "_machine_vertices",
 
@@ -43,9 +54,12 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         # the vertex has multiple dimensions, one or more of the dimensions
         # might have fewer atoms on the last core (e.g. the rectangle on the
         # last core of a 2D vertex might be smaller).
-        "_max_atoms_per_dimension_per_core"]
+        "_max_atoms_per_dimension_per_core")
 
-    def __init__(self, label=None, max_atoms_per_core=None, splitter=None):
+    def __init__(
+            self, label: Optional[str] = None,
+            max_atoms_per_core: Union[int, Tuple[int, ...], None] = None,
+            splitter: Optional[AbstractSplitterCommon[Self]] = None):
         """
         :param str label: The optional name of the vertex.
         :param max_atoms_per_core: The max number of atoms that can be
@@ -60,16 +74,18 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
         # Need to set to None temporarily as add_constraint checks splitter
-        self._splitter = None
+        self._splitter: Optional[AbstractSplitterCommon[Self]] = None
         super().__init__(label)
-        self._machine_vertices = OrderedSet()
+        self._machine_vertices: OrderedSet[MV] = OrderedSet()
         if splitter:
             # Use setter as there is extra work to do
             self.splitter = splitter
         # Keep the name for simplicity but move to new internal representation
-        self._max_atoms_per_dimension_per_core = max_atoms_per_core
+        self._max_atoms_per_dimension_per_core: Optional[Tuple[int, ...]]
         if isinstance(max_atoms_per_core, int):
             self._max_atoms_per_dimension_per_core = (max_atoms_per_core, )
+        else:
+            self._max_atoms_per_dimension_per_core = max_atoms_per_core
 
     def __str__(self):
         return self.label
@@ -82,14 +98,26 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             return f"ApplicationVertex({self.label})"
 
     @property
-    def splitter(self):
+    def has_splitter(self) -> bool:
+        """
+        Whether this vertex currently has a splitter defined.
+        """
+        return self._splitter is not None
+
+    @property
+    def splitter(self) -> AbstractSplitterCommon[Self]:
         """
         :rtype: ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
-        return self._splitter
+        s = self._splitter
+        if s is None:
+            raise PacmanConfigurationException(
+                f"The splitter object on {self._label} has not yet had "
+                "a splitter set.")
+        return s
 
     @splitter.setter
-    def splitter(self, new_value):
+    def splitter(self, new_value: AbstractSplitterCommon[Self]):
         """
         Sets the splitter object. Does not allow repeated settings.
 
@@ -106,7 +134,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         self._splitter = new_value
         self._splitter.set_governed_app_vertex(self)
 
-    def remember_machine_vertex(self, machine_vertex):
+    def remember_machine_vertex(self, machine_vertex: MV):
         """
         Adds the machine vertex to the iterable returned by machine_vertices
 
@@ -117,7 +145,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         self._machine_vertices.add(machine_vertex)
 
     @property
-    def atoms_shape(self):
+    def atoms_shape(self) -> Tuple[int, ...]:
         """
         The "shape" of the atoms in the vertex i.e. how the atoms are split
         between the dimensions of the vertex.  By default everything is
@@ -128,15 +156,18 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         """
         return (self.n_atoms,)
 
-    @abstractproperty
-    def n_atoms(self):
+    @property
+    @abstractmethod
+    def n_atoms(self) -> int:
         """
         The number of atoms in the vertex.
 
         :rtype: int
         """
+        raise NotImplementedError
 
-    def round_n_atoms(self, n_atoms, label="n_atoms"):
+    def round_n_atoms(
+            self, n_atoms: Union[int, float], label: str = "n_atoms") -> int:
         """
         Utility function to allow superclasses to make sure `n_atoms` is an
         integer.
@@ -163,7 +194,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             label, n_atoms, f"int value expected for {label}")
 
     @property
-    def machine_vertices(self):
+    def machine_vertices(self) -> Collection[MV]:
         """
         The machine vertices that this application vertex maps to.
 
@@ -190,7 +221,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
                         " by the maximum number of atoms per core in that"
                         f" dimension {self._max_atoms_per_dimension_per_core}")
 
-    def get_max_atoms_per_core(self):
+    def get_max_atoms_per_core(self) -> int:
         """
         Gets the maximum number of atoms per core, which is either the
         number of atoms required across the whole application vertex,
@@ -203,7 +234,7 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         self.__check_atoms_per_core()
         return int(numpy.prod(self._max_atoms_per_dimension_per_core))
 
-    def get_max_atoms_per_dimension_per_core(self):
+    def get_max_atoms_per_dimension_per_core(self) -> Tuple[int, ...]:
         """
         Gets the maximum number of atoms per dimension per core.  This
         will return a tuple with a number for each dimension of the vertex,
@@ -216,7 +247,8 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         self.__check_atoms_per_core()
         return self._max_atoms_per_dimension_per_core
 
-    def set_max_atoms_per_dimension_per_core(self, new_value):
+    def set_max_atoms_per_dimension_per_core(
+            self, new_value: Union[None, int, Tuple[int, ...]]):
         """
         Set the maximum number of atoms per dimension per core.
 
@@ -230,12 +262,13 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
             vertex will have atoms_shape as the maximum.
         :type new_value: None or int or tuple(int,...)
         """
-        self._max_atoms_per_dimension_per_core = new_value
         if isinstance(new_value, int):
             self._max_atoms_per_dimension_per_core = (new_value, )
+        else:
+            self._max_atoms_per_dimension_per_core = new_value
         self.__check_atoms_per_core()
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Forget all machine vertices in the application vertex, and reset
         the splitter (if any).
@@ -244,7 +277,9 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         if self._splitter is not None:
             self._splitter.reset_called()
 
-    def get_machine_fixed_key_and_mask(self, machine_vertex, partition_id):
+    def get_machine_fixed_key_and_mask(
+            self, machine_vertex: MachineVertex,
+            partition_id: str) -> Optional[BaseKeyAndMask]:
         """
         Get a fixed key and mask for the given machine vertex and partition
         identifier, or `None` if not fixed (the default).
@@ -265,7 +300,8 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         # pylint: disable=unused-argument
         return None
 
-    def get_fixed_key_and_mask(self, partition_id):
+    def get_fixed_key_and_mask(
+            self, partition_id: str) -> Optional[BaseKeyAndMask]:
         """
         Get a fixed key and mask for the application vertex or `None` if not
         fixed (the default).  See :py:meth:`get_machine_gixed_key_and_mask` for
@@ -278,7 +314,8 @@ class ApplicationVertex(AbstractVertex, metaclass=AbstractBase):
         # pylint: disable=unused-argument
         return None
 
-    def add_incoming_edge(self, edge, partition):
+    def add_incoming_edge(
+            self, edge: ApplicationEdge, partition: ApplicationEdgePartition):
         """
         Add an edge incoming to this vertex.  This is ignored by default,
         but could be used to track incoming edges, and/or report faults.
