@@ -152,6 +152,7 @@ def __merged_keys_and_masks(
     else:
         yield from app_r_info.merge_machine_entries(entries)
 
+
 #: :meta private:
 E = TypeVar("E")
 
