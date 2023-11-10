@@ -67,17 +67,9 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         for multicast_routing_entry in multicast_routing_entries:
             self.add_multicast_routing_entry(multicast_routing_entry)
 
+    @overrides(AbstractMulticastRoutingTable.add_multicast_routing_entry)
     def add_multicast_routing_entry(
             self, multicast_routing_entry: MulticastRoutingEntry):
-        """
-        Adds a routing entry to this table.
-
-        :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
-            The route to add
-        :raise PacmanAlreadyExistsException:
-            If a routing entry with the same key-mask combination already
-            exists
-        """
         routing_entry_key = multicast_routing_entry.routing_entry_key
         mask = multicast_routing_entry.mask
 
