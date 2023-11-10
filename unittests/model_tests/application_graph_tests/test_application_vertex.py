@@ -120,6 +120,8 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert = SimpleTestVertex(5)
         vert.set_label("test 1")
         self.assertEqual("test 1", vert.label)
-        vert.addedToGraph()
+        self.assertFalse(vert.has_been_added_to_graph())
+        vert.setAddedToGraph()
         with self.assertRaises(PacmanConfigurationException):
             vert.set_label("test 2")
+        self.assertTrue(vert.has_been_added_to_graph())

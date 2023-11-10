@@ -64,6 +64,20 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    def add_multicast_routing_entry(
+            self, multicast_routing_entry: MulticastRoutingEntry):
+        """
+        Adds a routing entry to this table.
+
+        :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
+            The route to add
+        :raise PacmanAlreadyExistsException:
+            If a routing entry with the same key-mask combination already
+            exists
+        """
+        raise NotImplementedError
+
     @property
     @abstractmethod
     def number_of_entries(self) -> int:
