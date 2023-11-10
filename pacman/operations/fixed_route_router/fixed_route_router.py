@@ -21,14 +21,15 @@ from pacman.exceptions import (
     PacmanRoutingException)
 
 
-def fixed_route_router(destination_class):
+def fixed_route_router(
+        destination_class) -> Dict[Tuple[int, int], FixedRouteEntry]:
     """
     Runs the fixed route generator for all boards on machine.
 
     :param destination_class: the destination class to route packets to
     :type destination_class: type or tuple(type,...)
     :return: router tables for fixed route paths
-    :rtype: dict(~spinn_machine.Chip, ~spinn_machine.FixedRouteEntry)
+    :rtype: dict((int, int)), ~spinn_machine.FixedRouteEntry)
     :raises PacmanConfigurationException: if no placement processor found
     :raises PacmanRoutingException:
     :raises PacmanAlreadyExistsException:
