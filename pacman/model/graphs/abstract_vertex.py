@@ -62,7 +62,7 @@ class AbstractVertex(object):
                 "As Labels are also IDs they can not be changed.")
         self._label = label
 
-    def addedToGraph(self) -> None:
+    def setAddedToGraph(self) -> None:
         """
         Records that the vertex has been added to a graph.
 
@@ -70,6 +70,13 @@ class AbstractVertex(object):
             If there is an attempt to add the same vertex more than once
         """
         self._added_to_graph = True
+
+    def has_been_added_to_graph(self) -> bool:
+        """
+        State if the vertex has been added to the graph or not
+
+        """
+        return self._added_to_graph
 
     def get_fixed_location(self) -> Optional[ChipAndCore]:
         """
