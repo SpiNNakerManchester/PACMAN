@@ -29,7 +29,7 @@ from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     get_app_partitions)
 from pacman.model.graphs.machine import MachineVertex
-from pacman.model.placements import Placements, Placement
+from pacman.model.placements import Placement
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.routing_tables import (
     AbstractMulticastRoutingTable, MulticastRoutingTables)
