@@ -25,6 +25,7 @@ from pacman.data import PacmanDataView
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanRoutingException)
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs import AbstractVirtual
 from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     get_app_partitions)
@@ -114,6 +115,8 @@ def validate_routes(routing_tables: MulticastRoutingTables):
         # communicate with for a given key_and_mask and search its
         # determined destinations
         for m_vertex in outgoing:
+            if isinstance(m_vertex, AbstractVirtual):
+                continue
             placement = PacmanDataView.get_placement_of_vertex(m_vertex)
             r_info = routing_infos.get_routing_info_from_pre_vertex(
                 m_vertex, partition.identifier)
