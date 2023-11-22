@@ -64,3 +64,4 @@ precompression
 Navaridas
 obj
 subobj
+xy

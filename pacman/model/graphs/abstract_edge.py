@@ -11,36 +11,48 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from __future__ import annotations
+from typing import Generic, Optional, TypeVar
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from .abstract_vertex import AbstractVertex
+
+#: :meta private:
+V = TypeVar("V", bound=AbstractVertex)
 
 
-class AbstractEdge(object, metaclass=AbstractBase):
+class AbstractEdge(Generic[V], metaclass=AbstractBase):
     """
     A directed edge in a graph between two vertices.
     """
 
     __slots__ = ()
 
-    @abstractproperty
-    def label(self):
+    @property
+    @abstractmethod
+    def label(self) -> Optional[str]:
         """
         The label of the edge.
 
         :rtype: str
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def pre_vertex(self):
+    @property
+    @abstractmethod
+    def pre_vertex(self) -> V:
         """
         The vertex at the start of the edge.
 
         :rtype: ~pacman.model.graphs.AbstractVertex
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def post_vertex(self):
+    @property
+    @abstractmethod
+    def post_vertex(self) -> V:
         """
         The vertex at the end of the edge.
 
         :rtype: ~pacman.model.graphs.AbstractVertex
         """
+        raise NotImplementedError

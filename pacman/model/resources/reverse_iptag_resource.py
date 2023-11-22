@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional
 
 
 class ReverseIPtagResource(object):
@@ -19,21 +20,18 @@ class ReverseIPtagResource(object):
     packets to it during execution.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The target port of the tag or None if this is to be assigned
         # elsewhere
         "_port",
-
         # The SDP port number to be used when constructing SDP packets from
         # the received UDP packets for this tag
         "_sdp_port",
-
         # A fixed tag ID to assign, or None if any tag is OK
-        "_tag"
-    ]
+        "_tag")
 
-    def __init__(
-            self, port=None, sdp_port=1, tag=None):
+    def __init__(self, port: Optional[int] = None, sdp_port: int = 1,
+                 tag: Optional[int] = None):
         """
         :param port: The UDP port to listen to on the board for this tag
             or `None` for a default
@@ -49,7 +47,7 @@ class ReverseIPtagResource(object):
         self._tag = tag
 
     @property
-    def port(self):
+    def port(self) -> Optional[int]:
         """
         The port of the tag.
 
@@ -58,7 +56,7 @@ class ReverseIPtagResource(object):
         return self._port
 
     @property
-    def sdp_port(self):
+    def sdp_port(self) -> int:
         """
         The SDP port to use when constructing the SDP message from the
         received UDP message.
@@ -68,7 +66,7 @@ class ReverseIPtagResource(object):
         return self._sdp_port
 
     @property
-    def tag(self):
+    def tag(self) -> Optional[int]:
         """
         The tag required, or `None` if any tag is OK.
 

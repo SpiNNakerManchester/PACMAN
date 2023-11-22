@@ -16,11 +16,14 @@ A collection of methods which support partitioning algorithms.
 """
 
 import math
+from typing import List
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import MDSlice, Slice
+from pacman.model.graphs.application import ApplicationVertex
 
 
-def get_multidimensional_slices(app_vertex):
+def get_multidimensional_slices(
+        app_vertex: ApplicationVertex) -> List[Slice]:
     """
     Get the multi-dimensional slices of an application vertex
     such that each is sized to the maximum atoms per dimension per core
@@ -61,7 +64,7 @@ def get_multidimensional_slices(app_vertex):
         total_n_atoms *= n_atoms[d]
 
     # Run over all the vertices and create slices for them
-    slices = list()
+    slices: List[Slice] = list()
     hi_atom = -1
     for v in range(n_vertices):
         # Work out where in each of the dimensions this vertex starts by
@@ -89,7 +92,7 @@ def get_multidimensional_slices(app_vertex):
     return slices
 
 
-def get_single_dimension_slices(app_vertex):
+def get_single_dimension_slices(app_vertex: ApplicationVertex) -> List[Slice]:
     """ Get the single dimension slices of an application vertex
         such that each is sized to the maximum atoms per dimension per core
         except the last which might be smaller in one or more dimensions

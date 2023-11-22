@@ -11,34 +11,32 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import Tuple, Union
 import numpy
+from numpy.typing import NDArray
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanValueError
 from .slice import Slice
 
 
 class MDSlice(Slice):
-    """ Represents a Multi Dimension slice of a vertex.
-
-    :attr int lo_atom: The lowest atom represented in the slice.
-    :attr int hi_atom: The highest atom represented in the slice.
-    :attr int n_atoms: The number of atoms represented by the slice.
-    :attr slice as_slice: This slice represented as a `slice` object (for
-        use in indexing lists, arrays, etc.)
-    :attr tuple(int,...) shape: The shape of the atoms over multiple
-        dimensions.  By default the shape will be 1-dimensional.
-    :attr tuple(int,...) start: The start coordinates of the slice.  By default
-        this will be lo_atom in 1 dimension.
+    """
+    Represents a multi-dimensional slice of a vertex.
     """
 
-    __slots__ = ["_shape", "_start", "_atoms_shape"]
+    __slots__ = ("_shape", "_start", "_atoms_shape")
 
-    def __init__(self, lo_atom, hi_atom, shape, start, atoms_shape):
-        """ Create a new Mutile dimensional Slice object.
-
+    def __init__(
+            self, lo_atom: int, hi_atom: int, shape: Tuple[int, ...],
+            start: Tuple[int, ...], atoms_shape: Tuple[int, ...]):
+        """
         :param int lo_atom: Index of the lowest atom to represent.
         :param int hi_atom: Index of the highest atom to represent.
+        :param tuple(int,...) shape: The size of each dimension in the slice.
+        :param tuple(int,...) start:
+            The offset to the start index along each dimension.
+        :param list(int) atoms_shape: The shape of atoms (?)
         :raises PacmanValueError: If the bounds of the slice are invalid.
         """
         super().__init__(lo_atom, hi_atom)
@@ -53,34 +51,36 @@ class MDSlice(Slice):
         if len(shape) != len(start):
             raise PacmanValueError(
                 "Both shape and start must have the same length")
-        self._shape = shape
-        self._start = start
-        self._atoms_shape = atoms_shape
+        self._shape = tuple(shape)
+        self._start = tuple(start)
+        self._atoms_shape = tuple(atoms_shape)
 
     @property
     @overrides(Slice.hi_atom)
-    def hi_atom(self):
+    def hi_atom(self) -> int:
         raise NotImplementedError(
             "hi_atom does not work for multi dimensional slices")
 
     @property
     @overrides(Slice.shape)
-    def shape(self):
+    def shape(self) -> Tuple[int, ...]:
         return self._shape
 
     @property
     @overrides(Slice.start)
-    def start(self):
+    def start(self) -> Tuple[int, ...]:
         return self._start
 
     @property
     @overrides(Slice.as_slice)
-    def as_slice(self):
+    def as_slice(self) -> slice:
         raise NotImplementedError(
             "as slice does not work for multi dimensional slices")
 
-    def get_slice(self, n):
-        """ Get a slice in the n-th dimension
+    @overrides(Slice.get_slice, extend_doc=False)
+    def get_slice(self, n: int) -> slice:
+        """
+        Get a slice in the `n`'Th dimension
 
         :param int n: The 0-indexed dimension to get the shape of
         :type: slice
@@ -93,52 +93,53 @@ class MDSlice(Slice):
 
     @property
     @overrides(Slice.dimension)
-    def dimension(self):
-        """ Get slices for every dimension
-
-        :rtype: tuple(slice)
-        """
+    def dimension(self) -> Tuple[slice, ...]:
         return tuple(self.get_slice(n) for n in range(len(self.shape)))
 
     @property
     @overrides(Slice.end)
-    def end(self):
-        """ The end positions of the slice in each dimension
-        """
+    def end(self) -> Tuple[int, ...]:
         return tuple((numpy.array(self.start) + numpy.array(self.shape)) - 1)
 
     @overrides(Slice.get_ids_as_slice_or_list)
-    def get_ids_as_slice_or_list(self):
+    def get_ids_as_slice_or_list(self) -> numpy.ndarray:
         return self.get_raster_ids()
 
     @overrides(Slice.get_raster_ids)
-    def get_raster_ids(self):
+    def get_raster_ids(self) -> NDArray[numpy.integer]:
         slices = tuple(self.get_slice(n)
                        for n in reversed(range(len(self.start))))
         ids = numpy.arange(numpy.prod(self._atoms_shape)).reshape(
             tuple(reversed(self._atoms_shape)))
         return ids[slices].flatten()
 
-    def __str__(self):
+    def __str__(self) -> str:
         value = ""
         for a_slice in self.dimension:
             value += f"({a_slice.start}:{a_slice.stop})"
         return f"{self.lo_atom}{self._atoms_shape}{value}"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if not isinstance(other, MDSlice):
             return False
         if not super().__eq__(other):
             return False
         return self._atoms_shape == other._atoms_shape
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         # Slices will generally only be hashed in sets for the same Vertex
         return self._lo_atom
 
     @classmethod
-    @overrides(Slice.from_string)
-    def from_string(cls, as_str):
+    @overrides(Slice.from_string, extend_doc=False)
+    def from_string(cls, as_str: str) -> Union[MDSlice, Slice]:
+        """
+        Convert the string form of a :py:class:`MDSlice` into an object
+        instance.
+
+        :param str as_str: The string to parse
+        :rtype: MDSlice
+        """
         if as_str[0] == "(":
             return Slice.from_string(as_str)
         parts = as_str.split("(")
