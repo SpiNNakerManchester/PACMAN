@@ -14,6 +14,7 @@
 from spinn_utilities.overrides import overrides
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
+from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.operations.routing_info_allocator_algorithms.\
     zoned_routing_info_allocator import (flexible_allocate, global_allocate)
 from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
@@ -162,14 +163,20 @@ def create_graphs1(with_fixed):
                 ApplicationEdge(app_vertex, out_app_vertex), f"Part{i}")
 
 
-def create_graphs_only_fixed():
+def create_graphs_only_fixed(overlap: bool):
     # An output vertex to aim things at (to make keys required)
     out_app_vertex = MockAppVertex(splitter=MockSplitter())
     PacmanDataView.add_vertex(out_app_vertex)
 
-    fixed_keys_by_partition = {
-        "Part0": BaseKeyAndMask(0x4c00000, 0xFFFFFFFE),
-        "Part1": BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)
+    if overlap:
+        fixed_keys_by_partition = {
+            "Part0": BaseKeyAndMask(0x0, 0xffff0000),
+            "Part1": BaseKeyAndMask(0x1000, 0xfffff800)
+    }
+    else:
+        fixed_keys_by_partition = {
+            "Part0": BaseKeyAndMask(0x0, 0xFFFFFFFE),
+            "Part1": BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)
     }
     app_vertex = MockAppVertex(
         splitter=MockSplitter(),
@@ -281,10 +288,20 @@ def test_flexible_allocator_no_fixed():
 
 def test_fixed_only():
     unittest_setup()
-    create_graphs_only_fixed()
+    create_graphs_only_fixed(overlap=False)
     flexible_allocate([])
     routing_info = global_allocate([])
     assert len(list(routing_info)) == 4
+
+
+def test_overlap():
+    unittest_setup()
+    create_graphs_only_fixed(overlap=True)
+    try:
+        flexible_allocate([])
+        raise ValueError
+    except PacmanRouteInfoAllocationException:
+        pass
 
 
 def test_no_edge():
