@@ -172,12 +172,12 @@ def create_graphs_only_fixed(overlap: bool):
         fixed_keys_by_partition = {
             "Part0": BaseKeyAndMask(0x0, 0xffff0000),
             "Part1": BaseKeyAndMask(0x1000, 0xfffff800)
-    }
+        }
     else:
         fixed_keys_by_partition = {
             "Part0": BaseKeyAndMask(0x0, 0xFFFFFFFE),
             "Part1": BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)
-    }
+        }
     app_vertex = MockAppVertex(
         splitter=MockSplitter(),
         fixed_keys_by_partition=fixed_keys_by_partition)
