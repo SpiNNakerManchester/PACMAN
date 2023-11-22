@@ -154,6 +154,19 @@ class ZonedRoutingInfoAllocator(object):
 
         return self.__allocate()
 
+    def __insert_fixed(
+            self, identifier: str, vertex: AbstractVertex, km: BaseKeyAndMask):
+        is_app = isinstance(vertex, ApplicationVertex)
+        for (_, vertex2), km2 in self.__fixed_partitions.items():
+            if is_app and isinstance(vertex2, MachineVertex) and \
+                    (vertex == vertex2.app_vertex):
+                continue
+            # check if any keys could overlap
+            if (km.key & km2.mask) == (km2.key & km.mask):
+                raise PacmanRouteInfoAllocationException(
+                    f"{vertex} has {km} which overlaps with {vertex2} {km2}")
+        self.__fixed_partitions[identifier, vertex] = km
+
     def __find_fixed(self) -> None:
         """
         Looks for FixedKeyAmdMask Constraints and keeps track of these.
@@ -186,7 +199,7 @@ class ZonedRoutingInfoAllocator(object):
                             f"For application vertex {pre}, the fixed key for "
                             f"machine vertex {vert} of {key_and_mask} does "
                             f"not align with the app key {app_key_and_mask}")
-                    self.__fixed_partitions[identifier, vert] = key_and_mask
+                    self.__insert_fixed(identifier, vert, key_and_mask)
                 else:
                     if is_fixed_m_key:
                         raise PacmanRouteInfoAllocationException(
@@ -203,9 +216,8 @@ class ZonedRoutingInfoAllocator(object):
                             f"On {pre} only a fixed app key has been provided,"
                             " but there is more than one machine vertex.")
                     # pylint:disable=undefined-loop-variable
-                    self.__fixed_partitions[
-                        identifier, vert] = app_key_and_mask
-                self.__fixed_partitions[identifier, pre] = app_key_and_mask
+                    self.__insert_fixed(identifier, vert, app_key_and_mask)
+                self.__insert_fixed(identifier, pre, app_key_and_mask)
 
     def __calculate_zones(self) -> None:
         """
