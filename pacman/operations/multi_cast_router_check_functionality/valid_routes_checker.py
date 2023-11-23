@@ -146,9 +146,10 @@ def _search_route(
     :raise PacmanRoutingException:
         when the trace completes and there are still destinations not visited
     """
-    if logger.isEnabledFor(logging.DEBUG):
-        for dest in dest_placements:
-            logger.debug("[{}:{}:{}]", dest.x, dest.y, dest.p)
+    logger.info(f"{source_placement=}")
+    #if logger.isEnabledFor(logging.DEBUG):
+    for dest in dest_placements:
+        logger.info("[{}:{}:{}]", dest.x, dest.y, dest.p)
 
     located_destinations: Set[PlacementTuple] = set()
 
@@ -207,7 +208,7 @@ def _search_route(
     # raise error if required
     if error_message != "":
         raise PacmanRoutingException(error_message)
-    logger.debug("successful test between {} and {}",
+    logger.info("successful test between {} and {}",
                  source_placement.vertex.label, dest_placements)
 
 
