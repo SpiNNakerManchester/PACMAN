@@ -44,7 +44,7 @@ def get_multidimensional_slices(
         return get_single_dimension_slices(app_vertex)
 
     # If there is only one slice, get that
-    if app_vertex.n_atoms < app_vertex.get_max_atoms_per_core():
+    if app_vertex.n_atoms <= app_vertex.get_max_atoms_per_core():
         return [MDSlice(0, app_vertex.n_atoms - 1, app_vertex.atoms_shape,
                         tuple(0 for _ in app_vertex.atoms_shape),
                         app_vertex.atoms_shape)]
