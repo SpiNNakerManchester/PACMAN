@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 import numpy
 from typing import (
-    Collection, Generic, Optional, Tuple, TypeVar, Union, TYPE_CHECKING)
+    Collection, Generic, Optional, Tuple, TypeVar, Union, cast, TYPE_CHECKING)
 from typing_extensions import Self
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ordered_set import OrderedSet
@@ -58,7 +58,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
 
     def __init__(
             self, label: Optional[str] = None,
-            max_atoms_per_core: Union[int, Tuple[int, ...], None] = None,
+            max_atoms_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
             splitter: Optional[AbstractSplitterCommon[Self]] = None):
         """
         :param str label: The optional name of the vertex.
@@ -82,11 +82,16 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             self.splitter = splitter
         # Keep the name for simplicity but move to new internal representation
         self._max_atoms_per_dimension_per_core: Optional[Tuple[int, ...]]
-        if max_atoms_per_core is not None and numpy.isscalar(
-                max_atoms_per_core):
-            self._max_atoms_per_dimension_per_core = (max_atoms_per_core, )
+
+        if max_atoms_per_core is None:
+            self._max_atoms_per_dimension_per_core = None
+        elif numpy.isscalar(max_atoms_per_core):
+            max_atoms_int: int = int(cast(int, max_atoms_per_core))
+            self._max_atoms_per_dimension_per_core = (max_atoms_int, )
         else:
-            self._max_atoms_per_dimension_per_core = max_atoms_per_core
+            max_atoms_tuple: Tuple[int, ...] = cast(
+                Tuple[int, ...],  max_atoms_per_core)
+            self._max_atoms_per_dimension_per_core = max_atoms_tuple
 
     def __str__(self):
         return self.label
