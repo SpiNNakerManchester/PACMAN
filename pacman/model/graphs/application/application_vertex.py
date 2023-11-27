@@ -82,16 +82,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             self.splitter = splitter
         # Keep the name for simplicity but move to new internal representation
         self._max_atoms_per_dimension_per_core: Optional[Tuple[int, ...]]
-
-        if max_atoms_per_core is None:
-            self._max_atoms_per_dimension_per_core = None
-        elif numpy.isscalar(max_atoms_per_core):
-            max_atoms_int: int = int(cast(int, max_atoms_per_core))
-            self._max_atoms_per_dimension_per_core = (max_atoms_int, )
-        else:
-            max_atoms_tuple: Tuple[int, ...] = cast(
-                Tuple[int, ...],  max_atoms_per_core)
-            self._max_atoms_per_dimension_per_core = max_atoms_tuple
+        self._set_max_atoms_per_dimension_per_core(max_atoms_per_core)
 
     def __str__(self):
         return self.label
@@ -253,8 +244,8 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         self.__check_atoms_per_core()
         return self._max_atoms_per_dimension_per_core
 
-    def set_max_atoms_per_dimension_per_core(
-            self, new_value: Union[None, int, Tuple[int, ...]]):
+    def _set_max_atoms_per_dimension_per_core(
+            self, new_value: Optional[Union[int, Tuple[int, ...]]]):
         """
         Set the maximum number of atoms per dimension per core.
 
@@ -268,10 +259,32 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             vertex will have atoms_shape as the maximum.
         :type new_value: None or int or tuple(int,...)
         """
-        if isinstance(new_value, int):
-            self._max_atoms_per_dimension_per_core = (new_value, )
+        if new_value is None:
+            self._max_atoms_per_dimension_per_core = None
+        elif numpy.isscalar(new_value):
+            max_atoms_int: int = int(cast(int, new_value))
+            self._max_atoms_per_dimension_per_core = (max_atoms_int, )
         else:
-            self._max_atoms_per_dimension_per_core = new_value
+            max_atoms_tuple: Tuple[int, ...] = cast(
+                Tuple[int, ...],  new_value)
+            self._max_atoms_per_dimension_per_core = max_atoms_tuple
+
+    def set_max_atoms_per_dimension_per_core(
+            self, new_value: Optional[Union[int, Tuple[int, ...]]]):
+        """
+        Set the maximum number of atoms per dimension per core.
+
+        Can be used to raise or lower the maximum number of atoms per core
+        or per dimension per core.
+
+        :param new_value:
+            Value to set.  If the vertex is n-dimensional where n > 1, a tuple
+            of n values must be given.  If the vertex is 1 dimensional,
+            a 1-tuple or integer can be given.  If this is set to `None` the
+            vertex will have atoms_shape as the maximum.
+        :type new_value: None or int or tuple(int,...)
+        """
+        self._set_max_atoms_per_dimension_per_core(new_value)
         self.__check_atoms_per_core()
 
     def reset(self) -> None:
