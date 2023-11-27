@@ -82,7 +82,8 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             self.splitter = splitter
         # Keep the name for simplicity but move to new internal representation
         self._max_atoms_per_dimension_per_core: Optional[Tuple[int, ...]]
-        if isinstance(max_atoms_per_core, int):
+        if max_atoms_per_core is not None and numpy.isscalar(
+                max_atoms_per_core):
             self._max_atoms_per_dimension_per_core = (max_atoms_per_core, )
         else:
             self._max_atoms_per_dimension_per_core = max_atoms_per_core
