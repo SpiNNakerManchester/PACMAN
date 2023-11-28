@@ -17,7 +17,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
-from pacman.utilities.utility_calls import get_n_bits_for_fields
+from pacman.utilities.utility_calls import get_n_bits
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
     from pacman.model.resources import AbstractSDRAM
@@ -96,7 +96,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :rtype: int
         """
         # pylint: disable=unused-argument
-        return 1 << get_n_bits_for_fields(self.__vertex_slice.shape)
+        return 1 << get_n_bits(self.__vertex_slice.n_atoms)
 
     @property
     def index(self) -> int:

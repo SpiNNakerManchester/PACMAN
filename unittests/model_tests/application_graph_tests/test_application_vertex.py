@@ -19,6 +19,7 @@ from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.model.graphs.common import Slice, ChipAndCore
 from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman_test_objects import SimpleTestVertex
 
@@ -29,6 +30,22 @@ class MockSplitter(SplitterFixedLegacy):
 
     def reset_called(self):
         self.reset_seen = True
+
+
+class SimpleMDVertex(ApplicationVertex):
+
+    def __init__(self, max_atoms_per_core, atoms_shape):
+        super(SimpleMDVertex, self).__init__(
+            max_atoms_per_core=max_atoms_per_core)
+        self.__atoms_shape = atoms_shape
+
+    @property
+    def n_atoms(self):
+        return numpy.prod(self.__atoms_shape)
+
+    @property
+    def atoms_shape(self):
+        return self.__atoms_shape
 
 
 class TestApplicationGraphModel(unittest.TestCase):
@@ -125,3 +142,32 @@ class TestApplicationGraphModel(unittest.TestCase):
         with self.assertRaises(PacmanConfigurationException):
             vert.set_label("test 2")
         self.assertTrue(vert.has_been_added_to_graph())
+
+    def test_get_key_ordered_indices(self):
+        vtx = SimpleMDVertex((3, 3), (6, 6))
+        # From the interdimensional compatibility documentation diagram, we can
+        # check we get what we expect
+        first_half_indices = vtx.get_key_ordered_indices(numpy.arange(18))
+        assert numpy.array_equal(
+            first_half_indices,
+            [0, 1, 2, 9, 10, 11, 3, 4, 5, 12, 13, 14, 6, 7, 8, 15, 16, 17])
+
+        # Much more complex - suffice to check that each index exists exactly
+        # once
+        size = (6, 9, 2)
+        n_atoms = numpy.prod(size)
+        vtx_2 = SimpleMDVertex((2, 3, 2), size)
+        row_indices = vtx_2.get_key_ordered_indices(numpy.arange(n_atoms))
+        test_array = numpy.zeros(n_atoms)
+        test_array[row_indices] += 1
+        assert all(numpy.equal(test_array, 1))
+
+    def test_get_raster_ordered_indices(self):
+        # Go forward to row indices then back to atoms
+        vtx = SimpleMDVertex((3, 4, 5), (9, 16, 25))
+        all_atoms = numpy.arange(9 * 16 * 25)
+        row_indices = vtx.get_key_ordered_indices(all_atoms)
+        atoms = vtx.get_raster_ordered_indices(row_indices)
+
+        # Should be the original list of atoms on reversal
+        assert numpy.array_equal(atoms, all_atoms)
