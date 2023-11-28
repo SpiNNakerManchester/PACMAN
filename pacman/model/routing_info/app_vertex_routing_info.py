@@ -21,7 +21,8 @@ from .vertex_routing_info import VertexRoutingInfo
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
     from pacman.model.routing_info import BaseKeyAndMask
-    from pacman.model.graphs.machine.machine_vertex import MachineVertex
+    from pacman.model.routing_table_by_partition import (
+        MulticastRoutingTableByPartitionEntry)
     from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
 logger = logging.getLogger(__name__)
@@ -57,7 +58,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         self.__max_machine_index = max_machine_index
 
     def merge_machine_entries(self, entries: List[Tuple[
-            MachineVertex, str, MulticastRoutingEntry,
+            MulticastRoutingTableByPartitionEntry,
             MachineVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:
         """
         Merge the machine entries.
@@ -65,17 +66,17 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         :param entries:
             The entries to merge
         :type entries:
-            list(tuple(MachineVertex, str,
-            ~spinn_machine.MulticastRoutingEntry, VertexRoutingInfo))
+            list(tuple(
+                MulticastRoutingTableByPartitionEntry, VertexRoutingInfo))
         :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
         """
         n_entries = len(entries)
-        (_, _, _, last_r_info) = entries[-1]
+        (_, last_r_info) = entries[-1]
         is_last = last_r_info.index == self.__max_machine_index
         i = 0
         while i < n_entries:
             # The maximum number of next entries
-            (_, _, entry, r_info) = entries[i]
+            (entry, r_info) = entries[i]
             next_entries = self.__n_sequential_entries(r_info.index, n_entries)
 
             # If that is OK, we can just use them
@@ -92,7 +93,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                 while entries_to_go > 0:
                     next_entries = 2 ** int(math.log2(entries_to_go))
                     mask = self.__group_mask(next_entries)
-                    (_, _, entry, r_info) = entries[i]
+                    (entry, r_info) = entries[i]
                     yield MulticastRoutingEntry(
                         r_info.key, mask,
                         defaultable=entry.defaultable,

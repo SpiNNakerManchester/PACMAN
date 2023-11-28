@@ -14,7 +14,7 @@
 
 import hashlib
 import math
-from typing import Any, Dict, Iterable, Tuple
+from typing import Any, Iterable, Tuple
 import numpy
 from pacman.model.graphs.common import Slice
 
@@ -155,80 +155,6 @@ def get_n_bits(n_values: int) -> int:
     return int(math.ceil(math.log2(n_values)))
 
 
-def get_field_based_keys(
-        key: int, vertex_slice: Slice, shift: int = 0) -> numpy.ndarray:
-    """
-    Translate a vertex slice with potentially multiple dimensions into
-    a list of keys, one for each atom of the vertex, by putting the values
-    into fields of the keys based on the shape of the slice.
-
-    :param int key: The base key
-    :param Slice vertex_slice: The slice to translate
-    :param int shift:
-        The left shift to apply to the atom key before adding to the key. Can
-        be used to make space for additional information at the bottom of the
-        key.
-    :rtype: list(int)
-    """
-    # Find the size of field required for each coordinate, and the shift
-    # required to get to this field position (the first field has a shift
-    # of 0)
-    field_sizes = numpy.array([get_n_bits(n) for n in vertex_slice.shape])
-    shifts = numpy.concatenate(([0], numpy.cumsum(field_sizes[:-1])))
-
-    # Convert each atom into x, y coordinates based on shape
-    # This uses numpy.unravel_index, the result of which needs to be
-    # made into an array (it is a list of tuples) and transposed (it
-    # gives the coordinates separately per axis)
-    coords = numpy.array(numpy.unravel_index(
-        numpy.arange(vertex_slice.n_atoms),
-        vertex_slice.shape, order='F')).T
-
-    # We now left shift each coordinate into its field and add them up to
-    # get the key
-    keys = numpy.sum(numpy.left_shift(coords, shifts), axis=1)
-
-    # Do any final shifting as required (zero shift is valid but does nothing)
-    if shift:
-        keys = numpy.left_shift(keys, shift)
-
-    # The final result is the above with the base key added
-    return keys + key
-
-
-def get_field_based_index(
-        base_key: int, vertex_slice: Slice, shift: int = 0) -> Dict[int, int]:
-    """
-    Map field based keys back to indices.
-
-    :param int base_key: The base key
-    :param Slice vertex_slice: The slice to translate
-    :param int shift:
-        The left shift to apply to the atom key before adding to the key. Can
-        be used to make space for additional information at the bottom of the
-        key.
-    :rtype: dict(int,int)
-    """
-    # Get the field based keys
-    field_based_keys = get_field_based_keys(base_key, vertex_slice, shift)
-
-    # Inverse the index
-    return {
-        key: i
-        for i, key in enumerate(field_based_keys)
-    }
-
-
-def get_n_bits_for_fields(field_sizes: Iterable[int]) -> int:
-    """
-    Get the number of bits required for the fields in the vertex slice.
-
-    :param iterable(int) field_sizes: The sizes each of the fields
-    :rtype: int
-    """
-    return sum(get_n_bits(n) for n in field_sizes)
-
-
 def allocator_bits_needed(size: int) -> int:
     """
     Get the bits needed for the routing info allocator.
@@ -240,3 +166,29 @@ def allocator_bits_needed(size: int) -> int:
     if size == 0:
         return 0
     return int(math.ceil(math.log2(size)))
+
+
+def get_keys(
+        base_key: int, vertex_slice: Slice,
+        n_extra_bits: int = 0) -> numpy.ndarray:
+    """
+    Get the keys for a given vertex slice.
+
+    :param int base_key: The base key for the vertex slice
+    :param Slice vertex_slice: The slice of the vertex to get keys for
+    :param int n_extra_bits: Additional right shift to apply to atoms
+
+    :rtype: iterable(int)
+    """
+    indices = numpy.arange(0, vertex_slice.n_atoms) << n_extra_bits
+    return base_key + indices
+
+
+def is_power_of_2(v: int) -> bool:
+    """
+    Determine if a value is a power of 2.
+
+    :param int v: The value to test
+    :rtype: bool
+    """
+    return (v & (v - 1) == 0) and (v != 0)
