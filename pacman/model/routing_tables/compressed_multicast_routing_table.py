@@ -11,32 +11,33 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from typing import Any, Collection, Iterable, List
 from pacman.model.routing_tables import AbstractMulticastRoutingTable
 from spinn_utilities.overrides import overrides
+from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 
 
 class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     """
     Represents a compressed routing table for a chip.
+    Compressed tables have a maximum size, ensuring that they fit in the
+    hardware available.
     """
 
-    __slots__ = [
-        # The x-coordinate of the chip for which this is the routing table
-        "_x",
-
-        # The y-coordinate of the chip for which this is the routing tables
-        "_y",
+    __slots__ = (
+        # The coordinates of the chip for which this is the routing table
+        "_x", "_y",
 
         # An iterable of routing entries to add to the table
         "_multicast_routing_entries",
 
         # counter of how many entries in their multicast routing table are
         # defaultable
-        "_number_of_defaulted_routing_entries"
-    ]
+        "_number_of_defaulted_routing_entries")
 
-    def __init__(self, x, y, multicast_routing_entries=None):
+    def __init__(
+            self, x: int, y: int,
+            multicast_routing_entries: Iterable[MulticastRoutingEntry] = ()):
         """
         :param int x:
             The x-coordinate of the chip for which this is the routing table
@@ -52,21 +53,14 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         self._x = x
         self._y = y
         self._number_of_defaulted_routing_entries = 0
-        self._multicast_routing_entries = list()
+        self._multicast_routing_entries: List[MulticastRoutingEntry] = list()
 
-        if multicast_routing_entries is not None:
-            for multicast_routing_entry in multicast_routing_entries:
-                self.add_multicast_routing_entry(multicast_routing_entry)
+        for multicast_routing_entry in multicast_routing_entries:
+            self.add_multicast_routing_entry(multicast_routing_entry)
 
-    def add_multicast_routing_entry(self, multicast_routing_entry):
-        """
-        Adds a routing entry to this table.
-
-        :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
-            The route to add
-        :raise pacman.exceptions.PacmanAlreadyExistsException: If a routing
-            entry with the same key-mask combination already exists
-        """
+    @overrides(AbstractMulticastRoutingTable.add_multicast_routing_entry)
+    def add_multicast_routing_entry(
+            self, multicast_routing_entry: MulticastRoutingEntry):
         self._multicast_routing_entries.append(multicast_routing_entry)
 
         # update default routed counter if required
@@ -75,31 +69,31 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
 
     @property
     @overrides(AbstractMulticastRoutingTable.x)
-    def x(self):
+    def x(self) -> int:
         return self._x
 
     @property
     @overrides(AbstractMulticastRoutingTable.y)
-    def y(self):
+    def y(self) -> int:
         return self._y
 
     @property
     @overrides(AbstractMulticastRoutingTable.multicast_routing_entries)
-    def multicast_routing_entries(self):
+    def multicast_routing_entries(self) -> Collection[MulticastRoutingEntry]:
         return self._multicast_routing_entries
 
     @property
     @overrides(AbstractMulticastRoutingTable.number_of_entries)
-    def number_of_entries(self):
+    def number_of_entries(self) -> int:
         return len(self._multicast_routing_entries)
 
     @property
     @overrides(AbstractMulticastRoutingTable.number_of_defaultable_entries)
-    def number_of_defaultable_entries(self):
+    def number_of_defaultable_entries(self) -> int:
         return self._number_of_defaulted_routing_entries
 
     @overrides(AbstractMulticastRoutingTable.__eq__)
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, CompressedMulticastRoutingTable):
             return False
         if self._x != other.x and self._y != other.y:
@@ -107,17 +101,6 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         return self._multicast_routing_entries == \
             other.multicast_routing_entries
 
-    @overrides(AbstractMulticastRoutingTable.__ne__)
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    @overrides(AbstractMulticastRoutingTable.__repr__)
-    def __repr__(self):
-        entry_string = ""
-        for entry in self._multicast_routing_entries:
-            entry_string += f"{entry}\n"
-        return f"{self._x}:{self._y}\n\n{entry_string}"
-
     @overrides(AbstractMulticastRoutingTable.__hash__)
-    def __hash__(self):
+    def __hash__(self) -> int:
         return id(self)

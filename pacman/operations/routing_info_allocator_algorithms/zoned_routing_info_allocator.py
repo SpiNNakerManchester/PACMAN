@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+from typing import Dict, FrozenSet, Iterable, Set, Tuple, cast
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
@@ -20,13 +21,14 @@ from pacman.data import PacmanDataView
 from pacman.model.routing_info import (
     RoutingInfo, MachineVertexRoutingInfo, BaseKeyAndMask,
     AppVertexRoutingInfo)
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.utilities.utility_calls import (
     get_key_ranges, allocator_bits_needed)
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
-
+_XAlloc = Iterable[Tuple[ApplicationVertex, str]]
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
@@ -77,7 +79,7 @@ class ZonedRoutingInfoAllocator(object):
     will a very high number of atoms.
     """
 
-    __slots__ = [
+    __slots__ = (
         # A list of vertices and partitions to allocate
         "__vertex_partitions",
         # For each App vertex / Partition name zone keep track of the number of
@@ -99,17 +101,35 @@ class ZonedRoutingInfoAllocator(object):
         # Set of app_part indexes used by fixed
         "__fixed_used",
         # True if all partitions are fixed
-        "__all_fixed"
-    ]
+        "__all_fixed")
+    __FROZEN: FrozenSet = frozenset()
 
-    def __call__(self, extra_allocations, flexible):
+    def __init__(self, flexible: bool = False):
         """
+        :param bool flexible: Determines if flexible can be use.
+            If False, global settings will be attempted
+        """
+        self.__vertex_partitions: OrderedSet[
+            Tuple[ApplicationVertex, str]] = OrderedSet()
+        self.__n_bits_atoms_and_mac = 0
+        self.__n_bits_machine = 0
+        self.__n_bits_atoms = 0
+        self.__atom_bits_per_app_part: Dict[
+            Tuple[AbstractVertex, str], int] = dict()
+        self.__flexible = flexible
+        self.__fixed_partitions: Dict[
+            Tuple[str, AbstractVertex], BaseKeyAndMask] = dict()
+        self.__fixed_used: Set[int] = cast(Set, self.__FROZEN)
+        self.__all_fixed = True
+
+    def allocate(self, extra_allocations: _XAlloc) -> RoutingInfo:
+        """
+        Perform routing information allocation.
+
         :param list(tuple(ApplicationVertex,str)) extra_allocations:
             Additional (vertex, partition identifier) pairs to allocate
             keys to.  These might not appear in partitions in the graph
             due to being added by the system.
-        :param bool flexible: Determines if flexible can be use.
-            If False, global settings will be attempted
         :return: The routing information
         :rtype: RoutingInfo
         :raise PacmanRouteInfoAllocationException:
@@ -122,16 +142,8 @@ class ZonedRoutingInfoAllocator(object):
         self.__vertex_partitions.update(
             (v, p.identifier)
             for v in PacmanDataView.iterate_vertices()
+            if isinstance(v, ApplicationVertex)
             for p in v.splitter.get_internal_multicast_partitions())
-
-        self.__n_bits_atoms_and_mac = 0
-        self.__n_bits_machine = 0
-        self.__n_bits_atoms = 0
-        self.__atom_bits_per_app_part = dict()
-        self.__flexible = flexible
-        self.__fixed_partitions = dict()
-        self.__fixed_used = set()
-        self.__all_fixed = True
 
         self.__find_fixed()
         self.__calculate_zones()
@@ -142,7 +154,20 @@ class ZonedRoutingInfoAllocator(object):
 
         return self.__allocate()
 
-    def __find_fixed(self):
+    def __insert_fixed(
+            self, identifier: str, vertex: AbstractVertex, km: BaseKeyAndMask):
+        is_app = isinstance(vertex, ApplicationVertex)
+        for (_, vertex2), km2 in self.__fixed_partitions.items():
+            if is_app and isinstance(vertex2, MachineVertex) and \
+                    (vertex == vertex2.app_vertex):
+                continue
+            # check if any keys could overlap
+            if (km.key & km2.mask) == (km2.key & km.mask):
+                raise PacmanRouteInfoAllocationException(
+                    f"{vertex} has {km} which overlaps with {vertex2} {km2}")
+        self.__fixed_partitions[identifier, vertex] = km
+
+    def __find_fixed(self) -> None:
         """
         Looks for FixedKeyAmdMask Constraints and keeps track of these.
 
@@ -174,7 +199,7 @@ class ZonedRoutingInfoAllocator(object):
                             f"For application vertex {pre}, the fixed key for "
                             f"machine vertex {vert} of {key_and_mask} does "
                             f"not align with the app key {app_key_and_mask}")
-                    self.__fixed_partitions[identifier, vert] = key_and_mask
+                    self.__insert_fixed(identifier, vert, key_and_mask)
                 else:
                     if is_fixed_m_key:
                         raise PacmanRouteInfoAllocationException(
@@ -191,11 +216,10 @@ class ZonedRoutingInfoAllocator(object):
                             f"On {pre} only a fixed app key has been provided,"
                             " but there is more than one machine vertex.")
                     # pylint:disable=undefined-loop-variable
-                    self.__fixed_partitions[
-                        identifier, vert] = app_key_and_mask
-                self.__fixed_partitions[identifier, pre] = app_key_and_mask
+                    self.__insert_fixed(identifier, vert, app_key_and_mask)
+                self.__insert_fixed(identifier, pre, app_key_and_mask)
 
-    def __calculate_zones(self):
+    def __calculate_zones(self) -> None:
         """
         Computes the size for the zones.
 
@@ -212,15 +236,13 @@ class ZonedRoutingInfoAllocator(object):
 
         # search for size of regions
         for pre, identifier in progress.over(self.__vertex_partitions):
-            splitter = pre.splitter
-            machine_vertices = splitter.get_out_going_vertices(identifier)
+            machine_vertices = pre.splitter.get_out_going_vertices(identifier)
             if not machine_vertices:
                 continue
             max_keys = 0
-            for machine_vertex in machine_vertices:
-                n_keys = machine_vertex.get_n_keys_for_partition(
-                    identifier)
-                max_keys = max(max_keys, n_keys)
+            for m_vtx in machine_vertices:
+                max_keys = max(max_keys, m_vtx.get_n_keys_for_partition(
+                    identifier))
 
             if max_keys > 0:
                 atom_bits = allocator_bits_needed(max_keys)
@@ -235,7 +257,7 @@ class ZonedRoutingInfoAllocator(object):
             else:
                 self.__atom_bits_per_app_part[pre, identifier] = 0
 
-    def __check_zones(self):
+    def __check_zones(self) -> None:
         # See if it could fit even before considerding fixed
         app_part_bits = allocator_bits_needed(
             len(self.__atom_bits_per_app_part))
@@ -272,7 +294,7 @@ class ZonedRoutingInfoAllocator(object):
                 self.__n_bits_atoms_and_mac = \
                     self.__n_bits_machine + self.__n_bits_atoms
 
-    def __set_fixed_used(self):
+    def __set_fixed_used(self) -> None:
         """
         Block the use of ``AP`` indexes that would clash with fixed keys
         """
@@ -304,10 +326,9 @@ class ZonedRoutingInfoAllocator(object):
             # Generate all possible combinations of keys for the remaining
             # mask
             for k, n_keys in get_key_ranges(key, mask):
-                for i in range(n_keys):
-                    self.__fixed_used.add(k + i)
+                self.__fixed_used.update(range(k, k + n_keys))
 
-    def __allocate_all_fixed(self):
+    def __allocate_all_fixed(self) -> RoutingInfo:
         routing_infos = RoutingInfo()
         progress = ProgressBar(
             len(self.__fixed_partitions), "Allocating routing keys")
@@ -315,18 +336,16 @@ class ZonedRoutingInfoAllocator(object):
                 self.__fixed_partitions.items()):
             if isinstance(vertex, ApplicationVertex):
                 n_bits_atoms = self.__atom_bits_per_app_part[vertex, part_id]
-                routing_infos.add_routing_info(
-                    AppVertexRoutingInfo(
-                        key_and_mask, part_id, vertex,
-                        self.__mask(n_bits_atoms), n_bits_atoms,
-                        len(vertex.machine_vertices)-1))
+                routing_infos.add_routing_info(AppVertexRoutingInfo(
+                    key_and_mask, part_id, vertex,
+                    self.__mask(n_bits_atoms), n_bits_atoms,
+                    len(vertex.machine_vertices)-1))
             elif isinstance(vertex, MachineVertex):
-                routing_infos.add_routing_info(
-                    MachineVertexRoutingInfo(
-                        key_and_mask, part_id, vertex, vertex.index))
+                routing_infos.add_routing_info(MachineVertexRoutingInfo(
+                    key_and_mask, part_id, vertex, vertex.index))
         return routing_infos
 
-    def __allocate(self):
+    def __allocate(self) -> RoutingInfo:
         progress = ProgressBar(
             len(self.__vertex_partitions), "Allocating routing keys")
         routing_infos = RoutingInfo()
@@ -354,10 +373,10 @@ class ZonedRoutingInfoAllocator(object):
                     n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
 
             for machine_index, machine_vertex in enumerate(machine_vertices):
-                key = (identifier, machine_vertex)
-                if key in self.__fixed_partitions:
+                id_mv = (identifier, machine_vertex)
+                if id_mv in self.__fixed_partitions:
                     # Ignore zone calculations and just use fixed
-                    key_and_mask = self.__fixed_partitions[key]
+                    key_and_mask = self.__fixed_partitions[id_mv]
                 else:
                     mask = self.__mask(n_bits_atoms)
                     key = app_part_index
@@ -369,9 +388,9 @@ class ZonedRoutingInfoAllocator(object):
                     machine_index))
 
             # Add application-level routing information
-            key = (identifier, pre)
-            if key in self.__fixed_partitions:
-                key_and_mask = self.__fixed_partitions[key]
+            id_pr = (identifier, pre)
+            if id_pr in self.__fixed_partitions:
+                key_and_mask = self.__fixed_partitions[id_pr]
             else:
                 key = app_part_index << (n_bits_atoms + n_bits_machine)
                 mask = self.__mask(n_bits_atoms + n_bits_machine)
@@ -385,7 +404,7 @@ class ZonedRoutingInfoAllocator(object):
         return routing_infos
 
     @staticmethod
-    def __mask(bits):
+    def __mask(bits: int) -> int:
         """
         :param int bits:
         :rtype int:
@@ -393,7 +412,7 @@ class ZonedRoutingInfoAllocator(object):
         return FULL_MASK - ((2 ** bits) - 1)
 
 
-def flexible_allocate(extra_allocations):
+def flexible_allocate(extra_allocations: _XAlloc) -> RoutingInfo:
     """
     Allocated with fixed bits for the Application/Partition index but
     with the size of the atom and machine bit changing.
@@ -402,25 +421,19 @@ def flexible_allocate(extra_allocations):
         Additional (vertex, partition identifier) pairs to allocate
         keys to.  These might not appear in partitions in the graph
         due to being added by the system.
-    :rtype: tuple(RoutingInfo,
-        dict((ApplicationVertex, str), BaseKeyAndMask))
+    :rtype: RoutingInfo
     :raise PacmanRouteInfoAllocationException:
     """
-    allocator = ZonedRoutingInfoAllocator()
-
-    return allocator(extra_allocations, True)
+    return ZonedRoutingInfoAllocator(True).allocate(extra_allocations)
 
 
-def global_allocate(extra_allocations):
+def global_allocate(extra_allocations: _XAlloc) -> RoutingInfo:
     """
     :param list(tuple(ApplicationVertex,str)) extra_allocations:
         Additional (vertex, partition identifier) pairs to allocate
         keys to.  These might not appear in partitions in the graph
         due to being added by the system.
-    :rtype: tuple(RoutingInfo,
-        dict((ApplicationVertex, str), BaseKeyAndMask))
+    :rtype: RoutingInfo
     :raise PacmanRouteInfoAllocationException:
     """
-    allocator = ZonedRoutingInfoAllocator()
-
-    return allocator(extra_allocations, False)
+    return ZonedRoutingInfoAllocator().allocate(extra_allocations)

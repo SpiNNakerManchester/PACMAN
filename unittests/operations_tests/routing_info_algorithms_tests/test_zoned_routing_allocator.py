@@ -14,6 +14,7 @@
 from spinn_utilities.overrides import overrides
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
+from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.operations.routing_info_allocator_algorithms.\
     zoned_routing_info_allocator import (flexible_allocate, global_allocate)
 from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
@@ -22,7 +23,7 @@ from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 
 
-class TestSplitter(AbstractSplitterCommon):
+class MockSplitter(AbstractSplitterCommon):
 
     def create_machine_vertices(self, chip_counter):
         return 1
@@ -46,11 +47,11 @@ class TestSplitter(AbstractSplitterCommon):
         pass
 
 
-class TestAppVertex(ApplicationVertex):
+class MockAppVertex(ApplicationVertex):
 
     def __init__(self, splitter=None, fixed_keys_by_partition=None,
                  fixed_key=None, fixed_machine_keys_by_partition=None):
-        super(TestAppVertex, self).__init__(splitter=splitter)
+        super(MockAppVertex, self).__init__(splitter=splitter)
         self.__fixed_keys_by_partition = fixed_keys_by_partition
         self.__fixed_key = fixed_key
         self.__fixed_machine_keys_by_partition = \
@@ -97,7 +98,7 @@ class TestMacVertex(MachineVertex):
 
 def create_graphs1(with_fixed):
     # An output vertex to aim things at (to make keys required)
-    out_app_vertex = TestAppVertex(splitter=TestSplitter())
+    out_app_vertex = MockAppVertex(splitter=MockSplitter())
     PacmanDataView.add_vertex(out_app_vertex)
     # Create 5 application vertices (3 bits)
     app_vertices = list()
@@ -116,8 +117,8 @@ def create_graphs1(with_fixed):
                 fixed_keys_by_partition["Part1"] = BaseKeyAndMask(
                     0x33000000, 0xFFFF0000)
 
-        app_vertex = TestAppVertex(
-            splitter=TestSplitter(),
+        app_vertex = MockAppVertex(
+            splitter=MockSplitter(),
             fixed_keys_by_partition=fixed_keys_by_partition,
             fixed_machine_keys_by_partition=fixed_machine_keys_by_partition)
 
@@ -162,17 +163,23 @@ def create_graphs1(with_fixed):
                 ApplicationEdge(app_vertex, out_app_vertex), f"Part{i}")
 
 
-def create_graphs_only_fixed():
+def create_graphs_only_fixed(overlap: bool):
     # An output vertex to aim things at (to make keys required)
-    out_app_vertex = TestAppVertex(splitter=TestSplitter())
+    out_app_vertex = MockAppVertex(splitter=MockSplitter())
     PacmanDataView.add_vertex(out_app_vertex)
 
-    fixed_keys_by_partition = {
-        "Part0": BaseKeyAndMask(0x4c00000, 0xFFFFFFFE),
-        "Part1": BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)
-    }
-    app_vertex = TestAppVertex(
-        splitter=TestSplitter(),
+    if overlap:
+        fixed_keys_by_partition = {
+            "Part0": BaseKeyAndMask(0x0, 0xffff0000),
+            "Part1": BaseKeyAndMask(0x1000, 0xfffff800)
+        }
+    else:
+        fixed_keys_by_partition = {
+            "Part0": BaseKeyAndMask(0x0, 0xFFFFFFFE),
+            "Part1": BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)
+        }
+    app_vertex = MockAppVertex(
+        splitter=MockSplitter(),
         fixed_keys_by_partition=fixed_keys_by_partition)
     PacmanDataView.add_vertex(app_vertex)
 
@@ -193,9 +200,9 @@ def create_graphs_only_fixed():
 
 
 def create_graphs_no_edge():
-    out_app_vertex = TestAppVertex(splitter=TestSplitter())
+    out_app_vertex = MockAppVertex(splitter=MockSplitter())
     PacmanDataView.add_vertex(out_app_vertex)
-    app_vertex = TestAppVertex(splitter=TestSplitter())
+    app_vertex = MockAppVertex(splitter=MockSplitter())
     PacmanDataView.add_vertex(app_vertex)
 
     # An output vertex to aim things at (to make keys required)
@@ -281,10 +288,20 @@ def test_flexible_allocator_no_fixed():
 
 def test_fixed_only():
     unittest_setup()
-    create_graphs_only_fixed()
+    create_graphs_only_fixed(overlap=False)
     flexible_allocate([])
     routing_info = global_allocate([])
     assert len(list(routing_info)) == 4
+
+
+def test_overlap():
+    unittest_setup()
+    create_graphs_only_fixed(overlap=True)
+    try:
+        flexible_allocate([])
+        raise ValueError
+    except PacmanRouteInfoAllocationException:
+        pass
 
 
 def test_no_edge():
@@ -314,14 +331,14 @@ def create_big(with_fixed):
     fixed_key = None
     if with_fixed:
         fixed_key = BaseKeyAndMask(0x0, 0x180000)
-    big_app_vertex = TestAppVertex(
-        splitter=TestSplitter(), fixed_key=fixed_key)
+    big_app_vertex = MockAppVertex(
+        splitter=MockSplitter(), fixed_key=fixed_key)
     PacmanDataView.add_vertex(big_app_vertex)
     # Create a single output vertex (which won't send)
-    out_app_vertex = TestAppVertex(splitter=TestSplitter())
+    out_app_vertex = MockAppVertex(splitter=MockSplitter())
     PacmanDataView.add_vertex(out_app_vertex)
     # Create a load of middle vertex
-    mid_app_vertex = TestAppVertex(splitter=TestSplitter())
+    mid_app_vertex = MockAppVertex(splitter=MockSplitter())
     PacmanDataView.add_vertex(mid_app_vertex)
 
     PacmanDataView.add_edge(

@@ -13,11 +13,13 @@
 # limitations under the License.
 
 import hashlib
-import numpy
 import math
+from typing import Any, Iterable, Tuple
+import numpy
+from pacman.model.graphs.common import Slice
 
 
-def expand_to_bit_array(value):
+def expand_to_bit_array(value: int) -> numpy.ndarray:
     """
     Expand a 32-bit value in to an array of length 32 of uint8 values,
     each of which is a 1 or 0.
@@ -29,7 +31,7 @@ def expand_to_bit_array(value):
         numpy.asarray([value], dtype=">u4").view(dtype="uint8"))
 
 
-def compress_from_bit_array(bit_array):
+def compress_from_bit_array(bit_array: numpy.ndarray) -> int:
     """
     Compress a bit array of 32 uint8 values, where each is a 1 or 0,
     into a 32-bit value.
@@ -40,7 +42,8 @@ def compress_from_bit_array(bit_array):
     return numpy.packbits(bit_array).view(dtype=">u4")[0].item()
 
 
-def compress_bits_from_bit_array(bit_array, bit_positions):
+def compress_bits_from_bit_array(
+        bit_array: numpy.ndarray, bit_positions: numpy.ndarray) -> int:
     """
     Compress specific positions from a bit array of 32 uint8 value,
     where is a 1 or 0, into a 32-bit value.
@@ -57,7 +60,7 @@ def compress_bits_from_bit_array(bit_array, bit_positions):
     return compress_from_bit_array(expanded_value)
 
 
-def is_equal_or_None(a, b):
+def is_equal_or_None(a: Any, b: Any) -> bool:
     """
     If a and b are both not `None`, return True if and only if they are equal,
     otherwise return True.
@@ -67,7 +70,7 @@ def is_equal_or_None(a, b):
     return (a is None or b is None or a == b)
 
 
-def is_single(iterable):
+def is_single(iterable: Iterable[Any]) -> bool:
     """
     Test if there is exactly one item in the iterable.
 
@@ -87,7 +90,7 @@ def is_single(iterable):
     return False
 
 
-def md5(string):
+def md5(string: str) -> str:
     """
     Get the MD5 hash of the given string, which is UTF-8 encoded.
 
@@ -97,7 +100,7 @@ def md5(string):
     return hashlib.md5(string.encode()).hexdigest()
 
 
-def get_key_ranges(key, mask):
+def get_key_ranges(key: int, mask: int) -> Iterable[Tuple[int, int]]:
     """
     Get a generator of base_key, n_keys pairs that represent ranges
     allowed by the mask.
@@ -137,7 +140,7 @@ def get_key_ranges(key, mask):
         yield compress_from_bit_array(generated_key), n_keys
 
 
-def get_n_bits(n_values):
+def get_n_bits(n_values: int) -> int:
     """
     Determine how many bits are required for the given number of values.
 
@@ -152,80 +155,7 @@ def get_n_bits(n_values):
     return int(math.ceil(math.log2(n_values)))
 
 
-def get_field_based_keys(key, vertex_slice, shift=0):
-    """
-    Translate a vertex slice with potentially multiple dimensions into
-    a list of keys, one for each atom of the vertex, by putting the values
-    into fields of the keys based on the shape of the slice.
-
-    :param int key: The base key
-    :param Slice vertex_slice: The slice to translate
-    :param int shift:
-        The left shift to apply to the atom key before adding to the key. Can
-        be used to make space for additional information at the bottom of the
-        key.
-    :rtype: list(int)
-    """
-    # Find the size of field required for each coordinate, and the shift
-    # required to get to this field position (the first field has a shift
-    # of 0)
-    field_sizes = numpy.array([get_n_bits(n) for n in vertex_slice.shape])
-    shifts = numpy.concatenate(([0], numpy.cumsum(field_sizes[:-1])))
-
-    # Convert each atom into x, y coordinates based on shape
-    # This uses numpy.unravel_index, the result of which needs to be
-    # made into an array (it is a list of tuples) and transposed (it
-    # gives the coordinates separately per axis)
-    coords = numpy.array(numpy.unravel_index(
-        numpy.arange(vertex_slice.n_atoms),
-        vertex_slice.shape, order='F')).T
-
-    # We now left shift each coordinate into its field and add them up to
-    # get the key
-    keys = numpy.sum(numpy.left_shift(coords, shifts), axis=1)
-
-    # Do any final shifting as required (zero shift is valid but does nothing)
-    if shift:
-        keys = numpy.left_shift(keys, shift)
-
-    # The final result is the above with the base key added
-    return keys + key
-
-
-def get_field_based_index(base_key, vertex_slice, shift=0):
-    """
-    Map field based keys back to indices.
-
-    :param int base_key: The base key
-    :param Slice vertex_slice: The slice to translate
-    :param int shift:
-        The left shift to apply to the atom key before adding to the key. Can
-        be used to make space for additional information at the bottom of the
-        key.
-    :rtype: dict(int,int)
-    """
-    # Get the field based keys
-    field_based_keys = get_field_based_keys(base_key, vertex_slice, shift)
-
-    # Inverse the index
-    return {
-        key: i
-        for i, key in enumerate(field_based_keys)
-    }
-
-
-def get_n_bits_for_fields(field_sizes):
-    """
-    Get the number of bits required for the fields in the vertex slice.
-
-    :param iterable(int) field_sizes: The sizes each of the fields
-    :rtype: int
-    """
-    field_size = [get_n_bits(n) for n in field_sizes]
-    return sum(field_size)
-
-
-def allocator_bits_needed(size):
+def allocator_bits_needed(size: int) -> int:
     """
     Get the bits needed for the routing info allocator.
 
@@ -236,3 +166,29 @@ def allocator_bits_needed(size):
     if size == 0:
         return 0
     return int(math.ceil(math.log2(size)))
+
+
+def get_keys(
+        base_key: int, vertex_slice: Slice,
+        n_extra_bits: int = 0) -> numpy.ndarray:
+    """
+    Get the keys for a given vertex slice.
+
+    :param int base_key: The base key for the vertex slice
+    :param Slice vertex_slice: The slice of the vertex to get keys for
+    :param int n_extra_bits: Additional right shift to apply to atoms
+
+    :rtype: iterable(int)
+    """
+    indices = numpy.arange(0, vertex_slice.n_atoms) << n_extra_bits
+    return base_key + indices
+
+
+def is_power_of_2(v: int) -> bool:
+    """
+    Determine if a value is a power of 2.
+
+    :param int v: The value to test
+    :rtype: bool
+    """
+    return (v & (v - 1) == 0) and (v != 0)

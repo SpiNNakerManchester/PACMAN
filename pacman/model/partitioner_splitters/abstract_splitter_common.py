@@ -11,27 +11,38 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import (
+    Iterable, Generic, Optional, Sequence, Tuple, TypeVar, Union)
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.utilities.utility_objs import ChipCounter
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import (
+    MachineVertex, MulticastEdgePartition, AbstractSDRAMPartition)
+from pacman.model.resources import AbstractSDRAM
+
+#: The type of vertex that we split.
+#: :meta private:
+V = TypeVar("V", bound=ApplicationVertex)
 
 
-class AbstractSplitterCommon(object, metaclass=AbstractBase):
+class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
     """
     Common base class for vertex splitters, defining some utility methods.
     """
 
-    __slots__ = [
+    __slots__ = (
         # the app vertex this splitter governs.
-        "_governed_app_vertex",
-    ]
+        "__governed_app_vertex", )
 
-    def __init__(self):
-        self._governed_app_vertex = None
+    def __init__(self) -> None:
+        self.__governed_app_vertex: Optional[V] = None
 
     def __str__(self):
         try:
             return (
-                f"{type(self).__name__} on {self._governed_app_vertex.label}")
+                f"{type(self).__name__} on {self.__governed_app_vertex.label}")
         except AttributeError:
             return f"{type(self).__name__} has no governed_app_vertex"
 
@@ -39,16 +50,20 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         return self.__str__()
 
     @property
-    def governed_app_vertex(self):
+    def governed_app_vertex(self) -> V:
         """
         The app vertex to be governed by this splitter object.
-        If `None`, not yet set.
 
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
+        :raises PacmanConfigurationException:
+            if the app vertex has not been been set.
         """
-        return self._governed_app_vertex
+        if self.__governed_app_vertex is None:
+            raise PacmanConfigurationException(
+                "This splitter has no governing app vertex set")
+        return self.__governed_app_vertex
 
-    def set_governed_app_vertex(self, app_vertex):
+    def set_governed_app_vertex(self, app_vertex: V):
         """
         Sets a application vertex to be governed by this splitter object.
         Once set it can't be reset.
@@ -58,44 +73,48 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         :raises PacmanConfigurationException:
             if the app vertex has already been set.
         """
-        if self._governed_app_vertex == app_vertex:
+        if self.__governed_app_vertex == app_vertex:
             return
-        if self._governed_app_vertex is not None:
+        if self.__governed_app_vertex is not None:
             raise PacmanConfigurationException(
-                f"The app vertex {self._governed_app_vertex} is already"
+                f"The app vertex {self.__governed_app_vertex} is already"
                 f" governed by this splitter. ")
-        self._governed_app_vertex = app_vertex
+        self.__governed_app_vertex = app_vertex
         app_vertex.splitter = self
 
     @abstractmethod
-    def create_machine_vertices(self, chip_counter):
+    def create_machine_vertices(self, chip_counter: ChipCounter):
         """
         Method for specific splitter objects to override.
 
         :param ~pacman.utilities.utility_objs.ChipCounter chip_counter:
             counter of used chips
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_out_going_slices(self):
+    def get_out_going_slices(self) -> Sequence[Slice]:
         """
         The slices of the output vertices.
 
         :return: list of Slices
         :rtype: list(~pacman.model.graphs.common.Slice)
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_in_coming_slices(self):
+    def get_in_coming_slices(self) -> Sequence[Slice]:
         """
         The slices of the input vertices.
 
         :return: list of Slices
         :rtype: list(~pacman.model.graphs.common.Slice)
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_out_going_vertices(self, partition_id):
+    def get_out_going_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         """
         Get machine pre-vertices.
 
@@ -105,9 +124,11 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         :param str partition_id: The identifier of the outgoing partition
         :rtype: list(~pacman.model.graphs.machine.MachineVertex)
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_in_coming_vertices(self, partition_id):
+    def get_in_coming_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         """
         Get machine post-vertices for a given partition.
 
@@ -121,9 +142,13 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         :param str partition_id: The identifier of the incoming partition
         :rtype: list(~pacman.model.graphs.machine.MachineVertex)
         """
+        raise NotImplementedError
 
     def get_source_specific_in_coming_vertices(
-            self, source_vertex, partition_id):
+            self, source_vertex: ApplicationVertex,
+            partition_id: str) -> Sequence[Tuple[
+                MachineVertex, Sequence[
+                    Union[MachineVertex, ApplicationVertex]]]]:
         """
         Get machine post-vertices for a given source.
 
@@ -151,7 +176,8 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
                 for m_vertex in self.get_in_coming_vertices(partition_id)]
 
     @abstractmethod
-    def machine_vertices_for_recording(self, variable_to_record):
+    def machine_vertices_for_recording(
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         """
         Gets the machine vertices which are recording this variable.
 
@@ -160,14 +186,17 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         :return: list of machine vertices
         :rtype: iterable(~pacman.model.graphs.machine.MachineVertex)
         """
+        raise NotImplementedError
 
     @abstractmethod
     def reset_called(self):
         """
         Reset the splitter to be as if it has not operated a splitting yet.
         """
+        raise NotImplementedError
 
-    def get_same_chip_groups(self):
+    def get_same_chip_groups(self) -> Sequence[
+            Tuple[Sequence[MachineVertex], AbstractSDRAM]]:
         """
         Get a list of lists of vertices and SDRAM which must be
         allocated on the same chip.  By default this returns a list of each
@@ -178,9 +207,10 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
             ~pacman.model.resources.AbstractSDRAM)
         """
         return [([v], v.sdram_required)
-                for v in self._governed_app_vertex.machine_vertices]
+                for v in self.governed_app_vertex.machine_vertices]
 
-    def get_internal_multicast_partitions(self):
+    def get_internal_multicast_partitions(
+            self) -> Sequence[MulticastEdgePartition]:
         """
         Get edge partitions between machine vertices that are to be
         handled by Multicast.  Returns empty by default, override if there
@@ -190,7 +220,8 @@ class AbstractSplitterCommon(object, metaclass=AbstractBase):
         """
         return []
 
-    def get_internal_sdram_partitions(self):
+    def get_internal_sdram_partitions(
+            self) -> Sequence[AbstractSDRAMPartition]:
         """
         Get edge partitions between machine vertices that are to be
         handled by SDRAM.  Returns empty by default, override if there

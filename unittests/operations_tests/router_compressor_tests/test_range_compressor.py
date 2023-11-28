@@ -31,6 +31,7 @@ class TestRangeCompressor(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
+        set_config("Machine", "version", 5)
         set_config(
             "Mapping", "router_table_compress_as_far_as_possible", True)
 

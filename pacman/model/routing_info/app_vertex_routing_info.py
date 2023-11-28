@@ -11,42 +11,72 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from .vertex_routing_info import VertexRoutingInfo
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
-from spinn_utilities.overrides import overrides
-
-import math
+from __future__ import annotations
 import logging
+import math
+from typing import Iterable, List, Tuple, TYPE_CHECKING
+from spinn_utilities.overrides import overrides
+from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+from .vertex_routing_info import VertexRoutingInfo
+if TYPE_CHECKING:
+    from pacman.model.graphs.application import ApplicationVertex
+    from pacman.model.routing_info import BaseKeyAndMask
+    from pacman.model.routing_table_by_partition import (
+        MulticastRoutingTableByPartitionEntry)
+    from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
 logger = logging.getLogger(__name__)
 
 
 class AppVertexRoutingInfo(VertexRoutingInfo):
+    """
+    Routing information for an application vertex.
+    """
 
-    __slots__ = [
+    __slots__ = (
         "__app_vertex",
         "__machine_mask",
         "__n_bits_atoms",
-        "__max_machine_index"]
+        "__max_machine_index")
 
     def __init__(
-            self, keys_and_masks, partition_id, app_vertex, machine_mask,
-            n_bits_atoms, max_machine_index):
-        super(AppVertexRoutingInfo, self).__init__(
-            keys_and_masks, partition_id)
+            self, key_and_mask: BaseKeyAndMask, partition_id: str,
+            app_vertex: ApplicationVertex, machine_mask: int,
+            n_bits_atoms: int, max_machine_index: int):
+        """
+        :param BaseKeyAndMask key_and_mask:
+        :param str partition_id:
+        :param ApplicationVertex app_vertex:
+        :param int machine_mask:
+        :param int n_bits_atoms:
+        :param int max_machine_index:
+        """
+        super().__init__(key_and_mask, partition_id)
         self.__app_vertex = app_vertex
         self.__machine_mask = machine_mask
         self.__n_bits_atoms = n_bits_atoms
         self.__max_machine_index = max_machine_index
 
-    def merge_machine_entries(self, entries):
+    def merge_machine_entries(self, entries: List[Tuple[
+            MulticastRoutingTableByPartitionEntry,
+            MachineVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:
+        """
+        Merge the machine entries.
+
+        :param entries:
+            The entries to merge
+        :type entries:
+            list(tuple(
+                MulticastRoutingTableByPartitionEntry, VertexRoutingInfo))
+        :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
+        """
         n_entries = len(entries)
-        (_, _, _, last_r_info) = entries[-1]
+        (_, last_r_info) = entries[-1]
         is_last = last_r_info.index == self.__max_machine_index
         i = 0
         while i < n_entries:
             # The maximum number of next entries
-            (_, _, entry, r_info) = entries[i]
+            (entry, r_info) = entries[i]
             next_entries = self.__n_sequential_entries(r_info.index, n_entries)
 
             # If that is OK, we can just use them
@@ -63,7 +93,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                 while entries_to_go > 0:
                     next_entries = 2 ** int(math.log2(entries_to_go))
                     mask = self.__group_mask(next_entries)
-                    (_, _, entry, r_info) = entries[i]
+                    (entry, r_info) = entries[i]
                     yield MulticastRoutingEntry(
                         r_info.key, mask,
                         defaultable=entry.defaultable,
@@ -71,10 +101,10 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                     entries_to_go -= next_entries
                     i += next_entries
 
-    def __group_mask(self, n_entries):
+    def __group_mask(self, n_entries: int) -> int:
         return self.__machine_mask - ((n_entries - 1) << self.__n_bits_atoms)
 
-    def __n_sequential_entries(self, i, n_entries):
+    def __n_sequential_entries(self, i: int, n_entries: int) -> int:
         # This finds the maximum number of entries that can be joined following
         # the starting entry index.  This is calculated by finding how many
         # zero bits are in the least significant position in the index.  These
@@ -86,21 +116,20 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
 
     @property
     @overrides(VertexRoutingInfo.vertex)
-    def vertex(self):
+    def vertex(self) -> ApplicationVertex:
         return self.__app_vertex
 
     @property
-    def machine_mask(self):
+    def machine_mask(self) -> int:
         """
         The mask that covers a specific machine vertex.
 
         :rtype: int
         """
-
         return self.__machine_mask
 
     @property
-    def n_bits_atoms(self):
+    def n_bits_atoms(self) -> int:
         """
         The number of bits for the atoms.
 

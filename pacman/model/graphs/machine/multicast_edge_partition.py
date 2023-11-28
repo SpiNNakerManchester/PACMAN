@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from pacman.model.graphs import AbstractSingleSourcePartition
-from pacman.model.graphs.machine.machine_edge import MachineEdge
+from .machine_edge import MachineEdge
+from .machine_vertex import MachineVertex
 
 
-class MulticastEdgePartition(AbstractSingleSourcePartition):
+class MulticastEdgePartition(
+        AbstractSingleSourcePartition[MachineVertex, MachineEdge]):
     """
     A simple implementation of a machine edge partition that will
     communicate with SpiNNaker multicast packets. They have a common set
@@ -24,7 +26,7 @@ class MulticastEdgePartition(AbstractSingleSourcePartition):
 
     __slots__ = ()
 
-    def __init__(self, pre_vertex, identifier):
+    def __init__(self, pre_vertex: MachineVertex, identifier: str):
         """
         :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
             the pre vertex of this partition.

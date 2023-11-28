@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from typing import Optional
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import ChipAndCore
 
@@ -21,25 +21,24 @@ class AbstractVertex(object):
     A vertex in a graph.
     """
 
-    __slots__ = [
+    __slots__ = (
         # Indicates if the Vertex has been added to a graph
         "_added_to_graph",
         # Label for the vertex. Changable until added to graph
         "_label",
         # the x, y (and p) this vertex MUST be placed on
-        "_fixed_location"
-    ]
+        "_fixed_location")
 
-    def __init__(self, label=None):
+    def __init__(self, label: Optional[str] = None):
         """
         :param str label: The optional name of the vertex
         """
         self._label = label
         self._added_to_graph = False
-        self._fixed_location = None
+        self._fixed_location: Optional[ChipAndCore] = None
 
     @property
-    def label(self):
+    def label(self) -> Optional[str]:
         """
         The current label to the vertex.
 
@@ -49,7 +48,7 @@ class AbstractVertex(object):
         """
         return self._label
 
-    def set_label(self, label):
+    def set_label(self, label: str):
         """
         Changes the label for a vertex *not yet added* to a graph.
 
@@ -63,7 +62,7 @@ class AbstractVertex(object):
                 "As Labels are also IDs they can not be changed.")
         self._label = label
 
-    def addedToGraph(self):
+    def setAddedToGraph(self) -> None:
         """
         Records that the vertex has been added to a graph.
 
@@ -72,7 +71,14 @@ class AbstractVertex(object):
         """
         self._added_to_graph = True
 
-    def get_fixed_location(self):
+    def has_been_added_to_graph(self) -> bool:
+        """
+        State if the vertex has been added to the graph or not
+
+        """
+        return self._added_to_graph
+
+    def get_fixed_location(self) -> Optional[ChipAndCore]:
         """
         The x, y and possibly p the vertex *must* be placed on.
 
@@ -84,7 +90,7 @@ class AbstractVertex(object):
         """
         return self._fixed_location
 
-    def set_fixed_location(self, x, y, p=None):
+    def set_fixed_location(self, x: int, y: int, p: Optional[int] = None):
         """
         Set the location where the vertex must be placed.
 

@@ -11,28 +11,32 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractEdge
+if TYPE_CHECKING:
+    from pacman.model.graphs.machine import MachineVertex
+    _MV = MachineVertex
+else:
+    _MV = object
 
 
-class MachineEdge(AbstractEdge):
+class MachineEdge(AbstractEdge[_MV]):
     """
     A simple implementation of a machine edge.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The vertex at the start of the edge
         "_pre_vertex",
-
         # The vertex at the end of the edge
         "_post_vertex",
-
         # The label of the edge
-        "_label"
-    ]
+        "_label")
 
-    def __init__(self, pre_vertex, post_vertex, label=None):
+    def __init__(self, pre_vertex: MachineVertex, post_vertex: MachineVertex,
+                 label: Optional[str] = None):
         """
         :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
             The vertex at the start of the edge.
@@ -52,7 +56,7 @@ class MachineEdge(AbstractEdge):
 
     @property
     @overrides(AbstractEdge.pre_vertex, extend_doc=False)
-    def pre_vertex(self):
+    def pre_vertex(self) -> MachineVertex:
         """
         The vertex at the start of the edge.
 
@@ -62,7 +66,7 @@ class MachineEdge(AbstractEdge):
 
     @property
     @overrides(AbstractEdge.post_vertex, extend_doc=False)
-    def post_vertex(self):
+    def post_vertex(self) -> MachineVertex:
         """
         The vertex at the end of the edge.
 
