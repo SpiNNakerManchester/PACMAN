@@ -191,7 +191,7 @@ class MDSlice(Slice):
         n_dims = len(self._atoms_shape)
         remainders = relative_indices
         cum_last_size = 1
-        global_index = numpy.zeros(len(relative_indices))
+        global_index = numpy.zeros(len(relative_indices), dtype=int)
         for n in range(n_dims):
             # Work out the local index in this dimension
             local_index_d = remainders % self._shape[n]
