@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional
 from spinn_utilities.overrides import overrides
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
@@ -59,11 +60,12 @@ class MockAppVertex(ApplicationVertex):
 
     @property
     @overrides(ApplicationVertex.n_atoms)
-    def n_atoms(self):
+    def n_atoms(self) -> int:
         return 10
 
     @overrides(ApplicationVertex.get_fixed_key_and_mask)
-    def get_fixed_key_and_mask(self, partition_id):
+    def get_fixed_key_and_mask(
+            self, partition_id: str) -> Optional[BaseKeyAndMask]:
         if self.__fixed_key is not None:
             return self.__fixed_key
         if self.__fixed_keys_by_partition is None:
@@ -71,7 +73,9 @@ class MockAppVertex(ApplicationVertex):
         return self.__fixed_keys_by_partition.get(partition_id)
 
     @overrides(ApplicationVertex.get_machine_fixed_key_and_mask)
-    def get_machine_fixed_key_and_mask(self, machine_vertex, partition_id):
+    def get_machine_fixed_key_and_mask(
+            self, machine_vertex: MachineVertex,
+            partition_id: str) -> Optional[BaseKeyAndMask]:
         if self.__fixed_machine_keys_by_partition is None:
             return None
         return self.__fixed_machine_keys_by_partition.get(
