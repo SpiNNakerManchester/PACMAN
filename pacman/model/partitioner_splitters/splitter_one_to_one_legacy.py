@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import List, Optional
+from typing import cast, List, Optional
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
@@ -48,9 +48,10 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon[ApplicationVertex]):
                 f"{self} is not a LegacyPartitionerAPI")
         super().set_governed_app_vertex(app_vertex)
         self._vertex_slice = Slice(0, self.governed_app_vertex.n_atoms - 1)
-        self._sdram = self.governed_app_vertex.get_sdram_used_by_atoms(
+        lp = cast(LegacyPartitionerAPI, app_vertex)
+        self._sdram = lp.get_sdram_used_by_atoms(
             self._vertex_slice)
-        self._machine_vertex = self.governed_app_vertex.create_machine_vertex(
+        self._machine_vertex = lp.create_machine_vertex(
             vertex_slice=self._vertex_slice,
             sdram=self._sdram, label=None)
         self.governed_app_vertex.remember_machine_vertex(self._machine_vertex)

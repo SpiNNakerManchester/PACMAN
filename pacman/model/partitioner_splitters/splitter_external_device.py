@@ -163,5 +163,5 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         return []
 
     @overrides(AbstractSplitterCommon.reset_called)
-    def reset_called(self) -> bool:
+    def reset_called(self) -> None:
         pass
