@@ -67,23 +67,23 @@ class Application2DSpiNNakerLinkVertex(
         self._verify_sub_size()
 
     @property
-    @overrides(Abstract2DDeviceVertex._width)
-    def _width(self) -> int:
+    @overrides(Abstract2DDeviceVertex.width)
+    def width(self) -> int:
         return self.__width
 
     @property
-    @overrides(Abstract2DDeviceVertex._height)
-    def _height(self) -> int:
+    @overrides(Abstract2DDeviceVertex.height)
+    def height(self) -> int:
         return self.__height
 
     @property
-    @overrides(Abstract2DDeviceVertex._sub_width)
-    def _sub_width(self) -> int:
+    @overrides(Abstract2DDeviceVertex.sub_width)
+    def sub_width(self) -> int:
         return self.__sub_width
 
     @property
-    @overrides(Abstract2DDeviceVertex._sub_height)
-    def _sub_height(self) -> int:
+    @overrides(Abstract2DDeviceVertex.sub_height)
+    def sub_height(self) -> int:
         return self.__sub_height
 
     @property

@@ -16,6 +16,7 @@ from .base_key_and_mask import BaseKeyAndMask
 from .routing_info import RoutingInfo
 from .machine_vertex_routing_info import MachineVertexRoutingInfo
 from .app_vertex_routing_info import AppVertexRoutingInfo
+from .vertex_routing_info import VertexRoutingInfo
 
 __all__ = ["BaseKeyAndMask", "MachineVertexRoutingInfo",
-           "RoutingInfo", "AppVertexRoutingInfo"]
+           "RoutingInfo", "AppVertexRoutingInfo", "VertexRoutingInfo"]

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import (
-    Any, Dict, Iterable, List, Optional, Tuple, TypeVar, Generic, cast)
+    Dict, Iterable, List, Optional, Tuple, TypeVar, Generic)
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry
 from pacman.data import PacmanDataView
@@ -20,14 +20,12 @@ from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.routing_info import RoutingInfo
+from pacman.model.routing_info import (
+    RoutingInfo, AppVertexRoutingInfo, MachineVertexRoutingInfo)
 from pacman.model.graphs import AbstractVertex
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartitionEntry)
-from pacman.model.routing_info.vertex_routing_info import VertexRoutingInfo
-from pacman.model.routing_info.app_vertex_routing_info import \
-    AppVertexRoutingInfo
-from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
 
 def merged_routing_table_generator() -> MulticastRoutingTables:
@@ -76,27 +74,57 @@ def __create_routing_table(
         if r_info is None:
             raise PacmanRoutingException(
                 f"Missing Routing information for {vertex}, {part_id}")
+
+        # If we have an application vertex, just put the entry in and move on
+        if isinstance(vertex, ApplicationVertex):
+            table.add_multicast_routing_entry(
+                MulticastRoutingEntry(
+                    r_info.key, r_info.mask, defaultable=entry.defaultable,
+                    spinnaker_route=entry.spinnaker_route))
+            continue
+        # Otherwise it has to be a machine vertex...
+        assert isinstance(vertex, MachineVertex)
+        assert isinstance(r_info, MachineVertexRoutingInfo)
+
+        # If there is no application vertex, just add the entry
+        if vertex.app_vertex is None:
+            table.add_multicast_routing_entry(
+                MulticastRoutingEntry(
+                    r_info.key, r_info.mask, defaultable=entry.defaultable,
+                    spinnaker_route=entry.spinnaker_route))
+            continue
+
+        # This has to be AppVertexRoutingInfo!
+        app_r_info = routing_info.get_routing_info_from_pre_vertex(
+            vertex.app_vertex, part_id)
+        assert isinstance(app_r_info, AppVertexRoutingInfo)
+
+        # Get the entries to merge
         entries: List[Tuple[
-            AbstractVertex, str, MulticastRoutingTableByPartitionEntry,
-            VertexRoutingInfo]] = [(vertex, part_id, entry, r_info)]
-        while __match(iterator, vertex, part_id, r_info, entry, routing_info):
+            MulticastRoutingTableByPartitionEntry,
+            MachineVertexRoutingInfo]] = [(entry, r_info)]
+        while __match(iterator, vertex, part_id, r_info, entry, routing_info,
+                      app_r_info):
             (vertex, part_id), entry = iterator.pop()
             r_info = routing_info.get_routing_info_from_pre_vertex(
                 vertex, part_id)
             if r_info is not None:
-                entries.append((vertex, part_id, entry, r_info))
+                assert isinstance(r_info, MachineVertexRoutingInfo)
+                entries.append((entry, r_info))
 
         # Now attempt to merge sources together as much as possible
-        for mrentry in __merged_keys_and_masks(entries, routing_info):
+        for mrentry in __merged_keys_and_masks(app_r_info, entries):
             table.add_multicast_routing_entry(mrentry)
 
     return table
 
 
-def __match(iterator, vertex, part_id, r_info, entry, routing_info) -> bool:
+def __match(
+        iterator, vertex, part_id, r_info, entry, routing_info,
+        app_r_info) -> bool:
     if not iterator.has_next:
         return False
-    if isinstance(vertex, ApplicationVertex):
+    if r_info.mask != app_r_info.machine_mask:
         return False
     (next_vertex, next_part_id), next_entry = iterator.peek()
     if isinstance(next_vertex, ApplicationVertex):
@@ -132,34 +160,19 @@ def __mask_has_holes(mask: int) -> bool:
 
 
 def __merged_keys_and_masks(
+        app_r_info: AppVertexRoutingInfo,
         entries: List[Tuple[
-            AbstractVertex, str, MulticastRoutingTableByPartitionEntry,
-            VertexRoutingInfo]],
-        routing_info: RoutingInfo) -> Iterable[MulticastRoutingEntry]:
-    """
-    :param entries:
-    :type entries:
-        list(tuple(AbstractVertex, str,
-        ~spinn_machine.MulticastRoutingEntry, VertexRoutingInfo))
-    :param RoutingInfo routing_info:
-    :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
-    """
+            MulticastRoutingTableByPartitionEntry,
+            MachineVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:
     if not entries:
         return
-    (vertex, part_id, entry, r_info) = entries[0]
-    if isinstance(vertex, ApplicationVertex) or len(entries) == 1:
+    (entry, r_info) = entries[0]
+    if len(entries) == 1:
         yield MulticastRoutingEntry(
             r_info.key, r_info.mask, defaultable=entry.defaultable,
             spinnaker_route=entry.spinnaker_route)
     else:
-        assert isinstance(vertex, MachineVertex)
-        av = vertex.app_vertex
-        if av is not None:
-            app_r_info = routing_info.get_routing_info_from_pre_vertex(
-                av, part_id)
-            if isinstance(app_r_info, AppVertexRoutingInfo):
-                yield from app_r_info.merge_machine_entries(
-                    cast(Any, entries))
+        yield from app_r_info.merge_machine_entries(entries)
 
 
 #: :meta private:
