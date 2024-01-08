@@ -13,40 +13,42 @@
 # limitations under the License.
 
 # Our abbreviations/names
+Navaridas
 NER
 
 # Our types
 AbstractEdge
-ApplicationEdge
-MachineEdge
-SDRAMMachineEdge
 AbstractEdgePartition
-AbstractSingleSourcePartition
-ApplicationEdgePartition
-MulticastEdgePartition
+AbstractMulticastRoutingTable
+AbstractSDRAM
 AbstractSDRAMPartition
+AbstractSingleSourcePartition
 AbstractVertex
+ApplicationEdge
+ApplicationEdgePartition
 ApplicationVertex
-MachineVertex
-MulticastRoutingTable
+BaseKeyAndMask
+ChipAndCore
 FPGAConnection
 IPTag
 IPtagResource
+MachineEdge
+MachineVertex
+MulticastEdgePartition
+MulticastRoutingTable
+PacmanAlreadyExistsException
+PlacementTuple
 ReverseIPtagResource
-AbstractSDRAM
-BaseKeyAndMask
+RoutingTableEntry
 RoutingInfo
 RoutingTree
-RoutingTableEntry
-PlacementTuple
-ChipAndCore
-
+RTEntry
+SDRAMMachineEdge
 ValidationError
-PacmanAlreadyExistsException
 
 # Python packages
-pacman
 jsonschema
+pacman
 
 # Others' types
 FileIO
@@ -55,13 +57,14 @@ FileIO
 maxsize
 
 # Our special words
-reorderable
 mergable
-sdram
-precompressor
 precompressed
 precompression
-Navaridas
+precompressor
+quicksort
 obj
+reorderable
+sdram
 subobj
+vartype
 xy
