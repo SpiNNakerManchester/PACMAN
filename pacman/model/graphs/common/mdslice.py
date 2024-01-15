@@ -160,7 +160,8 @@ class MDSlice(Slice):
             atoms_shape)
 
     @overrides(Slice.get_relative_indices)
-    def get_relative_indices(self, app_vertex_indices):
+    def get_relative_indices(self, app_vertex_indices: NDArray[numpy.integer]
+                             ) -> NDArray[numpy.integer]:
         n_dims = len(self._atoms_shape)
         remainders = app_vertex_indices
         cum_last_core = 1
@@ -185,11 +186,12 @@ class MDSlice(Slice):
         return rel_index.astype(numpy.uint32)
 
     @overrides(Slice.get_raster_indices)
-    def get_raster_indices(self, relative_indices):
+    def get_raster_indices(self, relative_indices: NDArray[numpy.integer]
+                           ) -> NDArray[numpy.integer]:
         n_dims = len(self._atoms_shape)
         remainders = relative_indices
         cum_last_size = 1
-        global_index = numpy.zeros(len(relative_indices))
+        global_index = numpy.zeros(len(relative_indices), dtype=int)
         for n in range(n_dims):
             # Work out the local index in this dimension
             local_index_d = remainders % self._shape[n]
