@@ -49,7 +49,7 @@ class ConstantSDRAMMachinePartition(
         self._sdram_base_address: Optional[int] = None
 
     @overrides(AbstractSingleSourcePartition.add_edge)
-    def add_edge(self, edge):
+    def add_edge(self, edge: E):
         if self._sdram_size is None:
             self._sdram_size = edge.sdram_size
         elif self._sdram_size != edge.sdram_size:

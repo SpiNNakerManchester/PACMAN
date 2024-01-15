@@ -14,7 +14,7 @@
 
 import math
 import numpy
-from typing import Optional, Union
+from typing import Optional, TextIO, Union
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from .abstract_sdram import AbstractSDRAM
@@ -87,7 +87,8 @@ class VariableSDRAM(AbstractSDRAM):
             other.per_timestep - self._per_timestep_sdram)
 
     @overrides(AbstractSDRAM.report)
-    def report(self, timesteps, indent="", preamble="", target=None):
+    def report(self, timesteps: Optional[int], indent: str = "",
+               preamble: str = "", target: Optional[TextIO] = None):
         print(indent, preamble,
               f"Fixed {self._fixed_sdram} bytes "
               f"Per_timestep {self._per_timestep_sdram} bytes "

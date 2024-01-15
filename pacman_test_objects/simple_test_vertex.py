@@ -14,12 +14,14 @@
 
 """ test vertex used in many unit tests
 """
+from  typing import Optional
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
     LegacyPartitionerAPI)
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.resources import ConstantSDRAM
+from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 
 
 class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
@@ -38,7 +40,7 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
         self._fixed_sdram_value = fixed_sdram_value
 
     @overrides(LegacyPartitionerAPI.get_sdram_used_by_atoms)
-    def get_sdram_used_by_atoms(self, vertex_slice):
+    def get_sdram_used_by_atoms(self, vertex_slice: Slice) -> ConstantSDRAM:
         return ConstantSDRAM(self.get_sdram_usage_for_atoms(vertex_slice))
 
     def get_sdram_usage_for_atoms(self, vertex_slice):
@@ -51,10 +53,12 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
         return self._fixed_sdram_value
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
-    def create_machine_vertex(self, vertex_slice, sdram, label=None):
+    def create_machine_vertex(
+            self, vertex_slice: Slice, sdram: AbstractSDRAM,
+            label: Optional[str] = None) -> SimpleMachineVertex:
         return SimpleMachineVertex(sdram, label, self, vertex_slice)
 
     @property
     @overrides(ApplicationVertex.n_atoms)
-    def n_atoms(self):
+    def n_atoms(self) -> int:
         return self._n_atoms

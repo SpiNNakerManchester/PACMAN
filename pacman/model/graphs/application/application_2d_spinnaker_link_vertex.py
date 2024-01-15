@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
+from typing import Optional, Tuple
 from spinn_utilities.overrides import overrides
 from .application_spinnaker_link_vertex import ApplicationSpiNNakerLinkVertex
 from pacman.model.graphs.application.abstract import Abstract2DDeviceVertex
@@ -88,7 +88,7 @@ class Application2DSpiNNakerLinkVertex(
 
     @property
     @overrides(ApplicationSpiNNakerLinkVertex.atoms_shape)
-    def atoms_shape(self):
+    def atoms_shape(self) -> Tuple[int, ...]:
         return (self.__width, self.__height)
 
     @overrides(ApplicationSpiNNakerLinkVertex.get_incoming_slice)

@@ -51,7 +51,7 @@ class MachineEdge(AbstractEdge[_MV]):
 
     @property
     @overrides(AbstractEdge.label)
-    def label(self):
+    def label(self) -> Optional[str]:
         return self._label
 
     @property

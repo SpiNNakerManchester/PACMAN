@@ -15,7 +15,7 @@ from __future__ import annotations
 from enum import Enum
 import math
 import numpy
-from typing import Dict, Union
+from typing import Dict, Optional, TextIO, Union
 from typing_extensions import TypeAlias
 from spinn_utilities.overrides import overrides
 from .abstract_sdram import AbstractSDRAM
@@ -132,7 +132,8 @@ class MultiRegionSDRAM(VariableSDRAM):
                 self.__regions[region] = other.regions[region]
 
     @overrides(AbstractSDRAM.report)
-    def report(self, timesteps, indent="", preamble="", target=None):
+    def report(self, timesteps: Optional[int], indent: str = "",
+               preamble: str = "", target: Optional[TextIO] = None):
         super().report(timesteps, indent, preamble, target)
         for region in self.__regions:
             self.__regions[region].report(

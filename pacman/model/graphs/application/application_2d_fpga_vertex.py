@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from spinn_utilities.overrides import overrides
 from .application_fpga_vertex import ApplicationFPGAVertex
 from pacman.model.graphs.application.abstract import Abstract2DDeviceVertex
@@ -90,7 +90,7 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
 
     @property
     @overrides(ApplicationFPGAVertex.atoms_shape)
-    def atoms_shape(self):
+    def atoms_shape(self) -> Tuple[int, ...]:
         return (self.__width, self.__height)
 
     @overrides(ApplicationFPGAVertex.get_incoming_slice_for_link)
