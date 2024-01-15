@@ -205,7 +205,8 @@ class Slice(object):
         hi_atom = int(parts[1])
         return Slice(lo_atom, hi_atom)
 
-    def get_relative_indices(self, app_vertex_indices):
+    def get_relative_indices(self, app_vertex_indices: NDArray[numpy.integer]
+                             ) -> NDArray[numpy.integer]:
         """
         Convert from raster indices to slice-level indices.
 
@@ -218,7 +219,8 @@ class Slice(object):
         """
         return app_vertex_indices - self._lo_atom
 
-    def get_raster_indices(self, relative_indices):
+    def get_raster_indices(self, relative_indices: NDArray[numpy.integer]
+                           ) -> NDArray[numpy.integer]:
         """
         Convert from slice-level indices to raster indices.
 

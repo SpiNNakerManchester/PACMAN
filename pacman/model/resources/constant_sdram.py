@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional, TextIO
 from spinn_utilities.overrides import overrides
 from .abstract_sdram import AbstractSDRAM
 
@@ -35,7 +36,7 @@ class ConstantSDRAM(AbstractSDRAM):
         self._sdram = int(sdram)
 
     @overrides(AbstractSDRAM.get_total_sdram)
-    def get_total_sdram(self, n_timesteps) -> int:  # @UnusedVariable
+    def get_total_sdram(self, n_timesteps: Optional[int]) -> int:
         return self._sdram
 
     @property
@@ -65,7 +66,7 @@ class ConstantSDRAM(AbstractSDRAM):
             return other.sub_from(self)
 
     @overrides(AbstractSDRAM.sub_from)
-    def sub_from(self, other):
+    def sub_from(self, other: AbstractSDRAM) -> AbstractSDRAM:
         if isinstance(other, ConstantSDRAM):
             return ConstantSDRAM(
                 other.fixed - self._sdram)
@@ -74,5 +75,6 @@ class ConstantSDRAM(AbstractSDRAM):
             return other - self
 
     @overrides(AbstractSDRAM.report)
-    def report(self, timesteps, indent="", preamble="", target=None):
+    def report(self, timesteps: Optional[int], indent: str = "",
+               preamble: str = "", target: Optional[TextIO] = None):
         print(indent, preamble, f"Constant {self._sdram} bytes", file=target)
