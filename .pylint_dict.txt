@@ -17,29 +17,15 @@ Navaridas
 NER
 
 # Our types
-AbstractEdge
 AbstractEdgePartition
-AbstractMulticastRoutingTable
-AbstractSDRAM
 AbstractSDRAMPartition
 AbstractSingleSourcePartition
-AbstractVertex
-ApplicationEdge
-ApplicationEdgePartition
-ApplicationVertex
 BaseKeyAndMask
 ChipAndCore
-FPGAConnection
-IPTag
-IPtagResource
-MachineEdge
-MachineVertex
 MulticastEdgePartition
-MulticastRoutingTable
 PacmanAlreadyExistsException
 PlacementTuple
 ReverseIPtagResource
-RoutingTableEntry
 RoutingInfo
 RoutingTree
 RTEntry
@@ -48,10 +34,6 @@ ValidationError
 
 # Python packages
 jsonschema
-pacman
-
-# Others' types
-FileIO
 
 # Python bits
 maxsize
@@ -64,7 +46,6 @@ precompressor
 quicksort
 obj
 reorderable
-sdram
 subobj
 vartype
-xy
+
