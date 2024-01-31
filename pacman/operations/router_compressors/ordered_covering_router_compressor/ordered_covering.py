@@ -33,6 +33,7 @@ _Aliases: TypeAlias = Dict[_KeyMask, FrozenSet[_KeyMask]]
 _ROAliases: TypeAlias = Mapping[_KeyMask, FrozenSet[_KeyMask]]
 #: Sequence of all bit positions in a 32-bit word
 _all_bits = tuple(1 << i for i in range(32))
+# pylint: disable=wrong-spelling-in-comment
 
 
 def ordered_covering_compressor() -> MulticastRoutingTables:

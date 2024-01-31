@@ -38,6 +38,7 @@ infinity = float("inf")
 BW_PER_ROUTE_ENTRY = 0.01
 #: Maximum bandwidth of a link.
 MAX_BW = 250
+# pylint: disable=wrong-spelling-in-comment
 
 
 class _NodeInfo(object):

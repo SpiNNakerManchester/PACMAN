@@ -46,6 +46,7 @@ from pacman.model.graphs.machine import MachineVertex
 _Vec: TypeAlias = Tuple[int, int, int]
 _V2N: TypeAlias = Callable[[_Vec, XY], List[Tuple[int, XY]]]
 _Inf: Final = float("inf")
+# pylint: disable=wrong-spelling-in-comment
 
 
 def _ner_net(src: XY, destinations: Iterable[XY],

@@ -60,7 +60,7 @@ def get_app_partitions() -> List[ApplicationEdgePartition]:
             continue
         internal_partitions = v.splitter.get_internal_multicast_partitions()
         if v not in sources and internal_partitions:
-            # Use dict.fromkeys to guarantee order
+            # guarantee order
             for identifier in dict.fromkeys(
                     p.identifier for p in internal_partitions):
                 # Add a partition with no edges to identify this as internal
@@ -127,7 +127,7 @@ def avoid_dead_links(root: RoutingTree) -> RoutingTree:
                 # new RoutingTree for the segment.
                 new_node = RoutingTree((x, y))
                 # A* will not traverse anything but chips in this tree so this
-                # assert is meerly a sanity check that this occurred correctly.
+                # assert is a sanity check that this occurred correctly.
                 assert (x, y) not in lookup, "Cycle created."
                 lookup[(x, y)] = new_node
             else:
@@ -291,7 +291,7 @@ def a_star(sink: XY, heuristic_source: XY,
 
         # Try all neighbouring locations.
         for neighbour_link in range(6):  # Router.MAX_LINKS_PER_ROUTER
-            # Note: link identifiers arefrom the perspective of the neighbour,
+            # Note: link identifiers are from the perspective of the neighbour,
             # not the current node!
             neighbour = machine.xy_over_link(
                 #                  Same as Router.opposite

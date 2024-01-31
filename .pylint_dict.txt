@@ -39,6 +39,7 @@ jsonschema
 maxsize
 
 # Our special words
+heapq
 mergable
 precompressed
 precompression
@@ -47,5 +48,6 @@ quicksort
 obj
 reorderable
 subobj
+unmergeable
 vartype
 

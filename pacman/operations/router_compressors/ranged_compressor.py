@@ -67,7 +67,7 @@ class RangeCompressor(object):
     """
     # pylint: disable=attribute-defined-outside-init
     __slots__ = (
-        # Router table to add merged rutes into
+        # Router table to add merged routes into
         "_compressed",
         # List of entries to be merged
         "_entries")

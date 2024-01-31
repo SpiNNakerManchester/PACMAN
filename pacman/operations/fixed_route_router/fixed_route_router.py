@@ -95,7 +95,7 @@ class _FixedRouteRouter(object):
             for x, y in to_route:
                 # Check links starting with the most direct to 0,0
                 for link_id in [4, 3, 5, 2, 0, 1]:
-                    # Get protential destination
+                    # Get potential destination
                     destination = self._machine.xy_over_link(x, y, link_id)
                     # If it is useful
                     if destination in routed:
@@ -110,11 +110,12 @@ class _FixedRouteRouter(object):
                 raise PacmanRoutingException(
                     "Unable to do fixed point routing "
                     f"on {ethernet_chip.ip_address}.")
-            to_route -= found
+            to_route -= fou
+            nd
             routed |= found
 
         # create final fixed route entry
-        # locate where to put data on ethernet chip
+        # locate where to put data on Ethernet chip
         processor_id = self.__locate_destination(ethernet_chip)
         # build entry and add to tables
         self.__add_fixed_route_entry((eth_x, eth_y), [], [processor_id])
