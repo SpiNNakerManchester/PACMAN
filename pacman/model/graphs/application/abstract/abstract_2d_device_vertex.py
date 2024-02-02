@@ -150,7 +150,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         Get the key and mask of the given machine vertex index.
 
-        :param int base_key: The unshifted key to use
+        :param int base_key: The key to use (not shifted)
         :param int index: The machine vertex index
         :rtype: BaseKeyAndMask
         """

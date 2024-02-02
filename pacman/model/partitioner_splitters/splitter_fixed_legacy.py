@@ -80,7 +80,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter):
         app_vertex = self.governed_app_vertex
-        # The typer needs to know the vertex implements LegacyPartitionerAPI
+        # The mypy needs to know the vertex implements LegacyPartitionerAPI
         # We know is does because we checked when setting
         lp = cast(LegacyPartitionerAPI, app_vertex)
 

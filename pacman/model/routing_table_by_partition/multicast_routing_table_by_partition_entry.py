@@ -40,6 +40,7 @@ class MulticastRoutingTableByPartitionEntry(object):
     """
 
     __slots__ = (
+        # pylint: disable=wrong-spelling-in-comment
         # Entry made up of bits as follows:
         # | IL = 6 bits | IP = 1 bit | OL = 6 bits | OP = 18 bits |
         # IL = incoming link id

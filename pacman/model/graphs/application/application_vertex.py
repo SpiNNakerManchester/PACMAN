@@ -41,7 +41,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
     """
 
     __slots__ = (
-        # List of machine verts associated with this app vertex
+        # List of machine vertices associated with this app vertex
         "_machine_vertices",
 
         # The splitter object associated with this app vertex
