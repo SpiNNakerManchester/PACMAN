@@ -50,6 +50,11 @@ class ChipCounter(object):
         self.__n_chips = 0
 
     def add_core(self, resources: AbstractSDRAM):
+        """
+        Adds a core (or if needed a Chip) to the count
+
+        :param AbstractSDRAM resources:
+        """
         sdram = resources.get_total_sdram(
             PacmanDataView.get_plan_n_timestep())
         if self.__cores_free == 0 or self.__sdram_free < sdram:

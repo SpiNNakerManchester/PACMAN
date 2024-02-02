@@ -62,6 +62,11 @@ class RoutingTree(object):
 
     @property
     def label(self) -> Optional[str]:
+        """
+        The label value provided to the init (if applicable).
+
+        :rtype: str or None
+        """
         return self._label
 
     @property
@@ -121,6 +126,10 @@ class RoutingTree(object):
 
     @property
     def is_leaf(self) -> bool:
+        """
+        Detect if this is a leaf node. IE has no children.
+        :return:
+        """
         return not self._children
 
     def __iter__(self) -> Iterator[Union[RoutingTree, MachineVertex]]:

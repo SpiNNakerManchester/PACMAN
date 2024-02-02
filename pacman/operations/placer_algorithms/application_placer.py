@@ -477,6 +477,9 @@ class _Spaces(object):
         self.__saved_chips.update(chips)
 
     def restore_chips(self) -> None:
+        """
+        Moves all the saved chips form used to restored
+        """
         for chip in self.__saved_chips:
             self.__used_chips.remove(chip)
             self.__restored_chips.add(chip)
@@ -540,6 +543,12 @@ class _ChipWithSpace(object):
 
     def __init__(
             self, chip: Chip, used_processors: Set[int], used_sdram: int):
+        """
+
+        :param Chip chip:
+        :param set(int) used_processors:
+        :param int used_sdram:
+        """
         self.chip = chip
         self.cores = set(p.processor_id for p in chip.processors
                          if not p.is_monitor)
@@ -548,19 +557,45 @@ class _ChipWithSpace(object):
 
     @property
     def x(self) -> int:
-        return self.chip.x
+        """
+        The x value of the Chip passed in at init time
+
+        :rtype: int
+        """
 
     @property
     def y(self) -> int:
+        """
+        The y value of the Chip passed in at init time
+
+        :rtype: int
+        """
         return self.chip.y
 
     def is_space(self, n_cores: int, sdram: int) -> bool:
+        """
+        CHecks if there is space based on both cores and sdram
+
+        :param int n_cores:
+        :param int sdram:
+        :rtype: bool
+        """
         return len(self.cores) >= n_cores and self.sdram >= sdram
 
     def use_sdram(self, sdram: int):
+        """
+        Reduces available sdram by this amount
+
+        :param int sdram:
+        """
         self.sdram -= sdram
 
     def use_next_core(self) -> int:
+        """
+        Pops a core value
+
+        :rtype: int
+        """
         core = next(iter(self.cores))
         self.cores.remove(core)
         return core

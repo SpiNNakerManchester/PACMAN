@@ -80,6 +80,12 @@ class ApplicationGraph(object):
         return self._vertex_by_label.values()
 
     def vertex_by_label(self, label: str) -> ApplicationVertex:
+        """
+        Looks up a vertex in the graph based on the label
+
+        :param str label:
+        :rtype: ApplicationVertex
+        """
         return self._vertex_by_label[label]
 
     @property

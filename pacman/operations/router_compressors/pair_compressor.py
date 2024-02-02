@@ -519,4 +519,9 @@ class _PairCompressor(AbstractCompressor):
 
     @property
     def ordered(self) -> bool:
+        """
+        The ordered value passed into the init
+
+        :rtype: bool
+        """
         return self._ordered

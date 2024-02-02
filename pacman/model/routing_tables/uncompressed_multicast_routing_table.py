@@ -152,6 +152,12 @@ def _from_csv_file(
 
 
 def from_csv(file_name: str) -> UnCompressedMulticastRoutingTable:
+    """
+    Reads a comma separated file into Routing Tables
+
+    :param str file_name:
+    :rtype: UnCompressedMulticastRoutingTable:
+    """
     if file_name.endswith(".gz"):
         with gzip.open(file_name, mode="rt", newline='') as csvfile:
             return _from_csv_file(csvfile)

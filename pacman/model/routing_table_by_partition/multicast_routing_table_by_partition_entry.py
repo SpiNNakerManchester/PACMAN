@@ -264,10 +264,21 @@ class MulticastRoutingTableByPartitionEntry(object):
 
     def has_same_route(
             self, entry: MulticastRoutingTableByPartitionEntry) -> bool:
+        """
+        Checks if the two Entries have the same routes after applying mask
+
+        :param  MulticastRoutingTableByPartitionEntry entry:
+        :rtype: bool
+        """
         # pylint:disable=protected-access
         return ((self._links_and_procs & _COMPARE_MASK) ==
                 (entry._links_and_procs & _COMPARE_MASK))
 
     @property
     def spinnaker_route(self) -> int:
+        """
+        The masked routes
+
+        :rtype: int
+        """
         return self._links_and_procs & _SPINNAKER_ROUTE_MASK
