@@ -125,6 +125,7 @@ def place_application_graph(system_placements: Placements) -> Placements:
                 chips_attempted.clear()
 
     if get_config_bool("Reports", "draw_placements"):
+        # pylint: disable=import-outside-toplevel
         from .draw_placements import draw_placements as dp
         dp(placements, system_placements)
 
@@ -212,6 +213,7 @@ def _place_error(
                         " free cores)\n")
 
     if get_config_bool("Reports", "draw_placements_on_error"):
+        # pylint: disable=import-outside-toplevel
         from .draw_placements import draw_placements as dp
         dp(placements, system_placements)
 
