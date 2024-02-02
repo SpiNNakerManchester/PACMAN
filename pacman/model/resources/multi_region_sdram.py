@@ -14,13 +14,17 @@
 from __future__ import annotations
 from enum import Enum
 import math
-import numpy
 from typing import Dict, Optional, TextIO, Union
+
+import numpy
 from typing_extensions import TypeAlias
+
 from spinn_utilities.overrides import overrides
+
 from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
 from .variable_sdram import VariableSDRAM
+
 _RegionKey: TypeAlias = Union[int, str, Enum]
 _Value: TypeAlias = Union[int, float, numpy.integer, numpy.floating]
 

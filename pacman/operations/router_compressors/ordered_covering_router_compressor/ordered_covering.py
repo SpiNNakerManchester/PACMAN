@@ -15,16 +15,22 @@ from __future__ import annotations
 from typing import (
     Collection, Dict, FrozenSet, Iterable, List, Mapping, Optional, Set, Tuple,
     Union, cast)
+
+
 from typing_extensions import TypeAlias
+
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.timer import Timer
+
 from pacman.exceptions import MinimisationFailedError
 from pacman.utilities.constants import FULL_MASK
 from pacman.model.routing_tables import UnCompressedMulticastRoutingTable
 from pacman.operations.router_compressors import (AbstractCompressor, RTEntry)
-from .utils import intersect, remove_default_routes
 from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.data.pacman_data_view import PacmanDataView
+
+from .utils import intersect, remove_default_routes
+
 #: A key,mask pair
 _KeyMask: TypeAlias = Tuple[int, int]
 #: A mapping from a key,mask pair to the things it aliases

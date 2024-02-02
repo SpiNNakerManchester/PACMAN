@@ -13,8 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from .vertex_routing_info import VertexRoutingInfo
 from spinn_utilities.overrides import overrides
+from .vertex_routing_info import VertexRoutingInfo
 if TYPE_CHECKING:
     from .base_key_and_mask import BaseKeyAndMask
     from pacman.model.graphs.machine import MachineVertex

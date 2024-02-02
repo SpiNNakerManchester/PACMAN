@@ -16,13 +16,16 @@ import json
 import gzip
 from typing import (
     Collection, Dict, Iterable, Iterator, Optional, Union, cast)
+
 from spinn_utilities.typing.coords import XY
 from spinn_utilities.typing.json import JsonObjectArray
+from spinn_machine import MulticastRoutingEntry
+
 from pacman.exceptions import PacmanAlreadyExistsException
+
 from .abstract_multicast_routing_table import AbstractMulticastRoutingTable
 from .uncompressed_multicast_routing_table import (
     UnCompressedMulticastRoutingTable)
-from spinn_machine import MulticastRoutingEntry
 
 
 class MulticastRoutingTables(object):

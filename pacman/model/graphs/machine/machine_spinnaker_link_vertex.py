@@ -13,10 +13,13 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import List, Optional, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+
+from pacman.model.graphs import AbstractVirtual
 from pacman.model.resources import ConstantSDRAM
 from .machine_vertex import MachineVertex
-from pacman.model.graphs import AbstractVirtual
+
 if TYPE_CHECKING:
     from spinn_utilities.typing.coords import XY
     from spinn_machine import Machine

@@ -11,13 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from collections import deque, defaultdict
 import heapq
 import itertools
 from typing import Deque, Dict, Iterable, List, Optional, Set, Tuple
+
 from spinn_utilities.typing.coords import XY
-from .routing_tree import RoutingTree
 from spinn_machine import Machine, Chip
+
 from pacman.data import PacmanDataView
 from pacman.exceptions import MachineHasDisconnectedSubRegion
 from pacman.model.routing_table_by_partition import (
@@ -27,6 +29,8 @@ from pacman.model.graphs import AbstractVertex, AbstractVirtual
 from pacman.model.graphs.application import (
     ApplicationEdgePartition, ApplicationVertex)
 from pacman.model.graphs.machine import MachineVertex
+
+from .routing_tree import RoutingTree
 
 
 def get_app_partitions() -> List[ApplicationEdgePartition]:

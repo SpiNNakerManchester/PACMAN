@@ -14,12 +14,14 @@
 from __future__ import annotations
 from collections import defaultdict
 from typing import Dict, Iterable, Optional, Sequence, cast
-from .application_edge import ApplicationEdge
-from .application_vertex import ApplicationVertex
-from .application_edge_partition import ApplicationEdgePartition
+
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
+
+from .application_edge import ApplicationEdge
+from .application_edge_partition import ApplicationEdgePartition
+from .application_vertex import ApplicationVertex
 
 
 class ApplicationGraph(object):
