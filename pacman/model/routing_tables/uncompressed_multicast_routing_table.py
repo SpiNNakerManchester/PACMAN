@@ -16,11 +16,12 @@ import csv
 import gzip
 import logging
 from typing import Any, Collection, Dict, Iterable
+
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
 from spinn_machine import MulticastRoutingEntry
 from pacman.exceptions import PacmanAlreadyExistsException
 from pacman.model.routing_tables import AbstractMulticastRoutingTable
-from spinn_utilities.overrides import overrides
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
