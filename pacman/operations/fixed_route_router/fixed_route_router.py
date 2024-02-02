@@ -110,8 +110,7 @@ class _FixedRouteRouter(object):
                 raise PacmanRoutingException(
                     "Unable to do fixed point routing "
                     f"on {ethernet_chip.ip_address}.")
-            to_route -= fou
-            nd
+            to_route -= found
             routed |= found
 
         # create final fixed route entry
