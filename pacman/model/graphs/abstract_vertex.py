@@ -62,7 +62,7 @@ class AbstractVertex(object):
                 "As Labels are also IDs they can not be changed.")
         self._label = label
 
-    def setAddedToGraph(self) -> None:
+    def set_added_to_graph(self) -> None:
         """
         Records that the vertex has been added to a graph.
 

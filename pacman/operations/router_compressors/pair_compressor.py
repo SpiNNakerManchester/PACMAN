@@ -430,7 +430,7 @@ class _PairCompressor(AbstractCompressor):
 
         for entry in router_table.multicast_routing_entries:
             self._all_entries.append(
-                RTEntry.from_MulticastRoutingEntry(entry))
+                RTEntry.from_multicast_routing_entry(entry))
             self._update_frequency(entry)
 
         if self._c_sort:

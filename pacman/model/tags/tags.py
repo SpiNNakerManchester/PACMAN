@@ -77,7 +77,7 @@ class Tags(object):
         if (ip_tag.board_address, ip_tag.tag) in self._ip_tags:
             existing_tag = self._ip_tags[ip_tag.board_address, ip_tag.tag]
             if (existing_tag.ip_address != ip_tag.ip_address or
-                    not utility_calls.is_equal_or_None(
+                    not utility_calls.is_equal_or_none(
                         existing_tag.port, ip_tag.port) or
                     existing_tag.strip_sdp != ip_tag.strip_sdp):
                 raise PacmanInvalidParameterException(

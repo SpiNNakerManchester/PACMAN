@@ -88,7 +88,7 @@ class _OrderedCoveringCompressor(AbstractCompressor):
             target_length = chip.router.n_available_multicast_entries
         # Convert into a list of entries
         routing_table = list(map(
-            RTEntry.from_MulticastRoutingEntry,
+            RTEntry.from_multicast_routing_entry,
             router_table.multicast_routing_entries))
         # Compress the router entries
         table, _ = ordered_covering(

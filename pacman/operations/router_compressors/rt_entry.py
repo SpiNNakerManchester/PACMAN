@@ -58,7 +58,7 @@ class RTEntry(object):
                 self.spinnaker_route == other.spinnaker_route)
 
     @staticmethod
-    def from_MulticastRoutingEntry(source: MulticastRoutingEntry) -> RTEntry:
+    def from_multicast_routing_entry(source: MulticastRoutingEntry) -> RTEntry:
         """
         :param ~spinn_machine.MulticastRoutingEntry source:
         :rtype: RTEntry
@@ -69,7 +69,7 @@ class RTEntry(object):
             source._routing_entry_key, source._mask, source._defaultable,
             source._spinnaker_route)
 
-    def to_MulticastRoutingEntry(self) -> MulticastRoutingEntry:
+    def to_multicast_routing_entry(self) -> MulticastRoutingEntry:
         """
         :rtype: ~spinn_machine.MulticastRoutingEntry
         """

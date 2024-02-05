@@ -69,7 +69,7 @@ class ApplicationGraph(object):
             if self._vertex_by_label[vertex.label] == vertex:
                 raise PacmanAlreadyExistsException("vertex", vertex.label)
             vertex.set_label(vertex.label + self._label_postfix())
-        vertex.setAddedToGraph()
+        vertex.set_added_to_graph()
         self._vertex_by_label[cast(str, vertex.label)] = vertex
 
     @property
