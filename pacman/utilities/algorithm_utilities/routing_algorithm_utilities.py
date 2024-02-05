@@ -269,6 +269,7 @@ def a_star(sink: XY, heuristic_source: XY,
     """
     machine = PacmanDataView.get_machine()
     # Select the heuristic function to use for distances
+    # pylint: disable=unnecessary-lambda-assignment
     heuristic = (lambda the_node: machine.get_vector_length(
         the_node, heuristic_source))
 
