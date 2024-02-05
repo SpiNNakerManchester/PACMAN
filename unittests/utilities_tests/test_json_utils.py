@@ -14,9 +14,11 @@
 import unittest
 import json
 from pacman.config_setup import unittest_setup
+from pacman.model.placements import Placement
 from pacman.model.resources import (
     ConstantSDRAM, IPtagResource, ReverseIPtagResource)
-from pacman.utilities.json_utils import (vertex_to_json, vertex_from_json)
+from pacman.utilities.json_utils import (
+    placement_from_json, placement_to_json, vertex_to_json, vertex_from_json)
 from pacman.model.graphs.machine import SimpleMachineVertex
 
 
@@ -47,6 +49,12 @@ class TestJsonUtils(unittest.TestCase):
         self.assertEqual(v1.sdram_required, v2.sdram_required)
         seen.append(v1.label)
 
+    def _compare_placement(self, p1, p2, seen=None):
+        self.assertEqual(p1.x, p2.x)
+        self.assertEqual(p1.y, p2.y)
+        self.assertEqual(p1.p, p2.p)
+        self.assertEqual(p1.vertex.label, p2.vertex.label)
+
     # ------------------------------------------------------------------
     # Composite JSON round-trip testing schemes
     # ------------------------------------------------------------------
@@ -57,6 +65,13 @@ class TestJsonUtils(unittest.TestCase):
         j_object2 = json.loads(j_str)
         back = vertex_from_json(j_object2)
         self._compare_vertex(there, back)
+
+    def placement_there_and_back(self, there):
+        j_object = placement_to_json(there)
+        j_str = json.dumps(j_object)
+        j_object2 = json.loads(j_str)
+        back = placement_from_json(j_object2)
+        self._compare_placement(there, back)
 
     # ------------------------------------------------------------------
     # Test cases
@@ -69,3 +84,12 @@ class TestJsonUtils(unittest.TestCase):
             reverse_iptags=[ReverseIPtagResource(port=25, sdp_port=2, tag=5)],
             label="Vertex")
         self.vertex_there_and_back(s1)
+
+    def test_placement(self):
+        s1 = SimpleMachineVertex(
+            sdram=ConstantSDRAM(0),
+            iptags=[IPtagResource("127.0.0.1", port=None, strip_sdp=True)],
+            reverse_iptags=[ReverseIPtagResource(port=25, sdp_port=2, tag=5)],
+            label="PVertex")
+        p1 = Placement(s1, 1, 2, 3)
+        self.placement_there_and_back(p1)
