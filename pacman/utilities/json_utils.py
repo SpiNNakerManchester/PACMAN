@@ -17,7 +17,7 @@ Miscellaneous minor functions for converting between JSON and Python objects.
 
 import json
 import gzip
-from typing import cast, List, Union
+from typing import cast, Iterable, List, Union
 
 from spinn_utilities.typing.json import JsonArray, JsonObject
 
@@ -98,7 +98,7 @@ def iptag_resource_from_json(json_dict: JsonObject) -> IPtagResource:
         cast(str, json_dict["traffic_identifier"]))
 
 
-def iptag_resources_to_json(iptags: List[IPtagResource]) -> JsonArray:
+def iptag_resources_to_json(iptags: Iterable[IPtagResource]) -> JsonArray:
     """
     Converts a list of iptags to json.
 
@@ -157,7 +157,7 @@ def reverse_iptag_from_json(json_dict: JsonObject) -> ReverseIPtagResource:
     return ReverseIPtagResource(port, sdp_port, tag)
 
 
-def reverse_iptags_to_json(iptags: List[ReverseIPtagResource]) -> JsonArray:
+def reverse_iptags_to_json(iptags: Iterable[ReverseIPtagResource]) -> JsonArray:
     """
     Converts a list of reverse iptags to json
 
@@ -216,8 +216,10 @@ def vertex_from_json(json_dict: JsonObject) -> SimpleMachineVertex:
     sdram = VariableSDRAM(
         cast(int, json_dict["fixed_sdram"]),
         cast(float, json_dict["per_timestep_sdram"]))
-    iptags = iptag_resources_from_json(json_dict["iptags"])
-    reverse_iptags = reverse_iptags_from_json(json_dict["reverse_iptags"])
+    iptags = iptag_resources_from_json(
+        cast(List[JsonObject], json_dict["iptags"]))
+    reverse_iptags = reverse_iptags_from_json(
+        cast(List[JsonObject], json_dict["reverse_iptags"]))
     return SimpleMachineVertex(
         sdram=sdram, label=json_dict["label"], iptags=iptags,
         reverse_iptags=reverse_iptags)
