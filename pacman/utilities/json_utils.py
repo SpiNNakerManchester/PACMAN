@@ -157,7 +157,8 @@ def reverse_iptag_from_json(json_dict: JsonObject) -> ReverseIPtagResource:
     return ReverseIPtagResource(port, sdp_port, tag)
 
 
-def reverse_iptags_to_json(iptags: Iterable[ReverseIPtagResource]) -> JsonArray:
+def reverse_iptags_to_json(
+        iptags: Iterable[ReverseIPtagResource]) -> JsonArray:
     """
     Converts a list of reverse iptags to json
 
