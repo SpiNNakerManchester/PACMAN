@@ -17,13 +17,11 @@ Miscellaneous minor functions for converting between JSON and Python objects.
 
 import json
 import gzip
-from typing import List, Optional, Union
+from typing import cast, Iterable, List, Union
 
 from spinn_utilities.typing.json import JsonArray, JsonObject
 
 from pacman.data import PacmanDataView
-from pacman.model.graphs.application import (
-    ApplicationGraph, ApplicationVertex)
 from pacman.model.graphs.machine import MachineVertex, SimpleMachineVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.resources import (
@@ -94,14 +92,13 @@ def iptag_resource_from_json(json_dict: JsonObject) -> IPtagResource:
     :param dict(str, object) json_dict:
     :rtype: IPtagResource
     """
-    port = json_dict.get("port")
-    tag = json_dict.get("tag")
     return IPtagResource(
-        json_dict["ip_address"], port, json_dict["strip_sdp"], tag,
-        json_dict["traffic_identifier"])
+        cast(str, json_dict["ip_address"]), cast(int, json_dict.get("port")),
+        cast(bool, json_dict["strip_sdp"]), cast(int, json_dict.get("tag")),
+        cast(str, json_dict["traffic_identifier"]))
 
 
-def iptag_resources_to_json(iptags: List[IPtagResource]) -> JsonArray:
+def iptag_resources_to_json(iptags: Iterable[IPtagResource]) -> JsonArray:
     """
     Converts a list of iptags to json.
 
@@ -114,7 +111,8 @@ def iptag_resources_to_json(iptags: List[IPtagResource]) -> JsonArray:
     return json_list
 
 
-def iptag_resources_from_json(json_list: JsonArray) -> List[IPtagResource]:
+def iptag_resources_from_json(
+        json_list: List[JsonObject]) -> List[IPtagResource]:
     """
     Creates a list of iptags from json.
 
@@ -153,13 +151,14 @@ def reverse_iptag_from_json(json_dict: JsonObject) -> ReverseIPtagResource:
     :param dict(str, object) json_dict:
     :rtype: ReverseIPtagResource
     """
-    port = json_dict.get("port")
-    sdp_port = json_dict["sdp_port"]
-    tag = json_dict.get("tag")
+    port = cast(int, json_dict.get("port"))
+    sdp_port = cast(int, json_dict["sdp_port"])
+    tag = cast(int, json_dict.get("tag"))
     return ReverseIPtagResource(port, sdp_port, tag)
 
 
-def reverse_iptags_to_json(iptags: List[ReverseIPtagResource]) -> JsonArray:
+def reverse_iptags_to_json(
+        iptags: Iterable[ReverseIPtagResource]) -> JsonArray:
     """
     Converts a list of reverse iptags to json
 
@@ -173,7 +172,7 @@ def reverse_iptags_to_json(iptags: List[ReverseIPtagResource]) -> JsonArray:
 
 
 def reverse_iptags_from_json(
-        json_list: JsonArray) -> List[ReverseIPtagResource]:
+        json_list: List[JsonObject]) -> List[ReverseIPtagResource]:
     """
     Creates a list of ReverseIPtagResource from json
 
@@ -216,27 +215,15 @@ def vertex_from_json(json_dict: JsonObject) -> SimpleMachineVertex:
     :rtype:  SimpleMachineVertex
     """
     sdram = VariableSDRAM(
-        json_dict["fixed_sdram"], json_dict["per_timestep_sdram"])
-    iptags = iptag_resources_from_json(json_dict["iptags"])
-    reverse_iptags = reverse_iptags_from_json(json_dict["reverse_iptags"])
+        cast(int, json_dict["fixed_sdram"]),
+        cast(float, json_dict["per_timestep_sdram"]))
+    iptags = iptag_resources_from_json(
+        cast(List[JsonObject], json_dict["iptags"]))
+    reverse_iptags = reverse_iptags_from_json(
+        cast(List[JsonObject], json_dict["reverse_iptags"]))
     return SimpleMachineVertex(
         sdram=sdram, label=json_dict["label"], iptags=iptags,
         reverse_iptags=reverse_iptags)
-
-
-def vertex_lookup(
-        label, graph: Optional[ApplicationGraph] = None) -> ApplicationVertex:
-    """
-    Looks up the vertex in the graph or create a simple vertex if no graph
-
-    :param str label:
-    :param graph: ApplicationGraph if applicable
-    :type graph: ApplicationGraph or None
-    :rtype: ApplicationVertex
-    """
-    if graph:
-        return graph.vertex_by_label(label)
-    return SimpleMachineVertex(None, label)
 
 
 def placement_to_json(placement: Placement) -> JsonObject:
@@ -267,16 +254,15 @@ def placements_to_json() -> JsonArray:
     return json_list
 
 
-def placement_from_json(json_dict: JsonObject,
-                        graph: Optional[ApplicationGraph] = None) -> Placement:
+def placement_from_json(json_dict: JsonObject) -> Placement:
     """
     Gets a Placement based on the json.
 
     :param dict(str, object) json_dict:
-    :param graph: Application Graph (if used)
-    :type graph:  ApplicationGraph or None
     :rtype: Placement
     """
-    vertex = vertex_lookup(json_dict["vertex_label"], graph)
+    vertex = SimpleMachineVertex(None, cast(str, json_dict["vertex_label"]))
+    # The cast(int tells mypy to assume the value can be converted to an int
     return Placement(
-        vertex, int(json_dict["x"]), int(json_dict["y"]), int(json_dict["p"]))
+        vertex, int(cast(int, json_dict["x"])),
+        int(cast(int, json_dict["y"])), int(cast(int, json_dict["p"])))
