@@ -127,7 +127,7 @@ class RoutingTree(object):
     @property
     def is_leaf(self) -> bool:
         """
-        Detect if this is a leaf node. IE has no children.
+        Detect if this is a leaf node, which is one with no children.
         :return:
         """
         return not self._children
