@@ -262,5 +262,7 @@ def placement_from_json(json_dict: JsonObject) -> Placement:
     :rtype: Placement
     """
     vertex = SimpleMachineVertex(None, cast(str, json_dict["vertex_label"]))
+    # The cast(int tells mypy to assume the value can be converted to an int
     return Placement(
-        vertex, int(json_dict["x"]), int(json_dict["y"]), int(json_dict["p"]))
+        vertex, int(cast(int, json_dict["x"])),
+        int(cast(int, json_dict["y"])), int(cast(int, json_dict["p"])))
