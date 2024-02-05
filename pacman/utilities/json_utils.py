@@ -17,13 +17,11 @@ Miscellaneous minor functions for converting between JSON and Python objects.
 
 import json
 import gzip
-from typing import cast, List, Optional, Union
+from typing import cast, List, Union
 
 from spinn_utilities.typing.json import JsonArray, JsonObject
 
 from pacman.data import PacmanDataView
-from pacman.model.graphs.application import (
-    ApplicationGraph, ApplicationVertex)
 from pacman.model.graphs.machine import MachineVertex, SimpleMachineVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.resources import (
@@ -258,8 +256,6 @@ def placement_from_json(json_dict: JsonObject) -> Placement:
     Gets a Placement based on the json.
 
     :param dict(str, object) json_dict:
-    :param graph: Application Graph (if used)
-    :type graph:  ApplicationGraph or None
     :rtype: Placement
     """
     vertex = SimpleMachineVertex(None, cast(str, json_dict["vertex_label"]))
