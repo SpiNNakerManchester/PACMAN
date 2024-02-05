@@ -47,7 +47,7 @@ class Spinner:
         :raises ImportError: if on Windows
         """
         # spinner as graphical library so
-        # pylint: disable=import-error
+        # pylint: disable=import-error,import-outside-toplevel
 
         # Depends on Cairo, which is virtually never there on Windows.
         # We could catch the OSError, but that's very noisy in this case
