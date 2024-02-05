@@ -256,11 +256,10 @@ class MulticastRoutingTableByPartitionEntry(object):
         return entry
 
     def __repr__(self) -> str:
-        return "{}:{}:{}:{{{}}}:{{{}}}".format(
-            self.incoming_link, self.incoming_processor,
-            self.defaultable,
-            ", ".join(map(str, self.link_ids)),
-            ", ".join(map(str, self.processor_ids)))
+        return (f"{self.incoming_link}:{self.incoming_processor}:"
+                f"{self.defaultable}:"
+                f"{{{', '.join(map(str, self.link_ids))}}}:"
+                f"{{{', '.join(map(str, self.processor_ids))}}}")
 
     def has_same_route(
             self, entry: MulticastRoutingTableByPartitionEntry) -> bool:

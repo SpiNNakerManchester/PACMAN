@@ -147,10 +147,8 @@ class RoutingTree(object):
                 yield obj
 
     def __repr__(self) -> str:
-        return "<RoutingTree at {} with {} {}>".format(
-            self.chip,
-            len(self._children),
-            "child" if len(self._children) == 1 else "children")
+        return f"<RoutingTree at {self.chip} with {len(self._children)}" \
+               f" {'child' if len(self._children) == 1 else 'children'}>"
 
     def traverse(self) -> Iterable[Tuple[Optional[int], XY, Set[int]]]:
         """
