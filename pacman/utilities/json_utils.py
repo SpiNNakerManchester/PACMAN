@@ -58,7 +58,7 @@ def key_mask_to_json(key_mask: BaseKeyAndMask) -> JsonObject:
     :rtype: dict(str, object)
     """
     try:
-        json_object = dict()
+        json_object: JsonObject = dict()
         json_object["key"] = key_mask.key
         json_object["mask"] = key_mask.mask
     except Exception as ex:  # pylint: disable=broad-except
@@ -73,7 +73,7 @@ def iptag_resource_to_json(iptag: IPtagResource) -> JsonObject:
     :param IPtagResource iptag:
     :rtype: dict(str, object)
     """
-    json_dict = dict()
+    json_dict: JsonObject = dict()
     try:
         json_dict["ip_address"] = iptag.ip_address
         if iptag.port is not None:
@@ -108,7 +108,7 @@ def iptag_resources_to_json(iptags: List[IPtagResource]) -> JsonArray:
     :param list(IPtagResource) iptags:
     :rtype: list
     """
-    json_list = []
+    json_list: JsonArray = []
     for iptag in iptags:
         json_list.append(iptag_resource_to_json(iptag))
     return json_list
@@ -134,7 +134,7 @@ def reverse_iptag_to_json(iptag: ReverseIPtagResource) -> JsonObject:
     :param ReverseIPtagResource iptag:
     :rtype: dict(object)
     """
-    json_dict = dict()
+    json_dict: JsonObject = dict()
     try:
         if iptag.port is not None:
             json_dict["port"] = iptag.port
@@ -166,7 +166,7 @@ def reverse_iptags_to_json(iptags: List[ReverseIPtagResource]) -> JsonArray:
     :param list(ReverseIPtagResource) iptags:
     :rtype: list
     """
-    json_list = []
+    json_list: JsonArray = []
     for iptag in iptags:
         json_list.append(reverse_iptag_to_json(iptag))
     return json_list
@@ -193,7 +193,7 @@ def vertex_to_json(vertex: MachineVertex) -> JsonObject:
     :param MachineVertex vertex:
     :rtype: dict(str, object)
     """
-    json_dict = dict()
+    json_dict: JsonObject = dict()
     try:
         json_dict["class"] = vertex.__class__.__name__
         json_dict["label"] = vertex.label
@@ -246,7 +246,7 @@ def placement_to_json(placement: Placement) -> JsonObject:
     :param Placement placement:
     :rtype: dict(str, object)
     """
-    json_dict = dict()
+    json_dict: JsonObject = dict()
     try:
         json_dict["vertex_label"] = placement.vertex.label
         json_dict["x"] = placement.x
@@ -261,7 +261,7 @@ def placements_to_json() -> JsonArray:
     """
     Gets a json description of the placements (held in DataView)
     """
-    json_list = []
+    json_list: JsonArray = []
     for placement in PacmanDataView.iterate_placemements():
         json_list.append(placement_to_json(placement))
     return json_list
