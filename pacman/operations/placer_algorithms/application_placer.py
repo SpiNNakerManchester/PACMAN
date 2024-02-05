@@ -564,6 +564,7 @@ class _ChipWithSpace(object):
 
         :rtype: int
         """
+        return self.chip.x
 
     @property
     def y(self) -> int:
