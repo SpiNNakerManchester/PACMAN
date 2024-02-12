@@ -31,7 +31,7 @@ def pair_compressor(
         A flag which should only be used in testing to stop raising an
         exception if result is too big
     :param bool verify: If set to true will verify the length before returning
-    :param bool c_sort: If set will use the slower quicksort as it is
+    :param bool c_sort: If set will use the slower quick sort as it is
         implemented in c/ on cores
     :rtype: MulticastRoutingTables
     """
@@ -148,7 +148,7 @@ class _PairCompressor(AbstractCompressor):
         # A list of all entries which may be sorted
         #   of entries represented as (key, mask, defaultable)
         "_all_entries",
-        # flag to use slower quicksort as it is implemented in c/ on cores
+        # flag to use slower quick sort as it is implemented in c/ on cores
         "_c_sort",
         # The next index to write a merged/unmergeable entry to
         "_write_index",

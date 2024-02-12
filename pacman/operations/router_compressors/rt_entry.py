@@ -21,16 +21,16 @@ class RTEntry(object):
     table compressors. Essentially a tuple and compacted version of
     :py:class:`~spinn_machine.MulticastRoutingEntry`.
 
-    :ivar key: The key
-    :vartype key: int
-    :ivar mask: The mask
-    :vartype mask: int
-    :ivar defaultable: Whether the route may be handled by default routing
-    :vartype defaultable: bool
-    :ivar spinnaker_route: The route
-    :vartype spinnaker_route: int
-    :ivar key_mask: The key,mask pair
-    :vartype key_mask: tuple(int,int)
+    :param key: The key
+    :type key: int
+    :param mask: The mask
+    :type mask: int
+    :param defaultable: Whether the route may be handled by default routing
+    :type defaultable: bool
+    :param spinnaker_route: The route
+    :type spinnaker_route: int
+    :param key_mask: The key,mask pair
+    :type key_mask: tuple(int,int)
     """
     __slots__ = ("key", "mask", "defaultable", "spinnaker_route", "key_mask")
 
