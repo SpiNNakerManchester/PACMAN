@@ -299,13 +299,11 @@ def test_fixed_only():
 
 
 def test_overlap():
+    # This should work here; overlap is allowed provided routes don't overlap
+    # (which is found elsewhere)
     unittest_setup()
     create_graphs_only_fixed(overlap=True)
-    try:
-        flexible_allocate([])
-        raise ValueError
-    except PacmanRouteInfoAllocationException:
-        pass
+    flexible_allocate([])
 
 
 def test_no_edge():
