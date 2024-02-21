@@ -32,6 +32,8 @@ from pacman.operations.routing_info_allocator_algorithms import (
 from pacman.operations.routing_table_generators.merged_routing_table_generator\
     import (merged_routing_table_generator, _IteratorWithNext)
 from pacman_test_objects import SimpleTestVertex
+from pacman.model.routing_info import BaseKeyAndMask
+from .test_basic import FixedKeyAppVertex
 
 
 class TestMerged(unittest.TestCase):
@@ -151,3 +153,62 @@ class TestMerged(unittest.TestCase):
             # this needs to work even with a debugger look at ten here
             check.append(ten.pop())
         self.assertEqual(10, len(check))
+
+    def test_overlapping(self):
+        # Two vertices in the same router can't send with the same key
+        writer = PacmanDataWriter.mock()
+        v_target = SimpleTestVertex(1, splitter=SplitterFixedLegacy())
+        v1 = FixedKeyAppVertex(BaseKeyAndMask(0x1, 0xFFFFFFFF))
+        v2 = FixedKeyAppVertex(BaseKeyAndMask(0x1, 0xFFFFFFFF))
+        writer.add_vertex(v_target)
+        writer.add_vertex(v1)
+        writer.add_vertex(v2)
+        writer.add_edge(ApplicationEdge(v1, v_target), "Test")
+        writer.add_edge(ApplicationEdge(v2, v_target), "Test")
+        system_placements = Placements()
+        system_placements.add_placement(Placement(v1.machine_vertex, 0, 0, 1))
+        system_placements.add_placement(Placement(v2.machine_vertex, 0, 0, 2))
+        self.make_infos(writer, system_placements)
+        with self.assertRaises(KeyError):
+            merged_routing_table_generator()
+
+    def test_overlapping_different_chips(self):
+        # Two vertices in the same router can't send with the same key
+        writer = PacmanDataWriter.mock()
+        v_target = SimpleTestVertex(1, splitter=SplitterFixedLegacy())
+        v1 = FixedKeyAppVertex(BaseKeyAndMask(0x1, 0xFFFFFFFF))
+        v2 = FixedKeyAppVertex(BaseKeyAndMask(0x1, 0xFFFFFFFF))
+        writer.add_vertex(v_target)
+        writer.add_vertex(v1)
+        writer.add_vertex(v2)
+        writer.add_edge(ApplicationEdge(v1, v_target), "Test")
+        writer.add_edge(ApplicationEdge(v2, v_target), "Test")
+        system_placements = Placements()
+        system_placements.add_placement(Placement(v1.machine_vertex, 1, 0, 1))
+        system_placements.add_placement(Placement(v2.machine_vertex, 0, 0, 2))
+        self.make_infos(writer, system_placements)
+        with self.assertRaises(KeyError):
+            merged_routing_table_generator()
+
+    def test_non_overlapping_different_chips(self):
+        # Two vertices with non-overlapping routes can use the same key
+        writer = PacmanDataWriter.mock()
+        v_target_1 = FixedKeyAppVertex(None)
+        v_target_2 = FixedKeyAppVertex(None)
+        v1 = FixedKeyAppVertex(BaseKeyAndMask(0x1, 0xFFFFFFFF))
+        v2 = FixedKeyAppVertex(BaseKeyAndMask(0x1, 0xFFFFFFFF))
+        writer.add_vertex(v_target_1)
+        writer.add_vertex(v_target_2)
+        writer.add_vertex(v1)
+        writer.add_vertex(v2)
+        writer.add_edge(ApplicationEdge(v1, v_target_1), "Test")
+        writer.add_edge(ApplicationEdge(v2, v_target_2), "Test")
+        system_placements = Placements()
+        system_placements.add_placement(Placement(v1.machine_vertex, 1, 0, 1))
+        system_placements.add_placement(
+            Placement(v_target_1.machine_vertex, 1, 0, 2))
+        system_placements.add_placement(Placement(v2.machine_vertex, 0, 0, 2))
+        system_placements.add_placement(
+            Placement(v_target_2.machine_vertex, 0, 0, 3))
+        self.make_infos(writer, system_placements)
+        merged_routing_table_generator()

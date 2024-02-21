@@ -21,6 +21,7 @@ from pacman.model.graphs import AbstractVertex
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartitionEntry)
 from pacman.model.routing_info import RoutingInfo
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 
 
 def basic_routing_table_generator() -> MulticastRoutingTables:
@@ -61,6 +62,8 @@ def __create_routing_table(
     :rtype: MulticastRoutingTable
     """
     table = UnCompressedMulticastRoutingTable(x, y)
+    sources_by_key_mask: Dict[BaseKeyAndMask,
+                              Tuple[AbstractVertex, str]] = dict()
     for source_vertex, partition_id in partitions_in_table:
         r_info = routing_infos.get_routing_info_from_pre_vertex(
             source_vertex, partition_id)
@@ -68,6 +71,16 @@ def __create_routing_table(
         if r_info is None:
             continue
         entry = partitions_in_table[source_vertex, partition_id]
+        if r_info.key_and_mask in sources_by_key_mask:
+            if (sources_by_key_mask[r_info.key_and_mask]
+                    != (source_vertex, partition_id)):
+                raise KeyError(
+                    f"Source {source_vertex}, {partition_id} is trying to "
+                    f"send to the same key and mask as "
+                    f"{sources_by_key_mask[r_info.key_and_mask]}")
+        else:
+            sources_by_key_mask[r_info.key_and_mask] = (
+                source_vertex, partition_id)
         table.add_multicast_routing_entry(MulticastRoutingEntry(
             routing_entry_key=r_info.key_and_mask.key_combo,
             defaultable=entry.defaultable, mask=r_info.key_and_mask.mask,
