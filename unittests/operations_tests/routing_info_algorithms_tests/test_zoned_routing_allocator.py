@@ -15,7 +15,6 @@ from typing import Optional
 from spinn_utilities.overrides import overrides
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
-from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.operations.routing_info_allocator_algorithms.\
     zoned_routing_info_allocator import (flexible_allocate, global_allocate)
 from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
