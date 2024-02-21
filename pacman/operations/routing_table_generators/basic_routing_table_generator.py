@@ -21,6 +21,7 @@ from pacman.model.graphs import AbstractVertex
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartitionEntry)
 from pacman.model.routing_info import RoutingInfo
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 
 
 def basic_routing_table_generator() -> MulticastRoutingTables:
@@ -61,7 +62,8 @@ def __create_routing_table(
     :rtype: MulticastRoutingTable
     """
     table = UnCompressedMulticastRoutingTable(x, y)
-    sources_by_key_mask = dict()
+    sources_by_key_mask: Dict[BaseKeyAndMask,
+                              Tuple[AbstractVertex, str]] = dict()
     for source_vertex, partition_id in partitions_in_table:
         r_info = routing_infos.get_routing_info_from_pre_vertex(
             source_vertex, partition_id)
