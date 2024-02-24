@@ -75,6 +75,8 @@ def place_application_graph(system_placements: Placements) -> Placements:
                     raise _place_error(
                         placements, system_placements, e,
                         plan_n_timesteps) from e
+                
+                # next_chip_space hold a chip, and cores that avaliable be used. 
                 logger.debug(f"Starting placement from {next_chip_space}")
 
                 placements_to_make: List = list()
@@ -82,6 +84,7 @@ def place_application_graph(system_placements: Placements) -> Placements:
                 # Go through the groups
                 last_chip_space: Optional[_ChipWithSpace] = None
                 for vertices, sdram in same_chip_groups:
+                    # It need to find out that how slices property in a vertex is used in placement.
                     vertices_to_place = [
                         vertex
                         for vertex in vertices
@@ -92,6 +95,8 @@ def place_application_graph(system_placements: Placements) -> Placements:
                     n_cores = len(vertices_to_place)
 
                     # If this group has a fixed location, place it there
+                    # it seems that all verteces in the `vertices_to_place` 
+                    # are belongs to the same group. 
                     if _do_fixed_location(vertices_to_place, actual_sdram,
                                           placements, next_chip_space):
                         continue
@@ -106,6 +111,8 @@ def place_application_graph(system_placements: Placements) -> Placements:
                     # If this worked, store placements to be made
                     last_chip_space = next_chip_space
                     chips_attempted.append(next_chip_space.chip)
+
+                    # Vertices are appended to `placements_to_make` 
                     _store_on_chip(
                         placements_to_make, vertices_to_place, actual_sdram,
                         next_chip_space)
@@ -129,7 +136,6 @@ def place_application_graph(system_placements: Placements) -> Placements:
         dp(placements, system_placements)
 
     return placements
-
 
 def _place_error(
         placements: Placements, system_placements: Placements,

@@ -383,6 +383,9 @@ class ZonedRoutingInfoAllocator(object):
                     key = (key << n_bits_machine) | machine_index
                     key = key << n_bits_atoms
                     key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
+                # the smaller machine_index, the smaller lo_atoms of the machine vertex.
+                # It seems that, `MachineVertexRoutingInfo` is used for routing inner an application vertex.
+                # It then next generte cross application routing information by appedning instance of `AppVertexRoutingInfo`. 
                 routing_infos.add_routing_info(MachineVertexRoutingInfo(
                     key_and_mask, identifier, machine_vertex,
                     machine_index))
