@@ -8,11 +8,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 class AbstractPartitioner(SolutionAdapter, object):
-    __slots__ = (
-        # an application graph
-        "application_graph"
-        )
-
+  
     def __init__(self, application_graph: Optional[str] = None):
         self._application_graph = application_graph
         self.checker = SolutionChecker()
@@ -28,13 +24,12 @@ class AbstractPartitioner(SolutionAdapter, object):
     
     def partitioning(self):
         self._partitioning()
-        return self._adapted_output()
+        return self
 
-    @overrides(SolutionAdapter.adapted_output)
+    @overrides(SolutionAdapter._adapted_output)
     def _adapted_output(self):
         pass
 
-    
     def adapted_output(self):
         self._adapted_output()
 
