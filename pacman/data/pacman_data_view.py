@@ -223,6 +223,9 @@ class PacmanDataView(MachineDataView):
                 yield vertex
 
     @classmethod
+    def get_graph(cls) -> ApplicationGraph:
+        return cls.__pacman_data._graph
+    @classmethod
     def get_n_vertices(cls) -> int:
         """
         The number of vertices in the user application graph.
