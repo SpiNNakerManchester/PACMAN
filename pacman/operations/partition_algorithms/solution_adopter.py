@@ -25,7 +25,9 @@ from typing import Sequence
 from numpy.typing import NDArray
 from spynnaker.pyNN.models.neuron.population_machine_common import (
     PopulationMachineCommon)
+from .solution_checker import SolutionChecker
 from numpy import floating
+
 
 class SolutionAdopter:
     @classmethod
@@ -178,6 +180,8 @@ class SolutionAdopter:
 
     @classmethod
     def AdoptSolution(self, adapter_output: bytearray, graph: ApplicationGraph, chip_counter: ChipCounter, max_atoms_per_core: int):
+        if not SolutionChecker.check(adapter_output):
+            raise RuntimeError("[solution_adopter.py] Machine graph solution not satisfies constraints.")
         encoded_solution = adapter_output
         N_Ai = [vertex.n_atoms for vertex in graph.vertices]
         presum_N_Ai = [0] * len(N_Ai)

@@ -1,4 +1,4 @@
 class SolutionChecker(object):
-    
-    def check(self):
+    @classmethod
+    def check(self, adapted_solution: bytearray) -> bool:
         pass

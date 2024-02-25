@@ -1,7 +1,6 @@
 
 from typing import Optional
 from .solution_adapter import SolutionAdapter
-from .solution_checker import SolutionChecker
 from spinn_utilities.overrides import overrides
 from pacman.data import PacmanDataView
 from spinn_utilities.progress_bar import ProgressBar
@@ -31,7 +30,7 @@ class AbstractPartitioner(SolutionAdapter, object):
         raise NotImplementedError
 
     def adapted_output(self):
-        self._adapted_output()
+        return self._adapted_output()
 
 
     def get_chip_counter(self):
