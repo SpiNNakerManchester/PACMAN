@@ -179,7 +179,7 @@ class SolutionAdopter:
     
 
     @classmethod
-    def AdoptSolution(self, adapter_output: bytearray, graph: ApplicationGraph, chip_counter: ChipCounter, max_atoms_per_core: int):
+    def AdoptSolution(self, adapter_output: bytearray, graph: ApplicationGraph, chip_counter: ChipCounter):
         encoded_solution = adapter_output
         N_Ai = [vertex.n_atoms for vertex in graph.vertices]
         presum_N_Ai = [0] * len(N_Ai)
@@ -192,6 +192,8 @@ class SolutionAdopter:
         prev_chip_id = -1
         prev_core_id = -1
         presum_N_Ai[0] = N_Ai[0]
+        core_atoms_amount_map = dict({})
+
         for i in range(1, len(presum_N_Ai)):
             presum_N_Ai[i] = presum_N_Ai[i - 1] + N_Ai[i]
 
@@ -240,31 +242,53 @@ class SolutionAdopter:
                         application_vertex.atoms_shape)
                 label = f"{application_vertex.label}{vertex_slice}"
 
+                lo_atom = prev_index
+                hi_atom = i - 1
+                n_on_core_1_dim = hi_atom - lo_atom + 1
+                
+
+                key_core_location =  ("%d#%d" % (chip_id, core_id)) 
+                if key_core_location in core_atoms_amount_map:
+                    core_atoms_amount_map[key_core_location]['atoms_in_core'] = \
+                        core_atoms_amount_map[key_core_location]['atoms_in_core'] + n_on_core_1_dim
+                else:
+                    core_atoms_amount_map[key_core_location] = {}
+                    core_atoms_amount_map[key_core_location]['atoms_in_core'] = \
+                        n_on_core_1_dim
+                    core_atoms_amount_map[key_core_location]['slices'] = []
+                core_atoms_amount_map[key_core_location]['slices'].append((application_vertex, vertex_slice))
                 prev_chip_id = chip_id
                 prev_core_id = core_id
                 prev_index = i
+
+        for key in core_atoms_amount_map.keys():
+            atoms_in_core = core_atoms_amount_map[key]['atoms_in_core']
+            chip_core_index = [int(x) for x in str(key).split("#")]
+            chip_index = chip_core_index[0]
+            core_index = chip_core_index[1]
+
+            for (application_vertex, vertex_slice) in core_atoms_amount_map[key]['slices']:
                 ring_buffer_shifts = application_vertex.get_ring_buffer_shifts()
                 weight_scales = application_vertex.get_weight_scales(ring_buffer_shifts)
                 all_syn_block_sz = application_vertex.get_synapses_size(
-                    max_atoms_per_core)
+                        atoms_in_core)
                 structural_sz = application_vertex.get_structural_dynamics_size(
-                    max_atoms_per_core)
+                        atoms_in_core)
                 sdram = self.get_sdram_used_by_atoms(self,
-                    max_atoms_per_core, all_syn_block_sz, structural_sz, application_vertex)
+                        atoms_in_core, all_syn_block_sz, structural_sz, application_vertex)
                 synapse_regions = PopulationMachineVertex.SYNAPSE_REGIONS
                 synaptic_matrices = SynapticMatrices(
-                    application_vertex, synapse_regions, max_atoms_per_core, weight_scales,
-                    all_syn_block_sz)
+                        application_vertex, synapse_regions, atoms_in_core, weight_scales,
+                        all_syn_block_sz)
                 neuron_data = NeuronData(application_vertex)
 
                 index = slice_index
                 machine_vertex = self.create_machine_vertex(self,
-                    vertex_slice, sdram, label,
-                    structural_sz, ring_buffer_shifts, weight_scales,
-                    index, max_atoms_per_core, synaptic_matrices, neuron_data, application_vertex)
+                        vertex_slice, sdram, label,
+                        structural_sz, ring_buffer_shifts, weight_scales,
+                        index, atoms_in_core, synaptic_matrices, neuron_data, application_vertex)
                 application_vertex.remember_machine_vertex(machine_vertex)
-                slice_index += 1               
-
+                slice_index += 1       
         chip_counter.set_n_chips(max_chips)
     
     

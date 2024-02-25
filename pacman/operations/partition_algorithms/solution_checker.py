@@ -75,19 +75,11 @@ class SolutionChecker(object):
                 return False
 
             if prev_index == -1 or prev_chip_id == -1 or prev_core_id == -1:
-                lo_atom = prev_index
-                hi_atom = i - 1
-                n_on_core_1_dim = hi_atom - lo_atom + 1
-                
+             
                 prev_index = i
                 prev_chip_id = chip_id
                 prev_core_id = core_id
                 
-                key_core_location =  ("%d#%d" % (chip_id, core_id)) 
-                if key_core_location in core_atoms_amount_map:
-                    core_atoms_amount_map[key_core_location] = core_atoms_amount_map[key_core_location] + n_on_core_1_dim
-                else:
-                    core_atoms_amount_map[key_core_location] = n_on_core_1_dim
                 
                 continue
             
@@ -97,6 +89,18 @@ class SolutionChecker(object):
                 prev_chip_id = chip_id
                 prev_core_id = core_id
                 prev_index = i
+
+                lo_atom = prev_index
+                hi_atom = i - 1
+                n_on_core_1_dim = hi_atom - lo_atom + 1
+                
+
+                key_core_location =  ("%d#%d" % (chip_id, core_id)) 
+                if key_core_location in core_atoms_amount_map:
+                    core_atoms_amount_map[key_core_location] = core_atoms_amount_map[key_core_location] + n_on_core_1_dim
+                else:
+                    core_atoms_amount_map[key_core_location] = n_on_core_1_dim
+                
 
                 atoms_in_atoms = core_atoms_amount_map[key_core_location]
                 all_syn_block_sz = application_vertex.get_synapses_size(
