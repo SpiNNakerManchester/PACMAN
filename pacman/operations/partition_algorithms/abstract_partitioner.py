@@ -28,7 +28,7 @@ class AbstractPartitioner(SolutionAdapter, object):
 
     @overrides(SolutionAdapter._adapted_output)
     def _adapted_output(self):
-        pass
+        raise NotImplementedError
 
     def adapted_output(self):
         self._adapted_output()
