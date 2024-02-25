@@ -6,10 +6,12 @@ from pacman.model.graphs.application import ApplicationGraph
 from .solution_adopter import SolutionAdopter
 import numpy as np
 import random
+from pacman.utilities.utility_objs.chip_counter import ChipCounter
 class RandomPartitioner(AbstractPartitioner):
   
-    def __init__(self, application_graph: ApplicationGraph = None):
+    def __init__(self, application_graph: ApplicationGraph = None, max_slice_length = 100):
         super().__init__(application_graph)
+        self.max_slice_length = max_slice_length
 
     def application_graph(self):
         return self._application_graph
@@ -19,13 +21,15 @@ class RandomPartitioner(AbstractPartitioner):
         return self.global_solution
 
     @overrides(AbstractPartitioner._partitioning)
-    def _partitioning(self, max_slice_length = 100):
+    def _partitioning(self):
         # Begin coding for partitioning here
         N_Ai = [vertex.n_atoms for vertex in self.graph.vertices]
-        N = np.sum(N_Ai)
-        core_bits = np.ceil(np.log2(18))
-        chip_bits = np.ceil(np.log2(N))
-        chip_core_represent_total_length = chip_bits + core_bits
+        N = int(np.sum(N_Ai))
+        
+        # Todo:: make each chip's core count be variable.
+        max_cores_per_chip = 18
+        max_chips = N
+        chip_core_represent_total_length = int(np.ceil(np.log2(max_chips * max_cores_per_chip)))
         bytes_needed_for_encoding = N * chip_core_represent_total_length
         self.global_solution = bytearray(bytes_needed_for_encoding)
         total_pos = 0
@@ -33,20 +37,19 @@ class RandomPartitioner(AbstractPartitioner):
             n_atoms = vertex.n_atoms
             pos = 0
             while pos < n_atoms:
-                slice_length = min(random.randint(0, max_slice_length), n_atoms - pos)
+                slice_length = min(random.randint(0, self.max_slice_length), n_atoms - pos)
                 if slice_length == 0:
                     continue
                 random_chip = random.randint(0, N)
                 random_core = random.randint(0, 17)
-                chip_core_represent =  (random_chip << core_bits) | random_core
-                binary_string = '{0:' + chip_core_represent_total_length + 'b}'.format(chip_core_represent) * slice_length
+                chip_core_represent =  (random_chip * max_cores_per_chip) + random_core
+                binary_string = ('{0:' + str(chip_core_represent_total_length) + 'b}').format(chip_core_represent) * slice_length
                 global_offset_begin = (total_pos + pos) * chip_core_represent_total_length
                 global_offset_end = (total_pos + pos + slice_length) * chip_core_represent_total_length - 1
-                self.global_solution[global_offset_begin:global_offset_end] = binary_string
-            total_pos += n_atoms                
+                self.global_solution[global_offset_begin:global_offset_end] = bytes(binary_string, 'ascii')
+                pos += slice_length
+            total_pos += n_atoms
         # End coding
 
         adapter_output = self._adapted_output()
         SolutionAdopter.AdoptSolution(adapter_output, self.graph, self.chip_counter)
-
-
