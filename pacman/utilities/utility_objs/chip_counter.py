@@ -49,6 +49,9 @@ class ChipCounter(object):
         self.__sdram_free = 0
         self.__n_chips = 0
 
+    def set_n_chips(self, n_chip):
+        self.__n_chips = n_chip
+        
     def add_core(self, resources: AbstractSDRAM):
         sdram = resources.get_total_sdram(
             PacmanDataView.get_plan_n_timestep())
