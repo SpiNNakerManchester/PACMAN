@@ -85,7 +85,7 @@ class SolutionChecker(object):
             
             if chip_id != prev_chip_id or core_id != prev_core_id:
                 application_vertex = list(graph.vertices)[application_vertex_index]
-
+                
                 prev_chip_id = chip_id
                 prev_core_id = core_id
                 prev_index = i
@@ -94,7 +94,6 @@ class SolutionChecker(object):
                 hi_atom = i - 1
                 n_on_core_1_dim = hi_atom - lo_atom + 1
                 
-
                 key_core_location =  ("%d#%d" % (chip_id, core_id)) 
                 if key_core_location in core_atoms_amount_map:
                     core_atoms_amount_map[key_core_location] = core_atoms_amount_map[key_core_location] + n_on_core_1_dim
