@@ -23,8 +23,6 @@ class GAPartitioner(AbstractPartitioner):
     def _adapted_output(self):
         return self.global_solution
 
-
-
     @overrides(AbstractPartitioner._partitioning)
     def _partitioning(self):
         # Begin coding for partitioning here
@@ -35,7 +33,6 @@ class GAPartitioner(AbstractPartitioner):
 
         init_solutions_common_representation = self._generate_init_solutions(N_Ai, N, max_cores_per_chip, max_chips) # None -> List<CommonRepresentation>[]
 
-
-        self.solution = GaAlgorithm().do_GA_algorithm(init_solutions_common_representation, mutation_strategy, )
+        self.solution = GaAlgorithm().do_GA_algorithm(init_solutions_common_representation)
         adapter_output = self._adapted_output()
         SolutionAdopter.AdoptSolution(adapter_output, self.graph, self.chip_counter)

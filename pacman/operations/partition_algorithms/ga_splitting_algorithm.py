@@ -82,7 +82,7 @@ class GaAlgorithm(object):
             costs = self.solution_cost_calculation_strategy.calculate(solutions)
             self._log("[In Epoch %d] Finish. Costs = %s" % str(costs))
             solutions = self.selection_strategy.select(costs, solutions)
-            if self.output_population_all_epoch:
+            if self.output_populaton_all_epoch:
                 self._out_solutions(epoch, solutions)
         costs = self.solution_cost_calculation_strategy.calculate(solutions)
         self._log("Finish Ga. Costs = %s" % str(costs))
