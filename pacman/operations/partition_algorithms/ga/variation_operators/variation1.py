@@ -10,3 +10,4 @@ class GaVariation1(AbstractGaVariation):
     
     def __str__(self):
         return "abst_variation"
+
