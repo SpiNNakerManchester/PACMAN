@@ -513,7 +513,7 @@ class _PairCompressor(AbstractCompressor):
         # Compute the new mask  and key
         any_zeros = ~all_ones
         new_xs = any_ones ^ any_zeros
-        mask = all_selected & new_xs  # Combine existing and new X's
+        mask = all_selected & new_xs
         key = all_ones & mask
         return key, mask, entry1.defaultable and entry2.defaultable
 

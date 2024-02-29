@@ -88,9 +88,9 @@ class ZonedRoutingInfoAllocator(object):
         # maximum number of bites to represent the keys and masks
         # for a single app vertex / partition name zone
         "__n_bits_atoms_and_mac",
-        # Maximum number pf bit to represent the machine assuming global
+        # Maximum number of bits to represent the machine assuming global
         "__n_bits_machine",
-        # Maximum number pf bit to represent the machine assuming global
+        # Maximum number of bits to represent the machine assuming global
         "__n_bits_atoms",
         # Flag to say operating in flexible mode
         "__flexible",

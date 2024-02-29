@@ -176,7 +176,7 @@ class RangeCompressor(object):
             dif = last_point - first_point
             power = 1 if dif < 1 else 1 << ((dif - 1).bit_length())
 
-            # Find the start range cutoffs
+            # Find the start range cut-offs
             low_cut = first_point // power * power
             high_cut = low_cut + power
 
