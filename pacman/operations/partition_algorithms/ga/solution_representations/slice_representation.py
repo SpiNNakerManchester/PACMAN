@@ -2,12 +2,29 @@ from .abst_ga_solution_representation import AbstractGASolutionRepresentation
 from .common_ga_solution_representation import CommonGASolutionRepresentation
 from spinn_utilities.overrides import overrides
 class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
-    def __init__(self, byte_array_solution: bytearray) -> None:
+    def __init__(self) -> None:
           super().__init__()
-          self._solution = []
+          self._solution = [] # List[List[(slice_neuron_from, slice_neuron_to, chip_index, core_index)]]
           self._max_cores_per_chip = -1
           self._max_chips = -1
           self._single_neuron_encoding_length = -1
+
+    def __init__(self, slices_end_points, slices_chip_indexes, slices_core_indexes, max_cores_per_chip, max_chips, single_neuron_encoding_length) -> None:
+          super().__init__()
+          self._solution = []
+          self._max_cores_per_chip = max_cores_per_chip
+          self._max_chips = max_chips
+          self._single_neuron_encoding_length = single_neuron_encoding_length
+          previous_pos = 0
+          slice_index = 0
+          for endpoint in slices_end_points:
+               slice_neuron_from = previous_pos
+               slice_neuron_to = endpoint
+               chip_index = slices_chip_indexes[slice_index]
+               core_index = slices_core_indexes[slice_index]
+               slice_index += 1
+               self._solution.append((slice_neuron_from, slice_neuron_to, chip_index, core_index))
+
 
     @overrides(AbstractGASolutionRepresentation.get_npy_data)
     def get_npy_data(self):
@@ -17,17 +34,27 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
     def get_solution(self):
         return self._solution
 
-
     @overrides(AbstractGASolutionRepresentation.convert_to_gtype_representation)
     def convert_to_gtype_representation(self) -> bytearray:
         solution = self._solution
-        gtype_length = len(solution) * 32
+        gtype_length = len(solution) * 32 * 4
         gtype_represent = bytearray(gtype_length)
         for i in range(0, len(solution)):
-            binary_string_len32 = ('{0:32b}').format(solution[i])
+            binary_string_len32 = ('{0:32b}').format(solution[i / 4][i % 4])
             gtype_represent[i * 32: (i + 1) * 32] = binary_string_len32
         return gtype_represent
     
+    @overrides(AbstractGASolutionRepresentation.convert_to_ptype_from_gtype_representation)
+    def convert_to_ptype_from_gtype_representation(self, gtype_solution_representation) -> bytearray:
+        gtype_length = len(gtype_solution_representation)
+        solution = []
+        slice_info = []
+        for int32_index in range(0, gtype_length / 32):
+            slice_info.append(int(gtype_solution_representation[int32_index * 32, (int32_index + 1) * 32], 2))
+            if(len(slice_info) == 4):
+                 solution.append(slice_info)
+                 slice_info = []
+        return solution
 
     @overrides(AbstractGASolutionRepresentation.convert_to_common_representation)
     def convert_to_common_representation(self):
@@ -35,11 +62,12 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         single_neuron_encoding_length = self._single_neuron_encoding_length
         comm_solution = bytearray(single_neuron_encoding_length)
         neuron_index = 0
-        for i in range(0, len(solution), 4):
-            slice_neuron_from = solution[i]
-            slice_neuron_to = solution[i + 1]
-            chip_index = solution[i + 2]
-            core_index = solution[i + 3]
+        for i in range(0, len(solution)):
+            slice_info = solution[i]
+            slice_neuron_from = slice_info[0]
+            slice_neuron_to = slice_info[1]
+            chip_index = slice_info[2]
+            core_index = slice_info[3]
             write_common_solution_from = slice_neuron_from * single_neuron_encoding_length
             write_common_solution_to = (slice_neuron_to + 1) * single_neuron_encoding_length
             chip_core_represent = chip_index * self._max_cores_per_chip + core_index
@@ -50,7 +78,7 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         return CommonGASolutionRepresentation(comm_solution, single_neuron_encoding_length, self._max_cores_per_chip, self._max_chips)
 
 
-
+    
     @overrides(AbstractGASolutionRepresentation.convert_from_common_representation)
     def convert_from_common_representation(self, solution: CommonGASolutionRepresentation):
         self._solution = []
@@ -85,18 +113,16 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
 
             if chip_index == last_chip_index and core_index == last_core_index:
                 continue
+            
+            self._solution.append([last_neuron_index, neuron_index - 1, last_chip_index, last_core_index])
 
-            self._solution.append(last_neuron_index)
-            self._solution.append(neuron_index - 1)
-            self._solution.append(last_chip_index)
-            self._solution.append(last_core_index)
             last_neuron_index = neuron_index
             last_chip_index = chip_index
             last_core_index = core_index
 
         del solution_in_bytes_representation[-single_neuron_encoding_length:]
         
-        return self._solution
+        return self
 
             
             

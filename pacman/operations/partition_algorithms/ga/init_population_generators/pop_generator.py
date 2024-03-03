@@ -4,7 +4,7 @@ from pacman.model.graphs.application import ApplicationGraph
 from typing import List
 from spinn_utilities.overrides import overrides
 
-class GaInitialPopulationGenerator1(AbstractGaInitialPopulationGenerator):
+class GaFixedSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
     def __init__(self, population_size, application_graph: ApplicationGraph) -> None:
         super().__init__(population_size)
         self.application_graph = application_graph
