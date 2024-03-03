@@ -6,12 +6,7 @@ import numpy as np
 class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
     def __init__(self, solution, max_cores_pre_chip, max_chips, use_ptype = True) -> None:
           super().__init__(solution, max_cores_pre_chip, max_chips, use_ptype)
-          self._single_neuron_encoding_length = \
-            (int)(np.ceil(np.log2(self.get_max_chips() * self.get_max_core_per_chip)))
-   
-    def get_single_neuron_encoding_length(self):
-        return self._single_neuron_encoding_length
-
+          
     @overrides(AbstractGASolutionRepresentation.from_common_representation)
     def from_common_representation(self, solution: CommonGASolutionRepresentation):
         self._solution = solution.get_solution()
@@ -25,7 +20,7 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
         return CommonGASolutionRepresentation(self.get_solution(), self.get_max_core_per_chip(),
             self.get_max_chips(), self.get_use_ptype())
     
-    @overrides(AbstractGASolutionRepresentation._get_ptyte_solution)
+    @overrides(AbstractGASolutionRepresentation._get_ptype_solution)
     def _get_ptyte_solution(self):
         gtype_solution_rep = self.get_solution()
         single_neuron_encoding_lentgh = self.get_single_neuron_encoding_length()

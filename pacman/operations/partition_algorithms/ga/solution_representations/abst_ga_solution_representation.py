@@ -1,15 +1,22 @@
 from .common_ga_solution_representation import CommonGASolutionRepresentation
+import numpy as np
 class AbstractGASolutionRepresentation:
     def __init__(self, solution, max_cores_pre_chip, max_chips, use_ptype = True) -> None:
         self._use_ptype = use_ptype
         self._solution = solution
         self._max_cores_per_chip = max_cores_pre_chip
         self._max_chips = max_chips
-
-    def get_ptype_solution(self):
+        self._single_neuron_encoding_length = \
+            (int)(np.ceil(np.log2(self.get_max_chips() * self.get_max_core_per_chip)))
+   
+    def get_ptype_solution(self) -> bytearray:
         if self._use_ptype:
             self._solution
-        return self._get_ptyte_solution()
+        return self._get_ptype_solution()
+
+
+    def get_single_neuron_encoding_length(self):
+        return self._single_neuron_encoding_length
 
     def get_gtype_solution(self):
         if self._use_ptype:
@@ -38,7 +45,7 @@ class AbstractGASolutionRepresentation:
     def to_common_representation(self) -> CommonGASolutionRepresentation:
         raise NotImplementedError
    
-    def _get_ptyte_solution(self):
+    def _get_ptype_solution(self):
         raise NotImplementedError
     
     def _get_gtyte_solution(self):
