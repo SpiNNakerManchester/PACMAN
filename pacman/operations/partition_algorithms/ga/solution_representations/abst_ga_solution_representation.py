@@ -7,20 +7,19 @@ class AbstractGASolutionRepresentation:
         self._max_cores_per_chip = max_cores_pre_chip
         self._max_chips = max_chips
         self._single_neuron_encoding_length = \
-            (int)(np.ceil(np.log2(self.get_max_chips() * self.get_max_core_per_chip)))
+            (int)(np.ceil(np.log2(self.get_max_chips() * self.get_max_cores_per_chip)))
    
-    def get_ptype_solution(self) -> bytearray:
+    def get_ptype_solution_representation(self) -> bytearray:
         if self._use_ptype:
             self._solution
-        return self._get_ptype_solution()
-
+        return self._get_ptype_solution_representation()
 
     def get_single_neuron_encoding_length(self):
         return self._single_neuron_encoding_length
 
-    def get_gtype_solution(self):
+    def get_gtype_solution_representation(self):
         if self._use_ptype:
-            return self._get_gtyte_solution()
+            return self._get_gtyte_solution_representation()
         return self._solution
     
     def get_solution(self):
@@ -38,17 +37,16 @@ class AbstractGASolutionRepresentation:
     def get_solution(self):
         return self._solution
     
-    
     def from_common_representation(self, solution: CommonGASolutionRepresentation):
         raise NotImplementedError
     
     def to_common_representation(self) -> CommonGASolutionRepresentation:
         raise NotImplementedError
    
-    def _get_ptype_solution(self):
+    def _get_ptype_solution_representation(self):
         raise NotImplementedError
     
-    def _get_gtyte_solution(self):
+    def _get_gtype_solution_representation(self):
         raise NotImplementedError
     
     def __str__(self):

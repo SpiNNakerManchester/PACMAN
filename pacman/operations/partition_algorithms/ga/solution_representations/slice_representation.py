@@ -1,14 +1,13 @@
 from .abst_ga_solution_representation import AbstractGASolutionRepresentation
 from .common_ga_solution_representation import CommonGASolutionRepresentation
 from spinn_utilities.overrides import overrides
+
+# ptype representation: List[List[(slice_neuron_from, slice_neuron_to, chip_index, core_index)]]
+
 class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
     def __init__(self) -> None:
-          super().__init__()
-          self._solution = [] # List[List[(slice_neuron_from, slice_neuron_to, chip_index, core_index)]]
-          self._max_cores_per_chip = -1
-          self._max_chips = -1
-          self._single_neuron_encoding_length = -1
-
+          super().__init__([], -1, -1)
+          
     def __init__(self, slices_end_points, slices_chip_indexes, slices_core_indexes, max_cores_per_chip, max_chips) -> None:
           super().__init__([], max_cores_per_chip, max_chips, False)
           previous_pos = 0
@@ -21,8 +20,8 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
                slice_index += 1
                self._solution.append((slice_neuron_from, slice_neuron_to, chip_index, core_index))
 
-    @overrides(AbstractGASolutionRepresentation._get_gtyte_solution)
-    def _get_gtyte_solution(self) -> bytearray:
+    @overrides(AbstractGASolutionRepresentation._get_gtype_solution_representation)
+    def _get_gtype_solution_representation(self) -> bytearray:
         solution = self._solution
         gtype_length = len(solution) * 32 * 4
         gtype_represent = bytearray(gtype_length)
@@ -31,8 +30,8 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
             gtype_represent[i * 32: (i + 1) * 32] = binary_string_len32
         return gtype_represent
     
-    @overrides(AbstractGASolutionRepresentation._get_ptype_solution)
-    def _get_ptype_solution(self, gtype_solution_representation) -> bytearray:
+    @overrides(AbstractGASolutionRepresentation._get_ptype_solution_representation)
+    def _get_ptype_solution_representation(self, gtype_solution_representation) -> bytearray:
         gtype_length = len(gtype_solution_representation)
         solution = []
         slice_info = []
@@ -67,7 +66,7 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
     @overrides(AbstractGASolutionRepresentation.from_common_representation)
     def from_common_representation(self, solution: CommonGASolutionRepresentation):
         self._solution = []
-        solution_in_bytes_representation = solution.get_ptype_solution()
+        solution_in_bytes_representation = solution.get_ptype_solution_representation()
         single_neuron_encoding_length = solution.get_single_neuron_encoding_length()
         bytearray_length = len(solution_in_bytes_representation)
         neuron_count = bytearray_length / single_neuron_encoding_length

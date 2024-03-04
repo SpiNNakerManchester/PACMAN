@@ -17,11 +17,11 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
     
     @overrides(AbstractGASolutionRepresentation.to_common_representation)
     def to_common_representation(self) -> CommonGASolutionRepresentation:
-        return CommonGASolutionRepresentation(self.get_solution(), self.get_max_core_per_chip(),
+        return CommonGASolutionRepresentation(self.get_solution(), self.get_max_cores_per_chip(),
             self.get_max_chips(), self.get_use_ptype())
     
-    @overrides(AbstractGASolutionRepresentation._get_ptype_solution)
-    def _get_ptyte_solution(self):
+    @overrides(AbstractGASolutionRepresentation._get_ptype_solution_representation)
+    def _get_ptype_solution_representation(self):
         gtype_solution_rep = self.get_solution()
         single_neuron_encoding_lentgh = self.get_single_neuron_encoding_length()
         solution = bytearray(len(gtype_solution_rep) * single_neuron_encoding_lentgh)
@@ -34,8 +34,8 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
             neuron_encoding_binary_str = ('{0:' + str(single_neuron_encoding_lentgh) + 'b}').format(gtype_solution_rep[neuron_index])
             solution[neuron_encoding_offset_from:neuron_encoding_offset_to] = neuron_encoding_binary_str
 
-    @overrides(AbstractGASolutionRepresentation.get_gtype_solution)
-    def _get_gtyte_solution(self):
+    @overrides(AbstractGASolutionRepresentation._get_gtype_solution_representation)
+    def _get_gtype_solution_representation(self):
         solution = []
         ptype_solution_rep = self.get_solution()
         single_neuron_encoding_lentgh = self.get_single_neuron_encoding_length()
