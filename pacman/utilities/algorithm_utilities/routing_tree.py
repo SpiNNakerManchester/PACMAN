@@ -62,6 +62,11 @@ class RoutingTree(object):
 
     @property
     def label(self) -> Optional[str]:
+        """
+        The label value provided to the init (if applicable).
+
+        :rtype: str or None
+        """
         return self._label
 
     @property
@@ -121,6 +126,10 @@ class RoutingTree(object):
 
     @property
     def is_leaf(self) -> bool:
+        """
+        Detect if this is a leaf node, which is one with no children.
+        :return:
+        """
         return not self._children
 
     def __iter__(self) -> Iterator[Union[RoutingTree, MachineVertex]]:
@@ -138,10 +147,8 @@ class RoutingTree(object):
                 yield obj
 
     def __repr__(self) -> str:
-        return "<RoutingTree at {} with {} {}>".format(
-            self.chip,
-            len(self._children),
-            "child" if len(self._children) == 1 else "children")
+        return f"<RoutingTree at {self.chip} with {len(self._children)}" \
+               f" {'child' if len(self._children) == 1 else 'children'}>"
 
     def traverse(self) -> Iterable[Tuple[Optional[int], XY, Set[int]]]:
         """

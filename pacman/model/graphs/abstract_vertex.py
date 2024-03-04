@@ -24,7 +24,7 @@ class AbstractVertex(object):
     __slots__ = (
         # Indicates if the Vertex has been added to a graph
         "_added_to_graph",
-        # Label for the vertex. Changable until added to graph
+        # Label for the vertex. Changeable until added to graph
         "_label",
         # the x, y (and p) this vertex MUST be placed on
         "_fixed_location")
@@ -62,7 +62,7 @@ class AbstractVertex(object):
                 "As Labels are also IDs they can not be changed.")
         self._label = label
 
-    def setAddedToGraph(self) -> None:
+    def set_added_to_graph(self) -> None:
         """
         Records that the vertex has been added to a graph.
 

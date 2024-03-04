@@ -38,6 +38,7 @@ infinity = float("inf")
 BW_PER_ROUTE_ENTRY = 0.01
 #: Maximum bandwidth of a link.
 MAX_BW = 250
+# pylint: disable=wrong-spelling-in-comment
 
 
 class _NodeInfo(object):
@@ -53,6 +54,11 @@ class _NodeInfo(object):
 
     @property
     def neighweights(self) -> Iterable[Tuple[Optional[Link], float]]:
+        """
+        Zip of neighbours and their weights
+
+        :rtype: iterable(link or None, float)
+        """
         return zip(self.neighbours, self.weights)
 
 

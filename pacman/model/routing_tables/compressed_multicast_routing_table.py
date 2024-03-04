@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Any, Collection, Iterable, List
-from pacman.model.routing_tables import AbstractMulticastRoutingTable
 from spinn_utilities.overrides import overrides
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+from pacman.model.routing_tables import AbstractMulticastRoutingTable
 
 
 class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):

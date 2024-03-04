@@ -25,14 +25,16 @@ https://github.com/project-rig/rig/blob/master/rig/geometry.py
 https://github.com/project-rig/rig/blob/master/rig/place_and_route/route/utils.py
 """
 
+from collections import defaultdict
 import functools
 from typing import Callable, Dict, Final, Iterable, List, Tuple
+
 from typing_extensions import TypeAlias
-from collections import defaultdict
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.typing.coords import XY
+
 from pacman.data import PacmanDataView
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition)
@@ -43,9 +45,11 @@ from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 from pacman.model.graphs.machine import MachineVertex
+
 _Vec: TypeAlias = Tuple[int, int, int]
 _V2N: TypeAlias = Callable[[_Vec, XY], List[Tuple[int, XY]]]
 _Inf: Final = float("inf")
+# pylint: disable=wrong-spelling-in-comment
 
 
 def _ner_net(src: XY, destinations: Iterable[XY],
