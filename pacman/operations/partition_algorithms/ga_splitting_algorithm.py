@@ -65,13 +65,15 @@ class GaAlgorithm(object):
     
     def do_GA_algorithm(self) -> AbstractGASolutionRepresentation:
         init_solution = self.init_solutions_common_representation_generator.generate_initial_population()
-        solutions = self.solution_representation_strategy.convert_from_common_representation(init_solution)
+        solutions = self.solution_representation_strategy.from_common_representation(init_solution)
         for epoch in range(0, self.epochs):
             self._log("begin epoch %d..." % epoch)
 
             avaliable_parents_count = len(solutions)
+            costs = self.solution_cost_calculation_strategy.calculate(solutions)
+
             while len(solutions) < self.max_individuals_each_epoch:
-                individual1, individual2 = self.crossover_individuals_selection_strategy.do_select_individuals(solutions[:avaliable_parents_count], self.solution_cost_calculation_strategy)
+                individual1, individual2 = self.crossover_individuals_selection_strategy.do_select_individuals(solutions[:avaliable_parents_count], costs)
                 new_individual = self.crossover_perform_strategy.do_crossover(individual1, individual2)
                 new_individual = self.variation_strategy.do_variation(new_individual)
                 new_individual = self.solution_fixing_strategy.do_solution_fixing(new_individual)
@@ -79,8 +81,8 @@ class GaAlgorithm(object):
                 self._log("[In Epoch %d] Finish solution %d/%d" % (len(solutions), self.max_individuals_each_epoch))
             
             self._log("[In Epoch %d] Finish. Begin calculating cost of each individual." % epoch)
-            costs = self.solution_cost_calculation_strategy.calculate(solutions)
-            self._log("[In Epoch %d] Finish. Costs = %s" % str(costs))
+            costs.append(self.solution_cost_calculation_strategy.calculate(solutions[avaliable_parents_count:]))
+            self._log("[In Epoc h %d] Finish. Costs = %s" % str(costs))
             solutions = self.selection_strategy.select(costs, solutions)
             if self.output_populaton_all_epoch:
                 self._out_solutions(epoch, solutions)
