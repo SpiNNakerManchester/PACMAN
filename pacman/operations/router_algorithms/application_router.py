@@ -288,7 +288,7 @@ def _route_source_to_target(
     :param dict(tuple(int,int), RoutingTree) routes:
         The routes made by chip (updated here)
     """
-    # Get which vertices are targetted by the source
+    # Get which vertices are targeted by the source
     target_vertices = target.splitter.get_source_specific_in_coming_vertices(
         source, partition.identifier)
 

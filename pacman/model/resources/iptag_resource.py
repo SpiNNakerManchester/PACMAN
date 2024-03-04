@@ -25,7 +25,7 @@ class IPtagResource(object):
         # the port number that data from this tag will be sent to, or None
         # if the port is to be assigned elsewhere
         "_port",
-        # a boolean flag that indicates if the SDP headers are
+        # a Boolean flag that indicates if the SDP headers are
         # stripped before transmission of data
         "_strip_sdp",
         #  A fixed tag ID to assign, or None if any tag is OK

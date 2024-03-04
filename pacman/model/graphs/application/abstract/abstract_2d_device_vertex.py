@@ -83,6 +83,14 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     @abstractmethod
     @overrides(ApplicationVertex.atoms_shape)
     def atoms_shape(self) -> Tuple[int, ...]:
+        """
+        The "shape" of the atoms in the vertex i.e. how the atoms are split
+        between the dimensions of the vertex.  By default everything is
+        1-dimensional, so the value will be a 1-tuple but can be
+        overridden by a vertex that supports multiple dimensions.
+
+        :rtype: tuple(int, ...)
+        """
         raise NotImplementedError
 
     def _verify_sub_size(self) -> None:
@@ -150,7 +158,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         Get the key and mask of the given machine vertex index.
 
-        :param int base_key: The unshifted key to use
+        :param int base_key: The key to use (not shifted)
         :param int index: The machine vertex index
         :rtype: BaseKeyAndMask
         """
