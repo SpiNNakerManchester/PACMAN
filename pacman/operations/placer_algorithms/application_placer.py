@@ -541,8 +541,7 @@ class _ChipWithSpace(object):
     def __init__(
             self, chip: Chip, used_processors: Set[int], used_sdram: int):
         self.chip = chip
-        self.cores = set(p.processor_id for p in chip.processors
-                         if not p.is_monitor)
+        self.cores = set(chip.user_processors_ids)
         self.cores -= used_processors
         self.sdram = chip.sdram - used_sdram
 
