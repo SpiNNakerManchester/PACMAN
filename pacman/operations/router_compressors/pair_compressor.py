@@ -31,7 +31,7 @@ def pair_compressor(
         A flag which should only be used in testing to stop raising an
         exception if result is too big
     :param bool verify: If set to true will verify the length before returning
-    :param bool c_sort: If set will use the slower quicksort as it is
+    :param bool c_sort: If set will use the slower quick sort as it is
         implemented in c/ on cores
     :rtype: MulticastRoutingTables
     """
@@ -146,13 +146,13 @@ class _PairCompressor(AbstractCompressor):
 
     __slots__ = (
         # A list of all entries which may be sorted
-        #   of entries represented as (key, mask, defautible)
+        #   of entries represented as (key, mask, defaultable)
         "_all_entries",
-        # flag ot use slower quicksort as it is implemented in c/ on cores
+        # flag to use slower quick sort as it is implemented in c/ on cores
         "_c_sort",
-        # The next index to write a merged/unmergable entry to
+        # The next index to write a merged/unmergeable entry to
         "_write_index",
-        # Inclusive index of last entry in the array (len in python)
+        # Inclusive index of last entry in the array (length in python)
         "_max_index",
         # Exclusive pointer to the end of the entries for previous buckets
         "_previous_index",
@@ -430,7 +430,7 @@ class _PairCompressor(AbstractCompressor):
 
         for entry in router_table.multicast_routing_entries:
             self._all_entries.append(
-                RTEntry.from_MulticastRoutingEntry(entry))
+                RTEntry.from_multicast_routing_entry(entry))
             self._update_frequency(entry)
 
         if self._c_sort:
@@ -513,10 +513,15 @@ class _PairCompressor(AbstractCompressor):
         # Compute the new mask  and key
         any_zeros = ~all_ones
         new_xs = any_ones ^ any_zeros
-        mask = all_selected & new_xs  # Combine existing and new Xs
+        mask = all_selected & new_xs
         key = all_ones & mask
         return key, mask, entry1.defaultable and entry2.defaultable
 
     @property
     def ordered(self) -> bool:
+        """
+        The ordered value passed into the init
+
+        :rtype: bool
+        """
         return self._ordered

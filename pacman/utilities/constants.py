@@ -27,6 +27,9 @@ SARK_PER_MALLOC_SDRAM_USAGE = 2 * BYTES_PER_WORD
 
 
 class EDGES(Enum):
+    """
+    The 6 directions links can go.
+    """
     EAST = 0
     NORTH_EAST = 1
     NORTH = 2

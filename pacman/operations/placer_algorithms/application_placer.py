@@ -125,6 +125,7 @@ def place_application_graph(system_placements: Placements) -> Placements:
                 chips_attempted.clear()
 
     if get_config_bool("Reports", "draw_placements"):
+        # pylint: disable=import-outside-toplevel
         from .draw_placements import draw_placements as dp
         dp(placements, system_placements)
 
@@ -212,6 +213,7 @@ def _place_error(
                         " free cores)\n")
 
     if get_config_bool("Reports", "draw_placements_on_error"):
+        # pylint: disable=import-outside-toplevel
         from .draw_placements import draw_placements as dp
         dp(placements, system_placements)
 
@@ -477,6 +479,9 @@ class _Spaces(object):
         self.__saved_chips.update(chips)
 
     def restore_chips(self) -> None:
+        """
+        Moves all the saved chips form used to restored
+        """
         for chip in self.__saved_chips:
             self.__used_chips.remove(chip)
             self.__restored_chips.add(chip)
@@ -540,6 +545,12 @@ class _ChipWithSpace(object):
 
     def __init__(
             self, chip: Chip, used_processors: Set[int], used_sdram: int):
+        """
+
+        :param Chip chip:
+        :param set(int) used_processors:
+        :param int used_sdram:
+        """
         self.chip = chip
         self.cores = set(chip.user_processors_ids)
         self.cores -= used_processors
@@ -547,19 +558,46 @@ class _ChipWithSpace(object):
 
     @property
     def x(self) -> int:
+        """
+        The x value of the Chip passed in at init time
+
+        :rtype: int
+        """
         return self.chip.x
 
     @property
     def y(self) -> int:
+        """
+        The y value of the Chip passed in at init time
+
+        :rtype: int
+        """
         return self.chip.y
 
     def is_space(self, n_cores: int, sdram: int) -> bool:
+        """
+        CHecks if there is space based on both cores and sdram
+
+        :param int n_cores:
+        :param int sdram:
+        :rtype: bool
+        """
         return len(self.cores) >= n_cores and self.sdram >= sdram
 
     def use_sdram(self, sdram: int):
+        """
+        Reduces available sdram by this amount
+
+        :param int sdram:
+        """
         self.sdram -= sdram
 
     def use_next_core(self) -> int:
+        """
+        Pops a core value
+
+        :rtype: int
+        """
         core = next(iter(self.cores))
         self.cores.remove(core)
         return core

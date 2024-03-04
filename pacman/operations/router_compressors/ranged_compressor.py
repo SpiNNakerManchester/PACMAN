@@ -67,7 +67,7 @@ class RangeCompressor(object):
     """
     # pylint: disable=attribute-defined-outside-init
     __slots__ = (
-        # Router table to add merged rutes into
+        # Router table to add merged routes into
         "_compressed",
         # List of entries to be merged
         "_entries")
@@ -176,7 +176,7 @@ class RangeCompressor(object):
             dif = last_point - first_point
             power = 1 if dif < 1 else 1 << ((dif - 1).bit_length())
 
-            # Find the start range cutoffs
+            # Find the start range cut-off
             low_cut = first_point // power * power
             high_cut = low_cut + power
 
