@@ -17,7 +17,6 @@ class CommonGaVariationuUniformGaussian(AbstractGaVariation):
         else:
             self._gtype_variation(individual)
 
-
     # in ptype representation, a gene variation should consider the gen near it, so that it could make as more as neurons logically alive neigbor could be in the same place. 
     def _ptype_variation(self, individual: AbstractGASolutionRepresentation):
         # variate a neuron's chip index and core index, then randomly change its neight to the same place
