@@ -47,6 +47,8 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
             The optional IP address of the board to which the device is
             connected e.g. in a multi-board system
         :param str label: The optional name of the vertex.
+        :param bool incoming:
+        :param bool outgoing:
         """
         super().__init__(label=label)
         self._n_atoms = self.round_n_atoms(n_atoms)
@@ -115,10 +117,20 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
 
     @property
     def incoming(self) -> bool:
+        """
+        Reports if this vertex supports incoming links
+
+        :rtype: bool
+        """
         return self._incoming
 
     @property
     def outgoing(self) -> bool:
+        """
+        Reports if this vertex supports incoming links
+
+        :rtype: bool
+        """
         return self._outgoing
 
     @overrides(ApplicationVirtualVertex.get_outgoing_link_data)

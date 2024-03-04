@@ -29,6 +29,12 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SplitterOneToOneLegacy(AbstractSplitterCommon[ApplicationVertex]):
+    """
+    A Splitter which hands an vertex with the LegacyPartitionerAPI
+
+    The assumption is that each ApplicationVertex
+    will get just one Machine vertex
+    """
 
     __slots__ = [
         "_machine_vertex",

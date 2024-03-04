@@ -40,6 +40,7 @@ class MulticastRoutingTableByPartitionEntry(object):
     """
 
     __slots__ = (
+        # pylint: disable=wrong-spelling-in-comment
         # Entry made up of bits as follows:
         # | IL = 6 bits | IP = 1 bit | OL = 6 bits | OP = 18 bits |
         # IL = incoming link id
@@ -255,18 +256,28 @@ class MulticastRoutingTableByPartitionEntry(object):
         return entry
 
     def __repr__(self) -> str:
-        return "{}:{}:{}:{{{}}}:{{{}}}".format(
-            self.incoming_link, self.incoming_processor,
-            self.defaultable,
-            ", ".join(map(str, self.link_ids)),
-            ", ".join(map(str, self.processor_ids)))
+        return (f"{self.incoming_link}:{self.incoming_processor}:"
+                f"{self.defaultable}:"
+                f"{{{', '.join(map(str, self.link_ids))}}}:"
+                f"{{{', '.join(map(str, self.processor_ids))}}}")
 
     def has_same_route(
             self, entry: MulticastRoutingTableByPartitionEntry) -> bool:
+        """
+        Checks if the two Entries have the same routes after applying mask
+
+        :param  MulticastRoutingTableByPartitionEntry entry:
+        :rtype: bool
+        """
         # pylint:disable=protected-access
         return ((self._links_and_procs & _COMPARE_MASK) ==
                 (entry._links_and_procs & _COMPARE_MASK))
 
     @property
     def spinnaker_route(self) -> int:
+        """
+        The masked routes
+
+        :rtype: int
+        """
         return self._links_and_procs & _SPINNAKER_ROUTE_MASK

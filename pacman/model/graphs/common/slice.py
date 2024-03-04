@@ -44,7 +44,7 @@ class Slice(object):
             raise PacmanValueError('lo_atom < 0')
         if hi_atom < lo_atom:
             raise PacmanValueError(
-                'hi_atom {:d} < lo_atom {:d}'.format(hi_atom, lo_atom))
+                f'hi_atom {hi_atom:d} < lo_atom {lo_atom:d}')
 
         self._lo_atom = lo_atom
         # Number of atoms represented by this slice

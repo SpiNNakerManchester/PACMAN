@@ -109,7 +109,7 @@ class AbstractCompressor(object):
 
                 for entry in compressed_table:
                     new_table.add_multicast_routing_entry(
-                        entry.to_MulticastRoutingEntry())
+                        entry.to_multicast_routing_entry())
                 if new_table.number_of_entries > target:
                     self._problems += (
                         f"(x:{new_table.x},y:{new_table.y})="

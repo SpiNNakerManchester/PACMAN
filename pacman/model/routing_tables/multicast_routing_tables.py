@@ -16,13 +16,16 @@ import json
 import gzip
 from typing import (
     Collection, Dict, Iterable, Iterator, Optional, Union, cast)
+
 from spinn_utilities.typing.coords import XY
 from spinn_utilities.typing.json import JsonObjectArray
+from spinn_machine import MulticastRoutingEntry
+
 from pacman.exceptions import PacmanAlreadyExistsException
+
 from .abstract_multicast_routing_table import AbstractMulticastRoutingTable
 from .uncompressed_multicast_routing_table import (
     UnCompressedMulticastRoutingTable)
-from spinn_machine import MulticastRoutingEntry
 
 
 class MulticastRoutingTables(object):
@@ -134,6 +137,12 @@ class MulticastRoutingTables(object):
 
 
 def to_json(router_table: MulticastRoutingTables) -> JsonObjectArray:
+    """
+    Converts RoutingTables to json
+
+    :param MulticastRoutingTables router_table:
+    :rtype: list(dict(str, object))
+    """
     return [
         {
             "x": routing_table.x,
@@ -151,6 +160,13 @@ def to_json(router_table: MulticastRoutingTables) -> JsonObjectArray:
 
 
 def from_json(j_router: Union[str, JsonObjectArray]) -> MulticastRoutingTables:
+    """
+    Creates Routing Tables based on json
+
+    :param j_router:
+    :type: str or list
+    :rtype: MulticastRoutingTables
+    """
     if isinstance(j_router, str):
         if j_router.endswith(".gz"):
             with gzip.open(j_router) as j_file:
