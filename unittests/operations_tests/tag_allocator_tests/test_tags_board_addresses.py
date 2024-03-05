@@ -73,10 +73,8 @@ class TestTagsBoardAddresses(unittest.TestCase):
         eth_chips = machine.ethernet_connected_chips
         eth_chip = eth_chips[0]
         eth_chip_2 = machine.get_chip_at(eth_chip.x + 1, eth_chip.y + 1)
-        eth_procs = [
-            proc.processor_id for proc in eth_chip.processors
-            if not proc.is_monitor]
-        procs = [proc for proc in eth_chip_2.processors if not proc.is_monitor]
+        eth_procs = list(eth_chip.user_processors_ids)
+        procs = list(eth_chip_2.user_processors)
         eth2_procs = [proc.processor_id for proc in procs]
         proc = procs[-1]
         eth_vertices = [
@@ -125,9 +123,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         machine = virtual_machine(8, 8)
         writer.set_machine(machine)
         chip00 = machine.get_chip_at(0, 0)
-        procs = [
-            proc.processor_id for proc in chip00.processors
-            if not proc.is_monitor]
+        procs = chip00.user_processors_ids
         placements = Placements()
         for i in range(5):
             vertex = SimpleMachineVertex(
@@ -135,7 +131,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
                 iptags=[IPtagResource(
                     "127.0.0.1", port=10000 + i, strip_sdp=True, tag=1+i)],
                 label="Vertex {i}")
-            placements.add_placement(Placement(vertex, 0, 0, procs[i]))
+            placements.add_placement(Placement(vertex, 0, 0, next(procs)))
         writer.set_placements(placements)
         writer.set_plan_n_timesteps(1000)
         tags = basic_tag_allocator()
@@ -146,9 +142,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         writer = PacmanDataWriter.mock()
         writer.set_machine(machine)
         chip00 = machine.get_chip_at(0, 0)
-        procs = [
-            proc.processor_id for proc in chip00.processors
-            if not proc.is_monitor]
+        procs = chip00.user_processors_ids
         placements = Placements()
         for i in range(3):
             vertex = SimpleMachineVertex(
@@ -158,7 +152,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
                         IPtagResource("127.45.0.1", port=10000 + i,
                                       strip_sdp=True, tag=1+i)],
                 label=f"Vertex {i}")
-            placements.add_placement(Placement(vertex, 0, 0, procs[i]))
+            placements.add_placement(Placement(vertex, 0, 0, next(procs)))
         writer.set_placements(placements)
         writer.set_plan_n_timesteps(1000)
         tags = basic_tag_allocator()
@@ -182,14 +176,12 @@ class TestTagsBoardAddresses(unittest.TestCase):
         writer = PacmanDataWriter.mock()
         writer.set_machine(machine)
         chip00 = machine.get_chip_at(0, 0)
-        procs = [
-            proc.processor_id for proc in chip00.processors
-            if not proc.is_monitor]
+        processor = chip00.get_first_none_monitor_processor()
         placements = Placements()
         vertex = SimpleMachineVertex(
             sdram=ConstantSDRAM(0),
             reverse_iptags=[ReverseIPtagResource(port=10000, tag=1)])
-        placements.add_placement(Placement(vertex, 0, 0, procs[1]))
+        placements.add_placement(Placement(vertex, 0, 0, processor))
         writer.set_placements(placements)
         writer.set_plan_n_timesteps(1000)
         tags = basic_tag_allocator()

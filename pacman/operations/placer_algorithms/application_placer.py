@@ -298,8 +298,7 @@ def _do_fixed_location(
             f"Constrained to chip {x, y} but no such chip")
     on_chip = placements.placements_on_chip(x, y)
     cores_used = {p.p for p in on_chip}
-    cores = set(p.processor_id for p in chip.processors
-                if not p.is_monitor) - cores_used
+    cores = set(chip.user_processors_ids) - cores_used
     next_cores = iter(cores)
     for vertex in vertices:
         next_core = None
