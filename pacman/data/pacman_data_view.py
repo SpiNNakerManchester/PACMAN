@@ -61,8 +61,8 @@ class _PacmanDataModel(object):
         "_placements",
         "_plan_n_timesteps",
         "_precompressed",
-        "_monitor_cores",
-        "_monitor_sdram",
+        "_system_cores",
+        "_system_sdram",
         "_routing_infos",
         "_routing_table_by_partition",
         "_tags",
@@ -93,8 +93,8 @@ class _PacmanDataModel(object):
             self._graph.reset()
         self._placements: Optional[Placements] = None
         self._precompressed: Optional[MulticastRoutingTables] = None
-        self._monitor_cores: int = 0
-        self._monitor_sdram: int = 0
+        self._system_cores: int = 0
+        self._system_sdram: int = 0
         self._uncompressed: Optional[MulticastRoutingTables] = None
         self._routing_infos: Optional[RoutingInfo] = None
         self._routing_table_by_partition: Optional[
@@ -534,25 +534,28 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._routing_table_by_partition
 
     @classmethod
-    def get_monitor_cores(cls) -> int:
+    def get_system_cores(cls) -> int:
         """
-        The number of cores on every chip reported to be used by monitors.
+        The number of cores on every chip reported to be used by system cores.
+
         Ethernet-enabled chips may have more.
 
-        Does not include the system core reserved by the machine itself.
+        Does not include the core reserved by the scamp itself.
 
         :rtype: int
         """
-        return cls.__pacman_data._monitor_cores
+        return cls.__pacman_data._system_cores
 
     @classmethod
-    def get_monitor_sdram(cls) -> int:
+    def get_system_sdram(cls) -> int:
         """
-        The amount of SDRAM on every chip reported to be used by monitors.
+        The amount of SDRAM on every chip reported to be used by \
+        system cores.
+
         Ethernet-enabled chips may have more.
 
-        Does not include the system SDRAM reserved by the machine itself.
+        Does not include the SDRAM reserved by the scamp itself.
 
         :rtype: int
         """
-        return cls.__pacman_data._monitor_sdram
+        return cls.__pacman_data._system_sdram
