@@ -14,12 +14,11 @@
 
 from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
-from .element_free_space import ElementFreeSpace
 from .iptag_resource import IPtagResource
 from .multi_region_sdram import MultiRegionSDRAM
 from .reverse_iptag_resource import ReverseIPtagResource
 from .variable_sdram import VariableSDRAM
 
 __all__ = ["AbstractSDRAM", "ConstantSDRAM",
-           "ElementFreeSpace", "IPtagResource", "MultiRegionSDRAM",
+           "IPtagResource", "MultiRegionSDRAM",
            "ReverseIPtagResource", "VariableSDRAM"]
