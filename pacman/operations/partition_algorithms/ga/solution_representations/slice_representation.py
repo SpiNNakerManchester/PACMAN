@@ -7,7 +7,8 @@ from spinn_utilities.overrides import overrides
 class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
     def __init__(self) -> None:
           super().__init__([], -1, -1)
-          
+        
+    
     def __init__(self, slices_end_points, slices_chip_indexes, slices_core_indexes, max_cores_per_chip, max_chips) -> None:
           super().__init__([], max_cores_per_chip, max_chips, False)
           previous_pos = 0
@@ -21,7 +22,7 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
                self._solution.append((slice_neuron_from, slice_neuron_to, chip_index, core_index))
 
     @overrides(AbstractGASolutionRepresentation._get_gtype_solution_representation)
-    def _get_gtype_solution_representation(self) -> bytearray:
+    def _get_ptype_solution_representation(self) -> bytearray:
         solution = self._solution
         gtype_length = len(solution) * 32 * 4
         gtype_represent = bytearray(gtype_length)
@@ -31,7 +32,7 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         return gtype_represent
     
     @overrides(AbstractGASolutionRepresentation._get_ptype_solution_representation)
-    def _get_ptype_solution_representation(self, gtype_solution_representation) -> bytearray:
+    def _get_gtype_solution_representation(self, gtype_solution_representation) -> bytearray:
         gtype_length = len(gtype_solution_representation)
         solution = []
         slice_info = []

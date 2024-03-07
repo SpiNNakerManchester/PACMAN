@@ -3,7 +3,7 @@ from pacman.operations.partition_algorithms.ga.solution_representations.abst_ga_
 from pacman.operations.partition_algorithms.ga.cost_caculators.abst_cost_calculator import AbstractGaCostCalculator
 from spinn_utilities.overrides import overrides
 
-class C1Cost(AbstractGaCostCalculator):
+class ResourceUtilizationCost(AbstractGaCostCalculator):
     @override(AbstractGaCostCalculator._calculate_single)
     def _calculate_single(self, solution: AbstractGASolutionRepresentation) -> List[float]:
         common_solution_representation = solution.to_common_representation()
