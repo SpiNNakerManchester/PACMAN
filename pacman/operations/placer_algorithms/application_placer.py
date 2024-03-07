@@ -208,7 +208,7 @@ def _place_error(
             n_placed = placements.n_placements_on_chip(x, y)
             system_placed = system_placements.n_placements_on_chip(x, y)
             if n_placed - system_placed == 0:
-                n_procs = machine[x, y].n_user_processors
+                n_procs = machine[x, y].n_placable_processors
                 f.write(f"    {x}, {y} ({n_procs - system_placed}"
                         " free cores)\n")
 
@@ -298,7 +298,7 @@ def _do_fixed_location(
             f"Constrained to chip {x, y} but no such chip")
     on_chip = placements.placements_on_chip(x, y)
     cores_used = {p.p for p in on_chip}
-    cores = set(chip.user_processors_ids) - cores_used
+    cores = set(chip.placable_processors_ids) - cores_used
     next_cores = iter(cores)
     for vertex in vertices:
         next_core = None
@@ -551,7 +551,7 @@ class _ChipWithSpace(object):
         :param int used_sdram:
         """
         self.chip = chip
-        self.cores = set(chip.user_processors_ids)
+        self.cores = set(chip.placable_processors_ids)
         self.cores -= used_processors
         self.sdram = chip.sdram - used_sdram
 
