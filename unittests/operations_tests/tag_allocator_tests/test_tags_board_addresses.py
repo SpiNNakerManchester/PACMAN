@@ -74,9 +74,8 @@ class TestTagsBoardAddresses(unittest.TestCase):
         eth_chip = eth_chips[0]
         eth_chip_2 = machine.get_chip_at(eth_chip.x + 1, eth_chip.y + 1)
         eth_procs = list(eth_chip.placable_processors_ids)
-        procs = list(eth_chip_2.placeable_processors)
-        eth2_procs = [proc.processor_id for proc in procs]
-        proc = procs[-1]
+        eth2_procs = list(eth_chip_2.placable_processors_ids)
+        proc = eth2_procs[-1]
         eth_vertices = [
             SimpleMachineVertex(
                 sdram=ConstantSDRAM(0),
