@@ -95,7 +95,6 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         solution = self.get_solution()
         single_neuron_encoding_length = self._single_neuron_encoding_length
         comm_solution = bytearray(single_neuron_encoding_length)
-        neuron_index = 0
         for i in range(0, len(solution)):
             slice_info = solution[i]
             slice_neuron_from = slice_info[0]
