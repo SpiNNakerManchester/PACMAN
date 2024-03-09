@@ -11,7 +11,7 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
     CORE_INDEX = 3
     
     def __init__(self) -> None:
-          super().__init__([], -1, -1)
+          super().__init__([], -1, -1, False)
           
 
     def __init__(self, slices_end_points, slices_chip_indexes, slices_core_indexes, max_cores_per_chip, max_chips) -> None:
@@ -79,12 +79,12 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
     
     @overrides(AbstractGASolutionRepresentation._get_ptype_solution_representation)
     def _get_ptype_solution_representation(self):
-        ptype_solution_representation = self.get_solution()
-        ptype_length = len(ptype_solution_representation)
+        gtype_solution_representation = self.get_solution()
+        gtype_length = len(gtype_solution_representation)
         solution = []
         slice_info = []
-        for neuron_index in range(0, ptype_length / 32):
-            slice_info.append(int(ptype_solution_representation[neuron_index * 32, (neuron_index + 1) * 32], 2))
+        for neuron_index in range(0, gtype_length / 32):
+            slice_info.append(int(gtype_solution_representation[neuron_index * 32, (neuron_index + 1) * 32], 2))
             if(len(slice_info) == 4):
                  solution.append((*slice_info, ))
                  slice_info = []
