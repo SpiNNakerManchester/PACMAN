@@ -18,7 +18,6 @@ class GaSliceVariationuUniformGaussian(AbstractGaVariation):
             self._gtype_variation(individual)
             return individual
 
-    # in ptype representation, a genes variation should consider the genes near it, so that it could make as more as neurons logically alive neigbor could be in the same place.
     def _ptype_variation(self, individual: GASliceSolutionRepresentation):
         # variate a neuron's chip index and core index, then randomly change its neighbors to the same place.
         single_neuron_encoding_length = individual.get_single_neuron_encoding_length()
@@ -110,9 +109,9 @@ class GaSliceVariationuUniformGaussian(AbstractGaVariation):
         self.__gtype_variation(individual_rep, max_cores_per_chip, max_chips)
 
                 
-    # each gene is variated with a possibility of variation_rate. and the variation quantance obtains a gaussian distribution N(Sigma^2, mu)
-    # if a gene is variated, it will make its neighbor neurons in the same place as it. The range of neighbor neuron is decided by a gaussian distribution of N(neibor_effect_sigma, neibor_effect_mu). 
-    def __init__(self, use_ptype=True, variation_happen_ratio=0.2, sigma=1.0, mu=0.0, chip_index_variation_mu=0.0, chip_index_variation_sigma=0.0, core_index_variation_mu=0.0, core_index_variation_sigma=0.0) -> None:
+    # Each gene is variated with a possibility of variation_rate. and the variation quantance obtains a gaussian distribution N(Sigma^2, mu)
+    # If a gene is variated, it will make its neighbor neurons in the same place as it. The range of neighbor neuron is decided by a gaussian distribution of N(neibor_effect_sigma, neibor_effect_mu). 
+    def __init__(self, use_ptype=False, variation_happen_ratio=0.2, sigma=1.0, mu=0.0, chip_index_variation_mu=0.0, chip_index_variation_sigma=0.0, core_index_variation_mu=0.0, core_index_variation_sigma=0.0) -> None:
         super().__init__()
         self._use_ptype = use_ptype
         self._variation_happen_ratio = variation_happen_ratio

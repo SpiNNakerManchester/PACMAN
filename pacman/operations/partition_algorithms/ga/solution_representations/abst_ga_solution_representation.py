@@ -9,7 +9,7 @@ class AbstractGASolutionRepresentation:
         self._single_neuron_encoding_length = \
             (int)(np.ceil(np.log2(self.get_max_chips() * self.get_max_cores_per_chip)))
    
-    def get_ptype_solution_representation(self) -> bytearray:
+    def get_ptype_solution_representation(self) :
         if self._use_ptype:
             self._solution
         return self._get_ptype_solution_representation()
@@ -17,9 +17,9 @@ class AbstractGASolutionRepresentation:
     def get_single_neuron_encoding_length(self):
         return self._single_neuron_encoding_length
 
-    def get_gtype_solution_representation(self):
+    def get_gtype_solution_representation(self) -> bytearray:
         if self._use_ptype:
-            return self._get_gtyte_solution_representation()
+            return self._get_gtype_solution_representation()
         return self._solution
     
     def get_solution(self):

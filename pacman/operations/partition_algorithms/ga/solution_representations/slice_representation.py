@@ -78,7 +78,7 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         return gtype_represent
     
     @overrides(AbstractGASolutionRepresentation._get_ptype_solution_representation)
-    def _get_ptype_solution_representation(self) -> bytearray:
+    def _get_ptype_solution_representation(self):
         ptype_solution_representation = self.get_solution()
         ptype_length = len(ptype_solution_representation)
         solution = []

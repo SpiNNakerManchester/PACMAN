@@ -82,8 +82,8 @@ class CommonGaVariationuUniformGaussian(AbstractGaVariation):
                 individual_rep[variation_neuron_index_from: variation_neuron_index_to] = chip_core_encoding_after_variation * (variation_neuron_index_to - variation_neuron_index_from)
         return individual_rep
     
-    # each gene is variated with a possibility of variation_rate. and the variation quantance obtains a gaussian distribution N(Sigma^2, mu)
-    # if a gene is variated, it will make its neighbor neurons in the same place as it. The range of neighbor neuron is decided by a gaussian distribution of N(neibor_effect_sigma, neibor_effect_mu). 
+    # Each gene is variated with a possibility of variation_rate. and the variation quantance obtains a gaussian distribution N(Sigma^2, mu)
+    # If a gene is variated, it will make its neighbor neurons in the same place as it. The range of neighbor neuron is decided by a gaussian distribution of N(neibor_effect_sigma, neibor_effect_mu). 
     def __init__(self, use_ptype=True, variation_rate = 0.001, chip_var_sigma = 1.0, core_var_sigma = 1.0, neighbor_effect_sigma = 100, chip_var_mu = 0.0, core_var_mu = 0.0, neighbor_effect_mu = 0) -> None:
         super().__init__()
         self._use_ptype = use_ptype

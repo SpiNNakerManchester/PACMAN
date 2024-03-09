@@ -10,7 +10,7 @@ import numpy as np
 
 
 class GaSliceCrossoverKPoints(AbstractGaCrossover):
-    def __init__(self, k: int, use_ptype=True) -> None:
+    def __init__(self, k: int, use_ptype=False) -> None:
         super().__init__()
         self._k = k
         self._use_ptype = use_ptype
@@ -67,7 +67,7 @@ class GaSliceCrossoverKPoints(AbstractGaCrossover):
 
 
 class GaSliceCrossoverUniform(AbstractGaCrossover):
-    def __init__(self, use_ptype=True) -> None:
+    def __init__(self, use_ptype=False) -> None:
         super().__init__()
         self._use_ptype = use_ptype
 
