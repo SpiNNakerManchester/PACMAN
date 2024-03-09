@@ -18,11 +18,11 @@ class CommonGaVariationuUniformGaussian(AbstractGaVariation):
             self._gtype_variation(individual)
             return individual
 
-    # In ptype representation, a gene variation should consider the gen near it, so that it could make as more as neurons logically alive neigbor could be in the same place. 
-    def _ptype_variation(self, individual: AbstractGASolutionRepresentation):
+    # In gtype representation, a gene variation should consider the gen near it, so that it could make as more as neurons logically alive neigbor could be in the same place. 
+    def _gtype_variation(self, individual: AbstractGASolutionRepresentation):
         # variate a neuron's chip index and core index, then randomly change its neighbors to the same place.
         single_neuron_encoding_length = individual.get_single_neuron_encoding_length()
-        individual_rep = individual.get_ptype_solution_representation()
+        individual_rep = individual.get_gtype_solution_representation()
         if ((len(individual_rep) % single_neuron_encoding_length != 0)):
             raise ValueError
 
@@ -53,9 +53,9 @@ class CommonGaVariationuUniformGaussian(AbstractGaVariation):
                 individual_rep[variation_neuron_index_from * single_neuron_encoding_length:variation_neuron_index_to* single_neuron_encoding_length] = chip_core_encoding_after_variation * (variation_neuron_index_to - variation_neuron_index_from)
         return individual_rep
     
-    def _gtype_variation(self, individual: AbstractGASolutionRepresentation):
+    def _ptype_variation(self, individual: AbstractGASolutionRepresentation):
         # variate a neuron's chip index and core index, then randomly change its neight to the same place
-        individual_rep = individual.get_gtype_solution_representation()
+        individual_rep = individual.get_ptype_solution_representation()
     
         neuron_count = len(individual_rep)
         max_cores_per_chip = individual.get_max_cores_per_chip()

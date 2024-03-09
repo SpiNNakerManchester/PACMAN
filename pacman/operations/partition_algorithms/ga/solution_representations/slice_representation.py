@@ -2,15 +2,17 @@ from .abst_ga_solution_representation import AbstractGASolutionRepresentation
 from .common_ga_solution_representation import CommonGASolutionRepresentation
 from spinn_utilities.overrides import overrides
 
-# GTYPE := List[(slice_neuron_from: int, slice_neuron_to: int, chip_index: int, core_index: int)]
+# PTYPE := List[(slice_neuron_from: int, slice_neuron_to: int, chip_index: int, core_index: int)]
 
 class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
+    SLICE_NEURON_FROM_INDEX = 0
+    SLICE_NEURON_TO_INDEX = 1
+    CHIP_INDEX = 2
+    CORE_INDEX = 3
+    
     def __init__(self) -> None:
           super().__init__([], -1, -1)
-          self.SLICE_NEURON_FROM_INDEX = 0
-          self.SLICE_NEURON_TO_INDEX = 0
-          self.CHIP_INDEX = 0
-          self.CORE_INDEX = 0
+          
 
     def __init__(self, slices_end_points, slices_chip_indexes, slices_core_indexes, max_cores_per_chip, max_chips) -> None:
           super().__init__([], max_cores_per_chip, max_chips, False)
@@ -24,59 +26,59 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
                slice_index += 1
                self._solution.append((slice_neuron_from, slice_neuron_to, chip_index, core_index))
 
-
     def get_slice_neuron_from_in_solution(self, element_index):
-         if not self._use_ptype:
+         if self._use_ptype:
             return self._solution[element_index][self.SLICE_NEURON_FROM_INDEX]
          raise NotImplementedError
     
     def get_slice_neuron_to_in_solution(self, element_index):
-         if not self._use_ptype:
+         if self._use_ptype:
             return self._solution[element_index][self.SLICE_NEURON_TO_INDEX]
          raise NotImplementedError
 
     def get_chip_index_in_solution(self, element_index):
-         if not self._use_ptype:
+         if self._use_ptype:
             return self._solution[element_index][self.CHIP_INDEX]
          raise NotImplementedError
 
     def get_core_index_in_solution(self, element_index):
-         if not self._use_ptype:
+         if self._use_ptype:
             return self._solution[element_index][self.CORE_INDEX]
          raise NotImplementedError
 
     def set_slice_neuron_from_in_solution(self, element_index, value):
-         if not self._use_ptype:
+         if self._use_ptype:
             self._solution[element_index][self.SLICE_NEURON_FROM_INDEX] = value
          raise NotImplementedError
 
     def set_slice_neuron_to_in_solution(self, element_index, value):
-         if not self._use_ptype:
+         if self._use_ptype:
             self._solution[element_index][self.SLICE_NEURON_TO_INDEX] = value
          raise NotImplementedError
 
     def set_chip_index_in_solution(self, element_index, value):
-         if not self._use_ptype:
+         if self._use_ptype:
             self._solution[element_index][self.CHIP_INDEX] = value
          raise NotImplementedError
 
     def set_core_index_in_solution(self, element_index, value):
-         if not self._use_ptype:
+         if self._use_ptype:
             self._solution[element_index][self.CORE_INDEX] = value
          raise NotImplementedError
 
     @overrides(AbstractGASolutionRepresentation._get_gtype_solution_representation)
-    def _get_ptype_solution_representation(self) -> bytearray:
+    def _get_gtype_solution_representation(self) -> bytearray:
         solution = self._solution
         gtype_length = len(solution) * 32 * 4
         gtype_represent = bytearray(gtype_length)
         for i in range(0, len(solution)):
-            binary_string_len32 = ('{0:32b}').format(solution[i / 4][i % 4])
-            gtype_represent[i * 32: (i + 1) * 32] = binary_string_len32
+            for j in range(0, 4):
+                binary_string_len32 = ('{0:32b}').format(solution[i][j])
+                gtype_represent[(i * 4 + j) * 32: (i * 4 + j + 1) * 32] = binary_string_len32
         return gtype_represent
     
     @overrides(AbstractGASolutionRepresentation._get_ptype_solution_representation)
-    def _get_gtype_solution_representation(self) -> bytearray:
+    def _get_ptype_solution_representation(self) -> bytearray:
         ptype_solution_representation = self.get_solution()
         ptype_length = len(ptype_solution_representation)
         solution = []
@@ -87,8 +89,6 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
                  solution.append((*slice_info, ))
                  slice_info = []
         return solution
-
-    
 
     @overrides(AbstractGASolutionRepresentation.to_common_representation)
     def to_common_representation(self):
@@ -157,4 +157,4 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         return self
 
     def __str__(self):
-            return "comm_rep"
+            return "slice_rep"
