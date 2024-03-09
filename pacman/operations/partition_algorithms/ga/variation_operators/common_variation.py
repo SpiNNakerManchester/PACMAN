@@ -16,10 +16,11 @@ class CommonGaVariationuUniformGaussian(AbstractGaVariation):
             return individual
         else:
             self._gtype_variation(individual)
+            return individual
 
-    # in ptype representation, a gene variation should consider the gen near it, so that it could make as more as neurons logically alive neigbor could be in the same place. 
+    # In ptype representation, a gene variation should consider the gen near it, so that it could make as more as neurons logically alive neigbor could be in the same place. 
     def _ptype_variation(self, individual: AbstractGASolutionRepresentation):
-        # variate a neuron's chip index and core index, then randomly change its neight to the same place
+        # variate a neuron's chip index and core index, then randomly change its neighbors to the same place.
         single_neuron_encoding_length = individual.get_single_neuron_encoding_length()
         individual_rep = individual.get_ptype_solution_representation()
         if ((len(individual_rep) % single_neuron_encoding_length != 0)):
@@ -80,6 +81,7 @@ class CommonGaVariationuUniformGaussian(AbstractGaVariation):
                 chip_core_encoding_after_variation = (chip_index * individual.get_max_cores_per_chip() + core_index)
                 individual_rep[variation_neuron_index_from: variation_neuron_index_to] = chip_core_encoding_after_variation * (variation_neuron_index_to - variation_neuron_index_from)
         return individual_rep
+    
     # each gene is variated with a possibility of variation_rate. and the variation quantance obtains a gaussian distribution N(Sigma^2, mu)
     # if a gene is variated, it will make its neighbor neurons in the same place as it. The range of neighbor neuron is decided by a gaussian distribution of N(neibor_effect_sigma, neibor_effect_mu). 
     def __init__(self, use_ptype=True, variation_rate = 0.001, chip_var_sigma = 1.0, core_var_sigma = 1.0, neighbor_effect_sigma = 100, chip_var_mu = 0.0, core_var_mu = 0.0, neighbor_effect_mu = 0) -> None:
