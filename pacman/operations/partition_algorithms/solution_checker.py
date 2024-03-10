@@ -6,7 +6,6 @@ from pacman.model.graphs.common import Slice, MDSlice
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
-from pacman.model.resources import AbstractSDRAM
 from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
 from spynnaker.pyNN.models.neuron.population_machine_vertex import (
     NeuronProvenance, SynapseProvenance, MainProvenance,
@@ -23,18 +22,18 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region)
 from typing import Sequence
 from numpy.typing import NDArray
-from spynnaker.pyNN.models.neuron.population_machine_common import (
-    PopulationMachineCommon)
+from spynnaker.pyNN.models.neuron.population_machine_common import (PopulationMachineCommon)
 from .solution_checker import SolutionChecker
 from pacman.operations.partition_algorithms.solution_adopter import SolutionAdopter
 from numpy import floating
-
+from pacman.operations.partition_algorithms.utils.sdram_recorder import SDRAMRecorder
 
 class SolutionChecker(object):
     def __init__(self) -> None:
         self.constraint_max_core_per_chip = 18
         self.constraint_max_chips = np.inf
         self.constraint_sdram_capacity = 100 * 1024 * 1024
+        self.sdram_recorder = SDRAMRecorder()
 
     @classmethod
     def check(self, adapter_output: bytearray, graph: ApplicationGraph, solution_configuration_max_chips = np.inf, solution_configuration_max_chips_per_core = 18) -> bool:
@@ -106,8 +105,16 @@ class SolutionChecker(object):
                     atoms_in_atoms)
                 structural_sz = application_vertex.get_structural_dynamics_size(
                     atoms_in_atoms)
+                recorded_sdram = self.sdram_recorder._get_sdram(chip_id, core_id)
                 sdram = self.get_sdram_used_by_atoms(self,
                     atoms_in_atoms, all_syn_block_sz, structural_sz, application_vertex)
-                if sdram > self.constraint_sdram_capacity:
-                    return False
+                if recorded_sdram == None:
+                    self.sdram_recorder._record_sdram(chip_id, core_id, sdram)
+                    recorded_sdram = sdram
+                else:
+                    recorded_sdram.merge(sdram)
                 
+                if recorded_sdram.get_total_sdram() > self.constraint_sdram_capacity:
+                    return False
+    
+    

@@ -97,15 +97,16 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         comm_solution = bytearray(single_neuron_encoding_length)
         for i in range(0, len(solution)):
             slice_info = solution[i]
-            slice_neuron_from = slice_info[0]
-            slice_neuron_to = slice_info[1]
-            chip_index = slice_info[2]
-            core_index = slice_info[3]
+            slice_neuron_from = slice_info[GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX]
+            slice_neuron_to = slice_info[GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
+            chip_index = slice_info[GASliceSolutionRepresentation.CHIP_INDEX]
+            core_index = slice_info[GASliceSolutionRepresentation.CORE_INDEX]
             write_common_solution_from = slice_neuron_from * single_neuron_encoding_length
             write_common_solution_to = (slice_neuron_to + 1) * single_neuron_encoding_length
             chip_core_represent = chip_index * self._max_cores_per_chip + core_index
             slice_length = slice_neuron_to - slice_neuron_from + 1
-            binary_string = ('{0:' + str(single_neuron_encoding_length) + 'b}').format(chip_core_represent) * slice_length
+            binary_string = ('{0:' + str(single_neuron_encoding_length) + 'b}')\
+                .format(chip_core_represent) * slice_length
 
             comm_solution[write_common_solution_from:write_common_solution_to] = binary_string
         return CommonGASolutionRepresentation(comm_solution, single_neuron_encoding_length, self._max_cores_per_chip, self._max_chips)

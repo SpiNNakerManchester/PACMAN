@@ -27,9 +27,12 @@ from spynnaker.pyNN.models.neuron.population_machine_common import (
     PopulationMachineCommon)
 from .solution_checker import SolutionChecker
 from numpy import floating
-
+from pacman.operations.partition_algorithms.utils.sdram_recorder import SDRAMRecorder
 
 class SolutionAdopter:
+    def __init__(self) -> None:
+        self._sdram_recorder = SDRAMRecorder()
+
     @classmethod
     def to_multi_dimension_representation(num :int, max_per_dimension):
         l = num
@@ -58,11 +61,9 @@ class SolutionAdopter:
         s_dynamics = vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
             max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts()
-            vertex.synapse_recorder.set_max_rewires_per_ts(
-                max_rewires_per_ts)
+            vertex.synapse_recorder.set_max_rewires_per_ts(max_rewires_per_ts)
 
-        return (
-            vertex.get_max_neuron_variable_sdram(n_atoms) +
+        return (vertex.get_max_neuron_variable_sdram(n_atoms) +
             vertex.get_max_synapse_variable_sdram(n_atoms))
 
     def __get_constant_sdram(
@@ -147,8 +148,8 @@ class SolutionAdopter:
         """
         # pylint: disable=arguments-differ
         variable_sdram = self.__get_variable_sdram(self, n_atoms, vertex)
-        constant_sdram = self.__get_constant_sdram(self, 
-            n_atoms, all_syn_block_sz, structural_sz, vertex)
+        constant_sdram = self.__get_constant_sdram(self, n_atoms, all_syn_block_sz, 
+                                                   structural_sz, vertex)
         sdram = MultiRegionSDRAM()
         sdram.nest(len(PopulationMachineVertex.REGIONS) + 1, variable_sdram)
         sdram.merge(constant_sdram)
@@ -177,6 +178,16 @@ class SolutionAdopter:
             weight_scales, structural_sz, max_atoms_per_core,
             synaptic_matrices, neuron_data)
     
+    @classmethod
+    def calculate_sdram(self, application_vertex, slice_n_atoms):
+        ring_buffer_shifts = application_vertex.get_ring_buffer_shifts()
+        weight_scales = application_vertex.get_weight_scales(ring_buffer_shifts)
+        all_syn_block_sz = application_vertex.get_synapses_size(slice_n_atoms)
+        structural_sz = application_vertex.get_structural_dynamics_size(
+                        slice_n_atoms)
+        sdram = self.get_sdram_used_by_atoms(self,
+                        slice_n_atoms, all_syn_block_sz, structural_sz, application_vertex)
+        return sdram
 
     @classmethod
     def AdoptSolution(self, adapter_output: bytearray, graph: ApplicationGraph, chip_counter: ChipCounter):
@@ -262,21 +273,36 @@ class SolutionAdopter:
                 prev_index = i
 
         for key in core_atoms_amount_map.keys():
-            atoms_in_core = core_atoms_amount_map[key]['atoms_in_core']
+            atoms_in_core = core_atoms_amount_map[key]['atoms_in_core'] # atoms_in_core: total number of atoms in the core
             chip_core_index = [int(x) for x in str(key).split("#")]
             chip_index = chip_core_index[0]
             core_index = chip_core_index[1]
-
+            
             for (application_vertex, vertex_slice) in core_atoms_amount_map[key]['slices']:
+                # It seems the atoms_in_core should be the size of slice.
                 ring_buffer_shifts = application_vertex.get_ring_buffer_shifts()
                 weight_scales = application_vertex.get_weight_scales(ring_buffer_shifts)
+                slice_n_atoms = vertex_slice.n_atoms()
                 all_syn_block_sz = application_vertex.get_synapses_size(
-                        atoms_in_core)
+                        slice_n_atoms)
                 structural_sz = application_vertex.get_structural_dynamics_size(
-                        atoms_in_core)
+                        slice_n_atoms)
+                key_core_location =  ("%d#%d" % (chip_id, core_id)) 
+                recorded_sdram = self._sdram_recorder._get_sdram(chip_index, core_index)
+                
                 sdram = self.get_sdram_used_by_atoms(self,
-                        atoms_in_core, all_syn_block_sz, structural_sz, application_vertex)
+                        slice_n_atoms, all_syn_block_sz, structural_sz, application_vertex)
+                
+                if recorded_sdram == None:
+                    self._sdram_recorder._record_sdram(chip_index, core_index, sdram)
+                    recorded_sdram = sdram
+                else:
+                    recorded_sdram.merge(sdram)
+
                 synapse_regions = PopulationMachineVertex.SYNAPSE_REGIONS
+
+                # Note that the 3rd argument of __init__ method of SynapticMatrices class
+                # should be the max_atoms_per_core
                 synaptic_matrices = SynapticMatrices(
                         application_vertex, synapse_regions, atoms_in_core, weight_scales,
                         all_syn_block_sz)
@@ -284,11 +310,11 @@ class SolutionAdopter:
 
                 index = slice_index
                 machine_vertex = self.create_machine_vertex(self,
-                        vertex_slice, sdram, label,
-                        structural_sz, ring_buffer_shifts, weight_scales,
-                        index, atoms_in_core, synaptic_matrices, neuron_data, application_vertex)
+                        vertex_slice, recorded_sdram, label,
+                        structural_sz, ring_buffer_shifts, weight_scales, index, 
+                        slice_n_atoms, synaptic_matrices, neuron_data, application_vertex)
                 application_vertex.remember_machine_vertex(machine_vertex)
-                slice_index += 1       
+                slice_index += 1
         chip_counter.set_n_chips(max_chips)
     
     
