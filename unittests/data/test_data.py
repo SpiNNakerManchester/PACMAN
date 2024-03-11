@@ -349,13 +349,13 @@ class TestSimulatorData(unittest.TestCase):
     def test_get_monitors(self):
         writer = PacmanDataWriter.setup()
         writer.set_plan_n_timesteps((45))
-        self.assertEqual(0, PacmanDataView.get_monitor_cores())
-        self.assertEqual(0, PacmanDataView.get_monitor_sdram())
-        writer.add_monitor_all_chips(SimpleMachineVertex(ConstantSDRAM(200)))
-        self.assertEqual(1, PacmanDataView.get_monitor_cores())
-        self.assertEqual(200, PacmanDataView.get_monitor_sdram())
-        writer.add_monitor_all_chips(SimpleMachineVertex(
+        self.assertEqual(0, PacmanDataView.get_all_system_cores())
+        self.assertEqual(0, PacmanDataView.get_all_system_sdram())
+        writer.add_sample_system_vertex(SimpleMachineVertex(ConstantSDRAM(200)))
+        self.assertEqual(1, PacmanDataView.get_all_system_cores())
+        self.assertEqual(200, PacmanDataView.get_all_system_sdram())
+        writer.add_sample_system_vertex(SimpleMachineVertex(
             VariableSDRAM(100, 10)))
-        self.assertEqual(2, PacmanDataView.get_monitor_cores())
+        self.assertEqual(2, PacmanDataView.get_all_system_cores())
         target = 200 + 100 + 10 * 45
-        self.assertEqual(target, PacmanDataView.get_monitor_sdram())
+        self.assertEqual(target, PacmanDataView.get_all_system_sdram())
