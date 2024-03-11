@@ -156,5 +156,10 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         
         return self
 
+
+    def set_new_ptype_representation_solution(self, new_ptype_representation_solution):
+        if self._use_ptype:
+            self._solution.clear()
+            self._solution += new_ptype_representation_solution
     def __str__(self):
-            return "slice_rep"
+        return "slice_rep"

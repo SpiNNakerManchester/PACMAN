@@ -19,6 +19,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         else:
             self._fixing_in_gtype_representation(solution)
 
+
     def _fixing_in_ptype_representation(self, solution: AbstractGASolutionRepresentation):
         ptype_representation: List[Tuple] = solution.get_ptype_solution_representation() 
 
@@ -125,6 +126,24 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         if new_ptype_representation[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] < self.res_configuration.get_neruon_count() - 1:
             append_slice_with_considering_application_vertexes_ending(new_ptype_representation[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] + 1, self.res_configuration.get_neruon_count() - 1, -1, -1)        
         self.__fixing_chip_core_in_ptype(new_ptype_representation)
+
+        chip_index_remapping_lookup_table = dict({})
+
+        # Remapping chip_index, make chip index in used are contiguous.
+        keys = list(set([item[GASliceSolutionRepresentation.CHIP_INDEX] for item in new_ptype_representation]))
+        for i in range(0, len(keys)):
+            chip_index_remapping_lookup_table[keys[i]] = i
+        for i in range(0, len(new_ptype_representation)):
+            new_ptype_representation[i][GASliceSolutionRepresentation.CHIP_INDEX] = \
+                chip_index_remapping_lookup_table[new_ptype_representation[i][GASliceSolutionRepresentation.CHIP_INDEX]]
+            
+        # update solution
+        solution.set_new_ptype_representation_solution(new_ptype_representation)
+
+        
+    
+
+        
     
     def __fixing_chip_core_in_ptype(self, ptype_solution):
         SLCIE_NEURON_FROM_INDEX = GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX
@@ -169,6 +188,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
 
         # Built sdrams for all cores. Type: List[[chip_index: int, core_index: int, sdram: AbstractSDRAM, sdram_cost: int]]
         sdram_records = []
+        chip_record_index = 0
         for chip_record in chip_core_records:
             chip_index = chip_record[0]
             if chip_index == -1:
@@ -180,13 +200,13 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                 slice_froms = list(data_frames[0])
                 slice_tos = list(data_frames[1])
                 # chip_core_location_identification = "%s#%s" % (chip_index, core_index)
-                slice_count = len(slice_froms)
-                if slice_count == 0:
+                recorded_slice_count = len(slice_froms)
+                if recorded_slice_count == 0:
                     continue                
                 sdram = SolutionAdopter \
                     .calculate_sdram(self.get_application_vertex(slice_froms[0], slice_tos[0]), slice_froms[0], slice_tos[0])
                 sdram_records.append([chip_index, core_index , sdram, sdram.get_total_sdram()])
-                for i in range(1, slice_count):
+                for i in range(1, recorded_slice_count):
                     sdram.merge(SolutionAdopter \
                         .calculate_sdram(None, slice_froms[i], slice_tos[i]))
 
@@ -204,10 +224,12 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
             ptype_solution[slice_index][GASliceSolutionRepresentation.CHIP_INDEX] = allocated_chip_index
 
         # Create a map that map (chip_index, core_index) to (space usage)
-        for slice_index in range(0, slice_count):
+        slice_index = 0
+        while slice_index < slice_count:
             if ptype_solution[slice_index][GASliceSolutionRepresentation.CHIP_INDEX] != -1 and \
                 ptype_solution[slice_index][GASliceSolutionRepresentation.CORE_INDEX] != -1:
                 # Unnecessary to be processed.
+                slice_index += 1
                 continue
                 
             slice_from = ptype_solution[slice_index][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX]
@@ -215,15 +237,26 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
             slice_chip_index = ptype_solution[slice_index][GASliceSolutionRepresentation.CHIP_INDEX]
             slice_core_index = ptype_solution[slice_index][GASliceSolutionRepresentation.CORE_INDEX]
             
-            # 1. Find proper application vertex
+            # 1. Find the proper application vertex
             while slice_to >= application_vertex_neurons_index_presum[current_application_vertex_index]:
                 current_application_vertex_index += 1
 
             application_vertex = application_vertices[current_application_vertex_index]
+            sdram = None
+
+            # split current slice to fix the constraint of max slice length when current slice's length exceed the maximun of slice length
+            if slice_to - slice_from + 1 > self._max_slice_length[current_application_vertex_index]:
+                slices_after_splitted = []
+                while slice_from <= slice_to:
+                    target_slice_to = min(slice_from + self._max_slice_length[current_application_vertex_index] - 1, slice_to)
+                    slices_after_splitted.append[(slice_from, target_slice_to, slice_chip_index, slice_core_index)]
+                del ptype_solution[slice_index]
+                ptype_solution[slice_index:slice_index] = slices_after_splitted
+                continue
+
 
             sdram = SolutionAdopter.calculate_sdram(application_vertex, slice_to - slice_from + 1)
-            # TODO: solve problems in a single slice's required space exceed the maximun space capacity of a single SDRAM
-
+            
             # 2. Find whether the same core of its left neighbor has enough space.
             if slice_index != 0:
                 left_slice_from = ptype_solution[slice_index - 1][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX]
@@ -345,25 +378,32 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                 core_records.append(pos, [slice_from, slice_to, chip, allocated_core_id])
                 set_core_chip(slice_index, allocated_chip_index, allocated_core_index)
 
-
-
-                            
-
-
-                    
-
-
-
-
-
-
-
-
-
     def __init__(self, resource_configuration: ResourceConfiguration, application_graph: ApplicationGraph) -> None:
         super().__init__()
         self.res_configuration = resource_configuration
         self._application_graph = application_graph
+        # calculate max_slice_length
+        self._max_slice_length = self._calculate_max_slice_length()
+
+    def _calculate_max_slice_lengths(self) -> List[int]:
+        def _calculate_max_slice_length(application_vertex) -> int:
+            binary_search_left_pt = 0
+            binary_search_right_pt = self.res_configuration.get_neruon_count() - 1
+            while binary_search_left_pt <= binary_search_right_pt:
+                m = (binary_search_right_pt - binary_search_left_pt) // 2 + binary_search_left_pt
+                sdram = SolutionAdopter.calculate_sdram(application_vertex, m)
+                if(sdram.get_total_sdram() == self.res_configuration.get_max_sdram()):
+                    return m
+                if(sdram.get_total_sdram() < self.res_configuration.get_max_sdram()):
+                    binary_search_left_pt = m + 1
+                    continue
+                else:
+                    binary_search_right_pt = m - 1
+                    continue
+            return binary_search_left_pt
+
+        return [_calculate_max_slice_length(application_vertex) for application_vertex in self._application_graph.vertices]
+
 
     def _fixing_in_gtype_representation(self, solution: AbstractGASolutionRepresentation):
         raise NotImplementedError
