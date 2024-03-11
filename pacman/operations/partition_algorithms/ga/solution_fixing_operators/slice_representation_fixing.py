@@ -73,7 +73,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
             if index != -1:
                 appended = new_ptype_representation[-inserted:]
                 new_ptype_representation = new_ptype_representation[:len(new_ptype_representation) - inserted]
-                new_ptype_representation.insert(index, appended)
+                new_ptype_representation[index:index] = appended
 
         while pt < ptype_representation_length:
             slice_neuron_index_from = ptype_representation[pt][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX]
