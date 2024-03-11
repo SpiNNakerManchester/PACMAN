@@ -80,7 +80,8 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
             slice_neuron_index_to = ptype_representation[pt][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
             if slice_neuron_index_from < 0:
                 continue
-            if slice_neuron_index_from >= self.res_configuration.get_neruon_count() or slice_neuron_index_to >= self.res_configuration.get_neruon_count():
+            if slice_neuron_index_from >= self.res_configuration.get_neruon_count() or slice_neuron_index_to >= \
+                                                                        self.res_configuration.get_neruon_count():
                 break
             
             if slice_neuron_index_from == last_slice_neuron_index_to + 1:
