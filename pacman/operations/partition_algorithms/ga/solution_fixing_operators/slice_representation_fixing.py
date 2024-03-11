@@ -5,6 +5,8 @@ from typing import Tuple, List
 from spinn_utilities.overrides import overrides
 from pacman.operations.partition_algorithms.ga.entities.resource_conf import ResourceConfiguration
 import pandas as pd
+from pacman.operations.partition_algorithms.solution_adopter import SolutionAdopter
+from pacman.model.graphs.application import ApplicationGraph
 
 
 class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
@@ -35,6 +37,42 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         last_slice_neuron_index_from = ptype_representation[0][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX]
         last_slice_neuron_index_to = ptype_representation[0][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
         new_ptype_representation.append(ptype_representation[0])
+        application_vertexes = self._application_graph.vertices
+        application_vertexes_prefix_sum = [0] * len(application_vertexes)
+        application_vertexes_prefix_sum[0] = application_vertexes[0].n_atoms()
+        for i in range(1, len(application_vertexes)):
+            application_vertexes_prefix_sum[i] = application_vertexes_prefix_sum[i - 1] + application_vertexes[i].n_atoms()
+        
+        application_vertexes_index = 0
+
+
+        def append_slice_with_considering_application_vertexes_ending(slice_neuron_index_from, slice_neuron_index_to, chip_index, core_index, index = -1):
+            current_application_vertex_max_neuron_index = application_vertexes_prefix_sum[application_vertexes_index] - 1
+            neuron_index_from = slice_neuron_index_from
+            neuron_index_to = slice_neuron_index_to
+            inserted = 0
+            while neuron_index_to > current_application_vertex_max_neuron_index:
+                new_ptype_representation.append((\
+                                    slice_neuron_index_from,\
+                                    current_application_vertex_max_neuron_index,\
+                                    ptype_representation[pt][GASliceSolutionRepresentation.CHIP_INDEX],\
+                                    ptype_representation[pt][GASliceSolutionRepresentation.CORE_INDEX]))
+                slice_neuron_index_from = application_vertexes_prefix_sum[application_vertexes_index]
+                application_vertexes_index += 1
+                current_application_vertex_max_neuron_index = application_vertexes_prefix_sum[application_vertexes_index]
+                inserted += 1
+
+            # it necessary has condition slice_neuron_index_from <= slice_neuron_index_to.
+            new_ptype_representation.append((\
+                                    slice_neuron_index_from,\
+                                    slice_neuron_index_to,\
+                                    chip_index,\
+                                    core_index))
+            inserted += 1
+            if index != -1:
+                appended = new_ptype_representation[-inserted:]
+                new_ptype_representation = new_ptype_representation[:len(new_ptype_representation) - inserted]
+                new_ptype_representation.insert(index, appended)
 
         while pt < ptype_representation_length:
             slice_neuron_index_from = ptype_representation[pt][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX]
@@ -43,17 +81,22 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                 continue
             if slice_neuron_index_from >= self.res_configuration.get_neruon_count() or slice_neuron_index_to >= self.res_configuration.get_neruon_count():
                 break
+            
             if slice_neuron_index_from == last_slice_neuron_index_to + 1:
                 # No need any processing.
-                new_ptype_representation.append(ptype_representation[pt])
+                append_slice_with_considering_application_vertexes_ending(slice_neuron_index_from,\
+                                                                          slice_neuron_index_to,\
+                                                                          ptype_representation[pt][GASliceSolutionRepresentation.CHIP_INDEX],\
+                                                                          ptype_representation[pt][GASliceSolutionRepresentation.CORE_INDEX])
                 last_slice_neuron_index_from = ptype_representation[pt]
                 last_slice_neuron_index_to = ptype_representation[pt]
+
                 pt += 1
                 continue
 
             if slice_neuron_index_from > last_slice_neuron_index_to + 1:
                 # Fill vacancy. (Chip index and core index's decision are pending.)
-                new_ptype_representation.append((last_slice_neuron_index_to + 1, slice_neuron_index_from - 1, -1, -1))
+                append_slice_with_considering_application_vertexes_ending(last_slice_neuron_index_to + 1, slice_neuron_index_from - 1, -1, -1)
                 last_slice_neuron_index_from = last_slice_neuron_index_to + 1
                 last_slice_neuron_index_to = slice_neuron_index_from - 1
                 continue
@@ -69,18 +112,18 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                 new_ptype_representation[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]\
                       = new_previous_slice_to
                 ptype_representation[pt][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX] = new_current_slice_from
-                new_ptype_representation.append((new_current_slice_from + 1, slice_neuron_index_to, -1, -1))
+                append_slice_with_considering_application_vertexes_ending(new_current_slice_from + 1, slice_neuron_index_to, -1, -1)
                 last_slice_neuron_index_from = new_current_slice_from
                 last_slice_neuron_index_to = slice_neuron_index_to
+                
                 pt += 1
                 continue
         
         # Fill Vacancy of the beginning part and the ending part
         if new_ptype_representation[0][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX] > 0:
-            new_ptype_representation.insert(0, (0, new_ptype_representation[0][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX - 1], -1, -1))
+            append_slice_with_considering_application_vertexes_ending(0, (0, new_ptype_representation[0][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX - 1], -1, -1, 0))
         if new_ptype_representation[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] < self.res_configuration.get_neruon_count() - 1:
-            new_ptype_representation.append((new_ptype_representation[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] + 1, self.res_configuration.get_neruon_count() - 1, -1, -1))
-        
+            append_slice_with_considering_application_vertexes_ending(new_ptype_representation[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] + 1, self.res_configuration.get_neruon_count() - 1, -1, -1)        
         self.__fixing_chip_core_in_ptype(new_ptype_representation)
     
     def __fixing_chip_core_in_ptype(self, ptype_solution):
@@ -89,7 +132,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         CHIP_INDEX = GASliceSolutionRepresentation.CHIP_INDEX
         CORE_INDEX = GASliceSolutionRepresentation.CORE_INDEX
 
-        slice_count = len([ptype_solution])
+        slice_count = len(ptype_solution)
         # Ensure the use of cores and chips satisfies resource limiatation described by 
         # 'max_chips' and 'max_cores_per_chip' 
         
@@ -124,17 +167,203 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                     in slices_data_frame.groupby(lambda item: item[CHIP_INDEX])
             ].sort(key=lambda x: x[0])
 
+        # Built sdrams for all cores. Type: List[[chip_index: int, core_index: int, sdram: AbstractSDRAM, sdram_cost: int]]
+        sdram_records = []
+        for chip_record in chip_core_records:
+            chip_index = chip_record[0]
+            if chip_index == -1:
+                continue
+            core_records = chip_record[1] # List[[core_id, slice_infos_data_frame]]
+            for core_record in core_records:
+                core_index = core_record[0]
+                data_frames = core_record[1]
+                slice_froms = list(data_frames[0])
+                slice_tos = list(data_frames[1])
+                # chip_core_location_identification = "%s#%s" % (chip_index, core_index)
+                slice_count = len(slice_froms)
+                if slice_count == 0:
+                    continue                
+                sdram = SolutionAdopter \
+                    .calculate_sdram(self.get_application_vertex(slice_froms[0], slice_tos[0]), slice_froms[0], slice_tos[0])
+                sdram_records.append([chip_index, core_index , sdram, sdram.get_total_sdram()])
+                for i in range(1, slice_count):
+                    sdram.merge(SolutionAdopter \
+                        .calculate_sdram(None, slice_froms[i], slice_tos[i]))
+
+        current_application_vertex_index = 0 
+        application_vertices = self._application_graph.vertices
+        application_vertex_neurons_index_presum = [0] * len(application_vertices)
+        application_vertex_neurons_index_presum[0] = application_vertices[0].n_atoms()
+        for i in range(1, len(application_vertices)):
+            application_vertex_neurons_index_presum[i] = \
+            application_vertex_neurons_index_presum[i - 1] + application_vertices[i].n_atoms()
+
+
+
+        def set_core_chip(slice_index, allocated_chip_index, allocated_core_index):
+            ptype_solution[slice_index][GASliceSolutionRepresentation.CHIP_INDEX] = allocated_chip_index
+
         # Create a map that map (chip_index, core_index) to (space usage)
         for slice_index in range(0, slice_count):
-            if slice_count[slice_index][GASliceSolutionRepresentation.CHIP_INDEX] != -1 and \
-                slice_count[slice_index][GASliceSolutionRepresentation.CORE_INDEX] != -1:
-                # Unnecessary be processed.
+            if ptype_solution[slice_index][GASliceSolutionRepresentation.CHIP_INDEX] != -1 and \
+                ptype_solution[slice_index][GASliceSolutionRepresentation.CORE_INDEX] != -1:
+                # Unnecessary to be processed.
                 continue
-            # 1. Find whether the slice 
+                
+            slice_from = ptype_solution[slice_index][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX]
+            slice_to = ptype_solution[slice_index][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
+            slice_chip_index = ptype_solution[slice_index][GASliceSolutionRepresentation.CHIP_INDEX]
+            slice_core_index = ptype_solution[slice_index][GASliceSolutionRepresentation.CORE_INDEX]
+            
+            # 1. Find proper application vertex
+            while slice_to >= application_vertex_neurons_index_presum[current_application_vertex_index]:
+                current_application_vertex_index += 1
 
-    def __init__(self, resource_configuration: ResourceConfiguration) -> None:
+            application_vertex = application_vertices[current_application_vertex_index]
+
+            sdram = SolutionAdopter.calculate_sdram(application_vertex, slice_to - slice_from + 1)
+            # TODO: solve problems in a single slice's required space exceed the maximun space capacity of a single SDRAM
+
+            # 2. Find whether the same core of its left neighbor has enough space.
+            if slice_index != 0:
+                left_slice_from = ptype_solution[slice_index - 1][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX]
+                left_slice_to = ptype_solution[slice_index - 1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
+                left_slice_chip_index = ptype_solution[slice_index - 1][GASliceSolutionRepresentation.CHIP_INDEX]
+                left_slice_core_index = ptype_solution[slice_index - 1][GASliceSolutionRepresentation.CORE_INDEX]
+                # find sdram
+                ## linear search (TODO: binary search)
+                success = False
+                left_slice_location_in_sram_record = -1
+                allocated_chip_index = -1
+                allocated_core_index = -1
+                # 1. find whether the core the left side slice of current slice prepared to be stored has enough space
+                # to store current slice.
+                for i in range(0, len(sdram_records)):
+                    if(sdram_records[i][0] != left_slice_chip_index or sdram_records[i][1] != left_slice_core_index):
+                        continue
+                    left_slice_sdram = sdram_records[i][2]
+                    left_slice_sdram_cost = sdram_records[i][3]
+                    if left_slice_sdram_cost + sdram.get_total_sdram() > self.res_configuration.get_max_sdram():
+                        break
+                    left_slice_location_in_sram_record = i
+                    left_slice_sdram.merge(sdram)
+                    allocated_chip_index =  sdram_records[i][0]
+                    allocated_core_index =  sdram_records[i][1]
+                    success = True
+                    break
+                
+                if success:
+                    set_core_chip(slice_index, allocated_chip_index, allocated_core_index)
+                    continue
+                
+                # 2. Find whether in the same chip the chip of the left slice
+                # prepared to be stored there has a core that has enough space for storing 
+                # the current slice, utilizing a greedy algorithm.
+                pos = 0
+                while pos < len(sdram_records):
+                    if(sdram_records[pos][0] != left_slice_chip_index):
+                        pos += 1
+                        continue
+                    j = pos + 1
+                    while j < len(sdram_records) and sdram_records[j][0] == left_slice_chip_index:
+                        j += 1
+                    # sort sdram records of cores in the chip specified by 'left_slice_chip_index', according to 
+                    # to recorded sdram cost (the 3rd element of a single record), ascending.
+                    sdram_records[pos:j] = sorted(sdram_records[pos:j], key=lambda item:item[3], reverse=True)
+                    break
+                success = False
+                while pos < len(sdram_records):
+                    if(sdram_records[pos][0] != left_slice_chip_index):
+                        break
+                    sdram_in_record = sdram_records[pos][2]
+                    sdram_cost_in_record = sdram_records[pos][3]
+                    if sdram_cost_in_record + sdram_in_record.get_total_sdram() > self.res_configuration.get_max_sdram():
+                        continue
+                    sdram_in_record.merge(sdram)
+                    allocated_chip_index = sdram_records[pos][0]
+                    allocated_core_index = sdram_records[pos][1]
+                    success = True
+
+                if success:
+                    set_core_chip(slice_index, allocated_chip_index, allocated_core_index)
+                    continue
+
+                # 3. Find whether there is a core that has enough space for storing current slice. Utilizes a greedy algorithm.
+                sdram_records.sort(key=lambda item: item[3])
+                success = False
+                pos = 0
+                while pos < len(sdram_records):
+                    sdram_in_record = sdram_records[pos][2]
+                    sdram_cost_in_record = sdram_records[pos][3]
+                    if sdram_cost_in_record + sdram_in_record.get_total_sdram() > self.res_configuration.get_max_sdram():
+                        pos += 1
+                        continue
+                    sdram_in_record.merge(sdram)
+                    allocated_chip_index = sdram_records[pos][0]
+                    allocated_core_index = sdram_records[pos][1]
+                    success = True
+
+                if success:
+                    set_core_chip(slice_index, allocated_chip_index, allocated_core_index)
+                    continue
+
+                # 4. Try to find any chip that still can allocate a new core.
+                last_pos = -1
+                last_chip = -1
+                success = False
+                while pos < len(sdram_records):
+                    chip = sdram_records[pos][0]
+                    if last_pos == -1 or last_chip == -1:
+                        last_pos = pos
+                        pos += 1
+                        continue
+                    if chip == last_chip:
+                        continue
+                    else:
+                        core_count = pos - last_pos
+                        if core_count < self.res_configuration.get_max_cores_per_chip():
+                            allocated_core_id = core_count
+                            core_records.insert(pos, [slice_from, slice_to, chip, allocated_core_id])
+                            success = True
+                            allocated_chip_index = sdram_records[pos][0]
+                            allocated_core_index = allocated_core_id
+                            break
+
+                if success:
+                    set_core_chip(slice_index, allocated_chip_index, allocated_core_index)
+                    break
+
+                # 5. The worest situation. All chips are allocate all there cores.
+                # And there is no exist a core that has enough space to store current slice.
+                # In this situation, allocates a new chip.
+                sdram_records.sort(key=lambda item:item[0])
+                allocated_chip_index = sdram_records[-1][0] + 1 # New chip's index is set to the max index of current recorded chips' indexes + 1.
+                allocated_core_index = 0
+                if len(set([item[0] for item in chip_core_records])) > self.res_configuration.get_max_chips():
+                    # We cannot find a legal configuration of this slice in the given resource constraints.
+                    raise ValueError
+                core_records.append(pos, [slice_from, slice_to, chip, allocated_core_id])
+                set_core_chip(slice_index, allocated_chip_index, allocated_core_index)
+
+
+
+                            
+
+
+                    
+
+
+
+
+
+
+
+
+
+    def __init__(self, resource_configuration: ResourceConfiguration, application_graph: ApplicationGraph) -> None:
         super().__init__()
         self.res_configuration = resource_configuration
+        self._application_graph = application_graph
 
     def _fixing_in_gtype_representation(self, solution: AbstractGASolutionRepresentation):
         raise NotImplementedError

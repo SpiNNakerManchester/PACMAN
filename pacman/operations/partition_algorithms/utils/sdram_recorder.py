@@ -7,7 +7,6 @@ class SDRAMRecorder(object):
         # value: AbstractSDRAM
         self._sdram_records = dict({})
     
-    
     def _get_sdram(self, chip_index, core_index) -> AbstractSDRAM:
         key_chip_core_identification = '%s#%s' % (chip_index, core_index)
         if key_chip_core_identification in self._sdram_record:
@@ -17,7 +16,4 @@ class SDRAMRecorder(object):
     def _record_sdram(self, chip_index, core_index, sdram: AbstractSDRAM) -> None:
         key_chip_core_identification = '%s#%s' % (chip_index, core_index)
         self._sdram_record[key_chip_core_identification] = sdram
-                
 
-
-    
