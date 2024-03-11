@@ -233,10 +233,11 @@ def _check_could_fit(
     """
     version = PacmanDataView.get_machine_version()
     max_sdram = (
-            version.max_sdram_per_chip - PacmanDataView.get_all_system_sdram())
+            version.max_sdram_per_chip -
+            PacmanDataView.get_all_monitor_sdram())
     max_cores = (
             version.max_cores_per_chip - version.n_non_user_cores -
-            PacmanDataView.get_all_system_cores())
+            PacmanDataView.get_all_monitor_cores())
     n_cores = len(vertices_to_place)
     if sdram <= max_sdram and n_cores <= max_cores:
         # should fit somewhere
@@ -263,7 +264,7 @@ def _check_could_fit(
     else:
         message += (
             f"is more vertices than the {max_cores} cores available on a "
-            f"Chip once {PacmanDataView.get_all_system_cores()} "
+            f"Chip once {PacmanDataView.get_all_monitor_cores()} "
             "are reserved for monitors")
     raise PacmanTooBigToPlace(message)
 

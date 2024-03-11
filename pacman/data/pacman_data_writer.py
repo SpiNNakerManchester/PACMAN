@@ -179,20 +179,31 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
                 "This call is only expected if requires mapping is True")
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
 
-    def add_sample_system_vertex(self, vertex: MachineVertex):
+    def add_sample_monitor_vertex(
+            self, vertex: MachineVertex, all_cores: bool):
         """
-        Reports that a monitor has been added to every chip.
-        Should be called once for each monitor added to all chips.
-        Should not be called for monitors only added to Ethernet-enabled chips.
+        Accepts a simple of the monitor cores to be added.
 
-        Only affect is to change the numbers reported by the `get_monitor`
-        methods.
+        Should be called once for each monitor added to all (Ethernet) chips.
+
+        Only affect is to change the numbers reported by the
+        get_all/ethernet_monitor methods.
 
         :param ~pacman.model.graphs.machine.MachineVertex vertex:
             One of the vertices added to each core, assumed to be typical of
             all.
+        :param bool all_cores:
+            If True assumes that this Vertex will be placed on all cores
+            including Ethernet ones.
+            If False assumes that this Vertex type will only be placed on
+            Ethernet Vertices
         """
-        self.__pacman_data._all_system_cores += 1
-        self.__pacman_data._all_system_vertices.append(vertex)
+        self.__pacman_data._ethernet_monitor_cores += 1
+        self.__pacman_data._ethernet_monitor_vertices.append(vertex)
         # Clear any previous cached total sdram
-        self.__pacman_data._all_system_sdram = None
+        self.__pacman_data._ethernet_monitor_sdram = None
+        if all_cores:
+            self.__pacman_data._all_monitor_cores += 1
+            self.__pacman_data._all_monitor_vertices.append(vertex)
+            # Clear any previous cached total sdram
+            self.__pacman_data._all_monitor_sdram = None

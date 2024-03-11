@@ -62,9 +62,12 @@ class _PacmanDataModel(object):
         "_placements",
         "_plan_n_timesteps",
         "_precompressed",
-        "_all_system_vertices",
-        "_all_system_cores",
-        "_all_system_sdram",
+        "_all_monitor_vertices",
+        "_all_monitor_cores",
+        "_all_monitor_sdram",
+        "_ethernet_monitor_vertices",
+        "_ethernet_monitor_cores",
+        "_ethernet_monitor_sdram",
         "_routing_infos",
         "_routing_table_by_partition",
         "_tags",
@@ -95,9 +98,12 @@ class _PacmanDataModel(object):
             self._graph.reset()
         self._placements: Optional[Placements] = None
         self._precompressed: Optional[MulticastRoutingTables] = None
-        self._all_system_vertices: List[MachineVertex] = []
-        self._all_system_cores: int = 0
-        self._all_system_sdram: Optional[int] = None
+        self._all_monitor_vertices: List[MachineVertex] = []
+        self._all_monitor_cores: int = 0
+        self._all_monitor_sdram: Optional[int] = None
+        self._ethernet_monitor_vertices: List[MachineVertex] = []
+        self._ethernet_monitor_cores: int = 0
+        self._ethernet_monitor_sdram: Optional[int] = None
         self._uncompressed: Optional[MulticastRoutingTables] = None
         self._routing_infos: Optional[RoutingInfo] = None
         self._routing_table_by_partition: Optional[
@@ -537,10 +543,10 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._routing_table_by_partition
 
     @classmethod
-    def get_all_system_cores(cls) -> int:
+    def get_all_monitor_cores(cls) -> int:
         """
         The number of cores on every chip reported to be used by \
-        system vertices.
+        monitor vertices.
 
         Ethernet-enabled chips may have more.
 
@@ -548,13 +554,13 @@ class PacmanDataView(MachineDataView):
 
         :rtype: int
         """
-        return cls.__pacman_data._all_system_cores
+        return cls.__pacman_data._all_monitor_cores
 
     @classmethod
-    def get_all_system_sdram(cls) -> int:
+    def get_all_monitor_sdram(cls) -> int:
         """
         The amount of SDRAM on every chip reported to be used by \
-        system vertices.
+        monitor vertices.
 
         Ethernet-enabled chips may have more.
 
@@ -562,10 +568,46 @@ class PacmanDataView(MachineDataView):
 
         :rtype: int
         """
-        if cls.__pacman_data._all_system_sdram is None:
+        if cls.__pacman_data._all_monitor_sdram is None:
             sdram = 0
             timestep = cls.get_plan_n_timestep()
-            for vertex in cls.__pacman_data._all_system_vertices:
+            for vertex in cls.__pacman_data._all_monitor_vertices:
                 sdram += vertex.sdram_required.get_total_sdram(timestep)
-            cls.__pacman_data._all_system_sdram = sdram
-        return cast(int, cls.__pacman_data._all_system_sdram)
+            cls.__pacman_data._all_monitor_sdram = sdram
+        return cast(int, cls.__pacman_data._all_monitor_sdram)
+
+    @classmethod
+    def get_ethernet_monitor_cores(cls) -> int:
+        """
+        The number of cores on every Ethernet chip reported to be used by \
+        monitor vertices.
+
+        This includes the one returned by get_all_monitor_cores unless for
+        some reason these are not on Ethernet chips.
+
+        Does not include the system core reserved by the machine/ scamp.
+
+        :rtype: int
+        """
+        return cls.__pacman_data._ethernet_monitor_cores
+
+    @classmethod
+    def get_ethernet_monitor_sdram(cls) -> int:
+        """
+        The amount of SDRAM on every Ethernet chip reported to be used by \
+        monitor vertices.
+
+        This includes the SDRAM returned by get_all_monitor_sdram unless for
+        some reason these are not on Ethernet chips.
+
+        Does not include the system SDRAM reserved by the machine/scamp.
+
+        :rtype: int
+        """
+        if cls.__pacman_data._ethernet_monitor_sdram is None:
+            sdram = 0
+            timestep = cls.get_plan_n_timestep()
+            for vertex in cls.__pacman_data._ethernet_monitor_vertices:
+                sdram += vertex.sdram_required.get_total_sdram(timestep)
+            cls.__pacman_data._ethernet_monitor_sdram = sdram
+        return cast(int, cls.__pacman_data._ethernet_monitor_sdram)

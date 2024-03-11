@@ -152,7 +152,7 @@ def test_sdram_bigger_monitors():
     max_sdram = writer.get_machine_version().max_sdram_per_chip
     monitor = SimpleMachineVertex(ConstantSDRAM(max_sdram // 2))
     # This is purely an info call so test check directly
-    writer.add_sample_system_vertex(monitor)
+    writer.add_sample_monitor_vertex(monitor)
     try:
         _check_could_fit("app_test", ["m_vertex]"], sdram=max_sdram // 2 + 5)
         raise AssertionError("Error not raise")
@@ -190,7 +190,7 @@ def test_more_cores_with_monitor():
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(4000))
     # This is purely an info call so test check directly
-    writer.add_sample_system_vertex(monitor)
+    writer.add_sample_monitor_vertex(monitor)
     m_vertexs = [f"m_v_{i}" for i in range(17)]
     try:
         _check_could_fit("app_test", m_vertexs, 500000)
@@ -204,6 +204,6 @@ def test_could_fit():
     set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(0))
-    writer.add_sample_system_vertex(monitor)
+    writer.add_sample_monitor_vertex(monitor)
     m_vertexs = [f"m_v_{i}" for i in range(16)]
     _check_could_fit("app_test", m_vertexs, 500000)
