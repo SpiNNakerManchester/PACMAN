@@ -40,11 +40,15 @@ class ChipCounter(object):
         # The number of chips used, including the current one
         "__n_chips")
 
-    def __init__(
-            self, n_cores_per_chip: int = 15,
-            sdram_per_chip: int = 100 * 1024 * 1024):
-        self.__n_cores_per_chip = n_cores_per_chip
-        self.__sdram_per_chip = sdram_per_chip
+    def __init__(self):
+        version = PacmanDataView.get_machine_version()
+        self.__n_cores_per_chip = (
+                version.max_cores_per_chip - version.n_non_user_cores -
+                PacmanDataView.get_all_monitor_cores())
+        self.__sdram_per_chip = (
+                version.max_sdram_per_chip - 
+                PacmanDataView.get_all_monitor_sdram().get_total_sdram(
+                    PacmanDataView().get_plan_n_timestep()))
         self.__cores_free = 0
         self.__sdram_free = 0
         self.__n_chips = 0

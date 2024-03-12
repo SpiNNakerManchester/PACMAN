@@ -19,6 +19,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_machine.data import MachineDataView
 from pacman.exceptions import PacmanNotPlacedError
 from pacman.model.graphs.application import ApplicationGraph
+from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 if TYPE_CHECKING:
     from pacman.model.graphs import AbstractEdgePartition
     from pacman.model.graphs.application import (
@@ -64,10 +65,8 @@ class _PacmanDataModel(object):
         "_precompressed",
         "_all_monitor_vertices",
         "_all_monitor_cores",
-        "_all_monitor_sdram",
         "_ethernet_monitor_vertices",
         "_ethernet_monitor_cores",
-        "_ethernet_monitor_sdram",
         "_routing_infos",
         "_routing_table_by_partition",
         "_tags",
@@ -100,10 +99,8 @@ class _PacmanDataModel(object):
         self._precompressed: Optional[MulticastRoutingTables] = None
         self._all_monitor_vertices: List[MachineVertex] = []
         self._all_monitor_cores: int = 0
-        self._all_monitor_sdram: Optional[int] = None
         self._ethernet_monitor_vertices: List[MachineVertex] = []
         self._ethernet_monitor_cores: int = 0
-        self._ethernet_monitor_sdram: Optional[int] = None
         self._uncompressed: Optional[MulticastRoutingTables] = None
         self._routing_infos: Optional[RoutingInfo] = None
         self._routing_table_by_partition: Optional[
@@ -557,7 +554,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._all_monitor_cores
 
     @classmethod
-    def get_all_monitor_sdram(cls) -> int:
+    def get_all_monitor_sdram(cls) -> AbstractSDRAM:
         """
         The amount of SDRAM on every chip reported to be used by \
         monitor vertices.
@@ -566,15 +563,12 @@ class PacmanDataView(MachineDataView):
 
         Does not include the system SDRAM reserved by the machine/scamp.
 
-        :rtype: int
+        :rtype: AbstractSDRAM
         """
-        if cls.__pacman_data._all_monitor_sdram is None:
-            sdram = 0
-            timestep = cls.get_plan_n_timestep()
-            for vertex in cls.__pacman_data._all_monitor_vertices:
-                sdram += vertex.sdram_required.get_total_sdram(timestep)
-            cls.__pacman_data._all_monitor_sdram = sdram
-        return cast(int, cls.__pacman_data._all_monitor_sdram)
+        sdram = ConstantSDRAM(0)
+        for vertex in cls.__pacman_data._all_monitor_vertices:
+            sdram += vertex.sdram_required
+        return sdram
 
     @classmethod
     def get_ethernet_monitor_cores(cls) -> int:
@@ -592,7 +586,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._ethernet_monitor_cores
 
     @classmethod
-    def get_ethernet_monitor_sdram(cls) -> int:
+    def get_ethernet_monitor_sdram(cls) -> AbstractSDRAM:
         """
         The amount of SDRAM on every Ethernet chip reported to be used by \
         monitor vertices.
@@ -602,12 +596,9 @@ class PacmanDataView(MachineDataView):
 
         Does not include the system SDRAM reserved by the machine/scamp.
 
-        :rtype: int
+        :rtype: AbstractSDRAM
         """
-        if cls.__pacman_data._ethernet_monitor_sdram is None:
-            sdram = 0
-            timestep = cls.get_plan_n_timestep()
-            for vertex in cls.__pacman_data._ethernet_monitor_vertices:
-                sdram += vertex.sdram_required.get_total_sdram(timestep)
-            cls.__pacman_data._ethernet_monitor_sdram = sdram
-        return cast(int, cls.__pacman_data._ethernet_monitor_sdram)
+        sdram = ConstantSDRAM(0)
+        for vertex in cls.__pacman_data._ethernet_monitor_vertices:
+            sdram += vertex.sdram_required
+        return sdram

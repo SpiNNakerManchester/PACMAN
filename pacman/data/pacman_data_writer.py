@@ -200,10 +200,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         self.__pacman_data._ethernet_monitor_cores += 1
         self.__pacman_data._ethernet_monitor_vertices.append(vertex)
-        # Clear any previous cached total sdram
-        self.__pacman_data._ethernet_monitor_sdram = None
         if all_cores:
             self.__pacman_data._all_monitor_cores += 1
             self.__pacman_data._all_monitor_vertices.append(vertex)
-            # Clear any previous cached total sdram
-            self.__pacman_data._all_monitor_sdram = None

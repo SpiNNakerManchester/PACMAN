@@ -234,7 +234,8 @@ def _check_could_fit(
     version = PacmanDataView.get_machine_version()
     max_sdram = (
             version.max_sdram_per_chip -
-            PacmanDataView.get_all_monitor_sdram())
+            PacmanDataView.get_all_monitor_sdram().get_total_sdram(
+                PacmanDataView.get_plan_n_timestep()))
     max_cores = (
             version.max_cores_per_chip - version.n_non_user_cores -
             PacmanDataView.get_all_monitor_cores())
