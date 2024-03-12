@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-from typing import (cast, Iterable, List, Optional, Sequence, Type, TypeVar,
+from typing import (Iterable, List, Optional, Sequence, Type, TypeVar,
                     TYPE_CHECKING)
 from spinn_utilities.log import FormatAdapter
 from spinn_machine.data import MachineDataView
@@ -565,6 +565,8 @@ class PacmanDataView(MachineDataView):
 
         :rtype: AbstractSDRAM
         """
+        # Note the sdram can not be calculated in advance as some Vertices
+        # require the hardware time step not available until sim.run
         sdram = ConstantSDRAM(0)
         for vertex in cls.__pacman_data._all_monitor_vertices:
             sdram += vertex.sdram_required

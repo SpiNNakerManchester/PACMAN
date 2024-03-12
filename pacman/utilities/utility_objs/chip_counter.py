@@ -46,7 +46,7 @@ class ChipCounter(object):
                 version.max_cores_per_chip - version.n_non_user_cores -
                 PacmanDataView.get_all_monitor_cores())
         self.__sdram_per_chip = (
-                version.max_sdram_per_chip - 
+                version.max_sdram_per_chip -
                 PacmanDataView.get_all_monitor_sdram().get_total_sdram(
                     PacmanDataView().get_plan_n_timestep()))
         self.__cores_free = 0
