@@ -348,113 +348,28 @@ class TestSimulatorData(unittest.TestCase):
 
     def test_get_monitors(self):
         writer = PacmanDataWriter.setup()
-        writer.set_plan_n_timesteps((45))
-        self.assertEqual(0, PacmanDataView.get_monitor_cores())
-        self.assertEqual(0, PacmanDataView.get_monitor_sdram())
-        writer.add_monitor_all_chips(SimpleMachineVertex(ConstantSDRAM(200)))
-        self.assertEqual(1, PacmanDataView.get_monitor_cores())
-        self.assertEqual(200, PacmanDataView.get_monitor_sdram())
-        writer.add_monitor_all_chips(SimpleMachineVertex(
-            VariableSDRAM(100, 10)))
-        self.assertEqual(2, PacmanDataView.get_monitor_cores())
-        target = 200 + 100 + 10 * 45
-        self.assertEqual(target, PacmanDataView.get_monitor_sdram())
-
-    def test_required(self):
-        writer = PacmanDataWriter.setup()
-        with self.assertRaises(DataNotYetAvialable):
-            self.assertIsNone(PacmanDataView.get_n_boards_required())
-        self.assertFalse(PacmanDataView.has_n_boards_required())
-        with self.assertRaises(DataNotYetAvialable):
-            self.assertIsNone(PacmanDataView.get_n_chips_needed())
-        self.assertFalse(PacmanDataView.has_n_chips_needed())
-        # check always works
-        self.assertEqual("No requirements known",
-                         PacmanDataView.get_chips_boards_required_str())
-        # required higher than in graph
-        writer.set_n_required(None, 20)
-        self.assertFalse(PacmanDataView.has_n_boards_required())
-        self.assertEqual(20, PacmanDataView.get_n_chips_needed())
-        self.assertIn("20 Chips",
-                      PacmanDataView.get_chips_boards_required_str())
-        writer.set_n_chips_in_graph(15)
-        self.assertFalse(PacmanDataView.has_n_boards_required())
-        self.assertEqual(20, PacmanDataView.get_n_chips_needed())
-        self.assertIn("20 Chips",
-                      PacmanDataView.get_chips_boards_required_str())
-
-        # required higher than in graph
-        writer.set_n_chips_in_graph(25)
-        self.assertFalse(PacmanDataView.has_n_boards_required())
-        self.assertEqual(20, PacmanDataView.get_n_chips_needed())
-        self.assertIn("20 Chips",
-                      PacmanDataView.get_chips_boards_required_str())
-
-        # reset does not remove required
-        writer.start_run()
-        writer.finish_run()
-        writer.hard_reset()
-        self.assertFalse(PacmanDataView.has_n_boards_required())
-        self.assertEqual(20, PacmanDataView.get_n_chips_needed())
-        self.assertIn("20 Chips",
-                      PacmanDataView.get_chips_boards_required_str())
-
-        writer = PacmanDataWriter.setup()
-        self.assertFalse(PacmanDataView.has_n_boards_required())
-        self.assertFalse(PacmanDataView.has_n_chips_needed())
-
-        # in graph only
-        writer.set_n_chips_in_graph(25)
-        self.assertEqual(25, PacmanDataView.get_n_chips_needed())
-        self.assertIn("25 Chips",
-                      PacmanDataView.get_chips_boards_required_str())
-
-        # reset clears in graph
-        writer.start_run()
-        writer.finish_run()
-        writer.hard_reset()
-        self.assertFalse(PacmanDataView.has_n_chips_needed())
-
-        # N boards
-        writer = PacmanDataWriter.setup()
-        writer.set_n_required(5, None)
-        self.assertEqual(5, PacmanDataView.get_n_boards_required())
-        self.assertFalse(PacmanDataView.has_n_chips_needed())
-        self.assertIn("5 Boards",
-                      PacmanDataView.get_chips_boards_required_str())
-
-        # boards does not hide in graph
-        writer.set_n_chips_in_graph(40)
-        self.assertEqual(5, PacmanDataView.get_n_boards_required())
-        self.assertEqual(40, PacmanDataView.get_n_chips_needed())
-        self.assertIn("5 Boards",
-                      PacmanDataView.get_chips_boards_required_str())
-
-        # reset does not clear required
-        writer.start_run()
-        writer.finish_run()
-        writer.hard_reset()
-        self.assertEqual(5, PacmanDataView.get_n_boards_required())
-        self.assertFalse(PacmanDataView.has_n_chips_needed())
-        self.assertIn("5 Boards",
-                      PacmanDataView.get_chips_boards_required_str())
-
-        # two Nones fine
-        writer = PacmanDataWriter.setup()
-        writer.set_n_required(None, None)
-        self.assertFalse(PacmanDataView.has_n_boards_required())
-        self.assertFalse(PacmanDataView.has_n_chips_needed())
-        self.assertEqual("No requirements known",
-                         PacmanDataView.get_chips_boards_required_str())
-
-        # Ilegal calls
-        with self.assertRaises(ValueError):
-            writer.set_n_required(5, 5)
-        with self.assertRaises(ValueError):
-            writer.set_n_required(None, -5)
-        with self.assertRaises(ValueError):
-            writer.set_n_required(0, None)
-        with self.assertRaises(TypeError):
-            writer.set_n_required(None, "five")
-        with self.assertRaises(TypeError):
-            writer.set_n_required("2.3", None)
+        self.assertEqual(0, PacmanDataView.get_all_monitor_cores())
+        self.assertEqual(ConstantSDRAM(0),
+                         PacmanDataView.get_all_monitor_sdram())
+        self.assertEqual(0,
+                         PacmanDataView.get_ethernet_monitor_cores())
+        self.assertEqual(ConstantSDRAM(0),
+                         PacmanDataView.get_ethernet_monitor_sdram())
+        writer.add_sample_monitor_vertex(
+            SimpleMachineVertex(ConstantSDRAM(200)), True)
+        self.assertEqual(1, PacmanDataView.get_all_monitor_cores())
+        self.assertEqual(ConstantSDRAM(200),
+                         PacmanDataView.get_all_monitor_sdram())
+        self.assertEqual(1, PacmanDataView.get_ethernet_monitor_cores())
+        self.assertEqual(ConstantSDRAM(200),
+                         PacmanDataView.get_ethernet_monitor_sdram())
+        writer.add_sample_monitor_vertex(SimpleMachineVertex(
+            VariableSDRAM(55, 15)), False)
+        writer.add_sample_monitor_vertex(SimpleMachineVertex(
+            VariableSDRAM(100, 10)), True)
+        self.assertEqual(2, PacmanDataView.get_all_monitor_cores())
+        self.assertEqual(VariableSDRAM(200 + 100, 10),
+                         PacmanDataView.get_all_monitor_sdram())
+        self.assertEqual(3, PacmanDataView.get_ethernet_monitor_cores())
+        self.assertEqual(VariableSDRAM(200 + 100 + 55, 10 + 15),
+                         PacmanDataView.get_ethernet_monitor_sdram())
