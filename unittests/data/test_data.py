@@ -346,16 +346,30 @@ class TestSimulatorData(unittest.TestCase):
         writer.hard_reset()
         self.assertTrue(PacmanDataView.get_requires_mapping())
 
-    def test_get_application(self):
+    def test_get_monitors(self):
         writer = PacmanDataWriter.setup()
-        writer.set_plan_n_timesteps((45))
-        self.assertEqual(0, PacmanDataView.get_system_cores())
-        self.assertEqual(0, PacmanDataView.get_system_sdram())
-        writer.add_system_all_chips(SimpleMachineVertex(ConstantSDRAM(200)))
-        self.assertEqual(1, PacmanDataView.get_system_cores())
-        self.assertEqual(200, PacmanDataView.get_system_sdram())
-        writer.add_system_all_chips(SimpleMachineVertex(
-            VariableSDRAM(100, 10)))
-        self.assertEqual(2, PacmanDataView.get_system_cores())
-        target = 200 + 100 + 10 * 45
-        self.assertEqual(target, PacmanDataView.get_system_sdram())
+        self.assertEqual(0, PacmanDataView.get_all_monitor_cores())
+        self.assertEqual(ConstantSDRAM(0),
+                         PacmanDataView.get_all_monitor_sdram())
+        self.assertEqual(0,
+                         PacmanDataView.get_ethernet_monitor_cores())
+        self.assertEqual(ConstantSDRAM(0),
+                         PacmanDataView.get_ethernet_monitor_sdram())
+        writer.add_sample_monitor_vertex(
+            SimpleMachineVertex(ConstantSDRAM(200)), True)
+        self.assertEqual(1, PacmanDataView.get_all_monitor_cores())
+        self.assertEqual(ConstantSDRAM(200),
+                         PacmanDataView.get_all_monitor_sdram())
+        self.assertEqual(1, PacmanDataView.get_ethernet_monitor_cores())
+        self.assertEqual(ConstantSDRAM(200),
+                         PacmanDataView.get_ethernet_monitor_sdram())
+        writer.add_sample_monitor_vertex(SimpleMachineVertex(
+            VariableSDRAM(55, 15)), False)
+        writer.add_sample_monitor_vertex(SimpleMachineVertex(
+            VariableSDRAM(100, 10)), True)
+        self.assertEqual(2, PacmanDataView.get_all_monitor_cores())
+        self.assertEqual(VariableSDRAM(200 + 100, 10),
+                         PacmanDataView.get_all_monitor_sdram())
+        self.assertEqual(3, PacmanDataView.get_ethernet_monitor_cores())
+        self.assertEqual(VariableSDRAM(200 + 100 + 55, 10 + 15),
+                         PacmanDataView.get_ethernet_monitor_sdram())
