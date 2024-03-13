@@ -28,4 +28,4 @@ class GaEliteSelection(AbstractGaSelection):
         return [solutions[sel_index] for sel_index in select_indexes]
     
     def __str__(self):
-        return "elite_sel"
+        return "possibility_sel"

@@ -66,11 +66,11 @@ class CommonGaVariationuUniformGaussian(AbstractGaVariation):
                 chip_core_encoding = individual_rep[neuron_index]
                 chip_index = chip_core_encoding / max_cores_per_chip
                 core_index = chip_core_encoding % max_cores_per_chip
-                # variate the chips
+                # variate the chip index
                 v = random.gauss(self._chip_var_mu, self._chip_var_sigma)
                 chip_index = max(0, min((int)((chip_index) + v), max_chips - 1))
                 
-                # variate the cores
+                # variate the core index
                 v = random.gauss(self._core_var_mu, self._core_var_sigma)
                 core_index = max(0, min((int)((core_index) + v), max_cores_per_chip - 1))
                 
@@ -96,11 +96,6 @@ class CommonGaVariationuUniformGaussian(AbstractGaVariation):
 
         self._variation_rate = variation_rate
 
-    def get_mu(self):
-        return self._mu
-    
-    def get_sigma(self):
-        return self._sigma
     
     def get_variation_rate(self):
         return self._variation_rate

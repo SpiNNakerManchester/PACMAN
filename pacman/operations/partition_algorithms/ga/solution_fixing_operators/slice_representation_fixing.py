@@ -47,7 +47,6 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         global application_vertexes_index
         application_vertexes_index = 0
 
-
         def append_slice_with_considering_application_vertexes_ending(slice_neuron_index_from, slice_neuron_index_to, chip_index, core_index, index = -1):
             global application_vertexes_index
             current_application_vertex_max_neuron_index = application_vertexes_prefix_sum[application_vertexes_index] - 1
@@ -82,8 +81,8 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
             slice_neuron_index_to = ptype_representation[pt][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
             if slice_neuron_index_from < 0:
                 continue
-            if slice_neuron_index_from >= self.res_configuration.get_neruon_count() or slice_neuron_index_to >= \
-                                                                        self.res_configuration.get_neruon_count():
+            if slice_neuron_index_from >= self._res_configuration.get_neruon_count() or slice_neuron_index_to >= \
+                                                                        self._res_configuration.get_neruon_count():
                 break
             
             if slice_neuron_index_from == last_slice_neuron_index_to + 1:
@@ -354,7 +353,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                         continue
                     else:
                         core_count = pos - last_pos
-                        if core_count < self.res_configuration.get_max_cores_per_chip():
+                        if core_count < self._res_configuration.get_max_cores_per_chip():
                             allocated_core_id = core_count
                             core_records.insert(pos, [slice_from, slice_to, chip, allocated_core_id])
                             success = True
@@ -372,7 +371,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                 sdram_records.sort(key=lambda item:item[0])
                 allocated_chip_index = sdram_records[-1][0] + 1 # New chip's index is set to the max index of current recorded chips' indexes + 1.
                 allocated_core_index = 0
-                if len(set([item[0] for item in chip_core_records])) > self.res_configuration.get_max_chips():
+                if len(set([item[0] for item in chip_core_records])) > self._res_configuration.get_max_chips():
                     # We cannot find a legal configuration of this slice in the given resource constraints.
                     raise ValueError
                 core_records.append(pos, [slice_from, slice_to, chip, allocated_core_id])
@@ -380,7 +379,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
 
     def __init__(self, resource_configuration: ResourceConfiguration, application_graph: ApplicationGraph) -> None:
         super().__init__()
-        self.res_configuration = resource_configuration
+        self._res_configuration = resource_configuration
         self._application_graph = application_graph
         # calculate max_slice_length
         self._max_slice_length = self._calculate_max_slice_length()
@@ -388,13 +387,13 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
     def _calculate_max_slice_lengths(self) -> List[int]:
         def _calculate_max_slice_length(application_vertex) -> int:
             binary_search_left_pt = 0
-            binary_search_right_pt = self.res_configuration.get_neruon_count() - 1
+            binary_search_right_pt = self._res_configuration.get_neruon_count() - 1
             while binary_search_left_pt <= binary_search_right_pt:
                 m = (binary_search_right_pt - binary_search_left_pt) // 2 + binary_search_left_pt
                 sdram = SolutionAdopter.calculate_sdram(application_vertex, m)
-                if(sdram.get_total_sdram() == self.res_configuration.get_max_sdram()):
+                if(sdram.get_total_sdram() == self._res_configuration.get_max_sdram()):
                     return m
-                if(sdram.get_total_sdram() < self.res_configuration.get_max_sdram()):
+                if(sdram.get_total_sdram() < self._res_configuration.get_max_sdram()):
                     binary_search_left_pt = m + 1
                     continue
                 else:

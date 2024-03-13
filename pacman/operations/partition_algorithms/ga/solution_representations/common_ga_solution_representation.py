@@ -67,8 +67,8 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
     def __str__(self):
         return "comm_rep"
     
-    @overrides(AbstractGASolutionRepresentation._get_narray_data)
-    def _get_narray_data(self):
+    @overrides(AbstractGASolutionRepresentation.get_narray_data)
+    def get_narray_data(self):
         if self._use_ptype:
             return np.array(self.get_solution())
         else:

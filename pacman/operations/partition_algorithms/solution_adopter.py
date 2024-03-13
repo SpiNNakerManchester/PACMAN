@@ -293,9 +293,8 @@ class SolutionAdopter:
                         slice_n_atoms)
                 structural_sz = application_vertex.get_structural_dynamics_size(
                         slice_n_atoms)
-                key_core_location =  ("%d#%d" % (chip_id, core_id)) 
-                recorded_sdram = self._sdram_recorder._get_sdram(chip_index, core_index)
-                
+
+                recorded_sdram = self._sdram_recorder._get_sdram(chip_index, core_index)                
                 sdram = self.get_sdram_used_by_atoms(self,
                         slice_n_atoms, all_syn_block_sz, structural_sz, application_vertex)
                 
