@@ -6,10 +6,10 @@ from spinn_utilities.overrides import overrides
 import random
 
 class GaEliteSelection(AbstractGaSelection):
-    def __init__(self, count_survival, count_parent_remains:int) -> None:
+    def __init__(self, count_survival, count_top_k_remains:int) -> None:
         super().__init__()
         self._count_survival = count_survival
-        self._count_parent_remains = count_parent_remains
+        self._top_k_remains = count_top_k_remains
 
     @overrides(AbstractGaSelection._select)
     def _select(self, costs:List[float], solutions:List[AbstractGASolutionRepresentation], parent_count:int, count_survival:int) -> List[AbstractGASolutionRepresentation]:
@@ -17,13 +17,13 @@ class GaEliteSelection(AbstractGaSelection):
             nor_costs = (costs - min(costs))/(max(costs) - min(costs))
             return nor_costs
         
-        if(self._count_parent_remains > len(solutions)):
+        if(self._top_k_remains > len(solutions)):
             raise ValueError
         
         select_indexes = set()
         weights = normalize_fitness(costs)
         indexes = range(0, len(solutions))
-        survive_solution_indexes = [solution for _, solution in sorted(zip(costs, range(0, len(solutions))))[:self._count_parent_remains]]
+        survive_solution_indexes = [solution for _, solution in sorted(zip(costs, range(0, len(solutions))))[:self._top_k_remains]]
         for solution_index in survive_solution_indexes:
             select_indexes.add(solution_index)
 
