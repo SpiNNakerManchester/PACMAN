@@ -23,7 +23,7 @@ class CommonGaCrossoverKPoints(AbstractGaCrossover):
 
         if (len(individual1_rep) != len(individual2_rep)) or \
             (individual1.get_single_neuron_encoding_length() != individual2.get_single_neuron_encoding_length()) or \
-                (not self._use_ptype or (len(individual1_rep) % single_neuron_encoding_length != 0)):
+                ((not self._use_ptype) and (len(individual1_rep) % single_neuron_encoding_length != 0)):
             raise ValueError
 
         neuron_count = (len(individual1_rep) / single_neuron_encoding_length) if self._use_ptype else len(individual1_rep)
@@ -52,7 +52,7 @@ class CommonGaCrossoverKPoints(AbstractGaCrossover):
         return self._k
 
     def __str__(self):
-        return "comm_k_points"
+        return "comm_k_points_crossover"
     
 
 

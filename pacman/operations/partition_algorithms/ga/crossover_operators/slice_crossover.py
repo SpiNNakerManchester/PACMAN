@@ -62,7 +62,7 @@ class GaSliceCrossoverKPoints(AbstractGaCrossover):
         return self._k
 
     def __str__(self):
-        return "slice_uniform"
+        return "slice_uniform_crossover"
     
 
 
