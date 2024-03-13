@@ -48,7 +48,7 @@ class GAPartitioner(AbstractPartitioner):
 
         initilization_solutions_generator:AbstractGaInitialPopulationGenerator = self.initialization_generator_selection() 
         init_solutions_common_representation = \
-            self._generate_init_solutions(initilization_solutions_generator) # None -> List<CommonRepresentation>[]
+            self._generate_init_solutions(generator=initilization_solutions_generator, population_size=15) # None -> List<CommonRepresentation>[]
         
         self._global_solution : AbstractGASolutionRepresentation = \
             GaAlgorithm().do_GA_algorithm(init_solutions_common_representation)
@@ -58,4 +58,4 @@ class GAPartitioner(AbstractPartitioner):
         adapter_output = self._adapted_output()
 
         # Deploy the network by utilizing the solution GA generated.
-        SolutionAdopter.AdoptSolution(adapter_output, self.graph, self.chip_counter)
+        SolutionAdopter.AdoptSolution(adapter_output, self.graph, self.chip_counter, self._resource_configuration)

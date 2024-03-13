@@ -167,8 +167,8 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         self._solution.clear()
         self._solution.append(solution_data)
 
-    @overrides(AbstractGASolutionRepresentation._get_narray_data)
-    def _get_narray_data(self):
+    @overrides(AbstractGASolutionRepresentation.get_narray_data)
+    def get_narray_data(self):
         if self._use_ptype:
             return np.array(self.get_solution())
         else:

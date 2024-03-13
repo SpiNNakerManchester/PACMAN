@@ -28,7 +28,7 @@ from spynnaker.pyNN.models.neuron.population_machine_common import (
 from .solution_checker import SolutionChecker
 from numpy import floating
 from pacman.operations.partition_algorithms.utils.sdram_recorder import SDRAMRecorder
-
+from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
 class SolutionAdopter:
     def __init__(self) -> None:
         self._sdram_recorder = SDRAMRecorder()
@@ -190,21 +190,24 @@ class SolutionAdopter:
         return sdram
 
     @classmethod
-    def AdoptSolution(self, adapter_output: bytearray, graph: ApplicationGraph, chip_counter: ChipCounter):
+    def AdoptSolution(self, adapter_output: bytearray, graph: ApplicationGraph, chip_counter: ChipCounter, resource_constraint_configuration: ResourceConfiguration):
         encoded_solution = adapter_output
         N_Ai = [vertex.n_atoms for vertex in graph.vertices]
+        if len(N_Ai) == 0:
+            return
         presum_N_Ai = [0] * len(N_Ai)
+        presum_N_Ai[0] = N_Ai[0]
         N = np.sum(N_Ai)
         max_chips = 0
-        max_chip_count = N
-        max_chips_per_core = 18
+        max_chip_count = resource_constraint_configuration.get_max_chips()
+        max_chips_per_core = resource_constraint_configuration.get_max_cores_per_chip()
         chip_core_representation_total_length = int(np.ceil(np.log2(max_chip_count * max_chips_per_core)))
         prev_index = -1
         prev_chip_id = -1
         prev_core_id = -1
-        presum_N_Ai[0] = N_Ai[0]
-        core_atoms_amount_map = dict({})
+        core_neuron_slice_placement_record_map = dict({})
 
+        # calculate presum of neuron count vertexes 
         for i in range(1, len(presum_N_Ai)):
             presum_N_Ai[i] = presum_N_Ai[i - 1] + N_Ai[i]
 
@@ -216,6 +219,8 @@ class SolutionAdopter:
         extend_encoding = bytes('1' * chip_core_representation_total_length, 'ascii')
         adapter_output.extend(extend_encoding)
         slice_index = 0
+
+        # Iterate neurons, making slices, and record slices and neurons amount in cores.
         for i in range(0, N + 1):
             while i > presum_N_Ai[application_vertex_index]:
                 application_vertex_index += 1
@@ -235,14 +240,12 @@ class SolutionAdopter:
                 continue
             
             if chip_id != prev_chip_id or core_id != prev_core_id:
-                # make slice here
-                # Slice(prev_i, i)
-                # make machine vertex ....
                 application_vertex = list(graph.vertices)[application_vertex_index]
                 lo_atom = prev_index
                 hi_atom = i - 1
                 n_on_core_1_dim = hi_atom - lo_atom + 1
                 vertex_slice = None
+                # Make Slice
                 if len(application_vertex.atoms_shape) == 1:
                     vertex_slice = Slice(lo_atom=lo_atom, hi_atom=hi_atom)
                 else:
@@ -258,27 +261,30 @@ class SolutionAdopter:
                 n_on_core_1_dim = hi_atom - lo_atom + 1
                 
 
-                key_core_location =  ("%d#%d" % (chip_id, core_id)) 
-                if key_core_location in core_atoms_amount_map:
-                    core_atoms_amount_map[key_core_location]['atoms_in_core'] = \
-                        core_atoms_amount_map[key_core_location]['atoms_in_core'] + n_on_core_1_dim
+                # record neuron_count and slice of this core
+                key_chip_core_location =  ("%d#%d" % (chip_id, core_id)) 
+                if key_chip_core_location in core_neuron_slice_placement_record_map:
+                    core_neuron_slice_placement_record_map[key_chip_core_location]['atoms_in_core'] = \
+                        core_neuron_slice_placement_record_map[key_chip_core_location]['atoms_in_core'] + n_on_core_1_dim
                 else:
-                    core_atoms_amount_map[key_core_location] = {}
-                    core_atoms_amount_map[key_core_location]['atoms_in_core'] = \
+                    core_neuron_slice_placement_record_map[key_chip_core_location] = {}
+                    core_neuron_slice_placement_record_map[key_chip_core_location]['atoms_in_core'] = \
                         n_on_core_1_dim
-                    core_atoms_amount_map[key_core_location]['slices'] = []
-                core_atoms_amount_map[key_core_location]['slices'].append((application_vertex, vertex_slice))
+                    core_neuron_slice_placement_record_map[key_chip_core_location]['slices'] = []
+                core_neuron_slice_placement_record_map[key_chip_core_location]['slices'].append((application_vertex, vertex_slice))
                 prev_chip_id = chip_id
                 prev_core_id = core_id
                 prev_index = i
 
-        for key in core_atoms_amount_map.keys():
-            atoms_in_core = core_atoms_amount_map[key]['atoms_in_core'] # atoms_in_core: total number of atoms in the core
+        # iterate records, creating machine vertexes.
+        for key in core_neuron_slice_placement_record_map.keys():
+            atoms_in_core = core_neuron_slice_placement_record_map[key]['atoms_in_core'] # atoms_in_core: total number of atoms in the core
             chip_core_index = [int(x) for x in str(key).split("#")]
             chip_index = chip_core_index[0]
             core_index = chip_core_index[1]
             
-            for (application_vertex, vertex_slice) in core_atoms_amount_map[key]['slices']:
+            # iterate all slices in the core identified by (chip_index, core_index)
+            for (application_vertex, vertex_slice) in core_neuron_slice_placement_record_map[key]['slices']:
                 # It seems the atoms_in_core should be the size of slice.
                 ring_buffer_shifts = application_vertex.get_ring_buffer_shifts()
                 weight_scales = application_vertex.get_weight_scales(ring_buffer_shifts)
