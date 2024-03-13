@@ -51,9 +51,8 @@ class RandomPartitioner(AbstractPartitioner):
                     neuron_in_core[location_key] = neuron_in_core[location_key] + slice_length
                 else:
                     neuron_in_core[location_key] = slice_length
-
-                chip_core_represent =  (random_chip * max_cores_per_chip) + random_core
-                binary_string = ('{0:' + str(chip_core_represent_total_length) + 'b}').format(chip_core_represent) * slice_length
+                chip_core_location_int_encoding =  (random_chip * max_cores_per_chip) + random_core
+                binary_string = ('{0:' + str(chip_core_represent_total_length) + 'b}').format(chip_core_location_int_encoding) * slice_length
                 global_offset_begin = (total_pos + pos) * chip_core_represent_total_length
                 global_offset_end = (total_pos + pos + slice_length) * chip_core_represent_total_length - 1
                 self.global_solution[global_offset_begin:global_offset_end + 1] = bytes(binary_string, 'ascii')
