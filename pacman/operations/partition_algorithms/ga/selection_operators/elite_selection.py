@@ -9,6 +9,7 @@ from spinn_utilities.overrides import overrides
 class GaEliteSelection(AbstractGaSelection):
     def __init__(self, count_survival) -> None:
         super().__init__()
+        self._count_survival = count_survival
 
     @overrides(AbstractGaSelection._select)
     def _select(self, costs:List[float], solutions:List[AbstractGASolutionRepresentation], parent_count:int, count_survival:int) -> List[AbstractGASolutionRepresentation]:
