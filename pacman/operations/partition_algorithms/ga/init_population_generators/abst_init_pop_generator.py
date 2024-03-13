@@ -4,7 +4,7 @@ class AbstractGaInitialPopulationGenerator(object):
     def __init__(self) -> None:
         pass
 
-    def generate_initial_population(self, population: int) -> List[CommonGASolutionRepresentation]:
+    def generate_initial_population(self, population_size: int) -> List[CommonGASolutionRepresentation]:
         raise NotImplementedError
     
     def __str__(self):

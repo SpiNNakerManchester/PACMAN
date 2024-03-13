@@ -7,12 +7,12 @@ from spinn_utilities.overrides import overrides
 import numpy as np
 
 class GaFixedSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
-    def __init__(self, application_graph: ApplicationGraph, fixed_slice_size: List[int], max_cores_per_chip = 18) -> None:
+    def __init__(self, application_graph: ApplicationGraph, fixed_slice_sizes: List[int], max_cores_per_chip = 18) -> None:
         super().__init__()
         if(max_cores_per_chip < 0 or fixed_slice_size < 0):
             raise ValueError
         self._application_graph = application_graph
-        self._fixed_slice_size = fixed_slice_size
+        self._fixed_slice_sizes = fixed_slice_sizes
         self._max_core_per_chips = max_cores_per_chip
             
 
@@ -52,8 +52,11 @@ class GaFixedSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
     @overrides(AbstractGaInitialPopulationGenerator.generate_initial_population)
     def generate_initial_population(self, population_size: int) -> List[CommonGASolutionRepresentation]:
         solutions = []
-        for fix_slice_size in population_size:
-            solutions.append(self._make_solution(fix_slice_size))
+        fix_slice_sizes = self._fixed_slice_sizes
+        if len(fix_slice_sizes) == 0:
+            raise ValueError
+        for i in range(0, population_size):
+            solutions.append(self._make_solution(fix_slice_sizes[i % len(fix_slice_sizes)]))
         return solutions
 
     def __str__(self):
