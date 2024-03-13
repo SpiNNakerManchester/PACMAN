@@ -11,9 +11,11 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 class RandomPartitioner(AbstractPartitioner):
   
-    def __init__(self, application_graph: ApplicationGraph = None, max_slice_length = 100):
+    def __init__(self, application_graph: ApplicationGraph = None, max_slice_length = 100, max_chips = -1, max_cores_per_chip = 18):
         super().__init__(application_graph)
-        self.max_slice_length = max_slice_length
+        self._max_slice_length = max_slice_length
+        self._max_chips = max_chips
+        self._max_cores_per_chip = max_cores_per_chip
 
     def application_graph(self):
         return self._application_graph
@@ -28,9 +30,8 @@ class RandomPartitioner(AbstractPartitioner):
         N_Ai = [vertex.n_atoms for vertex in self.graph.vertices]
         N = int(np.sum(N_Ai))
         
-        # Todo:: make each chip's core count be variable.
-        max_cores_per_chip = 18
-        max_chips = N
+        max_cores_per_chip = self._max_cores_per_chip
+        max_chips = N if self._max_chips <= 0 else self._max_chips
         chip_core_represent_total_length = int(np.ceil(np.log2(max_chips * max_cores_per_chip)))
         bytes_needed_for_encoding = N * chip_core_represent_total_length
         self.global_solution = bytearray(bytes_needed_for_encoding)
@@ -40,11 +41,11 @@ class RandomPartitioner(AbstractPartitioner):
             n_atoms = vertex.n_atoms
             pos = 0
             while pos < n_atoms:
-                slice_length = min(random.randint(0, self.max_slice_length), n_atoms - pos)
+                slice_length = min(random.randint(0, self._max_slice_length), n_atoms - pos)
                 if slice_length == 0:
                     continue
-                random_chip = random.randint(0, N)
-                random_core = random.randint(0, 17)
+                random_chip = random.randint(0, max_chips - 1)
+                random_core = random.randint(0, max_cores_per_chip - 1)
                 location_key = "%d#%d" % (random_chip, random_core)
                 if location_key in neuron_in_core:
                     neuron_in_core[location_key] = neuron_in_core[location_key] + slice_length
