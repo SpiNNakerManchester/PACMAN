@@ -130,7 +130,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
                 iptags=[IPtagResource(
                     "127.0.0.1", port=10000 + i, strip_sdp=True, tag=1+i)],
                 label="Vertex {i}")
-            placements.add_placement(Placement(vertex, 0, 0, next(procs)))
+            placements.add_placement(Placement(vertex, 0, 0, procs[i]))
         writer.set_placements(placements)
         writer.set_plan_n_timesteps(1000)
         tags = basic_tag_allocator()
@@ -151,7 +151,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
                         IPtagResource("127.45.0.1", port=10000 + i,
                                       strip_sdp=True, tag=1+i)],
                 label=f"Vertex {i}")
-            placements.add_placement(Placement(vertex, 0, 0, next(procs)))
+            placements.add_placement(Placement(vertex, 0, 0, procs[i]))
         writer.set_placements(placements)
         writer.set_plan_n_timesteps(1000)
         tags = basic_tag_allocator()
@@ -175,7 +175,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         writer = PacmanDataWriter.mock()
         writer.set_machine(machine)
         chip00 = machine.get_chip_at(0, 0)
-        processor = chip00.get_first_none_monitor_processor()
+        processor = chip00.placable_processors_ids[0]
         placements = Placements()
         vertex = SimpleMachineVertex(
             sdram=ConstantSDRAM(0),
