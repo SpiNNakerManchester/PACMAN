@@ -25,44 +25,44 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
                slice_index += 1
                self._solution.append((slice_neuron_from, slice_neuron_to, chip_index, core_index))
 
-    def get_slice_neuron_from_in_solution(self, element_index):
+    def get_slice_neuron_from_in_solution(self, record_index):
         if self._use_ptype:
-           return self._solution[element_index][self.SLICE_NEURON_FROM_INDEX]
+           return self._solution[record_index][self.SLICE_NEURON_FROM_INDEX]
         raise NotImplementedError
     
-    def get_slice_neuron_to_in_solution(self, element_index):
+    def get_slice_neuron_to_in_solution(self, record_index):
         if self._use_ptype:
-           return self._solution[element_index][self.SLICE_NEURON_TO_INDEX]
+           return self._solution[record_index][self.SLICE_NEURON_TO_INDEX]
         raise NotImplementedError
 
-    def get_chip_index_in_solution(self, element_index):
+    def get_chip_index_in_solution(self, record_index):
          if self._use_ptype:
-            return self._solution[element_index][self.CHIP_INDEX]
+            return self._solution[record_index][self.CHIP_INDEX]
          raise NotImplementedError
 
-    def get_core_index_in_solution(self, element_index):
+    def get_core_index_in_solution(self, record_index):
          if self._use_ptype:
-            return self._solution[element_index][self.CORE_INDEX]
+            return self._solution[record_index][self.CORE_INDEX]
          raise NotImplementedError
 
-    def set_slice_neuron_from_in_solution(self, element_index, value):
+    def set_slice_neuron_from_in_solution(self, record_index, value):
          if self._use_ptype:
-            self._solution[element_index][self.SLICE_NEURON_FROM_INDEX] = value
+            self._solution[record_index][self.SLICE_NEURON_FROM_INDEX] = value
          raise NotImplementedError
 
-    def set_slice_neuron_to_in_solution(self, element_index, value):
+    def set_slice_neuron_to_in_solution(self, record_index, value):
          if self._use_ptype:
-            self._solution[element_index][self.SLICE_NEURON_TO_INDEX] = value
+            self._solution[record_index][self.SLICE_NEURON_TO_INDEX] = value
          raise NotImplementedError
 
-    def set_chip_index_in_solution(self, element_index, value):
+    def set_chip_index_in_solution(self, record_index, value):
          if self._use_ptype:
-            self._solution[element_index][self.CHIP_INDEX] = value
+            self._solution[record_index][self.CHIP_INDEX] = value
          raise NotImplementedError
 
-    def set_core_index_in_solution(self, element_index, value):
+    def set_core_index_in_solution(self, record_index, value):
          if self._use_ptype:
-            self._solution[element_index][self.CORE_INDEX] = value
+            self._solution[record_index][self.CORE_INDEX] = value
          raise NotImplementedError
 
     @overrides(AbstractGASolutionRepresentation._get_gtype_solution_representation)
