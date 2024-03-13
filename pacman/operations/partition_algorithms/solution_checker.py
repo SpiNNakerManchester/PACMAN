@@ -27,13 +27,14 @@ from .solution_checker import SolutionChecker
 from pacman.operations.partition_algorithms.solution_adopter import SolutionAdopter
 from numpy import floating
 from pacman.operations.partition_algorithms.utils.sdram_recorder import SDRAMRecorder
+from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
 
 class SolutionChecker(object):
-    def __init__(self) -> None:
-        self.constraint_max_core_per_chip = 18
-        self.constraint_max_chips = np.inf
-        self.constraint_sdram_capacity = 100 * 1024 * 1024
-        self.sdram_recorder = SDRAMRecorder()
+    def __init__(self, resource_constraints_configuration: ResourceConfiguration) -> None:
+        self._constraint_max_core_per_chip = resource_constraints_configuration.get_max_cores_per_chip()
+        self._constraint_max_chips = resource_constraints_configuration.get_max_chips()
+        self._constraint_sdram_capacity = resource_constraints_configuration.get_max_sdram()
+        self._sdram_recorder: SDRAMRecorder = SDRAMRecorder()
 
     @classmethod
     def check(self, adapter_output: bytearray, graph: ApplicationGraph, solution_configuration_max_chips = np.inf, solution_configuration_max_chips_per_core = 18) -> bool:
@@ -45,18 +46,23 @@ class SolutionChecker(object):
         prev_index = -1
         prev_chip_id = -1
         prev_core_id = -1
+
+        # 1. Calculate the presum of application nodes' neurons count
         presum_N_Ai[0] = N_Ai[0]
         for i in range(1, len(presum_N_Ai)):
             presum_N_Ai[i] = presum_N_Ai[i - 1] + N_Ai[i]
 
         application_vertex_index = 0
+        
         # Append bytes of a dummy chip-core neuron location representation of at the end of bytearray, for simplying 
         # the deployment of the last slice of neurons.
         # Nueron slice deployment condition is met when encounter this representation at the (N+1)-th iteration, and 
         # the last slice of neurons be deployed at the (N+1)-th iteration.
         extend_encoding = bytes('1' * chip_core_representation_total_length, 'ascii')
         adapter_output.extend(extend_encoding)
-        core_atoms_amount_map = dict({})
+        
+        # Maps "chip_index#core_index" to neuron_count inside the specific core.
+        core_neurons_amount_map = dict({})
         for i in range(0, N + 1):
             while i > presum_N_Ai[application_vertex_index]:
                 application_vertex_index += 1
@@ -65,26 +71,22 @@ class SolutionChecker(object):
             i_th_neuron_info_encoding_end = (i + 1) * chip_core_representation_total_length
             encoded_neuron_info_str_value = encoded_solution[i_th_neuron__info_encoding_begin:i_th_neuron_info_encoding_end].decode()
             encoded_neuron_info_int_value = int(encoded_neuron_info_str_value, 2)
-            chip_id = encoded_neuron_info_int_value // self.constraint_max_core_per_chip
-            core_id = encoded_neuron_info_int_value % self.constraint_max_core_per_chip
-            if core_id >= self.constraint_max_core_per_chip or chip_id >= self.constraint_max_chips:
+            chip_id = encoded_neuron_info_int_value // self._constraint_max_core_per_chip
+            core_id = encoded_neuron_info_int_value % self._constraint_max_core_per_chip
+            if core_id >= self._constraint_max_core_per_chip or chip_id >= self._constraint_max_chips:
                 return False
             max_chips = max(max_chips, chip_id + 1)
-            if max_chips > self.constraint_max_chips:
+            if max_chips > self._constraint_max_chips:
                 return False
 
             if prev_index == -1 or prev_chip_id == -1 or prev_core_id == -1:
-             
                 prev_index = i
                 prev_chip_id = chip_id
                 prev_core_id = core_id
-                
-                
                 continue
             
             if chip_id != prev_chip_id or core_id != prev_core_id:
                 application_vertex = list(graph.vertices)[application_vertex_index]
-                
                 prev_chip_id = chip_id
                 prev_core_id = core_id
                 prev_index = i
@@ -94,27 +96,23 @@ class SolutionChecker(object):
                 n_on_core_1_dim = hi_atom - lo_atom + 1
                 
                 key_core_location =  ("%d#%d" % (chip_id, core_id)) 
-                if key_core_location in core_atoms_amount_map:
-                    core_atoms_amount_map[key_core_location] = core_atoms_amount_map[key_core_location] + n_on_core_1_dim
+                if key_core_location in core_neurons_amount_map:
+                    core_neurons_amount_map[key_core_location] = core_neurons_amount_map[key_core_location] + n_on_core_1_dim
                 else:
-                    core_atoms_amount_map[key_core_location] = n_on_core_1_dim
+                    core_neurons_amount_map[key_core_location] = n_on_core_1_dim
                 
-
-                atoms_in_atoms = core_atoms_amount_map[key_core_location]
-                all_syn_block_sz = application_vertex.get_synapses_size(
-                    atoms_in_atoms)
-                structural_sz = application_vertex.get_structural_dynamics_size(
-                    atoms_in_atoms)
-                recorded_sdram = self.sdram_recorder._get_sdram(chip_id, core_id)
-                sdram = self.get_sdram_used_by_atoms(self,
-                    atoms_in_atoms, all_syn_block_sz, structural_sz, application_vertex)
+                recorded_sdram = self._sdram_recorder._get_sdram(chip_id, core_id)
+                
+                # sdram = self.get_sdram_used_by_atoms(self,
+                #     atoms_in_atoms, all_syn_block_sz, structural_sz, application_vertex)
+                sdram = SolutionAdopter.calculate_sdram(application_vertex, n_on_core_1_dim)
                 if recorded_sdram == None:
-                    self.sdram_recorder._record_sdram(chip_id, core_id, sdram)
+                    self._sdram_recorder._record_sdram(chip_id, core_id, sdram)
                     recorded_sdram = sdram
                 else:
                     recorded_sdram.merge(sdram)
                 
-                if recorded_sdram.get_total_sdram() > self.constraint_sdram_capacity:
+                if recorded_sdram.get_total_sdram() > self._constraint_sdram_capacity:
                     return False
     
     

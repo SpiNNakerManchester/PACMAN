@@ -16,7 +16,6 @@ class AbstractPartitioner(SolutionAdapter, object):
                                             # to record the amount of allocated chips and 
         self.graph = PacmanDataView.get_graph() # get the application graph
 
-
     def application_graph(self):
         return self._application_graph
     
@@ -35,7 +34,6 @@ class AbstractPartitioner(SolutionAdapter, object):
 
     def get_n_chips(self):
         return self.chip_counter.n_chips
-    
 
     @overrides(SolutionAdapter._adapted_output)
     def _adapted_output(self):

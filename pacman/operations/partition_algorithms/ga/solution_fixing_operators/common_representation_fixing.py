@@ -6,7 +6,7 @@ from pacman.operations.partition_algorithms.ga.solution_fixing_operators.slice_r
 
 from typing import Tuple, List
 from spinn_utilities.overrides import overrides
-from pacman.operations.partition_algorithms.ga.entities.resource_conf import ResourceConfiguration
+from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
 import pandas as pd
 from pacman.operations.partition_algorithms.solution_adopter import SolutionAdopter
 from pacman.model.graphs.application import ApplicationGraph

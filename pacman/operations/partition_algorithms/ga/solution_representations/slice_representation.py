@@ -1,9 +1,9 @@
 from .abst_ga_solution_representation import AbstractGASolutionRepresentation
 from .common_ga_solution_representation import CommonGASolutionRepresentation
 from spinn_utilities.overrides import overrides
+import numpy as np
 
 # PTYPE := List[(slice_neuron_from: int, slice_neuron_to: int, chip_index: int, core_index: int)]
-
 class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
     SLICE_NEURON_FROM_INDEX = 0
     SLICE_NEURON_TO_INDEX = 1
@@ -26,14 +26,14 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
                self._solution.append((slice_neuron_from, slice_neuron_to, chip_index, core_index))
 
     def get_slice_neuron_from_in_solution(self, element_index):
-         if self._use_ptype:
-            return self._solution[element_index][self.SLICE_NEURON_FROM_INDEX]
-         raise NotImplementedError
+        if self._use_ptype:
+           return self._solution[element_index][self.SLICE_NEURON_FROM_INDEX]
+        raise NotImplementedError
     
     def get_slice_neuron_to_in_solution(self, element_index):
-         if self._use_ptype:
-            return self._solution[element_index][self.SLICE_NEURON_TO_INDEX]
-         raise NotImplementedError
+        if self._use_ptype:
+           return self._solution[element_index][self.SLICE_NEURON_TO_INDEX]
+        raise NotImplementedError
 
     def get_chip_index_in_solution(self, element_index):
          if self._use_ptype:
@@ -167,5 +167,12 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         self._solution.clear()
         self._solution.append(solution_data)
 
+    @overrides(AbstractGASolutionRepresentation._get_narray_data)
+    def _get_narray_data(self):
+        if self._use_ptype:
+            return np.array(self.get_solution())
+        else:
+            return self.get_solution()
+        
     def __str__(self):
         return "slice_rep"

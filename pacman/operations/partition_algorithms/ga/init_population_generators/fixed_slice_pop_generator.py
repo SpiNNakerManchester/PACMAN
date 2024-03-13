@@ -7,8 +7,8 @@ from spinn_utilities.overrides import overrides
 import numpy as np
 
 class GaFixedSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
-    def __init__(self, population_size, application_graph: ApplicationGraph, fixed_slice_size: List[int], max_cores_per_chip = 18) -> None:
-        super().__init__(population_size)
+    def __init__(self, application_graph: ApplicationGraph, fixed_slice_size: List[int], max_cores_per_chip = 18) -> None:
+        super().__init__()
         if(max_cores_per_chip < 0 or fixed_slice_size < 0):
             raise ValueError
         self._application_graph = application_graph
@@ -30,12 +30,15 @@ class GaFixedSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
         current_chip_index = 0
         current_chip_remains_core = self._max_core_per_chips
         for neuron_index in range(0, neuron_count, fix_slice_size):
+            # calculate slice beginning and ending
             slice_neuron_from = neuron_index
             slice_neuron_to = min(slice_neuron_from + fix_slice_size, neuron_count)
             slices_end_points.append(slice_neuron_to)
             if current_chip_remains_core <= 0:
                 current_chip_index += 1 
                 current_chip_remains_core = self._max_core_per_chips
+
+            # append chip index and core index for the slice
             slices_chip_indexes.append(current_chip_index)
             slices_core_indexes.append(self._max_core_per_chips - current_chip_remains_core)
             current_chip_remains_core -= 1
@@ -47,11 +50,11 @@ class GaFixedSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
                 single_neuron_encoding_length=single_neuron_encoding_length)
 
     @overrides(AbstractGaInitialPopulationGenerator.generate_initial_population)
-    def generate_initial_population(self) -> List[CommonGASolutionRepresentation]:
+    def generate_initial_population(self, population_size: int) -> List[CommonGASolutionRepresentation]:
         solutions = []
-        for fix_slice_size in self._fixed_slice_size:
+        for fix_slice_size in population_size:
             solutions.append(self._make_solution(fix_slice_size))
         return solutions
 
     def __str__(self):
-        return "abst_init_gen"
+        return "fix_slice_init_gen"
