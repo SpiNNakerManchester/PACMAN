@@ -29,12 +29,14 @@ class CommonGaCrossoverKPoints(AbstractGaCrossover):
         neuron_count = (len(individual1_rep) / single_neuron_encoding_length) if self._use_ptype else len(individual1_rep)
         max_cores_per_chip = individual1.get_max_cores_per_chip()
         max_chips = individual1.get_max_chips()
+        
+        # select k points
         points = np.sort(random.sample(range(1, neuron_count - 1), k = self._k))
         new_individual1 = bytearray(single_neuron_encoding_length * neuron_count) if self._use_ptype else [0] * neuron_count
         new_individual2 = bytearray(single_neuron_encoding_length * neuron_count) if self._use_ptype else [0] * neuron_count
         parents = [individual1, individual2]
         previous_index = 0
-        if not self._use_ptype:
+        if self._use_ptype:
             single_neuron_encoding_length = 1
 
         for p in points:
