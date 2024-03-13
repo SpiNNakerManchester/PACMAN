@@ -26,7 +26,6 @@ class MinMaxNormalizationWeightInvidualSelection(AbstractGaCrossoverIndividualSe
 
     def __str__(self):
         return "minmax_random_co_ind_sel"
-    
 
 class GaussianWeightInvidualSelection(AbstractGaCrossoverIndividualSelector):
     @overrides(AbstractGaCrossoverIndividualSelector._do_select_individuals)

@@ -103,7 +103,6 @@ class GaSliceCrossoverUniform(AbstractGaCrossover):
         return (GASliceSolutionRepresentation(new_individual1[0], new_individual1[1], new_individual1[2], individual1.get_max_cores_per_chip(), individual1.get_max_chips()),
                 GASliceSolutionRepresentation(new_individual2[0], new_individual2[1], new_individual2[2], individual2.get_max_cores_per_chip(), individual2.get_max_chips()))
 
-
     def __str__(self):
         return "slice_uniform"
     
