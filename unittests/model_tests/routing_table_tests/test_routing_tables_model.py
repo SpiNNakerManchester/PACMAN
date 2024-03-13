@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import unittest
-from pacman.config_setup import unittest_setup
+from spinn_utilities.config_holder import set_config
 from spinn_machine import MulticastRoutingEntry
+
+from pacman.config_setup import unittest_setup
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.routing_tables.multicast_routing_tables import (
@@ -34,6 +36,7 @@ class TestRoutingTable(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
+        set_config("Machine", "version", 5)
 
     def test_new_multicast_routing_table_entry(self):
         """
