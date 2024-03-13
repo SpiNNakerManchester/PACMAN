@@ -31,14 +31,13 @@ class GaSliceVariationuUniformGaussian(AbstractGaVariation):
         return individual_rep
     
     def __ptype_variation(self, individual_rep, max_cores_per_chip, max_chips):
-        neuron_count = individual_rep[-1] + 1 # Slice are represented closed interval of neurons
+        neuron_count = individual_rep[-1] + 1 # Slice are represented as closed interval of neurons
         ptype_representation_length = len(individual_rep)
         last_slice_end = -1
         for i in range(0, ptype_representation_length):
             slice_to_neuron_index = individual_rep[GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
             chip_index = individual_rep[GASliceSolutionRepresentation.CHIP_INDEX]
             core_index = individual_rep[GASliceSolutionRepresentation.CORE_INDEX]
-
 
             is_variation_happen = (random.random() <= self._variation_happen_ratio)
             if is_variation_happen:
@@ -86,7 +85,7 @@ class GaSliceVariationuUniformGaussian(AbstractGaVariation):
 
         self.__ptype_variation(individual_rep, max_cores_per_chip, max_chips)
 
-                
+    
     # Each gene is variated with a possibility of variation_rate. and the variation quantance obtains a gaussian distribution N(Sigma^2, mu)
     # If a gene is variated, it will make its neighbor neurons in the same place as it. The range of neighbor neuron is decided by a gaussian distribution of N(neibor_effect_sigma, neibor_effect_mu). 
     def __init__(self, use_ptype=False, variation_happen_ratio=0.2, sigma=1.0, mu=0.0, chip_index_variation_mu=0.0, chip_index_variation_sigma=0.0, core_index_variation_mu=0.0, core_index_variation_sigma=0.0) -> None:
@@ -122,5 +121,5 @@ class GaSliceVariationuUniformGaussian(AbstractGaVariation):
         return self._core_index_variation_sigma
     
     def __str__(self):
-        return "abst_variation"
+        return "slice_variation"
 
