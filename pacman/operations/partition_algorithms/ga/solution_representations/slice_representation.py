@@ -152,7 +152,6 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
 
         del solution_in_bytes_representation[-single_neuron_encoding_length:]
         return self
-
     
     @overrides(AbstractGASolutionRepresentation._set_new_solution_data_in_ptype)
     def _set_new_solution_data_in_ptype(self, solution_data):
