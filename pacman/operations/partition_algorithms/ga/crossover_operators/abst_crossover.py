@@ -8,7 +8,6 @@ class AbstractGaCrossover(object):
             raise ValueError
         self._do_crossover(individual1, individual2)
     
-
     def _do_crossover(self, individual1: AbstractGASolutionRepresentation, individual2: AbstractGASolutionRepresentation):
         raise NotImplementedError
 

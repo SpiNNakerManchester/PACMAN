@@ -4,6 +4,7 @@ from pacman.operations.partition_algorithms.ga.cost_caculators.abst_cost_calcula
 from typing import List
 from spinn_utilities.overrides import overrides
 import random
+import numpy as np
 class MinMaxNormalizationWeightInvidualSelection(AbstractGaCrossoverIndividualSelector):
     @overrides(AbstractGaCrossoverIndividualSelector._do_select_individuals)
     def _do_select_individuals(self, solutions: List[AbstractGASolutionRepresentation], costs: List[int]) -> List[AbstractGASolutionRepresentation]:
@@ -25,3 +26,28 @@ class MinMaxNormalizationWeightInvidualSelection(AbstractGaCrossoverIndividualSe
 
     def __str__(self):
         return "minmax_random_co_ind_sel"
+    
+
+class GaussianWeightInvidualSelection(AbstractGaCrossoverIndividualSelector):
+    @overrides(AbstractGaCrossoverIndividualSelector._do_select_individuals)
+    def _do_select_individuals(self, solutions: List[AbstractGASolutionRepresentation], costs: List[int]) -> List[AbstractGASolutionRepresentation]:
+        select_indexes = []
+        indexes = range(0, len(solutions))
+        weights = self._generate_selection_weights(costs)
+
+        while len(select_indexes) < 2:
+            random_index = random.choices(indexes, weights, k=1)[0]
+            if random_index not in indexes:
+                select_indexes.append(random_index)
+
+        return [solutions[index] for index in select_indexes[:2]]
+    
+    def _generate_selection_weights(self, costs):
+        if(len(costs) <= 1):
+            return costs
+        mu = np.average(costs)
+        s = np.sqrt(np.sum((np.array(costs) - mu) ** 2)) / (len(costs) - 1)
+        return (costs - mu) / s
+
+    def __str__(self):
+        return "gaussian_z_random_co_ind_sel"

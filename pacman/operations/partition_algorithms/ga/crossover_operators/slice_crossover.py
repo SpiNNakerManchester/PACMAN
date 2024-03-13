@@ -34,8 +34,7 @@ class GaSliceCrossoverKPoints(AbstractGaCrossover):
         SLICE_RECORD_CHIP_INDEX = individual1.CHIP_INDEX
         SLICE_RECORD_CORE_INDEX = individual1.CORE_INDEX
         while P[0] < individual1_length and P[1] < individual2_length:
-            select_individual = random.choices([0, 1], k = 1)[0]
-            
+            select_individual = random.choices([0, 1], k = 1)[0]    
             new_individual1[0].append(individuals[select_individual][P[select_individual]][SLICE_RECORD_TO_INDEX])
             new_individual1[1].append(individuals[select_individual][P[select_individual]][SLICE_RECORD_CHIP_INDEX])
             new_individual1[2].append(individuals[select_individual][P[select_individual]][SLICE_RECORD_CORE_INDEX])
@@ -52,8 +51,7 @@ class GaSliceCrossoverKPoints(AbstractGaCrossover):
         if new_individual2[-1] != individual2_rep[-1]:
             new_individual2.append(individual2_rep[-1])
         return (GASliceSolutionRepresentation(new_individual1[0], new_individual1[1], new_individual1[2], individual1.get_max_cores_per_chip(), individual1.get_max_chips()),
-                GASliceSolutionRepresentation(new_individual2[0], new_individual2[1], new_individual2[2], individual2.get_max_cores_per_chip(), individual2.get_max_chips()),
-                )
+                GASliceSolutionRepresentation(new_individual2[0], new_individual2[1], new_individual2[2], individual2.get_max_cores_per_chip(), individual2.get_max_chips()))
 
     def get_k(self):
         return self._k
@@ -103,11 +101,8 @@ class GaSliceCrossoverUniform(AbstractGaCrossover):
         if new_individual2[-1] != individual2_rep[-1]:
             new_individual2.append(individual2_rep[-1])
         return (GASliceSolutionRepresentation(new_individual1[0], new_individual1[1], new_individual1[2], individual1.get_max_cores_per_chip(), individual1.get_max_chips()),
-                GASliceSolutionRepresentation(new_individual2[0], new_individual2[1], new_individual2[2], individual2.get_max_cores_per_chip(), individual2.get_max_chips()),
-                )
+                GASliceSolutionRepresentation(new_individual2[0], new_individual2[1], new_individual2[2], individual2.get_max_cores_per_chip(), individual2.get_max_chips()))
 
-    def get_k(self):
-        return self._k
 
     def __str__(self):
         return "slice_uniform"
