@@ -49,5 +49,22 @@ class AbstractGASolutionRepresentation:
     def _get_gtype_solution_representation(self):
         raise NotImplementedError
     
+    def set_new_representation_solution(self, solution_data):
+        if self._use_ptype:
+            self._set_new_solution_data_in_ptype(solution_data)
+        else:
+            self._set_new_solution_data_in_gtype(solution_data)
+
+    def _set_new_solution_data_in_ptype(self, solution_data):
+        raise NotImplementedError
+
+    def _set_new_solution_data_in_gtype(self, solution_data):
+        raise NotImplementedError
+
+
+
+
+
+
     def __str__(self):
         return "abst_rep"

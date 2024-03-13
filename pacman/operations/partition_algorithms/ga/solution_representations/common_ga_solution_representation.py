@@ -51,5 +51,18 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
 
         return solution
     
+    @overrides(AbstractGASolutionRepresentation._set_new_solution_data_in_ptype)
+    def _set_new_solution_data_in_ptype(self, solution_data):
+        if not isinstance(solution_data, list):
+            raise TypeError
+        self._solution.clear()
+        self._solution.append(solution_data)
+
+    @overrides(AbstractGASolutionRepresentation._set_new_solution_data_in_gtype)
+    def _set_new_solution_data_in_gtype(self, solution_data):
+        if not isinstance(solution_data, bytearray):
+            raise TypeError
+        self._solution.clear()
+        self._solution.append(solution_data)
     def __str__(self):
         return "comm_rep"

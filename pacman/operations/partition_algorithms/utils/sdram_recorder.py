@@ -9,8 +9,8 @@ class SDRAMRecorder(object):
     
     def _get_sdram(self, chip_index, core_index) -> AbstractSDRAM:
         key_chip_core_identification = '%s#%s' % (chip_index, core_index)
-        if key_chip_core_identification in self._sdram_record:
-            return self._sdram_record[key_chip_core_identification]
+        if key_chip_core_identification in self._sdram_records:
+            return self._sdram_records[key_chip_core_identification]
         return None
     
     def _record_sdram(self, chip_index, core_index, sdram: AbstractSDRAM) -> None:

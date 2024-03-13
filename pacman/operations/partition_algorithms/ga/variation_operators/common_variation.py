@@ -106,5 +106,5 @@ class CommonGaVariationuUniformGaussian(AbstractGaVariation):
         return self._variation_rate
 
     def __str__(self):
-        return "abst_variation"
+        return "common_variation"
 

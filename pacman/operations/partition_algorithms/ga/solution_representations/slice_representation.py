@@ -13,7 +13,6 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
     def __init__(self) -> None:
           super().__init__([], -1, -1, False)
           
-
     def __init__(self, slices_end_points, slices_chip_indexes, slices_core_indexes, max_cores_per_chip, max_chips) -> None:
           super().__init__([], max_cores_per_chip, max_chips, False)
           previous_pos = 0
@@ -147,19 +146,27 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
                 continue
             
             self._solution.append([last_neuron_index, neuron_index - 1, last_chip_index, last_core_index])
-
             last_neuron_index = neuron_index
             last_chip_index = chip_index
             last_core_index = core_index
 
         del solution_in_bytes_representation[-single_neuron_encoding_length:]
-        
         return self
 
+    
+    @overrides(AbstractGASolutionRepresentation._set_new_solution_data_in_ptype)
+    def _set_new_solution_data_in_ptype(self, solution_data):
+        if not isinstance(solution_data, list):
+            raise TypeError
+        self._solution.clear()
+        self._solution += solution_data
 
-    def set_new_ptype_representation_solution(self, new_ptype_representation_solution):
-        if self._use_ptype:
-            self._solution.clear()
-            self._solution += new_ptype_representation_solution
+    @overrides(AbstractGASolutionRepresentation._set_new_solution_data_in_gtype)
+    def _set_new_solution_data_in_gtype(self, solution_data):
+        if not isinstance(solution_data, bytearray):
+            raise TypeError
+        self._solution.clear()
+        self._solution.append(solution_data)
+
     def __str__(self):
         return "slice_rep"
