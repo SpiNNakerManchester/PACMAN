@@ -26,7 +26,9 @@ class CommonGaCrossoverKPoints(AbstractGaCrossover):
                 ((not self._use_ptype) and (len(individual1_rep) % single_neuron_encoding_length != 0)):
             raise ValueError
 
-        neuron_count = (len(individual1_rep) / single_neuron_encoding_length) if self._use_ptype else len(individual1_rep)
+        if self._use_ptype:
+            single_neuron_encoding_length = 1
+        neuron_count = (len(individual1_rep) / single_neuron_encoding_length)
         max_cores_per_chip = individual1.get_max_cores_per_chip()
         max_chips = individual1.get_max_chips()
         
@@ -35,20 +37,20 @@ class CommonGaCrossoverKPoints(AbstractGaCrossover):
         new_individual1 = bytearray(single_neuron_encoding_length * neuron_count) if self._use_ptype else [0] * neuron_count
         new_individual2 = bytearray(single_neuron_encoding_length * neuron_count) if self._use_ptype else [0] * neuron_count
         parents = [individual1, individual2]
-        previous_index = 0
-        if self._use_ptype:
-            single_neuron_encoding_length = 1
+        previous_neuron_index = -1
 
         for p in points:
-            neuron_encoding_begin = previous_index * single_neuron_encoding_length
-            neuron_encoding_end = p * single_neuron_encoding_length
+            neuron_encoding_begin = (previous_neuron_index + 1) * single_neuron_encoding_length
+            neuron_encoding_end = (p + 1) * single_neuron_encoding_length
             new_individual1_select_parent_id = random.choice([0, 1])
             new_individual1[neuron_encoding_begin:neuron_encoding_end] = \
                 parents[new_individual1_select_parent_id][neuron_encoding_begin:neuron_encoding_end]
             new_individual2[neuron_encoding_begin:neuron_encoding_end] = \
                 parents[1 - new_individual1_select_parent_id][neuron_encoding_begin:neuron_encoding_end]
+            previous_neuron_index = p
 
-        return (CommonGASolutionRepresentation(new_individual1, max_cores_per_chip, max_chips, self._use_ptype), CommonGASolutionRepresentation(new_individual2, max_cores_per_chip, max_chips, self._use_ptype))
+        return (CommonGASolutionRepresentation(new_individual1, max_cores_per_chip, max_chips, self._use_ptype),\
+                 CommonGASolutionRepresentation(new_individual2, max_cores_per_chip, max_chips, self._use_ptype))
     
     def get_k(self):
         return self._k
@@ -77,15 +79,14 @@ class CommonGaCrossoverUniform(AbstractGaCrossover):
                 (not self._use_ptype or (len(individual1_rep) % single_neuron_encoding_length != 0)):
             raise ValueError
 
-        neuron_count = (len(individual1_rep) / single_neuron_encoding_length) if self._use_ptype else len(individual1_rep)
+        if not self._use_ptype:
+            single_neuron_encoding_length = 1
+        neuron_count = (len(individual1_rep) / single_neuron_encoding_length)
         max_cores_per_chip = individual1.get_max_cores_per_chip()
         max_chips = individual1.get_max_chips()
         new_individual1 = bytearray(single_neuron_encoding_length * neuron_count) if self._use_ptype else [0] * neuron_count
         new_individual2 = bytearray(single_neuron_encoding_length * neuron_count) if self._use_ptype else [0] * neuron_count
         parents = [individual1, individual2]
-
-        if not self._use_ptype:
-            single_neuron_encoding_length = 1
 
         for p in range(0, neuron_count):
             neuron_encoding_begin = p * single_neuron_encoding_length
@@ -95,12 +96,12 @@ class CommonGaCrossoverUniform(AbstractGaCrossover):
                 parents[new_individual1_select_parent_id][neuron_encoding_begin:neuron_encoding_end]
             new_individual2[neuron_encoding_begin:neuron_encoding_end] = \
                 parents[1 - new_individual1_select_parent_id][neuron_encoding_begin:neuron_encoding_end]
-
-        return (CommonGASolutionRepresentation(new_individual1, max_cores_per_chip, max_chips, self._use_ptype), CommonGASolutionRepresentation(new_individual2, max_cores_per_chip, max_chips, self._use_ptype))
+        return (CommonGASolutionRepresentation(new_individual1, max_cores_per_chip, max_chips, self._use_ptype), \
+                CommonGASolutionRepresentation(new_individual2, max_cores_per_chip, max_chips, self._use_ptype))
     
     def get_k(self):
         return self._k
 
     def __str__(self):
-        return "comm_k_points"
+        return "comm_uniform_crossover"
     
