@@ -107,10 +107,7 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
 
         :rtype: int or None
         """
-        if self._incoming > MAX_LINKS_PER_ROUTER:
-            return self._incoming - MAX_LINKS_PER_ROUTER - 1
-        else:
-            return None
+        return self._incoming_processor
 
     @incoming_processor.setter
     def incoming_processor(self, incoming_processor: int):
@@ -136,7 +133,7 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
         if self._incoming_link is None:
             return False
         # defaultable if the output route is exactly the inverse of the input
-        invert_link = ((self._incoming_li + 3) % 6)
+        invert_link = ((self._incoming_link + 3) % 6)
         # as it is faster to go from a link to a spinnaker route
         return (self._calc_spinnaker_route(None, invert_link) ==
                 self.spinnaker_route)
@@ -216,9 +213,5 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
         # False if the outgoing processor of linsk are diffeent
         if self.spinnaker_route != entry.spinnaker_route:
             return False
-        # True if the incoming link or processor is the same
-        if self._incoming == entry._incoming:
-            return True
-        # True if both have an incoming processor even if different
-        return (self._incoming > MAX_LINKS_PER_ROUTER and
-                entry._incoming > MAX_LINKS_PER_ROUTER)
+        # True if the incoming link s are the same
+        return self._incoming_link == entry._incoming_link

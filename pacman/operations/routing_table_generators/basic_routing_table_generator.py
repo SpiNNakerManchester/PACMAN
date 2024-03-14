@@ -71,6 +71,6 @@ def __create_routing_table(
         table.add_multicast_routing_entry(MulticastRoutingEntry(
             routing_entry_key=r_info.key_and_mask.key_combo,
             defaultable=entry.defaultable, mask=r_info.key_and_mask.mask,
-            link_ids=entry.link_ids, processor_ids=entry.processor_ids))
+            spinnaker_route=entry.spinnaker_route))
 
     return table
