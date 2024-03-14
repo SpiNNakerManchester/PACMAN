@@ -295,7 +295,7 @@ def a_star(sink: XY, heuristic_source: XY,
             break
 
         # Try all neighbouring locations.
-        for neighbour_link in range(6):  # Router.MAX_LINKS_PER_ROUTER
+        for neighbour_link in range(6):  # MAX_LINKS_PER_ROUTER
             # Note: link identifiers are from the perspective of the neighbour,
             # not the current node!
             neighbour = machine.xy_over_link(

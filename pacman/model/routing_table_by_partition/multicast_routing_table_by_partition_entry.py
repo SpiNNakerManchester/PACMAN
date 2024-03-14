@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 from typing import Iterable, Optional, Union
 from spinn_utilities.log import FormatAdapter
-from spinn_machine import Router
+from spinn_machine.constants import MAX_LINKS_PER_ROUTER
 from spinn_machine.base_multicast_routing_entry import (
     BaseMulticastRoutingEntry)
 from pacman.exceptions import (
@@ -85,7 +85,7 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
 
         :rtype: int or None
         """
-        if 0 < self._incoming <= Router.MAX_LINKS_PER_ROUTER:
+        if 0 < self._incoming <= MAX_LINKS_PER_ROUTER:
             return self._incoming - 1
         else:
             return None
@@ -101,21 +101,21 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
 
         :rtype: int or None
         """
-        if self._incoming > Router.MAX_LINKS_PER_ROUTER:
-            return self._incoming - Router.MAX_LINKS_PER_ROUTER - 1
+        if self._incoming > MAX_LINKS_PER_ROUTER:
+            return self._incoming - MAX_LINKS_PER_ROUTER - 1
         else:
             return None
 
     @incoming_processor.setter
     def incoming_processor(self, incoming_processor: int):
         self.__set_incoming(
-            incoming_processor + Router.MAX_LINKS_PER_ROUTER + 1)
+            incoming_processor + MAX_LINKS_PER_ROUTER + 1)
         self._defaultable = False
 
     def __set_incoming(self, incoming: int):
         if self._incoming == 0 or self._incoming == incoming:
             self._incoming = incoming
-            if 0 < self._incoming <= Router.MAX_LINKS_PER_ROUTER:
+            if 0 < self._incoming <= MAX_LINKS_PER_ROUTER:
                 # Defaultable if the spinnaker route represents just this link
                 route = self._calc_spinnaker_route(None, incoming - 1)
                 self._defaultable = (route == self.spinnaker_route)
@@ -206,5 +206,5 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
         if self._incoming == entry._incoming:
             return True
         # True if both have an incoming processor even if different
-        return (self._incoming > Router.MAX_LINKS_PER_ROUTER and
-                entry._incoming > Router.MAX_LINKS_PER_ROUTER)
+        return (self._incoming > MAX_LINKS_PER_ROUTER and
+                entry._incoming > MAX_LINKS_PER_ROUTER)
