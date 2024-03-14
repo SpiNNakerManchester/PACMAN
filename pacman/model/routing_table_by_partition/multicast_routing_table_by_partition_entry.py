@@ -29,7 +29,7 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
     An entry in a path of a multicast route.
     """
 
-    __slots__ = ["_defaultable", "_incoming"]
+    __slots__ = ["_incoming_processor", "_incoming_link"]
 
     def __init__(self, out_going_links: Union[int, Iterable[int], None],
                  outgoing_processors: Union[int, Iterable[int], None],
@@ -63,15 +63,15 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
             outgoing_processors, out_going_links,
             spinnaker_route=spinnaker_route)
 
-        self._incoming = 0
+        self._incoming_link: Optional[int]
+        self._incoming_processor: Optional[int]
         if incoming_link is None:
-            if incoming_processor is None:
-                self._defaultable = False
-            else:
-                self.incoming_processor = incoming_processor
+            self._incoming_link = None
+            self._incoming_processor = incoming_processor
         else:
             if incoming_processor is None:
-                self.incoming_link = incoming_link
+                self._incoming_link = incoming_link
+                self._incoming_processor = None
             else:
                 raise PacmanInvalidParameterException(
                     "The incoming direction for a path can only be from "
@@ -85,14 +85,20 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
 
         :rtype: int or None
         """
-        if 0 < self._incoming <= MAX_LINKS_PER_ROUTER:
-            return self._incoming - 1
-        else:
-            return None
+        return self._incoming_link
 
     @incoming_link.setter
     def incoming_link(self, incoming_link: int):
-        self.__set_incoming(incoming_link + 1)
+        if self._incoming_processor is not None:
+            raise PacmanConfigurationException(
+                f"Entry already has an incoming processor "
+                f"{self._incoming_processor}")
+        if (self._incoming_link is not None
+                and self._incoming_link != incoming_link):
+            raise PacmanConfigurationException(
+                f"Entry already has an unexpected incoming value "
+                f"{self._incoming}")
+        self._incoming_link = incoming_link
 
     @property
     def incoming_processor(self) -> Optional[int]:
@@ -108,33 +114,16 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
 
     @incoming_processor.setter
     def incoming_processor(self, incoming_processor: int):
-        self.__set_incoming(
-            incoming_processor + MAX_LINKS_PER_ROUTER + 1)
-        self._defaultable = False
-
-    def __set_incoming(self, incoming: int):
-        if self._incoming == 0 or self._incoming == incoming:
-            self._incoming = incoming
-            if 0 < self._incoming <= MAX_LINKS_PER_ROUTER:
-                # Defaultable if the spinnaker route represents just this link
-                route = self._calc_spinnaker_route(None, incoming - 1)
-                self._defaultable = (route == self.spinnaker_route)
-            else:
-                # Not defaultable if no incoming or incoming is not a link
-                self._defaultable = False
-        else:
-            self_proc = self.incoming_processor
-            self_link = self.incoming_link
-            if self_link is not None:
-                raise PacmanConfigurationException(
-                    f"Entry already has an incoming link {self.link}")
-            elif self_proc is not None:
-                raise PacmanConfigurationException(
-                    f"Entry already has an incoming processor {self_proc}")
-            else:
-                raise PacmanConfigurationException(
-                    f"Entry already has an unexpected incoming value "
-                    f"{self._incoming}")
+        if (self._incoming_processor is not None and
+                self._incoming_processor != incoming_processor):
+            raise PacmanConfigurationException(
+                f"Entry already has an incoming processor "
+                f"{self._incoming_processor}")
+        if self._incoming_link is not None:
+            raise PacmanConfigurationException(
+                f"Entry already has an unexpected incoming value "
+                f"{self._incoming}")
+        self._incoming_processor = self._incoming_processor
 
     @property
     def defaultable(self) -> bool:
@@ -143,7 +132,25 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
 
         :rtype: bool
         """
-        return self._defaultable
+        # without an incoming link is is not defaultable
+        if self._incoming_link is None:
+            return False
+        # defaultable if the output route is exactly the inverse of the input
+        invert_link = ((self._incoming_li + 3) % 6)
+        # as it is faster to go from a link to a spinnaker route
+        return (self._calc_spinnaker_route(None, invert_link) ==
+                self.spinnaker_route)
+
+    @staticmethod
+    def __merge_none_or_equal(p1, p2, name):
+        if p1 is None:
+            return p2
+        if p2 is None or p2 == p1:
+            return p1
+        raise PacmanInvalidParameterException(
+            name, "invalid merge",
+            "The two MulticastRoutingTableByPartitionEntry have "
+            "different " + name + "s, and so can't be merged")
 
     def merge_entry(self, other: MulticastRoutingTableByPartitionEntry) -> \
             MulticastRoutingTableByPartitionEntry:
@@ -164,25 +171,32 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
                 "MulticastRoutingTableByPartitionEntry, and therefore cannot "
                 "be merged.")
 
-        # validate incoming
-        if self._incoming == 0:
-            incoming = other._incoming
-        elif other._incoming == 0:
-            incoming = self._incoming
-        elif self._incoming == other._incoming:
-            incoming = self._incoming
+        if self._incoming_processor is None:
+            incoming_processor = other._incoming_processor
+        elif (other._incoming_processor is None or
+              self._incoming_processor == other._incoming_processor):
+            incoming_processor = self._incoming_processor
         else:
-            log.error("Error merging entry {} into {}", other, self)
             raise PacmanInvalidParameterException(
-                "incoming", other._incoming,
+                "other", other,
                 "The two MulticastRoutingTableByPartitionEntry have "
-                "different incomings, and so can't be merged")
+                "different incoming processors, and so can't be merged")
 
-        entry = MulticastRoutingTableByPartitionEntry(
-            None, None,
+        if self._incoming_link is None:
+            incoming_link = other._incoming_link
+        elif (other._incoming_link is None or
+              self._incoming_link == other._incoming_link):
+            incoming_link = self._incoming_link
+        else:
+            raise PacmanInvalidParameterException(
+                "other", other,
+                "The two MulticastRoutingTableByPartitionEntry have "
+                "different incoming links, and so can't be merged")
+
+        # init checks if both incoming values are not None
+        return MulticastRoutingTableByPartitionEntry(
+            None, None, incoming_processor, incoming_link,
             spinnaker_route=self.spinnaker_route | other.spinnaker_route)
-        entry.__set_incoming(incoming)
-        return entry
 
     def __repr__(self) -> str:
         return (f"{self.incoming_link}:{self.incoming_processor}:"
