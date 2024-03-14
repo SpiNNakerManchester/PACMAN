@@ -15,7 +15,6 @@ from __future__ import annotations
 import logging
 from typing import Iterable, Optional, Union
 from spinn_utilities.log import FormatAdapter
-from spinn_machine.constants import MAX_LINKS_PER_ROUTER
 from spinn_machine.base_multicast_routing_entry import (
     BaseMulticastRoutingEntry)
 from pacman.exceptions import (
