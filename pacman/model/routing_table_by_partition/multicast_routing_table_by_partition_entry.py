@@ -199,4 +199,12 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
         :rtype: bool
         """
         # pylint:disable=protected-access
-        return (self.spinnaker_route == entry.spinnaker_route)
+        # False if the outgoing processor of linsk are diffeent
+        if self.spinnaker_route != entry.spinnaker_route:
+            return False
+        # True if the incoming link or processor is the same
+        if self._incoming == entry._incoming:
+            return True
+        # True if both have an incoming processor even if different
+        return (self._incoming > Router.MAX_LINKS_PER_ROUTER and
+                entry._incoming > Router.MAX_LINKS_PER_ROUTER)
