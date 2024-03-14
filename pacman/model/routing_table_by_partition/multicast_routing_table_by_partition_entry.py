@@ -95,8 +95,8 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
         if (self._incoming_link is not None
                 and self._incoming_link != incoming_link):
             raise PacmanConfigurationException(
-                f"Entry already has an unexpected incoming value "
-                f"{self._incoming}")
+                f"Entry already has a different incoming value "
+                f"{self._incoming_link}")
         self._incoming_link = incoming_link
 
     @property
@@ -113,12 +113,11 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
         if (self._incoming_processor is not None and
                 self._incoming_processor != incoming_processor):
             raise PacmanConfigurationException(
-                f"Entry already has an incoming processor "
+                f"Entry already has an different incoming processor "
                 f"{self._incoming_processor}")
         if self._incoming_link is not None:
             raise PacmanConfigurationException(
-                f"Entry already has an unexpected incoming value "
-                f"{self._incoming}")
+                f"Entry already has an incoming link {self._incoming_link}")
         self._incoming_processor = self._incoming_processor
 
     @property
@@ -136,17 +135,6 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
         # as it is faster to go from a link to a spinnaker route
         return (self._calc_spinnaker_route(None, invert_link) ==
                 self.spinnaker_route)
-
-    @staticmethod
-    def __merge_none_or_equal(p1, p2, name):
-        if p1 is None:
-            return p2
-        if p2 is None or p2 == p1:
-            return p1
-        raise PacmanInvalidParameterException(
-            name, "invalid merge",
-            "The two MulticastRoutingTableByPartitionEntry have "
-            "different " + name + "s, and so can't be merged")
 
     def merge_entry(self, other: MulticastRoutingTableByPartitionEntry) -> \
             MulticastRoutingTableByPartitionEntry:
@@ -209,8 +197,8 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
         :rtype: bool
         """
         # pylint:disable=protected-access
-        # False if the outgoing processor of linsk are diffeent
+        # False if the outgoing processor of links are different
         if self.spinnaker_route != entry.spinnaker_route:
             return False
-        # True if the incoming link s are the same
+        # True if the incoming links are the same
         return self._incoming_link == entry._incoming_link
