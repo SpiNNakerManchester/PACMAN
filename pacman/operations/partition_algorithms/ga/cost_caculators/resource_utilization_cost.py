@@ -11,6 +11,5 @@ class ResourceUtilizationCost(AbstractGaCostCalculator):
         differ_cores = set(ptype_representation)
         return differ_cores
 
-
     def __str__(self):
-        return "c1_cost"
+        return "res_utilization_cost"

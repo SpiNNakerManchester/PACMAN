@@ -18,7 +18,7 @@ class GaSliceVariationuUniformGaussian(AbstractGaVariation):
             return individual
 
     def _gtype_variation(self, individual: GASliceSolutionRepresentation):
-        # variate a neuron's chip index and core index, then randomly change its neighbors
+        # Variate a neuron's chip index and core index, then randomly change its neighbors
         # to the same place.
         individual_rep = individual.get_gtype_solution_representation()
         single_neuron_encoding_length = individual.get_single_neuron_encoding_length()

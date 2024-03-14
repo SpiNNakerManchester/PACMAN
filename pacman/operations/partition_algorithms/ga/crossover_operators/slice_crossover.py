@@ -8,7 +8,6 @@ from typing import Tuple
 import random
 import numpy as np
 
-
 class GaSliceCrossoverKPoints(AbstractGaCrossover):
     def __init__(self, k: int, use_ptype=False) -> None:
         super().__init__()
@@ -57,7 +56,7 @@ class GaSliceCrossoverKPoints(AbstractGaCrossover):
         return self._k
 
     def __str__(self):
-        return "slice_uniform_crossover"
+        return "slice_k_points_crossover"
 
 class GaSliceCrossoverUniform(AbstractGaCrossover):
     def __init__(self, use_ptype=False) -> None:
@@ -104,5 +103,5 @@ class GaSliceCrossoverUniform(AbstractGaCrossover):
                 GASliceSolutionRepresentation(new_individual2[0], new_individual2[1], new_individual2[2], individual2.get_max_cores_per_chip(), individual2.get_max_chips()))
 
     def __str__(self):
-        return "slice_uniform"
+        return "slice_uniform_crossover"
     
