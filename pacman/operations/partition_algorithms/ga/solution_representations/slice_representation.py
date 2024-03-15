@@ -10,14 +10,15 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
     CHIP_INDEX = 2
     CORE_INDEX = 3
     
-    def __init__(self) -> None:
-          super().__init__([], -1, -1, False)
           
-    def __init__(self, slices_end_points, slices_chip_indexes, slices_core_indexes, max_cores_per_chip, max_chips) -> None:
-          super().__init__([], max_cores_per_chip, max_chips, False)
+    def __init__(self, solution_data, slices_chip_indexes, slices_core_indexes, max_cores_per_chip, max_chips, use_ptype=True) -> None:
+          super().__init__([], max_cores_per_chip, max_chips, use_ptype)
+          if use_ptype:
+              self._solution = solution_data
+              return
           previous_pos = 0
           slice_index = 0
-          for endpoint in slices_end_points:
+          for endpoint in solution_data:
                slice_neuron_from = previous_pos
                slice_neuron_to = endpoint
                chip_index = slices_chip_indexes[slice_index]
@@ -167,12 +168,24 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         self._solution.clear()
         self._solution.append(solution_data)
 
-    @overrides(AbstractGASolutionRepresentation.get_narray_data)
-    def get_narray_data(self):
+
+    @overrides(AbstractGASolutionRepresentation.get_serialization_data)
+    def get_serialization_data(self):
         if self._use_ptype:
-            return np.array(self.get_solution())
+            solution_data = self.get_solution()
+            return [GASliceSolutionRepresentation.class_str(), self._use_ptype, self._max_chips, self._max_cores_per_chip, \
+                    [slice_info[self.SLICE_NEURON_TO_INDEX] for slice_info in solution_data],\
+                    [slice_info[self.CHIP_INDEX] for slice_info in solution_data], \
+                    [slice_info[self.CORE_INDEX] for slice_info in solution_data]]
         else:
-            return self.get_solution()
-        
-    def __str__(self):
+            return [GASliceSolutionRepresentation.class_str(), self._use_ptype, self._max_chips, self._max_cores_per_chip, self.get_solution()]
+    
+    @classmethod
+    def class_str():
         return "slice_rep"
+    
+    def __str__(self):
+        return GASliceSolutionRepresentation.class_str()
+    
+
+    

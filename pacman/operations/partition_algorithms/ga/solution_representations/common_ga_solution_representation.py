@@ -4,14 +4,14 @@ from spinn_utilities.overrides import overrides
 import numpy as np
 
 class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
-    def __init__(self, solution, max_cores_pre_chip, max_chips, use_ptype = True) -> None:
+    def __init__(self, solution, max_cores_pre_chip, max_chips, use_ptype = False) -> None:
           super().__init__(solution, max_cores_pre_chip, max_chips, use_ptype)
           
     @overrides(AbstractGASolutionRepresentation.from_common_representation)
     def from_common_representation(self, solution: CommonGASolutionRepresentation):
         self._solution = solution.get_solution()
         self._single_neuron_encoding_length = solution.get_single_neuron_encoding_length()
-        self._max_chip = solution.get_max_chips()
+        self._max_chips = solution.get_max_chips()
         self._max_core_per_chip = solution.get_max_cores_per_chip()
         return self
     
@@ -64,12 +64,14 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
             raise TypeError
         self._solution.clear()
         self._solution.append(solution_data)
-    def __str__(self):
+    
+
+    def class_str():
         return "comm_rep"
     
-    @overrides(AbstractGASolutionRepresentation.get_narray_data)
-    def get_narray_data(self):
-        if self._use_ptype:
-            return np.array(self.get_solution())
-        else:
-            return self.get_solution()
+    def __str__(self):
+        return CommonGASolutionRepresentation.class_str()
+    
+    @overrides(AbstractGASolutionRepresentation.get_serialization_data)
+    def get_serialization_data(self):
+            return [CommonGASolutionRepresentation.class_str(), self._use_ptype, self._max_chips, self._max_cores_per_chip, self.get_solution()]
