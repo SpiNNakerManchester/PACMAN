@@ -2,6 +2,7 @@ from pacman.operations.partition_algorithms.splitter_partitioner import splitter
 from pacman.operations.partition_algorithms.random_partitioner import RandomPartitioner
 from pacman.operations.partition_algorithms.ga_partitioner import GAPartitioner
 from pacman.operations.partition_algorithms.ga.entities.ga_algorithm_configuration import GAAlgorithmConfiguration
+from pacman.operations.partition_algorithms.ga.init_population_generators.fixed_slice_pop_generator import GaFixedSlicePopulationGenerator
 
 class PartitionerSelector(object):
     def __init__(self, partitioner_name, resource_constraints_configuration) -> None:
@@ -14,7 +15,8 @@ class PartitionerSelector(object):
             self._partitioner = RandomPartitioner(100, resource_constraints_configuration).partitioning()
             self._n_chips = self._partitioner.get_n_chips()
         if partitioner_name == "ga":
-            ga_configuration: GAAlgorithmConfiguration = GAAlgorithmConfiguration()
+            ga_configuration: GAAlgorithmConfiguration = \
+                GAAlgorithmConfiguration(init_solutions_common_representation_generator=)
             self._partitioner = GAPartitioner(resource_contraints_configuration=resource_constraints_configuration,\
                 max_slice_length=10 ** 9,\
                 solution_file_path=None,\

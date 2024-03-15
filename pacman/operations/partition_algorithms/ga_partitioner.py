@@ -19,6 +19,7 @@ from pacman.operations.partition_algorithms.ga.init_population_generators.fixed_
 from pacman.operations.partition_algorithms.ga.entities.ga_algorithm_configuration import GAAlgorithmConfiguration
 from typing import List
 import numpy as np
+
 class GaAlgorithmSolutionReader(object):
     @classmethod
     def read_solution_from_file(solution_file_path) -> AbstractGASolutionRepresentation:
@@ -75,7 +76,7 @@ class GAPartitioner(AbstractPartitioner):
         
         if not self._read_solution_from_file:
             self._global_solution : AbstractGASolutionRepresentation = \
-                GaAlgorithm().do_GA_algorithm(init_solutions_common_representation)
+               GaAlgorithm(self._ga_algorithm_configuration).do_GA_algorithm(init_solutions_common_representation)
         else:
             self._global_solution : AbstractGASolutionRepresentation = \
                 GaAlgorithmSolutionReader().read_solution_from_file(self._solution_file_path)

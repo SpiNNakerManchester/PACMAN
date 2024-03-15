@@ -7,6 +7,7 @@ from .ga.solution_fixing_operators.abst_solution_fixing import AbstractGaSolutio
 from .ga.cost_caculators.abst_cost_calculator import AbstractGaCostCalculator
 from .ga.selection_operators.abst_selection import AbstractGaSelection
 import numpy as np
+
 class GaLogger(object):
     def log(self, message):
         print(message)

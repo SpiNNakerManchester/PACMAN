@@ -7,19 +7,18 @@ from spinn_utilities.overrides import overrides
 import numpy as np
 
 class GaFixedSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
-    def __init__(self, application_graph: ApplicationGraph,  fixed_slice_sizes: List[int], max_cores_per_chip = 18) -> None:
+    def __init__(self,  fixed_slice_sizes: List[int], max_cores_per_chip = 18) -> None:
         super().__init__()
         if(max_cores_per_chip < 0 or any(slice_size <= 0 for slice_size in fixed_slice_sizes)):
             raise ValueError
-        self._application_graph = application_graph
         self._max_core_per_chips = max_cores_per_chip
         self._fixed_slice_sizes = fixed_slice_sizes
             
-    def make_solution(self, fixed_slice_size):
+    def make_solution(self, fixed_slice_size, application_graph):
         return self._make_solution(fixed_slice_size)
     
-    def _make_solution(self, fixed_slice_size):
-        ag = self._application_graph
+    def _make_solution(self, fixed_slice_size, application_graph):
+        ag = application_graph
         neuron_count = int(np.sum([vertex.n_atoms for vertex in ag.vertices]))
         max_chips = neuron_count
         max_cores_per_chip = self._max_core_per_chips
@@ -52,13 +51,13 @@ class GaFixedSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
                 single_neuron_encoding_length=single_neuron_encoding_length)
 
     @overrides(AbstractGaInitialPopulationGenerator.generate_initial_population)
-    def generate_initial_population(self, population_size: int) -> List[CommonGASolutionRepresentation]:
+    def generate_initial_population(self, population_size: int, application_graph: ApplicationGraph) -> List[CommonGASolutionRepresentation]:
         solutions = []
         fixed_slice_sizes = self._fixed_slice_sizes
         if len(fixed_slice_sizes) == 0:
             raise ValueError
         for i in range(0, population_size):
-            solutions.append(self._make_solution(fixed_slice_sizes[i % len(fixed_slice_sizes)]))
+            solutions.append(self._make_solution(fixed_slice_sizes[i % len(fixed_slice_sizes)], application_graph))
         return solutions
 
     def __str__(self):
