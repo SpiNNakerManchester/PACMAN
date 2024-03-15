@@ -16,3 +16,6 @@ class ResourceConfiguration(object):
 
     def get_max_sdram(self):
         return self._max_sdram
+    
+    def set_neuron_count(self, neuron_count):
+        self._neuron_count = neuron_count

@@ -14,10 +14,8 @@ class RandomPartitioner(AbstractPartitioner):
         super().__init__(resource_constraints_configuration)
         self._max_slice_length = max_slice_length
 
-    def application_graph(self):
-        return self._application_graph
-    
-    def get_resource_constraints_configuration(self):
+  
+    def get_resource_constraints_configuration(self) -> ResourceConfiguration:
         return self._resource_constraints_configuration
     
     @overrides(AbstractPartitioner._adapted_output)
@@ -27,17 +25,17 @@ class RandomPartitioner(AbstractPartitioner):
     @overrides(AbstractPartitioner._partitioning)
     def _partitioning(self):
         # Begin coding for partitioning here
-        N_Ai = [vertex.n_atoms for vertex in self.graph.vertices]
+        N_Ai = [vertex.n_atoms for vertex in self._graph.vertices]
         N = int(np.sum(N_Ai))
         
-        max_cores_per_chip = self.get_resource_constraints_configuration()._max_cores_per_chip
+        max_cores_per_chip = self.get_resource_constraints_configuration().get_max_cores_per_chip()
         max_chips = N if self.get_resource_constraints_configuration().get_max_chips() <= 0 else self.get_resource_constraints_configuration().get_max_chips()
         chip_core_represent_total_length = int(np.ceil(np.log2(max_chips * max_cores_per_chip)))
         bytes_needed_for_encoding = N * chip_core_represent_total_length
         self.global_solution = bytearray(bytes_needed_for_encoding)
         total_pos = 0
         neuron_in_core = dict({})
-        for vertex in self.graph.vertices:
+        for vertex in self._graph.vertices:
             n_atoms = vertex.n_atoms
             pos = 0
             while pos < n_atoms:
@@ -61,5 +59,4 @@ class RandomPartitioner(AbstractPartitioner):
         # End coding
 
         adapter_output = self._adapted_output()
-        max_atoms_per_core = max(neuron_in_core.values())
-        SolutionAdopter.AdoptSolution(adapter_output, self.graph, self.chip_counter, max_atoms_per_core=max_atoms_per_core)
+        SolutionAdopter.AdoptSolution(adapter_output, self._graph, self._chip_counter, self.get_resource_constraints_configuration())

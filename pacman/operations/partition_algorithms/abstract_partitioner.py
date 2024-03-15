@@ -6,25 +6,30 @@ from pacman.data import PacmanDataView
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 from pacman.operations.partition_algorithms.solution_checker import SolutionChecker
+from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
+
+import numpy as np
 
 class AbstractPartitioner(SolutionAdapter, object):
   
-    def __init__(self, resource_constraints_configuration = None):
-        self._application_graph = application_graph
+    def __init__(self, resource_constraints_configuration:ResourceConfiguration = None):
         self._checker = SolutionChecker(resource_constraints_configuration)
         self._chip_counter = ChipCounter() # chip_counter instance is used
-                                            # to record the amount of allocated chips and 
+                                           # to record the amount of allocated chips and 
         self._graph = PacmanDataView.get_graph() # get the application graph
+        resource_constraints_configuration.set_neuron_count((int)(np.sum([vertex.n_atoms for vertex in self._graph.vertices])))
         self._resource_constraints_configuration = resource_constraints_configuration
 
     def application_graph(self):
-        return self._application_graph
+        return self._graph
     
     def partitioning(self):
+        # call the partiting implementation.
         self._partitioning()
         return self
 
     def _partitioning(self):
+        # the partitioning implementation should be implemented by the subclass.
         raise NotImplementedError
     
     def adapted_output(self):
