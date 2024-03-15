@@ -23,12 +23,13 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region)
 from typing import Sequence
 from numpy.typing import NDArray
-from spynnaker.pyNN.models.neuron.population_machine_common import (
-    PopulationMachineCommon)
-from .solution_checker import SolutionChecker
+from spynnaker.pyNN.models.neuron.population_machine_common import (PopulationMachineCommon)
+
+from pacman.operations.partition_algorithms.solution_checker import SolutionChecker
 from numpy import floating
 from pacman.operations.partition_algorithms.utils.sdram_recorder import SDRAMRecorder
 from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
+
 class SolutionAdopter:
     def __init__(self) -> None:
         self._sdram_recorder = SDRAMRecorder()
@@ -50,113 +51,6 @@ class SolutionAdopter:
                 break
         return t
 
-    def __get_variable_sdram(self, n_atoms: int, vertex: ApplicationVertex) -> AbstractSDRAM:
-        """
-        Returns the variable SDRAM from the recorders.
-
-        :param int n_atoms: The number of atoms to account for
-        :return: the variable SDRAM used by the neuron recorder
-        :rtype: VariableSDRAM
-        """
-        s_dynamics = vertex.synapse_dynamics
-        if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
-            max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts()
-            vertex.synapse_recorder.set_max_rewires_per_ts(max_rewires_per_ts)
-
-        return (vertex.get_max_neuron_variable_sdram(n_atoms) +
-            vertex.get_max_synapse_variable_sdram(n_atoms))
-
-    def __get_constant_sdram(
-            self, n_atoms: int, all_syn_block_sz: int,
-            structural_sz: int, vertex: ApplicationVertex) -> MultiRegionSDRAM:
-        """
-        Returns the constant SDRAM used by the atoms.
-
-        :param int n_atoms: The number of atoms to account for
-        :rtype: ~pacman.model.resources.MultiRegionSDRAM
-        """
-        s_dynamics = vertex.synapse_dynamics
-        n_record = (
-            len(vertex.neuron_recordables) +
-            len(vertex.synapse_recordables))
-
-        n_provenance = NeuronProvenance.N_ITEMS + MainProvenance.N_ITEMS
-        if isinstance(s_dynamics, AbstractLocalOnly):
-            n_provenance += LocalOnlyProvenance.N_ITEMS
-        else:
-            n_provenance += (
-                SynapseProvenance.N_ITEMS + SpikeProcessingProvenance.N_ITEMS)
-
-        sdram = MultiRegionSDRAM()
-        if isinstance(s_dynamics, AbstractLocalOnly):
-            sdram.merge(vertex.get_common_constant_sdram(
-                n_record, n_provenance,
-                PopulationMachineLocalOnlyCombinedVertex.COMMON_REGIONS))
-            sdram.merge(vertex.get_neuron_constant_sdram(
-                n_atoms,
-                PopulationMachineLocalOnlyCombinedVertex.NEURON_REGIONS))
-            sdram.merge(self.__get_local_only_constant_sdram(n_atoms))
-        else:
-            sdram.merge(vertex.get_common_constant_sdram(
-                n_record, n_provenance,
-                PopulationMachineVertex.COMMON_REGIONS))
-            sdram.merge(vertex.get_neuron_constant_sdram(
-                n_atoms, PopulationMachineVertex.NEURON_REGIONS))
-            sdram.merge(self.__get_synapse_constant_sdram(self, 
-                n_atoms, all_syn_block_sz, structural_sz, vertex))
-        return sdram
-
-
-    def __get_synapse_constant_sdram(
-            self, n_atoms: int, all_syn_block_sz: int,
-            structural_sz: int, vertex: ApplicationVertex) -> MultiRegionSDRAM:
-        """
-        Get the amount of fixed SDRAM used by synapse parts.
-
-        :param int n_atoms: The number of atoms to account for
-
-        :rtype: ~pacman.model.resources.MultiRegionSDRAM
-        """
-        regions = PopulationMachineVertex.SYNAPSE_REGIONS
-        sdram = MultiRegionSDRAM()
-        sdram.add_cost(regions.synapse_params,
-                       vertex.get_synapse_params_size())
-        sdram.add_cost(regions.synapse_dynamics,
-                       vertex.get_synapse_dynamics_size(
-                           n_atoms))
-        sdram.add_cost(regions.structural_dynamics, structural_sz)
-        sdram.add_cost(regions.synaptic_matrix, all_syn_block_sz)
-        sdram.add_cost(
-            regions.pop_table,
-            MasterPopTableAsBinarySearch.get_master_population_table_size(
-                vertex.incoming_projections))
-        sdram.add_cost(regions.connection_builder,
-                       vertex.get_synapse_expander_size())
-        sdram.add_cost(regions.bitfield_filter,
-                       get_sdram_for_bit_field_region(
-                           vertex.incoming_projections))
-        return sdram
-    
-    def get_sdram_used_by_atoms(
-            self, n_atoms: int, all_syn_block_sz: int,
-            structural_sz: int, vertex: ApplicationVertex) -> AbstractSDRAM:
-        """
-        Gets the resources of a slice of atoms.
-
-        :param int n_atoms:
-        :rtype: ~pacman.model.resources.MultiRegionSDRAM
-        """
-        # pylint: disable=arguments-differ
-        variable_sdram = self.__get_variable_sdram(self, n_atoms, vertex)
-        constant_sdram = self.__get_constant_sdram(self, n_atoms, all_syn_block_sz, 
-                                                   structural_sz, vertex)
-        sdram = MultiRegionSDRAM()
-        sdram.nest(len(PopulationMachineVertex.REGIONS) + 1, variable_sdram)
-        sdram.merge(constant_sdram)
-
-        # return the total resources.
-        return sdram
-    
     def create_machine_vertex(
             self, vertex_slice: Slice, sdram: AbstractSDRAM, label: str,
             structural_sz: int, ring_buffer_shifts: Sequence[int],
@@ -178,17 +72,6 @@ class SolutionAdopter:
             weight_scales, structural_sz, max_atoms_per_core,
             synaptic_matrices, neuron_data)
     
-    @classmethod
-    def calculate_sdram(self, application_vertex, slice_n_atoms):
-        ring_buffer_shifts = application_vertex.get_ring_buffer_shifts()
-        weight_scales = application_vertex.get_weight_scales(ring_buffer_shifts)
-        all_syn_block_sz = application_vertex.get_synapses_size(slice_n_atoms)
-        structural_sz = application_vertex.get_structural_dynamics_size(
-                        slice_n_atoms)
-        sdram = self.get_sdram_used_by_atoms(self,
-                        slice_n_atoms, all_syn_block_sz, structural_sz, application_vertex)
-        return sdram
-
     @classmethod
     def AdoptSolution(self, adapter_output: bytearray, graph: ApplicationGraph, chip_counter: ChipCounter, resource_constraint_configuration: ResourceConfiguration):
         encoded_solution = adapter_output

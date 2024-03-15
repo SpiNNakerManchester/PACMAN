@@ -23,12 +23,10 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
 from typing import Sequence
 from numpy.typing import NDArray
 from spynnaker.pyNN.models.neuron.population_machine_common import (PopulationMachineCommon)
-from .solution_checker import SolutionChecker
-from pacman.operations.partition_algorithms.solution_adopter import SolutionAdopter
 from numpy import floating
 from pacman.operations.partition_algorithms.utils.sdram_recorder import SDRAMRecorder
 from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
-
+from pacman.operations.partition_algorithms.utils.sdram_calculator import SDRAMCalculator
 class SolutionChecker(object):
     def __init__(self, resource_constraints_configuration: ResourceConfiguration) -> None:
         self._constraint_max_core_per_chip = resource_constraints_configuration.get_max_cores_per_chip()
@@ -105,7 +103,7 @@ class SolutionChecker(object):
                 
                 # sdram = self.get_sdram_used_by_atoms(self,
                 #     atoms_in_atoms, all_syn_block_sz, structural_sz, application_vertex)
-                sdram = SolutionAdopter.calculate_sdram(application_vertex, n_on_core_1_dim)
+                sdram = SDRAMCalculator().calculate_sdram(application_vertex, n_on_core_1_dim)
                 if recorded_sdram == None:
                     self._sdram_recorder._record_sdram(chip_id, core_id, sdram)
                     recorded_sdram = sdram

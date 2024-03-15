@@ -7,18 +7,20 @@ from .solution_adopter import SolutionAdopter
 import numpy as np
 import random
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (AbstractSynapseDynamicsStructural)
+from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
 class RandomPartitioner(AbstractPartitioner):
   
-    def __init__(self, application_graph: ApplicationGraph = None, max_slice_length = 100, max_chips = -1, max_cores_per_chip = 18):
+    def __init__(self, application_graph: ApplicationGraph = None, max_slice_length = 100, resource_constraints_configuration: ResourceConfiguration = None):
         super().__init__(application_graph)
         self._max_slice_length = max_slice_length
-        self._max_chips = max_chips
-        self._max_cores_per_chip = max_cores_per_chip
+        self._resource_constraints_configuration = resource_constraints_configuration
 
     def application_graph(self):
         return self._application_graph
+    
+    def get_resource_constraints_configuration(self):
+        return self._resource_constraints_configuration
     
     @overrides(AbstractPartitioner._adapted_output)
     def _adapted_output(self):
@@ -30,8 +32,8 @@ class RandomPartitioner(AbstractPartitioner):
         N_Ai = [vertex.n_atoms for vertex in self.graph.vertices]
         N = int(np.sum(N_Ai))
         
-        max_cores_per_chip = self._max_cores_per_chip
-        max_chips = N if self._max_chips <= 0 else self._max_chips
+        max_cores_per_chip = self.get_resource_constraints_configuration()._max_cores_per_chip
+        max_chips = N if self.get_resource_constraints_configuration().get_max_chips() <= 0 else self.get_resource_constraints_configuration().get_max_chips()
         chip_core_represent_total_length = int(np.ceil(np.log2(max_chips * max_cores_per_chip)))
         bytes_needed_for_encoding = N * chip_core_represent_total_length
         self.global_solution = bytearray(bytes_needed_for_encoding)
