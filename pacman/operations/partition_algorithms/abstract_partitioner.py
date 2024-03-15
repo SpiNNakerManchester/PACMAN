@@ -9,12 +9,13 @@ from pacman.operations.partition_algorithms.solution_checker import SolutionChec
 
 class AbstractPartitioner(SolutionAdapter, object):
   
-    def __init__(self, application_graph: Optional[str] = None):
+    def __init__(self, resource_constraints_configuration = None):
         self._application_graph = application_graph
-        self.checker = SolutionChecker()
-        self.chip_counter = ChipCounter() # chip_counter instance is used
+        self._checker = SolutionChecker(resource_constraints_configuration)
+        self._chip_counter = ChipCounter() # chip_counter instance is used
                                             # to record the amount of allocated chips and 
-        self.graph = PacmanDataView.get_graph() # get the application graph
+        self._graph = PacmanDataView.get_graph() # get the application graph
+        self._resource_constraints_configuration = resource_constraints_configuration
 
     def application_graph(self):
         return self._application_graph
@@ -30,10 +31,10 @@ class AbstractPartitioner(SolutionAdapter, object):
         return self._adapted_output()
 
     def get_chip_counter(self):
-        return self.chip_counter
+        return self._chip_counter
 
     def get_n_chips(self):
-        return self.chip_counter.n_chips
+        return self._chip_counter.n_chips
 
     @overrides(SolutionAdapter._adapted_output)
     def _adapted_output(self):

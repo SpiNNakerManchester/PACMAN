@@ -10,7 +10,7 @@ class PartitionerSelector(object):
             self._partitioner = None
             self._n_chips = splitter_partitioner()
         if partitioner_name == "random":
-            self._partitioner = RandomPartitioner(resource_constraints_configuration).partitioning()
+            self._partitioner = RandomPartitioner(100, resource_constraints_configuration).partitioning()
             self._n_chips = self._partitioner.get_n_chips()
     
     def get_partitioner_instance(self):

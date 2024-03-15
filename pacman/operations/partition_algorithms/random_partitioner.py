@@ -10,11 +10,9 @@ from pacman.utilities.utility_objs.chip_counter import ChipCounter
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (AbstractSynapseDynamicsStructural)
 from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
 class RandomPartitioner(AbstractPartitioner):
-  
-    def __init__(self, application_graph: ApplicationGraph = None, max_slice_length = 100, resource_constraints_configuration: ResourceConfiguration = None):
-        super().__init__(application_graph)
+    def __init__(self, max_slice_length = 100, resource_constraints_configuration: ResourceConfiguration = None):
+        super().__init__(resource_constraints_configuration)
         self._max_slice_length = max_slice_length
-        self._resource_constraints_configuration = resource_constraints_configuration
 
     def application_graph(self):
         return self._application_graph
