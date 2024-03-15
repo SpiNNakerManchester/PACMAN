@@ -32,8 +32,7 @@ from pacman.operations.partition_algorithms.utils.sdram_recorder import SDRAMRec
 from pacman.operations.partition_algorithms.utils.sdram_calculator import SDRAMCalculator
 
 class SolutionAdopter:
-    def __init__(self) -> None:
-        self._sdram_recorder = SDRAMRecorder()
+  
 
     @classmethod
     def to_multi_dimension_representation(num :int, max_per_dimension):
@@ -75,6 +74,7 @@ class SolutionAdopter:
     
     @classmethod
     def AdoptSolution(self, adapter_output: bytearray, graph: ApplicationGraph, chip_counter: ChipCounter, resource_constraint_configuration: ResourceConfiguration):
+        _sdram_recorder = SDRAMRecorder()
         encoded_solution = adapter_output
         N_Ai = [vertex.n_atoms for vertex in graph.vertices]
         if len(N_Ai) == 0:
@@ -180,12 +180,12 @@ class SolutionAdopter:
                 structural_sz = application_vertex.get_structural_dynamics_size(
                         slice_n_atoms)
 
-                recorded_sdram = self._sdram_recorder._get_sdram(chip_index, core_index)                
-                sdram = sdram_calculator.get_sdram_used_by_atoms(self,
+                recorded_sdram = _sdram_recorder._get_sdram(chip_index, core_index)                
+                sdram = sdram_calculator.get_sdram_used_by_atoms(
                         slice_n_atoms, all_syn_block_sz, structural_sz, application_vertex)
                 
                 if recorded_sdram == None:
-                    self._sdram_recorder._record_sdram(chip_index, core_index, sdram)
+                    _sdram_recorder._record_sdram(chip_index, core_index, sdram)
                     recorded_sdram = sdram
                 else:
                     recorded_sdram.merge(sdram)

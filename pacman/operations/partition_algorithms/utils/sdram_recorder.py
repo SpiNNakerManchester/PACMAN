@@ -15,5 +15,5 @@ class SDRAMRecorder(object):
     
     def _record_sdram(self, chip_index, core_index, sdram: AbstractSDRAM) -> None:
         key_chip_core_identification = '%s#%s' % (chip_index, core_index)
-        self._sdram_record[key_chip_core_identification] = sdram
+        self._sdram_records[key_chip_core_identification] = sdram
 

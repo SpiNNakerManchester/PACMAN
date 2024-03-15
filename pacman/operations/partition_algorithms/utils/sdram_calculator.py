@@ -99,7 +99,7 @@ class SDRAMCalculator(object):
                 PopulationMachineVertex.COMMON_REGIONS))
             sdram.merge(vertex.get_neuron_constant_sdram(
                 n_atoms, PopulationMachineVertex.NEURON_REGIONS))
-            sdram.merge(self.__get_synapse_constant_sdram(self, 
+            sdram.merge(self.__get_synapse_constant_sdram(
                 n_atoms, all_syn_block_sz, structural_sz, vertex))
         return sdram
 
@@ -144,8 +144,8 @@ class SDRAMCalculator(object):
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         # pylint: disable=arguments-differ
-        variable_sdram = self.__get_variable_sdram(self, n_atoms, vertex)
-        constant_sdram = self.__get_constant_sdram(self, n_atoms, all_syn_block_sz, 
+        variable_sdram = self.__get_variable_sdram(n_atoms, vertex)
+        constant_sdram = self.__get_constant_sdram(n_atoms, all_syn_block_sz, 
                                                    structural_sz, vertex)
         sdram = MultiRegionSDRAM()
         sdram.nest(len(PopulationMachineVertex.REGIONS) + 1, variable_sdram)
