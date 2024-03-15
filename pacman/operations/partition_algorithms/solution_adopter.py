@@ -21,14 +21,15 @@ from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region)
-from typing import Sequence
+from typing import Sequence, cast
 from numpy.typing import NDArray
 from spynnaker.pyNN.models.neuron.population_machine_common import (PopulationMachineCommon)
 
 from pacman.operations.partition_algorithms.solution_checker import SolutionChecker
+from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
 from numpy import floating
 from pacman.operations.partition_algorithms.utils.sdram_recorder import SDRAMRecorder
-from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
+from pacman.operations.partition_algorithms.utils.sdram_calculator import SDRAMCalculator
 
 class SolutionAdopter:
     def __init__(self) -> None:
@@ -82,7 +83,7 @@ class SolutionAdopter:
         presum_N_Ai[0] = N_Ai[0]
         N = np.sum(N_Ai)
         max_chips = 0
-        max_chip_count = resource_constraint_configuration.get_max_chips()
+        max_chip_count = N if resource_constraint_configuration.get_max_chips() <= 1 else resource_constraint_configuration.get_max_chips()
         max_chips_per_core = resource_constraint_configuration.get_max_cores_per_chip()
         chip_core_representation_total_length = int(np.ceil(np.log2(max_chip_count * max_chips_per_core)))
         prev_index = -1
@@ -95,6 +96,7 @@ class SolutionAdopter:
             presum_N_Ai[i] = presum_N_Ai[i - 1] + N_Ai[i]
 
         application_vertex_index = 0
+        vertices = list(graph.vertices)
         # Append bytes of a dummy chip-core neuron location representation of at the end of bytearray, for simplying 
         # the deployment of the last slice of neurons.
         # Nueron slice deployment condition is met when encounter this representation at the (N+1)-th iteration, and 
@@ -103,6 +105,7 @@ class SolutionAdopter:
         adapter_output.extend(extend_encoding)
         slice_index = 0
 
+        sdram_calculator: SDRAMCalculator = SDRAMCalculator(vertices[application_vertex_index]) 
         # Iterate neurons, making slices, and record slices and neurons amount in cores.
         for i in range(0, N + 1):
             while i > presum_N_Ai[application_vertex_index]:
@@ -123,7 +126,7 @@ class SolutionAdopter:
                 continue
             
             if chip_id != prev_chip_id or core_id != prev_core_id:
-                application_vertex = list(graph.vertices)[application_vertex_index]
+                application_vertex = vertices[application_vertex_index]
                 lo_atom = prev_index
                 hi_atom = i - 1
                 n_on_core_1_dim = hi_atom - lo_atom + 1
@@ -171,14 +174,14 @@ class SolutionAdopter:
                 # It seems the atoms_in_core should be the size of slice.
                 ring_buffer_shifts = application_vertex.get_ring_buffer_shifts()
                 weight_scales = application_vertex.get_weight_scales(ring_buffer_shifts)
-                slice_n_atoms = vertex_slice.n_atoms()
+                slice_n_atoms = vertex_slice.n_atoms
                 all_syn_block_sz = application_vertex.get_synapses_size(
                         slice_n_atoms)
                 structural_sz = application_vertex.get_structural_dynamics_size(
                         slice_n_atoms)
 
                 recorded_sdram = self._sdram_recorder._get_sdram(chip_index, core_index)                
-                sdram = self.get_sdram_used_by_atoms(self,
+                sdram = sdram_calculator.get_sdram_used_by_atoms(self,
                         slice_n_atoms, all_syn_block_sz, structural_sz, application_vertex)
                 
                 if recorded_sdram == None:
