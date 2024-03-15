@@ -16,6 +16,7 @@ from pacman.operations.partition_algorithms.ga_splitting_algorithm import GaAlgo
 from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
 from pacman.operations.partition_algorithms.ga.init_population_generators.abst_init_pop_generator import AbstractGaInitialPopulationGenerator
 from pacman.operations.partition_algorithms.ga.init_population_generators.fixed_slice_pop_generator import GaFixedSlicePopulationGenerator
+from pacman.operations.partition_algorithms.ga.entities.ga_algorithm_configuration import GAAlgorithmConfiguration
 from typing import List
 import numpy as np
 class GaAlgorithmSolutionReader(object):
@@ -35,15 +36,18 @@ class GaAlgorithmSolutionReader(object):
                 return GASliceSolutionRepresentation(solution[4], None, None, solution_max_cores_per_chip, solution_max_chips, False)
     
 class GAPartitioner(AbstractPartitioner):
-    def __init__(self, application_graph: ApplicationGraph = None, max_slice_length = 100, max_chips = -1, max_cores_per_chip = 18, solution_file_path=None, read_solution_from_file=False, serialize_solution_to_file=False):
-        super().__init__(application_graph)
-        SDRAM_SIZE =  128 * 1024 * 1024
+    def __init__(self, resource_contraints_configuration, max_slice_length = 100, solution_file_path=None, read_solution_from_file=False, serialize_solution_to_file=False, ga_algorithm_configuration: GAAlgorithmConfiguration=None):
+        super().__init__(resource_contraints_configuration)
+        SDRAM_SIZE = self.get_resource_constraints_configuration().get_max_sdram()
         self._max_slice_length = max_slice_length
-        self._neuron_count = int(sum(map(lambda x: len(x), application_graph.vertices)))
+        self._neuron_count = self.get_resource_constraints_configuration().get_neruon_count()
+        max_chips = self.get_resource_constraints_configuration().get_max_chips()
+        max_cores_per_chip = self.get_resource_constraints_configuration().get_max_cores_per_chip()
         self._resource_configuration = ResourceConfiguration(self._neuron_count, max_chips if max_chips > 0 else \
                                                              self._neuron_count, max_cores_per_chip, SDRAM_SIZE)
         self._solution_file_path = solution_file_path
         self._read_solution_from_file = read_solution_from_file
+        self._ga_algorithm_configuration = ga_algorithm_configuration
     
     @overrides(AbstractPartitioner._adapted_output)
     def _adapted_output(self) -> bytearray:
