@@ -39,7 +39,7 @@ class GAAlgorithmConfiguration(object):
         self.output_population_all_epoch = output_population_all_epoch
         self.output_final_epoch_population = output_final_epoch_population
         self.epochs = epochs
-        self.epochs = max_individuals_each_epoch
+        self.max_individuals_each_epoch = max_individuals_each_epoch
         self.remains_individuals = remains_individuals
         self.base_path_for_output = base_path_for_output
         self.initial_solution_count = initial_solution_count

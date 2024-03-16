@@ -39,7 +39,7 @@ class PartitionerSelector(object):
                     remains_individuals = 10, 
                     base_path_for_output = "./ga_algorithm_records/",
                     initial_solution_count = 10
-                    )
+            )
 
             self._partitioner = GAPartitioner(
                 resource_contraints_configuration=resource_constraints_configuration,

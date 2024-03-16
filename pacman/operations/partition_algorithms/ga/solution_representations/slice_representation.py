@@ -169,8 +169,8 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         self._solution.append(solution_data)
 
 
-    @overrides(AbstractGASolutionRepresentation.get_serialization_data)
-    def get_serialization_data(self):
+    @overrides(AbstractGASolutionRepresentation.get_serialized_data)
+    def get_serialized_data(self):
         if self._use_ptype:
             solution_data = self.get_solution()
             return [GASliceSolutionRepresentation.class_str(), self._use_ptype, self._max_chips, self._max_cores_per_chip, \

@@ -71,6 +71,6 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
     def __str__(self):
         return CommonGASolutionRepresentation.class_str()
     
-    @overrides(AbstractGASolutionRepresentation.get_serialization_data)
-    def get_serialization_data(self):
+    @overrides(AbstractGASolutionRepresentation.get_serialized_data)
+    def get_serialized_data(self):
             return [CommonGASolutionRepresentation.class_str(), self._use_ptype, self._max_chips, self._max_cores_per_chip, self.get_solution()]

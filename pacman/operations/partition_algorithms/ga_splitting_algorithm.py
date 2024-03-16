@@ -6,6 +6,8 @@ from .ga.variation_operators.abst_variation import AbstractGaVariation
 from .ga.solution_fixing_operators.abst_solution_fixing import AbstractGaSolutionFixing
 from .ga.cost_caculators.abst_cost_calculator import AbstractGaCostCalculator
 from .ga.selection_operators.abst_selection import AbstractGaSelection
+from .ga.entities.ga_algorithm_configuration import GAAlgorithmConfiguration
+
 import numpy as np
 
 class GaLogger(object):
@@ -13,34 +15,23 @@ class GaLogger(object):
         print(message)
 
 class GaAlgorithm(object):
-    def __init__(self, 
-                 init_solutions_common_representation_generator : AbstractGaInitialPopulationGenerator,
-                 solution_representation_strategy: AbstractGASolutionRepresentation,
-                 crossover_individuals_selection_strategy: AbstractGaCrossoverIndividualSelector, 
-                 crossover_perform_strategy: AbstractGaCrossover,
-                 variation_strategy: AbstractGaVariation, 
-                 solution_fixing_strategy: AbstractGaSolutionFixing, 
-                 solution_cost_calculation_strategy: AbstractGaCostCalculator,
-                 selection_strategy: AbstractGaSelection,
-                 log_processing=False,
-                 output_population_all_epoch=False, 
-                 output_final_epoch_population=False,
-                 epochs = 10, max_individuals_each_epoch = 20, remains_individuals = 10, base_path_for_output = "./") -> None:
-        self.init_solutions_common_representation_generator = init_solutions_common_representation_generator
-        self.solution_representation_strategy = solution_representation_strategy
-        self.crossover_individuals_selection_strategy = crossover_individuals_selection_strategy
-        self.crossover_perform_strategy = crossover_perform_strategy
-        self.variation_strategy = variation_strategy
-        self.solution_fixing_strategy = solution_fixing_strategy
-        self.solution_cost_calculation_strategy = solution_cost_calculation_strategy
-        self.selection_strategy = selection_strategy
-        self.log_processing=log_processing
-        self.output_populaton_all_epoch=output_population_all_epoch
-        self.output_final_epoch_population=output_final_epoch_population
-        self.epochs = epochs
-        self.max_individuals_each_epoch = max_individuals_each_epoch
-        self.remains_individuals = remains_individuals
-        self.base_path_for_output = base_path_for_output
+    def __init__(self, ga_configuration: GAAlgorithmConfiguration) -> None:
+        self.init_solutions_common_representation_generator = ga_configuration.init_solutions_common_representation_generator
+        self.solution_representation_strategy = ga_configuration.solution_representation_strategy
+        self.crossover_individuals_selection_strategy = ga_configuration.crossover_individuals_selection_strategy
+        self.crossover_perform_strategy = ga_configuration.crossover_perform_strategy
+        self.variation_strategy = ga_configuration.variation_strategy
+        self.solution_fixing_strategy = ga_configuration.solution_fixing_strategy
+        self.solution_cost_calculation_strategy = ga_configuration.solution_cost_calculation_strategy
+        self.selection_strategy = ga_configuration.selection_strategy
+        self.log_processing = ga_configuration.log_processing
+        self.output_populaton_all_epoch = ga_configuration.output_population_all_epoch
+        self.output_final_epoch_population = ga_configuration.output_final_epoch_population
+        self.epochs = ga_configuration.epochs
+        self.max_individuals_each_epoch = ga_configuration.max_individuals_each_epoch
+        self.remains_individuals = ga_configuration.remains_individuals
+        self.base_path_for_output = ga_configuration.base_path_for_output
+        self.initial_solution_count = ga_configuration.initial_solution_count
         if self.log_processing:
             self.GaLogger = GaLogger()
 

@@ -61,7 +61,7 @@ class AbstractGASolutionRepresentation:
     def _set_new_solution_data_in_gtype(self, solution_data):
         raise NotImplementedError
 
-    def get_serialization_data(self):
+    def get_serialized_data(self):
         raise NotImplementedError
 
     def __str__(self):

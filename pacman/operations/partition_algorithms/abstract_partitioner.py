@@ -42,8 +42,8 @@ class AbstractPartitioner(SolutionAdapter, object):
         return self._chip_counter.n_chips
 
     def get_resource_constraints_configuration(self) -> ResourceConfiguration:
-        return self._resource_constraints_configuration()
-
+        return self._resource_constraints_configuration
+    
     @overrides(SolutionAdapter._adapted_output)
     def _adapted_output(self):
         raise NotImplementedError
