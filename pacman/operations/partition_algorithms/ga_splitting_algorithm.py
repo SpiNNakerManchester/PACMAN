@@ -59,7 +59,7 @@ class GaAlgorithm(object):
     
     def do_GA_algorithm(self, application_graph: ApplicationGraph) -> AbstractGASolutionRepresentation:
         init_solution = self.init_solutions_common_representation_generator.generate_initial_population(self.initial_solution_count, application_graph)
-        solutions = self.solution_representation_strategy.from_common_representation(init_solution)
+        solutions = init_solution # self.solution_representation_strategy.from_common_representation(init_solution)
         for epoch in range(0, self.epochs):
             self._log("begin epoch %d..." % epoch)
             avaliable_parents_count = len(solutions)

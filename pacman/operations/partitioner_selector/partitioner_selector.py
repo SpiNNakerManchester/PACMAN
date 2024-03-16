@@ -3,7 +3,7 @@ from pacman.operations.partition_algorithms.random_partitioner import RandomPart
 from pacman.operations.partition_algorithms.ga_partitioner import GAPartitioner
 from pacman.operations.partition_algorithms.ga.entities.ga_algorithm_configuration import GAAlgorithmConfiguration
 from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
-from pacman.operations.partition_algorithms.ga.init_population_generators.fixed_slice_pop_generator import GaFixedSlicePopulationPTypeGenerator
+from pacman.operations.partition_algorithms.ga.init_population_generators.fixed_slice_pop_generator import GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore
 from pacman.operations.partition_algorithms.ga.crossover_operators.slice_crossover import GaSliceCrossoverKPoints
 from pacman.operations.partition_algorithms.ga.crossover_individuals_selectors.random_sel_crossover_solution import GaussianWeightInvidualSelection
 from pacman.operations.partition_algorithms.ga.variation_operators.slice_variation import GaSliceVariationuUniformGaussian
@@ -23,7 +23,7 @@ class PartitionerSelector(object):
             ga_configuration: GAAlgorithmConfiguration = \
                 GAAlgorithmConfiguration(
                     init_solutions_common_representation_generator=\
-                        GaFixedSlicePopulationPTypeGenerator([50, 100, 200, 300, 400, 500, 600, 700, 800, 900],resource_constraints_configuration.get_max_cores_per_chip()),
+                        GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore([50, 100, 200, 300, 400, 500, 600, 700, 800, 900],resource_constraints_configuration.get_max_cores_per_chip()),
                     solution_representation_strategy='slice',
                     crossover_individuals_selection_strategy=GaussianWeightInvidualSelection(),
                     crossover_perform_strategy=GaSliceCrossoverKPoints(5, True),

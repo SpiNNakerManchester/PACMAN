@@ -9,8 +9,7 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
     SLICE_NEURON_TO_INDEX = 1
     CHIP_INDEX = 2
     CORE_INDEX = 3
-    
-          
+
     def __init__(self, data_for_build_solution, slices_chip_indexes, slices_core_indexes, max_cores_per_chip, max_chips, use_ptype=True) -> None:
           super().__init__([], max_cores_per_chip, max_chips, use_ptype)
           # When it not use a ptype representation of solution data, 
@@ -175,7 +174,6 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
             raise TypeError
         self._solution.clear()
         self._solution.append(solution_data)
-
 
     @overrides(AbstractGASolutionRepresentation.get_serialized_data)
     def get_serialized_data(self):
