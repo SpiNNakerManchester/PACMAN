@@ -1,5 +1,5 @@
-from .common_ga_solution_representation import CommonGASolutionRepresentation
 import numpy as np
+
 class AbstractGASolutionRepresentation:
     def __init__(self, solution, max_cores_pre_chip, max_chips, use_ptype = True) -> None:
         self._use_ptype = use_ptype
@@ -37,10 +37,10 @@ class AbstractGASolutionRepresentation:
     def get_solution(self):
         return self._solution
     
-    def from_common_representation(self, solution: CommonGASolutionRepresentation):
+    def from_common_representation(self, solution):
         raise NotImplementedError
     
-    def to_common_representation(self) -> CommonGASolutionRepresentation:
+    def to_common_representation(self):
         raise NotImplementedError
    
     def _get_ptype_solution_representation(self):
@@ -66,3 +66,4 @@ class AbstractGASolutionRepresentation:
 
     def __str__(self):
         return "abst_rep"
+

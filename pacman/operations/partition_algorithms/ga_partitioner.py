@@ -48,29 +48,24 @@ class GAPartitioner(AbstractPartitioner):
                                                              self._neuron_count, max_cores_per_chip, SDRAM_SIZE)
         self._solution_file_path = solution_file_path
         self._read_solution_from_file = read_solution_from_file
-        self._ga_algorithm_configuration = ga_algorithm_configuration
+        self._ga_algorithm_configuration: GAAlgorithmConfiguration = ga_algorithm_configuration
     
     @overrides(AbstractPartitioner._adapted_output)
     def _adapted_output(self) -> bytearray:
         return self._global_solution.to_common_representation().get_gtype_solution_representation()
 
     def _generate_init_solutions(self, generator: AbstractGaInitialPopulationGenerator, population_size: int)->List[AbstractGASolutionRepresentation]:
-        return generator.generate_initial_population(population_size)
+        return generator.generate_initial_population(population_size, self._graph)
 
     def _get_max_slice_length(self):
         return self._max_slice_length
-
-    def initialization_generator_selection(self)->AbstractGaInitialPopulationGenerator:
-        return GaFixedSlicePopulationGenerator(application_graph=self.application_graph(), \
-                                               fixed_slice_size=100, \
-                                               max_cores_per_chip=self._resource_configuration.get_max_cores_per_chip())
 
     # important :: entry
     @overrides(AbstractPartitioner._partitioning)
     def _partitioning(self):
         # Begin coding for partitioning here
 
-        initilization_solutions_generator:AbstractGaInitialPopulationGenerator = self.initialization_generator_selection() 
+        initilization_solutions_generator:AbstractGaInitialPopulationGenerator = self._ga_algorithm_configuration.init_solutions_common_representation_generator 
         init_solutions_common_representation = \
             self._generate_init_solutions(generator=initilization_solutions_generator, population_size=15) # None -> List<CommonRepresentation>[]
         
@@ -86,4 +81,4 @@ class GAPartitioner(AbstractPartitioner):
         adapter_output = self._adapted_output()
 
         # Deploy the network by utilizing the solution GA generated.
-        SolutionAdopter.AdoptSolution(adapter_output, self.graph, self.chip_counter, self._resource_configuration)
+        SolutionAdopter.AdoptSolution(adapter_output, self._graph, self._chip_counter, self._resource_configuration)

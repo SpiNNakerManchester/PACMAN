@@ -9,7 +9,7 @@ import random
 import numpy as np
 
 class GaSliceCrossoverKPoints(AbstractGaCrossover):
-    def __init__(self, k: int, use_ptype=False) -> None:
+    def __init__(self, k: int, use_ptype=True) -> None:
         super().__init__()
         self._k = k
         self._use_ptype = use_ptype

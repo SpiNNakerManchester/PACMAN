@@ -24,7 +24,9 @@ class GAAlgorithmConfiguration(object):
             epochs = 10, 
             max_individuals_each_epoch = 20,
             remains_individuals = 10, 
-            base_path_for_output = "./") -> None:
+            base_path_for_output = "./",
+            initial_solution_count = 10
+            ) -> None:
         self.init_solutions_common_representation_generator = init_solutions_common_representation_generator
         self.solution_representation_strategy = solution_representation_strategy
         self.crossover_individuals_selection_strategy = crossover_individuals_selection_strategy

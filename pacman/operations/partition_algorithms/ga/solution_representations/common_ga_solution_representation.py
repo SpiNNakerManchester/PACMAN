@@ -1,5 +1,4 @@
 from .abst_ga_solution_representation import AbstractGASolutionRepresentation
-from .common_ga_solution_representation import CommonGASolutionRepresentation
 from spinn_utilities.overrides import overrides
 import numpy as np
 
@@ -8,7 +7,7 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
           super().__init__(solution, max_cores_pre_chip, max_chips, use_ptype)
           
     @overrides(AbstractGASolutionRepresentation.from_common_representation)
-    def from_common_representation(self, solution: CommonGASolutionRepresentation):
+    def from_common_representation(self, solution: AbstractGASolutionRepresentation):
         self._solution = solution.get_solution()
         self._single_neuron_encoding_length = solution.get_single_neuron_encoding_length()
         self._max_chips = solution.get_max_chips()
@@ -16,7 +15,7 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
         return self
     
     @overrides(AbstractGASolutionRepresentation.to_common_representation)
-    def to_common_representation(self) -> CommonGASolutionRepresentation:
+    def to_common_representation(self) -> AbstractGASolutionRepresentation:
         return CommonGASolutionRepresentation(self.get_solution(), self.get_max_cores_per_chip(),
             self.get_max_chips(), self.get_use_ptype())
     
