@@ -6,7 +6,7 @@ from typing import List
 from spinn_utilities.overrides import overrides
 import numpy as np
 
-class GaFixedSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
+class GaFixedSlicePopulationPTypeGenerator(AbstractGaInitialPopulationGenerator):
     def __init__(self,  fixed_slice_sizes: List[int], max_cores_per_chip = 18) -> None:
         super().__init__()
         if(max_cores_per_chip < 0 or any(slice_size <= 0 for slice_size in fixed_slice_sizes)):
@@ -45,10 +45,10 @@ class GaFixedSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
             current_chip_remains_core -= 1
             slice_index += 1
 
-        return GASliceSolutionRepresentation(solution_data=slices_end_points,
+        return GASliceSolutionRepresentation(data_for_build_solution=slices_end_points,
                 slices_chip_indexes=slices_chip_indexes, slices_core_indexes=slices_core_indexes, 
                 max_cores_per_chip=max_cores_per_chip, max_chips=max_chips, 
-                single_neuron_encoding_length=single_neuron_encoding_length)
+                use_ptype=True)
 
     @overrides(AbstractGaInitialPopulationGenerator.generate_initial_population)
     def generate_initial_population(self, population_size: int, application_graph: ApplicationGraph) -> List[CommonGASolutionRepresentation]:

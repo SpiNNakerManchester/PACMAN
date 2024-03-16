@@ -6,7 +6,7 @@ from typing import List
 from spinn_utilities.overrides import overrides
 import numpy as np
 import random
-from .fixed_slice_pop_generator import GaFixedSlicePopulationGenerator
+from .fixed_slice_pop_generator import GaFixedSlicePopulationPTypeGenerator
 
 class GaRandomSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
     def __init__(self, max_cores_per_chip = 18, max_slice_size = -1) -> None:
@@ -20,7 +20,7 @@ class GaRandomSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
         self._max_slice_size = self._max_slice_size if self._max_slice_size >= 1 else (int)(np.sum([v.n_atoms for v in application_graph.vertices]))
         fixed_slice_sizes = random.choices(range(0, self._max_slice_size), k = population_size)
         
-        self._fix_slice_init_population_generator = GaFixedSlicePopulationGenerator(fixed_slice_sizes, self._max_cores_per_chip)
+        self._fix_slice_init_population_generator = GaFixedSlicePopulationPTypeGenerator(fixed_slice_sizes, self._max_cores_per_chip)
         return self._fix_slice_init_population_generator.generate_initial_population(population_size, application_graph)
     
     def __str__(self):

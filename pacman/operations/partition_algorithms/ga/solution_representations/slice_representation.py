@@ -11,14 +11,22 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
     CORE_INDEX = 3
     
           
-    def __init__(self, solution_data, slices_chip_indexes, slices_core_indexes, max_cores_per_chip, max_chips, use_ptype=True) -> None:
+    def __init__(self, data_for_build_solution, slices_chip_indexes, slices_core_indexes, max_cores_per_chip, max_chips, use_ptype=True) -> None:
           super().__init__([], max_cores_per_chip, max_chips, use_ptype)
-          if use_ptype:
-              self._solution = solution_data
+          # When it not use a ptype representation of solution data, 
+          #     the data_for_build_solution should be a bytearray that each slice's neuron_id_from, neuron_id_to, chip_id and core_id are encoded.
+          # Specifically, it would be a bytearray with length of (4 * 32 * slice_count).
+          # Each of neuron_id_from, neuron_id_to, chip_id and core_id are encoded to a string with length of 32, representing the 32-bit binary representation of that slice 
+          #     information element.
+          # 128 bytes from (4 * 32 * i) to (4 * 32 * (i + 1)) encodes the i-th slice's neuron_id_from, neuron_id_to, chip_id and core_id. 
+
+          if not use_ptype:
+              self._solution = data_for_build_solution
               return
           previous_pos = 0
           slice_index = 0
-          for endpoint in solution_data:
+          
+          for endpoint in data_for_build_solution:
                slice_neuron_from = previous_pos
                slice_neuron_to = endpoint
                chip_index = slices_chip_indexes[slice_index]
