@@ -377,9 +377,9 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                 core_records.append(pos, [slice_from, slice_to, chip, allocated_core_id])
                 set_core_chip(slice_index, allocated_chip_index, allocated_core_index)
 
-    def __init__(self, resource_configuration: ResourceConfiguration, application_graph: ApplicationGraph) -> None:
+    def __init__(self, resource_constraint_configuration: ResourceConfiguration, application_graph: ApplicationGraph) -> None:
         super().__init__()
-        self._resourcr_constraint_configuration = resource_configuration
+        self._resourcr_constraint_configuration = resource_constraint_configuration
         self._application_graph = application_graph
         # calculate max_slice_length
         self._max_slice_length = self._calculate_max_slice_length()

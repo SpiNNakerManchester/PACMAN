@@ -8,6 +8,11 @@ from pacman.operations.partition_algorithms.ga.crossover_operators.slice_crossov
 from pacman.operations.partition_algorithms.ga.crossover_individuals_selectors.random_sel_crossover_solution import GaussianWeightInvidualSelection
 from pacman.operations.partition_algorithms.ga.variation_operators.slice_variation import GaSliceVariationuUniformGaussian
 from pacman.operations.partition_algorithms.ga.solution_representations.slice_representation import GASliceSolutionRepresentation
+from pacman.operations.partition_algorithms.ga.solution_fixing_operators.slice_representation_fixing import GaSliceRepresenationSolutionSimpleFillingFixing
+from pacman.operations.partition_algorithms.ga.cost_caculators.resource_utilization_cost import ResourceUtilizationCost
+from pacman.operations.partition_algorithms.ga.selection_operators.elite_possibility_selection import GaElitePossibilitySelection
+
+from pacman.data import PacmanDataView
 
 class PartitionerSelector(object):
     def __init__(self, partitioner_name, resource_constraints_configuration: ResourceConfiguration) -> None:
@@ -28,9 +33,9 @@ class PartitionerSelector(object):
                     crossover_individuals_selection_strategy=GaussianWeightInvidualSelection(),
                     crossover_perform_strategy=GaSliceCrossoverKPoints(5, True),
                     variation_strategy=GaSliceVariationuUniformGaussian(True, 0.05, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0), 
-                    solution_fixing_strategy=None, 
-                    solution_cost_calculation_strategy=None,
-                    selection_strategy=None,
+                    solution_fixing_strategy=GaSliceRepresenationSolutionSimpleFillingFixing(resource_constraints_configuration, PacmanDataView.get_graph()), 
+                    solution_cost_calculation_strategy=ResourceUtilizationCost(),
+                    selection_strategy=GaElitePossibilitySelection(8, 3),
                     log_processing=True,
                     output_population_all_epoch=True, 
                     output_final_epoch_population=True,

@@ -5,7 +5,7 @@ from typing import List
 from spinn_utilities.overrides import overrides
 import random
 
-class GaEliteSelection(AbstractGaSelection):
+class GaElitePossibilitySelection(AbstractGaSelection):
     def __init__(self, count_survival, count_top_k_remains:int) -> None:
         super().__init__()
         self._count_survival = count_survival

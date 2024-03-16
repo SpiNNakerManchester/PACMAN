@@ -205,7 +205,6 @@ def _place_error(
                         plce = placements.get_placement_of_vertex(vertex)
                         f.write(f" (placed at {plce.x}, {plce.y}, {plce.p})")
                     f.write("\n")
-
         f.write("\n")
         f.write("Unused chips:\n")
         machine = PacmanDataView.get_machine()
