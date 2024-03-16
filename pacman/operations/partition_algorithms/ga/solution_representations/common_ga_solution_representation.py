@@ -38,16 +38,13 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
         solution = []
         gtype_solution_rep = self.get_solution()
         single_neuron_encoding_lentgh = self.get_single_neuron_encoding_length()
-        if len(gtype_solution_rep) % single_neuron_encoding_lentgh != 0:
-            raise ValueError
         neuron_count = len(gtype_solution_rep) / single_neuron_encoding_lentgh
-
+        
         for neuron_index in range(0, neuron_count):
             neuron_encoding_offset_from = neuron_index * single_neuron_encoding_lentgh
             neuron_encoding_offset_to = (neuron_index + 1) * single_neuron_encoding_lentgh
             neuron_encoding_binary_str = self._solution[neuron_encoding_offset_from:neuron_encoding_offset_to]
             solution.append(int(neuron_encoding_binary_str, 2))
-
         return solution
     
     @overrides(AbstractGASolutionRepresentation._set_new_solution_data_in_ptype)

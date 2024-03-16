@@ -11,7 +11,7 @@ class AbstractGASolutionRepresentation:
    
     def get_ptype_solution_representation(self) :
         if self._use_ptype:
-            self._solution
+            return self._solution
         return self._get_ptype_solution_representation()
 
     def get_single_neuron_encoding_length(self):

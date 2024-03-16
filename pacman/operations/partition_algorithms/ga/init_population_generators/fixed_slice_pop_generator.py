@@ -114,7 +114,7 @@ class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPop
         neuron_count_prefix_sum = [0] * len(vertices)
         neuron_count_prefix_sum[0] = vertices[0].n_atoms
         for i in range(1, len(vertices)):
-             neuron_count_prefix_sum[i] = neuron_count_prefix_sum[i - 1] + vertices[i].n_atoms
+            neuron_count_prefix_sum[i] = neuron_count_prefix_sum[i - 1] + vertices[i].n_atoms
 
         max_chips = total_neuron_count
         max_cores_per_chip = self._max_core_per_chips

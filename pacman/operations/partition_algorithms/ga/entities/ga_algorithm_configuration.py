@@ -43,11 +43,3 @@ class GAAlgorithmConfiguration(object):
         self.remains_individuals = remains_individuals
         self.base_path_for_output = base_path_for_output
         self.initial_solution_count = initial_solution_count
-
-
-
-
-
-
-
-

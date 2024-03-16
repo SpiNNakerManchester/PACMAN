@@ -10,7 +10,7 @@ from pacman.model.graphs.application import ApplicationGraph
 from pacman.data import PacmanDataView
 
 class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
-    @overrides(AbstractGaSolutionFixing.do_solution_fixing)
+    @overrides(AbstractGaSolutionFixing._do_solution_fixing)
     def _do_solution_fixing(self, solution: AbstractGASolutionRepresentation) -> AbstractGASolutionRepresentation:
         if not isinstance(solution, GASliceSolutionRepresentation):
             raise TypeError
@@ -382,7 +382,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         self._resourcr_constraint_configuration = resource_constraint_configuration
         self._application_graph = application_graph
         # calculate max_slice_length
-        self._max_slice_length = self._calculate_max_slice_length()
+        self._max_slice_length = self._calculate_max_slice_lengths()
 
     def _calculate_max_slice_lengths(self) -> List[int]:
         
