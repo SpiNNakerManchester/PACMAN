@@ -25,6 +25,9 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
 from typing import Sequence
 from numpy.typing import NDArray
 from spynnaker.pyNN.models.neuron.population_machine_common import (PopulationMachineCommon)
+from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
+from pacman.data import PacmanDataView
+
 
 
 class SDRAMCalculator(object):
@@ -160,7 +163,24 @@ class SDRAMCalculator(object):
         all_syn_block_sz = application_vertex.get_synapses_size(slice_n_atoms)
         structural_sz = application_vertex.get_structural_dynamics_size(
                         slice_n_atoms)
-        sdram = self.get_sdram_used_by_atoms(self,
-                        slice_n_atoms, all_syn_block_sz, structural_sz, application_vertex)
+        sdram = self.get_sdram_used_by_atoms(slice_n_atoms, all_syn_block_sz, structural_sz, application_vertex)
         return sdram
+    
 
+    # binary search to find the max length of slice that can be stored on a SDRAM
+    #   for an application_vertex.
+    def calculate_max_slice_length(self, application_vertex, total_neuron_count: int, max_sdram: int):
+        left = 0
+        right = total_neuron_count - 1
+        
+        while left <= right:
+            test_slice_length = (right - left) // 2 + left
+            sdram_size_needed = self.calculate_sdram(application_vertex, test_slice_length).get_total_sdram(PacmanDataView.get_plan_n_timestep())
+            if sdram_size_needed == max_sdram:
+                return test_slice_length
+            if sdram_size_needed < max_sdram:
+                left = sdram_size_needed + 1
+                continue
+            right = sdram_size_needed - 1
+            
+        return left if left >= 0 and left <= right else -1

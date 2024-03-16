@@ -10,6 +10,8 @@ from pacman.operations.partition_algorithms.ga.entities.resource_configuration i
 import pandas as pd
 from pacman.operations.partition_algorithms.solution_adopter import SolutionAdopter
 from pacman.model.graphs.application import ApplicationGraph
+from pacman.operations.partition_algorithms.utils.sdram_calculator import SDRAMCalculator
+
 
 class CommonGARepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
     @overrides(AbstractGaSolutionFixing.do_solution_fixing)
@@ -41,21 +43,7 @@ class CommonGARepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing)
         self._max_slice_length = self._calculate_max_slice_lengths()
 
     def _calculate_max_slice_lengths(self) -> List[int]:
-        def _calculate_max_slice_length(application_vertex) -> int:
-            binary_search_left_pt = 0
-            binary_search_right_pt = self.res_configuration.get_neruon_count() - 1
-            while binary_search_left_pt <= binary_search_right_pt:
-                m = (binary_search_right_pt - binary_search_left_pt) // 2 + binary_search_left_pt
-                sdram = SolutionAdopter.calculate_sdram(application_vertex, m)
-                if(sdram.get_total_sdram() == self.res_configuration.get_max_sdram()):
-                    return m
-                if(sdram.get_total_sdram() < self.res_configuration.get_max_sdram()):
-                    binary_search_left_pt = m + 1
-                    continue
-                else:
-                    binary_search_right_pt = m - 1
-                    continue
-            return binary_search_left_pt
+        sdram_calculator = SDRAMCalculator()
 
         return [_calculate_max_slice_length(application_vertex) for application_vertex in self._application_graph.vertices]
 

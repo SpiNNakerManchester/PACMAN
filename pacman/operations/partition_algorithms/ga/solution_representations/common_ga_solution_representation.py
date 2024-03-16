@@ -64,7 +64,6 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
         self._solution.clear()
         self._solution.append(solution_data)
     
-
     def class_str():
         return "comm_rep"
     

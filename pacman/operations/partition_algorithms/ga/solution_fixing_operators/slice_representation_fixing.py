@@ -7,7 +7,7 @@ from pacman.operations.partition_algorithms.ga.entities.resource_configuration i
 import pandas as pd
 from pacman.operations.partition_algorithms.solution_adopter import SolutionAdopter
 from pacman.model.graphs.application import ApplicationGraph
-
+from pacman.data import PacmanDataView
 
 class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
     @overrides(AbstractGaSolutionFixing.do_solution_fixing)
@@ -204,7 +204,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                     continue                
                 sdram = SolutionAdopter \
                     .calculate_sdram(self.get_application_vertex(slice_froms[0], slice_tos[0]), slice_froms[0], slice_tos[0])
-                sdram_records.append([chip_index, core_index , sdram, sdram.get_total_sdram()])
+                sdram_records.append([chip_index, core_index , sdram, sdram.get_total_sdram(PacmanDataView.get_plan_n_timestep())])
                 for i in range(1, recorded_slice_count):
                     sdram.merge(SolutionAdopter \
                         .calculate_sdram(None, slice_froms[i], slice_tos[i]))
@@ -275,7 +275,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                         continue
                     left_slice_sdram = sdram_records[i][2]
                     left_slice_sdram_cost = sdram_records[i][3]
-                    if left_slice_sdram_cost + sdram.get_total_sdram() > self.res_configuration.get_max_sdram():
+                    if left_slice_sdram_cost + sdram.get_total_sdram(PacmanDataView.get_plan_n_timestep()) > self.res_configuration.get_max_sdram():
                         break
                     left_slice_location_in_sram_record = i
                     left_slice_sdram.merge(sdram)
@@ -309,7 +309,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                         break
                     sdram_in_record = sdram_records[pos][2]
                     sdram_cost_in_record = sdram_records[pos][3]
-                    if sdram_cost_in_record + sdram_in_record.get_total_sdram() > self.res_configuration.get_max_sdram():
+                    if sdram_cost_in_record + sdram_in_record.get_total_sdram(PacmanDataView.get_plan_n_timestep()) > self.res_configuration.get_max_sdram():
                         continue
                     sdram_in_record.merge(sdram)
                     allocated_chip_index = sdram_records[pos][0]
@@ -327,7 +327,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                 while pos < len(sdram_records):
                     sdram_in_record = sdram_records[pos][2]
                     sdram_cost_in_record = sdram_records[pos][3]
-                    if sdram_cost_in_record + sdram_in_record.get_total_sdram() > self.res_configuration.get_max_sdram():
+                    if sdram_cost_in_record + sdram_in_record.get_total_sdram(PacmanDataView.get_plan_n_timestep()) > self.res_configuration.get_max_sdram():
                         pos += 1
                         continue
                     sdram_in_record.merge(sdram)
@@ -385,15 +385,16 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         self._max_slice_length = self._calculate_max_slice_length()
 
     def _calculate_max_slice_lengths(self) -> List[int]:
+        
         def _calculate_max_slice_length(application_vertex) -> int:
             binary_search_left_pt = 0
             binary_search_right_pt = self._resourcr_constraint_configuration.get_neruon_count() - 1
             while binary_search_left_pt <= binary_search_right_pt:
                 m = (binary_search_right_pt - binary_search_left_pt) // 2 + binary_search_left_pt
                 sdram = SolutionAdopter.calculate_sdram(application_vertex, m)
-                if(sdram.get_total_sdram() == self._resourcr_constraint_configuration.get_max_sdram()):
+                if(sdram.get_total_sdram(PacmanDataView.get_plan_n_timestep()) == self._resourcr_constraint_configuration.get_max_sdram()):
                     return m
-                if(sdram.get_total_sdram() < self._resourcr_constraint_configuration.get_max_sdram()):
+                if(sdram.get_total_sdram(PacmanDataView.get_plan_n_timestep()) < self._resourcr_constraint_configuration.get_max_sdram()):
                     binary_search_left_pt = m + 1
                     continue
                 else:

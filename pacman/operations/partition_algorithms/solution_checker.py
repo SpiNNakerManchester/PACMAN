@@ -27,6 +27,7 @@ from numpy import floating
 from pacman.operations.partition_algorithms.utils.sdram_recorder import SDRAMRecorder
 from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
 from pacman.operations.partition_algorithms.utils.sdram_calculator import SDRAMCalculator
+from pacman.data import PacmanDataView
 class SolutionChecker(object):
     def __init__(self, resource_constraints_configuration: ResourceConfiguration) -> None:
         self._constraint_max_core_per_chip = resource_constraints_configuration.get_max_cores_per_chip()
@@ -110,7 +111,7 @@ class SolutionChecker(object):
                 else:
                     recorded_sdram.merge(sdram)
                 
-                if recorded_sdram.get_total_sdram() > self._constraint_sdram_capacity:
+                if recorded_sdram.get_total_sdram(PacmanDataView.get_plan_n_timestep()) > self._constraint_sdram_capacity:
                     return False
     
     

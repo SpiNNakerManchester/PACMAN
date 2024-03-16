@@ -28,14 +28,12 @@ class ProfilingIsingModelCost(AbstractGaCostCalculator):
                 current_target_slice_neuron_index_to = current_target_slice[GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
                 if neuron_index >= current_target_slice_neuron_index_from and neuron_index <= current_target_slice_neuron_index_to:
                     return mid
-                
                 if neuron_index < current_target_slice_neuron_index_from:
                     right = mid - 1
                     continue
                 if neuron_index > current_target_slice_neuron_index_to:
                     left = mid + 1
                     continue
-
             raise ValueError
 
         def calculate_single_cost(sample: bytearray, ptype_solution_representation, Z):
