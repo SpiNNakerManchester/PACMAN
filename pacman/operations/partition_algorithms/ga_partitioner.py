@@ -65,13 +65,10 @@ class GAPartitioner(AbstractPartitioner):
     def _partitioning(self):
         # Begin coding for partitioning here
 
-        initilization_solutions_generator:AbstractGaInitialPopulationGenerator = self._ga_algorithm_configuration.init_solutions_common_representation_generator 
-        init_solutions_common_representation = \
-            self._generate_init_solutions(generator=initilization_solutions_generator, population_size=15) # None -> List<CommonRepresentation>[]
-        
+      
         if not self._read_solution_from_file:
             self._global_solution : AbstractGASolutionRepresentation = \
-               GaAlgorithm(self._ga_algorithm_configuration).do_GA_algorithm(init_solutions_common_representation)
+               GaAlgorithm(self._ga_algorithm_configuration).do_GA_algorithm(self._graph)
         else:
             self._global_solution : AbstractGASolutionRepresentation = \
                 GaAlgorithmSolutionReader().read_solution_from_file(self._solution_file_path)

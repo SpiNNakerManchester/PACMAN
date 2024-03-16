@@ -7,6 +7,8 @@ from .ga.solution_fixing_operators.abst_solution_fixing import AbstractGaSolutio
 from .ga.cost_caculators.abst_cost_calculator import AbstractGaCostCalculator
 from .ga.selection_operators.abst_selection import AbstractGaSelection
 from .ga.entities.ga_algorithm_configuration import GAAlgorithmConfiguration
+from pacman.model.graphs.application import ApplicationGraph
+
 
 import numpy as np
 
@@ -55,8 +57,8 @@ class GaAlgorithm(object):
         data = np.array([solution.get_narray_data() for solution in solutions])
         np.save("%s/%s" % (self.base_path_for_output, filename), data, allow_pickle=True)
     
-    def do_GA_algorithm(self) -> AbstractGASolutionRepresentation:
-        init_solution = self.init_solutions_common_representation_generator.generate_initial_population()
+    def do_GA_algorithm(self, application_graph: ApplicationGraph) -> AbstractGASolutionRepresentation:
+        init_solution = self.init_solutions_common_representation_generator.generate_initial_population(self.initial_solution_count, application_graph)
         solutions = self.solution_representation_strategy.from_common_representation(init_solution)
         for epoch in range(0, self.epochs):
             self._log("begin epoch %d..." % epoch)
