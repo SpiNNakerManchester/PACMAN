@@ -45,7 +45,7 @@ class GaFixedSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
             current_chip_remains_core -= 1
             slice_index += 1
 
-        return GASliceSolutionRepresentation(slices_end_points=slices_end_points,
+        return GASliceSolutionRepresentation(solution_data=slices_end_points,
                 slices_chip_indexes=slices_chip_indexes, slices_core_indexes=slices_core_indexes, 
                 max_cores_per_chip=max_cores_per_chip, max_chips=max_chips, 
                 single_neuron_encoding_length=single_neuron_encoding_length)
