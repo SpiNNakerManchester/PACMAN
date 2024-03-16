@@ -10,17 +10,17 @@ from pacman.operations.partition_algorithms.ga.cost_caculators.abst_cost_calcula
 from pacman.operations.partition_algorithms.ga.selection_operators.abst_selection import AbstractGaSelection
 
 class GAAlgorithmConfiguration(object):
-    def __init__(self, init_solutions_common_representation_generator : AbstractGaInitialPopulationGenerator,
-            solution_representation_strategy: AbstractGASolutionRepresentation,
+    def __init__(self, init_solutions_common_representation_generator: AbstractGaInitialPopulationGenerator,
+            solution_representation_strategy: str,
             crossover_individuals_selection_strategy: AbstractGaCrossoverIndividualSelector, 
             crossover_perform_strategy: AbstractGaCrossover,
             variation_strategy: AbstractGaVariation, 
             solution_fixing_strategy: AbstractGaSolutionFixing, 
             solution_cost_calculation_strategy: AbstractGaCostCalculator,
             selection_strategy: AbstractGaSelection,
-            log_processing=False,
-            output_population_all_epoch=False, 
-            output_final_epoch_population=False,
+            log_processing = False,
+            output_population_all_epoch = False, 
+            output_final_epoch_population = False,
             epochs = 10, 
             max_individuals_each_epoch = 20,
             remains_individuals = 10, 
@@ -42,6 +42,7 @@ class GAAlgorithmConfiguration(object):
         self.epochs = max_individuals_each_epoch
         self.remains_individuals = remains_individuals
         self.base_path_for_output = base_path_for_output
+        self.initial_solution_count = initial_solution_count
 
 
 

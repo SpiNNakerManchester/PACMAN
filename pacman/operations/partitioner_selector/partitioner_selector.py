@@ -7,7 +7,7 @@ from pacman.operations.partition_algorithms.ga.init_population_generators.fixed_
 from pacman.operations.partition_algorithms.ga.crossover_operators.slice_crossover import GaSliceCrossoverKPoints
 from pacman.operations.partition_algorithms.ga.crossover_individuals_selectors.random_sel_crossover_solution import GaussianWeightInvidualSelection
 from pacman.operations.partition_algorithms.ga.variation_operators.slice_variation import GaSliceVariationuUniformGaussian
-
+from pacman.operations.partition_algorithms.ga.solution_representations.slice_representation import GASliceSolutionRepresentation
 
 class PartitionerSelector(object):
     def __init__(self, partitioner_name, resource_constraints_configuration: ResourceConfiguration) -> None:
@@ -24,6 +24,7 @@ class PartitionerSelector(object):
                 GAAlgorithmConfiguration(
                     init_solutions_common_representation_generator=\
                         GaFixedSlicePopulationGenerator([50, 100, 200, 300, 400, 500, 600, 700, 800, 900],resource_constraints_configuration.get_max_cores_per_chip()),
+                    solution_representation_strategy='slice',
                     crossover_individuals_selection_strategy=GaussianWeightInvidualSelection(),
                     crossover_perform_strategy=GaSliceCrossoverKPoints(5, True),
                     variation_strategy=GaSliceVariationuUniformGaussian(True, 0.05, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0), 
@@ -37,7 +38,8 @@ class PartitionerSelector(object):
                     max_individuals_each_epoch = 20,
                     remains_individuals = 10, 
                     base_path_for_output = "./ga_algorithm_records/",
-                    initial_solution_count = 10)
+                    initial_solution_count = 10
+                    )
 
             self._partitioner = GAPartitioner(
                 resource_contraints_configuration=resource_constraints_configuration,
