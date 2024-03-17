@@ -14,6 +14,7 @@ class GaRandomSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
         if(max_cores_per_chip < 0):
             raise ValueError
         self._max_cores_per_chip = max_cores_per_chip
+        self._max_slice_size = max_slice_size
 
     @overrides(AbstractGaInitialPopulationGenerator.generate_initial_population)
     def generate_initial_population(self, population_size: int, application_graph: ApplicationGraph) -> List[CommonGASolutionRepresentation]:
@@ -24,4 +25,4 @@ class GaRandomSlicePopulationGenerator(AbstractGaInitialPopulationGenerator):
         return self._fix_slice_init_population_generator.generate_initial_population(population_size, application_graph)
     
     def __str__(self):
-        return "random_slice_init_gen"
+        return "init_random_slice"

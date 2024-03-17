@@ -85,7 +85,7 @@ class GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore(AbstractGaInitialPopul
         return solutions
 
     def __str__(self):
-        return "fix_one_slice_one_core"
+        return "init_fix_one_slice_one_core"
     
 class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPopulationGenerator):
     def __init__(self, fixed_slice_sizes: List[int], resource_constraint_configuration: ResourceConfiguration) -> None:
@@ -104,7 +104,7 @@ class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPop
         if len(ag.vertices) == 0:
             return None
         
-        # 1. Calculate prefix sum of application vertexes' neuron counts
+        # calculates prefix sum of application vertexes' neuron counts
         #    this prefix sum will help the splitting process in identifiying which 
         #    application vertex a slice is belongs to. 
         vertices = list(ag.vertices)
@@ -134,7 +134,7 @@ class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPop
             
             sdram_current_chip_remains = self._resource_constraint_configuration.get_max_sdram()
             for inner_application_vertx_neuron_index in range(0, vertices[application_vertex_index].n_atoms, fixed_slice_size):
-                # 1. Calculate slice beginning and ending. The ending cannot exceed the total (neuron count - 1), 
+                # calculate slice beginning and ending. The ending cannot exceed the total (neuron count - 1), 
                 #   and the total count neurons from the first application vertex to current application vertex - 1 (include current application vertex).
                 slice_neuron_from = neuron_index + inner_application_vertx_neuron_index
                 slice_neuron_to = min(min(slice_neuron_from + fixed_slice_size, total_neuron_count - 1), neuron_count_prefix_sum[application_vertex_index] - 1)
@@ -150,13 +150,12 @@ class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPop
                     cores_remain_in_current_chip = self._max_core_per_chips
                     sdram_current_chip_remains = self._resource_constraint_configuration.get_max_sdram()
 
-                # 2. Append chip index and core index for the slice.
+                # 2. append chip index and core index for the slice.
                 slices_chip_indexes.append(current_chip_index)
                 slices_core_indexes.append(self._max_core_per_chips - cores_remain_in_current_chip)
                 cores_remain_in_current_chip -= 1
                 slice_index += 1
             neuron_index += neuron_count_prefix_sum[application_vertex_index]
-
 
         return GASliceSolutionRepresentation(data_for_build_solution=slices_end_points, 
                                              slices_chip_indexes=slices_chip_indexes, 
@@ -176,5 +175,5 @@ class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPop
         return solutions
 
     def __str__(self):
-        return "fix_multi_slice_one_core"
+        return "init_fix_multi_slice_one_core"
     
