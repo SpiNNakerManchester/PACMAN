@@ -98,11 +98,11 @@ class CommonGaCrossoverUniform(AbstractGaCrossover):
         for p in range(0, neuron_count):
             neuron_encoding_begin = p * single_neuron_encoding_length
             neuron_encoding_end = (p + 1) * single_neuron_encoding_length
-            new_individual1_select_parent_id = random.choice([0, 1])
+            selected_parent_id = random.choice([0, 1])
             new_individual1[neuron_encoding_begin:neuron_encoding_end] = \
-                parents[new_individual1_select_parent_id][neuron_encoding_begin:neuron_encoding_end]
+                parents[selected_parent_id][neuron_encoding_begin:neuron_encoding_end]
             new_individual2[neuron_encoding_begin:neuron_encoding_end] = \
-                parents[1 - new_individual1_select_parent_id][neuron_encoding_begin:neuron_encoding_end]
+                parents[1 - selected_parent_id][neuron_encoding_begin:neuron_encoding_end]
         return (CommonGASolutionRepresentation(new_individual1, max_cores_per_chip, max_chips, self._use_ptype), \
                 CommonGASolutionRepresentation(new_individual2, max_cores_per_chip, max_chips, self._use_ptype))
     
