@@ -10,12 +10,12 @@ from spinn_utilities.overrides import overrides
 import numpy as np
 
 class GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore(AbstractGaInitialPopulationGenerator):
-    def __init__(self,  fixed_slice_sizes: List[int], resource_constraints_configuration: ResourceConfiguration) -> None:
+    def __init__(self,  fixed_slice_sizes: List[int], resource_constraint_configuration: ResourceConfiguration) -> None:
         super().__init__()
-        self._resource_constraints_configuration = resource_constraints_configuration
-        if(resource_constraints_configuration.get_max_cores_per_chip() < 0 or any(slice_size <= 0 for slice_size in fixed_slice_sizes)):
+        self._resource_constraint_configuration = resource_constraint_configuration
+        if(resource_constraint_configuration.get_max_cores_per_chip() < 0 or any(slice_size <= 0 for slice_size in fixed_slice_sizes)):
             raise ValueError
-        self._max_core_per_chips = resource_constraints_configuration.get_max_cores_per_chip()
+        self._max_core_per_chips = resource_constraint_configuration.get_max_cores_per_chip()
         self._fixed_slice_sizes = fixed_slice_sizes
             
     def make_solution(self, fixed_slice_size, application_graph):
@@ -49,8 +49,8 @@ class GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore(AbstractGaInitialPopul
         for application_vertex_index in range(0, len(vertices)):
             sdram_calculator = SDRAMCalculator(vertices[application_vertex_index])
             fixed_slice_size = min(fixed_slice_size, sdram_calculator.calculate_max_slice_length(vertices[application_vertex_index],
-                self._resource_constraints_configuration.get_neruon_count(),
-                self._resource_constraints_configuration.get_max_sdram()))
+                self._resource_constraint_configuration.get_neruon_count(),
+                self._resource_constraint_configuration.get_max_sdram()))
             for inner_application_vertx_neuron_index in range(0, vertices[application_vertex_index].n_atoms, fixed_slice_size):
                 # Calculate slice beginning and ending. The ending cannot exceed the total neuron count - 1, 
                 #   and the total count neurons from the first application vertex to current application vertex - 1 (include current application vertex).
@@ -88,12 +88,12 @@ class GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore(AbstractGaInitialPopul
         return "fix_one_slice_one_core"
     
 class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPopulationGenerator):
-    def __init__(self, fixed_slice_sizes: List[int], resource_constraints_configuration: ResourceConfiguration) -> None:
+    def __init__(self, fixed_slice_sizes: List[int], resource_constraint_configuration: ResourceConfiguration) -> None:
         super().__init__()
-        self._resource_constraints_configuration = resource_constraints_configuration
-        if(resource_constraints_configuration.get_max_cores_per_chip() < 0 or any(slice_size <= 0 for slice_size in fixed_slice_sizes)):
+        self._resource_constraint_configuration = resource_constraint_configuration
+        if(resource_constraint_configuration.get_max_cores_per_chip() < 0 or any(slice_size <= 0 for slice_size in fixed_slice_sizes)):
             raise ValueError
-        self._max_core_per_chips = resource_constraints_configuration.get_max_cores_per_chip()
+        self._max_core_per_chips = resource_constraint_configuration.get_max_cores_per_chip()
         self._fixed_slice_sizes = fixed_slice_sizes
             
     def make_solution(self, fixed_slice_size, application_graph):
@@ -129,10 +129,10 @@ class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPop
             sdram_calculator = SDRAMCalculator(vertices[application_vertex_index])
             fixed_slice_size = min(fixed_slice_size, \
                                    sdram_calculator.calculate_max_slice_length(vertices[application_vertex_index], \
-                                   self._resource_constraints_configuration.get_neruon_count(),\
-                                   self._resource_constraints_configuration.get_max_sdram()))
+                                   self._resource_constraint_configuration.get_neruon_count(),\
+                                   self._resource_constraint_configuration.get_max_sdram()))
             
-            sdram_current_chip_remains = self._resource_constraints_configuration.get_max_sdram()
+            sdram_current_chip_remains = self._resource_constraint_configuration.get_max_sdram()
             for inner_application_vertx_neuron_index in range(0, vertices[application_vertex_index].n_atoms, fixed_slice_size):
                 # 1. Calculate slice beginning and ending. The ending cannot exceed the total (neuron count - 1), 
                 #   and the total count neurons from the first application vertex to current application vertex - 1 (include current application vertex).
@@ -148,7 +148,7 @@ class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPop
                     if cores_remain_in_current_chip <= 0:
                         current_chip_index += 1
                     cores_remain_in_current_chip = self._max_core_per_chips
-                    sdram_current_chip_remains = self._resource_constraints_configuration.get_max_sdram()
+                    sdram_current_chip_remains = self._resource_constraint_configuration.get_max_sdram()
 
                 # 2. Append chip index and core index for the slice.
                 slices_chip_indexes.append(current_chip_index)

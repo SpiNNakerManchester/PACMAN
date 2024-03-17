@@ -45,9 +45,9 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         raise NotImplementedError
 
     def get_chip_index_in_slice_info(self, slice_info_index):
-         if self._use_ptype:
-            return self._solution[slice_info_index][self.CHIP_INDEX]
-         raise NotImplementedError
+        if self._use_ptype:
+           return self._solution[slice_info_index][self.CHIP_INDEX]
+        raise NotImplementedError
 
     def get_core_index_in_slice_info(self, slice_info_index):
          if self._use_ptype:
@@ -115,7 +115,6 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
             slice_length = slice_neuron_to - slice_neuron_from + 1
             binary_string = ('{0:' + str(single_neuron_encoding_length) + 'b}')\
                 .format(chip_core_represent) * slice_length
-
             comm_solution[write_common_solution_from:write_common_solution_to] = bytearray(binary_string.encode('ascii'))
         return CommonGASolutionRepresentation(comm_solution, single_neuron_encoding_length, self._max_cores_per_chip, self._max_chips)
 

@@ -15,25 +15,25 @@ from pacman.operations.partition_algorithms.ga.crossover_operators.slice_crossov
 from pacman.data import PacmanDataView
 
 class PartitionerSelector(object):
-    def __init__(self, partitioner_name, resource_constraints_configuration: ResourceConfiguration) -> None:
+    def __init__(self, partitioner_name, resource_constraint_configuration: ResourceConfiguration) -> None:
         self._partitioner_name = partitioner_name
-        self._resource_constraints_configuration: ResourceConfiguration = resource_constraints_configuration
+        self._resource_constraint_configuration: ResourceConfiguration = resource_constraint_configuration
         if partitioner_name == "splitter":            
             self._partitioner = None
             self._n_chips = splitter_partitioner()
         if partitioner_name == "random":
-            self._partitioner = RandomPartitioner(100, resource_constraints_configuration).partitioning()
+            self._partitioner = RandomPartitioner(100, resource_constraint_configuration).partitioning()
             self._n_chips = self._partitioner.get_n_chips()
         if partitioner_name == "ga":
             ga_configuration: GAAlgorithmConfiguration = \
                 GAAlgorithmConfiguration(
                     init_solutions_generator=\
-                        GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore([50, 100, 200, 300, 400, 500, 600, 700, 800, 900],resource_constraints_configuration),
+                        GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore([50, 100, 200, 300, 400, 500, 600, 700, 800, 900],resource_constraint_configuration),
                     solution_representation_strategy='slice',
                     crossover_individuals_selection_strategy=GaussianWeightInvidualSelection(),
                     crossover_perform_strategy=GaSliceSliceInfoCombinationUniformCrossover(True),
                     variation_strategy=GaSliceVariationuUniformGaussian(True, 0.05, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0), 
-                    solution_fixing_strategy=GaSliceRepresenationSolutionSimpleFillingFixing(resource_constraints_configuration, PacmanDataView.get_graph()), 
+                    solution_fixing_strategy=GaSliceRepresenationSolutionSimpleFillingFixing(resource_constraint_configuration, PacmanDataView.get_graph()), 
                     solution_cost_calculation_strategy=ResourceUtilizationCost(),
                     selection_strategy=GaElitePossibilitySelection(8, 3),
                     log_processing=True,
@@ -47,7 +47,7 @@ class PartitionerSelector(object):
             )
 
             self._partitioner = GAPartitioner(
-                resource_contraints_configuration=resource_constraints_configuration,
+                resource_contraints_configuration=resource_constraint_configuration,
                 max_slice_length=10 ** 9,
                 solution_file_path=None,
                 serialize_solution_to_file=True,

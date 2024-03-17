@@ -11,14 +11,13 @@ from pacman.operations.partition_algorithms.ga.entities.resource_configuration i
 import numpy as np
 
 class AbstractPartitioner(SolutionAdapter, object):
-  
-    def __init__(self, resource_constraints_configuration:ResourceConfiguration = None):
-        self._checker = SolutionChecker(resource_constraints_configuration)
+    def __init__(self, resource_constraint_configuration:ResourceConfiguration = None):
+        self._checker = SolutionChecker(resource_constraint_configuration)
         self._chip_counter = ChipCounter() # chip_counter instance is used
                                            # to record the amount of allocated chips and 
         self._graph = PacmanDataView.get_graph() # get the application graph
-        resource_constraints_configuration.set_neuron_count((int)(np.sum([vertex.n_atoms for vertex in self._graph.vertices])))
-        self._resource_constraints_configuration = resource_constraints_configuration
+        resource_constraint_configuration.set_neuron_count((int)(np.sum([vertex.n_atoms for vertex in self._graph.vertices])))
+        self._resource_constraint_configuration = resource_constraint_configuration
 
     def application_graph(self):
         return self._graph
@@ -41,8 +40,8 @@ class AbstractPartitioner(SolutionAdapter, object):
     def get_n_chips(self):
         return self._chip_counter.n_chips
 
-    def get_resource_constraints_configuration(self) -> ResourceConfiguration:
-        return self._resource_constraints_configuration
+    def get_resource_constraint_configuration(self) -> ResourceConfiguration:
+        return self._resource_constraint_configuration
     
     @overrides(SolutionAdapter._adapted_output)
     def _adapted_output(self):

@@ -10,13 +10,13 @@ from pacman.utilities.utility_objs.chip_counter import ChipCounter
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (AbstractSynapseDynamicsStructural)
 from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
 class RandomPartitioner(AbstractPartitioner):
-    def __init__(self, max_slice_length = 100, resource_constraints_configuration: ResourceConfiguration = None):
-        super().__init__(resource_constraints_configuration)
+    def __init__(self, max_slice_length = 100, resource_constraint_configuration: ResourceConfiguration = None):
+        super().__init__(resource_constraint_configuration)
         self._max_slice_length = max_slice_length
 
   
-    def get_resource_constraints_configuration(self) -> ResourceConfiguration:
-        return self._resource_constraints_configuration
+    def get_resource_constraint_configuration(self) -> ResourceConfiguration:
+        return self._
     
     @overrides(AbstractPartitioner._adapted_output)
     def _adapted_output(self):
@@ -28,8 +28,8 @@ class RandomPartitioner(AbstractPartitioner):
         N_Ai = [vertex.n_atoms for vertex in self._graph.vertices]
         N = int(np.sum(N_Ai))
         
-        max_cores_per_chip = self.get_resource_constraints_configuration().get_max_cores_per_chip()
-        max_chips = N if self.get_resource_constraints_configuration().get_max_chips() <= 0 else self.get_resource_constraints_configuration().get_max_chips()
+        max_cores_per_chip = self.get_resource_constraint_configuration().get_max_cores_per_chip()
+        max_chips = N if self.get_resource_constraint_configuration().get_max_chips() <= 0 else self.get_resource_constraint_configuration().get_max_chips()
         chip_core_represent_total_length = int(np.ceil(np.log2(max_chips * max_cores_per_chip)))
         bytes_needed_for_encoding = N * chip_core_represent_total_length
         self.global_solution = bytearray(bytes_needed_for_encoding)
@@ -59,4 +59,4 @@ class RandomPartitioner(AbstractPartitioner):
         # End coding
 
         adapter_output = self._adapted_output()
-        SolutionAdopter.AdoptSolution(adapter_output, self._graph, self._chip_counter, self.get_resource_constraints_configuration())
+        SolutionAdopter.AdoptSolution(adapter_output, self._graph, self._chip_counter, self.get_resource_constraint_configuration())

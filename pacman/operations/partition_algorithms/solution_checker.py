@@ -29,10 +29,10 @@ from pacman.operations.partition_algorithms.ga.entities.resource_configuration i
 from pacman.operations.partition_algorithms.utils.sdram_calculator import SDRAMCalculator
 from pacman.data import PacmanDataView
 class SolutionChecker(object):
-    def __init__(self, resource_constraints_configuration: ResourceConfiguration) -> None:
-        self._constraint_max_core_per_chip = resource_constraints_configuration.get_max_cores_per_chip()
-        self._constraint_max_chips = resource_constraints_configuration.get_max_chips()
-        self._constraint_sdram_capacity = resource_constraints_configuration.get_max_sdram()
+    def __init__(self, resource_constraint_configuration: ResourceConfiguration) -> None:
+        self._constraint_max_core_per_chip = resource_constraint_configuration.get_max_cores_per_chip()
+        self._constraint_max_chips = resource_constraint_configuration.get_max_chips()
+        self._constraint_sdram_capacity = resource_constraint_configuration.get_max_sdram()
         self._sdram_recorder: SDRAMRecorder = SDRAMRecorder()
 
     @classmethod

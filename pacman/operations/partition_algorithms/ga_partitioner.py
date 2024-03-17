@@ -39,11 +39,11 @@ class GaAlgorithmSolutionReader(object):
 class GAPartitioner(AbstractPartitioner):
     def __init__(self, resource_contraints_configuration, max_slice_length = 100, solution_file_path=None, read_solution_from_file=False, serialize_solution_to_file=False, ga_algorithm_configuration: GAAlgorithmConfiguration=None):
         super().__init__(resource_contraints_configuration)
-        SDRAM_SIZE = self.get_resource_constraints_configuration().get_max_sdram()
+        SDRAM_SIZE = self.get_resource_constraint_configuration().get_max_sdram()
         self._max_slice_length = max_slice_length
-        self._neuron_count = self.get_resource_constraints_configuration().get_neruon_count()
-        max_chips = self.get_resource_constraints_configuration().get_max_chips()
-        max_cores_per_chip = self.get_resource_constraints_configuration().get_max_cores_per_chip()
+        self._neuron_count = self.get_resource_constraint_configuration().get_neruon_count()
+        max_chips = self.get_resource_constraint_configuration().get_max_chips()
+        max_cores_per_chip = self.get_resource_constraint_configuration().get_max_cores_per_chip()
         self._resource_configuration = ResourceConfiguration(self._neuron_count, max_chips if max_chips > 0 else \
                                                              self._neuron_count, max_cores_per_chip, SDRAM_SIZE)
         self._solution_file_path = solution_file_path
