@@ -19,9 +19,9 @@ class CommonGARepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing)
         if not isinstance(solution, CommonGASolutionRepresentation):
             raise TypeError
         if solution._use_ptype:
-            self._fixing_in_ptype_representation(solution)
+            return self._fixing_in_ptype_representation(solution)
         else:
-            self._fixing_in_gtype_representation(solution)
+            return self._fixing_in_gtype_representation(solution)
 
     def _fixing_in_ptype_representation(self, solution: AbstractGASolutionRepresentation):
         slice_representation_solution: GASliceSolutionRepresentation = \
@@ -42,7 +42,6 @@ class CommonGARepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing)
         self._max_slice_length = self._calculate_max_slice_lengths()
 
     def _calculate_max_slice_lengths(self) -> List[int]:
-
         return [SDRAMCalculator(application_vertex).calculate_max_slice_length(application_vertex, self._resource_constraint_configuration.get_neruon_count(), self._resource_constraint_configuration.get_max_sdram()) for application_vertex in self._application_graph.vertices]
 
 

@@ -11,7 +11,7 @@ class GaEliteSelection(AbstractGaSelection):
         self._count_survival = count_survival
 
     @overrides(AbstractGaSelection._select)
-    def _select(self, costs:List[float], solutions:List[AbstractGASolutionRepresentation], parent_count:int, count_survival:int) -> List[AbstractGASolutionRepresentation]:
+    def _select(self, costs:List[float], solutions:List[AbstractGASolutionRepresentation], k_value_top_k_survival:int, count_survival:int) -> List[AbstractGASolutionRepresentation]:
         def normalize_fitness(costs):
             nor_costs = (costs - min(costs))/(max(costs) - min(costs))
             return nor_costs

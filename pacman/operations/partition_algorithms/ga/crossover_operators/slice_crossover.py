@@ -172,5 +172,5 @@ class GaSliceSliceInfoCombinationUniformCrossover(AbstractGaCrossover):
                 GASliceSolutionRepresentation(new_individual2[0], new_individual2[1], new_individual2[2], individual2.get_max_cores_per_chip(), individual2.get_max_chips(), True))
 
     def __str__(self):
-        return "slice_combination_uniform_crossover"
+        return "slice_comb_uni_cv"
     

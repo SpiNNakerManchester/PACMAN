@@ -61,11 +61,12 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
         self._solution.clear()
         self._solution.append(solution_data)
     
-    def class_str():
+    @classmethod
+    def class_str(self):
         return "comm_rep"
     
     def __str__(self):
-        return CommonGASolutionRepresentation.class_str()
+        return CommonGASolutionRepresentation.class_str(self)
     
     @overrides(AbstractGASolutionRepresentation.get_serialized_data)
     def get_serialized_data(self):

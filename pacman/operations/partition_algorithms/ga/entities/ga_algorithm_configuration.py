@@ -24,7 +24,8 @@ class GAAlgorithmConfiguration(object):
             epochs = 10, 
             max_individuals_each_epoch = 20,
             remains_individuals = 10, 
-            base_path_for_output = "./",
+            k_value_top_k_survival = 3,
+            base_path_for_output = "./ga_algorithm_records/",
             initial_solution_count = 10
             ) -> None:
         self.init_solutions_generator = init_solutions_generator
@@ -41,5 +42,6 @@ class GAAlgorithmConfiguration(object):
         self.epochs = epochs
         self.max_individuals_each_epoch = max_individuals_each_epoch
         self.remains_individuals = remains_individuals
+        self.k_value_top_k_survival = k_value_top_k_survival
         self.base_path_for_output = base_path_for_output
         self.initial_solution_count = initial_solution_count

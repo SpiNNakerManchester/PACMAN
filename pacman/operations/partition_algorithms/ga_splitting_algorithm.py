@@ -8,9 +8,8 @@ from .ga.cost_caculators.abst_cost_calculator import AbstractGaCostCalculator
 from .ga.selection_operators.abst_selection import AbstractGaSelection
 from .ga.entities.ga_algorithm_configuration import GAAlgorithmConfiguration
 from pacman.model.graphs.application import ApplicationGraph
-
-
 import numpy as np
+import os
 
 class GaLogger(object):
     def log(self, message):
@@ -32,6 +31,7 @@ class GaAlgorithm(object):
         self.epochs = ga_configuration.epochs
         self.max_individuals_each_epoch = ga_configuration.max_individuals_each_epoch
         self.remains_individuals = ga_configuration.remains_individuals
+        self.k_value_top_k_survival = ga_configuration.k_value_top_k_survival
         self.base_path_for_output = ga_configuration.base_path_for_output
         self.initial_solution_count = ga_configuration.initial_solution_count
         if self.log_processing:
@@ -54,8 +54,24 @@ class GaAlgorithm(object):
              self.selection_strategy,
              epoch)
         
-        data = np.array([solution.get_narray_data() for solution in solutions])
-        np.save("%s/%s" % (self.base_path_for_output, filename), data, allow_pickle=True)
+
+        def get_output_folder_of_file(output_file_path: str):
+            pos = len(output_file_path) - 1
+            while(pos >= 0 and output_file_path[pos] != '/' and output_file_path[pos] != '\\'):
+                pos -= 1
+            if pos < 0:
+                return output_file_path
+            return output_file_path[:pos + 1]
+        file_path = "%s/%s" % (self.base_path_for_output, filename)
+        output_file_folder = get_output_folder_of_file(file_path)
+        if not os.path.exists(output_file_folder):
+            os.makedirs(output_file_folder)
+        data = [solution.get_serialized_data() for solution in solutions]
+        while file_path.count("//") > 0:
+            file_path = file_path.replace("//", "/")
+        while file_path.count("\\\\") > 0:
+            file_path = file_path.replace("\\\\", "\\")
+        np.save(file_path, np.array(data, dtype=object), allow_pickle=True)
     
     def do_GA_algorithm(self, application_graph: ApplicationGraph) -> AbstractGASolutionRepresentation:
         init_solution = self.init_solutions_generator.generate_initial_population(self.initial_solution_count, application_graph)
@@ -73,14 +89,14 @@ class GaAlgorithm(object):
                 solutions.append(new_individual2)
                 self._log("[In Epoch %d] Finish solution %d/%d" % (epoch, len(solutions), self.max_individuals_each_epoch))
             self._log("[In Epoch %d] Finish. Begin calculating cost of each individual." % epoch)
-            costs.append(self.solution_cost_calculation_strategy.calculate(solutions[avaliable_parents_count:]))
-            self._log("[In Epoch %d] Finish. Costs = %s" % str(costs))
+            costs += (self.solution_cost_calculation_strategy.calculate(solutions[avaliable_parents_count:]))
+            self._log("[In Epoch %d] Finish. Costs = %s" % (epoch, str(costs)))
             if self.output_populaton_all_epoch:
-                self._log("[In Epoch %d] Output solution of current epoch...")
+                self._log("[In Epoch %d] Output solution of current epoch..." % epoch)
                 self._out_solutions_of_a_epoch_before_selection(epoch, solutions)
-            self._log("[In Epoch %d] Selection Begin...")
-            solutions = self.selection_strategy.select(costs, solutions)
-            self._log("[In Epoch %d] Cost after selection: %s" % str(costs))
+            self._log("[In Epoch %d] Selection Begin..." % epoch)
+            solutions = self.selection_strategy.select(costs, solutions, self.k_value_top_k_survival, self.remains_individuals)
+            self._log("[In Epoch %d] Cost after selection: %s" % (epoch, str(costs)))
 
         costs = self.solution_cost_calculation_strategy.calculate(solutions)
         self._log("Finish GA. Costs = %s" % str(costs))

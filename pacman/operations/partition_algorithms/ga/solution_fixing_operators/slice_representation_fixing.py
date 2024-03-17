@@ -15,9 +15,9 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         if not isinstance(solution, GASliceSolutionRepresentation):
             raise TypeError
         if solution._use_ptype:
-            self._fixing_in_ptype_representation(solution)
+            return self._fixing_in_ptype_representation(solution)
         else:
-            self._fixing_in_gtype_representation(solution)
+            return self._fixing_in_gtype_representation(solution)
 
 
     def _fixing_in_ptype_representation(self, solution: AbstractGASolutionRepresentation):
@@ -144,7 +144,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         # Update the solution
         # TODO: pull the `set_new_ptype_representation_solution` to abstract class
         solution.set_new_representation_solution(new_ptype_representation)
-        return self
+        return solution
         
     def __fixing_chip_core_in_ptype(self, ptype_solution):
         SLCIE_NEURON_FROM_INDEX = GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX
@@ -175,8 +175,6 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         
         chip_core_records = \
             sorted([
-
-                    
                         [chip_index,
                             sorted([
                                 [core_index, chip_core_df] \
@@ -184,8 +182,6 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                                 in chip_df.groupby('core_id')
                             ], key=lambda x: x[0]) # sort each chip's records by core_index
                         ]
-                    
-                
                     for chip_index, chip_df
                     in slices_data_frame.groupby('chip_id')
             ], key=lambda x: x[0])
@@ -252,9 +248,11 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                 slices_after_splitted = []
                 while slice_from <= slice_to:
                     target_slice_to = min(slice_from + self._max_slice_length[current_application_vertex_index] - 1, slice_to)
+                    # TODO: ensure there exist enough space for a SDRAM ro store the slice prepared to be inserted.
                     slices_after_splitted.append([slice_from, target_slice_to, slice_chip_index, slice_core_index])
                 del ptype_solution[slice_index]
                 ptype_solution[slice_index:slice_index] = slices_after_splitted
+                slice_index += 1
                 continue
 
 
@@ -290,6 +288,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                 
                 if success:
                     set_core_chip(slice_index, allocated_chip_index, allocated_core_index)
+                    slice_index += 1
                     continue
                 
                 # 2. Find whether in the same chip the chip of the left slice
@@ -322,6 +321,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
 
                 if success:
                     set_core_chip(slice_index, allocated_chip_index, allocated_core_index)
+                    slice_index += 1
                     continue
 
                 # 3. Find whether there is a core that has enough space for storing current slice. Utilizes a greedy algorithm.
@@ -341,6 +341,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
 
                 if success:
                     set_core_chip(slice_index, allocated_chip_index, allocated_core_index)
+                    slice_index += 1
                     continue
 
                 # 4. Try to find any chip that still can allocate a new core.
@@ -367,6 +368,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
 
                 if success:
                     set_core_chip(slice_index, allocated_chip_index, allocated_core_index)
+                    slice_index += 1
                     break
 
                 # 5. The worest situation. All chips are allocate all there cores.
@@ -380,6 +382,8 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                     raise ValueError
                 core_records.append(pos, [slice_from, slice_to, chip, allocated_core_id])
                 set_core_chip(slice_index, allocated_chip_index, allocated_core_index)
+                slice_index += 1
+                
 
     def __init__(self, resource_constraint_configuration: ResourceConfiguration, application_graph: ApplicationGraph) -> None:
         super().__init__()

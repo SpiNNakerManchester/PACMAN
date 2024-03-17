@@ -4,6 +4,7 @@ from pacman.operations.partition_algorithms.ga.selection_operators.abst_selectio
 from typing import List
 from spinn_utilities.overrides import overrides
 import random
+import numpy as np
 
 class GaElitePossibilitySelection(AbstractGaSelection):
     def __init__(self, count_survival, count_top_k_remains:int) -> None:
@@ -12,9 +13,11 @@ class GaElitePossibilitySelection(AbstractGaSelection):
         self._top_k_remains = count_top_k_remains
 
     @overrides(AbstractGaSelection._select)
-    def _select(self, costs:List[float], solutions:List[AbstractGASolutionRepresentation], parent_count:int, count_survival:int) -> List[AbstractGASolutionRepresentation]:
+    def _select(self, costs:List[float], solutions:List[AbstractGASolutionRepresentation], k_value_top_k_survival:int, count_survival:int) -> List[AbstractGASolutionRepresentation]:
         def normalize_fitness(costs):
-            nor_costs = (costs - min(costs))/(max(costs) - min(costs))
+            if(max(costs) == min(costs)):
+                return np.array(costs)
+            nor_costs = (np.array(costs) - min(costs))/(max(costs) - min(costs))
             return nor_costs
         
         if(self._top_k_remains > len(solutions)):

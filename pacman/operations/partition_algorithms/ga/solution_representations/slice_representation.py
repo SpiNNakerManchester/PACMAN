@@ -188,7 +188,7 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
             return [GASliceSolutionRepresentation.class_str(), self._use_ptype, self._max_chips, self._max_cores_per_chip, self.get_solution()]
     
     @classmethod
-    def class_str():
+    def class_str(self):
         return "slice_rep"
     
     def __str__(self):
