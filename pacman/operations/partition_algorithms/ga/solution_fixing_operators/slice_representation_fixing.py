@@ -21,6 +21,8 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
 
 
     def _fixing_in_ptype_representation(self, solution: AbstractGASolutionRepresentation):
+        global application_vertexes_index
+        global new_ptype_representation
         ptype_representation: List[Tuple] = solution.get_ptype_solution_representation() 
 
         # 1. Ensure slice's ending >= slice's beginning
@@ -38,38 +40,38 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         last_slice_neuron_index_from = ptype_representation[0][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX]
         last_slice_neuron_index_to = ptype_representation[0][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
         new_ptype_representation.append(ptype_representation[0])
-        application_vertexes = self._application_graph.vertices
+        application_vertexes = list(self._application_graph.vertices)
         application_vertexes_prefix_sum = [0] * len(application_vertexes)
-        application_vertexes_prefix_sum[0] = application_vertexes[0].n_atoms()
+        application_vertexes_prefix_sum[0] = application_vertexes[0].n_atoms
         for i in range(1, len(application_vertexes)):
-            application_vertexes_prefix_sum[i] = application_vertexes_prefix_sum[i - 1] + application_vertexes[i].n_atoms()
+            application_vertexes_prefix_sum[i] = application_vertexes_prefix_sum[i - 1] + application_vertexes[i].n_atoms
         
-        global application_vertexes_index
         application_vertexes_index = 0
 
         def append_slice_with_considering_application_vertexes_ending(slice_neuron_index_from, slice_neuron_index_to, chip_index, core_index, index = -1):
             global application_vertexes_index
+            global new_ptype_representation
             current_application_vertex_max_neuron_index = application_vertexes_prefix_sum[application_vertexes_index] - 1
             neuron_index_from = slice_neuron_index_from
             neuron_index_to = slice_neuron_index_to
             inserted = 0
             while neuron_index_to > current_application_vertex_max_neuron_index:
-                new_ptype_representation.append((\
+                new_ptype_representation.append([\
                                     slice_neuron_index_from,\
                                     current_application_vertex_max_neuron_index,\
                                     ptype_representation[pt][GASliceSolutionRepresentation.CHIP_INDEX],\
-                                    ptype_representation[pt][GASliceSolutionRepresentation.CORE_INDEX]))
+                                    ptype_representation[pt][GASliceSolutionRepresentation.CORE_INDEX]])
                 slice_neuron_index_from = application_vertexes_prefix_sum[application_vertexes_index]
                 application_vertexes_index += 1
                 current_application_vertex_max_neuron_index = application_vertexes_prefix_sum[application_vertexes_index]
                 inserted += 1
 
             # it necessary has condition slice_neuron_index_from <= slice_neuron_index_to.
-            new_ptype_representation.append((\
+            new_ptype_representation.append([\
                                     slice_neuron_index_from,\
                                     slice_neuron_index_to,\
                                     chip_index,\
-                                    core_index))
+                                    core_index])
             inserted += 1
             if index != -1:
                 appended = new_ptype_representation[-inserted:]
@@ -91,8 +93,8 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                                                                           slice_neuron_index_to,\
                                                                           ptype_representation[pt][GASliceSolutionRepresentation.CHIP_INDEX],\
                                                                           ptype_representation[pt][GASliceSolutionRepresentation.CORE_INDEX])
-                last_slice_neuron_index_from = ptype_representation[pt]
-                last_slice_neuron_index_to = ptype_representation[pt]
+                last_slice_neuron_index_from = ptype_representation[pt][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX]
+                last_slice_neuron_index_to = ptype_representation[pt][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
 
                 pt += 1
                 continue
@@ -125,8 +127,8 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         # Fill Vacancy of the beginning part and the ending part
         if new_ptype_representation[0][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX] > 0:
             append_slice_with_considering_application_vertexes_ending(0, (0, new_ptype_representation[0][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX - 1], -1, -1, 0))
-        if new_ptype_representation[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] < self.res_configuration.get_neruon_count() - 1:
-            append_slice_with_considering_application_vertexes_ending(new_ptype_representation[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] + 1, self.res_configuration.get_neruon_count() - 1, -1, -1)        
+        if new_ptype_representation[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] < self._resourcr_constraint_configuration.get_neruon_count() - 1:
+            append_slice_with_considering_application_vertexes_ending(new_ptype_representation[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] + 1, self._resourcr_constraint_configuration.get_neruon_count() - 1, -1, -1)        
         self.__fixing_chip_core_in_ptype(new_ptype_representation)
 
         chip_index_remapping_lookup_table = dict({})
@@ -141,7 +143,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
             
         # Update the solution
         # TODO: pull the `set_new_ptype_representation_solution` to abstract class
-        solution.set_new_ptype_representation_solution(new_ptype_representation)
+        solution.set_new_representation_solution(new_ptype_representation)
         return self
         
     def __fixing_chip_core_in_ptype(self, ptype_solution):
@@ -157,9 +159,9 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
         # 1. Make all illegal core index and chip index be -1
         slices_data_frame = pd.DataFrame(ptype_solution, columns = ["slice_neuron_index_from", "slice_neuron_index_to", "chip_id", "core_id"])
         slices_data_frame[slices_data_frame["core_id"] < 0] = -1
-        slices_data_frame[slices_data_frame["core_id"] > self.res_configuration.get_max_cores_per_chip()] = -1
+        slices_data_frame[slices_data_frame["core_id"] > self._resourcr_constraint_configuration.get_max_cores_per_chip()] = -1
         slices_data_frame[slices_data_frame["chip_id"] < 0] = -1
-        slices_data_frame[slices_data_frame["chip_id"] > self.res_configuration.get_max_chips()] = -1
+        slices_data_frame[slices_data_frame["chip_id"] > self._resourcr_constraint_configuration.get_max_chips()] = -1
 
 
         # 2. Make all slice's size can be fitted in a core.
@@ -172,18 +174,21 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
             # grouped_result: List[List[chip_core_identification: int, List[core_index, slice_infos: DataFrame]]]
         
         chip_core_records = \
-            [
-                [
-                    chip_index,
-                    [
-                        [core_index, chip_core_df] \
-                        for core_index, chip_core_df \
-                        in chip_df.groupby(lambda item: item[CORE_INDEX])
-                    ]
-                ].sort(key=lambda x: x[0])
+            sorted([
+
+                    
+                        [chip_index,
+                            sorted([
+                                [core_index, chip_core_df] \
+                                for core_index, chip_core_df \
+                                in chip_df.groupby('core_id')
+                            ], key=lambda x: x[0]) # sort each chip's records by core_index
+                        ]
+                    
+                
                     for chip_index, chip_df
-                    in slices_data_frame.groupby(lambda item: item[CHIP_INDEX])
-            ].sort(key=lambda x: x[0])
+                    in slices_data_frame.groupby('chip_id')
+            ], key=lambda x: x[0])
 
         # Built sdrams for all cores. Type: List[[chip_index: int, core_index: int, sdram: AbstractSDRAM, sdram_cost: int]]
         sdram_records = []
@@ -210,14 +215,13 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                         .calculate_sdram(None, slice_froms[i], slice_tos[i]))
 
         current_application_vertex_index = 0 
-        application_vertices = self._application_graph.vertices
+        application_vertices = list(self._application_graph.vertices)
         application_vertex_neurons_index_presum = [0] * len(application_vertices)
-        application_vertex_neurons_index_presum[0] = application_vertices[0].n_atoms()
+        application_vertex_neurons_index_presum[0] = application_vertices[0].n_atoms
+        
         for i in range(1, len(application_vertices)):
             application_vertex_neurons_index_presum[i] = \
-            application_vertex_neurons_index_presum[i - 1] + application_vertices[i].n_atoms()
-
-
+            application_vertex_neurons_index_presum[i - 1] + application_vertices[i].n_atoms
 
         def set_core_chip(slice_index, allocated_chip_index, allocated_core_index):
             ptype_solution[slice_index][GASliceSolutionRepresentation.CHIP_INDEX] = allocated_chip_index
@@ -248,7 +252,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                 slices_after_splitted = []
                 while slice_from <= slice_to:
                     target_slice_to = min(slice_from + self._max_slice_length[current_application_vertex_index] - 1, slice_to)
-                    slices_after_splitted.append[(slice_from, target_slice_to, slice_chip_index, slice_core_index)]
+                    slices_after_splitted.append([slice_from, target_slice_to, slice_chip_index, slice_core_index])
                 del ptype_solution[slice_index]
                 ptype_solution[slice_index:slice_index] = slices_after_splitted
                 continue
@@ -275,7 +279,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                         continue
                     left_slice_sdram = sdram_records[i][2]
                     left_slice_sdram_cost = sdram_records[i][3]
-                    if left_slice_sdram_cost + sdram.get_total_sdram(PacmanDataView.get_plan_n_timestep()) > self.res_configuration.get_max_sdram():
+                    if left_slice_sdram_cost + sdram.get_total_sdram(PacmanDataView.get_plan_n_timestep()) > self._resourcr_constraint_configuration.get_max_sdram():
                         break
                     left_slice_location_in_sram_record = i
                     left_slice_sdram.merge(sdram)
@@ -309,7 +313,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                         break
                     sdram_in_record = sdram_records[pos][2]
                     sdram_cost_in_record = sdram_records[pos][3]
-                    if sdram_cost_in_record + sdram_in_record.get_total_sdram(PacmanDataView.get_plan_n_timestep()) > self.res_configuration.get_max_sdram():
+                    if sdram_cost_in_record + sdram_in_record.get_total_sdram(PacmanDataView.get_plan_n_timestep()) > self._resourcr_constraint_configuration.get_max_sdram():
                         continue
                     sdram_in_record.merge(sdram)
                     allocated_chip_index = sdram_records[pos][0]
@@ -327,7 +331,7 @@ class GaSliceRepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing):
                 while pos < len(sdram_records):
                     sdram_in_record = sdram_records[pos][2]
                     sdram_cost_in_record = sdram_records[pos][3]
-                    if sdram_cost_in_record + sdram_in_record.get_total_sdram(PacmanDataView.get_plan_n_timestep()) > self.res_configuration.get_max_sdram():
+                    if sdram_cost_in_record + sdram_in_record.get_total_sdram(PacmanDataView.get_plan_n_timestep()) > self._resourcr_constraint_configuration.get_max_sdram():
                         pos += 1
                         continue
                     sdram_in_record.merge(sdram)

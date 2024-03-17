@@ -32,7 +32,7 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
                core_index = slices_core_indexes[slice_index]
                slice_index += 1
                previous_pos = slice_neuron_to + 1 
-               self._solution.append((slice_neuron_from, slice_neuron_to, chip_index, core_index))
+               self._solution.append([slice_neuron_from, slice_neuron_to, chip_index, core_index])
 
     def get_slice_neuron_from_in_solution(self, record_index):
         if self._use_ptype:

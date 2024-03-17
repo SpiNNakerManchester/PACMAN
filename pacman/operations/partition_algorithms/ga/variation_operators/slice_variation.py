@@ -32,13 +32,13 @@ class GaSliceVariationuUniformGaussian(AbstractGaVariation):
         return individual_rep
     
     def __ptype_variation(self, individual_rep, max_cores_per_chip, max_chips):
-        neuron_count = individual_rep[-1] + 1 # Slice are represented as closed interval of neurons
+        neuron_count = individual_rep[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] + 1 # Slice are represented as closed interval of neurons
         ptype_representation_length = len(individual_rep)
         last_slice_end = -1
         for i in range(0, ptype_representation_length):
-            slice_to_neuron_index = individual_rep[GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
-            chip_index = individual_rep[GASliceSolutionRepresentation.CHIP_INDEX]
-            core_index = individual_rep[GASliceSolutionRepresentation.CORE_INDEX]
+            slice_to_neuron_index = individual_rep[i][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
+            chip_index = individual_rep[i][GASliceSolutionRepresentation.CHIP_INDEX]
+            core_index = individual_rep[i][GASliceSolutionRepresentation.CORE_INDEX]
             is_variation_happen = (random.random() <= self._variation_happen_ratio)
 
             if is_variation_happen:
@@ -63,8 +63,9 @@ class GaSliceVariationuUniformGaussian(AbstractGaVariation):
                                     (int)(slice_to_neuron_index + random.gauss(self.get_mu(), self.get_sigma()))))
                 
                 # Update the current slice's ending.
-                individual_rep[GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] = variated_slice_to_neuron_index
+                individual_rep[i][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] = variated_slice_to_neuron_index
                 last_slice_end = variated_slice_to_neuron_index
+
                 # Update the next slice's beginning if the next slice exists, so that there is no vacancy between two slices.
                 if i != ptype_representation_length - 1:
                     individual_rep[i + 1][GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX] = variated_slice_to_neuron_index + 1
@@ -72,15 +73,15 @@ class GaSliceVariationuUniformGaussian(AbstractGaVariation):
                 # Variate the chip index
                 variated_chip_index = \
                     max(0, min(max_chips, (int)(chip_index + random.gauss(self.get_chip_index_variation_mu(), self.get_chip_index_variation_sigma()))))
-                individual_rep[GASliceSolutionRepresentation.CHIP_INDEX] = variated_chip_index
+                individual_rep[i][GASliceSolutionRepresentation.CHIP_INDEX] = variated_chip_index
 
                 # Variate the core index
                 variated_core_index = \
                     max(0, min(max_cores_per_chip, (int)(core_index + random.gauss(self.get_chip_index_variation_mu(), self.get_chip_index_variation_sigma()))))
-                individual_rep[GASliceSolutionRepresentation.CORE_INDEX] = variated_core_index
+                individual_rep[i][GASliceSolutionRepresentation.CORE_INDEX] = variated_core_index
                 
     def _ptype_variation(self, individual: GASliceSolutionRepresentation):
-        individual_rep = individual.get_gtype_solution_representation()
+        individual_rep = individual.get_ptype_solution_representation()
         max_cores_per_chip = individual.get_max_cores_per_chip()
         max_chips = individual.get_max_chips()
 
