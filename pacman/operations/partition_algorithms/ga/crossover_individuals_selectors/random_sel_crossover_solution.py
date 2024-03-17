@@ -21,10 +21,12 @@ class MinMaxNormalizationWeightInvidualSelection(AbstractGaCrossoverIndividualSe
     def _generate_selection_weights(self, costs):
         # currently, use min_max normalization to generate random selection weights.
         # performance maybe improved by using gaussian heatmap.
-        return (costs - min(costs)) / (max(costs) - min(costs))
+        if max(costs) == min(costs):
+            return [1.0 / (len(costs))] * len(costs)
+        return (np.array(costs) - min(costs)) / (max(costs) - min(costs))
     
     def __str__(self):
-        return "minmax_random_co_ind_sel"
+        return "minmax_random_ind_sel"
 
 class GaussianWeightInvidualSelection(AbstractGaCrossoverIndividualSelector):
     @overrides(AbstractGaCrossoverIndividualSelector._do_select_individuals)
@@ -47,4 +49,4 @@ class GaussianWeightInvidualSelection(AbstractGaCrossoverIndividualSelector):
         return ([1.0 / (len(costs))] * len(costs)) if s == 0 else (costs - mu) / s
 
     def __str__(self):
-        return "gaussian_z_random_co_ind_sel"
+        return "nor_gaussian_random_ind_sel"
