@@ -85,7 +85,7 @@ class GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore(AbstractGaInitialPopul
         return solutions
 
     def __str__(self):
-        return "init_fix_one_slice_one_core"
+        return "init_fix_osoc"
     
 class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPopulationGenerator):
     def __init__(self, fixed_slice_sizes: List[int], resource_constraint_configuration: ResourceConfiguration) -> None:
@@ -175,5 +175,5 @@ class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPop
         return solutions
 
     def __str__(self):
-        return "init_fix_multi_slice_one_core"
+        return "init_fix_slices_msoc"
     

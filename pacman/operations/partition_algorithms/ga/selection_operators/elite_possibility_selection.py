@@ -7,13 +7,13 @@ import random
 import numpy as np
 
 class GaElitePossibilitySelection(AbstractGaSelection):
-    def __init__(self, count_survival, count_top_k_remains:int) -> None:
+    def __init__(self, count_survivals, count_top_k_remains:int) -> None:
         super().__init__()
-        self._count_survival = count_survival
+        self._count_survivals = count_survivals
         self._top_k_remains = count_top_k_remains
 
     @overrides(AbstractGaSelection._select)
-    def _select(self, costs:List[float], solutions:List[AbstractGASolutionRepresentation], k_value_top_k_survival:int, count_survival:int) -> List[AbstractGASolutionRepresentation]:
+    def _select(self, costs:List[float], solutions:List[AbstractGASolutionRepresentation], k_value_top_k_survival:int, count_survivals:int) -> List[AbstractGASolutionRepresentation]:
         def normalize_fitness(costs):
             if(max(costs) == min(costs)):
                 return np.array(costs)
@@ -30,7 +30,7 @@ class GaElitePossibilitySelection(AbstractGaSelection):
         for solution_index in survive_solution_indexes:
             select_indexes.add(solution_index)
 
-        while len(select_indexes) < count_survival:
+        while len(select_indexes) < count_survivals:
             index = random.choices(indexes, weights=weights, k = 1)[0]
             if(index not in select_indexes):
                 select_indexes.add(index)
