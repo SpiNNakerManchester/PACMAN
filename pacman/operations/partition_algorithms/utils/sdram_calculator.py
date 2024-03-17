@@ -24,8 +24,6 @@ from spynnaker.pyNN.models.neuron.population_machine_common import (PopulationMa
 from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
 from pacman.data import PacmanDataView
 
-
-
 class SDRAMCalculator(object):
     def __init__(self, governed_app_vertex: ApplicationVertex) -> None:
         self._governed_app_vertex = governed_app_vertex
@@ -143,8 +141,7 @@ class SDRAMCalculator(object):
         """
         # pylint: disable=arguments-differ
         variable_sdram = self.__get_variable_sdram(n_atoms, vertex)
-        constant_sdram = self.__get_constant_sdram(n_atoms, all_syn_block_sz, 
-                                                   structural_sz, vertex)
+        constant_sdram = self.__get_constant_sdram(n_atoms, all_syn_block_sz, structural_sz, vertex)
         sdram = MultiRegionSDRAM()
         sdram.nest(len(PopulationMachineVertex.REGIONS) + 1, variable_sdram)
         sdram.merge(constant_sdram)
@@ -161,12 +158,15 @@ class SDRAMCalculator(object):
         sdram = self.get_sdram_used_by_atoms(slice_n_atoms, all_syn_block_sz, structural_sz, application_vertex)
         return sdram
     
-
     # binary search to find the max length of slice that can be stored on a SDRAM
     #   for an application_vertex.
-    def calculate_max_slice_length(self, application_vertex, total_neuron_count: int, max_sdram: int):
+    def calculate_max_slice_length_sdram_capable_store(self, application_vertex, max_slice_length_upper_limitation: int, max_sdram: int):
         left = 0
-        right = max_sdram if total_neuron_count < 0 else total_neuron_count
+        # the max_slice_length_upper_limitation indicates the max legal length of a single slice with considering other constrainsts beside sdram capacity. 
+        # It could be the total amount of neurons, as a single slice's length should not exceed the total count of neurons.
+        # when max_slice_length_upper_limitation < 0, the algorithm search max slice length that a single sdram
+        # is capable to store in [0, max_sdram]
+        right = max_sdram if max_slice_length_upper_limitation < 0 else max_slice_length_upper_limitation
         
         while left <= right:
             test_slice_length = (right - left) // 2 + left
@@ -177,5 +177,4 @@ class SDRAMCalculator(object):
                 left = test_slice_length + 1
                 continue
             right = test_slice_length - 1
-            
         return min(right, left) if left >= 0 else -1
