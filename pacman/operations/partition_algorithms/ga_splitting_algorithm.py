@@ -30,7 +30,7 @@ class GaAlgorithm(object):
         self.output_final_epoch_population = ga_configuration.output_final_epoch_population
         self.epochs = ga_configuration.epochs
         self.max_individuals_each_epoch = ga_configuration.max_individuals_each_epoch
-        self.remains_individuals = ga_configuration.remains_individuals
+        self.individual_survivals_each_epoch = ga_configuration.individual_survivals_each_epoch
         self.k_value_top_k_survival = ga_configuration.k_value_top_k_survival
         self.base_path_for_output = ga_configuration.base_path_for_output
         self.initial_solution_count = ga_configuration.initial_solution_count
@@ -95,7 +95,7 @@ class GaAlgorithm(object):
                 self._log("[In Epoch %d] Output solution of current epoch..." % epoch)
                 self._out_solutions_of_a_epoch_before_selection(epoch, solutions)
             self._log("[In Epoch %d] Selection Begin..." % epoch)
-            solutions = self.selection_strategy.select(costs, solutions, self.k_value_top_k_survival, self.remains_individuals)
+            solutions = self.selection_strategy.select(costs, solutions, self.k_value_top_k_survival, self.individual_survivals_each_epoch)
             self._log("[In Epoch %d] Cost after selection: %s" % (epoch, str(costs)))
 
         costs = self.solution_cost_calculation_strategy.calculate(solutions)

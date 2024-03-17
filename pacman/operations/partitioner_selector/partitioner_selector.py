@@ -41,7 +41,7 @@ class PartitionerSelector(object):
                     output_final_epoch_population=True,
                     epochs = 10, 
                     max_individuals_each_epoch = 20,
-                    remains_individuals = 10, 
+                    individual_survivals_each_epoch = 10, 
                     base_path_for_output = "./ga_algorithm_records/",
                     initial_solution_count = 10
             )
