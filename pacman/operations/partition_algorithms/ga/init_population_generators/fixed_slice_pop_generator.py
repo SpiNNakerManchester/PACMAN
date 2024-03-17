@@ -68,13 +68,11 @@ class GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore(AbstractGaInitialPopul
                 current_chip_remains_core -= 1
                 slice_index += 1
             neuron_index += neuron_count_prefix_sum[application_vertex_index]
-        return GASliceSolutionRepresentation(
-                                             data_for_build_solution=slices_end_points, 
+        return GASliceSolutionRepresentation(data_for_build_solution=slices_end_points, 
                                              slices_chip_indexes=slices_chip_indexes, 
                                              slices_core_indexes=slices_core_indexes, 
                                              max_cores_per_chip=max_cores_per_chip, max_chips=max_chips, 
-                                             use_ptype=True
-                                            )
+                                             use_ptype=True)
 
     @overrides(AbstractGaInitialPopulationGenerator.generate_initial_population)
     def generate_initial_population(self, population_size: int, application_graph: ApplicationGraph) -> List[CommonGASolutionRepresentation]:

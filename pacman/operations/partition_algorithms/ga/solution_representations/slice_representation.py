@@ -34,44 +34,44 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
                previous_pos = slice_neuron_to + 1 
                self._solution.append([slice_neuron_from, slice_neuron_to, chip_index, core_index])
 
-    def get_slice_neuron_from_in_solution(self, record_index):
+    def get_slice_neuron_from_in_slice_info(self, slice_info_index):
         if self._use_ptype:
-           return self._solution[record_index][self.SLICE_NEURON_FROM_INDEX]
+           return self._solution[slice_info_index][self.SLICE_NEURON_FROM_INDEX]
         raise NotImplementedError
     
-    def get_slice_neuron_to_in_solution(self, record_index):
+    def get_slice_neuron_to_index_in_slice_info(self, slice_info_index):
         if self._use_ptype:
-           return self._solution[record_index][self.SLICE_NEURON_TO_INDEX]
+           return self._solution[slice_info_index][self.SLICE_NEURON_TO_INDEX]
         raise NotImplementedError
 
-    def get_chip_index_in_solution(self, record_index):
+    def get_chip_index_in_slice_info(self, slice_info_index):
          if self._use_ptype:
-            return self._solution[record_index][self.CHIP_INDEX]
+            return self._solution[slice_info_index][self.CHIP_INDEX]
          raise NotImplementedError
 
-    def get_core_index_in_solution(self, record_index):
+    def get_core_index_in_slice_info(self, slice_info_index):
          if self._use_ptype:
-            return self._solution[record_index][self.CORE_INDEX]
+            return self._solution[slice_info_index][self.CORE_INDEX]
          raise NotImplementedError
 
-    def set_slice_neuron_from_in_solution(self, record_index, value):
+    def set_slice_neuron_from_in_slice_info(self, slice_info_index, value):
          if self._use_ptype:
-            self._solution[record_index][self.SLICE_NEURON_FROM_INDEX] = value
+            self._solution[slice_info_index][self.SLICE_NEURON_FROM_INDEX] = value
          raise NotImplementedError
 
-    def set_slice_neuron_to_in_solution(self, record_index, value):
+    def set_slice_neuron_to_in_slice_info(self, slice_info_index, value):
          if self._use_ptype:
-            self._solution[record_index][self.SLICE_NEURON_TO_INDEX] = value
+            self._solution[slice_info_index][self.SLICE_NEURON_TO_INDEX] = value
          raise NotImplementedError
 
-    def set_chip_index_in_solution(self, record_index, value):
+    def set_chip_index_in_slice_info(self, slice_info_index, value):
          if self._use_ptype:
-            self._solution[record_index][self.CHIP_INDEX] = value
+            self._solution[slice_info_index][self.CHIP_INDEX] = value
          raise NotImplementedError
 
-    def set_core_index_in_solution(self, record_index, value):
+    def set_core_index_in_slice_info(self, slice_info_index, value):
          if self._use_ptype:
-            self._solution[record_index][self.CORE_INDEX] = value
+            self._solution[slice_info_index][self.CORE_INDEX] = value
          raise NotImplementedError
 
     @overrides(AbstractGASolutionRepresentation._get_gtype_solution_representation)
@@ -126,7 +126,6 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         single_neuron_encoding_length = solution.get_single_neuron_encoding_length()
         bytearray_length = len(solution_in_bytes_representation)
         neuron_count = bytearray_length / single_neuron_encoding_length
-        pos = 0
         max_chips = solution.get_max_chips()
         max_cores_per_chip = solution.get_max_cores_per_chip()
         last_chip_index = -1
@@ -135,7 +134,6 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         self._max_chips = max_chips
         self._max_cores_per_chip = max_cores_per_chip
         self._single_neuron_encoding_length = solution.get_single_neuron_encoding_length()
-
         solution_in_bytes_representation.extend('1' * single_neuron_encoding_length)
         
         for neuron_index in range(0, neuron_count + 1):
