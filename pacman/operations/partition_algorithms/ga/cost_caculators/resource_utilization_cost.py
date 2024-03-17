@@ -4,8 +4,8 @@ from pacman.operations.partition_algorithms.ga.cost_caculators.abst_cost_calcula
 from spinn_utilities.overrides import overrides
 
 class ResourceUtilizationCost(AbstractGaCostCalculator):
-    @overrides(AbstractGaCostCalculator._calculate_single)
-    def _calculate_single(self, solution: AbstractGASolutionRepresentation) -> List[float]:
+    @overrides(AbstractGaCostCalculator._calculate_cost_for_single_individual)
+    def _calculate_cost_for_single_individual(self, solution: AbstractGASolutionRepresentation) -> List[float]:
         common_solution_representation = solution.to_common_representation()
         ptype_representation: List[int] = common_solution_representation.get_ptype_solution_representation()
         differ_cores = set(ptype_representation)

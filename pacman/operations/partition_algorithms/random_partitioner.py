@@ -1,20 +1,15 @@
 
-from typing import Optional
 from .abstract_partitioner import AbstractPartitioner
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.application import ApplicationGraph
 from .solution_adopter import SolutionAdopter
 import numpy as np
 import random
-from pacman.utilities.utility_objs.chip_counter import ChipCounter
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (AbstractSynapseDynamicsStructural)
 from pacman.operations.partition_algorithms.ga.entities.resource_configuration import ResourceConfiguration
 class RandomPartitioner(AbstractPartitioner):
     def __init__(self, max_slice_length = 100, resource_constraint_configuration: ResourceConfiguration = None):
         super().__init__(resource_constraint_configuration)
         self._max_slice_length = max_slice_length
 
-  
     def get_resource_constraint_configuration(self) -> ResourceConfiguration:
         return self._resource_constraint_configuration
     

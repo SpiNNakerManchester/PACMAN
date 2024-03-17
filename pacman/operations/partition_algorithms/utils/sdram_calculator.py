@@ -1,9 +1,5 @@
 from pacman.model.resources import AbstractSDRAM
-from pacman.model.graphs.application import ApplicationGraph
-from pacman.utilities.utility_objs.chip_counter import ChipCounter
-import numpy as np
 from pacman.model.graphs.application.application_vertex import ApplicationVertex
-from pacman.model.graphs.common import Slice, MDSlice 
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices

@@ -9,8 +9,8 @@ import numpy as np
 import random
 class ProfilingIsingModelCost(AbstractGaCostCalculator):
 
-    @override(AbstractGaCostCalculator._calculate_single)
-    def _calculate_single(self, solution: AbstractGASolutionRepresentation) -> List[float]:
+    @override(AbstractGaCostCalculator._calculate_cost_for_single_individual)
+    def _calculate_cost_for_single_individual(self, solution: AbstractGASolutionRepresentation) -> List[float]:
         common_solution_representation = solution.to_common_representation()
         ptype_solution_representation: List[int] = common_solution_representation.get_ptype_solution_representation()
         sampling_count = len(ptype_solution_representation) if self._sampling_count <= 0 else self._sampling_count

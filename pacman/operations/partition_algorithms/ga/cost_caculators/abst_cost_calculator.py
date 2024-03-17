@@ -5,15 +5,15 @@ class AbstractGaCostCalculator(object):
         costs = []
         if type(solutions) is list:
             for solution in solutions:
-                cost = self._calculate_single(solution)
+                cost = self._calculate_cost_for_single_individual(solution)
                 costs.append(cost)
         elif isinstance(solutions, AbstractGASolutionRepresentation):
-            costs.append(self._calculate_single(solution))
+            costs.append(self._calculate_cost_for_single_individual(solution))
         else:
             raise TypeError
         return costs
     
-    def _calculate_single(self, solution: AbstractGASolutionRepresentation):
+    def _calculate_cost_for_single_individual(self, solution: AbstractGASolutionRepresentation):
         raise NotImplementedError
     
     def __str__(self):
