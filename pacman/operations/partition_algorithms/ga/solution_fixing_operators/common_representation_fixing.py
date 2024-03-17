@@ -23,7 +23,6 @@ class CommonGARepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing)
         else:
             self._fixing_in_gtype_representation(solution)
 
-
     def _fixing_in_ptype_representation(self, solution: AbstractGASolutionRepresentation):
         slice_representation_solution: GASliceSolutionRepresentation = \
             GASliceSolutionRepresentation()
@@ -37,15 +36,14 @@ class CommonGARepresenationSolutionSimpleFillingFixing(AbstractGaSolutionFixing)
 
     def __init__(self, resource_configuration: ResourceConfiguration, application_graph: ApplicationGraph) -> None:
         super().__init__()
-        self.res_configuration = resource_configuration
+        self._resource_constraint_configuration = resource_configuration
         self._application_graph = application_graph
         # calculate max_slice_length
         self._max_slice_length = self._calculate_max_slice_lengths()
 
     def _calculate_max_slice_lengths(self) -> List[int]:
-        sdram_calculator = SDRAMCalculator()
 
-        return [_calculate_max_slice_length(application_vertex) for application_vertex in self._application_graph.vertices]
+        return [SDRAMCalculator(application_vertex).calculate_max_slice_length(application_vertex, self._resource_constraint_configuration.get_neruon_count(), self._resource_constraint_configuration.get_max_sdram()) for application_vertex in self._application_graph.vertices]
 
 
     def _fixing_in_gtype_representation(self, solution: AbstractGASolutionRepresentation):

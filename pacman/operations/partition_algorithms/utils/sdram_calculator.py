@@ -171,7 +171,7 @@ class SDRAMCalculator(object):
     #   for an application_vertex.
     def calculate_max_slice_length(self, application_vertex, total_neuron_count: int, max_sdram: int):
         left = 0
-        right = total_neuron_count - 1
+        right = total_neuron_count
         
         while left <= right:
             test_slice_length = (right - left) // 2 + left
@@ -179,8 +179,8 @@ class SDRAMCalculator(object):
             if sdram_size_needed == max_sdram:
                 return test_slice_length
             if sdram_size_needed < max_sdram:
-                left = sdram_size_needed + 1
+                left = test_slice_length + 1
                 continue
-            right = sdram_size_needed - 1
+            right = test_slice_length - 1
             
-        return left if left >= 0 and left <= right else -1
+        return min(right, left) if left >= 0 else -1

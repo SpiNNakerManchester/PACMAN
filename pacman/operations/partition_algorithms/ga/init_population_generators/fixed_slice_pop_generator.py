@@ -56,7 +56,7 @@ class GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore(AbstractGaInitialPopul
                 #   and the total count neurons from the first application vertex to current application vertex - 1 (include current application vertex).
                 slice_neuron_from = neuron_index + inner_application_vertx_neuron_index
                 slice_neuron_to = \
-                    min(min(slice_neuron_from + fixed_slice_size, total_neuron_count - 1), neuron_count_prefix_sum[application_vertex_index] - 1)
+                    min(min(slice_neuron_from + fixed_slice_size - 1, total_neuron_count - 1), neuron_count_prefix_sum[application_vertex_index] - 1)
                 slices_end_points.append(slice_neuron_to)
                 if current_chip_remains_core <= 0:
                     current_chip_index += 1
@@ -67,7 +67,7 @@ class GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore(AbstractGaInitialPopul
                 slices_core_indexes.append(self._max_core_per_chips - current_chip_remains_core)
                 current_chip_remains_core -= 1
                 slice_index += 1
-
+            neuron_index += neuron_count_prefix_sum[application_vertex_index]
         return GASliceSolutionRepresentation(
                                              data_for_build_solution=slices_end_points, 
                                              slices_chip_indexes=slices_chip_indexes, 
@@ -157,6 +157,8 @@ class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPop
                 slices_core_indexes.append(self._max_core_per_chips - cores_remain_in_current_chip)
                 cores_remain_in_current_chip -= 1
                 slice_index += 1
+            neuron_index += neuron_count_prefix_sum[application_vertex_index]
+
 
         return GASliceSolutionRepresentation(data_for_build_solution=slices_end_points, 
                                              slices_chip_indexes=slices_chip_indexes, 
