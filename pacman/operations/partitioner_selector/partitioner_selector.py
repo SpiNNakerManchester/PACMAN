@@ -10,7 +10,7 @@ from pacman.operations.partition_algorithms.ga.variation_operators.slice_variati
 from pacman.operations.partition_algorithms.ga.solution_representations.slice_representation import GASliceSolutionRepresentation
 from pacman.operations.partition_algorithms.ga.solution_fixing_operators.slice_representation_fixing import GaSliceRepresenationSolutionSimpleFillingFixing
 from pacman.operations.partition_algorithms.ga.cost_caculators.resource_utilization_cost import ResourceUtilizationCost
-from pacman.operations.partition_algorithms.ga.selection_operators.elite_possibility_selection import GaElitePossibilitySelection
+from pacman.operations.partition_algorithms.ga.selection_operators.elite_possibility_selection import GaEliteProbabilisticSelection
 from pacman.operations.partition_algorithms.ga.crossover_operators.slice_crossover import GaSliceSliceInfoCombinationUniformCrossover
 from pacman.data import PacmanDataView
 
@@ -35,7 +35,7 @@ class PartitionerSelector(object):
                     variation_strategy=GaSliceVariationuUniformGaussian(True, 0.05, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0), 
                     solution_fixing_strategy=GaSliceRepresenationSolutionSimpleFillingFixing(resource_constraint_configuration, PacmanDataView.get_graph()), 
                     solution_cost_calculation_strategy=ResourceUtilizationCost(),
-                    selection_strategy=GaElitePossibilitySelection(8, 3),
+                    selection_strategy=GaEliteProbabilisticSelection(8, 3),
                     log_processing=True,
                     output_population_all_epoch=True, 
                     output_final_epoch_population=True,

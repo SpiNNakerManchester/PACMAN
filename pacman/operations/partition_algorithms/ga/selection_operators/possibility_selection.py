@@ -6,7 +6,7 @@ from spinn_utilities.overrides import overrides
 import random
 import numpy as np
 
-class GaPossibilitySelection(AbstractGaSelection):
+class GaProbabilisticSelection(AbstractGaSelection):
     def __init__(self, count_survivals) -> None:
         super().__init__()
         self._count_survivals = count_survivals
