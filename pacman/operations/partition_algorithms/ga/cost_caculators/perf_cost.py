@@ -1,7 +1,6 @@
-from typing import List
+from typing import List, Tuple
 from pacman.operations.partition_algorithms.ga.solution_representations.abst_ga_solution_representation import AbstractGASolutionRepresentation
 from pacman.operations.partition_algorithms.ga.solution_representations.slice_representation import GASliceSolutionRepresentation
-
 from pacman.operations.partition_algorithms.ga.cost_caculators.abst_cost_calculator import AbstractGaCostCalculator
 from spinn_utilities.overrides import overrides
 from numpy.typing import NDArray
@@ -9,7 +8,7 @@ import numpy as np
 import random
 class ProfilingIsingModelCost(AbstractGaCostCalculator):
 
-    @override(AbstractGaCostCalculator._calculate_cost_for_single_individual)
+    @overrides(AbstractGaCostCalculator._calculate_cost_for_single_individual)
     def _calculate_cost_for_single_individual(self, solution: AbstractGASolutionRepresentation) -> List[float]:
         common_solution_representation = solution.to_common_representation()
         ptype_solution_representation: List[int] = common_solution_representation.get_ptype_solution_representation()
@@ -17,17 +16,17 @@ class ProfilingIsingModelCost(AbstractGaCostCalculator):
         cost = 0.0
         
 
-        def find_chip_core(neuron_index):
+        def find_chip_core(neuron_index) -> Tuple[int, int]:
             # binary search
             left = 0
-            right = len(ptype_solution_representation)
+            right = len(ptype_solution_representation) - 1
             while left <= right:
                 mid = (right - left) // 2 + left
                 current_target_slice = ptype_solution_representation[mid]
                 current_target_slice_neuron_index_from = current_target_slice[GASliceSolutionRepresentation.SLICE_NEURON_FROM_INDEX]
                 current_target_slice_neuron_index_to = current_target_slice[GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]
                 if neuron_index >= current_target_slice_neuron_index_from and neuron_index <= current_target_slice_neuron_index_to:
-                    return mid
+                    return (current_target_slice[GASliceSolutionRepresentation.CHIP_INDEX], current_target_slice[GASliceSolutionRepresentation.CORE_INDEX])
                 if neuron_index < current_target_slice_neuron_index_from:
                     right = mid - 1
                     continue
@@ -60,18 +59,16 @@ class ProfilingIsingModelCost(AbstractGaCostCalculator):
                     if (sample[i] == '1' and sample[j] == '0') or (sample[i] == '0' and sample[j] == '1'):
                         cost += self._cost_one_activation
                         continue
-                    chip_core_index_i = find_chip_core(i)
-                    chip_core_index_j = find_chip_core(j)
-                    if chip_core_index_i[0] == chip_core_index_i[0] and chip_core_index_i[1] == chip_core_index_i[1]:
+                    neuron_i_chip_id, neuron_i_core_id = find_chip_core(i)
+                    neuron_j_chip_id, neuron_j_core_id = find_chip_core(j)
+                    if neuron_i_chip_id == neuron_j_chip_id and neuron_i_core_id == neuron_j_core_id:
                         cost += self._cost_same_core
                         continue
-                    if chip_core_index_i[0] == chip_core_index_i[0]:
+                    if neuron_i_chip_id == neuron_i_core_id:
                         cost += self._cost_differnt_core_same_chip
                         continue
                     cost += self._cost_different_chip
-
             return p * cost
-
 
         def sampling_one(neuron_count) -> bytearray:
             sample = bytearray(neuron_count)
@@ -102,11 +99,9 @@ class ProfilingIsingModelCost(AbstractGaCostCalculator):
                     h_j = self._H[j]
                     sigma_i = 1 if sample[i] == '1' else -1
                     sigma_j = 1 if sample[j] == '1' else -1
-
                     interaction_factor += sigma_i * sigma_j * self._J[i, j]
             activation_factor *= self._mean_field
             hamiltonian = - interaction_factor - activation_factor
-
 
             return hamiltonian
 
@@ -115,7 +110,6 @@ class ProfilingIsingModelCost(AbstractGaCostCalculator):
         Z = calculate_Z()
         for _ in range(0, sampling_count):
             sample = sampling_one(len(ptype_solution_representation))
-            
             single_cost = calculate_single_cost(sample, ptype_solution_representation, Z)
             cost += single_cost
         cost /= sampling_count
@@ -134,13 +128,10 @@ class ProfilingIsingModelCost(AbstractGaCostCalculator):
         self._normalization_factor = normalization_factor
         self._beta = 1.0
         self._cost_no_activation = cost_no_activation
-        self._cost_one_activation = cost_no_activation
+        self._cost_one_activation = cost_one_activation
         self._cost_same_core = cost_same_core
         self._cost_differnt_core_same_chip = cost_differnt_core_same_chip
         self._cost_different_chip = cost_different_chip
-
-
-
         
     def __str__(self):
-        return "c1_cost"
+        return "perf_cost_ising"

@@ -8,8 +8,8 @@ class ResourceUtilizationCost(AbstractGaCostCalculator):
     def _calculate_cost_for_single_individual(self, solution: AbstractGASolutionRepresentation) -> List[float]:
         common_solution_representation = solution.to_common_representation()
         ptype_representation: List[int] = common_solution_representation.get_ptype_solution_representation()
-        differ_cores = set(ptype_representation)
-        return len(differ_cores)
+        different_core_ids = set(ptype_representation)
+        return len(different_core_ids)
 
     def __str__(self):
-        return "res_utilization_cost"
+        return "res_util_cost"
