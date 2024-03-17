@@ -16,7 +16,7 @@ class RandomPartitioner(AbstractPartitioner):
 
   
     def get_resource_constraint_configuration(self) -> ResourceConfiguration:
-        return self._
+        return self._resource_constraint_configuration
     
     @overrides(AbstractPartitioner._adapted_output)
     def _adapted_output(self):
@@ -29,7 +29,7 @@ class RandomPartitioner(AbstractPartitioner):
         N = int(np.sum(N_Ai))
         
         max_cores_per_chip = self.get_resource_constraint_configuration().get_max_cores_per_chip()
-        max_chips = N if self.get_resource_constraint_configuration().get_max_chips() <= 0 else self.get_resource_constraint_configuration().get_max_chips()
+        max_chips = N if self.get_resource_constraint_configuration().get_max_chips() <= 0 else self.get_resource_constraints_configuration().get_max_chips()
         chip_core_represent_total_length = int(np.ceil(np.log2(max_chips * max_cores_per_chip)))
         bytes_needed_for_encoding = N * chip_core_represent_total_length
         self.global_solution = bytearray(bytes_needed_for_encoding)
