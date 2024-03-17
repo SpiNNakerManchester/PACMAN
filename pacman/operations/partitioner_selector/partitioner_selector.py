@@ -27,7 +27,7 @@ class PartitionerSelector(object):
         if partitioner_name == "ga":
             ga_configuration: GAAlgorithmConfiguration = \
                 GAAlgorithmConfiguration(
-                    init_solutions_common_representation_generator=\
+                    init_solutions_generator=\
                         GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore([50, 100, 200, 300, 400, 500, 600, 700, 800, 900],resource_constraints_configuration),
                     solution_representation_strategy='slice',
                     crossover_individuals_selection_strategy=GaussianWeightInvidualSelection(),

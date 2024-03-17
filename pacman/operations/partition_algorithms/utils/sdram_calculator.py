@@ -34,7 +34,6 @@ class SDRAMCalculator(object):
     def __init__(self, governed_app_vertex: ApplicationVertex) -> None:
         self._governed_app_vertex = governed_app_vertex
 
-    
     def __get_local_only_constant_sdram(
             self, n_atoms: int) -> MultiRegionSDRAM:
         s_dynamics = cast(AbstractLocalOnly,
@@ -171,7 +170,7 @@ class SDRAMCalculator(object):
     #   for an application_vertex.
     def calculate_max_slice_length(self, application_vertex, total_neuron_count: int, max_sdram: int):
         left = 0
-        right = total_neuron_count
+        right = max_sdram if total_neuron_count < 0 else total_neuron_count
         
         while left <= right:
             test_slice_length = (right - left) // 2 + left

@@ -18,7 +18,7 @@ class GaLogger(object):
 
 class GaAlgorithm(object):
     def __init__(self, ga_configuration: GAAlgorithmConfiguration) -> None:
-        self.init_solutions_common_representation_generator = ga_configuration.init_solutions_common_representation_generator
+        self.init_solutions_generator = ga_configuration.init_solutions_generator
         self.solution_representation_strategy = ga_configuration.solution_representation_strategy
         self.crossover_individuals_selection_strategy = ga_configuration.crossover_individuals_selection_strategy
         self.crossover_perform_strategy = ga_configuration.crossover_perform_strategy
@@ -44,7 +44,7 @@ class GaAlgorithm(object):
 
     def _out_solutions_of_a_epoch_before_selection(self, epoch, solutions):
         filename = "[%s][%s][%s][%s][%s][%s][%s][%s]epoch-%d.npy" % \
-            (self.init_solutions_common_representation_generator,
+            (self.init_solutions_generator,
              self.solution_representation_strategy,
              self.crossover_individuals_selection_strategy,
              self.crossover_perform_strategy,
@@ -58,7 +58,7 @@ class GaAlgorithm(object):
         np.save("%s/%s" % (self.base_path_for_output, filename), data, allow_pickle=True)
     
     def do_GA_algorithm(self, application_graph: ApplicationGraph) -> AbstractGASolutionRepresentation:
-        init_solution = self.init_solutions_common_representation_generator.generate_initial_population(self.initial_solution_count, application_graph)
+        init_solution = self.init_solutions_generator.generate_initial_population(self.initial_solution_count, application_graph)
         solutions = init_solution # self.solution_representation_strategy.from_common_representation(init_solution)
         for epoch in range(0, self.epochs):
             self._log("begin epoch %d..." % epoch)

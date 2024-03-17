@@ -21,7 +21,7 @@ class GaSliceCrossoverKPoints(AbstractGaCrossover):
         individual1_rep = individual1.get_ptype_solution_representation()
         individual2_rep = individual2.get_ptype_solution_representation()
         # last element should be neuron_count - 1. Two solutions should cover the same count of neurons.
-        if(individual1_rep[-1] != individual2_rep[-1]):
+        if(individual1_rep[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX] != individual2_rep[-1][GASliceSolutionRepresentation.SLICE_NEURON_TO_INDEX]):
             raise ValueError
         individual1_length = len(individual1_rep)
         individual2_length = len(individual2_rep)

@@ -82,7 +82,7 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
         for i in range(0, len(solution)):
             for j in range(0, 4):
                 binary_string_len32 = ('{0:32b}').format(solution[i][j])
-                gtype_represent[(i * 4 + j) * 32: (i * 4 + j + 1) * 32] = binary_string_len32
+                gtype_represent[(i * 4 + j) * 32: (i * 4 + j + 1) * 32] = bytearray(binary_string_len32.encode('ascii'))
         return gtype_represent
     
     @overrides(AbstractGASolutionRepresentation._get_ptype_solution_representation)
@@ -116,7 +116,7 @@ class GASliceSolutionRepresentation(AbstractGASolutionRepresentation):
             binary_string = ('{0:' + str(single_neuron_encoding_length) + 'b}')\
                 .format(chip_core_represent) * slice_length
 
-            comm_solution[write_common_solution_from:write_common_solution_to] = binary_string
+            comm_solution[write_common_solution_from:write_common_solution_to] = bytearray(binary_string.encode('ascii'))
         return CommonGASolutionRepresentation(comm_solution, single_neuron_encoding_length, self._max_cores_per_chip, self._max_chips)
 
     @overrides(AbstractGASolutionRepresentation.from_common_representation)
