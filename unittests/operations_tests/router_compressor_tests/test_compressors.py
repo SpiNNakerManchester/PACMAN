@@ -31,6 +31,10 @@ from pacman.operations.router_compressors.ordered_covering_router_compressor \
 class TestCompressor(unittest.TestCase):
 
     def setUp(self):
+        unittest_setup()
+        set_config(
+            "Mapping", "router_table_compress_as_far_as_possible", True)
+        set_config("Machine", "version", 5)
         original_tables = MulticastRoutingTables()
         original_table = UnCompressedMulticastRoutingTable(x=0, y=0)
         original_table.add_multicast_routing_entry(
@@ -66,10 +70,6 @@ class TestCompressor(unittest.TestCase):
                 0b0010, 0b1011,
                 processor_ids=[4, 5], link_ids=[], defaultable=False))
         original_tables.add_routing_table(original_table)
-        unittest_setup()
-        set_config(
-            "Mapping", "router_table_compress_as_far_as_possible", True)
-        set_config("Machine", "version", 5)
         writer = PacmanDataWriter.mock()
         writer.set_uncompressed(original_tables)
         writer.set_precompressed(original_tables)
