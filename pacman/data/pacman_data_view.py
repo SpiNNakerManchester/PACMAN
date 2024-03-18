@@ -369,7 +369,7 @@ class PacmanDataView(MachineDataView):
         """
         Iterate over placements with this x and y.
 
-        :parami tuple(int, int) xy: x and y coordinates to find placements for.
+        :param tuple(int, int) xy: x and y coordinates to find placements for.
         :rtype: iterable(Placement)
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the placements are currently unavailable
