@@ -67,9 +67,10 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon[AV], Generic[AV, MV]):
         return [self.governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
-    def machine_vertices_for_recording(self, variable_to_record) -> List[MV]:
+    def machine_vertices_for_recording(
+            self, variable_to_record: str) -> List[MV]:
         return [self.governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.reset_called)
-    def reset_called(self):
+    def reset_called(self) -> None:
         pass

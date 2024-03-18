@@ -125,6 +125,7 @@ def place_application_graph(system_placements: Placements) -> Placements:
                 chips_attempted.clear()
 
     if get_config_bool("Reports", "draw_placements"):
+        # pylint: disable=import-outside-toplevel
         from .draw_placements import draw_placements as dp
         dp(placements, system_placements)
 
@@ -207,11 +208,12 @@ def _place_error(
             n_placed = placements.n_placements_on_chip(x, y)
             system_placed = system_placements.n_placements_on_chip(x, y)
             if n_placed - system_placed == 0:
-                n_procs = machine[x, y].n_user_processors
+                n_procs = machine[x, y].n_placable_processors
                 f.write(f"    {x}, {y} ({n_procs - system_placed}"
                         " free cores)\n")
 
     if get_config_bool("Reports", "draw_placements_on_error"):
+        # pylint: disable=import-outside-toplevel
         from .draw_placements import draw_placements as dp
         dp(placements, system_placements)
 
@@ -231,10 +233,12 @@ def _check_could_fit(
     """
     version = PacmanDataView.get_machine_version()
     max_sdram = (
-            version.max_sdram_per_chip - PacmanDataView.get_monitor_sdram())
+            version.max_sdram_per_chip -
+            PacmanDataView.get_all_monitor_sdram().get_total_sdram(
+                PacmanDataView.get_plan_n_timestep()))
     max_cores = (
-            version.max_cores_per_chip - version.n_non_user_cores -
-            PacmanDataView.get_monitor_cores())
+            version.max_cores_per_chip - version.n_scamp_cores -
+            PacmanDataView.get_all_monitor_cores())
     n_cores = len(vertices_to_place)
     if sdram <= max_sdram and n_cores <= max_cores:
         # should fit somewhere
@@ -253,7 +257,7 @@ def _check_could_fit(
     if n_cores > version.max_cores_per_chip:
         message += " is more vertices than the number of cores on a chip."
         raise PacmanTooBigToPlace(message)
-    user_cores = version.max_cores_per_chip - version.n_non_user_cores
+    user_cores = version.max_cores_per_chip - version.n_scamp_cores
     if n_cores > user_cores:
         message += (
             f"is more vertices than the user cores ({user_cores}) "
@@ -261,7 +265,7 @@ def _check_could_fit(
     else:
         message += (
             f"is more vertices than the {max_cores} cores available on a "
-            f"Chip once {PacmanDataView.get_monitor_cores()} "
+            f"Chip once {PacmanDataView.get_all_monitor_cores()} "
             "are reserved for monitors")
     raise PacmanTooBigToPlace(message)
 
@@ -296,8 +300,7 @@ def _do_fixed_location(
             f"Constrained to chip {x, y} but no such chip")
     on_chip = placements.placements_on_chip(x, y)
     cores_used = {p.p for p in on_chip}
-    cores = set(p.processor_id for p in chip.processors
-                if not p.is_monitor) - cores_used
+    cores = set(chip.placable_processors_ids) - cores_used
     next_cores = iter(cores)
     for vertex in vertices:
         next_core = None
@@ -477,6 +480,9 @@ class _Spaces(object):
         self.__saved_chips.update(chips)
 
     def restore_chips(self) -> None:
+        """
+        Moves all the saved chips form used to restored
+        """
         for chip in self.__saved_chips:
             self.__used_chips.remove(chip)
             self.__restored_chips.add(chip)
@@ -540,27 +546,59 @@ class _ChipWithSpace(object):
 
     def __init__(
             self, chip: Chip, used_processors: Set[int], used_sdram: int):
+        """
+
+        :param Chip chip:
+        :param set(int) used_processors:
+        :param int used_sdram:
+        """
         self.chip = chip
-        self.cores = set(p.processor_id for p in chip.processors
-                         if not p.is_monitor)
+        self.cores = set(chip.placable_processors_ids)
         self.cores -= used_processors
         self.sdram = chip.sdram - used_sdram
 
     @property
     def x(self) -> int:
+        """
+        The x value of the Chip passed in at init time
+
+        :rtype: int
+        """
         return self.chip.x
 
     @property
     def y(self) -> int:
+        """
+        The y value of the Chip passed in at init time
+
+        :rtype: int
+        """
         return self.chip.y
 
     def is_space(self, n_cores: int, sdram: int) -> bool:
+        """
+        CHecks if there is space based on both cores and sdram
+
+        :param int n_cores:
+        :param int sdram:
+        :rtype: bool
+        """
         return len(self.cores) >= n_cores and self.sdram >= sdram
 
     def use_sdram(self, sdram: int):
+        """
+        Reduces available sdram by this amount
+
+        :param int sdram:
+        """
         self.sdram -= sdram
 
     def use_next_core(self) -> int:
+        """
+        Pops a core value
+
+        :rtype: int
+        """
         core = next(iter(self.cores))
         self.cores.remove(core)
         return core

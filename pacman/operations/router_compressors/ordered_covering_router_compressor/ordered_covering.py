@@ -15,16 +15,22 @@ from __future__ import annotations
 from typing import (
     Collection, Dict, FrozenSet, Iterable, List, Mapping, Optional, Set, Tuple,
     Union, cast)
+
+
 from typing_extensions import TypeAlias
+
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.timer import Timer
+
 from pacman.exceptions import MinimisationFailedError
 from pacman.utilities.constants import FULL_MASK
 from pacman.model.routing_tables import UnCompressedMulticastRoutingTable
 from pacman.operations.router_compressors import (AbstractCompressor, RTEntry)
-from .utils import intersect, remove_default_routes
 from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.data.pacman_data_view import PacmanDataView
+
+from .utils import intersect, remove_default_routes
+
 #: A key,mask pair
 _KeyMask: TypeAlias = Tuple[int, int]
 #: A mapping from a key,mask pair to the things it aliases
@@ -33,6 +39,7 @@ _Aliases: TypeAlias = Dict[_KeyMask, FrozenSet[_KeyMask]]
 _ROAliases: TypeAlias = Mapping[_KeyMask, FrozenSet[_KeyMask]]
 #: Sequence of all bit positions in a 32-bit word
 _all_bits = tuple(1 << i for i in range(32))
+# pylint: disable=wrong-spelling-in-comment
 
 
 def ordered_covering_compressor() -> MulticastRoutingTables:
@@ -81,7 +88,7 @@ class _OrderedCoveringCompressor(AbstractCompressor):
             target_length = chip.router.n_available_multicast_entries
         # Convert into a list of entries
         routing_table = list(map(
-            RTEntry.from_MulticastRoutingEntry,
+            RTEntry.from_multicast_routing_entry,
             router_table.multicast_routing_entries))
         # Compress the router entries
         table, _ = ordered_covering(

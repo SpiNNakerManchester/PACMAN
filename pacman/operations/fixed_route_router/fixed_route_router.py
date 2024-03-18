@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Type
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import Chip, FixedRouteEntry
 from pacman.data import PacmanDataView
@@ -22,12 +22,12 @@ from pacman.exceptions import (
 
 
 def fixed_route_router(
-        destination_class) -> Dict[Tuple[int, int], FixedRouteEntry]:
+        destination_class: Type) -> Dict[Tuple[int, int], FixedRouteEntry]:
     """
     Runs the fixed route generator for all boards on machine.
 
     :param destination_class: the destination class to route packets to
-    :type destination_class: type or tuple(type,...)
+    :type destination_class: type
     :return: router tables for fixed route paths
     :rtype: dict((int, int)), ~spinn_machine.FixedRouteEntry)
     :raises PacmanConfigurationException: if no placement processor found
@@ -48,7 +48,12 @@ class _FixedRouteRouter(object):
         "_destination_class", "_fixed_route_tables",
         "_machine")
 
-    def __init__(self, destination_class):
+    def __init__(self, destination_class: Type):
+        """
+
+        :param destination_class: the destination class to route packets to
+        :type destination_class: type
+        """
         self._machine = PacmanDataView.get_machine()
         self._destination_class = destination_class
         self._fixed_route_tables: Dict[Tuple[int, int], FixedRouteEntry] = \
@@ -95,7 +100,7 @@ class _FixedRouteRouter(object):
             for x, y in to_route:
                 # Check links starting with the most direct to 0,0
                 for link_id in [4, 3, 5, 2, 0, 1]:
-                    # Get protential destination
+                    # Get potential destination
                     destination = self._machine.xy_over_link(x, y, link_id)
                     # If it is useful
                     if destination in routed:
@@ -114,7 +119,7 @@ class _FixedRouteRouter(object):
             routed |= found
 
         # create final fixed route entry
-        # locate where to put data on ethernet chip
+        # locate where to put data on Ethernet chip
         processor_id = self.__locate_destination(ethernet_chip)
         # build entry and add to tables
         self.__add_fixed_route_entry((eth_x, eth_y), [], [processor_id])

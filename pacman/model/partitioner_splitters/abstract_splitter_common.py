@@ -189,7 +189,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def reset_called(self):
+    def reset_called(self) -> None:
         """
         Reset the splitter to be as if it has not operated a splitting yet.
         """

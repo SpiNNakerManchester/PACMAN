@@ -18,8 +18,10 @@ A simple bit of support code for validation.
 
 import os
 import json
-import jsonschema
 from typing import Union
+
+import jsonschema
+
 from spinn_utilities.typing.json import JsonArray, JsonObject, JsonObjectArray
 
 

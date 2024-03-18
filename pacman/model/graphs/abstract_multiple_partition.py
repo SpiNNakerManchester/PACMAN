@@ -55,7 +55,7 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
     @overrides(AbstractEdgePartition.add_edge)
     def add_edge(self, edge: E):
         # safety checks
-        if edge.pre_vertex not in self._pre_vertices.keys():
+        if edge.pre_vertex not in self._pre_vertices:
             raise PacmanValueError(
                 f"The edge {edge} is not allowed in this outgoing partition")
 

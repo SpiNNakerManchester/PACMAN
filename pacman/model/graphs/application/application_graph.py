@@ -14,12 +14,14 @@
 from __future__ import annotations
 from collections import defaultdict
 from typing import Dict, Iterable, Optional, Sequence, cast
-from .application_edge import ApplicationEdge
-from .application_vertex import ApplicationVertex
-from .application_edge_partition import ApplicationEdgePartition
+
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
+
+from .application_edge import ApplicationEdge
+from .application_edge_partition import ApplicationEdgePartition
+from .application_vertex import ApplicationVertex
 
 
 class ApplicationGraph(object):
@@ -67,7 +69,7 @@ class ApplicationGraph(object):
             if self._vertex_by_label[vertex.label] == vertex:
                 raise PacmanAlreadyExistsException("vertex", vertex.label)
             vertex.set_label(vertex.label + self._label_postfix())
-        vertex.setAddedToGraph()
+        vertex.set_added_to_graph()
         self._vertex_by_label[cast(str, vertex.label)] = vertex
 
     @property
@@ -80,6 +82,12 @@ class ApplicationGraph(object):
         return self._vertex_by_label.values()
 
     def vertex_by_label(self, label: str) -> ApplicationVertex:
+        """
+        Looks up a vertex in the graph based on the label
+
+        :param str label:
+        :rtype: ApplicationVertex
+        """
         return self._vertex_by_label[label]
 
     @property

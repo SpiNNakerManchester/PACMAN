@@ -13,13 +13,16 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-import numpy
 from typing import (
     Collection, Generic, Optional, Tuple, TypeVar, Union, cast, TYPE_CHECKING)
+
+import numpy
 from typing_extensions import Self
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.log import FormatAdapter
+
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.model.graphs import AbstractVertex
@@ -41,7 +44,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
     """
 
     __slots__ = (
-        # List of machine verts associated with this app vertex
+        # List of machine vertices associated with this app vertex
         "_machine_vertices",
 
         # The splitter object associated with this app vertex

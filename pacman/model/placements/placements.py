@@ -14,12 +14,15 @@
 
 from collections import defaultdict
 from typing import Dict, Iterable, Iterator
+
 from spinn_utilities.typing.coords import XY
+
 from pacman.exceptions import (
     PacmanAlreadyPlacedError, PacmanNotPlacedError,
     PacmanProcessorAlreadyOccupiedError, PacmanProcessorNotOccupiedError)
-from .placement import Placement
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
+
+from .placement import Placement
 
 
 class Placements(object):

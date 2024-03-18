@@ -21,7 +21,7 @@ class ChipAndCore(object):
     """
 
     __slots__ = (
-        # the chip coords in the SpiNNaker machine to which the machine
+        # the chip coordinates in the SpiNNaker machine to which the machine
         # vertex is placed
         "_x", "_y",
         # The processor ID on chip (x,y) that this vertex is placed on within
