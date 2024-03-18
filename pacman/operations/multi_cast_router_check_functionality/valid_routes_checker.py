@@ -147,9 +147,9 @@ def _search_route(
         when the trace completes and there are still destinations not visited
     """
     logger.info(f"{source_placement=}")
-    # if logger.isEnabledFor(logging.DEBUG):
-    for dest in dest_placements:
-        logger.info("[{}:{}:{}]", dest.x, dest.y, dest.p)
+    if logger.isEnabledFor(logging.INFO):
+        for dest in dest_placements:
+            logger.info("[{}:{}:{}]", dest.x, dest.y, dest.p)
 
     located_destinations: Set[PlacementTuple] = set()
 
