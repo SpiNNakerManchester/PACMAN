@@ -147,7 +147,7 @@ def _search_route(
         when the trace completes and there are still destinations not visited
     """
     logger.info(f"{source_placement=}")
-    #if logger.isEnabledFor(logging.DEBUG):
+    # if logger.isEnabledFor(logging.DEBUG):
     for dest in dest_placements:
         logger.info("[{}:{}:{}]", dest.x, dest.y, dest.p)
 
@@ -208,8 +208,8 @@ def _search_route(
     # raise error if required
     if error_message != "":
         raise PacmanRoutingException(error_message)
-    logger.info("successful test between {} and {}",
-                 source_placement.vertex.label, dest_placements)
+    logger.info(f"successful test between {source_placement.vertex.label} "
+                f"and {dest_placements}")
 
 
 def _start_trace_via_routing_tables(
