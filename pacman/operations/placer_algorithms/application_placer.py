@@ -179,13 +179,13 @@ def _place_error(
                 f"{PacmanDataView.get_n_vertices()} application vertices.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
                 " last app vertex\n\n")
-        for xy in placements.chips_with_placements:
+        for x, y in placements.chips_with_placements:
             first = True
-            for placement in placements.placements_on_chip(xy):
+            for placement in placements.placements_on_chip(x, y):
                 if system_placements.is_vertex_placed(placement.vertex):
                     continue
                 if first:
-                    f.write(f"Chip ({xy}):\n")
+                    f.write(f"Chip ({x}, {y}):\n")
                     first = False
                 f.write(f"    Processor {placement.p}:"
                         f" Vertex {placement.vertex}\n")
@@ -210,12 +210,12 @@ def _place_error(
         f.write("\n")
         f.write("Unused chips:\n")
         machine = PacmanDataView.get_machine()
-        for xy in machine.chip_coordinates:
-            n_placed = placements.n_placements_on_chip(xy)
-            system_placed = system_placements.n_placements_on_chip(xy)
+        for x, y in machine.chip_coordinates:
+            n_placed = placements.n_placements_on_chip(x, y)
+            system_placed = system_placements.n_placements_on_chip(x, y)
             if n_placed - system_placed == 0:
-                n_procs = machine[xy].n_placable_processors
-                f.write(f"    {xy} ({n_procs - system_placed}"
+                n_procs = machine[x, y].n_placable_processors
+                f.write(f"    {x}, {y} ({n_procs - system_placed}"
                         " free cores)\n")
 
     if get_config_bool("Reports", "draw_placements_on_error"):
@@ -304,7 +304,7 @@ def _do_fixed_location(
     if chip is None:
         raise PacmanConfigurationException(
             f"Constrained to chip {x, y} but no such chip")
-    on_chip = placements.placements_on_chip(chip)
+    on_chip = placements.placements_on_chip(x, y)
     cores_used = {p.p for p in on_chip}
     cores = set(chip.placable_processors_ids) - cores_used
     next_cores = iter(cores)
@@ -386,6 +386,8 @@ class _Spaces(object):
 
     def __cores_and_sdram(self, chip: Chip) -> Tuple[Set[int], int]:
         """
+        Gets the core ids and the plan sdram of the placements for this Chip
+
         :param Chip chip:
         :return cores, sdram
         :rtype: tuple(int, int)
@@ -421,6 +423,10 @@ class _Spaces(object):
 
     def __get_next_chip(self) -> Chip:
         """
+        Gets the next Chip from either restored or if none the Machine
+
+        Ignores any Chip in the used set
+
         :rtype: Chip
         :raises: StopIteration
         """
