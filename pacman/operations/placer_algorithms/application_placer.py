@@ -208,7 +208,7 @@ def _place_error(
             n_placed = placements.n_placements_on_chip(x, y)
             system_placed = system_placements.n_placements_on_chip(x, y)
             if n_placed - system_placed == 0:
-                n_procs = machine[x, y].n_user_processors
+                n_procs = machine[x, y].n_placable_processors
                 f.write(f"    {x}, {y} ({n_procs - system_placed}"
                         " free cores)\n")
 
@@ -237,7 +237,7 @@ def _check_could_fit(
             PacmanDataView.get_all_monitor_sdram().get_total_sdram(
                 PacmanDataView.get_plan_n_timestep()))
     max_cores = (
-            version.max_cores_per_chip - version.n_non_user_cores -
+            version.max_cores_per_chip - version.n_scamp_cores -
             PacmanDataView.get_all_monitor_cores())
     n_cores = len(vertices_to_place)
     if sdram <= max_sdram and n_cores <= max_cores:
@@ -257,7 +257,7 @@ def _check_could_fit(
     if n_cores > version.max_cores_per_chip:
         message += " is more vertices than the number of cores on a chip."
         raise PacmanTooBigToPlace(message)
-    user_cores = version.max_cores_per_chip - version.n_non_user_cores
+    user_cores = version.max_cores_per_chip - version.n_scamp_cores
     if n_cores > user_cores:
         message += (
             f"is more vertices than the user cores ({user_cores}) "
@@ -300,7 +300,7 @@ def _do_fixed_location(
             f"Constrained to chip {x, y} but no such chip")
     on_chip = placements.placements_on_chip(x, y)
     cores_used = {p.p for p in on_chip}
-    cores = set(chip.user_processors_ids) - cores_used
+    cores = set(chip.placable_processors_ids) - cores_used
     next_cores = iter(cores)
     for vertex in vertices:
         next_core = None
@@ -554,7 +554,7 @@ class _ChipWithSpace(object):
         :param int used_sdram:
         """
         self.chip = chip
-        self.cores = set(chip.user_processors_ids)
+        self.cores = set(chip.placable_processors_ids)
         self.cores -= used_processors
         self.sdram = chip.sdram - used_sdram
 
