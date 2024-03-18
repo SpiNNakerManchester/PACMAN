@@ -173,13 +173,13 @@ def _place_error(
                 f"{PacmanDataView.get_n_vertices()} application vertices.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
                 " last app vertex\n\n")
-        for x, y in placements.chips_with_placements:
+        for xy in placements.chips_with_placements:
             first = True
-            for placement in placements.placements_on_chip(x, y):
+            for placement in placements.placements_on_chip(xy):
                 if system_placements.is_vertex_placed(placement.vertex):
                     continue
                 if first:
-                    f.write(f"Chip ({x}, {y}):\n")
+                    f.write(f"Chip ({xy}):\n")
                     first = False
                 f.write(f"    Processor {placement.p}:"
                         f" Vertex {placement.vertex}\n")
@@ -204,12 +204,12 @@ def _place_error(
         f.write("\n")
         f.write("Unused chips:\n")
         machine = PacmanDataView.get_machine()
-        for x, y in machine.chip_coordinates:
-            n_placed = placements.n_placements_on_chip(x, y)
-            system_placed = system_placements.n_placements_on_chip(x, y)
+        for xy in machine.chip_coordinates:
+            n_placed = placements.n_placements_on_chip(xy)
+            system_placed = system_placements.n_placements_on_chip(xy)
             if n_placed - system_placed == 0:
-                n_procs = machine[x, y].n_placable_processors
-                f.write(f"    {x}, {y} ({n_procs - system_placed}"
+                n_procs = machine[xy].n_placable_processors
+                f.write(f"    {xy} ({n_procs - system_placed}"
                         " free cores)\n")
 
     if get_config_bool("Reports", "draw_placements_on_error"):
@@ -298,7 +298,7 @@ def _do_fixed_location(
     if chip is None:
         raise PacmanConfigurationException(
             f"Constrained to chip {x, y} but no such chip")
-    on_chip = placements.placements_on_chip(x, y)
+    on_chip = placements.placements_on_chip(chip)
     cores_used = {p.p for p in on_chip}
     cores = set(chip.placable_processors_ids) - cores_used
     next_cores = iter(cores)
@@ -385,7 +385,7 @@ class _Spaces(object):
         :return cores, sdram
         :rtype: tuple(int, int)
         """
-        on_chip = self.__placements.placements_on_chip(chip.x, chip.y)
+        on_chip = self.__placements.placements_on_chip(chip)
         cores_used = {p.p for p in on_chip}
         sdram_used = sum(
             p.vertex.sdram_required.get_total_sdram(
