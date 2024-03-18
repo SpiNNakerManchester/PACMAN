@@ -43,7 +43,7 @@ class ChipCounter(object):
     def __init__(self):
         version = PacmanDataView.get_machine_version()
         self.__n_cores_per_chip = (
-                version.max_cores_per_chip - version.n_non_user_cores -
+                version.max_cores_per_chip - version.n_scamp_cores -
                 PacmanDataView.get_all_monitor_cores())
         self.__sdram_per_chip = (
                 version.max_sdram_per_chip -
