@@ -55,74 +55,13 @@ def place_application_graph(system_placements: Placements) -> Placements:
     # Go through the application graph by application vertex
     progress = ProgressBar(
         PacmanDataView.get_n_vertices(), "Placing Vertices")
-    for app_vertex in progress.over(PacmanDataView.iterate_vertices()):
-        spaces.restore_chips()
-
-        # Try placements from the next chip, but try again if fails
-        placed = False
-        while not placed:
-            chips_attempted = list()
-            try:
-                same_chip_groups = app_vertex.splitter.get_same_chip_groups()
-                if not same_chip_groups:
-                    placed = True
-                    break
-
-                # Start a new space
-                try:
-                    next_chip_space, space = spaces.get_next_chip_and_space()
-                except PacmanPlaceException as e:
-                    raise _place_error(
-                        placements, system_placements, e,
-                        plan_n_timesteps) from e
-                logger.debug(f"Starting placement from {next_chip_space}")
-
-                placements_to_make: List = list()
-
-                # Go through the groups
-                last_chip_space: Optional[_ChipWithSpace] = None
-                for vertices, sdram in same_chip_groups:
-                    vertices_to_place = [
-                        vertex
-                        for vertex in vertices
-                        # No need to place virtual vertices
-                        if not isinstance(vertex, AbstractVirtual)
-                        and not placements.is_vertex_placed(vertex)]
-                    actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
-                    n_cores = len(vertices_to_place)
-
-                    # If this group has a fixed location, place it there
-                    if _do_fixed_location(vertices_to_place, actual_sdram,
-                                          placements, next_chip_space):
-                        continue
-
-                    # Try to find a chip with space; this might result in a
-                    # _SpaceExceededException
-                    while not next_chip_space.is_space(n_cores, actual_sdram):
-                        next_chip_space = spaces.get_next_chip_space(
-                            space, last_chip_space)
-                        last_chip_space = None
-
-                    # If this worked, store placements to be made
-                    last_chip_space = next_chip_space
-                    chips_attempted.append(next_chip_space.chip)
-                    _store_on_chip(
-                        placements_to_make, vertices_to_place, actual_sdram,
-                        next_chip_space)
-
-                # Now make the placements having confirmed all can be done
-                placements.add_placements(placements_to_make)
-                placed = True
-                logger.debug(f"Used {chips_attempted}")
-            except _SpaceExceededException:
-                # This might happen while exploring a space; this may not be
-                # fatal since the last space might have just been bound by
-                # existing placements, and there might be bigger spaces out
-                # there to use
-                _check_could_fit(app_vertex, vertices_to_place, actual_sdram)
-                logger.debug(f"Failed, saving {chips_attempted}")
-                spaces.save_chips(chips_attempted)
-                chips_attempted.clear()
+    try:
+        for app_vertex in progress.over(PacmanDataView.iterate_vertices()):
+            _place_vertex(app_vertex, spaces, plan_n_timesteps, placements)
+    except PacmanPlaceException as e:
+        raise _place_error(
+            placements, system_placements, e,
+            plan_n_timesteps) from e
 
     if get_config_bool("Reports", "draw_placements"):
         # pylint: disable=import-outside-toplevel
@@ -130,6 +69,73 @@ def place_application_graph(system_placements: Placements) -> Placements:
         dp(placements, system_placements)
 
     return placements
+
+
+def _place_vertex(
+        app_vertex: ApplicationVertex, spaces: _Spaces,
+        plan_n_timesteps: Optional[int], placements: Placements):
+    spaces.restore_chips()
+
+    same_chip_groups = app_vertex.splitter.get_same_chip_groups()
+    if not same_chip_groups:
+        # This vertex does not require placement or delegates
+        return
+
+    # Try placements from the next chip, but try again if fails
+    placed = False
+    while not placed:
+        chips_attempted = list()
+        try:
+            # Start a new space
+            next_chip_space, space = spaces.get_next_chip_and_space()
+            logger.debug(f"Starting placement from {next_chip_space}")
+
+            placements_to_make: List = list()
+
+            # Go through the groups
+            last_chip_space: Optional[_ChipWithSpace] = None
+            for vertices, sdram in same_chip_groups:
+                vertices_to_place = [
+                    vertex
+                    for vertex in vertices
+                    # No need to place virtual vertices
+                    if not isinstance(vertex, AbstractVirtual)
+                    and not placements.is_vertex_placed(vertex)]
+                actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
+                n_cores = len(vertices_to_place)
+
+                # If this group has a fixed location, place it there
+                if _do_fixed_location(vertices_to_place, actual_sdram,
+                                      placements, next_chip_space):
+                    continue
+
+                # Try to find a chip with space; this might result in a
+                # _SpaceExceededException
+                while not next_chip_space.is_space(n_cores, actual_sdram):
+                    next_chip_space = spaces.get_next_chip_space(
+                        space, last_chip_space)
+                    last_chip_space = None
+
+                # If this worked, store placements to be made
+                last_chip_space = next_chip_space
+                chips_attempted.append(next_chip_space.chip)
+                _store_on_chip(
+                    placements_to_make, vertices_to_place, actual_sdram,
+                    next_chip_space)
+
+            # Now make the placements having confirmed all can be done
+            placements.add_placements(placements_to_make)
+            placed = True
+            logger.debug(f"Used {chips_attempted}")
+        except _SpaceExceededException:
+            # This might happen while exploring a space; this may not be
+            # fatal since the last space might have just been bound by
+            # existing placements, and there might be bigger spaces out
+            # there to use
+            _check_could_fit(app_vertex, vertices_to_place, actual_sdram)
+            logger.debug(f"Failed, saving {chips_attempted}")
+            spaces.save_chips(chips_attempted)
+            chips_attempted.clear()
 
 
 def _place_error(
@@ -362,9 +368,8 @@ class _Spaces(object):
         self.__saved_chips: OrderedSet[Chip] = OrderedSet()
         self.__restored_chips: OrderedSet[Chip] = OrderedSet()
 
-    def __chip_order(self):
+    def __chip_order(self) -> Iterable[Chip]:
         """
-        :param Machine machine:
         :rtype: iterable(Chip)
         """
         s_x, s_y = get_config_str("Mapping", "placer_start_chip").split(",")
