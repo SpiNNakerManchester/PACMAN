@@ -49,7 +49,6 @@ def place_application_graph(system_placements: Placements) -> Placements:
     # Track the placements and space
     placements = Placements(system_placements)
 
-    plan_n_timesteps = PacmanDataView.get_plan_n_timestep()
     # Go through the application graph by application vertex
     progress = ProgressBar(
         PacmanDataView.get_n_vertices() * 2, "Placing Vertices")
@@ -57,8 +56,9 @@ def place_application_graph(system_placements: Placements) -> Placements:
         for app_vertex in progress.over(
                 PacmanDataView.iterate_vertices(), finish_at_end=False):
             if app_vertex.has_fixed_location():
-                _place_fixed_vertex(
-                    app_vertex, plan_n_timesteps, placements)
+                _place_fixed_vertex(app_vertex, placements)
+
+        plan_n_timesteps = PacmanDataView.get_plan_n_timestep()
         spaces = _Spaces(placements, plan_n_timesteps)
         for app_vertex in progress.over(PacmanDataView.iterate_vertices()):
             # as this checks if placed already not need to check if fixed
@@ -281,8 +281,7 @@ class _SpaceExceededException(Exception):
 
 
 def _place_fixed_vertex(
-        app_vertex: ApplicationVertex,
-        plan_n_timesteps: Optional[int], placements: Placements):
+        app_vertex: ApplicationVertex, placements: Placements):
     same_chip_groups = app_vertex.splitter.get_same_chip_groups()
     if not same_chip_groups:
         raise NotImplementedError("Unexpected mix of Fixed and no groups")
@@ -294,18 +293,14 @@ def _place_fixed_vertex(
             if not isinstance(vertex, AbstractVirtual)
             and not placements.is_vertex_placed(vertex)]
 
-        actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
-
-        _do_fixed_location(vertices_to_place, actual_sdram, placements)
+        _do_fixed_location(vertices_to_place, placements)
 
 
 def _do_fixed_location(
-        vertices: list[MachineVertex], sdram: int, placements: Placements):
+        vertices: list[MachineVertex], placements: Placements):
     """
     :param list(MachineVertex) vertices:
-    :param int sdram:
     :param Placements placements:
-    :param _ChipWithSpace next_chip_space:
     :rtype: bool
     :raise PacmanConfigurationException:
     """
