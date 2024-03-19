@@ -286,7 +286,7 @@ def _place_fixed_vertex(
     if not same_chip_groups:
         raise NotImplementedError("Unexpected mix of Fixed and no groups")
 
-    for vertices, sdram in same_chip_groups:
+    for vertices, _ in same_chip_groups:
         vertices_to_place = [
             vertex for vertex in vertices
             # No need to place virtual vertices
