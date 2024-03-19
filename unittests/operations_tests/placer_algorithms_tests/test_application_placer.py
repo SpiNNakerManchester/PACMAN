@@ -124,11 +124,7 @@ def test_application_placer_late_fixed():
     fixed.splitter.create_machine_vertices(ChipCounter())
 
     writer.set_machine(virtual_machine(24, 12))
-    try:
-        place_application_graph(Placements())
-    except PacmanConfigurationException:
-        raise unittest.SkipTest(
-            "https://github.com/SpiNNakerManchester/PACMAN/issues/444")
+    place_application_graph(Placements())
 
 
 def test_sdram_bigger_than_chip():

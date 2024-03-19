@@ -50,13 +50,18 @@ def place_application_graph(system_placements: Placements) -> Placements:
     placements = Placements(system_placements)
 
     plan_n_timesteps = PacmanDataView.get_plan_n_timestep()
-    spaces = _Spaces(placements, plan_n_timesteps)
-
     # Go through the application graph by application vertex
     progress = ProgressBar(
-        PacmanDataView.get_n_vertices(), "Placing Vertices")
+        PacmanDataView.get_n_vertices() * 2, "Placing Vertices")
     try:
+        for app_vertex in progress.over(
+                PacmanDataView.iterate_vertices(), finish_at_end=False):
+            if app_vertex.has_fixed_location():
+                _place_fixed_vertex(
+                    app_vertex, plan_n_timesteps, placements)
+        spaces = _Spaces(placements, plan_n_timesteps)
         for app_vertex in progress.over(PacmanDataView.iterate_vertices()):
+            # as this checks if placed already not need to check if fixed
             _place_vertex(app_vertex, spaces, plan_n_timesteps, placements)
     except PacmanPlaceException as e:
         raise _place_error(
@@ -103,11 +108,6 @@ def _place_vertex(
                     and not placements.is_vertex_placed(vertex)]
                 actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
                 n_cores = len(vertices_to_place)
-
-                # If this group has a fixed location, place it there
-                if _do_fixed_location(vertices_to_place, actual_sdram,
-                                      placements, next_chip_space):
-                    continue
 
                 # Try to find a chip with space; this might result in a
                 # _SpaceExceededException
@@ -280,9 +280,27 @@ class _SpaceExceededException(Exception):
     pass
 
 
+def _place_fixed_vertex(
+        app_vertex: ApplicationVertex,
+        plan_n_timesteps: Optional[int], placements: Placements):
+    same_chip_groups = app_vertex.splitter.get_same_chip_groups()
+    if not same_chip_groups:
+        raise NotImplementedError("Unexpected mix of Fixed and no groups")
+
+    for vertices, sdram in same_chip_groups:
+        vertices_to_place = [vertex
+            for vertex in vertices
+            # No need to place virtual vertices
+            if not isinstance(vertex, AbstractVirtual)
+            and not placements.is_vertex_placed(vertex)]
+
+        actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
+
+        _do_fixed_location(vertices_to_place, actual_sdram, placements)
+
+
 def _do_fixed_location(
-        vertices: list[MachineVertex], sdram: int, placements: Placements,
-        next_chip_space: _ChipWithSpace) -> bool:
+        vertices: list[MachineVertex], sdram: int, placements: Placements):
     """
     :param list(MachineVertex) vertices:
     :param int sdram:
@@ -297,27 +315,31 @@ def _do_fixed_location(
             x, y = loc.x, loc.y
             break
     else:
-        return False
+        raise NotImplementedError(
+            "Mixing fixed location and not fixed location groups "
+            "within one vertex")
 
-    machine = PacmanDataView.get_machine()
-    chip = machine.get_chip_at(x, y)
+    chip = PacmanDataView.get_chip_at(x, y)
     if chip is None:
         raise PacmanConfigurationException(
             f"Constrained to chip {x, y} but no such chip")
-    on_chip = placements.placements_on_chip(x, y)
+    on_chip = placements.placements_on_chip(chip)
     cores_used = {p.p for p in on_chip}
     cores = set(chip.placable_processors_ids) - cores_used
     next_cores = iter(cores)
+    # first do the ones with a fixed p
     for vertex in vertices:
-        next_core = None
         fixed = vertex.get_fixed_location()
         if fixed and fixed.p is not None:
             if fixed.p not in next_cores:
                 raise PacmanConfigurationException(
                     f"Core {fixed.p} on {x}, {y} not available to "
                     f"place {vertex} on")
-            next_core = fixed.p
-        else:
+            placements.add_placement(Placement(vertex, x, y, fixed.p))
+    # Then do the ones without a fixed p
+    for vertex in vertices:
+        fixed = vertex.get_fixed_location()
+        if not fixed or fixed.p is None:
             try:
                 next_core = next(next_cores)
             except StopIteration:
@@ -325,10 +347,6 @@ def _do_fixed_location(
                 raise PacmanConfigurationException(
                     f"No more cores available on {x}, {y}: {on_chip}")
         placements.add_placement(Placement(vertex, x, y, next_core))
-        if next_chip_space.x == x and next_chip_space.y == y:
-            next_chip_space.cores.remove(next_core)
-            next_chip_space.use_sdram(sdram)
-    return True
 
 
 def _store_on_chip(

@@ -440,3 +440,19 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             cum_size *= atoms_shape[n]
 
         return global_index.astype(numpy.uint32)
+
+    def has_fixed_location(self):
+        """
+        Check if this vertex or any machine vertex has a fixed location.
+
+        :rtype: bool
+        :returns: True if the Application Vertex or any one of its
+        Machine Vertices has a fixed location
+        False if None of the Vertices has a none None fixed location
+        """
+        if self.get_fixed_location() is not None:
+            return True
+        for vertex in self._machine_vertices:
+            if vertex.get_fixed_location() is not None:
+                return True
+        return False
