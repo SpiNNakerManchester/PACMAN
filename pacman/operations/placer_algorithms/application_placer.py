@@ -92,7 +92,8 @@ def _place_vertex(
         chips_attempted = list()
         try:
             # Start a new space
-            next_chip_space, space = spaces.get_next_chip_and_space()
+            next_chip_space, space = spaces.get_next_chip()
+            space = _Space(next_chip_space)
             logger.debug(f"Starting placement from {next_chip_space}")
 
             placements_to_make: List = list()
@@ -396,9 +397,9 @@ class _Spaces(object):
                 self.__plan_n_timesteps) for p in on_chip)
         return cores_used, sdram_used
 
-    def get_next_chip_and_space(self) -> Tuple[_ChipWithSpace, _Space]:
+    def get_next_chip(self) -> _ChipWithSpace:
         """
-        :rtype: (_ChipWithSpace, _Space)
+        :rtype: _ChipWithSpace
         """
         try:
             if self.__last_chip_space is None:
@@ -408,10 +409,7 @@ class _Spaces(object):
                     chip, cores_used, sdram_used)
                 self.__used_chips.add(chip)
 
-            # Start a new space by finding all the chips that can be reached
-            # from the start chip but have not been used
-            return (self.__last_chip_space,
-                    _Space(self.__last_chip_space.chip))
+            return self.__last_chip_space
 
         except StopIteration:
             raise PacmanPlaceException(  # pylint: disable=raise-missing-from
