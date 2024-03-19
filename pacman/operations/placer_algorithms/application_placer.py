@@ -92,8 +92,8 @@ def _place_vertex(
         chips_attempted = list()
         try:
             # Start a new space
-            next_chip_space, space = spaces.get_next_chip()
-            space = _Space(next_chip_space)
+            next_chip_space = spaces.get_next_chip()
+            space = _Space(next_chip_space.chip)
             logger.debug(f"Starting placement from {next_chip_space}")
 
             placements_to_make: List = list()
