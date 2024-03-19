@@ -343,7 +343,7 @@ def _do_fixed_location(
         fixed = vertex.get_fixed_location()
         if not fixed or fixed.p is None:
             try:
-                next_core = next(next_cores)
+                placements.add_placement(Placement(vertex, x, y, next(next_cores)))
             except StopIteration:
                 # pylint: disable=raise-missing-from
                 raise PacmanConfigurationException(
