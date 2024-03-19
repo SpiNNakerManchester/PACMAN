@@ -86,55 +86,63 @@ def _place_vertex(
         # This vertex does not require placement or delegates
         return
 
-    # Try placements from the next chip, but try again if fails
-    placed = False
-    while not placed:
-        try:
-            # Start a new space
-            next_chip_space = spaces.get_next_chip()
-            space = _Space(next_chip_space.chip)
-            logger.debug(f"Starting placement from {next_chip_space}")
+    while True:
+        placements_to_make = _prepare_placements(
+            spaces, placements, plan_n_timesteps, same_chip_groups, app_vertex)
+        if placements_to_make is not None:
+            break
+    
+    # Now make the placements having confirmed all can be done
+    placements.add_placements(placements_to_make)
+    logger.debug(f"Used {spaces.chips_saved()}")
+    spaces.clear_saved()
 
-            placements_to_make: List = list()
 
-            # Go through the groups
-            last_chip_space: Optional[_ChipWithSpace] = None
-            for vertices, sdram in same_chip_groups:
-                vertices_to_place = [
-                    vertex
-                    for vertex in vertices
-                    # No need to place virtual vertices
-                    if not isinstance(vertex, AbstractVirtual)
-                    and not placements.is_vertex_placed(vertex)]
-                actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
-                n_cores = len(vertices_to_place)
+def _prepare_placements(
+        spaces, placements, plan_n_timesteps, same_chip_groups, app_vertex):
+    try:
+        # Start a new space
+        next_chip_space = spaces.get_next_chip()
+        space = _Space(next_chip_space.chip)
+        logger.debug(f"Starting placement from {next_chip_space}")
 
-                # Try to find a chip with space; this might result in a
-                # _SpaceExceededException
-                while not next_chip_space.is_space(n_cores, actual_sdram):
-                    next_chip_space = spaces.get_next_chip_space(
-                        space, last_chip_space)
-                    last_chip_space = None
+        placements_to_make: List = list()
 
-                # If this worked, store placements to be made
-                last_chip_space = next_chip_space
-                spaces.save_chip(next_chip_space.chip)
-                _store_on_chip(
-                    placements_to_make, vertices_to_place, actual_sdram,
-                    next_chip_space)
+        # Go through the groups
+        last_chip_space: Optional[_ChipWithSpace] = None
+        for vertices, sdram in same_chip_groups:
+            vertices_to_place = [
+                vertex
+                for vertex in vertices
+                # No need to place virtual vertices
+                if not isinstance(vertex, AbstractVirtual)
+                and not placements.is_vertex_placed(vertex)]
+            actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
+            n_cores = len(vertices_to_place)
 
-            # Now make the placements having confirmed all can be done
-            placements.add_placements(placements_to_make)
-            placed = True
-            logger.debug(f"Used {spaces.chips_saved()}")
-            spaces.clear_saved()
-        except _SpaceExceededException:
-            # This might happen while exploring a space; this may not be
-            # fatal since the last space might have just been bound by
-            # existing placements, and there might be bigger spaces out
-            # there to use
-            _check_could_fit(app_vertex, vertices_to_place, actual_sdram)
-            logger.debug(f"Failed, saving {spaces.chips_saved()}")
+            # Try to find a chip with space; this might result in a
+            # _SpaceExceededException
+            while not next_chip_space.is_space(n_cores, actual_sdram):
+                next_chip_space = spaces.get_next_chip_space(
+                    space, last_chip_space)
+                last_chip_space = None
+
+            # If this worked, store placements to be made
+            last_chip_space = next_chip_space
+            spaces.save_chip(next_chip_space.chip)
+            _store_on_chip(
+                placements_to_make, vertices_to_place, actual_sdram,
+                next_chip_space)
+        return placements_to_make
+
+    except _SpaceExceededException:
+        # This might happen while exploring a space; this may not be
+        # fatal since the last space might have just been bound by
+        # existing placements, and there might be bigger spaces out
+        # there to use
+        _check_could_fit(app_vertex, vertices_to_place, actual_sdram)
+        logger.debug(f"Failed, saving {spaces.chips_saved()}")
+        return None
 
 
 def _place_error(
@@ -340,7 +348,6 @@ def _do_fixed_location(
                 # pylint: disable=raise-missing-from
                 raise PacmanConfigurationException(
                     f"No more cores available on {x}, {y}: {on_chip}")
-        placements.add_placement(Placement(vertex, x, y, next_core))
 
 
 def _store_on_chip(
