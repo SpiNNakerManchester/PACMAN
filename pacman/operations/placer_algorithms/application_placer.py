@@ -179,13 +179,13 @@ def _place_error(
                 f"{PacmanDataView.get_n_vertices()} application vertices.\n")
         f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
                 " last app vertex\n\n")
-        for x, y in placements.chips_with_placements:
+        for xy in placements.chips_with_placements:
             first = True
-            for placement in placements.placements_on_chip(x, y):
+            for placement in placements.placements_on_chip(xy):
                 if system_placements.is_vertex_placed(placement.vertex):
                     continue
                 if first:
-                    f.write(f"Chip ({x}, {y}):\n")
+                    f.write(f"Chip ({xy}):\n")
                     first = False
                 f.write(f"    Processor {placement.p}:"
                         f" Vertex {placement.vertex}\n")
@@ -210,12 +210,12 @@ def _place_error(
         f.write("\n")
         f.write("Unused chips:\n")
         machine = PacmanDataView.get_machine()
-        for x, y in machine.chip_coordinates:
-            n_placed = placements.n_placements_on_chip(x, y)
-            system_placed = system_placements.n_placements_on_chip(x, y)
+        for xy in machine.chip_coordinates:
+            n_placed = placements.n_placements_on_chip(xy)
+            system_placed = system_placements.n_placements_on_chip(xy)
             if n_placed - system_placed == 0:
-                n_procs = machine[x, y].n_placable_processors
-                f.write(f"    {x}, {y} ({n_procs - system_placed}"
+                n_procs = machine[xy].n_placable_processors
+                f.write(f"    {xy} ({n_procs - system_placed}"
                         " free cores)\n")
 
     if get_config_bool("Reports", "draw_placements_on_error"):
@@ -374,28 +374,12 @@ class _Spaces(object):
         self.__machine = PacmanDataView.get_machine()
         self.__placements = placements
         self.__plan_n_timesteps = plan_n_timesteps
-        self.__chips = iter(self.__chip_order())
+        self.__chips = self.__machine.chips
         self.__next_chip = next(self.__chips)
         self.__used_chips: Set[Chip] = set()
         self.__last_chip_space: Optional[_ChipWithSpace] = None
         self.__saved_chips: OrderedSet[Chip] = OrderedSet()
         self.__restored_chips: OrderedSet[Chip] = OrderedSet()
-
-    def __chip_order(self) -> Iterable[Chip]:
-        """
-        :rtype: iterable(Chip)
-        """
-        s_x, s_y = get_config_str("Mapping", "placer_start_chip").split(",")
-        s_x = int(s_x)
-        s_y = int(s_y)
-
-        for x in range(self.__machine.width):
-            for y in range(self.__machine.height):
-                c_x = (x + s_x) % self.__machine.width
-                c_y = (y + s_y) % self.__machine.height
-                chip = self.__machine.get_chip_at(c_x, c_y)
-                if chip:
-                    yield chip
 
     def __cores_and_sdram(self, chip: Chip) -> Tuple[Set[int], int]:
         """
