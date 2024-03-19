@@ -292,7 +292,7 @@ def _place_fixed_vertex(
             vertex for vertex in vertices
             # No need to place virtual vertices
             if not isinstance(vertex, AbstractVirtual)
-               and not placements.is_vertex_placed(vertex)]
+            and not placements.is_vertex_placed(vertex)]
 
         actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
 
