@@ -448,7 +448,7 @@ class _Spaces(object):
             space.update(self.__usable_from_chip(last_chip))
 
         # If no space, error
-        if not space:
+        if not space.has_next():
             self.__last_chip_space = None
             raise _SpaceExceededException(
                 "No more chips to place on in this space; "
@@ -471,8 +471,10 @@ class _Spaces(object):
 
     def __usable_from_chip(self, chip: Chip) -> Iterable[Chip]:
         """
+        Get the unused Chips linked to from this Chip
+
         :param Chip chip:
-        :rtype set(Chip)
+        :rtype iterable(Chip)
         """
         for link in chip.router.links:
             target = self.__machine[link.destination_x, link.destination_y]
@@ -505,8 +507,9 @@ class _Space(object):
         self.__same_board_chips: OrderedSet[Chip] = OrderedSet()
         self.__remaining_chips: OrderedSet[Chip] = OrderedSet()
 
-    def __len__(self) -> int:
-        return len(self.__same_board_chips) + len(self.__remaining_chips)
+    def has_next(self):
+        return (len(self.__same_board_chips) > 0 or
+                len(self.__remaining_chips) > 0)
 
     def __on_same_board(self, chip: Chip) -> bool:
         return (chip.nearest_ethernet_x == self.__board_x and
