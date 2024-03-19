@@ -89,7 +89,6 @@ def _place_vertex(
     # Try placements from the next chip, but try again if fails
     placed = False
     while not placed:
-        chips_attempted = list()
         try:
             # Start a new space
             next_chip_space = spaces.get_next_chip()
@@ -119,7 +118,7 @@ def _place_vertex(
 
                 # If this worked, store placements to be made
                 last_chip_space = next_chip_space
-                chips_attempted.append(next_chip_space.chip)
+                spaces.save_chip(next_chip_space.chip)
                 _store_on_chip(
                     placements_to_make, vertices_to_place, actual_sdram,
                     next_chip_space)
@@ -127,16 +126,15 @@ def _place_vertex(
             # Now make the placements having confirmed all can be done
             placements.add_placements(placements_to_make)
             placed = True
-            logger.debug(f"Used {chips_attempted}")
+            logger.debug(f"Used {spaces.chips_saved()}")
+            spaces.clear_saved()
         except _SpaceExceededException:
             # This might happen while exploring a space; this may not be
             # fatal since the last space might have just been bound by
             # existing placements, and there might be bigger spaces out
             # there to use
             _check_could_fit(app_vertex, vertices_to_place, actual_sdram)
-            logger.debug(f"Failed, saving {chips_attempted}")
-            spaces.save_chips(chips_attempted)
-            chips_attempted.clear()
+            logger.debug(f"Failed, saving {spaces.chips_saved()}")
 
 
 def _place_error(
@@ -481,11 +479,20 @@ class _Spaces(object):
             if target not in self.__used_chips:
                 yield target
 
-    def save_chips(self, chips: Iterable[Chip]):
+    def save_chip(self, chip: Chip):
         """
-        :param iterable(Chip) chips:
+        Marks a Chip as to be used by the current Vertex
+        :param Chip chip:
         """
-        self.__saved_chips.update(chips)
+        self.__saved_chips.add(chip)
+
+    def chips_saved(self):
+        """
+        The chips saved but not yet permanently used
+
+        :rtype:int
+        """
+        return self.__saved_chips
 
     def restore_chips(self) -> None:
         """
@@ -494,6 +501,12 @@ class _Spaces(object):
         for chip in self.__saved_chips:
             self.__used_chips.remove(chip)
             self.__restored_chips.add(chip)
+        self.__saved_chips.clear()
+
+    def clear_saved(self) -> None:
+        """
+        Clears the saved Chip which makes the permanently used
+        """
         self.__saved_chips.clear()
 
 
