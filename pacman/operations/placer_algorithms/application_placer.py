@@ -16,7 +16,7 @@ import logging
 import os
 from typing import Iterable, List, Optional, Set, Tuple
 
-from spinn_utilities.config_holder import get_config_bool, get_config_str
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
