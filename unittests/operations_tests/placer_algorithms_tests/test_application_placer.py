@@ -11,13 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import unittest
-
 from spinn_utilities.config_holder import set_config
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.data.pacman_data_writer import PacmanDataWriter
-from pacman.exceptions import (
-    PacmanConfigurationException, PacmanTooBigToPlace)
+from pacman.exceptions import PacmanTooBigToPlace
 from pacman.model.partitioner_splitters import (
     SplitterFixedLegacy, AbstractSplitterCommon)
 from pacman.operations.placer_algorithms.application_placer import (
