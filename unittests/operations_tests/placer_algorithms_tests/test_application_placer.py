@@ -14,7 +14,8 @@
 from spinn_utilities.config_holder import set_config
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.data.pacman_data_writer import PacmanDataWriter
-from pacman.exceptions import PacmanTooBigToPlace
+from pacman.exceptions import (
+    PacmanConfigurationException, PacmanPlaceException, PacmanTooBigToPlace)
 from pacman.model.partitioner_splitters import (
     SplitterFixedLegacy, AbstractSplitterCommon)
 from pacman.operations.placer_algorithms.application_placer import (
@@ -104,6 +105,59 @@ def test_application_placer():
     for i in range(56):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
     writer.set_machine(virtual_machine(24, 12))
+    place_application_graph(Placements())
+
+
+def test_application_placer_large_groups():
+    unittest_setup()
+    set_config("Machine", "version", 5)
+    writer = PacmanDataWriter.mock()
+    # fixed early works as this vertex is looked at first
+    fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
+    fixed.splitter = SplitterFixedLegacy()
+    fixed.set_fixed_location(0, 0)
+    writer.add_vertex(fixed)
+    fixed.splitter.create_machine_vertices(ChipCounter())
+    for i in range(17):
+        _make_vertices(writer, 1000, 14, 17, f"app_vertex_{i}")
+    writer.set_machine(virtual_machine(24, 12))
+    place_application_graph(Placements())
+
+
+def test_application_placer_too_few_boards():
+    unittest_setup()
+    set_config("Machine", "version", 5)
+    writer = PacmanDataWriter.mock()
+    # fixed early works as this vertex is looked at first
+    fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
+    fixed.splitter = SplitterFixedLegacy()
+    fixed.set_fixed_location(0, 0)
+    writer.add_vertex(fixed)
+    fixed.splitter.create_machine_vertices(ChipCounter())
+    for i in range(56):
+        _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
+    writer.set_machine(virtual_machine(12, 12))
+    try:
+        place_application_graph(Placements())
+        raise AssertionError("Error not raise")
+    except PacmanPlaceException as ex:
+        assert ("No more chips to place" in str(ex))
+
+
+def test_application_placer_restart_needed():
+    unittest_setup()
+    set_config("Machine", "version", 5)
+    writer = PacmanDataWriter.mock()
+    for (x, y) in [(1, 0), (1, 1), (0, 1)]:
+        fixed = SimpleTestVertex(15, f"FIXED {x}:{y}", max_atoms_per_core=1)
+        fixed.splitter = SplitterFixedLegacy()
+        fixed.set_fixed_location(x, y)
+        writer.add_vertex(fixed)
+        fixed.splitter.create_machine_vertices(ChipCounter())
+    for i in range(56):
+        _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
+    # Don't use a full wrap machine
+    writer.set_machine(virtual_machine(28, 16))
     place_application_graph(Placements())
 
 
