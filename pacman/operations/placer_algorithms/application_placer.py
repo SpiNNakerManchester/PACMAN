@@ -14,11 +14,10 @@
 from __future__ import annotations
 import logging
 import os
-from typing import Iterable, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 
 from spinn_machine import Chip
@@ -365,7 +364,8 @@ class _Spaces(object):
     __slots__ = ("__machine", "__chips", "__next_chip", "__used_chips",
                  "__system_placements", "__placements", "__plan_n_timesteps",
                  "__last_chip_space", "__saved_chips", "__restored_chips",
-                 "__space")
+                 "__ethernet_x", "__ethernet_y", "__same_board_chips",
+                 "__other_board_chips")
 
     def __init__(
             self, placements: Placements, plan_n_timesteps: Optional[int]):
@@ -380,9 +380,14 @@ class _Spaces(object):
         self.__next_chip = next(self.__chips)
         self.__used_chips: Set[Chip] = set()
         self.__last_chip_space: Optional[_ChipWithSpace] = None
-        self.__saved_chips: OrderedSet[Chip] = OrderedSet()
-        self.__restored_chips: OrderedSet[Chip] = OrderedSet()
-        self.__space = _Space(self.__next_chip)
+        self.__saved_chips: List[Chip] = list()
+        self.__restored_chips: List[Chip] = list()
+
+        # Set some value so no Optional needed
+        self.__ethernet_x = self.__next_chip.nearest_ethernet_x
+        self.__ethernet_y = self.__next_chip.nearest_ethernet_y
+        self.__same_board_chips: Dict[Chip, Chip] = dict()
+        self.__other_board_chips:  Dict[Chip, Chip] = dict()
 
     def __chip_order(self):
         """
@@ -424,7 +429,12 @@ class _Spaces(object):
                     chip, cores_used, sdram_used)
                 self.__used_chips.add(chip)
 
-            self.__space = _Space(self.__last_chip_space.chip)
+            chip = self.__last_chip_space.chip
+            # reset the neighbour chip info
+            self.__ethernet_x = chip.nearest_ethernet_x
+            self.__ethernet_y = chip.nearest_ethernet_y
+            self.__same_board_chips.clear()
+            self.__other_board_chips.clear()
             return self.__last_chip_space
 
         except StopIteration:
@@ -442,7 +452,7 @@ class _Spaces(object):
         :raises: StopIteration
         """
         while self.__restored_chips:
-            chip = self.__restored_chips.pop(last=False)
+            chip = self.__restored_chips.pop[0]
             if chip not in self.__used_chips:
                 return chip
         while self.__next_chip in self.__used_chips:
@@ -463,18 +473,19 @@ class _Spaces(object):
         # If we are reporting a used chip, update with reachable chips
         if last_chip_space is not None:
             last_chip = last_chip_space.chip
-            self.__space.update(self.__usable_from_chip(last_chip))
+            self.__add_neighbours(last_chip)
 
         # If no space, error
-        if not self.__space.has_next():
+        if not self.__has_neighbour():
             self.__last_chip_space = None
             logger.debug("No more chips to place on in this space; "
                          "{} of {} used",
                          self.n_chips_used, self.__machine.n_chips)
             return None
-        chip = self.__space.pop()
+        chip = self.__pop_neighbour()
         self.__used_chips.add(chip)
-        self.__restored_chips.discard(chip)
+        if chip in self.__restored_chips:
+            self.__restored_chips.remove(chip)
         cores_used, sdram_used = self.__cores_and_sdram(chip)
         self.__last_chip_space = _ChipWithSpace(chip, cores_used, sdram_used)
         return self.__last_chip_space
@@ -488,30 +499,53 @@ class _Spaces(object):
         """
         return len(self.__used_chips)
 
-    def __usable_from_chip(self, chip: Chip) -> Iterable[Chip]:
-        """
-        Get the unused Chips linked to from this Chip
-
-        :param Chip chip:
-        :rtype iterable(Chip)
-        """
+    def __add_neighbours(self, chip: Chip):
         for link in chip.router.links:
             target = self.__machine[link.destination_x, link.destination_y]
             if target not in self.__used_chips:
-                yield target
+                if (target.nearest_ethernet_x == self.__ethernet_x and
+                        target.nearest_ethernet_y == self.__ethernet_y):
+                    self.__same_board_chips[target] = target
+                else:
+                    self.__other_board_chips[target] = target
+
+    def __has_neighbour(self):
+        return (len(self.__same_board_chips) > 0 or
+                len(self.__other_board_chips) > 0)
+
+    def __pop_neighbour(self):
+        if self.__same_board_chips:
+            k = next(iter(self.__same_board_chips))
+            del self.__same_board_chips[k]
+            return k
+        if self.__other_board_chips:
+            next_chip = next(iter(self.__other_board_chips))
+            del self.__other_board_chips[next_chip]
+            self.__ethernet_x = next_chip.nearest_ethernet_x
+            self.__ethernet_y = next_chip.nearest_ethernet_y
+            to_check = list(self.__other_board_chips)
+            self.__other_board_chips.clear()
+            for chip in to_check:
+                if (chip.nearest_ethernet_x == self.__ethernet_x and
+                        chip.nearest_ethernet_y == self.__ethernet_y):
+                    self.__same_board_chips[chip] = chip
+                else:
+                    self.__other_board_chips[chip] = chip
+            return next_chip
+        raise StopIteration
 
     def save_chip(self, chip: Chip):
         """
         Marks a Chip as to be used by the current Vertex
         :param Chip chip:
         """
-        self.__saved_chips.add(chip)
+        self.__saved_chips.append(chip)
 
-    def chips_saved(self):
+    def chips_saved(self) -> List[Chip]:
         """
         The chips saved but not yet permanently used
 
-        :rtype:int
+        :rtype:list(Chip)
         """
         return self.__saved_chips
 
@@ -521,7 +555,7 @@ class _Spaces(object):
         """
         for chip in self.__saved_chips:
             self.__used_chips.remove(chip)
-            self.__restored_chips.add(chip)
+            self.__restored_chips.append(chip)
         self.__saved_chips.clear()
 
     def clear_saved(self) -> None:
@@ -529,56 +563,6 @@ class _Spaces(object):
         Clears the saved Chip which makes the permanently used
         """
         self.__saved_chips.clear()
-
-
-class _Space(object):
-    __slots__ = ("__same_board_chips", "__remaining_chips",
-                 "__board_x", "__board_y", "__first_chip")
-
-    def __init__(self, chip: Chip):
-        self.__board_x = chip.nearest_ethernet_x
-        self.__board_y = chip.nearest_ethernet_y
-        self.__same_board_chips: OrderedSet[Chip] = OrderedSet()
-        self.__remaining_chips: OrderedSet[Chip] = OrderedSet()
-
-    def has_next(self):
-        return (len(self.__same_board_chips) > 0 or
-                len(self.__remaining_chips) > 0)
-
-    def __on_same_board(self, chip: Chip) -> bool:
-        return (chip.nearest_ethernet_x == self.__board_x and
-                chip.nearest_ethernet_y == self.__board_y)
-
-    def pop(self) -> Chip:
-        """
-        :rtype: Chip
-        :raise: StopIteration
-        """
-        if self.__same_board_chips:
-            return self.__same_board_chips.pop(last=False)
-        if self.__remaining_chips:
-            next_chip = self.__remaining_chips.pop(last=False)
-            self.__board_x = next_chip.nearest_ethernet_x
-            self.__board_y = next_chip.nearest_ethernet_y
-            to_remove = list()
-            for chip in self.__remaining_chips:
-                if self.__on_same_board(chip):
-                    to_remove.append(chip)
-                    self.__same_board_chips.add(chip)
-            for chip in to_remove:
-                self.__remaining_chips.remove(chip)
-            return next_chip
-        raise StopIteration
-
-    def update(self, chips: Iterable[Chip]):
-        """
-        :param iterable(Chip) chips:
-        """
-        for chip in chips:
-            if self.__on_same_board(chip):
-                self.__same_board_chips.add(chip)
-            else:
-                self.__remaining_chips.add(chip)
 
 
 class _ChipWithSpace(object):
