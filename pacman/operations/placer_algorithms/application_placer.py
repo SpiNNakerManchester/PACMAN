@@ -94,50 +94,44 @@ def _place_vertex(
     
     # Now make the placements having confirmed all can be done
     placements.add_placements(placements_to_make)
-    logger.debug(f"Used {spaces.chips_saved()}")
+    logger.debug("Used {}", spaces.chips_saved())
     spaces.clear_saved()
 
 
 def _prepare_placements(
         spaces, placements, plan_n_timesteps, same_chip_groups, app_vertex):
-    try:
-        # Start a new space
-        next_chip_space = spaces.get_next_chip()
-        space = _Space(next_chip_space.chip)
-        logger.debug(f"Starting placement from {next_chip_space}")
+    # Start a new space
+    next_chip_space = spaces.get_next_chip()
+    space = _Space(next_chip_space.chip)
+    logger.debug("Starting placement from {}", next_chip_space)
 
-        placements_to_make: List = list()
+    placements_to_make: List = list()
 
-        # Go through the groups
-        last_chip_space: Optional[_ChipWithSpace] = None
-        for vertices, sdram in same_chip_groups:
-            vertices_to_place = _filter_vertices(vertices, placements)
-            actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
-            n_cores = len(vertices_to_place)
+    # Go through the groups
+    last_chip_space: Optional[_ChipWithSpace] = None
+    for vertices, sdram in same_chip_groups:
+        vertices_to_place = _filter_vertices(vertices, placements)
+        actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
+        n_cores = len(vertices_to_place)
 
-            # Try to find a chip with space; this might result in a
-            # _SpaceExceededException
-            while not next_chip_space.is_space(n_cores, actual_sdram):
-                next_chip_space = spaces.get_next_chip_space(
-                    space, last_chip_space)
-                last_chip_space = None
+        # Try to find a chip with space
+        while not next_chip_space.is_space(n_cores, actual_sdram):
+            next_chip_space = spaces.get_next_chip_space(
+                space, last_chip_space)
+            if next_chip_space is None:
+                # Ran out of space so need try a new start chip
+                _check_could_fit(app_vertex, vertices_to_place, actual_sdram)
+                logger.debug("Failed, saving {}", spaces.chips_saved())
+                return None
+            last_chip_space = None
 
-            # If this worked, store placements to be made
-            last_chip_space = next_chip_space
-            spaces.save_chip(next_chip_space.chip)
-            _store_on_chip(
-                placements_to_make, vertices_to_place, actual_sdram,
-                next_chip_space)
-        return placements_to_make
-
-    except _SpaceExceededException:
-        # This might happen while exploring a space; this may not be
-        # fatal since the last space might have just been bound by
-        # existing placements, and there might be bigger spaces out
-        # there to use
-        _check_could_fit(app_vertex, vertices_to_place, actual_sdram)
-        logger.debug(f"Failed, saving {spaces.chips_saved()}")
-        return None
+        # If this worked, store placements to be made
+        last_chip_space = next_chip_space
+        spaces.save_chip(next_chip_space.chip)
+        _store_on_chip(
+            placements_to_make, vertices_to_place, actual_sdram,
+            next_chip_space)
+    return placements_to_make
 
 
 def _filter_vertices(vertices, placements):
@@ -293,10 +287,6 @@ def _check_could_fit(
     raise PacmanTooBigToPlace(message)
 
 
-class _SpaceExceededException(Exception):
-    pass
-
-
 def _place_fixed_vertex(
         app_vertex: ApplicationVertex, placements: Placements):
     same_chip_groups = app_vertex.splitter.get_same_chip_groups()
@@ -446,13 +436,16 @@ class _Spaces(object):
         return self.__next_chip
 
     def get_next_chip_space(
-            self, space: _Space,
-            last_chip_space: Optional[_ChipWithSpace]) -> _ChipWithSpace:
+            self, space: _Space,  last_chip_space: Optional[_ChipWithSpace]
+            ) -> Optional[_ChipWithSpace]:
         """
+        Gets the next neighbouring Chip and its space
+
+        If No more Chips available returns None
+
         :param _Space space:
         :param _ChipWithSpace last_chip_space:
-        :rtype: _ChipWithSpace
-        :raises _SpaceExceededException:
+        :rtype: _ChipWithSpace or None
         """
         # If we are reporting a used chip, update with reachable chips
         if last_chip_space is not None:
@@ -462,9 +455,10 @@ class _Spaces(object):
         # If no space, error
         if not space.has_next():
             self.__last_chip_space = None
-            raise _SpaceExceededException(
-                "No more chips to place on in this space; "
-                f"{self.n_chips_used} of {self.__machine.n_chips} used")
+            logger.debug("No more chips to place on in this space; "
+                         "{} of {} used",
+                         self.n_chips_used, self.__machine.n_chips)
+            return None
         chip = space.pop()
         self.__used_chips.add(chip)
         self.__restored_chips.discard(chip)
