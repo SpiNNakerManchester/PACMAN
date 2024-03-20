@@ -64,8 +64,6 @@ class GAPartitioner(AbstractPartitioner):
     @overrides(AbstractPartitioner._partitioning)
     def _partitioning(self):
         # Begin coding for partitioning here
-
-      
         if not self._read_solution_from_file:
             self._global_solution : AbstractGASolutionRepresentation = \
                GaAlgorithm(self._ga_algorithm_configuration).do_GA_algorithm(self._graph)

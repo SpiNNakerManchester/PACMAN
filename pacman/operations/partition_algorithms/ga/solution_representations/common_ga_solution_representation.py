@@ -24,9 +24,7 @@ class CommonGASolutionRepresentation(AbstractGASolutionRepresentation):
         ptype_solution_rep = self.get_solution()
         single_neuron_encoding_lentgh = self.get_single_neuron_encoding_length()
         solution = bytearray(len(ptype_solution_rep) * single_neuron_encoding_lentgh)
-
         neuron_count = len(ptype_solution_rep)
-
         for neuron_index in range(0, neuron_count):
             neuron_encoding_offset_from = neuron_index * single_neuron_encoding_lentgh
             neuron_encoding_offset_to = (neuron_index + 1) * single_neuron_encoding_lentgh

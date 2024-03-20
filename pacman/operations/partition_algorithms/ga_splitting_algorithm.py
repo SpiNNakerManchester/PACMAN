@@ -53,7 +53,6 @@ class GaAlgorithm(object):
              self.solution_cost_calculation_strategy,
              self.selection_strategy,
              epoch)
-        
 
         def get_output_folder_of_file(output_file_path: str):
             pos = len(output_file_path) - 1
