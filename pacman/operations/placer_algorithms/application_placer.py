@@ -102,7 +102,6 @@ def _prepare_placements(
         spaces, placements, plan_n_timesteps, same_chip_groups, app_vertex):
     # Start a new space
     next_chip_space = spaces.get_next_chip()
-    space = _Space(next_chip_space.chip)
     logger.debug("Starting placement from {}", next_chip_space)
 
     placements_to_make: List = list()
@@ -116,8 +115,7 @@ def _prepare_placements(
 
         # Try to find a chip with space
         while not next_chip_space.is_space(n_cores, actual_sdram):
-            next_chip_space = spaces.get_next_chip_space(
-                space, last_chip_space)
+            next_chip_space = spaces.get_next_chip_space(last_chip_space)
             if next_chip_space is None:
                 # Ran out of space so need try a new start chip
                 _check_could_fit(app_vertex, vertices_to_place, actual_sdram)
@@ -366,7 +364,8 @@ def _store_on_chip(
 class _Spaces(object):
     __slots__ = ("__machine", "__chips", "__next_chip", "__used_chips",
                  "__system_placements", "__placements", "__plan_n_timesteps",
-                 "__last_chip_space", "__saved_chips", "__restored_chips")
+                 "__last_chip_space", "__saved_chips", "__restored_chips",
+                 "__space")
 
     def __init__(
             self, placements: Placements, plan_n_timesteps: Optional[int]):
@@ -383,6 +382,7 @@ class _Spaces(object):
         self.__last_chip_space: Optional[_ChipWithSpace] = None
         self.__saved_chips: OrderedSet[Chip] = OrderedSet()
         self.__restored_chips: OrderedSet[Chip] = OrderedSet()
+        self.__space = _Space(self.__next_chip)
 
     def __chip_order(self):
         """
@@ -424,6 +424,7 @@ class _Spaces(object):
                     chip, cores_used, sdram_used)
                 self.__used_chips.add(chip)
 
+            self.__space = _Space(self.__last_chip_space.chip)
             return self.__last_chip_space
 
         except StopIteration:
@@ -449,30 +450,29 @@ class _Spaces(object):
         return self.__next_chip
 
     def get_next_chip_space(
-            self, space: _Space,  last_chip_space: Optional[_ChipWithSpace]
+            self, last_chip_space: Optional[_ChipWithSpace]
             ) -> Optional[_ChipWithSpace]:
         """
         Gets the next neighbouring Chip and its space
 
         If No more Chips available returns None
 
-        :param _Space space:
         :param _ChipWithSpace last_chip_space:
         :rtype: _ChipWithSpace or None
         """
         # If we are reporting a used chip, update with reachable chips
         if last_chip_space is not None:
             last_chip = last_chip_space.chip
-            space.update(self.__usable_from_chip(last_chip))
+            self.__space.update(self.__usable_from_chip(last_chip))
 
         # If no space, error
-        if not space.has_next():
+        if not self.__space.has_next():
             self.__last_chip_space = None
             logger.debug("No more chips to place on in this space; "
                          "{} of {} used",
                          self.n_chips_used, self.__machine.n_chips)
             return None
-        chip = space.pop()
+        chip = self.__space.pop()
         self.__used_chips.add(chip)
         self.__restored_chips.discard(chip)
         cores_used, sdram_used = self.__cores_and_sdram(chip)
