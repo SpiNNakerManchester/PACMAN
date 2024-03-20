@@ -111,12 +111,7 @@ def _prepare_placements(
         # Go through the groups
         last_chip_space: Optional[_ChipWithSpace] = None
         for vertices, sdram in same_chip_groups:
-            vertices_to_place = [
-                vertex
-                for vertex in vertices
-                # No need to place virtual vertices
-                if not isinstance(vertex, AbstractVirtual)
-                and not placements.is_vertex_placed(vertex)]
+            vertices_to_place = _filter_vertices(vertices, placements)
             actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
             n_cores = len(vertices_to_place)
 
@@ -143,6 +138,21 @@ def _prepare_placements(
         _check_could_fit(app_vertex, vertices_to_place, actual_sdram)
         logger.debug(f"Failed, saving {spaces.chips_saved()}")
         return None
+
+
+def _filter_vertices(vertices, placements):
+    # Remove any already placed
+    vertices_to_place = [
+        vertex for vertex in vertices
+        if not placements.is_vertex_placed(vertex)]
+    if len(vertices_to_place) != len(vertices) and len(vertices_to_place) > 0:
+        # Putting the rest on a different chip is wrong
+        # Putting them on the same chip is hard so will do if needed
+        raise NotImplementedError(
+            "Unexpected mix of placed and unplaced vertices")
+    # No need to place virtual vertices
+    return [vertex for vertex in vertices_to_place
+            if not isinstance(vertex, AbstractVirtual)]
 
 
 def _place_error(
@@ -294,12 +304,7 @@ def _place_fixed_vertex(
         raise NotImplementedError("Unexpected mix of Fixed and no groups")
 
     for vertices, _ in same_chip_groups:
-        vertices_to_place = [
-            vertex for vertex in vertices
-            # No need to place virtual vertices
-            if not isinstance(vertex, AbstractVirtual)
-            and not placements.is_vertex_placed(vertex)]
-
+        vertices_to_place = _filter_vertices(vertices, placements)
         _do_fixed_location(vertices_to_place, placements)
 
 
@@ -317,6 +322,8 @@ def _do_fixed_location(
             x, y = loc.x, loc.y
             break
     else:
+        # Mixing fixed and free allocations while still keeping the whole
+        # App vertex together is hard so will only do is needed
         raise NotImplementedError(
             "Mixing fixed location and not fixed location groups "
             "within one vertex")
