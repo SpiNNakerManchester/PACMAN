@@ -374,12 +374,25 @@ class _Spaces(object):
         self.__machine = PacmanDataView.get_machine()
         self.__placements = placements
         self.__plan_n_timesteps = plan_n_timesteps
-        self.__chips = self.__machine.chips
+        self.__chips = self.__chip_order()
         self.__next_chip = next(self.__chips)
         self.__used_chips: Set[Chip] = set()
         self.__last_chip_space: Optional[_ChipWithSpace] = None
         self.__saved_chips: OrderedSet[Chip] = OrderedSet()
         self.__restored_chips: OrderedSet[Chip] = OrderedSet()
+
+    def __chip_order(self):
+        """
+        Iterate the Chips in a guaranteed order
+
+        :param Machine machine:
+        :rtype: iterable(Chip)
+        """
+        for x in range(self.__machine.width):
+            for y in range(self.__machine.height):
+                chip = self.__machine.get_chip_at(x, y)
+                if chip:
+                    yield chip
 
     def __cores_and_sdram(self, chip: Chip) -> Tuple[Set[int], int]:
         """
