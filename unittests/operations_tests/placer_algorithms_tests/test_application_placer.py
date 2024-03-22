@@ -14,12 +14,11 @@
 from spinn_utilities.config_holder import set_config
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.data.pacman_data_writer import PacmanDataWriter
-from pacman.exceptions import (
-    PacmanConfigurationException, PacmanPlaceException, PacmanTooBigToPlace)
+from pacman.exceptions import (PacmanPlaceException, PacmanTooBigToPlace)
 from pacman.model.partitioner_splitters import (
     SplitterFixedLegacy, AbstractSplitterCommon)
 from pacman.operations.placer_algorithms.application_placer import (
-    place_application_graph, _Spaces)
+    place_application_graph, ApplicationPlacer)
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ConstantSDRAM
 from pacman.model.graphs.application import ApplicationVertex
@@ -219,8 +218,8 @@ def test_sdram_bigger_monitors():
     # This is purely an info call so test check directly
     writer.add_sample_monitor_vertex(monitor, True)
     try:
-        spaces = _Spaces(Placements())
-        spaces._Spaces__check_could_fit(1, plan_sdram=max_sdram // 2 + 5)
+        placer = ApplicationPlacer(Placements())
+        placer._check_could_fit(1, plan_sdram=max_sdram // 2 + 5)
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
         assert ("after monitors only" in str(ex))
@@ -258,8 +257,8 @@ def test_more_cores_with_monitor():
     # This is purely an info call so test check directly
     writer.add_sample_monitor_vertex(monitor, True)
     try:
-        spaces = _Spaces(Placements())
-        spaces._Spaces__check_could_fit(17, 500000)
+        placer = ApplicationPlacer(Placements())
+        placer._check_could_fit(17, 500000)
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
         assert ("reserved for monitors" in str(ex))
@@ -271,5 +270,5 @@ def test_could_fit():
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(0))
     writer.add_sample_monitor_vertex(monitor, True)
-    spaces = _Spaces(Placements())
-    spaces._Spaces__check_could_fit(16, 500000)
+    placer = ApplicationPlacer(Placements())
+    placer._check_could_fit(16, 500000)
