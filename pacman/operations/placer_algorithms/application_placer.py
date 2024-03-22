@@ -14,7 +14,7 @@
 from __future__ import annotations
 import logging
 import os
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
@@ -90,7 +90,7 @@ def _place_vertex(
             spaces, placements, plan_n_timesteps, same_chip_groups)
         if placements_to_make is not None:
             break
-    
+
     # Now actually add the placements having confirmed all can be done
     placements.add_placements(placements_to_make)
 
@@ -226,46 +226,6 @@ def _place_error(
         f" Report written to {report_file}.")
 
 
-def _check_could_fit(
-        app_vertex: ApplicationVertex, vertices_to_place: List[MachineVertex],
-        sdram: int):
-    """
-    :param ApplicationVertex app_vertex:
-    :param list(MachineVertex) vertices_to_place:
-    :param int sdram:
-    :raises PacmanTooBigToPlace:
-    """
-    n_cores = len(vertices_to_place)
-    if sdram <= self.__max_sdram and n_cores <= self.__max_cores:
-        # should fit somewhere
-        return
-    message = (
-        f"{app_vertex} will not fit on any possible Chip "
-        f"the reason is that {vertices_to_place} ")
-    if sdram > max_sdram:
-        message += f"requires {sdram} bytes but "
-        if sdram > version.max_sdram_per_chip:
-            message += f"a Chip only has {version.max_sdram_per_chip} bytes "
-        else:
-            message += f"after monitors only {max_sdram} bytes are available "
-        message += "Lowering max_core_per_chip may resolve this."
-        raise PacmanTooBigToPlace(message)
-    if n_cores > version.max_cores_per_chip:
-        message += " is more vertices than the number of cores on a chip."
-        raise PacmanTooBigToPlace(message)
-    user_cores = version.max_cores_per_chip - version.n_scamp_cores
-    if n_cores > user_cores:
-        message += (
-            f"is more vertices than the user cores ({user_cores}) "
-            "available on a Chip")
-    else:
-        message += (
-            f"is more vertices than the {max_cores} cores available on a "
-            f"Chip once {PacmanDataView.get_all_monitor_cores()} "
-            "are reserved for monitors")
-    raise PacmanTooBigToPlace(message)
-
-
 def _place_fixed_vertex(
         app_vertex: ApplicationVertex, placements: Placements):
     same_chip_groups = app_vertex.splitter.get_same_chip_groups()
@@ -324,17 +284,6 @@ def _do_fixed_location(
                 # pylint: disable=raise-missing-from
                 raise PacmanConfigurationException(
                     f"No more cores available on {x}, {y}: {on_chip}")
-
-
-def _store_on_chip(
-        placements_to_make: List[Placement], vertices: List[MachineVertex],
-        sdram: int, next_chip_space: _ChipWithSpace):
-    """
-    :param list(Placement) placements_to_make:
-    :param list(MachineVertex) vertices:
-    :param int sdram:
-    :param _ChipWithSpace next_chip_space:
-    """
 
 
 class _Spaces(object):
@@ -525,7 +474,7 @@ class _Spaces(object):
 
         return True
 
-    def __check_could_fit(self, n_cores:int, plan_sdram: int):
+    def __check_could_fit(self, n_cores: int, plan_sdram: int):
         """
         :param int n_cores: number of cores needs
         :param int plan_sdram: minimum amount of SDRAM needed
@@ -570,10 +519,10 @@ class _Spaces(object):
     def __get_next_start(self, n_cores: int, plan_sdram: int) -> Chip:
         """
         Gets the next start Chip
-        
+
         Also sets up the current_chip and starts a new neighbourhood
-         
-        :param int n_cores: number of cores needs 
+
+        :param int n_cores: number of cores needs
         :param int plan_sdram: minimum amount of SDRAM needed
 
         :rtype: Chip
