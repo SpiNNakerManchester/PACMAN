@@ -178,6 +178,24 @@ def test_application_placer_late_fixed():
     place_application_graph(Placements())
 
 
+def test_application_placer_fill_chips():
+    unittest_setup()
+    set_config("Machine", "version", 5)
+    writer = PacmanDataWriter.mock()
+    # fixed early works as this vertex is looked at first
+    fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
+    fixed.splitter = SplitterFixedLegacy()
+    fixed.set_fixed_location(0, 0)
+    writer.add_vertex(fixed)
+    fixed.splitter.create_machine_vertices(ChipCounter())
+    for i in range(17):
+        _make_vertices(writer, 1000, 14, 9, f"app_vertex_{i}")
+    for i in range(17):
+        _make_vertices(writer, 1000, 14, 8, f"app_vertex_{i}")
+    writer.set_machine(virtual_machine(24, 12))
+    place_application_graph(Placements())
+
+
 def test_sdram_bigger_than_chip():
     unittest_setup()
     set_config("Machine", "version", 5)
