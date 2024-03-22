@@ -102,7 +102,7 @@ def test_application_placer():
     fixed.set_fixed_location(0, 0)
     writer.add_vertex(fixed)
     fixed.splitter.create_machine_vertices(ChipCounter())
-    for i in range(56):
+    for i in range(61):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
     writer.set_machine(virtual_machine(24, 12))
     place_application_graph(Placements())
