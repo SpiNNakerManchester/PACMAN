@@ -19,7 +19,7 @@ from pacman.exceptions import (
 from pacman.model.partitioner_splitters import (
     SplitterFixedLegacy, AbstractSplitterCommon)
 from pacman.operations.placer_algorithms.application_placer import (
-    place_application_graph, _check_could_fit)
+    place_application_graph, _Spaces)
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ConstantSDRAM
 from pacman.model.graphs.application import ApplicationVertex
@@ -141,7 +141,7 @@ def test_application_placer_too_few_boards():
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
     except PacmanPlaceException as ex:
-        assert ("No more chips to place" in str(ex))
+        assert ("No more chips to start" in str(ex))
 
 
 def test_application_placer_restart_needed():
@@ -201,7 +201,8 @@ def test_sdram_bigger_monitors():
     # This is purely an info call so test check directly
     writer.add_sample_monitor_vertex(monitor, True)
     try:
-        _check_could_fit("app_test", ["m_vertex]"], sdram=max_sdram // 2 + 5)
+        spaces = _Spaces(Placements())
+        spaces._Spaces__check_could_fit(1, plan_sdram=max_sdram // 2 + 5)
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
         assert ("after monitors only" in str(ex))
@@ -238,9 +239,9 @@ def test_more_cores_with_monitor():
     monitor = SimpleMachineVertex(ConstantSDRAM(4000))
     # This is purely an info call so test check directly
     writer.add_sample_monitor_vertex(monitor, True)
-    m_vertexs = [f"m_v_{i}" for i in range(17)]
     try:
-        _check_could_fit("app_test", m_vertexs, 500000)
+        spaces = _Spaces(Placements())
+        spaces._Spaces__check_could_fit(17, 500000)
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
         assert ("reserved for monitors" in str(ex))
@@ -252,5 +253,5 @@ def test_could_fit():
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(0))
     writer.add_sample_monitor_vertex(monitor, True)
-    m_vertexs = [f"m_v_{i}" for i in range(16)]
-    _check_could_fit("app_test", m_vertexs, 500000)
+    spaces = _Spaces(Placements())
+    spaces._Spaces__check_could_fit(16, 500000)
