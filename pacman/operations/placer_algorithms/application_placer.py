@@ -312,7 +312,8 @@ class ApplicationPlacer(object):
             PacmanDataView.get_run_dir_path(), "placements_error.txt")
         with open(report_file, 'w', encoding="utf-8") as f:
             f.write(f"Could not place {len(unplaceable)} of "
-                    f"{PacmanDataView.get_n_vertices()} application vertices.\n")
+                    f"{PacmanDataView.get_n_vertices()} "
+                    f"application vertices.\n")
             f.write(
                 f"    Could not place {vertex_count} of {n_vertices} in the"
                 " last app vertex\n\n")
@@ -334,9 +335,9 @@ class ApplicationPlacer(object):
                 f.write(f"Vertex: {app_vertex}\n")
                 same_chip_groups = app_vertex.splitter.get_same_chip_groups()
                 for vertices, sdram in same_chip_groups:
+                    sdram = sdram.get_total_sdram(self.__plan_n_timesteps)
                     f.write(f"    Group of {len(vertices)} vertices uses "
-                            f"{sdram.get_total_sdram(self.__plan_n_timesteps)} "
-                            "bytes of SDRAM:\n")
+                            f"{sdram} bytes of SDRAM:\n")
                     for vertex in vertices:
                         f.write(f"        Vertex {vertex}")
                         if self.__placements.is_vertex_placed(vertex):
