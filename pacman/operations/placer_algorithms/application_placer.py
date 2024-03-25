@@ -129,7 +129,7 @@ class ApplicationPlacer(object):
         self.__current_chip: Optional[Chip] = None
         self.__current_cores_free: List[int] = list()
         self.__current_sdram_free = 0
-        self.__app_vertex_label = None
+        self.__app_vertex_label: Optional[str] = None
 
         # Set some value so no Optional needed
         self.__ethernet_x = -1
