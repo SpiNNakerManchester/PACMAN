@@ -129,7 +129,7 @@ class ApplicationPlacer(object):
         self.__current_chip: Optional[Chip] = None
         self.__current_cores_free: List[int] = list()
         self.__current_sdram_free = 0
-        self.__app_vertex_label = "NO APP VETERX SET"
+        self.__app_vertex_label = None
 
         # Set some value so no Optional needed
         self.__ethernet_x = -1
@@ -255,7 +255,7 @@ class ApplicationPlacer(object):
         return placements_to_make
 
     def _filter_vertices(
-            self, vertices: List[MachineVertex]) -> List[MachineVertex]:
+            self, vertices: Sequence[MachineVertex]) -> List[MachineVertex]:
         """
         Removes an already placed or virtual vertices.
 
@@ -335,9 +335,9 @@ class ApplicationPlacer(object):
                 f.write(f"Vertex: {app_vertex}\n")
                 same_chip_groups = app_vertex.splitter.get_same_chip_groups()
                 for vertices, sdram in same_chip_groups:
-                    sdram = sdram.get_total_sdram(self.__plan_n_timesteps)
+                    p_sdram = sdram.get_total_sdram(self.__plan_n_timesteps)
                     f.write(f"    Group of {len(vertices)} vertices uses "
-                            f"{sdram} bytes of SDRAM:\n")
+                            f"{p_sdram} bytes of SDRAM:\n")
                     for vertex in vertices:
                         f.write(f"        Vertex {vertex}")
                         if self.__placements.is_vertex_placed(vertex):

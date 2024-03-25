@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Dict, Iterable, Iterator
+from typing import Collection, Dict, Iterable, Iterator
 
 from spinn_utilities.typing.coords import XY
 
@@ -197,7 +197,7 @@ class Placements(object):
         """
         return iter(self._machine_vertices.values())
 
-    def placements_on_chip(self, xy: XY) -> Iterable[Placement]:
+    def placements_on_chip(self, xy: XY) -> Collection[Placement]:
         """
         Get the placements on a specific chip.
 
