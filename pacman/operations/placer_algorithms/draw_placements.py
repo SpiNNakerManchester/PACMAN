@@ -66,14 +66,14 @@ def draw_placements(
     vertex_colours[None] = unused
     board_colours: Dict[XY, Colour] = dict()
     machine = PacmanDataView.get_machine()
-    for x, y in machine.chip_coordinates:
-        if (placements.n_placements_on_chip(x, y) ==
-                system_placements.n_placements_on_chip(x, y)):
-            board_colours[x, y] = unused
+    for xy in machine.chip_coordinates:
+        if (placements.n_placements_on_chip(xy) ==
+                system_placements.n_placements_on_chip(xy)):
+            board_colours[xy] = unused
             continue
-        for placement in placements.placements_on_chip(x, y):
+        for placement in placements.placements_on_chip(xy):
             if not system_placements.is_vertex_placed(placement.vertex):
-                board_colours[x, y] = \
+                board_colours[xy] = \
                     vertex_colours[placement.vertex.app_vertex]
                 break
     include_boards = [
