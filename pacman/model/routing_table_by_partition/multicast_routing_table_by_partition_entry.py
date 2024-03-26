@@ -110,8 +110,8 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
             spinnaker_route=self.spinnaker_route | other.spinnaker_route)
 
     def __repr__(self) -> str:
-        repr = (f"{{{', '.join(map(str, self.link_ids))}}}:"
+        rstr = (f"{{{', '.join(map(str, self.link_ids))}}}:"
                 f"{{{', '.join(map(str, self.processor_ids))}}}")
         if self._defaultable:
-            repr += ("defaultable")
-        return repr
+            rstr += ("defaultable")
+        return rstr
