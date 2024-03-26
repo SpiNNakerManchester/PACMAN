@@ -57,12 +57,13 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
 
         :raises PacmanInvalidParameterException:
         """
-        # pylint: disable=unused-argument
         super().__init__(
             outgoing_processors, out_going_links,
             spinnaker_route=spinnaker_route)
 
-        if incoming_link is None:
+        if incoming_processor is not None:
+            self._defaultable = False
+        elif incoming_link is None:
             self._defaultable = False
         else:
             # defaultable if the output route is exactly the inverse of the input
