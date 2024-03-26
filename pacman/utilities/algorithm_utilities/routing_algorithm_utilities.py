@@ -353,54 +353,6 @@ def _is_linked(
     return True
 
 
-def convert_a_route(
-        routing_tables: MulticastRoutingTableByPartition,
-        source_vertex: AbstractVertex, partition_id: str,
-        incoming_processor: Optional[int], incoming_link: Optional[int],
-        route_tree: RoutingTree,
-        targets_by_chip: Dict[XY, Tuple[Set[int], Set[int]]]):
-    """
-    Converts the algorithm specific partition_route back to standard SpiNNaker
-    and adds it to the `routing_tables`.
-
-    :param MulticastRoutingTableByPartition routing_tables:
-        SpiNNaker-format routing tables
-    :param AbstractSingleSourcePartition partition:
-        Partition this route applies to
-    :param incoming_processor: processor this link came from
-    :type incoming_processor: int or None
-    :param incoming_link: link this link came from
-    :type incoming_link: int or None
-    :param RoutingTree route_tree: algorithm specific format of the route
-    :param dict((int,int),(list(int),list(int))) targets_by_chip:
-        Target cores and links of things on the route that are final end points
-    """
-    x, y = route_tree.chip
-
-    next_hops: List[Tuple[RoutingTree, int]] = list()
-    processor_ids: List[int] = list()
-    link_ids: List[int] = list()
-    for (route, next_hop) in route_tree.children:
-        if route is not None:
-            link_ids.append(route)
-            next_incoming_link = (route + 3) % 6
-        if isinstance(next_hop, RoutingTree):
-            next_hops.append((next_hop, next_incoming_link))
-    if (x, y) in targets_by_chip:
-        cores, links = targets_by_chip[x, y]
-        processor_ids.extend(cores)
-        link_ids.extend(links)
-
-    entry = MulticastRoutingTableByPartitionEntry(
-        link_ids, processor_ids, incoming_processor, incoming_link)
-    routing_tables.add_path_entry(entry, x, y, source_vertex, partition_id)
-
-    for next_hop, next_incoming_link in next_hops:
-        convert_a_route(
-            routing_tables, source_vertex, partition_id, None,
-            next_incoming_link, next_hop, targets_by_chip)
-
-
 def longest_dimension_first(
         vector: Tuple[int, int, int], start: XY) -> List[Tuple[int, XY]]:
     """
