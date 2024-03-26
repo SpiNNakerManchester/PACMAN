@@ -66,7 +66,7 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
         elif incoming_link is None:
             self._defaultable = False
         else:
-            # defaultable if the output route is exactly the inverse of the input
+            # defaultable if the output route is exactly the inverse of input
             invert_link = ((incoming_link + 3) % 6)
             # as it is faster to go from a link to a spinnaker route
             self._defaultable = self._calc_spinnaker_route(
@@ -111,7 +111,7 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
 
     def __repr__(self) -> str:
         repr = (f"{{{', '.join(map(str, self.link_ids))}}}:"
-               f"{{{', '.join(map(str, self.processor_ids))}}}")
+                f"{{{', '.join(map(str, self.processor_ids))}}}")
         if self._defaultable:
             repr += ("defaultable")
         return repr

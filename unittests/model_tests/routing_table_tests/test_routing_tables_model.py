@@ -23,8 +23,7 @@ from pacman.model.routing_tables.multicast_routing_tables import (
     to_json, from_json)
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
-from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanInvalidParameterException)
+from pacman.exceptions import PacmanAlreadyExistsException
 from pacman.utilities import file_format_schemas
 from pacman.model.graphs.machine import SimpleMachineVertex
 
