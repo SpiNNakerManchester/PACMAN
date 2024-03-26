@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Dict, Iterable, Iterator
+from typing import Collection, Dict, Iterable, Iterator
 
 from spinn_utilities.typing.coords import XY
 
@@ -142,28 +142,25 @@ class Placements(object):
         """
         return (pr := self._placements.get((x, y))) is not None and p in pr
 
-    def iterate_placements_on_core(
-            self, x: int, y: int) -> Iterable[Placement]:
+    def iterate_placements_on_core(self, xy: XY) -> Iterable[Placement]:
         """
         Iterate over placements with this x and y.
 
-        :param int x: x coordinate to find placements for.
-        :param int y: y coordinate  to find placements for.
+        :param tuple(int, int) xy: x and y coordinates to find placements for.
         :rtype: iterable(Placement)
         """
-        return self._placements[x, y].values()
+        return self._placements[xy].values()
 
     def iterate_placements_by_xy_and_type(
-            self, x: int, y: int, vertex_type: type) -> Iterable[Placement]:
+            self, xy: XY, vertex_type: type) -> Iterable[Placement]:
         """
         Iterate over placements with this x, y and this vertex_type.
 
-        :param int x: x coordinate to find placements for.
-        :param int y: y coordinate  to find placements for.
+        :param tuple(int, int) xy: x and y coordinate to find placements for.
         :param class vertex_type: Class of vertex to find
         :rtype: iterable(Placement)
         """
-        for placement in self._placements[x, y].values():
+        for placement in self._placements[xy].values():
             if isinstance(placement.vertex, vertex_type):
                 yield placement
 
@@ -179,17 +176,16 @@ class Placements(object):
             if isinstance(placement.vertex, vertex_type):
                 yield placement
 
-    def n_placements_on_chip(self, x: int, y: int) -> int:
+    def n_placements_on_chip(self, xy: XY) -> int:
         """
         The number of placements on the given chip.
 
-        :param int x: x coordinate of chip.
-        :param int y: y coordinate of chip.
+        :param tuple(int, int) xy: x and y coordinate of chip.
         :rtype: int
         """
-        if (x, y) not in self._placements:
+        if xy not in self._placements:
             return 0
-        return len(self._placements[x, y])
+        return len(self._placements[xy])
 
     @property
     def placements(self) -> Iterable[Placement]:
@@ -201,15 +197,14 @@ class Placements(object):
         """
         return iter(self._machine_vertices.values())
 
-    def placements_on_chip(self, x: int, y: int) -> Iterable[Placement]:
+    def placements_on_chip(self, xy: XY) -> Collection[Placement]:
         """
         Get the placements on a specific chip.
 
-        :param int x: The x-coordinate of the chip
-        :param int y: The y-coordinate of the chip
+        :param tuple(int , int) xy: The x and y coordinates of the chip
         :rtype: iterable(Placement)
         """
-        return self._placements[x, y].values()
+        return self._placements[xy].values()
 
     @property
     def chips_with_placements(self) -> Iterable[XY]:

@@ -150,7 +150,7 @@ class _FixedRouteRouter(object):
         :raises PacmanConfigurationException: if no placement processor found
         """
         for placement in PacmanDataView.iterate_placements_by_xy_and_type(
-                chip.x, chip.y, self._destination_class):
+                chip, self._destination_class):
             return placement.p
         raise PacmanConfigurationException(
             f"no destination vertex found on Ethernet chip {chip.x}:{chip.y}")
