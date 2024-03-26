@@ -208,14 +208,11 @@ class TestRoutingTable(unittest.TestCase):
             source_vertex, partition_id)
         mre = mrt.get_entries_for_router(0, 0)[source_vertex, partition_id]
         assert str(mre) == (
-            "None:None:False:"
             "{0, 1, 2, 3, 4, 5}:{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}")
         assert mre == mrt.get_entry_on_coords_for_edge(
             source_vertex, partition_id, 0, 0)
 
     def test_multicast_routing_table_by_partition_entry(self):
-        with self.assertRaises(PacmanInvalidParameterException):
-            MulticastRoutingTableByPartitionEntry(range(6), range(18), 4, 3)
         e1 = MulticastRoutingTableByPartitionEntry(range(6), range(18))
         e2 = MulticastRoutingTableByPartitionEntry(
             range(2), range(4), incoming_processor=4)
@@ -223,21 +220,17 @@ class TestRoutingTable(unittest.TestCase):
             range(3, 5), range(12, 16), incoming_link=3)
         e4 = MulticastRoutingTableByPartitionEntry(2, 16)
         e5 = MulticastRoutingTableByPartitionEntry(None, None)
-        assert str(e2) == "None:4:False:{0, 1}:{0, 1, 2, 3}"
-        assert str(e3) == "3:None:False:{3, 4}:{12, 13, 14, 15}"
-        with self.assertRaises(PacmanInvalidParameterException):
-            e2.merge_entry(e3)
+        assert str(e2) == "{0, 1}:{0, 1, 2, 3}"
+        assert str(e3) == "{3, 4}:{12, 13, 14, 15}"
         e6 = e2.merge_entry(MulticastRoutingTableByPartitionEntry(
             range(3, 5), range(12, 16)))
-        assert str(e2) == "None:4:False:{0, 1}:{0, 1, 2, 3}"
-        assert str(e6) == (
-            "None:4:False:{0, 1, 3, 4}:{0, 1, 2, 3, 12, 13, 14, 15}")
+        assert str(e2) == "{0, 1}:{0, 1, 2, 3}"
+        assert str(e6) == "{0, 1, 3, 4}:{0, 1, 2, 3, 12, 13, 14, 15}"
         e6 = e3.merge_entry(MulticastRoutingTableByPartitionEntry(
             range(2), range(4)))
-        assert str(e3) == "3:None:False:{3, 4}:{12, 13, 14, 15}"
-        assert str(e6) == (
-            "3:None:False:{0, 1, 3, 4}:{0, 1, 2, 3, 12, 13, 14, 15}")
-        assert str(e4.merge_entry(e5)) == "None:None:False:{2}:{16}"
+        assert str(e3) == "{3, 4}:{12, 13, 14, 15}"
+        assert str(e6) == "{0, 1, 3, 4}:{0, 1, 2, 3, 12, 13, 14, 15}"
+        assert str(e4.merge_entry(e5)) == "{2}:{16}"
         assert str(e1) == str(e5.merge_entry(e1))
         # NB: Have true object identity; we have setters!
         assert e5 != MulticastRoutingTableByPartitionEntry(None, None)

@@ -142,7 +142,8 @@ def __match(
         return False
     app_src = vertex.app_vertex
     next_app_src = next_vertex.app_vertex
-    return next_app_src == app_src and entry.has_same_route(next_entry)
+    return (next_app_src == app_src and
+            entry.spinnaker_route == next_entry.spinnaker_route)
 
 
 def __mask_has_holes(mask: int) -> bool:

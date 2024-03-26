@@ -17,8 +17,7 @@ from typing import Iterable, Optional, Union
 from spinn_utilities.log import FormatAdapter
 from spinn_machine.base_multicast_routing_entry import (
     BaseMulticastRoutingEntry)
-from pacman.exceptions import (
-    PacmanConfigurationException, PacmanInvalidParameterException)
+from pacman.exceptions import (PacmanInvalidParameterException)
 
 log = FormatAdapter(logging.getLogger(__name__))
 
@@ -28,7 +27,7 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
     An entry in a path of a multicast route.
     """
 
-    __slots__ = ["_incoming_processor", "_incoming_link"]
+    __slots__ = ["_defaultable"]
 
     def __init__(self, out_going_links: Union[int, Iterable[int], None],
                  outgoing_processors: Union[int, Iterable[int], None],
@@ -58,67 +57,19 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
 
         :raises PacmanInvalidParameterException:
         """
+        # pylint: disable=unused-argument
         super().__init__(
             outgoing_processors, out_going_links,
             spinnaker_route=spinnaker_route)
 
-        self._incoming_link: Optional[int]
-        self._incoming_processor: Optional[int]
         if incoming_link is None:
-            self._incoming_link = None
-            self._incoming_processor = incoming_processor
+            self._defaultable = False
         else:
-            if incoming_processor is None:
-                self._incoming_link = incoming_link
-                self._incoming_processor = None
-            else:
-                raise PacmanInvalidParameterException(
-                    "The incoming direction for a path can only be from "
-                    "either one link or one processors, not both",
-                    str(incoming_link), str(incoming_processor))
-
-    @property
-    def incoming_link(self) -> Optional[int]:
-        """
-        The source link for this path entry.
-
-        :rtype: int or None
-        """
-        return self._incoming_link
-
-    @incoming_link.setter
-    def incoming_link(self, incoming_link: int):
-        if self._incoming_processor is not None:
-            raise PacmanConfigurationException(
-                f"Entry already has an incoming processor "
-                f"{self._incoming_processor}")
-        if (self._incoming_link is not None
-                and self._incoming_link != incoming_link):
-            raise PacmanConfigurationException(
-                f"Entry already has a different incoming value "
-                f"{self._incoming_link}")
-        self._incoming_link = incoming_link
-
-    @property
-    def incoming_processor(self) -> Optional[int]:
-        """
-        The source processor.
-
-        :rtype: int or None
-        """
-        return self._incoming_processor
-
-    @incoming_processor.setter
-    def incoming_processor(self, incoming_processor: int):
-        if (self._incoming_processor is not None and
-                self._incoming_processor != incoming_processor):
-            raise PacmanConfigurationException(
-                f"Entry already has an different incoming processor "
-                f"{self._incoming_processor}")
-        if self._incoming_link is not None:
-            raise PacmanConfigurationException(
-                f"Entry already has an incoming link {self._incoming_link}")
-        self._incoming_processor = self._incoming_processor
+            # defaultable if the output route is exactly the inverse of the input
+            invert_link = ((incoming_link + 3) % 6)
+            # as it is faster to go from a link to a spinnaker route
+            self._defaultable = self._calc_spinnaker_route(
+                None, invert_link) == self.spinnaker_route
 
     @property
     def defaultable(self) -> bool:
@@ -127,14 +78,7 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
 
         :rtype: bool
         """
-        # without an incoming link is is not defaultable
-        if self._incoming_link is None:
-            return False
-        # defaultable if the output route is exactly the inverse of the input
-        invert_link = ((self._incoming_link + 3) % 6)
-        # as it is faster to go from a link to a spinnaker route
-        return (self._calc_spinnaker_route(None, invert_link) ==
-                self.spinnaker_route)
+        return self._defaultable
 
     def merge_entry(self, other: MulticastRoutingTableByPartitionEntry) -> \
             MulticastRoutingTableByPartitionEntry:
@@ -155,50 +99,18 @@ class MulticastRoutingTableByPartitionEntry(BaseMulticastRoutingEntry):
                 "MulticastRoutingTableByPartitionEntry, and therefore cannot "
                 "be merged.")
 
-        if self._incoming_processor is None:
-            incoming_processor = other._incoming_processor
-        elif (other._incoming_processor is None or
-              self._incoming_processor == other._incoming_processor):
-            incoming_processor = self._incoming_processor
-        else:
-            raise PacmanInvalidParameterException(
-                "other", other,
-                "The two MulticastRoutingTableByPartitionEntry have "
-                "different incoming processors, and so can't be merged")
-
-        if self._incoming_link is None:
-            incoming_link = other._incoming_link
-        elif (other._incoming_link is None or
-              self._incoming_link == other._incoming_link):
-            incoming_link = self._incoming_link
-        else:
-            raise PacmanInvalidParameterException(
-                "other", other,
-                "The two MulticastRoutingTableByPartitionEntry have "
-                "different incoming links, and so can't be merged")
+        if (self.defaultable == other.defaultable and
+                self.spinnaker_route == other.spinnaker_route):
+            return self
 
         # init checks if both incoming values are not None
         return MulticastRoutingTableByPartitionEntry(
-            None, None, incoming_processor, incoming_link,
+            None, None,
             spinnaker_route=self.spinnaker_route | other.spinnaker_route)
 
     def __repr__(self) -> str:
-        return (f"{self.incoming_link}:{self.incoming_processor}:"
-                f"{self.defaultable}:"
-                f"{{{', '.join(map(str, self.link_ids))}}}:"
-                f"{{{', '.join(map(str, self.processor_ids))}}}")
-
-    def has_same_route(
-            self, entry: MulticastRoutingTableByPartitionEntry) -> bool:
-        """
-        Checks if the two Entries have the same routes after applying mask
-
-        :param  MulticastRoutingTableByPartitionEntry entry:
-        :rtype: bool
-        """
-        # pylint:disable=protected-access
-        # False if the outgoing processor of links are different
-        if self.spinnaker_route != entry.spinnaker_route:
-            return False
-        # True if the incoming links are the same
-        return self._incoming_link == entry._incoming_link
+        repr = (f"{{{', '.join(map(str, self.link_ids))}}}:"
+               f"{{{', '.join(map(str, self.processor_ids))}}}")
+        if self._defaultable:
+            repr += ("defaultable")
+        return repr
