@@ -14,13 +14,14 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
-from spinn_machine import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry, RoutingEntry
+from spinn_machine.exceptions import SpinnMachineInvalidParameterException
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.routing_tables.multicast_routing_tables import (
     to_json, from_json)
 from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
+    MulticastRoutingTableByPartition)
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanInvalidParameterException)
 from pacman.utilities import file_format_schemas
@@ -192,12 +193,11 @@ class TestRoutingTable(unittest.TestCase):
         mrt = MulticastRoutingTableByPartition()
         partition_id = "foo"
         source_vertex = SimpleMachineVertex(sdram=None)
-        entry = MulticastRoutingTableByPartitionEntry(range(2), range(4))
+        entry = RoutingEntry(link_ids=range(2), processor_ids=range(4))
         mrt.add_path_entry(entry, 0, 0, source_vertex, partition_id)
-        entry = MulticastRoutingTableByPartitionEntry(range(2, 4), range(4, 8))
+        entry = RoutingEntry(link_ids=range(2, 4), processor_ids=range(4, 8))
         mrt.add_path_entry(entry, 0, 0, source_vertex, partition_id)
-        entry = MulticastRoutingTableByPartitionEntry(
-            range(4, 6), range(8, 12))
+        entry = RoutingEntry(link_ids=range(4, 6), processor_ids=range(8, 12))
         mrt.add_path_entry(entry, 0, 0, source_vertex, partition_id)
         assert list(mrt.get_routers()) == [(0, 0)]
         assert len(mrt.get_entries_for_router(0, 0)) == 1
@@ -205,43 +205,31 @@ class TestRoutingTable(unittest.TestCase):
             source_vertex, partition_id)
         mre = mrt.get_entries_for_router(0, 0)[source_vertex, partition_id]
         assert str(mre) == (
-            "None:None:False:"
-            "{0, 1, 2, 3, 4, 5}:{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}")
+            "{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}:{0, 1, 2, 3, 4, 5}")
         assert mre == mrt.get_entry_on_coords_for_edge(
             source_vertex, partition_id, 0, 0)
 
     def test_multicast_routing_table_by_partition_entry(self):
-        with self.assertRaises(PacmanInvalidParameterException):
-            MulticastRoutingTableByPartitionEntry(range(6), range(18), 4, 3)
-        with self.assertRaises(ValueError):
-            MulticastRoutingTableByPartitionEntry(7, 18)
-        with self.assertRaises(ValueError):
-            MulticastRoutingTableByPartitionEntry(6, 19)
-        e1 = MulticastRoutingTableByPartitionEntry(range(6), range(18))
-        e2 = MulticastRoutingTableByPartitionEntry(
-            range(2), range(4), incoming_processor=4)
-        e3 = MulticastRoutingTableByPartitionEntry(
-            range(3, 5), range(12, 16), incoming_link=3)
-        e4 = MulticastRoutingTableByPartitionEntry(2, 16)
-        e5 = MulticastRoutingTableByPartitionEntry(None, None)
-        assert str(e2) == "None:4:False:{0, 1}:{0, 1, 2, 3}"
-        assert str(e3) == "3:None:False:{3, 4}:{12, 13, 14, 15}"
-        with self.assertRaises(PacmanInvalidParameterException):
-            e2.merge_entry(e3)
-        e6 = e2.merge_entry(MulticastRoutingTableByPartitionEntry(
-            range(3, 5), range(12, 16)))
-        assert str(e2) == "None:4:False:{0, 1}:{0, 1, 2, 3}"
+        with self.assertRaises(SpinnMachineInvalidParameterException):
+            RoutingEntry(link_ids=range(6), processor_ids=range(18),
+                         incoming_processor=4, incoming_link=3)
+        e1 = RoutingEntry(link_ids=range(6), processor_ids=range(18))
+        e2 = RoutingEntry(link_ids=range(2), processor_ids=range(4),
+                          incoming_processor=4)
+        e3 = RoutingEntry(link_ids=range(3, 5), processor_ids=range(12, 16),
+                          incoming_link=3)
+        e4 = RoutingEntry(link_ids=2, processor_ids=16)
+        assert str(e2) == "{0, 1, 2, 3}:{0, 1}"
+        assert str(e3) == "{12, 13, 14, 15}:{3, 4}"
+        e6 = e2.merge(
+            RoutingEntry(link_ids=range(3, 5), processor_ids=range(12, 16)))
+        assert str(e2) == "{0, 1, 2, 3}:{0, 1}"
         assert str(e6) == (
-            "None:4:False:{0, 1, 3, 4}:{0, 1, 2, 3, 12, 13, 14, 15}")
-        e6 = e3.merge_entry(MulticastRoutingTableByPartitionEntry(
-            range(2), range(4)))
-        assert str(e3) == "3:None:False:{3, 4}:{12, 13, 14, 15}"
-        assert str(e6) == (
-            "3:None:False:{0, 1, 3, 4}:{0, 1, 2, 3, 12, 13, 14, 15}")
-        assert str(e4.merge_entry(e5)) == "None:None:False:{2}:{16}"
-        assert str(e1) == str(e5.merge_entry(e1))
-        # NB: Have true object identity; we have setters!
-        assert e5 != MulticastRoutingTableByPartitionEntry(None, None)
+            "{0, 1, 2, 3, 12, 13, 14, 15}:{0, 1, 3, 4}")
+        e6 = e3.merge(RoutingEntry(
+            link_ids=range(2), processor_ids=range(4)))
+        assert str(e3) == "{12, 13, 14, 15}:{3, 4}"
+        assert str(e6) == ("{0, 1, 2, 3, 12, 13, 14, 15}:{0, 1, 3, 4}")
 
 
 if __name__ == '__main__':

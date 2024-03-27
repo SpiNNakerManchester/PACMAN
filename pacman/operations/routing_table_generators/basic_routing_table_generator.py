@@ -13,13 +13,11 @@
 # limitations under the License.
 from typing import Dict, Tuple
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.graphs import AbstractVertex
-from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartitionEntry)
 from pacman.model.routing_info import RoutingInfo
 
 
@@ -48,7 +46,7 @@ def basic_routing_table_generator() -> MulticastRoutingTables:
 
 def __create_routing_table(
         x: int, y: int, partitions_in_table: Dict[
-            Tuple[AbstractVertex, str], MulticastRoutingTableByPartitionEntry],
+            Tuple[AbstractVertex, str], RoutingEntry],
         routing_infos: RoutingInfo):
     """
     :param int x:
@@ -56,7 +54,7 @@ def __create_routing_table(
     :param partitions_in_table:
     :type partitions_in_table:
         dict(((ApplicationVertex or MachineVertex), str),
-        MulticastRoutingTableByPartitionEntry)
+        RoutingEntry)
     :param RoutingInfo routing_infos:
     :rtype: MulticastRoutingTable
     """

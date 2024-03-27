@@ -14,7 +14,7 @@
 from typing import (
     Dict, Iterable, List, Optional, Tuple, TypeVar, Generic)
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_tables import (
@@ -23,8 +23,6 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.routing_info import (
     RoutingInfo, AppVertexRoutingInfo, MachineVertexRoutingInfo)
 from pacman.model.graphs import AbstractVertex
-from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartitionEntry)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
 
@@ -54,15 +52,14 @@ def merged_routing_table_generator() -> MulticastRoutingTables:
 def __create_routing_table(
         x: int, y: int,
         partitions_in_table: Dict[Tuple[AbstractVertex, str],
-                                  MulticastRoutingTableByPartitionEntry],
+                                  RoutingEntry],
         routing_info: RoutingInfo) -> UnCompressedMulticastRoutingTable:
     """
     :param int x:
     :param int y:
     :param partitions_in_table:
     :type partitions_in_table:
-        dict(((ApplicationVertex or MachineVertex), str),
-        MulticastRoutingTableByPartitionEntry)
+        dict(((ApplicationVertex or MachineVertex), str), RoutingEntry)
     :param RoutingInfo routing_infos:
     :rtype: MulticastRoutingTable
     """
@@ -101,8 +98,7 @@ def __create_routing_table(
 
         # Get the entries to merge
         entries: List[Tuple[
-            MulticastRoutingTableByPartitionEntry,
-            MachineVertexRoutingInfo]] = [(entry, r_info)]
+            RoutingEntry, MachineVertexRoutingInfo]] = [(entry, r_info)]
         while __match(iterator, vertex, part_id, r_info, entry, routing_info,
                       app_r_info):
             (vertex, part_id), entry = iterator.pop()
@@ -142,7 +138,8 @@ def __match(
         return False
     app_src = vertex.app_vertex
     next_app_src = next_vertex.app_vertex
-    return next_app_src == app_src and entry.has_same_route(next_entry)
+    return (next_app_src == app_src and
+            entry.spinnaker_route == next_entry.spinnaker_route)
 
 
 def __mask_has_holes(mask: int) -> bool:
@@ -161,8 +158,7 @@ def __mask_has_holes(mask: int) -> bool:
 
 def __merged_keys_and_masks(
         app_r_info: AppVertexRoutingInfo,
-        entries: List[Tuple[
-            MulticastRoutingTableByPartitionEntry,
+        entries: List[Tuple[RoutingEntry,
             MachineVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:
     if not entries:
         return
