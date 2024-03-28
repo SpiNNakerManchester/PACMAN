@@ -22,10 +22,12 @@ from typing_extensions import TypeAlias
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.timer import Timer
 
+from spinn_machine import MulticastRoutingEntry, RoutingEntry
+
 from pacman.exceptions import MinimisationFailedError
 from pacman.utilities.constants import FULL_MASK
 from pacman.model.routing_tables import UnCompressedMulticastRoutingTable
-from pacman.operations.router_compressors import (AbstractCompressor, RTEntry)
+from pacman.operations.router_compressors import AbstractCompressor
 from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.data.pacman_data_view import PacmanDataView
 
@@ -63,7 +65,7 @@ class _OrderedCoveringCompressor(AbstractCompressor):
 
     def compress_table(
             self, router_table: UnCompressedMulticastRoutingTable
-            ) -> List[RTEntry]:
+            ) -> List[MulticastRoutingEntry]:
         """
         Reduce the size of a routing table by merging together entries where
         possible and by removing any remaining default routes.
@@ -74,7 +76,7 @@ class _OrderedCoveringCompressor(AbstractCompressor):
             Routing table to be merged.
         :return:
             The compressed table entries
-        :rtype: list(RTEntry)
+        :rtype: list(MulticastRoutingEntry)
         :raises MinimisationFailedError:
             If the smallest table that can be produced is larger than
             the space usually available in a hardware router table.
@@ -86,23 +88,21 @@ class _OrderedCoveringCompressor(AbstractCompressor):
         else:
             chip = PacmanDataView.get_chip_at(router_table.x, router_table.y)
             target_length = chip.router.n_available_multicast_entries
-        # Convert into a list of entries
-        routing_table = list(map(
-            RTEntry.from_multicast_routing_entry,
-            router_table.multicast_routing_entries))
         # Compress the router entries
         table, _ = ordered_covering(
-            routing_table=routing_table, target_length=target_length,
+            routing_table=router_table.multicast_routing_entries,
+            target_length=target_length,
             aliases={}, no_raise=True, time_to_run_for=None)
         # Strip the defaultable routes
         return remove_default_routes(table, target_length)
 
 
 def ordered_covering(
-        routing_table: List[RTEntry], target_length: Optional[int],
+        routing_table: List[MulticastRoutingEntry],
+        target_length: Optional[int],
         aliases: _Aliases, *, no_raise: bool = False,
         time_to_run_for: Optional[float] = None
-        ) -> Tuple[List[RTEntry], _Aliases]:
+        ) -> Tuple[List[MulticastRoutingEntry], _Aliases]:
     """
     Reduce the size of a routing table by merging together entries where
     possible.
@@ -121,7 +121,7 @@ def ordered_covering(
         at least orthogonal (i.e., there are no two entries which would match
         the same key) and reorderable.
 
-    :param list(RTEntry) routing_table:
+    :param list(MulticastRoutingEntry) routing_table:
         Routing entries to be merged.
     :param target_length:
         Target length of the routing table; the minimisation procedure will
@@ -146,7 +146,8 @@ def ordered_covering(
         If supplied, a maximum number of seconds to run for before giving an
         error. May only be obeyed approximately.
     :return: new routing table, A new _aliases dictionary.
-    :rtype: tuple(list(RTEntry), dict(tuple(int,int), set(tuple(int,int))))
+    :rtype: tuple(list(MulticastRoutingEntry),
+        dict(tuple(int,int), set(tuple(int,int))))
     :raises MinimisationFailedError:
         If the smallest table that can be produced is larger than
         ``target_length``.
@@ -217,7 +218,7 @@ def get_generality(key: int, mask: int) -> int:
     return bin(xs).count("1")
 
 
-def _get_entry_generality(entry: Union[RTEntry, _Merge]) -> int:
+def _get_entry_generality(entry: Union[MulticastRoutingEntry, _Merge]) -> int:
     """
     Actually useful-in-this-file form of get_generality.
     """
@@ -225,12 +226,14 @@ def _get_entry_generality(entry: Union[RTEntry, _Merge]) -> int:
 
 
 def _get_best_merge(
-        routing_table: List[RTEntry], aliases: _ROAliases) -> '_Merge':
+        routing_table: List[MulticastRoutingEntry],
+        aliases: _ROAliases) -> '_Merge':
     """
     Inspect all possible merges for the routing table and return the merge
     which would combine the greatest number of entries.
 
-    :param RTEntry routing_table: Routing entries to be merged.
+    :param MulticastRoutingEntry routing_table:
+        Routing entries to be merged.
     :param aliases:
         Dictionary of which keys and masks in the routing table are
         combinations of other (now removed) keys and masks; this allows us to
@@ -268,11 +271,13 @@ def _get_best_merge(
     return best_merge
 
 
-def _get_all_merges(routing_table: List[RTEntry]) -> Iterable['_Merge']:
+def _get_all_merges(routing_table: List[MulticastRoutingEntry]
+                    ) -> Iterable['_Merge']:
     """
     Get possible sets of entries to merge.
 
-    :param list(RTEntry) routing_table: Routing entries to be merged.
+    :param list(MulticastRoutingEntry) routing_table:
+        Routing entries to be merged.
     :rtype: iterable(_Merge)
     """
     # Memorise entries that have been considered as part of a merge
@@ -322,10 +327,10 @@ class _Merge(object):
         # Whether this merge is defaultable
         "defaultable"]
 
-    def __init__(self, routing_table: List[RTEntry],
+    def __init__(self, routing_table: List[MulticastRoutingEntry],
                  entries: Collection[int] = frozenset()):
         """
-        :param list(RTEntry) routing_table:
+        :param list(MulticastRoutingEntry) routing_table:
         :param set(int) entries:
         """
         # Generate the new key, mask and sources
@@ -346,7 +351,7 @@ class _Merge(object):
 
         # Compute the goodness of the merge
         self.goodness: int = len(entries) - 1
-        self.routing_table: List[RTEntry] = routing_table
+        self.routing_table: List[MulticastRoutingEntry] = routing_table
         self.entries: FrozenSet[int] = frozenset(entries)
 
         # Compute the new mask, key and generality
@@ -390,7 +395,7 @@ class _Merge(object):
 
         return pos
 
-    def apply(self, aliases: _Aliases) -> List[RTEntry]:
+    def apply(self, aliases: _Aliases) -> List[MulticastRoutingEntry]:
         """
         Apply the merge to the routing table it is defined against and get a
         new routing table.
@@ -405,17 +410,20 @@ class _Merge(object):
             *This dictionary will be updated by this method.*
         :type aliases: dict(tuple(int, int), set(tuple(int, int))
         :return: new routing table
-        :rtype: list(RTEntry)
+        :rtype: list(MulticastRoutingEntry)
         """
         # Create a new routing table of the correct size
         new_size = len(self.routing_table) - len(self.entries) + 1
-        new_table: List[Optional[RTEntry]] = [None for _ in range(new_size)]
+        new_table: List[Optional[MulticastRoutingEntry]] = [
+            None for _ in range(new_size)]
 
         # Get the new entry
-        new_entry = RTEntry(
+        routing_entry = RoutingEntry(
             spinnaker_route=self.routing_table[
                 next(iter(self.entries))].spinnaker_route,
-            key=self.key, mask=self.mask, defaultable=self.defaultable)
+            defaultable=self.defaultable)
+        new_entry = MulticastRoutingEntry(
+            key=self.key, mask=self.mask, routing_entry=routing_entry)
         our_aliases: Set[_KeyMask] = set()
 
         # Iterate through the old table copying entries across
@@ -446,7 +454,7 @@ class _Merge(object):
             new_table[insert] = new_entry
 
         # All entries in new_table are now not None; cast is safe
-        return cast(List[RTEntry], new_table)
+        return cast(List[MulticastRoutingEntry], new_table)
 
 
 def _refine_merge(
@@ -761,7 +769,7 @@ def _get_covered_keys_and_masks(
     # and masks would overlap with the key and mask of the merged entry.
     covered: List[_KeyMask] = list()
     for entry in merge.routing_table[merge.insertion_index:]:
-        km = entry.key_mask
+        km = (entry.key, entry.mask)
         for key_mask in aliases.get(km, {km}):
             key, mask = key_mask
             if intersect(merge.key, merge.mask, key, mask):

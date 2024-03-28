@@ -18,11 +18,11 @@ from typing import (
 from typing_extensions import TypeAlias
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.typing.coords import XY
-from spinn_machine import Machine
+from spinn_machine import Machine, RoutingEntry
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartition, MulticastRoutingTableByPartitionEntry)
+    MulticastRoutingTableByPartition)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     longest_dimension_first, get_app_partitions, vertex_xy,
     vertex_xy_and_route)
@@ -984,9 +984,11 @@ def _convert_a_route(
                     app_vertex_source = True
                 else:
                     machine_vertex_sources.add(source)
-                entry = MulticastRoutingTableByPartitionEntry(
-                    link_ids + add_links, processor_ids + add_cores,
-                    incoming_processor, incoming_link)
+                entry = RoutingEntry(
+                    link_ids=link_ids + add_links,
+                    processor_ids=processor_ids + add_cores,
+                    incoming_processor=incoming_processor,
+                    incoming_link=incoming_link)
                 _add_routing_entry(
                     first_route, routing_tables, entry, x, y, source,
                     partition_id)
@@ -997,15 +999,18 @@ def _convert_a_route(
                 for m_vert in source_vertex.splitter.get_out_going_vertices(
                         partition_id):
                     if m_vert not in machine_vertex_sources:
-                        entry = MulticastRoutingTableByPartitionEntry(
-                            link_ids, processor_ids, incoming_processor,
-                            incoming_link)
+                        entry = RoutingEntry(
+                            link_ids=link_ids, processor_ids=processor_ids,
+                            incoming_processor=incoming_processor,
+                            incoming_link=incoming_link)
                         _add_routing_entry(
                             first_route, routing_tables, entry, x, y, m_vert,
                             partition_id)
         else:
-            entry = MulticastRoutingTableByPartitionEntry(
-                link_ids, processor_ids, incoming_processor, incoming_link)
+            entry = RoutingEntry(
+                link_ids=link_ids, processor_ids=processor_ids,
+                incoming_processor=incoming_processor,
+                incoming_link=incoming_link)
             _add_routing_entry(
                 first_route, routing_tables, entry, x, y, source_vertex,
                 partition_id)
@@ -1014,7 +1019,7 @@ def _convert_a_route(
 def _add_routing_entry(
         first_route: RoutingTree,
         routing_tables: MulticastRoutingTableByPartition,
-        entry: MulticastRoutingTableByPartitionEntry,
+        entry: RoutingEntry,
         x: int, y: int, source: _AnyVertex, partition_id: str):
     try:
         routing_tables.add_path_entry(entry, x, y, source, partition_id)

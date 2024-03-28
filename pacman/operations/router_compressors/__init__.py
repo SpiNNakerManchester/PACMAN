@@ -13,9 +13,8 @@
 # limitations under the License.
 
 from .abstract_compressor import AbstractCompressor
-from .rt_entry import RTEntry
 from .pair_compressor import pair_compressor
 from .ranged_compressor import range_compressor, RangeCompressor
 
-__all__ = ['AbstractCompressor', 'RTEntry', 'pair_compressor',
+__all__ = ['AbstractCompressor', 'pair_compressor',
            'RangeCompressor', 'range_compressor']

@@ -40,7 +40,7 @@ def codify(route: MulticastRoutingEntry, length: int = 32) -> str:
     :rtype: str
     """
     mask = route.mask
-    key = route.routing_entry_key
+    key = route.key
     # Check for validity: key 1 with mask 0 is an error
     bad = key & ~mask
     if bad:

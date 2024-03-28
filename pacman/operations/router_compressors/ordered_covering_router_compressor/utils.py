@@ -19,7 +19,7 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/remove_default_
 """
 
 from typing import List, Optional
-from pacman.operations.router_compressors import RTEntry
+from spinn_machine import MulticastRoutingEntry
 from pacman.exceptions import MinimisationFailedError
 
 
@@ -51,13 +51,14 @@ def intersect(key_a: int, mask_a: int, key_b: int, mask_b: int) -> bool:
 
 
 def remove_default_routes(
-        table: List[RTEntry], target_length: Optional[int],
-        check_for_aliases: bool = True) -> List[RTEntry]:
+        table: List[MulticastRoutingEntry], target_length: Optional[int],
+        check_for_aliases: bool = True) -> List[MulticastRoutingEntry]:
     """
     Remove from the routing table any entries which could be replaced by
     default routing.
 
-    :param list(RTEntry) table: Routing entries to be merged.
+    :param list(router_table.multicast_routing_entries) table:
+        Routing entries to be merged.
     :param target_length:
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
@@ -73,7 +74,7 @@ def remove_default_routes(
         If ``False``, the alias-check is skipped resulting in O(N) runtime.
         This option should only be used if the supplied table is guaranteed not
         to contain any aliased entries.
-    :rtype: list(RTEntry)
+    :rtype: list(MulticastRoutingEntry)
     :raises MinimisationFailedError:
         If the smallest table that can be produced is larger than
         ``target_length``.
