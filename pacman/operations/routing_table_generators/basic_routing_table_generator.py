@@ -68,7 +68,6 @@ def __create_routing_table(
         entry = partitions_in_table[source_vertex, partition_id]
         table.add_multicast_routing_entry(MulticastRoutingEntry(
             routing_entry_key=r_info.key_and_mask.key_combo,
-            defaultable=entry.defaultable, mask=r_info.key_and_mask.mask,
-            link_ids=entry.link_ids, processor_ids=entry.processor_ids))
+            mask=r_info.key_and_mask.mask, routing_entry=entry))
 
     return table

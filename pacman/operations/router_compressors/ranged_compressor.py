@@ -18,7 +18,7 @@ from typing import cast
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables,
@@ -201,8 +201,10 @@ class RangeCompressor(object):
             # make the new router entry
             new_mask = 2 ** 32 - power
             route = self._entries[first].spinnaker_route
+
+            entry = RoutingEntry(spinnaker_route=route)
             self._compressed.add_multicast_routing_entry(MulticastRoutingEntry(
-                low_cut, new_mask,  spinnaker_route=route))
+                low_cut, new_mask, entry))
 
             # Check if we're done
             if full_last == last:

@@ -76,8 +76,7 @@ def __create_routing_table(
         if isinstance(vertex, ApplicationVertex):
             table.add_multicast_routing_entry(
                 MulticastRoutingEntry(
-                    r_info.key, r_info.mask, defaultable=entry.defaultable,
-                    spinnaker_route=entry.spinnaker_route))
+                    r_info.key, r_info.mask, entry))
             continue
         # Otherwise it has to be a machine vertex...
         assert isinstance(vertex, MachineVertex)
@@ -86,9 +85,7 @@ def __create_routing_table(
         # If there is no application vertex, just add the entry
         if vertex.app_vertex is None:
             table.add_multicast_routing_entry(
-                MulticastRoutingEntry(
-                    r_info.key, r_info.mask, defaultable=entry.defaultable,
-                    spinnaker_route=entry.spinnaker_route))
+                MulticastRoutingEntry(r_info.key, r_info.mask, entry))
             continue
 
         # This has to be AppVertexRoutingInfo!
@@ -164,9 +161,7 @@ def __merged_keys_and_masks(
         return
     (entry, r_info) = entries[0]
     if len(entries) == 1:
-        yield MulticastRoutingEntry(
-            r_info.key, r_info.mask, defaultable=entry.defaultable,
-            spinnaker_route=entry.spinnaker_route)
+        yield MulticastRoutingEntry(r_info.key, r_info.mask, entry)
     else:
         yield from app_r_info.merge_machine_entries(entries)
 

@@ -131,11 +131,11 @@ def compare_route(
             c_route = compressed_dict[c_code]
             if f is not None:
                 f.write(f"\t\t{format_route(c_route)}\n")
-            if o_route.processor_ids != c_route.processor_ids:
+            if o_route.entry.processor_ids != c_route.entry.processor_ids:
                 raise PacmanRoutingException(
                     f"Compressed route {c_route} covers original route "
                     f"{o_route} but has a different processor_ids.")
-            if o_route.link_ids != c_route.link_ids:
+            if o_route.entry.link_ids != c_route.entry.link_ids:
                 raise PacmanRoutingException(
                     f"Compressed route {c_route} covers original route "
                     f"{o_route} but has a different link_ids.")

@@ -45,9 +45,8 @@ class TestRoutingTable(unittest.TestCase):
         mask = 0xff00
         proc_ids = range(18)
         link_ids = range(6)
-        MulticastRoutingEntry(key_combo, mask,
-                              processor_ids=proc_ids, link_ids=link_ids,
-                              defaultable=True)
+        MulticastRoutingEntry(key_combo, mask, RoutingEntry(
+            processor_ids=proc_ids, link_ids=link_ids, defaultable=True))
 
     def test_new_multicast_routing_table(self):
         """
@@ -66,7 +65,8 @@ class TestRoutingTable(unittest.TestCase):
         for i in range(5):
             multicast_entries.append(MulticastRoutingEntry(
                 key_combo + i, mask + i,
-                processor_ids=proc_ids, link_ids=link_ids, defaultable=True))
+                RoutingEntry(processor_ids=proc_ids, link_ids=link_ids,
+                             defaultable=True)))
         mrt = UnCompressedMulticastRoutingTable(0, 0, multicast_entries)
         self.assertEqual(mrt.x, 0)
         self.assertEqual(mrt.y, 0)
@@ -97,14 +97,16 @@ class TestRoutingTable(unittest.TestCase):
         multicast_entries = list()
         for i in range(5):
             multicast_entries.append(MulticastRoutingEntry(
-                key_combo + i, mask + i, processor_ids=proc_ids,
-                link_ids=link_ids, defaultable=True))
+                key_combo + i, mask + i,
+                RoutingEntry(processor_ids=proc_ids, link_ids=link_ids,
+                             defaultable=True)))
         mrt = UnCompressedMulticastRoutingTable(0, 0, multicast_entries)
         # We can't add an entry with the same key but different route
         with self.assertRaises(PacmanAlreadyExistsException):
             mrt.add_multicast_routing_entry(MulticastRoutingEntry(
-                key_combo, mask, processor_ids=[], link_ids=link_ids,
-                defaultable=True))
+                key_combo, mask,
+                RoutingEntry(processor_ids=[], link_ids=link_ids,
+                             defaultable=True)))
 
     def test_new_multicast_routing_table_duplicate_key_combo(self):
 
@@ -119,8 +121,9 @@ class TestRoutingTable(unittest.TestCase):
         multicast_entries = list()
         for i in range(5):
             multicast_entries.append(MulticastRoutingEntry(
-                key_combo, mask, processor_ids=proc_ids, link_ids=link_ids,
-                defaultable=True))
+                key_combo, mask, RoutingEntry(
+                    processor_ids=proc_ids, link_ids=link_ids,
+                    defaultable=True)))
         # We can add entries that are exactly the same
         UnCompressedMulticastRoutingTable(0, 0, multicast_entries)
 
@@ -134,11 +137,11 @@ class TestRoutingTable(unittest.TestCase):
         for i in range(6):
             link_ids.append(i)
         multicast_entries1 = MulticastRoutingEntry(
-            key_combo, mask, processor_ids=proc_ids, link_ids=link_ids,
-            defaultable=True)
+            key_combo, mask, RoutingEntry(
+                processor_ids=proc_ids, link_ids=link_ids, defaultable=True))
         multicast_entries2 = MulticastRoutingEntry(
-            key_combo - 1, mask - 1, processor_ids=proc_ids, link_ids=link_ids,
-            defaultable=True)
+            key_combo - 1, mask - 1, RoutingEntry(
+                processor_ids=proc_ids, link_ids=link_ids, defaultable=True))
         mrt = list()
 
         t1 = UnCompressedMulticastRoutingTable(0, 0, [multicast_entries1])
@@ -175,12 +178,12 @@ class TestRoutingTable(unittest.TestCase):
         for i in range(6):
             link_ids.append(i)
         multicast_entries1 = MulticastRoutingEntry(
-            key_combo, mask, processor_ids=proc_ids, link_ids=link_ids,
-            defaultable=True)
+            key_combo, mask, RoutingEntry(
+                processor_ids=proc_ids, link_ids=link_ids, defaultable=True))
 
         multicast_entries2 = MulticastRoutingEntry(
-            key_combo - 1, mask, processor_ids=proc_ids, link_ids=link_ids,
-            defaultable=True)
+            key_combo - 1, mask, RoutingEntry(
+                processor_ids=proc_ids, link_ids=link_ids, defaultable=True))
         mrt = list()
         mrt.append(
             UnCompressedMulticastRoutingTable(3, 0, [multicast_entries1]))

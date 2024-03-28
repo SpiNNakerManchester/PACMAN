@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from spinn_machine import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
 
 class RTEntry(object):
@@ -66,13 +66,13 @@ class RTEntry(object):
         # Yes I know using _params is ugly but this is for speed
         # pylint:disable=protected-access
         return RTEntry(
-            source._routing_entry_key, source._mask, source._defaultable,
-            source._spinnaker_route)
+            source._routing_entry_key, source._mask, source.defaultable,
+            source.spinnaker_route)
 
     def to_multicast_routing_entry(self) -> MulticastRoutingEntry:
         """
         :rtype: ~spinn_machine.MulticastRoutingEntry
         """
         return MulticastRoutingEntry(
-            self.key, self.mask, defaultable=self.defaultable,
-            spinnaker_route=self.spinnaker_route)
+            self.key, self.mask,
+            RoutingEntry(spinnaker_route=self.spinnaker_route))

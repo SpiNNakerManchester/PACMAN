@@ -79,9 +79,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
             # If that is OK, we can just use them
             if next_entries <= (n_entries - i) or is_last:
                 mask = self.__group_mask(next_entries)
-                yield MulticastRoutingEntry(
-                    r_info.key, mask, defaultable=entry.defaultable,
-                    spinnaker_route=entry.spinnaker_route)
+                yield MulticastRoutingEntry(r_info.key, mask, entry)
                 i += next_entries
 
             # Otherwise, we have to break down into powers of two
@@ -91,10 +89,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                     next_entries = 2 ** int(math.log2(entries_to_go))
                     mask = self.__group_mask(next_entries)
                     (entry, r_info) = entries[i]
-                    yield MulticastRoutingEntry(
-                        r_info.key, mask,
-                        defaultable=entry.defaultable,
-                        spinnaker_route=entry.spinnaker_route)
+                    yield MulticastRoutingEntry(r_info.key, mask, entry)
                     entries_to_go -= next_entries
                     i += next_entries
 
