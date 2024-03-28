@@ -149,7 +149,7 @@ def to_json(router_table: MulticastRoutingTables) -> JsonObjectArray:
             "y": routing_table.y,
             "entries": [
                 {
-                    "key": entry.routing_entry_key,
+                    "key": entry.key,
                     "mask": entry.mask,
                     "defaultable": entry.defaultable,
                     "spinnaker_route": entry.spinnaker_route

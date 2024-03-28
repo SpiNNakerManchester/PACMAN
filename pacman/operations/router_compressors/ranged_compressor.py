@@ -96,7 +96,7 @@ class RangeCompressor(object):
 
         # Step 1 get the entries and make sure they are sorted by key
         self._entries = list(uncompressed.multicast_routing_entries)
-        self._entries.sort(key=lambda x: x.routing_entry_key)
+        self._entries.sort(key=lambda x: x.key)
         if not self._validate():
             return uncompressed
 
@@ -141,7 +141,7 @@ class RangeCompressor(object):
         if index == len(self._entries):
             return sys.maxsize
         entry = self._entries[index]
-        return entry.routing_entry_key & entry.mask
+        return entry.key & entry.mask
 
     def _get_endpoint(self, index: int) -> int:
         """
@@ -155,7 +155,7 @@ class RangeCompressor(object):
             return 0
         entry = self._entries[index]
         # return the key plus the mask flipping ones and zeros
-        return (entry.routing_entry_key | ~entry.mask) & 0xFFFFFFFF
+        return (entry.key | ~entry.mask) & 0xFFFFFFFF
 
     def _merge_range(self, first: int, last: int):
         while True:

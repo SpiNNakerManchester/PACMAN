@@ -71,7 +71,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     @overrides(AbstractMulticastRoutingTable.add_multicast_routing_entry)
     def add_multicast_routing_entry(
             self, multicast_routing_entry: MulticastRoutingEntry):
-        routing_entry_key = multicast_routing_entry.routing_entry_key
+        routing_entry_key = multicast_routing_entry.key
         mask = multicast_routing_entry.mask
 
         tuple_key = (routing_entry_key, mask)
