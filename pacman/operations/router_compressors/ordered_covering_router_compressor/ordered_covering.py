@@ -98,7 +98,7 @@ class _OrderedCoveringCompressor(AbstractCompressor):
 
 
 def ordered_covering(
-        routing_table: List[MulticastRoutingEntry],
+        routing_table: Iterable[MulticastRoutingEntry],
         target_length: Optional[int],
         aliases: _Aliases, *, no_raise: bool = False,
         time_to_run_for: Optional[float] = None
@@ -121,7 +121,7 @@ def ordered_covering(
         at least orthogonal (i.e., there are no two entries which would match
         the same key) and reorderable.
 
-    :param list(MulticastRoutingEntry) routing_table:
+    :param iterable(MulticastRoutingEntry) routing_table:
         Routing entries to be merged.
     :param target_length:
         Target length of the routing table; the minimisation procedure will
