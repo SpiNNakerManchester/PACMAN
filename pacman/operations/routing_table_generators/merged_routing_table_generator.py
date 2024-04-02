@@ -155,8 +155,8 @@ def __mask_has_holes(mask: int) -> bool:
 
 def __merged_keys_and_masks(
         app_r_info: AppVertexRoutingInfo,
-        entries: List[Tuple[RoutingEntry,
-            MachineVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:
+        entries: List[Tuple[RoutingEntry, MachineVertexRoutingInfo]]
+        ) -> Iterable[MulticastRoutingEntry]:
     if not entries:
         return
     (entry, r_info) = entries[0]
