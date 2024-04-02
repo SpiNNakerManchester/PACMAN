@@ -22,8 +22,7 @@ from pacman.model.routing_tables.multicast_routing_tables import (
     to_json, from_json)
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition)
-from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanInvalidParameterException)
+from pacman.exceptions import PacmanAlreadyExistsException
 from pacman.utilities import file_format_schemas
 from pacman.model.graphs.machine import SimpleMachineVertex
 
@@ -212,12 +211,10 @@ class TestRoutingTable(unittest.TestCase):
         with self.assertRaises(SpinnMachineInvalidParameterException):
             RoutingEntry(link_ids=range(6), processor_ids=range(18),
                          incoming_processor=4, incoming_link=3)
-        e1 = RoutingEntry(link_ids=range(6), processor_ids=range(18))
         e2 = RoutingEntry(link_ids=range(2), processor_ids=range(4),
                           incoming_processor=4)
         e3 = RoutingEntry(link_ids=range(3, 5), processor_ids=range(12, 16),
                           incoming_link=3)
-        e4 = RoutingEntry(link_ids=2, processor_ids=16)
         assert str(e2) == "{0, 1, 2, 3}:{0, 1}"
         assert str(e3) == "{12, 13, 14, 15}:{3, 4}"
         e6 = e2.merge(
