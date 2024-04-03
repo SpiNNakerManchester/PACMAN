@@ -17,6 +17,7 @@ from pacman.operations.partition_algorithms.ga.entities.resource_configuration i
 from pacman.operations.partition_algorithms.ga.init_population_generators.abst_init_pop_generator import AbstractGaInitialPopulationGenerator
 from pacman.operations.partition_algorithms.ga.init_population_generators.fixed_slice_pop_generator import GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore
 from pacman.operations.partition_algorithms.ga.entities.ga_algorithm_configuration import GAAlgorithmConfiguration
+from pacman.operations.partition_algorithms.neurodynamics.ising_model import IsingModel2D, load_neurodynamics_record
 from typing import List
 import numpy as np
 
@@ -37,7 +38,7 @@ class GaAlgorithmSolutionReader(object):
                 return GASliceSolutionRepresentation(solution[4], None, None, solution_max_cores_per_chip, solution_max_chips, False)
     
 class GAPartitioner(AbstractPartitioner):
-    def __init__(self, resource_contraints_configuration, max_slice_length = 100, solution_file_path=None, read_solution_from_file=False, serialize_solution_to_file=False, ga_algorithm_configuration: GAAlgorithmConfiguration=None):
+    def __init__(self, resource_contraints_configuration, max_slice_length = 100, solution_file_path=None, read_solution_from_file=False, serialize_solution_to_file=False, ga_algorithm_configuration: GAAlgorithmConfiguration=None, neurodynamics_configuration_base_path = "./", neurodynamics_configuration_name = ""):
         super().__init__(resource_contraints_configuration)
         SDRAM_SIZE = self.get_resource_constraint_configuration().get_max_sdram()
         self._max_slice_length = max_slice_length
@@ -49,6 +50,7 @@ class GAPartitioner(AbstractPartitioner):
         self._solution_file_path = solution_file_path
         self._read_solution_from_file = read_solution_from_file
         self._ga_algorithm_configuration: GAAlgorithmConfiguration = ga_algorithm_configuration
+        
     
     @overrides(AbstractPartitioner._adapted_output)
     def _adapted_output(self) -> bytearray:

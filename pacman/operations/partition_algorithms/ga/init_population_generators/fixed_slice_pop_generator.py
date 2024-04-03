@@ -48,7 +48,7 @@ class GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore(AbstractGaInitialPopul
         neuron_index = 0
         for application_vertex_index in range(0, len(vertices)):
             sdram_calculator = SDRAMCalculator(vertices[application_vertex_index])
-            fixed_slice_size = min(fixed_slice_size, sdram_calculator.calculate_max_slice_length(vertices[application_vertex_index],
+            fixed_slice_size = min(fixed_slice_size, sdram_calculator.calculate_max_slice_length_sdram_capable_store(vertices[application_vertex_index],
                 self._resource_constraint_configuration.get_neruon_count(),
                 self._resource_constraint_configuration.get_max_sdram()))
             for inner_application_vertx_neuron_index in range(0, vertices[application_vertex_index].n_atoms, fixed_slice_size):
@@ -128,7 +128,7 @@ class GaFixedSlicePopulationPTypeGeneratorMultiSliceOneCore(AbstractGaInitialPop
         for application_vertex_index in range(0, len(vertices)):
             sdram_calculator = SDRAMCalculator(vertices[application_vertex_index])
             fixed_slice_size = min(fixed_slice_size, \
-                                   sdram_calculator.calculate_max_slice_length(vertices[application_vertex_index], \
+                                   sdram_calculator.calculate_max_slice_length_sdram_capable_store(vertices[application_vertex_index], \
                                    self._resource_constraint_configuration.get_neruon_count(),\
                                    self._resource_constraint_configuration.get_max_sdram()))
             

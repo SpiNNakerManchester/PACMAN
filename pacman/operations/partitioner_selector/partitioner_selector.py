@@ -12,46 +12,56 @@ from pacman.operations.partition_algorithms.ga.solution_fixing_operators.slice_r
 from pacman.operations.partition_algorithms.ga.cost_caculators.resource_utilization_cost import ResourceUtilizationCost
 from pacman.operations.partition_algorithms.ga.selection_operators.elite_possibility_selection import GaEliteProbabilisticSelection
 from pacman.operations.partition_algorithms.ga.crossover_operators.slice_crossover import GaSliceSliceInfoCombinationUniformCrossover
+from pacman.operations.partition_algorithms.ga.cost_caculators.perf_cost import ProfilingSamplingBasedIsingModelCost
 from pacman.data import PacmanDataView
+from pacman.operations.partition_algorithms.neurodynamics.ising_model import IsingModel2D, load_neurodynamics_record
+
+import os
 
 class PartitionerSelector(object):
-    def __init__(self, partitioner_name, resource_constraint_configuration: ResourceConfiguration) -> None:
+    def __init__(self, partitioner_name, resource_constraint_configuration: ResourceConfiguration, extra_args:dict=None) -> None:
         self._partitioner_name = partitioner_name
         self._resource_constraint_configuration: ResourceConfiguration = resource_constraint_configuration
-        if partitioner_name == "splitter":            
+        if partitioner_name == "splitter":
             self._partitioner = None
             self._n_chips = splitter_partitioner()
         if partitioner_name == "random":
             self._partitioner = RandomPartitioner(100, resource_constraint_configuration).partitioning()
             self._n_chips = self._partitioner.get_n_chips()
         if partitioner_name == "ga":
+            ising_model, samples = load_neurodynamics_record(extra_args['neurodynamics_configuration_name'], extra_args['neurodynamics_configuration_base_path'])
+
             ga_configuration: GAAlgorithmConfiguration = \
                 GAAlgorithmConfiguration(
-                    init_solutions_generator=\
-                        GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore([50, 100, 200, 300, 400, 500, 600, 700, 800, 900],resource_constraint_configuration),
+                    init_solutions_generator = \
+                        GaFixedSlicePopulationPTypeGeneratorOneSliceOneCore([50, 100, 200, 300, 400, 500, 600, 700, 800, 900], resource_constraint_configuration),
                     solution_representation_strategy='slice',
                     crossover_individuals_selection_strategy=GaussianWeightInvidualSelection(),
                     crossover_perform_strategy=GaSliceSliceInfoCombinationUniformCrossover(True),
                     variation_strategy=GaSliceVariationuUniformGaussian(True, 0.05, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0), 
                     solution_fixing_strategy=GaSliceRepresenationSolutionSimpleFillingFixing(resource_constraint_configuration, PacmanDataView.get_graph()), 
-                    solution_cost_calculation_strategy=ResourceUtilizationCost(),
+                    solution_cost_calculation_strategy=ProfilingSamplingBasedIsingModelCost(ising_model=ising_model, samples=samples),
                     selection_strategy=GaEliteProbabilisticSelection(8, 3),
                     log_processing=True,
                     output_population_all_epoch=True, 
                     output_final_epoch_population=True,
-                    epochs = 10, 
-                    max_individuals_each_epoch = 20,
-                    individual_survivals_each_epoch = 10, 
-                    base_path_for_output = "./ga_algorithm_records/",
-                    initial_solution_count = 10
+                    epochs=10, 
+                    max_individuals_each_epoch=20,
+                    individual_survivals_each_epoch=10, 
+                    base_path_for_output="./ga_algorithm_records/",
+                    initial_solution_count=10
             )
 
-            self._partitioner = GAPartitioner(
-                resource_contraints_configuration=resource_constraint_configuration,
-                max_slice_length=10 ** 9,
-                solution_file_path=None,
-                serialize_solution_to_file=True,
-                ga_algorithm_configuration=ga_configuration).partitioning()
+            self._partitioner = \
+                GAPartitioner(
+                    resource_contraints_configuration=resource_constraint_configuration,
+                    max_slice_length=10 ** 9,
+                    solution_file_path=None,
+                    read_solution_from_file=False,
+                    serialize_solution_to_file=True,
+                    ga_algorithm_configuration=ga_configuration, 
+                    neurodynamics_configuration_base_path=extra_args['neurodynamics_configuration_base_path'], 
+                    neurodynamics_configuration_name=extra_args['neurodynamics_configuration_name']).partitioning()
 
     def get_partitioner_instance(self):
         return self._partitioner

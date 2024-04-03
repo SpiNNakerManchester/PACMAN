@@ -7,7 +7,7 @@ class AbstractGASolutionRepresentation:
         self._max_cores_per_chip = max_cores_pre_chip
         self._max_chips = max_chips
         self._single_neuron_encoding_length = \
-            (int)(np.ceil(np.log2(self.get_max_chips() * self.get_max_cores_per_chip())))
+            (int)(np.ceil(np.log2(self.get_max_chips() * self.get_max_cores_per_chip()))) if not use_ptype else 1
    
     def get_ptype_solution_representation(self) :
         if self._use_ptype:

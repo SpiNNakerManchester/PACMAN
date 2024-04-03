@@ -1,5 +1,6 @@
 from typing import List, Union
 from pacman.operations.partition_algorithms.ga.solution_representations.abst_ga_solution_representation import AbstractGASolutionRepresentation
+
 class AbstractGaCostCalculator(object):
     def calculate(self, solutions: Union[List[AbstractGASolutionRepresentation], AbstractGASolutionRepresentation]) -> List[float]:
         costs = []

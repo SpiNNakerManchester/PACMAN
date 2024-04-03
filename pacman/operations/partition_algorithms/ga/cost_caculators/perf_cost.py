@@ -3,18 +3,20 @@ from pacman.operations.partition_algorithms.ga.solution_representations.abst_ga_
 from pacman.operations.partition_algorithms.ga.solution_representations.slice_representation import GASliceSolutionRepresentation
 from pacman.operations.partition_algorithms.ga.cost_caculators.abst_cost_calculator import AbstractGaCostCalculator
 from spinn_utilities.overrides import overrides
+from pacman.operations.partition_algorithms.neurodynamics.ising_model import IsingModel2D
 from numpy.typing import NDArray
 import numpy as np
 import random
-class ProfilingIsingModelCost(AbstractGaCostCalculator):
 
+class ProfilingSamplingBasedIsingModelCost(AbstractGaCostCalculator):
     @overrides(AbstractGaCostCalculator._calculate_cost_for_single_individual)
     def _calculate_cost_for_single_individual(self, solution: AbstractGASolutionRepresentation) -> List[float]:
-        common_solution_representation = solution.to_common_representation()
-        ptype_solution_representation: List[int] = common_solution_representation.get_ptype_solution_representation()
-        sampling_count = len(ptype_solution_representation) if self._sampling_count <= 0 else self._sampling_count
-        cost = 0.0
+        if not isinstance(solution, GASliceSolutionRepresentation):
+            raise NotImplemented
         
+        ptype_solution_representation: List[int] = solution.get_ptype_solution_representation()
+        sampling_count = len(self._samples)
+        accumulated_cost = 0.0
 
         def find_chip_core(neuron_index) -> Tuple[int, int]:
             # binary search
@@ -35,13 +37,7 @@ class ProfilingIsingModelCost(AbstractGaCostCalculator):
                     continue
             raise ValueError
 
-        def calculate_single_cost(sample: bytearray, ptype_solution_representation, Z):
-            hamiltonian = calculate_hamiltonian(sample)
-            # # For calculate cost, the normalization factor in calculating graph state possibility.
-            # # The is not be considered currently.
-            # # The cost of different.
-            normalization_factor = Z
-            p = np.exp(-hamiltonian) / normalization_factor
+        def calculate_single_cost(sample: bytearray):
             # For all neuron pairs, caculates the cost of this pairs.
             # 1. no neuron in the pair are activated --> 0
             # 2. one of the neuron in the pair is activated -> 0
@@ -53,10 +49,10 @@ class ProfilingIsingModelCost(AbstractGaCostCalculator):
             cost = 0.0
             for i in range(0, N):
                 for j in range(0, i):
-                    if sample[i] == '0' and sample[j] == '0':
+                    if sample[i] == -1 and sample[j] == -1:
                         cost += self._cost_no_activation
                         continue
-                    if (sample[i] == '1' and sample[j] == '0') or (sample[i] == '0' and sample[j] == '1'):
+                    if (sample[i] == 1 and sample[j] == -1) or (sample[i] == -1 and sample[j] == 1):
                         cost += self._cost_one_activation
                         continue
                     neuron_i_chip_id, neuron_i_core_id = find_chip_core(i)
@@ -68,65 +64,27 @@ class ProfilingIsingModelCost(AbstractGaCostCalculator):
                         cost += self._cost_differnt_core_same_chip
                         continue
                     cost += self._cost_different_chip
-            return p * cost
+            return cost
 
-        def sampling_one(neuron_count) -> bytearray:
-            sample = bytearray(neuron_count)
-            for i in range(0, neuron_count):
-                sample[i] = '1' if random.random() < self._J[i] else '0'
-            return sample
-
-        def calculate_Z(N):
-            z = 2
-            Z = np.exp(-self._beta * self._J * z * self._mean_field ** 2 * N / 2) * \
-                (2 * np.cosh(self._beta * (self._J * z * self._mean_field + self._H))) ** N
-            return Z
-
-        def calculate_hamiltonian(sample: bytearray) -> bytearray:
-            hamiltonian  = 0.0
-            interaction_factor = 0.0
-            activation_factor = 0.0
-            # Activation factor
-            for j in range(0, len(ptype_solution_representation)):
-                h_j = self._H[j]
-                sigma_j = 1 if sample[j] == '1' else -1
-                activation_factor += h_j * sigma_j
-            activation_factor *= self._mean_field
-            hamiltonian = -activation_factor
-
-            for i in range(0, len(ptype_solution_representation)):
-                for j in range(0, i):
-                    h_j = self._H[j]
-                    sigma_i = 1 if sample[i] == '1' else -1
-                    sigma_j = 1 if sample[j] == '1' else -1
-                    interaction_factor += sigma_i * sigma_j * self._J[i, j]
-            activation_factor *= self._mean_field
-            hamiltonian = - interaction_factor - activation_factor
-
-            return hamiltonian
-
+   
         # Sampling neuron network states.
         # Calculate the average cost of sampled states under the given neurons placement.
-        Z = calculate_Z()
-        for _ in range(0, sampling_count):
-            sample = sampling_one(len(ptype_solution_representation))
-            single_cost = calculate_single_cost(sample, ptype_solution_representation, Z)
-            cost += single_cost
-        cost /= sampling_count
-        return cost
-    def __init__(self, H: NDArray, J: NDArray, mean_field, \
-                 normalization_factor = np.inf, sampling_count = -1, beta = 1.0,\
+        for i in range(0, sampling_count):
+            sample = self._samples[i]
+            # it may better utilize $\sum_s p(s)cost(s)$. It require the partition function Z, when calculate p(s).
+            single_cost = calculate_single_cost(sample)
+            accumulated_cost += single_cost
+        accumulated_cost /= sampling_count
+        return accumulated_cost
+    
+    def __init__(self, ising_model: IsingModel2D, samples,
                     cost_no_activation=0.0, cost_one_activation=1.0, cost_same_core=2.0,\
                     cost_differnt_core_same_chip=3.0, cost_different_chip=4.0) -> None:
         super().__init__()
-        if len(H.shape) or len(J.shape) != 2 or J.shape[0] != J.shape[1] or H.shape[0] != J.shape[1]:
+        if len(ising_model.get_H().shape) != 1 or len(ising_model.get_J().shape) != 2 or ising_model.get_J().shape[0] != ising_model.get_J().shape[1] or ising_model.get_H().shape[0] != ising_model.get_J().shape[1]:
             raise ValueError
-        self._H = H
-        self._J = J
-        self._mean_field = mean_field
-        self._sampling_count = sampling_count
-        self._normalization_factor = normalization_factor
-        self._beta = 1.0
+        self._ising_model = ising_model
+        self._samples = samples
         self._cost_no_activation = cost_no_activation
         self._cost_one_activation = cost_one_activation
         self._cost_same_core = cost_same_core
