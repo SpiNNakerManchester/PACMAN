@@ -14,11 +14,10 @@
 from __future__ import annotations
 import logging
 import os
-from typing import Iterable, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Tuple, Sequence, Set
 
-from spinn_utilities.config_holder import get_config_bool, get_config_str
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 
 from spinn_machine import Chip
@@ -28,6 +27,7 @@ from pacman.model.placements import Placements, Placement
 from pacman.model.graphs import AbstractVirtual
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.resources import AbstractSDRAM
 from pacman.exceptions import (
     PacmanPlaceException, PacmanConfigurationException, PacmanTooBigToPlace)
 
@@ -46,529 +46,661 @@ def place_application_graph(system_placements: Placements) -> Placements:
     :return: Placements for the application. *Includes the system placements.*
     :rtype: Placements
     """
-    # Track the placements and space
-    placements = Placements(system_placements)
+    placer = ApplicationPlacer(system_placements)
+    return placer.do_placements(system_placements)
 
-    plan_n_timesteps = PacmanDataView.get_plan_n_timestep()
-    spaces = _Spaces(placements, plan_n_timesteps)
-
-    # Go through the application graph by application vertex
-    progress = ProgressBar(
-        PacmanDataView.get_n_vertices(), "Placing Vertices")
-    for app_vertex in progress.over(PacmanDataView.iterate_vertices()):
-        spaces.restore_chips()
-
-        # Try placements from the next chip, but try again if fails
-        placed = False
-        while not placed:
-            chips_attempted = list()
-            try:
-                same_chip_groups = app_vertex.splitter.get_same_chip_groups()
-                if not same_chip_groups:
-                    placed = True
-                    break
-
-                # Start a new space
-                try:
-                    next_chip_space, space = spaces.get_next_chip_and_space()
-                except PacmanPlaceException as e:
-                    raise _place_error(
-                        placements, system_placements, e,
-                        plan_n_timesteps) from e
-                
-                # next_chip_space hold a chip, and cores that avaliable be used. 
-                logger.debug(f"Starting placement from {next_chip_space}")
-
-                placements_to_make: List = list()
-
-                # Go through the groups
-                last_chip_space: Optional[_ChipWithSpace] = None
-                for vertices, sdram in same_chip_groups:
-                    # It need to find out that how slices property in a vertex is used in placement.
-                    vertices_to_place = [
-                        vertex
-                        for vertex in vertices
-                        # No need to place virtual vertices
-                        if not isinstance(vertex, AbstractVirtual)
-                        and not placements.is_vertex_placed(vertex)]
-                    actual_sdram = sdram.get_total_sdram(plan_n_timesteps)
-                    n_cores = len(vertices_to_place)
-
-                    # If this group has a fixed location, place it there
-                    # it seems that all verteces in the `vertices_to_place` 
-                    # are belongs to the same group. 
-                    if _do_fixed_location(vertices_to_place, actual_sdram,
-                                          placements, next_chip_space):
-                        continue
-
-                    # Try to find a chip with space; this might result in a
-                    # _SpaceExceededException
-                    while not next_chip_space.is_space(n_cores, actual_sdram):
-                        next_chip_space = spaces.get_next_chip_space(
-                            space, last_chip_space)
-                        last_chip_space = None
-
-                    # If this worked, store placements to be made
-                    last_chip_space = next_chip_space
-                    chips_attempted.append(next_chip_space.chip)
-
-                    # Vertices are appended to `placements_to_make` 
-                    _store_on_chip(
-                        placements_to_make, vertices_to_place, actual_sdram,
-                        next_chip_space)
-
-                # Now make the placements having confirmed all can be done
-                placements.add_placements(placements_to_make)
-                placed = True
-                logger.debug(f"Used {chips_attempted}")
-            except _SpaceExceededException:
-                # This might happen while exploring a space; this may not be
-                # fatal since the last space might have just been bound by
-                # existing placements, and there might be bigger spaces out
-                # there to use
-                _check_could_fit(app_vertex, vertices_to_place, actual_sdram)
-                logger.debug(f"Failed, saving {chips_attempted}")
-                spaces.save_chips(chips_attempted)
-                chips_attempted.clear()
-
-    if get_config_bool("Reports", "draw_placements"):
-        from .draw_placements import draw_placements as dp
-        dp(placements, system_placements)
-
-    return placements
-
-def _place_error(
-        placements: Placements, system_placements: Placements,
-        exception: Exception,
-        plan_n_timesteps: Optional[int]) -> PacmanPlaceException:
+class ApplicationPlacer(object):
     """
-    :param Placements placements:
-    :param Placements system_placements:
-    :param PacmanPlaceException exception:
-    :param int plan_n_timesteps:
-    :rtype: PacmanPlaceException
+    Places the Vertices keeping ones for an ApplicationVertex together.
+
     """
-    unplaceable = list()
-    vertex_count = 0
-    n_vertices = 0
-    for app_vertex in PacmanDataView.iterate_vertices():
-        same_chip_groups = app_vertex.splitter.get_same_chip_groups()
-        app_vertex_placed = True
-        found_placed_cores = False
-        for vertices, _sdram in same_chip_groups:
-            if isinstance(vertices[0], AbstractVirtual):
-                break
-            if placements.is_vertex_placed(vertices[0]):
-                found_placed_cores = True
-            elif found_placed_cores:
-                vertex_count += len(vertices)
-                n_vertices = len(same_chip_groups)
-                app_vertex_placed = False
-                break
-            else:
-                app_vertex_placed = False
-                break
-        if not app_vertex_placed:
-            unplaceable.append(app_vertex)
+    __slots__ = (
+        # Values from PacmanDataView cached for speed
+        # PacmanDataView.get_machine()
+        "__machine",
+        # PacmanDataView.get_plan_n_timestep()
+        "__plan_n_timesteps",
+        # Sdram available on perfect none Ethernet Chip after Monitors placed
+        "__max_sdram",
+        # Minimum sdram that should be available for a Chip to not be full
+        "__min_sdram",
+        # N Cores free on perfect none Ethernet Chip after Monitors placed
+        "__max_cores",
 
-    report_file = os.path.join(
-        PacmanDataView.get_run_dir_path(), "placements_error.txt")
-    with open(report_file, 'w', encoding="utf-8") as f:
-        f.write(f"Could not place {len(unplaceable)} of "
-                f"{PacmanDataView.get_n_vertices()} application vertices.\n")
-        f.write(f"    Could not place {vertex_count} of {n_vertices} in the"
-                " last app vertex\n\n")
-        for x, y in placements.chips_with_placements:
-            first = True
-            for placement in placements.placements_on_chip(x, y):
-                if system_placements.is_vertex_placed(placement.vertex):
-                    continue
-                if first:
-                    f.write(f"Chip ({x}, {y}):\n")
-                    first = False
-                f.write(f"    Processor {placement.p}:"
-                        f" Vertex {placement.vertex}\n")
-            if not first:
-                f.write("\n")
-        f.write("\n")
-        f.write("Not placed:\n")
-        for app_vertex in unplaceable:
-            f.write(f"Vertex: {app_vertex}\n")
-            same_chip_groups = app_vertex.splitter.get_same_chip_groups()
-            for vertices, sdram in same_chip_groups:
-                f.write(f"    Group of {len(vertices)} vertices uses "
-                        f"{sdram.get_total_sdram(plan_n_timesteps)} "
-                        "bytes of SDRAM:\n")
-                for vertex in vertices:
-                    f.write(f"        Vertex {vertex}")
-                    if placements.is_vertex_placed(vertex):
-                        plce = placements.get_placement_of_vertex(vertex)
-                        f.write(f" (placed at {plce.x}, {plce.y}, {plce.p})")
-                    f.write("\n")
-        f.write("\n")
-        f.write("Unused chips:\n")
-        machine = PacmanDataView.get_machine()
-        for x, y in machine.chip_coordinates:
-            n_placed = placements.n_placements_on_chip(x, y)
-            system_placed = system_placements.n_placements_on_chip(x, y)
-            if n_placed - system_placed == 0:
-                n_procs = machine[x, y].n_user_processors
-                f.write(f"    {x}, {y} ({n_procs - system_placed}"
-                        " free cores)\n")
+        # Pointer to the placements including all previous Application Vertices
+        "__placements",
+        # A Function to yield the Chips in a consistent order
+        "__chips",
+        # Chips that have been fully placed by previous Application Vertices
+        "__full_chips",
+        # Chips that have already been used by this ApplicationVertex
+        "__prepared_chips",
+        # Start Chips from previous ApplicationVertices not yet marked as full
+        "__restored_chips",
+        # Start Chips tried for this ApplicationVertex
+        "__starts_tried",
+        # Label of the current ApplicationVertex for (error) reporting
+        "__app_vertex_label",
 
-    if get_config_bool("Reports", "draw_placements_on_error"):
-        from .draw_placements import draw_placements as dp
-        dp(placements, system_placements)
+        # Data for the last Chip offered to place on
+        # May be full after current group placed
+        "__current_chip",
+        # List of cores available. Included ones for current group until used
+        "__current_cores_free",
+        # Available sdram after the current group is placed
+        "__current_sdram_free",
 
-    return PacmanPlaceException(
-        f" {exception}."
-        f" Report written to {report_file}.")
+        # Data about the neighbouring Chips to ones used
+        # Current board being placed on
+        "__ethernet_x",
+        "__ethernet_y",
+        # List of available neighbours on the current board
+        "__same_board_chips",
+        # List of available neighbours not on the current board
+        "__other_board_chips")
 
-
-def _check_could_fit(
-        app_vertex: ApplicationVertex, vertices_to_place: List[MachineVertex],
-        sdram: int):
-    """
-    :param ApplicationVertex app_vertex:
-    :param list(MachineVertex) vertices_to_place:
-    :param int sdram:
-    :raises PacmanTooBigToPlace:
-    """
-    version = PacmanDataView.get_machine_version()
-    max_sdram = (
-            version.max_sdram_per_chip - PacmanDataView.get_monitor_sdram())
-    max_cores = (
-            version.max_cores_per_chip - version.n_non_user_cores -
-            PacmanDataView.get_monitor_cores())
-    n_cores = len(vertices_to_place)
-    if sdram <= max_sdram and n_cores <= max_cores:
-        # should fit somewhere
-        return
-    message = (
-        f"{app_vertex} will not fit on any possible Chip "
-        f"the reason is that {vertices_to_place} ")
-    if sdram > max_sdram:
-        message += f"requires {sdram} bytes but "
-        if sdram > version.max_sdram_per_chip:
-            message += f"a Chip only has {version.max_sdram_per_chip} bytes "
-        else:
-            message += f"after monitors only {max_sdram} bytes are available "
-        message += "Lowering max_core_per_chip may resolve this."
-        raise PacmanTooBigToPlace(message)
-    if n_cores > version.max_cores_per_chip:
-        message += " is more vertices than the number of cores on a chip."
-        raise PacmanTooBigToPlace(message)
-    user_cores = version.max_cores_per_chip - version.n_non_user_cores
-    if n_cores > user_cores:
-        message += (
-            f"is more vertices than the user cores ({user_cores}) "
-            "available on a Chip")
-    else:
-        message += (
-            f"is more vertices than the {max_cores} cores available on a "
-            f"Chip once {PacmanDataView.get_monitor_cores()} "
-            "are reserved for monitors")
-    raise PacmanTooBigToPlace(message)
-
-
-class _SpaceExceededException(Exception):
-    pass
-
-
-def _do_fixed_location(
-        vertices: list[MachineVertex], sdram: int, placements: Placements,
-        next_chip_space: _ChipWithSpace) -> bool:
-    """
-    :param list(MachineVertex) vertices:
-    :param int sdram:
-    :param Placements placements:
-    :param _ChipWithSpace next_chip_space:
-    :rtype: bool
-    :raise PacmanConfigurationException:
-    """
-    for vertex in vertices:
-        loc = vertex.get_fixed_location()
-        if loc:
-            x, y = loc.x, loc.y
-            break
-    else:
-        return False
-
-    machine = PacmanDataView.get_machine()
-    chip = machine.get_chip_at(x, y)
-    if chip is None:
-        raise PacmanConfigurationException(
-            f"Constrained to chip {x, y} but no such chip")
-    on_chip = placements.placements_on_chip(x, y)
-    cores_used = {p.p for p in on_chip}
-    cores = set(p.processor_id for p in chip.processors
-                if not p.is_monitor) - cores_used
-    next_cores = iter(cores)
-    for vertex in vertices:
-        next_core = None
-        fixed = vertex.get_fixed_location()
-        if fixed and fixed.p is not None:
-            if fixed.p not in next_cores:
-                raise PacmanConfigurationException(
-                    f"Core {fixed.p} on {x}, {y} not available to "
-                    f"place {vertex} on")
-            next_core = fixed.p
-        else:
-            try:
-                next_core = next(next_cores)
-            except StopIteration:
-                # pylint: disable=raise-missing-from
-                raise PacmanConfigurationException(
-                    f"No more cores available on {x}, {y}: {on_chip}")
-        placements.add_placement(Placement(vertex, x, y, next_core))
-        if next_chip_space.x == x and next_chip_space.y == y:
-            next_chip_space.cores.remove(next_core)
-            next_chip_space.use_sdram(sdram)
-    return True
-
-
-def _store_on_chip(
-        placements_to_make: List[Placement], vertices: List[MachineVertex],
-        sdram: int, next_chip_space: _ChipWithSpace):
-    """
-    :param list(Placement) placements_to_make:
-    :param list(MachineVertex) vertices:
-    :param int sdram:
-    :param _ChipWithSpace next_chip_space:
-    """
-    for vertex in vertices:
-        core = next_chip_space.use_next_core()
-        placements_to_make.append(Placement(
-            vertex, next_chip_space.x, next_chip_space.y, core))
-    next_chip_space.use_sdram(sdram)
-
-
-class _Spaces(object):
-    __slots__ = ("__machine", "__chips", "__next_chip", "__used_chips",
-                 "__system_placements", "__placements", "__plan_n_timesteps",
-                 "__last_chip_space", "__saved_chips", "__restored_chips")
-
-    def __init__(
-            self, placements: Placements, plan_n_timesteps: Optional[int]):
+    def __init__(self, placements: Placements):
         """
         :param Placements placements:
         :param int plan_n_timesteps:
         """
+        # Data cached for speed
         self.__machine = PacmanDataView.get_machine()
-        self.__placements = placements
-        self.__plan_n_timesteps = plan_n_timesteps
-        self.__chips = iter(self.__chip_order())
-        self.__next_chip = next(self.__chips)
-        self.__used_chips: Set[Chip] = set()
-        self.__last_chip_space: Optional[_ChipWithSpace] = None
-        self.__saved_chips: OrderedSet[Chip] = OrderedSet()
-        self.__restored_chips: OrderedSet[Chip] = OrderedSet()
+        self.__plan_n_timesteps = PacmanDataView.get_plan_n_timestep()
+        version = PacmanDataView.get_machine_version()
+        self.__max_sdram = (
+                version.max_sdram_per_chip -
+                PacmanDataView.get_all_monitor_sdram().get_total_sdram(
+                    PacmanDataView.get_plan_n_timestep()))
+        self.__max_cores = (
+                version.max_cores_per_chip - version.n_scamp_cores -
+                PacmanDataView.get_all_monitor_cores())
+        self.__min_sdram = self.__max_sdram // self.__max_cores
 
-    def __chip_order(self):
+        self.__placements = placements
+        self.__chips = self._chip_order()
+
+        self.__full_chips: Set[Chip] = set()
+        self.__prepared_chips: Set[Chip] = set()
+        self.__restored_chips: List[Chip] = list()
+        self.__starts_tried: List[Chip] = list()
+
+        self.__current_chip: Optional[Chip] = None
+        self.__current_cores_free: List[int] = list()
+        self.__current_sdram_free = 0
+        self.__app_vertex_label: Optional[str] = None
+
+        # Set some value so no Optional needed
+        self.__ethernet_x = -1
+        self.__ethernet_y = -1
+        self.__same_board_chips: Dict[Chip, Chip] = dict()
+        self.__other_board_chips:  Dict[Chip, Chip] = dict()
+
+    def do_placements(self, system_placements: Placements) -> Placements:
         """
-        :param Machine machine:
+        Perform placement of an application graph on the machine.
+
+        .. note::
+            app_graph must have been partitioned
+
+        :param Placements system_placements:
+            The placements of cores doing system tasks.
+        :return: Placements for the application.
+            *Includes the system placements.*
+        :rtype: Placements
+        :raises PacmanPlaceException: If no new start Chip is available
+        :raises PacmanTooBigToPlace:
+            If the requirements are too big for any chip
+        """
+        # Go through the application graph by application vertex
+        progress = ProgressBar(
+            PacmanDataView.get_n_vertices() * 2, "Placing Vertices")
+        try:
+            for app_vertex in progress.over(
+                    PacmanDataView.iterate_vertices(), finish_at_end=False):
+                if app_vertex.has_fixed_location():
+                    self._place_fixed_vertex(app_vertex)
+
+            for app_vertex in progress.over(PacmanDataView.iterate_vertices()):
+                # as this checks if placed already not need to check if fixed
+                self._place_vertex(app_vertex)
+        except PacmanPlaceException as e:
+            raise self._place_error(system_placements, e) from e
+
+        if get_config_bool("Reports", "draw_placements"):
+            # pylint: disable=import-outside-toplevel
+            from .draw_placements import draw_placements as dp
+            dp(self.__placements, system_placements)
+
+        return self.__placements
+
+    def _place_vertex(self, app_vertex: ApplicationVertex):
+        """
+        Place the next application vertex
+
+        :param ApplicationVertex app_vertex:
+        :raises PacmanPlaceException: If no new start Chip is available
+        :raises PacmanTooBigToPlace:
+            If the requirements are too big for any chip
+        """
+        same_chip_groups = app_vertex.splitter.get_same_chip_groups()
+        if not same_chip_groups:
+            # This vertex does not require placement or delegates
+            return
+
+        self.__app_vertex_label = app_vertex.label
+
+        # Restore the starts tried last time.
+        # Check if they are full comes later
+        while len(self.__starts_tried) > 0:
+            self.__restored_chips.append(self.__starts_tried.pop(0))
+
+        # try to make placements with a different start Chip each time
+        while True:
+            placements_to_make = self._prepare_placements(same_chip_groups)
+            if placements_to_make is not None:
+                break
+
+        # Now actually add the placements having confirmed all can be done
+        self.__placements.add_placements(placements_to_make)
+
+    def _prepare_placements(self, same_chip_groups:  Sequence[
+            Tuple[Sequence[MachineVertex], AbstractSDRAM]]
+            ) -> Optional[List[Placement]]:
+        """
+        Try to make the placements for this ApplicationVertex.
+
+        This will make sure all placements are on linked Chips
+
+        The next start Chip is tried.
+
+        If successful a list of created but NOT added placements is returned
+
+        If this start Chip fails it returns None.
+        A start chip could fail either because it does not have enough space
+        or because its neighbours do not have enough space
+
+
+        :param list(list(MachineVertex), AbstractSdram) same_chip_groups:
+        :raises PacmanPlaceException: If no new start Chip is available
+        :raises PacmanTooBigToPlace:
+            If the requirements are too big for any chip
+        """
+        # Clear the Chips used in the last prepare
+        self.__prepared_chips.clear()
+        self.__current_chip = None
+
+        placements_to_make: List = list()
+
+        # Go through the groups
+        for vertices, sdram in same_chip_groups:
+            vertices_to_place = self._filter_vertices(vertices)
+            if len(vertices_to_place) == 0:
+                # Either placed (fixed) or virtual so skip group
+                continue
+            plan_sdram = sdram.get_total_sdram(self.__plan_n_timesteps)
+            n_cores = len(vertices_to_place)
+
+            # Try to find a chip with space
+            chip = self._get_next_chip_with_space(n_cores, plan_sdram)
+            if chip is None:
+                return None
+
+            # If this worked, store placements to be made
+            for vertex in vertices:
+                core = self.__current_cores_free.pop(0)
+                placements_to_make.append(Placement(
+                    vertex, chip.x, chip.y, core))
+        return placements_to_make
+
+    def _filter_vertices(
+            self, vertices: Sequence[MachineVertex]) -> List[MachineVertex]:
+        """
+        Removes an already placed or virtual vertices.
+
+        Errors on groups that have both placed and unplaced vertices!
+
+        :param vertices:
+        :rtype: List(MachineVertex)
+        """
+        # Remove any already placed
+        vertices_to_place = [
+            vertex for vertex in vertices
+            if not self.__placements.is_vertex_placed(vertex)]
+        if len(vertices_to_place) != len(vertices) and len(
+                vertices_to_place) > 0:
+            # Putting the rest on a different chip is wrong
+            # Putting them on the same chip is hard so will do if needed
+            raise NotImplementedError(
+                "Unexpected mix of placed and unplaced vertices")
+        # No need to place virtual vertices
+        return [vertex for vertex in vertices_to_place
+                if not isinstance(vertex, AbstractVirtual)]
+
+    def _place_error(self, system_placements: Placements,
+                     exception: Exception) -> PacmanPlaceException:
+        """
+        :param Placements system_placements:
+        :param PacmanPlaceException exception:
+        :rtype: PacmanPlaceException
+        """
+        unplaceable = list()
+        vertex_count = 0
+        n_vertices = 0
+        for app_vertex in PacmanDataView.iterate_vertices():
+            same_chip_groups = app_vertex.splitter.get_same_chip_groups()
+            app_vertex_placed = True
+            found_placed_cores = False
+            for vertices, _sdram in same_chip_groups:
+                if isinstance(vertices[0], AbstractVirtual):
+                    break
+                if self.__placements.is_vertex_placed(vertices[0]):
+                    found_placed_cores = True
+                elif found_placed_cores:
+                    vertex_count += len(vertices)
+                    n_vertices = len(same_chip_groups)
+                    app_vertex_placed = False
+                    break
+                else:
+                    app_vertex_placed = False
+                    break
+            if not app_vertex_placed:
+                unplaceable.append(app_vertex)
+
+        report_file = os.path.join(
+            PacmanDataView.get_run_dir_path(), "placements_error.txt")
+        with open(report_file, 'w', encoding="utf-8") as f:
+            f.write(f"Could not place {len(unplaceable)} of "
+                    f"{PacmanDataView.get_n_vertices()} "
+                    f"application vertices.\n")
+            f.write(
+                f"    Could not place {vertex_count} of {n_vertices} in the"
+                " last app vertex\n\n")
+            for xy in self.__placements.chips_with_placements:
+                first = True
+                for placement in self.__placements.placements_on_chip(xy):
+                    if system_placements.is_vertex_placed(placement.vertex):
+                        continue
+                    if first:
+                        f.write(f"Chip ({xy}):\n")
+                        first = False
+                    f.write(f"    Processor {placement.p}:"
+                            f" Vertex {placement.vertex}\n")
+                if not first:
+                    f.write("\n")
+            f.write("\n")
+            f.write("Not placed:\n")
+            for app_vertex in unplaceable:
+                f.write(f"Vertex: {app_vertex}\n")
+                same_chip_groups = app_vertex.splitter.get_same_chip_groups()
+                for vertices, sdram in same_chip_groups:
+                    p_sdram = sdram.get_total_sdram(self.__plan_n_timesteps)
+                    f.write(f"    Group of {len(vertices)} vertices uses "
+                            f"{p_sdram} bytes of SDRAM:\n")
+                    for vertex in vertices:
+                        f.write(f"        Vertex {vertex}")
+                        if self.__placements.is_vertex_placed(vertex):
+                            plce = self.__placements.get_placement_of_vertex(
+                                vertex)
+                            f.write(
+                                f" (placed at {plce.x}, {plce.y}, {plce.p})")
+                        f.write("\n")
+
+            f.write("\n")
+            f.write("Unused chips:\n")
+            machine = PacmanDataView.get_machine()
+            for xy in machine.chip_coordinates:
+                n_placed = self.__placements.n_placements_on_chip(xy)
+                system_placed = system_placements.n_placements_on_chip(xy)
+                if n_placed - system_placed == 0:
+                    n_procs = machine[xy].n_placable_processors
+                    f.write(f"    {xy} ({n_procs - system_placed}"
+                            " free cores)\n")
+
+        if get_config_bool("Reports", "draw_placements_on_error"):
+            # pylint: disable=import-outside-toplevel
+            from .draw_placements import draw_placements as dp
+            dp(self.__placements, system_placements)
+
+        return PacmanPlaceException(
+            f" {exception}."
+            f" Report written to {report_file}.")
+
+    def _place_fixed_vertex(self, app_vertex: ApplicationVertex):
+        """
+        Place all vertices for this Application Vertex
+
+        Checks that all MachineVertices are fixed or errors
+
+        :param ApplicationVertex app_vertex:
+        """
+        same_chip_groups = app_vertex.splitter.get_same_chip_groups()
+        if not same_chip_groups:
+            raise NotImplementedError("Unexpected mix of Fixed and no groups")
+
+        for vertices, _ in same_chip_groups:
+            vertices_to_place = self._filter_vertices(vertices)
+            self._do_fixed_location(vertices_to_place)
+
+    def _do_fixed_location(self, vertices: list[MachineVertex]):
+        """
+        Do fixed placing for one group.
+
+        Errors if the group does not have a fixed location
+
+        :param list(MachineVertex) vertices:
+        :raise PacmanConfigurationException:
+            If the requested location is not available
+        """
+        for vertex in vertices:
+            loc = vertex.get_fixed_location()
+            if loc:
+                x, y = loc.x, loc.y
+                break
+        else:
+            # Mixing fixed and free allocations while still keeping the whole
+            # App vertex together is hard so will only do is needed
+            raise NotImplementedError(
+                "Mixing fixed location and not fixed location groups "
+                "within one vertex")
+
+        chip = PacmanDataView.get_chip_at(x, y)
+        if chip is None:
+            raise PacmanConfigurationException(
+                f"Constrained to chip {x, y} but no such chip")
+        on_chip = self.__placements.placements_on_chip(chip)
+        cores_used = {p.p for p in on_chip}
+        cores = set(chip.placable_processors_ids) - cores_used
+        next_cores = iter(cores)
+        # first do the ones with a fixed p
+        for vertex in vertices:
+            fixed = vertex.get_fixed_location()
+            if fixed and fixed.p is not None:
+                if fixed.p not in next_cores:
+                    raise PacmanConfigurationException(
+                        f"Core {fixed.p} on {x}, {y} not available to "
+                        f"place {vertex} on")
+                self.__placements.add_placement(
+                    Placement(vertex, x, y, fixed.p))
+        # Then do the ones without a fixed p
+        for vertex in vertices:
+            fixed = vertex.get_fixed_location()
+            if not fixed or fixed.p is None:
+                try:
+                    self.__placements.add_placement(
+                        Placement(vertex, x, y, next(next_cores)))
+                except StopIteration:
+                    # pylint: disable=raise-missing-from
+                    raise PacmanConfigurationException(
+                        f"No more cores available on {x}, {y}: {on_chip}")
+
+    def _chip_order(self):
+        """
+        Iterate the Chips in a guaranteed order
+
         :rtype: iterable(Chip)
         """
-        s_x, s_y = get_config_str("Mapping", "placer_start_chip").split(",")
-        s_x = int(s_x)
-        s_y = int(s_y)
-
         for x in range(self.__machine.width):
             for y in range(self.__machine.height):
-                c_x = (x + s_x) % self.__machine.width
-                c_y = (y + s_y) % self.__machine.height
-                chip = self.__machine.get_chip_at(c_x, c_y)
+                chip = self.__machine.get_chip_at(x, y)
                 if chip:
                     yield chip
 
-    def __cores_and_sdram(self, chip: Chip) -> Tuple[Set[int], int]:
+    def _space_on_chip(
+            self, chip: Chip, n_cores: int, plan_sdram: int) -> bool:
         """
+        Checks if the Chip has enough space for this group, Cache if yes
+
+        If the Chip has already full from other Application Vertices,
+        the Chip is added to the full list and False is returned
+
+        If the chip is not full but does not have the space,
+        the Chip is added to the prepared_chips list and False is returned.
+        As safety check is also done to make sure the group could fit on
+        another Chip
+
+        If there there is room on the Chip
+        the Chip is cached and True is returned.
+        The values Cached are the:
+        current_chip Even if full to keep the code simpler
+        current_cores_free Including the ones for this group
+        current_sdram_free Excluding the sdram needed fit this group
+
         :param Chip chip:
-        :return cores, sdram
-        :rtype: tuple(int, int)
+        :param int n_cores: number of cores needed
+        :param int plan_sdram:
+        :rtype: bool
+        :raises PacmanTooBigToPlace:
+            If the requirements are too big for any chip
         """
-        on_chip = self.__placements.placements_on_chip(chip.x, chip.y)
-        cores_used = {p.p for p in on_chip}
-        sdram_used = sum(
-            p.vertex.sdram_required.get_total_sdram(
-                self.__plan_n_timesteps) for p in on_chip)
-        return cores_used, sdram_used
+        cores_free = list(chip.placable_processors_ids)
+        sdram_free = chip.sdram
 
-    def get_next_chip_and_space(self) -> Tuple[_ChipWithSpace, _Space]:
+        # remove the already placed for other Application Vertices
+        on_chip = self.__placements.placements_on_chip(chip)
+        if len(on_chip) == len(cores_free):
+            self.__full_chips.add(chip)
+            return False
+
+        for placement in on_chip:
+            cores_free.remove(placement.p)
+            sdram_free -= placement.vertex.sdram_required.get_total_sdram(
+                self.__plan_n_timesteps)
+
+        if sdram_free < self.__min_sdram:
+            self.__full_chips.add(chip)
+            return False
+
+        # Remember this chip so it is not tried again in this preparation
+        # This assumes all groups are the same size so even if too small
+        self.__prepared_chips.add(chip)
+
+        if len(cores_free) < n_cores or sdram_free < plan_sdram:
+            self._check_could_fit(n_cores, plan_sdram)
+            return False
+
+        # record the current Chip
+        self.__current_chip = chip
+        # cores are popped out later to keep them here for now
+        self.__current_cores_free = cores_free
+        # sdram is the whole group so can be removed now
+        self.__current_sdram_free = sdram_free - plan_sdram
+
+        # adds the neighbours
+        self._add_neighbours(chip)
+
+        return True
+
+    def _check_could_fit(self, n_cores: int, plan_sdram: int):
         """
-        :rtype: (_ChipWithSpace, _Space)
+        Checks that the cores/SDRAM would fit on a empty perfect Chip
+
+        :param int n_cores: number of cores needs
+        :param int plan_sdram: minimum amount of SDRAM needed
+        :raises PacmanTooBigToPlace:
+            If the requirements are too big for any chip
         """
-        try:
-            if self.__last_chip_space is None:
-                chip = self.__get_next_chip()
-                cores_used, sdram_used = self.__cores_and_sdram(chip)
-                self.__last_chip_space = _ChipWithSpace(
-                    chip, cores_used, sdram_used)
-                self.__used_chips.add(chip)
+        if plan_sdram <= self.__max_sdram and n_cores <= self.__max_cores:
+            # should fit somewhere
+            return
+        message = (
+            f"{self.__app_vertex_label} will not fit on any possible Chip "
+            f"as a smae_chip_group ")
 
-            # Start a new space by finding all the chips that can be reached
-            # from the start chip but have not been used
-            return (self.__last_chip_space,
-                    _Space(self.__last_chip_space.chip))
+        version = PacmanDataView.get_machine_version()
+        if plan_sdram > self.__max_sdram:
+            message += f"requires {plan_sdram} bytes but "
+            if plan_sdram > version.max_sdram_per_chip:
+                message += f"a Chip only has {version.max_sdram_per_chip} " \
+                           f"bytes "
+            else:
+                message += f"after monitors only {self.__max_sdram} " \
+                           f"bytes are available "
+            message += "Lowering max_core_per_chip may resolve this."
+            raise PacmanTooBigToPlace(message)
 
-        except StopIteration:
-            raise PacmanPlaceException(  # pylint: disable=raise-missing-from
-                f"No more chips to place on; {self.n_chips_used} of "
-                f"{self.__machine.n_chips} used")
+        if n_cores > version.max_cores_per_chip:
+            message += " is more vertices than the number of cores on a chip."
+            raise PacmanTooBigToPlace(message)
+        user_cores = version.max_cores_per_chip - version.n_scamp_cores
+        if n_cores > user_cores:
+            message += (
+                f"is more vertices than the user cores ({user_cores}) "
+                "available on a Chip")
+        else:
+            message += (
+                f"is more vertices than the {self.__max_cores} cores "
+                f"available on a Chip once "
+                f"{PacmanDataView.get_all_monitor_cores()} "
+                f"are reserved for monitors")
+        raise PacmanTooBigToPlace(message)
 
-    def __get_next_chip(self) -> Chip:
+    def _get_next_start(self, n_cores: int, plan_sdram: int) -> Chip:
         """
+        Gets the next start Chip
+
+        Also sets up the current_chip and starts a new neighbourhood
+
+        :param int n_cores: number of cores needs
+        :param int plan_sdram: minimum amount of SDRAM needed
+
         :rtype: Chip
-        :raises: StopIteration
+        :raises PacmanPlaceException: If no new start Chip is available
+        :raises PacmanTooBigToPlace:
+            If the requirements are too big for any chip
+        """
+        # reset the neighbour chip info
+        self.__same_board_chips.clear()
+        self.__other_board_chips.clear()
+
+        # Find the next start chip
+        while True:
+            start = self._pop_start_chip()
+            # Save as tried as not full even if toO small
+            self.__starts_tried.append(start)
+            # Set the Ethernet x and y in case space_on_chip adds neighbours
+            self.__ethernet_x = start.nearest_ethernet_x
+            self.__ethernet_y = start.nearest_ethernet_y
+            if self._space_on_chip(start, n_cores, plan_sdram):
+                break
+
+        logger.debug("Starting placement from {}", start)
+        return start
+
+    def _pop_start_chip(self) -> Chip:
+        """
+        Gets the next start Chip from either restored or if none the Machine
+
+        Ignores any Chip that are already full
+
+        :rtype: Chip
+        :raises PacmanPlaceException: If no new start Chip is available
         """
         while self.__restored_chips:
-            chip = self.__restored_chips.pop(last=False)
-            if chip not in self.__used_chips:
+            chip = self.__restored_chips.pop(0)
+            if chip not in self.__full_chips:
                 return chip
-        while self.__next_chip in self.__used_chips:
-            self.__next_chip = next(self.__chips)
-        return self.__next_chip
+        try:
+            start = next(self.__chips)
+            while start in self.__full_chips:
+                start = next(self.__chips)
+            return start
+        except StopIteration:
+            raise PacmanPlaceException(  # pylint: disable=raise-missing-from
+                f"No more chips to start with for {self.__app_vertex_label} "
+                f"Out of {self.__machine.n_chips} "
+                f"{len(self.__full_chips)} already full "
+                f"and {len(self.__starts_tried)} tried")
 
-    def get_next_chip_space(
-            self, space: _Space,
-            last_chip_space: Optional[_ChipWithSpace]) -> _ChipWithSpace:
+    def _get_next_neighbour(self, n_cores: int, plan_sdram: int):
         """
-        :param _Space space:
-        :param _ChipWithSpace last_chip_space:
-        :rtype: _ChipWithSpace
-        :raises _SpaceExceededException:
-        """
-        # If we are reporting a used chip, update with reachable chips
-        if last_chip_space is not None:
-            last_chip = last_chip_space.chip
-            space.update(self.__usable_from_chip(last_chip))
+        Gets the next neighbour Chip
 
-        # If no space, error
-        if not space:
-            self.__last_chip_space = None
-            raise _SpaceExceededException(
-                "No more chips to place on in this space; "
-                f"{self.n_chips_used} of {self.__machine.n_chips} used")
-        chip = space.pop()
-        self.__used_chips.add(chip)
-        self.__restored_chips.discard(chip)
-        cores_used, sdram_used = self.__cores_and_sdram(chip)
-        self.__last_chip_space = _ChipWithSpace(chip, cores_used, sdram_used)
-        return self.__last_chip_space
+        Also changes the current_chip and updates the neighbourhood
 
-    @property
-    def n_chips_used(self) -> int:
-        """
-        The number of chips used.
+        This will return None if there are no more neighbouring Chip big enough
 
-        :rtype: int
+        :param int n_cores: number of cores needs
+        :param int plan_sdram: minimum amount of SDRAM needed
+        :rtype: Chip or None
+        :raises PacmanTooBigToPlace:
+            If the requirements are too big for any chip
         """
-        return len(self.__used_chips)
+        # Do while Chip with space not found
+        while True:
+            chip = self._pop_neighbour()
+            if chip is None:
+                # Sign to consider preparation with this start a failure
+                return None
+            if self._space_on_chip(chip, n_cores, plan_sdram):
+                return chip
 
-    def __usable_from_chip(self, chip: Chip) -> Iterable[Chip]:
+    def _get_next_chip_with_space(
+            self, n_cores: int, plan_sdram: int) -> Optional[Chip]:
         """
+        Gets the next Chip with space
+
+        If no start Chip is available raise an Exception
+        If no neighbouring more Chips available returns None
+
+        :param int n_cores: number of cores needs
+        :param int plan_sdram: minimum amount of SDRAM needed
+        :raises PacmanPlaceException: If no new start Chip is available
+        :raises PacmanTooBigToPlace:
+            If the requirements are too big for any chip
+        """
+        if self.__current_chip is None:
+            return self._get_next_start(n_cores, plan_sdram)
+        elif (len(self.__current_cores_free) >= n_cores and
+              self.__current_sdram_free >= plan_sdram):
+            # Cores are popped out later
+            self.__current_sdram_free -= plan_sdram
+            return self.__current_chip
+        else:
+            return self._get_next_neighbour(n_cores, plan_sdram)
+
+    def _add_neighbours(self, chip: Chip):
+        """
+        Adds the neighbours for this Chip to be used as the next chips.
+
         :param Chip chip:
-        :rtype set(Chip)
+        :return:
         """
         for link in chip.router.links:
             target = self.__machine[link.destination_x, link.destination_y]
-            if target not in self.__used_chips:
-                yield target
+            if (target not in self.__full_chips
+                    and target not in self.__prepared_chips):
+                if (target.nearest_ethernet_x == self.__ethernet_x and
+                        target.nearest_ethernet_y == self.__ethernet_y):
+                    self.__same_board_chips[target] = target
+                else:
+                    self.__other_board_chips[target] = target
 
-    def save_chips(self, chips: Iterable[Chip]):
+    def _pop_neighbour(self) -> Optional[Chip]:
         """
-        :param iterable(Chip) chips:
-        """
-        self.__saved_chips.update(chips)
+        Pops the next neighbour Chip with preference to ones on current board
 
-    def restore_chips(self) -> None:
-        for chip in self.__saved_chips:
-            self.__used_chips.remove(chip)
-            self.__restored_chips.add(chip)
-        self.__saved_chips.clear()
-
-
-class _Space(object):
-    __slots__ = ("__same_board_chips", "__remaining_chips",
-                 "__board_x", "__board_y", "__first_chip")
-
-    def __init__(self, chip: Chip):
-        self.__board_x = chip.nearest_ethernet_x
-        self.__board_y = chip.nearest_ethernet_y
-        self.__same_board_chips: OrderedSet[Chip] = OrderedSet()
-        self.__remaining_chips: OrderedSet[Chip] = OrderedSet()
-
-    def __len__(self) -> int:
-        return len(self.__same_board_chips) + len(self.__remaining_chips)
-
-    def __on_same_board(self, chip: Chip) -> bool:
-        return (chip.nearest_ethernet_x == self.__board_x and
-                chip.nearest_ethernet_y == self.__board_y)
-
-    def pop(self) -> Chip:
-        """
-        :rtype: Chip
-        :raise: StopIteration
+        :return: A neighbour Chip or None if there are no More
+        :rtype: None
         """
         if self.__same_board_chips:
-            return self.__same_board_chips.pop(last=False)
-        if self.__remaining_chips:
-            next_chip = self.__remaining_chips.pop(last=False)
-            self.__board_x = next_chip.nearest_ethernet_x
-            self.__board_y = next_chip.nearest_ethernet_y
-            to_remove = list()
-            for chip in self.__remaining_chips:
-                if self.__on_same_board(chip):
-                    to_remove.append(chip)
-                    self.__same_board_chips.add(chip)
-            for chip in to_remove:
-                self.__remaining_chips.remove(chip)
+            k = next(iter(self.__same_board_chips))
+            del self.__same_board_chips[k]
+            return k
+        if self.__other_board_chips:
+            next_chip = next(iter(self.__other_board_chips))
+            del self.__other_board_chips[next_chip]
+            self.__ethernet_x = next_chip.nearest_ethernet_x
+            self.__ethernet_y = next_chip.nearest_ethernet_y
+            to_check = list(self.__other_board_chips)
+            self.__other_board_chips.clear()
+            for chip in to_check:
+                if (chip.nearest_ethernet_x == self.__ethernet_x and
+                        chip.nearest_ethernet_y == self.__ethernet_y):
+                    self.__same_board_chips[chip] = chip
+                else:
+                    self.__other_board_chips[chip] = chip
             return next_chip
-        raise StopIteration
 
-    def update(self, chips: Iterable[Chip]):
-        """
-        :param iterable(Chip) chips:
-        """
-        for chip in chips:
-            if self.__on_same_board(chip):
-                self.__same_board_chips.add(chip)
-            else:
-                self.__remaining_chips.add(chip)
-
-
-class _ChipWithSpace(object):
-    """
-    A chip with space for placement.
-    """
-    __slots__ = ("chip", "cores", "sdram")
-
-    def __init__(
-            self, chip: Chip, used_processors: Set[int], used_sdram: int):
-        self.chip = chip
-        self.cores = set(p.processor_id for p in chip.processors
-                         if not p.is_monitor)
-        self.cores -= used_processors
-        self.sdram = chip.sdram - used_sdram
-
-    @property
-    def x(self) -> int:
-        return self.chip.x
-
-    @property
-    def y(self) -> int:
-        return self.chip.y
-
-    def is_space(self, n_cores: int, sdram: int) -> bool:
-        return len(self.cores) >= n_cores and self.sdram >= sdram
-
-    def use_sdram(self, sdram: int):
-        self.sdram -= sdram
-
-    def use_next_core(self) -> int:
-        core = next(iter(self.cores))
-        self.cores.remove(core)
-        return core
-
-    def __repr__(self):
-        return f"({self.x}, {self.y})"
+        # Signal that there are no more Chips with a None
+        return None

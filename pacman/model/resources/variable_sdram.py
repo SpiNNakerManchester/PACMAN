@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import math
-import numpy
 from typing import Optional, TextIO, Union
+
+import numpy
+
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from .abstract_sdram import AbstractSDRAM

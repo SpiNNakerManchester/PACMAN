@@ -13,11 +13,14 @@
 # limitations under the License.
 
 from typing import Iterable, Optional
-from .machine_vertex import MachineVertex
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.resources import AbstractSDRAM
 from pacman.model.resources import IPtagResource
 from pacman.model.resources import ReverseIPtagResource
+
+from .machine_vertex import MachineVertex
 
 
 class SimpleMachineVertex(MachineVertex):

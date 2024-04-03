@@ -13,11 +13,14 @@
 # limitations under the License.
 
 from typing import List, Optional, Tuple
+
 from spinn_utilities.overrides import overrides
-from .application_fpga_vertex import ApplicationFPGAVertex
+
 from pacman.model.graphs.application.abstract import Abstract2DDeviceVertex
-from .fpga_connection import FPGAConnection
 from pacman.model.graphs.common import Slice
+
+from .application_fpga_vertex import ApplicationFPGAVertex
+from .fpga_connection import FPGAConnection
 
 
 class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):

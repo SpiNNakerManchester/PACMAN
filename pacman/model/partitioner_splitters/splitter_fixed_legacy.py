@@ -11,18 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import logging
 from typing import cast, Generic, List, Optional
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities import\
     get_multidimensional_slices
-from .abstract_splitter_common import AbstractSplitterCommon, V
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_objs import ChipCounter
+
+from .abstract_splitter_common import AbstractSplitterCommon, V
+
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -36,7 +41,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
         implement :py:class:`LegacyPartitionerAPI`.
     """
 
-    __slots__ = ("__slices")
+    __slots__ = ["__slices"]
 
     def __init__(self) -> None:
         super().__init__()
@@ -80,7 +85,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter):
         app_vertex = self.governed_app_vertex
-        # The typer needs to know the vertex implements LegacyPartitionerAPI
+        # The mypy needs to know the vertex implements LegacyPartitionerAPI
         # We know is does because we checked when setting
         lp = cast(LegacyPartitionerAPI, app_vertex)
 

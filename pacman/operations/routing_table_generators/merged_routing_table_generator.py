@@ -180,7 +180,14 @@ E = TypeVar("E")
 
 
 class _IteratorWithNext(Generic[E]):
+    """
+    An iterator wrapper which allows peek
+    """
+
     def __init__(self, iterable: Iterable[E]):
+        """
+        :param iterable: iterable  to be wrapped
+        """
         self.__iterator = iter(iterable)
         try:
             self.__next: Optional[E] = next(self.__iterator)
@@ -190,13 +197,24 @@ class _IteratorWithNext(Generic[E]):
             self.__has_next = False
 
     def peek(self) -> Optional[E]:
+        """
+        The Element if any that would be returned by a pop call
+        """
         return self.__next
 
     @property
     def has_next(self) -> bool:
+        """
+        True if there is another element for Peek or Pop to return
+        """
         return self.__has_next
 
     def pop(self) -> E:
+        """
+        The next element available.
+
+        :raises:  StopIteration if there is not more element available
+        """
         if not self.__has_next:
             raise StopIteration
         nxt = self.__next

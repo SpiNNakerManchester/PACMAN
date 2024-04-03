@@ -88,9 +88,9 @@ class ZonedRoutingInfoAllocator(object):
         # maximum number of bites to represent the keys and masks
         # for a single app vertex / partition name zone
         "__n_bits_atoms_and_mac",
-        # Maximum number pf bit to represent the machine assuming global
+        # Maximum number of bits to represent the machine assuming global
         "__n_bits_machine",
-        # Maximum number pf bit to represent the machine assuming global
+        # Maximum number of bits to represent the machine assuming global
         "__n_bits_atoms",
         # Flag to say operating in flexible mode
         "__flexible",
@@ -258,7 +258,7 @@ class ZonedRoutingInfoAllocator(object):
                 self.__atom_bits_per_app_part[pre, identifier] = 0
 
     def __check_zones(self) -> None:
-        # See if it could fit even before considerding fixed
+        # See if it could fit even before considering fixed
         app_part_bits = allocator_bits_needed(
             len(self.__atom_bits_per_app_part))
         if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
@@ -365,7 +365,7 @@ class ZonedRoutingInfoAllocator(object):
                 n_bits_machine = self.__n_bits_atoms_and_mac - n_bits_atoms
             else:
                 if n_bits_atoms <= self.__n_bits_atoms:
-                    # Ok it fits use global sizes
+                    # OK it fits use global sizes
                     n_bits_atoms = self.__n_bits_atoms
                     n_bits_machine = self.__n_bits_machine
                 else:

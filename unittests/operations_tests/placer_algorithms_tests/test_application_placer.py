@@ -11,17 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import unittest
-
 from spinn_utilities.config_holder import set_config
 from spinn_machine.virtual_machine import virtual_machine
 from pacman.data.pacman_data_writer import PacmanDataWriter
-from pacman.exceptions import (
-    PacmanConfigurationException, PacmanTooBigToPlace)
+from pacman.exceptions import (PacmanPlaceException, PacmanTooBigToPlace)
 from pacman.model.partitioner_splitters import (
     SplitterFixedLegacy, AbstractSplitterCommon)
 from pacman.operations.placer_algorithms.application_placer import (
-    place_application_graph, _check_could_fit)
+    place_application_graph, ApplicationPlacer)
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import ConstantSDRAM
 from pacman.model.graphs.application import ApplicationVertex
@@ -104,9 +101,62 @@ def test_application_placer():
     fixed.set_fixed_location(0, 0)
     writer.add_vertex(fixed)
     fixed.splitter.create_machine_vertices(ChipCounter())
-    for i in range(56):
+    for i in range(61):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
     writer.set_machine(virtual_machine(24, 12))
+    place_application_graph(Placements())
+
+
+def test_application_placer_large_groups():
+    unittest_setup()
+    set_config("Machine", "version", 5)
+    writer = PacmanDataWriter.mock()
+    # fixed early works as this vertex is looked at first
+    fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
+    fixed.splitter = SplitterFixedLegacy()
+    fixed.set_fixed_location(0, 0)
+    writer.add_vertex(fixed)
+    fixed.splitter.create_machine_vertices(ChipCounter())
+    for i in range(17):
+        _make_vertices(writer, 1000, 14, 17, f"app_vertex_{i}")
+    writer.set_machine(virtual_machine(24, 12))
+    place_application_graph(Placements())
+
+
+def test_application_placer_too_few_boards():
+    unittest_setup()
+    set_config("Machine", "version", 5)
+    writer = PacmanDataWriter.mock()
+    # fixed early works as this vertex is looked at first
+    fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
+    fixed.splitter = SplitterFixedLegacy()
+    fixed.set_fixed_location(0, 0)
+    writer.add_vertex(fixed)
+    fixed.splitter.create_machine_vertices(ChipCounter())
+    for i in range(56):
+        _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
+    writer.set_machine(virtual_machine(12, 12))
+    try:
+        place_application_graph(Placements())
+        raise AssertionError("Error not raise")
+    except PacmanPlaceException as ex:
+        assert ("No more chips to start" in str(ex))
+
+
+def test_application_placer_restart_needed():
+    unittest_setup()
+    set_config("Machine", "version", 5)
+    writer = PacmanDataWriter.mock()
+    for (x, y) in [(1, 0), (1, 1), (0, 1)]:
+        fixed = SimpleTestVertex(15, f"FIXED {x}:{y}", max_atoms_per_core=1)
+        fixed.splitter = SplitterFixedLegacy()
+        fixed.set_fixed_location(x, y)
+        writer.add_vertex(fixed)
+        fixed.splitter.create_machine_vertices(ChipCounter())
+    for i in range(56):
+        _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
+    # Don't use a full wrap machine
+    writer.set_machine(virtual_machine(28, 16))
     place_application_graph(Placements())
 
 
@@ -124,11 +174,25 @@ def test_application_placer_late_fixed():
     fixed.splitter.create_machine_vertices(ChipCounter())
 
     writer.set_machine(virtual_machine(24, 12))
-    try:
-        place_application_graph(Placements())
-    except PacmanConfigurationException:
-        raise unittest.SkipTest(
-            "https://github.com/SpiNNakerManchester/PACMAN/issues/444")
+    place_application_graph(Placements())
+
+
+def test_application_placer_fill_chips():
+    unittest_setup()
+    set_config("Machine", "version", 5)
+    writer = PacmanDataWriter.mock()
+    # fixed early works as this vertex is looked at first
+    fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
+    fixed.splitter = SplitterFixedLegacy()
+    fixed.set_fixed_location(0, 0)
+    writer.add_vertex(fixed)
+    fixed.splitter.create_machine_vertices(ChipCounter())
+    for i in range(17):
+        _make_vertices(writer, 1000, 14, 9, f"app_vertex_{i}")
+    for i in range(17):
+        _make_vertices(writer, 1000, 14, 8, f"app_vertex_{i}")
+    writer.set_machine(virtual_machine(24, 12))
+    place_application_graph(Placements())
 
 
 def test_sdram_bigger_than_chip():
@@ -152,9 +216,10 @@ def test_sdram_bigger_monitors():
     max_sdram = writer.get_machine_version().max_sdram_per_chip
     monitor = SimpleMachineVertex(ConstantSDRAM(max_sdram // 2))
     # This is purely an info call so test check directly
-    writer.add_monitor_all_chips(monitor)
+    writer.add_sample_monitor_vertex(monitor, True)
     try:
-        _check_could_fit("app_test", ["m_vertex]"], sdram=max_sdram // 2 + 5)
+        placer = ApplicationPlacer(Placements())
+        placer._check_could_fit(1, plan_sdram=max_sdram // 2 + 5)
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
         assert ("after monitors only" in str(ex))
@@ -190,10 +255,10 @@ def test_more_cores_with_monitor():
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(4000))
     # This is purely an info call so test check directly
-    writer.add_monitor_all_chips(monitor)
-    m_vertexs = [f"m_v_{i}" for i in range(17)]
+    writer.add_sample_monitor_vertex(monitor, True)
     try:
-        _check_could_fit("app_test", m_vertexs, 500000)
+        placer = ApplicationPlacer(Placements())
+        placer._check_could_fit(17, 500000)
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
         assert ("reserved for monitors" in str(ex))
@@ -204,6 +269,6 @@ def test_could_fit():
     set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(0))
-    writer.add_monitor_all_chips(monitor)
-    m_vertexs = [f"m_v_{i}" for i in range(16)]
-    _check_could_fit("app_test", m_vertexs, 500000)
+    writer.add_sample_monitor_vertex(monitor, True)
+    placer = ApplicationPlacer(Placements())
+    placer._check_could_fit(16, 500000)

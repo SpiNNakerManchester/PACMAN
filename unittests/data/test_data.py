@@ -180,9 +180,9 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             writer.iterate_placements_by_vertex_type(None)
         with self.assertRaises(DataNotYetAvialable):
-            writer.iterate_placements_on_core(None, None)
+            writer.iterate_placements_on_core((None, None))
         with self.assertRaises(DataNotYetAvialable):
-            writer.iterate_placements_by_xy_and_type(None, None, None)
+            writer.iterate_placements_by_xy_and_type((None, None), None)
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_n_placements()
         with self.assertRaises(DataNotYetAvialable):
@@ -201,7 +201,7 @@ class TestSimulatorData(unittest.TestCase):
         info.add_placement(Placement(SimpleMachineVertex(None), 2, 2, 3))
         writer.set_placements(info)
         self.assertEqual(3, PacmanDataView.get_n_placements())
-        on12 = list(PacmanDataView.iterate_placements_on_core(1, 2))
+        on12 = list(PacmanDataView.iterate_placements_on_core((1, 2)))
         self.assertEqual(on12, [p1, p2])
         vertex = PacmanDataView.get_placement_on_processor(1, 2, 5).vertex
         self.assertEqual(v2, vertex)
@@ -348,14 +348,28 @@ class TestSimulatorData(unittest.TestCase):
 
     def test_get_monitors(self):
         writer = PacmanDataWriter.setup()
-        writer.set_plan_n_timesteps((45))
-        self.assertEqual(0, PacmanDataView.get_monitor_cores())
-        self.assertEqual(0, PacmanDataView.get_monitor_sdram())
-        writer.add_monitor_all_chips(SimpleMachineVertex(ConstantSDRAM(200)))
-        self.assertEqual(1, PacmanDataView.get_monitor_cores())
-        self.assertEqual(200, PacmanDataView.get_monitor_sdram())
-        writer.add_monitor_all_chips(SimpleMachineVertex(
-            VariableSDRAM(100, 10)))
-        self.assertEqual(2, PacmanDataView.get_monitor_cores())
-        target = 200 + 100 + 10 * 45
-        self.assertEqual(target, PacmanDataView.get_monitor_sdram())
+        self.assertEqual(0, PacmanDataView.get_all_monitor_cores())
+        self.assertEqual(ConstantSDRAM(0),
+                         PacmanDataView.get_all_monitor_sdram())
+        self.assertEqual(0,
+                         PacmanDataView.get_ethernet_monitor_cores())
+        self.assertEqual(ConstantSDRAM(0),
+                         PacmanDataView.get_ethernet_monitor_sdram())
+        writer.add_sample_monitor_vertex(
+            SimpleMachineVertex(ConstantSDRAM(200)), True)
+        self.assertEqual(1, PacmanDataView.get_all_monitor_cores())
+        self.assertEqual(ConstantSDRAM(200),
+                         PacmanDataView.get_all_monitor_sdram())
+        self.assertEqual(1, PacmanDataView.get_ethernet_monitor_cores())
+        self.assertEqual(ConstantSDRAM(200),
+                         PacmanDataView.get_ethernet_monitor_sdram())
+        writer.add_sample_monitor_vertex(SimpleMachineVertex(
+            VariableSDRAM(55, 15)), False)
+        writer.add_sample_monitor_vertex(SimpleMachineVertex(
+            VariableSDRAM(100, 10)), True)
+        self.assertEqual(2, PacmanDataView.get_all_monitor_cores())
+        self.assertEqual(VariableSDRAM(200 + 100, 10),
+                         PacmanDataView.get_all_monitor_sdram())
+        self.assertEqual(3, PacmanDataView.get_ethernet_monitor_cores())
+        self.assertEqual(VariableSDRAM(200 + 100 + 55, 10 + 15),
+                         PacmanDataView.get_ethernet_monitor_sdram())

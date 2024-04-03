@@ -11,20 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from typing import List, Optional, Union
+
 from typing_extensions import TypeAlias
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex)
 from pacman.model.graphs.machine import (
     MachineFPGAVertex, MachineSpiNNakerLinkVertex)
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanNotExistException)
-from .abstract_splitter_common import AbstractSplitterCommon
 from pacman.model.graphs.application import FPGAConnection
 from pacman.utilities.utility_objs import ChipCounter
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+
+from .abstract_splitter_common import AbstractSplitterCommon
+
 _Allowed: TypeAlias = Union[
     ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex]
 

@@ -115,12 +115,12 @@ def get_multidimensional_slices(
     total_atoms_per_core = 1
     dim_numerator = [0] * len(n_atoms)
     total_n_atoms = 1
-    for d in range(len(n_atoms)):
+    for d, n_atom in enumerate(n_atoms):
         dim_numerator[d] = n_vertices
-        n_this_dim = int(math.ceil(n_atoms[d] / atoms_per_core[d]))
+        n_this_dim = int(math.ceil(n_atom / atoms_per_core[d]))
         n_vertices *= n_this_dim
         total_atoms_per_core *= atoms_per_core[d]
-        total_n_atoms *= n_atoms[d]
+        total_n_atoms *= n_atom
 
     # Run over all the vertices and create slices for them
     slices: List[Slice] = list()

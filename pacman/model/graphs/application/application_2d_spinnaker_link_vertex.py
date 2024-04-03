@@ -13,10 +13,13 @@
 # limitations under the License.
 
 from typing import Optional, Tuple
+
 from spinn_utilities.overrides import overrides
-from .application_spinnaker_link_vertex import ApplicationSpiNNakerLinkVertex
+
 from pacman.model.graphs.application.abstract import Abstract2DDeviceVertex
 from pacman.model.graphs.common import Slice
+
+from .application_spinnaker_link_vertex import ApplicationSpiNNakerLinkVertex
 
 
 class Application2DSpiNNakerLinkVertex(
