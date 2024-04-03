@@ -30,7 +30,7 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         unittest_setup()
 
     def test_api(self):
-        set_config("Machine", "version", 5)
+        set_config("Machine", "version", -1)
         splitter = SplitterOneToOneLegacy()
         self.assertIsNotNone(str(splitter))
         self.assertIsNotNone(repr(splitter))
