@@ -71,7 +71,8 @@ def _check_setup(width, height):
     [(3, 2, 2),
      (5, 8, 8),
      (5, 12, 12),
-     (5, 16, 16)])
+     (5, 16, 16),
+     (201, 1, 1)])
 @pytest.mark.parametrize(
     "with_down_links,with_down_chips",
     [(False, False),
