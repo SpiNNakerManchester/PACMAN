@@ -197,7 +197,7 @@ def test_application_placer_fill_chips():
 
 def test_sdram_bigger_than_chip():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", -1)
     writer = PacmanDataWriter.mock()
     max_sdram = writer.get_machine_version().max_sdram_per_chip
     _make_vertices(writer, 1, 1, 5, "big_app_vertex",
@@ -211,7 +211,7 @@ def test_sdram_bigger_than_chip():
 
 def test_sdram_bigger_monitors():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", -1)
     writer = PacmanDataWriter.mock()
     max_sdram = writer.get_machine_version().max_sdram_per_chip
     monitor = SimpleMachineVertex(ConstantSDRAM(max_sdram // 2))
@@ -227,9 +227,11 @@ def test_sdram_bigger_monitors():
 
 def test_more_cores_than_chip():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", -1)
     writer = PacmanDataWriter.mock()
-    _make_vertices(writer, 1, 1, 19, "big_app_vertex")
+    version = writer.get_machine_version()
+    _make_vertices(
+        writer, 1, 1, version.max_cores_per_chip + 1, "big_app_vertex")
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
@@ -239,9 +241,10 @@ def test_more_cores_than_chip():
 
 def test_more_cores_than_user():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", -1)
     writer = PacmanDataWriter.mock()
-    _make_vertices(writer, 1, 1, 18, "big_app_vertex")
+    version = writer.get_machine_version()
+    _make_vertices(writer, 1, 1, version.max_cores_per_chip, "big_app_vertex")
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
@@ -251,14 +254,15 @@ def test_more_cores_than_user():
 
 def test_more_cores_with_monitor():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", -1)
     writer = PacmanDataWriter.mock()
+    version = writer.get_machine_version()
     monitor = SimpleMachineVertex(ConstantSDRAM(4000))
     # This is purely an info call so test check directly
     writer.add_sample_monitor_vertex(monitor, True)
     try:
         placer = ApplicationPlacer(Placements())
-        placer._check_could_fit(17, 500000)
+        placer._check_could_fit(version.max_cores_per_chip-1, 500000)
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
         assert ("reserved for monitors" in str(ex))
@@ -266,7 +270,7 @@ def test_more_cores_with_monitor():
 
 def test_could_fit():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", -1)
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(0))
     writer.add_sample_monitor_vertex(monitor, True)
