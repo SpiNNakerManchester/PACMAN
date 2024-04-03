@@ -52,21 +52,25 @@ class ProfilingSamplingBasedIsingModelCost(AbstractGaCostCalculator):
                     if sample[i] == -1 and sample[j] == -1:
                         cost += self._cost_no_activation
                         continue
+                    
                     if (sample[i] == 1 and sample[j] == -1) or (sample[i] == -1 and sample[j] == 1):
                         cost += self._cost_one_activation
                         continue
+
                     neuron_i_chip_id, neuron_i_core_id = find_chip_core(i)
                     neuron_j_chip_id, neuron_j_core_id = find_chip_core(j)
+                    
                     if neuron_i_chip_id == neuron_j_chip_id and neuron_i_core_id == neuron_j_core_id:
                         cost += self._cost_same_core
                         continue
+                    
                     if neuron_i_chip_id == neuron_i_core_id:
                         cost += self._cost_differnt_core_same_chip
                         continue
+                    
                     cost += self._cost_different_chip
             return cost
 
-   
         # Sampling neuron network states.
         # Calculate the average cost of sampled states under the given neurons placement.
         for i in range(0, sampling_count):
@@ -78,18 +82,18 @@ class ProfilingSamplingBasedIsingModelCost(AbstractGaCostCalculator):
         return accumulated_cost
     
     def __init__(self, ising_model: IsingModel2D, samples,
-                    cost_no_activation=0.0, cost_one_activation=1.0, cost_same_core=2.0,\
-                    cost_differnt_core_same_chip=3.0, cost_different_chip=4.0) -> None:
-        super().__init__()
-        if len(ising_model.get_H().shape) != 1 or len(ising_model.get_J().shape) != 2 or ising_model.get_J().shape[0] != ising_model.get_J().shape[1] or ising_model.get_H().shape[0] != ising_model.get_J().shape[1]:
-            raise ValueError
-        self._ising_model = ising_model
-        self._samples = samples
-        self._cost_no_activation = cost_no_activation
-        self._cost_one_activation = cost_one_activation
-        self._cost_same_core = cost_same_core
-        self._cost_differnt_core_same_chip = cost_differnt_core_same_chip
-        self._cost_different_chip = cost_different_chip
-        
+        cost_no_activation=0.0, cost_one_activation=1.0, cost_same_core=2.0,\
+        cost_differnt_core_same_chip=3.0, cost_different_chip=4.0) -> None:
+            super().__init__()
+            if len(ising_model.get_H().shape) != 1 or len(ising_model.get_J().shape) != 2 or ising_model.get_J().shape[0] != ising_model.get_J().shape[1] or ising_model.get_H().shape[0] != ising_model.get_J().shape[1]:
+                raise ValueError
+            self._ising_model = ising_model
+            self._samples = samples
+            self._cost_no_activation = cost_no_activation
+            self._cost_one_activation = cost_one_activation
+            self._cost_same_core = cost_same_core
+            self._cost_differnt_core_same_chip = cost_differnt_core_same_chip
+            self._cost_different_chip = cost_different_chip
+            
     def __str__(self):
         return "perf_cost_ising"
