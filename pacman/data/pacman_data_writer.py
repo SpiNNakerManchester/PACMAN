@@ -198,8 +198,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             If False assumes that this Vertex type will only be placed on
             Ethernet Vertices
         """
-        self.__pacman_data._ethernet_monitor_cores += 1
+        self.add_monitor_core(all_cores)
         self.__pacman_data._ethernet_monitor_vertices.append(vertex)
         if all_cores:
-            self.__pacman_data._all_monitor_cores += 1
             self.__pacman_data._all_monitor_vertices.append(vertex)
