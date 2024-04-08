@@ -520,7 +520,8 @@ def test_multi_split(params):
             if source != target:
                 writer.add_edge(ApplicationEdge(source, target), "Test")
 
-    writer.set_machine(virtual_machine(24, 24))
+    writer.set_machine(virtual_machine(
+        n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -538,7 +539,8 @@ def test_multi_self_split(params):
         for target in writer.iterate_vertices():
             writer.add_edge(ApplicationEdge(source, target), "Test")
 
-    writer.set_machine(virtual_machine(24, 24))
+    writer.set_machine(virtual_machine(
+        n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -609,7 +611,8 @@ def test_internal_only(params):
         writer, 1000, 3, 2, 2, "app_vertex",
         internal_multicast=True)
 
-    writer.set_machine(virtual_machine(24, 24))
+    writer.set_machine(virtual_machine(
+        n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -629,7 +632,8 @@ def test_internal_and_split(params):
             if source != target:
                 writer.add_edge(ApplicationEdge(source, target), "Test")
 
-    writer.set_machine(virtual_machine(24, 24))
+    writer.set_machine(virtual_machine(
+        n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -692,7 +696,6 @@ def test_fpga_link_overlap(params):
     set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     set_config("Machine", "down_chips", "6,1")
-    writer.set_machine(virtual_machine(12, 12))
     in_device = ApplicationFPGAVertex(
         100, [FPGAConnection(0, i, None, None) for i in range(15, 0, -2)],
         None)
@@ -703,6 +706,8 @@ def test_fpga_link_overlap(params):
         writer, 1000, 60 * 16, "app_vertex")
     writer.add_edge(ApplicationEdge(in_device, app_vertex), "Test")
 
+    writer.set_machine(virtual_machine(
+        n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -736,6 +741,8 @@ def test_odd_case(params):
         x, y, p = next(core_iter)
         placements.add_placement(Placement(m_vertex, x, y, p))
 
+    writer.set_machine(virtual_machine(
+        n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -749,7 +756,9 @@ def test_with_ethernet_system_placements(params):
     unittest_setup()
     set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
-    writer.set_machine(virtual_machine(16, 16))
+    version = writer.get_machine_version()
+    width, height = version.size_from_n_boards(4)
+    writer.set_machine(virtual_machine(width, height))
     source_vertex = _make_vertices(writer, 200, 3, "app_vertex")
     target_vertex = _make_ethernet_vertices(writer, 1, "eth_vertex")
     writer.add_edge(ApplicationEdge(source_vertex, target_vertex), "Test")
@@ -797,7 +806,7 @@ def test_route_around():
     #  2,3 3,3 4,3
     #  2,2 3,2
     set_config("Machine", "down_chips", "2,3:3,2:3,4:4,4:4,3")
-    machine = virtual_machine(8, 8)
+    machine = PacmanDataView.get_machine()
     vector = machine.get_vector((0, 0), (6, 6))
     PacmanDataWriter.mock().set_machine(machine)
     nodes = longest_dimension_first(vector, (0, 0))
