@@ -39,6 +39,8 @@ class TestPairCompressor(unittest.TestCase):
         original_tables = from_json(j_router)
         writer = PacmanDataWriter.mock()
         writer.set_precompressed(original_tables)
+        # This tests requires a full wrap machine
+        # The input includes Chips like 3, 8
         writer.set_machine(virtual_machine(24, 24))
 
         compressed_tables = pair_compressor(c_sort=c_sort)
