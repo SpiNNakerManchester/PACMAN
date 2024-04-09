@@ -41,6 +41,8 @@ class TestUnorderedPairCompressor(unittest.TestCase):
 
         writer = PacmanDataWriter.mock()
         writer.set_precompressed(original_tables)
+        # This tests requires a full wrap machine
+        # The input includes Chips like 3, 8
         writer.set_machine(virtual_machine(24, 24))
         with self.assertRaises(PacmanElementAllocationException):
             pair_compressor(

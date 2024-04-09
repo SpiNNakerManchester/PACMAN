@@ -15,7 +15,7 @@
 import unittest
 from collections import defaultdict
 from spinn_utilities.config_holder import set_config
-from spinn_machine import virtual_machine
+from spinn_machine import virtual_machine_by_boards
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
@@ -36,9 +36,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
 
     def test_ip_tags(self):
         writer = PacmanDataWriter.mock()
-        version = writer.get_machine_version()
-        width, heigth = version.size_from_n_boards(3)
-        machine = virtual_machine(width, heigth)
+        machine = virtual_machine_by_boards(3)
         writer.set_machine(machine)
         eth_chips = machine.ethernet_connected_chips
         vertices = [
@@ -165,9 +163,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
             self.do_too_many_ip_tags_for_1_board(machine)
 
     def test_spread_ip_tags(self):
-        version = PacmanDataView.get_machine_version()
-        width, heigth = version.size_from_n_boards(3)
-        machine = virtual_machine(width, heigth)
+        machine = virtual_machine_by_boards(3)
         self.do_too_many_ip_tags_for_1_board(machine)
 
     def test_fixed_repeat_tag_1_board(self):
@@ -176,9 +172,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
             self.do_fixed_repeat_tag(machine)
 
     def test_fixed_repeat_tag_3_boards(self):
-        version = PacmanDataView.get_machine_version()
-        width, heigth = version.size_from_n_boards(3)
-        machine = virtual_machine(width, heigth)
+        machine = virtual_machine_by_boards(3)
         self.do_fixed_repeat_tag(machine)
 
     def do_reverse(self, machine):
@@ -197,7 +191,5 @@ class TestTagsBoardAddresses(unittest.TestCase):
         self.assertEqual(1, len(list(tags.reverse_ip_tags)))
 
     def test_do_reverse_3_boards(self):
-        version = PacmanDataView.get_machine_version()
-        width, heigth = version.size_from_n_boards(3)
-        machine = virtual_machine(width, heigth)
+        machine = virtual_machine_by_boards(3)
         self.do_reverse(machine)

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from spinn_utilities.config_holder import set_config
-from spinn_machine.virtual_machine import virtual_machine
+from spinn_machine.virtual_machine import virtual_machine_by_cores
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import (PacmanPlaceException, PacmanTooBigToPlace)
 from pacman.model.partitioner_splitters import (
@@ -104,7 +104,7 @@ def test_application_placer():
     for i in range(61):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
     # Fudge factor needed as not filling chips well
-    writer.set_machine(virtual_machine(
+    writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices() * 1.2))
     place_application_graph(Placements())
 
@@ -125,7 +125,7 @@ def test_application_placer_large_groups():
     for i in range(17):
         _make_vertices(
             writer, 1000, 14, n_machine_vertices, f"app_vertex_{i}")
-    writer.set_machine(virtual_machine(
+    writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
     place_application_graph(Placements())
 
@@ -143,7 +143,7 @@ def test_application_placer_too_few_boards():
     for i in range(56):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
     # intentionally too small
-    writer.set_machine(virtual_machine(
+    writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices() / 2))
     try:
         place_application_graph(Placements())
@@ -165,7 +165,7 @@ def test_application_placer_restart_needed():
     for i in range(56):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
     # Don't use a full wrap machine
-    writer.set_machine(virtual_machine(
+    writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
     place_application_graph(Placements())
 
@@ -183,7 +183,7 @@ def test_application_placer_late_fixed():
     writer.add_vertex(fixed)
     fixed.splitter.create_machine_vertices(ChipCounter())
 
-    writer.set_machine(virtual_machine(
+    writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
     place_application_graph(Placements())
 
@@ -204,7 +204,7 @@ def test_application_placer_fill_chips():
         _make_vertices(writer, 1000, 14, half, f"app_vertex_{i}")
     for i in range(17):
         _make_vertices(writer, 1000, 14, half - 1, f"app_vertex_{i}")
-    writer.set_machine(virtual_machine(
+    writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
     place_application_graph(Placements())
 
