@@ -13,7 +13,7 @@
 # limitations under the License.
 from spinn_utilities.config_holder import set_config
 from spinn_machine.virtual_machine import virtual_machine_by_cores
-from spinn_machine.version import ANY_VERSION
+from spinn_machine.version import ANY_VERSION, MULTIPLE_BOARDS
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import (PacmanPlaceException, PacmanTooBigToPlace)
 from pacman.model.partitioner_splitters import (
@@ -94,7 +94,7 @@ def _make_vertices(
 
 def test_application_placer():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", MULTIPLE_BOARDS)
     writer = PacmanDataWriter.mock()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
@@ -112,7 +112,7 @@ def test_application_placer():
 
 def test_application_placer_large_groups():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", MULTIPLE_BOARDS)
     writer = PacmanDataWriter.mock()
     version = writer.get_machine_version()
     # fixed early works as this vertex is looked at first
@@ -133,7 +133,7 @@ def test_application_placer_large_groups():
 
 def test_application_placer_too_few_boards():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", MULTIPLE_BOARDS)
     writer = PacmanDataWriter.mock()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
@@ -155,7 +155,7 @@ def test_application_placer_too_few_boards():
 
 def test_application_placer_restart_needed():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", MULTIPLE_BOARDS)
     writer = PacmanDataWriter.mock()
     for (x, y) in [(1, 0), (1, 1), (0, 1)]:
         fixed = SimpleTestVertex(15, f"FIXED {x}:{y}", max_atoms_per_core=1)
@@ -173,7 +173,7 @@ def test_application_placer_restart_needed():
 
 def test_application_placer_late_fixed():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", MULTIPLE_BOARDS)
     writer = PacmanDataWriter.mock()
     for i in range(56):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
@@ -191,7 +191,7 @@ def test_application_placer_late_fixed():
 
 def test_application_placer_fill_chips():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", MULTIPLE_BOARDS)
     writer = PacmanDataWriter.mock()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)

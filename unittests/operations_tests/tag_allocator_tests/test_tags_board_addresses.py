@@ -15,6 +15,7 @@
 import unittest
 from collections import defaultdict
 from spinn_utilities.config_holder import set_config
+from spinn_machine.version import MULTIPLE_BOARDS
 from spinn_machine.virtual_machine import virtual_machine_by_boards
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
@@ -32,7 +33,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
     """
     def setUp(self):
         unittest_setup()
-        set_config("Machine", "version", 5)
+        set_config("Machine", "version", MULTIPLE_BOARDS)
 
     def test_ip_tags(self):
         writer = PacmanDataWriter.mock()

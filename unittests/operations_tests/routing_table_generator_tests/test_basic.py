@@ -36,6 +36,8 @@ class TestBasic(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
+        # TODO check after
+        #  https://github.com/SpiNNakerManchester/PACMAN/pull/555
         set_config("Machine", "version", 5)
 
     def create_graphs3(self, writer):

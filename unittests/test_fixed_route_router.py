@@ -15,6 +15,7 @@
 import pytest
 from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
+from spinn_machine.version import FIVE
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.placements import Placements, Placement
@@ -104,7 +105,7 @@ def test_all_working(
 
 def test_unreachable():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "version", FIVE)
     set_config("Machine", "down_chips", "0,2:1,3:1,4")
     with pytest.raises(PacmanRoutingException):
         _check_setup(8, 8)
