@@ -13,7 +13,8 @@
 # limitations under the License.
 from spinn_utilities.timer import Timer
 from spinn_utilities.config_holder import set_config
-from spinn_machine import (virtual_machine_by_boards, virtual_machine_by_cores)
+from spinn_machine.virtual_machine import (
+    virtual_machine_by_boards, virtual_machine_by_cores)
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanRoutingException

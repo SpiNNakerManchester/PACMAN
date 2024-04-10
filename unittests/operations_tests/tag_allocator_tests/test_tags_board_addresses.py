@@ -15,7 +15,7 @@
 import unittest
 from collections import defaultdict
 from spinn_utilities.config_holder import set_config
-from spinn_machine import virtual_machine_by_boards
+from spinn_machine.virtual_machine import virtual_machine_by_boards
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
