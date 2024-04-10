@@ -270,7 +270,6 @@ def test_more_cores_with_monitor():
     unittest_setup()
     set_config("Machine", "version", ANY_VERSION)
     writer = PacmanDataWriter.mock()
-    version = writer.get_machine_version()
     monitor = SimpleMachineVertex(ConstantSDRAM(4000))
     # This is purely an info call so test check directly
     writer.add_sample_monitor_vertex(monitor, True)
