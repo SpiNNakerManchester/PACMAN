@@ -450,7 +450,9 @@ def test_simple(params):
 def test_self(params):
     algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", ANY_VERSION)
+    # TODO check after
+    #  https://github.com/SpiNNakerManchester/PACMAN/pull/555
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, n_m_vertices, "self")
     writer.add_edge(ApplicationEdge(source_vertex, source_vertex), "Test")
