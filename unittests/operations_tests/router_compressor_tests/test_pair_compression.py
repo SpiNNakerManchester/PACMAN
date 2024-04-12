@@ -18,7 +18,7 @@ import unittest
 
 from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
-from spinn_machine.version import WRAPPABLE
+from spinn_machine.version.version_strings import VersionStrings
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
@@ -31,7 +31,7 @@ class TestPairCompressor(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
-        set_config("Machine", "version", WRAPPABLE)
+        set_config("Machine", "versions", VersionStrings.WRAPPABLE.value)
 
     def do_pair_big(self, c_sort):
         class_file = sys.modules[self.__module__].__file__

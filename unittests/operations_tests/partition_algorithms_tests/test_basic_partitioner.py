@@ -19,7 +19,7 @@ test for partitioning
 import unittest
 
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version import ANY_VERSION
+from spinn_machine.version.version_strings import VersionStrings
 
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
@@ -45,7 +45,7 @@ class TestBasicPartitioner(unittest.TestCase):
         setup for all basic partitioner tests
         """
         unittest_setup()
-        set_config("Machine", "version", ANY_VERSION)
+        set_config("Machine", "versions", VersionStrings.ANY.value)
 
     def test_partition_with_no_fixed(self):
         """

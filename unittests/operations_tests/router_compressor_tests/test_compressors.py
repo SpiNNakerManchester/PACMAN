@@ -15,7 +15,7 @@
 import unittest
 from spinn_utilities.config_holder import set_config
 from spinn_machine import MulticastRoutingEntry
-from spinn_machine.version import ANY_VERSION
+from spinn_machine.version.version_strings import VersionStrings
 
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
@@ -71,7 +71,7 @@ class TestCompressor(unittest.TestCase):
         unittest_setup()
         set_config(
             "Mapping", "router_table_compress_as_far_as_possible", True)
-        set_config("Machine", "version", ANY_VERSION)
+        set_config("Machine", "versions", VersionStrings.ANY.value)
         writer = PacmanDataWriter.mock()
         writer.set_uncompressed(original_tables)
         writer.set_precompressed(original_tables)
