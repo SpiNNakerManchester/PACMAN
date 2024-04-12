@@ -212,7 +212,7 @@ def test_application_placer_fill_chips():
 
 def test_sdram_bigger_than_chip():
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.value)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
     max_sdram = writer.get_machine_version().max_sdram_per_chip
     _make_vertices(writer, 1, 1, 5, "big_app_vertex",
@@ -226,7 +226,7 @@ def test_sdram_bigger_than_chip():
 
 def test_sdram_bigger_monitors():
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.value)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
     max_sdram = writer.get_machine_version().max_sdram_per_chip
     monitor = SimpleMachineVertex(ConstantSDRAM(max_sdram // 2))
@@ -242,7 +242,7 @@ def test_sdram_bigger_monitors():
 
 def test_more_cores_than_chip():
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.value)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
     many = writer.get_machine_version().max_cores_per_chip + 1
     _make_vertices(writer, 1, 1, many, "big_app_vertex")
@@ -255,7 +255,7 @@ def test_more_cores_than_chip():
 
 def test_more_cores_than_user():
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.value)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
     many = writer.get_machine_version().max_cores_per_chip
     _make_vertices(writer, 1, 1, many, "big_app_vertex")
@@ -268,7 +268,7 @@ def test_more_cores_than_user():
 
 def test_more_cores_with_monitor():
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.value)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(4000))
     # This is purely an info call so test check directly
@@ -284,7 +284,7 @@ def test_more_cores_with_monitor():
 
 def test_could_fit():
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.value)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(0))
     writer.add_sample_monitor_vertex(monitor, True)

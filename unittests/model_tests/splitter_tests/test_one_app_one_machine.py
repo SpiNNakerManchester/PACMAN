@@ -35,7 +35,7 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
         unittest_setup()
 
     def test_legacy(self):
-        set_config("Machine", "versions", VersionStrings.ANY.value)
+        set_config("Machine", "versions", VersionStrings.ANY.text)
         splitter = SplitterOneAppOneMachine()
         v1 = NonLegacyApplicationVertex("v1")
         a = str(splitter)
