@@ -32,7 +32,7 @@ class TestOrderedCoveringCompressor(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
-        set_config("Machine", "versions", VersionStrings.WRAPPABLE.value)
+        set_config("Machine", "versions", VersionStrings.WRAPPABLE.text)
 
     def test_oc_big(self):
         class_file = sys.modules[self.__module__].__file__

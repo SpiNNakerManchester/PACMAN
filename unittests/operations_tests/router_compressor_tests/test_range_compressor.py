@@ -32,7 +32,7 @@ class TestRangeCompressor(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
-        set_config("Machine", "versions", VersionStrings.WRAPPABLE.value)
+        set_config("Machine", "versions", VersionStrings.WRAPPABLE.text)
         set_config(
             "Mapping", "router_table_compress_as_far_as_possible", True)
 

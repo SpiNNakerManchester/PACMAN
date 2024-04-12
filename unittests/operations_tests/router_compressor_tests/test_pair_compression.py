@@ -31,7 +31,7 @@ class TestPairCompressor(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
-        set_config("Machine", "versions", VersionStrings.WRAPPABLE.value)
+        set_config("Machine", "versions", VersionStrings.WRAPPABLE.text)
 
     def do_pair_big(self, c_sort):
         class_file = sys.modules[self.__module__].__file__
