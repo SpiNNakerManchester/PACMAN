@@ -19,7 +19,7 @@ from typing import Any, Collection, Dict, Iterable
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
-from spinn_machine import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.exceptions import PacmanAlreadyExistsException
 from pacman.model.routing_tables import AbstractMulticastRoutingTable
 
@@ -71,7 +71,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     @overrides(AbstractMulticastRoutingTable.add_multicast_routing_entry)
     def add_multicast_routing_entry(
             self, multicast_routing_entry: MulticastRoutingEntry):
-        routing_entry_key = multicast_routing_entry.routing_entry_key
+        routing_entry_key = multicast_routing_entry.key
         mask = multicast_routing_entry.mask
 
         tuple_key = (routing_entry_key, mask)
@@ -139,14 +139,16 @@ def _from_csv_file(
                 key = int(row[0], base=16)
                 mask = int(row[1], base=16)
                 route = int(row[2], base=16)
+                entry = RoutingEntry(spinnaker_route=route)
                 table.add_multicast_routing_entry(
-                    MulticastRoutingEntry(key, mask, spinnaker_route=route))
+                    MulticastRoutingEntry(key, mask, entry))
             elif len(row) == 6:
                 key = int(row[1], base=16)
                 mask = int(row[2], base=16)
                 route = int(row[3], base=16)
+                entry = RoutingEntry(spinnaker_route=route)
                 table.add_multicast_routing_entry(
-                    MulticastRoutingEntry(key, mask, spinnaker_route=route))
+                    MulticastRoutingEntry(key, mask, entry))
         except ValueError as ex:
             logger.warning(f"csv read error {ex}")
     return table
