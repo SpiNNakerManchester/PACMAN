@@ -14,13 +14,12 @@
 
 import functools
 from typing import List, Tuple, cast
-from spinn_machine import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanElementAllocationException
 from pacman.model.routing_tables import (
     MulticastRoutingTables, AbstractMulticastRoutingTable)
 from .abstract_compressor import AbstractCompressor
-from .rt_entry import RTEntry
 
 
 def pair_compressor(
@@ -171,7 +170,7 @@ class _PairCompressor(AbstractCompressor):
     def __init__(self, ordered: bool = True, accept_overflow: bool = False,
                  c_sort: bool = False):
         super().__init__(ordered, accept_overflow)
-        self._all_entries: List[RTEntry] = []
+        self._all_entries: List[MulticastRoutingEntry] = []
         self._c_sort = c_sort
         self._write_index = 0
         self._max_index = 0
@@ -182,7 +181,8 @@ class _PairCompressor(AbstractCompressor):
         self._routes_count = 0
 
     def _compare_entries(
-            self, route_a_entry: RTEntry, route_b_entry: RTEntry) -> int:
+            self, route_a_entry: MulticastRoutingEntry,
+            route_b_entry: MulticastRoutingEntry) -> int:
         """
         Compares two entries for sorting based on the frequency of each entry's
         SpiNNaker route.
@@ -195,8 +195,8 @@ class _PairCompressor(AbstractCompressor):
         For two different routes but with the same frequency order is based on
         the (currently arbitrary) order they are in the self._routes table
 
-        :param RTEntry route_a_entry:
-        :param RTEntry route_b_entry:
+        :param MulticastRoutingEntry route_a_entry:
+        :param MulticastRoutingEntry route_b_entry:
         :return: ordering value (-1, 0, 1)
         :rtype: int
         """
@@ -353,9 +353,10 @@ class _PairCompressor(AbstractCompressor):
                     self._all_entries[check].mask,
                     m_key, m_mask):
                 return False
-        self._all_entries[left] = RTEntry(
-            m_key, m_mask, defaultable,
-            self._all_entries[left].spinnaker_route)
+        self._all_entries[left] = MulticastRoutingEntry(
+            m_key, m_mask, RoutingEntry(
+                defaultable=defaultable,
+                spinnaker_route=self._all_entries[left].spinnaker_route))
         return True
 
     def _compress_by_route(self, left: int, right: int):
@@ -403,7 +404,7 @@ class _PairCompressor(AbstractCompressor):
 
     def compress_table(
             self, router_table: AbstractMulticastRoutingTable
-            ) -> List[RTEntry]:
+            ) -> List[MulticastRoutingEntry]:
         """
         Compresses all the entries for a single table.
 
@@ -417,7 +418,7 @@ class _PairCompressor(AbstractCompressor):
         :param UnCompressedMulticastRoutingTable router_table:
             Original Routing table for a single chip
         :return: Compressed routing table for the same chip
-        :rtype: list(RTEntry)
+        :rtype: list(MulticastRoutingEntry)
         """
         # Split the entries into buckets based on spinnaker_route
         self._all_entries = []
@@ -429,8 +430,7 @@ class _PairCompressor(AbstractCompressor):
         self._routes_frequency = n_routes * [0]
 
         for entry in router_table.multicast_routing_entries:
-            self._all_entries.append(
-                RTEntry.from_multicast_routing_entry(entry))
+            self._all_entries.append(entry)
             self._update_frequency(entry)
 
         if self._c_sort:
@@ -493,15 +493,16 @@ class _PairCompressor(AbstractCompressor):
         """
         return (key_a & mask_b) == (key_b & mask_a)
 
-    def merge(self, entry1: RTEntry, entry2: RTEntry) -> Tuple[int, int, bool]:
+    def merge(self, entry1: MulticastRoutingEntry,
+              entry2: MulticastRoutingEntry) -> Tuple[int, int, bool]:
         """
         Merges two entries/triples into one that covers both.
 
         The assumption is that they both have the same known spinnaker_route
 
-        :param ~pacman.operations.router_compressors.RTEntry entry1:
+        :param MulticastRoutingEntry entry1:
             Key, Mask, defaultable from the first entry
-        :param ~pacman.operations.router_compressors.RTEntry entry2:
+        :param MulticastRoutingEntry entry2:
             Key, Mask, defaultable from the second entry
         :return: Key, Mask, defaultable from merged entry
         :rtype: tuple(int, int, bool)
