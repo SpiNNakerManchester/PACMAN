@@ -114,7 +114,7 @@ class TestMerged(unittest.TestCase):
         self.create_graphs3(writer)
         self.make_infos(writer)
         data = merged_routing_table_generator()
-        self.assertEqual(7, data.get_max_number_of_entries())
+        self.assertEqual(6, data.get_max_number_of_entries())
         self.assertEqual(5, len(list(data.routing_tables)))
 
     def test_graph3_with_system(self):
@@ -125,7 +125,7 @@ class TestMerged(unittest.TestCase):
         system_plaements.add_placement(Placement(mv, 1, 2, 3))
         self.make_infos(writer, system_plaements)
         data = merged_routing_table_generator()
-        self.assertEqual(7, data.get_max_number_of_entries())
+        self.assertEqual(6, data.get_max_number_of_entries())
         self.assertEqual(5, len(list(data.routing_tables)))
 
     def test_bad_infos(self):

@@ -19,7 +19,7 @@ from typing import (
 
 from spinn_utilities.typing.coords import XY
 from spinn_utilities.typing.json import JsonObjectArray
-from spinn_machine import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
 from pacman.exceptions import PacmanAlreadyExistsException
 
@@ -149,7 +149,7 @@ def to_json(router_table: MulticastRoutingTables) -> JsonObjectArray:
             "y": routing_table.y,
             "entries": [
                 {
-                    "key": entry.routing_entry_key,
+                    "key": entry.key,
                     "mask": entry.mask,
                     "defaultable": entry.defaultable,
                     "spinnaker_route": entry.spinnaker_route
@@ -182,8 +182,9 @@ def from_json(j_router: Union[str, JsonObjectArray]) -> MulticastRoutingTables:
         table = UnCompressedMulticastRoutingTable(x, y)
         tables.add_routing_table(table)
         for j_entry in cast(JsonObjectArray, j_table["entries"]):
-            table.add_multicast_routing_entry(MulticastRoutingEntry(
-                cast(int, j_entry["key"]), cast(int, j_entry["mask"]),
+            entry = RoutingEntry(
                 defaultable=cast(bool, j_entry["defaultable"]),
-                spinnaker_route=cast(int, j_entry["spinnaker_route"])))
+                spinnaker_route=cast(int, j_entry["spinnaker_route"]))
+            table.add_multicast_routing_entry(MulticastRoutingEntry(
+                cast(int, j_entry["key"]), cast(int, j_entry["mask"]), entry))
     return tables
