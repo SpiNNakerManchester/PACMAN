@@ -28,10 +28,6 @@ from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
 from pacman.operations.router_algorithms.application_router import (
     route_application_graph, _path_without_errors)
-from pacman.operations.router_algorithms.basic_dijkstra_routing import (
-    basic_dijkstra_routing)
-from pacman.operations.router_algorithms.ner_route import (
-    ner_route, ner_route_traffic_aware)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     longest_dimension_first, get_app_partitions, vertex_xy,
     vertex_xy_and_route)
@@ -48,10 +44,7 @@ import pytest
 
 
 @pytest.fixture(params=[
-    (route_application_graph, 10, 50),
-    (basic_dijkstra_routing, 10, 10),
-    (ner_route, 10, 50),
-    (ner_route_traffic_aware, 10, 50)])
+    (route_application_graph, 10, 50)])
 def params(request):
     return request.param
 

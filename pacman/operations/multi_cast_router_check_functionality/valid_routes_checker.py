@@ -263,7 +263,7 @@ def _check_all_keys_hit_entry(
     bad_entries = list()
     for atom_id in range(0, n_atoms):
         key = base_key + atom_id
-        if entry.mask & key != entry.routing_entry_key:
+        if entry.mask & key != entry.key:
             bad_entries.append(key)
     return bad_entries
 
@@ -399,7 +399,7 @@ def _locate_routing_entry(
     found_entry = None
     for entry in current_router.multicast_routing_entries:
         key_combo = entry.mask & key
-        e_key = entry.routing_entry_key
+        e_key = entry.key
         if key_combo == e_key:
             if found_entry is None:
                 found_entry = entry

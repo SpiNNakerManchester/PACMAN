@@ -15,13 +15,12 @@ from __future__ import annotations
 import logging
 from typing import Dict, Iterator, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.typing.coords import XY
+from spinn_machine import RoutingEntry
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs.machine import MachineVertex
 if TYPE_CHECKING:
     from pacman.model.graphs import AbstractVertex
-    from .multicast_routing_table_by_partition_entry import (
-        MulticastRoutingTableByPartitionEntry)
 
 log = logging.getLogger(__name__)
 
@@ -38,17 +37,16 @@ class MulticastRoutingTableByPartition(object):
 
     def __init__(self) -> None:
         self._router_to_entries_map: Dict[XY, Dict[
-            Tuple[AbstractVertex, str],
-            MulticastRoutingTableByPartitionEntry]] = dict()
+            Tuple[AbstractVertex, str], RoutingEntry]] = dict()
 
     def add_path_entry(
-            self, entry: MulticastRoutingTableByPartitionEntry,
+            self, entry: RoutingEntry,
             router_x: int, router_y: int,
             source_vertex: AbstractVertex, partition_id: str):
         """
         Adds a multicast routing path entry.
 
-        :param MulticastRoutingTableByPartitionEntry entry: the entry to add
+        :param RoutingEntry entry: the entry to add
         :param int router_x: the X coordinate of the router
         :param int router_y: the Y coordinate of the router
         :param source_vertex: The source that will send via this entry
@@ -82,7 +80,7 @@ class MulticastRoutingTableByPartition(object):
             entries[source_key] = entry
         else:
             try:
-                entries[source_key] = entry.merge_entry(entries[source_key])
+                entries[source_key] = entry.merge(entries[source_key])
             except PacmanInvalidParameterException as e:
                 log.error(
                     "Error merging entries on %s for %s", key, source_key)
@@ -106,8 +104,7 @@ class MulticastRoutingTableByPartition(object):
         return len(self._router_to_entries_map)
 
     def get_entries_for_router(self, router_x: int, router_y: int) -> Optional[
-            Dict[Tuple[AbstractVertex, str],
-                 MulticastRoutingTableByPartitionEntry]]:
+            Dict[Tuple[AbstractVertex, str], RoutingEntry]]:
         """
         Get the set of multicast path entries assigned to this router.
 
@@ -115,15 +112,14 @@ class MulticastRoutingTableByPartition(object):
         :param int router_y: the Y coordinate of the router
         :return: all router_path_entries for the router.
         :rtype: dict(tuple((ApplicationVertex or MachineVertex), str),
-            MulticastRoutingTableByPartitionEntry)
+            RoutingEntry)
         """
         key = (router_x, router_y)
         return self._router_to_entries_map.get(key)
 
     def get_entry_on_coords_for_edge(
             self, source_vertex: AbstractVertex, partition_id: str,
-            router_x: int, router_y: int) -> Optional[
-                MulticastRoutingTableByPartitionEntry]:
+            router_x: int, router_y: int) -> Optional[RoutingEntry]:
         """
         Get an entry from a specific coordinate.
 
@@ -132,7 +128,7 @@ class MulticastRoutingTableByPartition(object):
         :param str partition_id:
         :param int router_x: the X coordinate of the router
         :param int router_y: the Y coordinate of the router
-        :rtype: MulticastRoutingTableByPartitionEntry or None
+        :rtype: RoutingEntry or None
         """
         entries = self.get_entries_for_router(router_x, router_y)
         if entries is None:
