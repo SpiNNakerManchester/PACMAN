@@ -180,7 +180,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
 
     def add_sample_monitor_vertex(
-            self, vertex: MachineVertex, all_cores: bool):
+            self, vertex: MachineVertex, all_chips: bool):
         """
         Accepts a simple of the monitor cores to be added.
 
@@ -192,13 +192,13 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         :param ~pacman.model.graphs.machine.MachineVertex vertex:
             One of the vertices added to each core, assumed to be typical of
             all.
-        :param bool all_cores:
-            If True assumes that this Vertex will be placed on all cores
+        :param bool all_chips:
+            If True assumes that this Vertex will be placed on all chips
             including Ethernet ones.
             If False assumes that this Vertex type will only be placed on
             Ethernet Vertices
         """
-        self.add_monitor_core(all_cores)
+        self.add_monitor_core(all_chips)
         self.__pacman_data._ethernet_monitor_vertices.append(vertex)
-        if all_cores:
+        if all_chips:
             self.__pacman_data._all_monitor_vertices.append(vertex)
