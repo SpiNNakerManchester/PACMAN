@@ -15,8 +15,10 @@
 import unittest
 from collections import defaultdict
 from spinn_utilities.config_holder import set_config
-from spinn_machine import virtual_machine
+from spinn_machine.version.version_strings import VersionStrings
+from spinn_machine.virtual_machine import virtual_machine_by_boards
 from pacman.config_setup import unittest_setup
+from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanNotFoundError
 from pacman.model.placements import Placement, Placements
@@ -31,11 +33,11 @@ class TestTagsBoardAddresses(unittest.TestCase):
     """
     def setUp(self):
         unittest_setup()
-        set_config("Machine", "version", 5)
+        set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
 
     def test_ip_tags(self):
         writer = PacmanDataWriter.mock()
-        machine = virtual_machine(12, 12)
+        machine = virtual_machine_by_boards(3)
         writer.set_machine(machine)
         eth_chips = machine.ethernet_connected_chips
         vertices = [
@@ -119,8 +121,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
 
     def test_fixed_tag(self):
         writer = PacmanDataWriter.mock()
-        machine = virtual_machine(8, 8)
-        writer.set_machine(machine)
+        machine = writer.get_machine()
         chip00 = machine.get_chip_at(0, 0)
         procs = chip00.placable_processors_ids
         placements = Placements()
@@ -158,18 +159,22 @@ class TestTagsBoardAddresses(unittest.TestCase):
         self.assertEqual(6, len(list(tags.ip_tags_vertices)))
 
     def test_too_many_ip_tags_for_1_board(self):
+        machine = PacmanDataView.get_machine()
         with self.assertRaises(PacmanNotFoundError):
-            self.do_too_many_ip_tags_for_1_board(virtual_machine(8, 8))
+            self.do_too_many_ip_tags_for_1_board(machine)
 
     def test_spread_ip_tags(self):
-        self.do_too_many_ip_tags_for_1_board(virtual_machine(12, 12))
+        machine = virtual_machine_by_boards(3)
+        self.do_too_many_ip_tags_for_1_board(machine)
 
     def test_fixed_repeat_tag_1_board(self):
+        machine = PacmanDataView.get_machine()
         with self.assertRaises(PacmanNotFoundError):
-            self.do_fixed_repeat_tag(virtual_machine(8, 8))
+            self.do_fixed_repeat_tag(machine)
 
     def test_fixed_repeat_tag_3_boards(self):
-        self.do_fixed_repeat_tag(virtual_machine(12, 12))
+        machine = virtual_machine_by_boards(3)
+        self.do_fixed_repeat_tag(machine)
 
     def do_reverse(self, machine):
         writer = PacmanDataWriter.mock()
@@ -187,4 +192,5 @@ class TestTagsBoardAddresses(unittest.TestCase):
         self.assertEqual(1, len(list(tags.reverse_ip_tags)))
 
     def test_do_reverse_3_boards(self):
-        self.do_reverse(virtual_machine(12, 12))
+        machine = virtual_machine_by_boards(3)
+        self.do_reverse(machine)

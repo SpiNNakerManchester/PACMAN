@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from spinn_utilities.config_holder import set_config
-from spinn_machine.virtual_machine import virtual_machine
+from spinn_machine.virtual_machine import virtual_machine_by_cores
+from spinn_machine.version.version_strings import VersionStrings
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import (PacmanPlaceException, PacmanTooBigToPlace)
 from pacman.model.partitioner_splitters import (
@@ -93,7 +94,7 @@ def _make_vertices(
 
 def test_application_placer():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
     writer = PacmanDataWriter.mock()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
@@ -103,29 +104,36 @@ def test_application_placer():
     fixed.splitter.create_machine_vertices(ChipCounter())
     for i in range(61):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
-    writer.set_machine(virtual_machine(24, 12))
+    # Fudge factor needed as not filling chips well
+    writer.set_machine(virtual_machine_by_cores(
+        n_cores=writer.get_n_machine_vertices() * 1.2))
     place_application_graph(Placements())
 
 
 def test_application_placer_large_groups():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
     writer = PacmanDataWriter.mock()
+    version = writer.get_machine_version()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
     fixed.splitter = SplitterFixedLegacy()
     fixed.set_fixed_location(0, 0)
     writer.add_vertex(fixed)
     fixed.splitter.create_machine_vertices(ChipCounter())
+    # make groups to fill chips
+    n_machine_vertices = version.max_cores_per_chip - 2
     for i in range(17):
-        _make_vertices(writer, 1000, 14, 17, f"app_vertex_{i}")
-    writer.set_machine(virtual_machine(24, 12))
+        _make_vertices(
+            writer, 1000, 14, n_machine_vertices, f"app_vertex_{i}")
+    writer.set_machine(virtual_machine_by_cores(
+        n_cores=writer.get_n_machine_vertices()))
     place_application_graph(Placements())
 
 
 def test_application_placer_too_few_boards():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
     writer = PacmanDataWriter.mock()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
@@ -135,7 +143,9 @@ def test_application_placer_too_few_boards():
     fixed.splitter.create_machine_vertices(ChipCounter())
     for i in range(56):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
-    writer.set_machine(virtual_machine(12, 12))
+    # intentionally too small
+    writer.set_machine(virtual_machine_by_cores(
+        n_cores=writer.get_n_machine_vertices() / 2))
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
@@ -145,7 +155,7 @@ def test_application_placer_too_few_boards():
 
 def test_application_placer_restart_needed():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
     writer = PacmanDataWriter.mock()
     for (x, y) in [(1, 0), (1, 1), (0, 1)]:
         fixed = SimpleTestVertex(15, f"FIXED {x}:{y}", max_atoms_per_core=1)
@@ -156,13 +166,14 @@ def test_application_placer_restart_needed():
     for i in range(56):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
     # Don't use a full wrap machine
-    writer.set_machine(virtual_machine(28, 16))
+    writer.set_machine(virtual_machine_by_cores(
+        n_cores=writer.get_n_machine_vertices()))
     place_application_graph(Placements())
 
 
 def test_application_placer_late_fixed():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
     writer = PacmanDataWriter.mock()
     for i in range(56):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
@@ -173,13 +184,14 @@ def test_application_placer_late_fixed():
     writer.add_vertex(fixed)
     fixed.splitter.create_machine_vertices(ChipCounter())
 
-    writer.set_machine(virtual_machine(24, 12))
+    writer.set_machine(virtual_machine_by_cores(
+        n_cores=writer.get_n_machine_vertices()))
     place_application_graph(Placements())
 
 
 def test_application_placer_fill_chips():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
     writer = PacmanDataWriter.mock()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
@@ -187,17 +199,20 @@ def test_application_placer_fill_chips():
     fixed.set_fixed_location(0, 0)
     writer.add_vertex(fixed)
     fixed.splitter.create_machine_vertices(ChipCounter())
+    version = writer.get_machine_version()
+    half = version.max_cores_per_chip // 2
     for i in range(17):
-        _make_vertices(writer, 1000, 14, 9, f"app_vertex_{i}")
+        _make_vertices(writer, 1000, 14, half, f"app_vertex_{i}")
     for i in range(17):
-        _make_vertices(writer, 1000, 14, 8, f"app_vertex_{i}")
-    writer.set_machine(virtual_machine(24, 12))
+        _make_vertices(writer, 1000, 14, half - 1, f"app_vertex_{i}")
+    writer.set_machine(virtual_machine_by_cores(
+        n_cores=writer.get_n_machine_vertices()))
     place_application_graph(Placements())
 
 
 def test_sdram_bigger_than_chip():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
     max_sdram = writer.get_machine_version().max_sdram_per_chip
     _make_vertices(writer, 1, 1, 5, "big_app_vertex",
@@ -211,7 +226,7 @@ def test_sdram_bigger_than_chip():
 
 def test_sdram_bigger_monitors():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
     max_sdram = writer.get_machine_version().max_sdram_per_chip
     monitor = SimpleMachineVertex(ConstantSDRAM(max_sdram // 2))
@@ -227,9 +242,10 @@ def test_sdram_bigger_monitors():
 
 def test_more_cores_than_chip():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
-    _make_vertices(writer, 1, 1, 19, "big_app_vertex")
+    many = writer.get_machine_version().max_cores_per_chip + 1
+    _make_vertices(writer, 1, 1, many, "big_app_vertex")
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
@@ -239,9 +255,10 @@ def test_more_cores_than_chip():
 
 def test_more_cores_than_user():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
-    _make_vertices(writer, 1, 1, 18, "big_app_vertex")
+    many = writer.get_machine_version().max_cores_per_chip
+    _make_vertices(writer, 1, 1, many, "big_app_vertex")
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
@@ -251,14 +268,15 @@ def test_more_cores_than_user():
 
 def test_more_cores_with_monitor():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(4000))
     # This is purely an info call so test check directly
     writer.add_sample_monitor_vertex(monitor, True)
+    many = writer.get_machine_version().max_cores_per_chip - 1
     try:
         placer = ApplicationPlacer(Placements())
-        placer._check_could_fit(17, 500000)
+        placer._check_could_fit(many, 500000)
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
         assert ("reserved for monitors" in str(ex))
@@ -266,9 +284,10 @@ def test_more_cores_with_monitor():
 
 def test_could_fit():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(0))
     writer.add_sample_monitor_vertex(monitor, True)
     placer = ApplicationPlacer(Placements())
-    placer._check_could_fit(16, 500000)
+    many = writer.get_machine_version().max_cores_per_chip - 2
+    placer._check_could_fit(many, 500000)
