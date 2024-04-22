@@ -15,6 +15,7 @@
 import unittest
 
 from spinn_utilities.config_holder import set_config
+from spinn_machine.version.version_strings import VersionStrings
 
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
@@ -34,7 +35,7 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
         unittest_setup()
 
     def test_legacy(self):
-        set_config("Machine", "version", 5)
+        set_config("Machine", "versions", VersionStrings.ANY.text)
         splitter = SplitterOneAppOneMachine()
         v1 = NonLegacyApplicationVertex("v1")
         a = str(splitter)
