@@ -70,6 +70,9 @@ class _PacmanDataModel(object):
         "_precompressed",
         "_all_monitor_vertices",
         "_ethernet_monitor_vertices",
+        "_n_boards_required",
+        "_n_chips_required",
+        "_n_chips_in_graph",
         "_routing_infos",
         "_routing_table_by_partition",
         "_tags",
@@ -104,6 +107,7 @@ class _PacmanDataModel(object):
         self._precompressed: Optional[MulticastRoutingTables] = None
         self._all_monitor_vertices: List[MachineVertex] = []
         self._ethernet_monitor_vertices: List[MachineVertex] = []
+        self._n_chips_in_graph: Optional[int] = None
         self._uncompressed: Optional[MulticastRoutingTables] = None
         self._routing_infos: Optional[RoutingInfo] = None
         self._routing_table_by_partition: Optional[
