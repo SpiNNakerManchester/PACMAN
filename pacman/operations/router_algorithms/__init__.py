@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .basic_dijkstra_routing import basic_dijkstra_routing
-from .ner_route import ner_route, ner_route_traffic_aware
 from .application_router import route_application_graph
 
-__all__ = ['basic_dijkstra_routing', 'ner_route', 'ner_route_traffic_aware',
-           'route_application_graph']
+__all__ = ['route_application_graph']

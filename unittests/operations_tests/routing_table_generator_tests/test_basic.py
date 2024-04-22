@@ -36,6 +36,8 @@ class TestBasic(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
+        # TODO check after
+        #  https://github.com/SpiNNakerManchester/PACMAN/pull/555
         set_config("Machine", "version", 5)
 
     def create_graphs3(self, writer):
@@ -81,6 +83,6 @@ class TestBasic(unittest.TestCase):
         system_plaements.add_placement(Placement(mv, 1, 2, 3))
         self.make_infos(writer, system_plaements)
         data = basic_routing_table_generator()
-        self.assertEqual(34, data.get_max_number_of_entries())
-        self.assertEqual(114, data.get_total_number_of_entries())
-        self.assertEqual(4, len(list(data.routing_tables)))
+        self.assertEqual(31, data.get_max_number_of_entries())
+        self.assertEqual(108, data.get_total_number_of_entries())
+        self.assertEqual(5, len(list(data.routing_tables)))

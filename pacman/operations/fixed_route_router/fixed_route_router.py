@@ -14,7 +14,7 @@
 
 from typing import Dict, List, Tuple, Type
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import Chip, FixedRouteEntry
+from spinn_machine import Chip, RoutingEntry
 from pacman.data import PacmanDataView
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
@@ -22,14 +22,14 @@ from pacman.exceptions import (
 
 
 def fixed_route_router(
-        destination_class: Type) -> Dict[Tuple[int, int], FixedRouteEntry]:
+        destination_class: Type) -> Dict[Tuple[int, int], RoutingEntry]:
     """
     Runs the fixed route generator for all boards on machine.
 
     :param destination_class: the destination class to route packets to
     :type destination_class: type
     :return: router tables for fixed route paths
-    :rtype: dict((int, int)), ~spinn_machine.FixedRouteEntry)
+    :rtype: dict((int, int)), ~spinn_machine.RoutingEntry)
     :raises PacmanConfigurationException: if no placement processor found
     :raises PacmanRoutingException:
     :raises PacmanAlreadyExistsException:
@@ -56,15 +56,15 @@ class _FixedRouteRouter(object):
         """
         self._machine = PacmanDataView.get_machine()
         self._destination_class = destination_class
-        self._fixed_route_tables: Dict[Tuple[int, int], FixedRouteEntry] = \
+        self._fixed_route_tables: Dict[Tuple[int, int], RoutingEntry] = \
             dict()
 
-    def build_fixed_routes(self) -> Dict[Tuple[int, int], FixedRouteEntry]:
+    def build_fixed_routes(self) -> Dict[Tuple[int, int], RoutingEntry]:
         """
         Runs the fixed route generator for all boards on machine.
 
         :return: router tables for fixed route paths
-        :rtype: dict((int, int), ~spinn_machine.FixedRouteEntry)
+        :rtype: dict((int, int), ~spinn_machine.RoutingEntry)
         :raises PacmanConfigurationException: if no placement processor found
         :raises PacmanRoutingException:
         :raises PacmanAlreadyExistsException:
@@ -136,7 +136,7 @@ class _FixedRouteRouter(object):
         if key in self._fixed_route_tables:
             raise PacmanAlreadyExistsException(
                 "fixed route entry", str(key))
-        self._fixed_route_tables[key] = FixedRouteEntry(
+        self._fixed_route_tables[key] = RoutingEntry(
             link_ids=link_ids, processor_ids=processor_ids)
 
     def __locate_destination(self, chip: Chip) -> int:
@@ -150,7 +150,7 @@ class _FixedRouteRouter(object):
         :raises PacmanConfigurationException: if no placement processor found
         """
         for placement in PacmanDataView.iterate_placements_by_xy_and_type(
-                chip.x, chip.y, self._destination_class):
+                chip, self._destination_class):
             return placement.p
         raise PacmanConfigurationException(
             f"no destination vertex found on Ethernet chip {chip.x}:{chip.y}")

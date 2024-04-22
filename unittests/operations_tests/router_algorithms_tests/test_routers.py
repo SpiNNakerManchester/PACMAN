@@ -13,7 +13,9 @@
 # limitations under the License.
 from spinn_utilities.timer import Timer
 from spinn_utilities.config_holder import set_config
-from spinn_machine import virtual_machine
+from spinn_machine.version.version_strings import VersionStrings
+from spinn_machine.virtual_machine import (
+    virtual_machine_by_boards, virtual_machine_by_cores)
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanRoutingException
@@ -28,10 +30,6 @@ from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph)
 from pacman.operations.router_algorithms.application_router import (
     route_application_graph, _path_without_errors)
-from pacman.operations.router_algorithms.basic_dijkstra_routing import (
-    basic_dijkstra_routing)
-from pacman.operations.router_algorithms.ner_route import (
-    ner_route, ner_route_traffic_aware)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     longest_dimension_first, get_app_partitions, vertex_xy,
     vertex_xy_and_route)
@@ -48,10 +46,7 @@ import pytest
 
 
 @pytest.fixture(params=[
-    (route_application_graph, 10, 50),
-    (basic_dijkstra_routing, 10, 10),
-    (ner_route, 10, 50),
-    (ner_route_traffic_aware, 10, 50)])
+    (route_application_graph, 10, 50)])
 def params(request):
     return request.param
 
@@ -441,7 +436,7 @@ def _route_and_time(algorithm):
 def test_simple(params):
     algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, n_m_vertices, "source")
     target_vertex = _make_vertices(writer, 1000, n_m_vertices, "target")
@@ -455,6 +450,8 @@ def test_simple(params):
 def test_self(params):
     algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
+    # TODO check after
+    #  https://github.com/SpiNNakerManchester/PACMAN/pull/555
     set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, n_m_vertices, "self")
@@ -468,7 +465,7 @@ def test_self(params):
 def test_simple_self(params):
     algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, n_m_vertices, "source")
     target_vertex = _make_vertices(writer, 1000, n_m_vertices, "target")
@@ -484,7 +481,7 @@ def test_simple_self(params):
 def test_multi(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices(writer, 1000, n_m_vertices, f"app_vertex_{i}")
@@ -501,7 +498,7 @@ def test_multi(params):
 def test_multi_self(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices(writer, 1000, n_m_vertices, f"app_vertex_{i}")
@@ -517,7 +514,7 @@ def test_multi_self(params):
 def test_multi_split(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices_split(writer, 1000, 3, 2, n_m_vertices,
@@ -527,7 +524,8 @@ def test_multi_split(params):
             if source != target:
                 writer.add_edge(ApplicationEdge(source, target), "Test")
 
-    writer.set_machine(virtual_machine(24, 24))
+    writer.set_machine(virtual_machine_by_cores(
+        n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -536,7 +534,7 @@ def test_multi_split(params):
 def test_multi_self_split(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices_split(writer, 1000, 3, 2, n_m_vertices,
@@ -545,7 +543,8 @@ def test_multi_self_split(params):
         for target in writer.iterate_vertices():
             writer.add_edge(ApplicationEdge(source, target), "Test")
 
-    writer.set_machine(virtual_machine(24, 24))
+    writer.set_machine(virtual_machine_by_cores(
+        n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -554,7 +553,7 @@ def test_multi_self_split(params):
 def test_multi_down_chips_and_links(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices(writer, 1000, n_m_vertices, f"app_vertex_{i}")
@@ -610,13 +609,14 @@ def test_multi_down_chips_and_links(params):
 def test_internal_only(params):
     algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
     _make_vertices_split(
         writer, 1000, 3, 2, 2, "app_vertex",
         internal_multicast=True)
 
-    writer.set_machine(virtual_machine(24, 24))
+    writer.set_machine(virtual_machine_by_cores(
+        n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -625,7 +625,7 @@ def test_internal_only(params):
 def test_internal_and_split(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices_split(
@@ -636,7 +636,8 @@ def test_internal_and_split(params):
             if source != target:
                 writer.add_edge(ApplicationEdge(source, target), "Test")
 
-    writer.set_machine(virtual_machine(24, 24))
+    writer.set_machine(virtual_machine_by_cores(
+        n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -645,7 +646,7 @@ def test_internal_and_split(params):
 def test_spinnaker_link(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     in_device = ApplicationSpiNNakerLinkVertex(100, 0)
     in_device.splitter = SplitterExternalDevice()
@@ -669,7 +670,7 @@ def test_spinnaker_link(params):
 def test_fpga_link(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     in_device = ApplicationFPGAVertex(
         100, [FPGAConnection(0, 0, None, None)], None)
@@ -696,10 +697,9 @@ def test_fpga_link(params):
 def test_fpga_link_overlap(params):
     algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     set_config("Machine", "down_chips", "6,1")
-    writer.set_machine(virtual_machine(12, 12))
     in_device = ApplicationFPGAVertex(
         100, [FPGAConnection(0, i, None, None) for i in range(15, 0, -2)],
         None)
@@ -710,6 +710,8 @@ def test_fpga_link_overlap(params):
         writer, 1000, 60 * 16, "app_vertex")
     writer.add_edge(ApplicationEdge(in_device, app_vertex), "Test")
 
+    writer.set_machine(virtual_machine_by_cores(
+        n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -718,7 +720,7 @@ def test_fpga_link_overlap(params):
 def test_odd_case(params):
     algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     target_vertex = _make_vertices(writer, 200, 20, "app_vertex")
     delay_vertex = _make_one_to_one_vertices(writer, 200, 20, "delay_vtx")
@@ -743,6 +745,8 @@ def test_odd_case(params):
         x, y, p = next(core_iter)
         placements.add_placement(Placement(m_vertex, x, y, p))
 
+    writer.set_machine(virtual_machine_by_cores(
+        n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
@@ -754,9 +758,9 @@ def test_with_ethernet_system_placements(params):
     # to one of them
     algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
-    writer.set_machine(virtual_machine(16, 16))
+    writer.set_machine(virtual_machine_by_boards(4))
     source_vertex = _make_vertices(writer, 200, 3, "app_vertex")
     target_vertex = _make_ethernet_vertices(writer, 1, "eth_vertex")
     writer.add_edge(ApplicationEdge(source_vertex, target_vertex), "Test")
@@ -797,14 +801,14 @@ def _check_path(source, nodes_fixed, machine, target):
 
 def test_route_around():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     # Take out all the chips around 3,3 except one then make a path that goes
     # through it
     #      3,4 4,4
     #  2,3 3,3 4,3
     #  2,2 3,2
     set_config("Machine", "down_chips", "2,3:3,2:3,4:4,4:4,3")
-    machine = virtual_machine(8, 8)
+    machine = PacmanDataView.get_machine()
     vector = machine.get_vector((0, 0), (6, 6))
     PacmanDataWriter.mock().set_machine(machine)
     nodes = longest_dimension_first(vector, (0, 0))
