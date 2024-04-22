@@ -626,7 +626,7 @@ def test_internal_only(params):
 def test_internal_and_split(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices_split(

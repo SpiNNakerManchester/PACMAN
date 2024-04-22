@@ -33,7 +33,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
     """
     def setUp(self):
         unittest_setup()
-        set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
+        set_config("Machine", "versions", VersionStrings.BIG.text)
 
     def test_ip_tags(self):
         writer = PacmanDataWriter.mock()
