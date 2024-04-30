@@ -94,7 +94,7 @@ def _make_vertices(
 
 def test_application_placer():
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
@@ -112,7 +112,7 @@ def test_application_placer():
 
 def test_application_placer_large_groups():
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     version = writer.get_machine_version()
     # fixed early works as this vertex is looked at first
@@ -133,16 +133,18 @@ def test_application_placer_large_groups():
 
 def test_application_placer_too_few_boards():
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
     fixed.splitter = SplitterFixedLegacy()
     fixed.set_fixed_location(0, 0)
     writer.add_vertex(fixed)
+    version = writer.get_machine_version()
+    n_machine_vertices = version.max_cores_per_chip - 2
     fixed.splitter.create_machine_vertices(ChipCounter())
     for i in range(56):
-        _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
+        _make_vertices(writer, 1000, 14, n_machine_vertices, f"app_vertex_{i}")
     # intentionally too small
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices() / 2))
@@ -155,7 +157,7 @@ def test_application_placer_too_few_boards():
 
 def test_application_placer_restart_needed():
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     for (x, y) in [(1, 0), (1, 1), (0, 1)]:
         fixed = SimpleTestVertex(15, f"FIXED {x}:{y}", max_atoms_per_core=1)
@@ -173,7 +175,7 @@ def test_application_placer_restart_needed():
 
 def test_application_placer_late_fixed():
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     for i in range(56):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
@@ -191,7 +193,7 @@ def test_application_placer_late_fixed():
 
 def test_application_placer_fill_chips():
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
