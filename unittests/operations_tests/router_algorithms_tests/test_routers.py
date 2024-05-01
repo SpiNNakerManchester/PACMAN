@@ -13,6 +13,7 @@
 # limitations under the License.
 from spinn_utilities.timer import Timer
 from spinn_utilities.config_holder import set_config
+from spinn_machine.version import FIVE
 from spinn_machine.version.version_strings import VersionStrings
 from spinn_machine.virtual_machine import (
     virtual_machine_by_boards, virtual_machine_by_cores)
@@ -625,7 +626,7 @@ def test_internal_only(params):
 def test_internal_and_split(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.MULTIPLE_BOARDS.text)
+    set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
     for i in range(n_vertices):
         _make_vertices_split(
@@ -646,7 +647,8 @@ def test_internal_and_split(params):
 def test_spinnaker_link(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    # TODO SPIN2 spinnaker links
+    set_config("Machine", "version", FIVE)
     writer = PacmanDataWriter.mock()
     in_device = ApplicationSpiNNakerLinkVertex(100, 0)
     in_device.splitter = SplitterExternalDevice()
@@ -670,7 +672,8 @@ def test_spinnaker_link(params):
 def test_fpga_link(params):
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    # TODO spin2 fpga
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     in_device = ApplicationFPGAVertex(
         100, [FPGAConnection(0, 0, None, None)], None)
@@ -697,7 +700,8 @@ def test_fpga_link(params):
 def test_fpga_link_overlap(params):
     algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    # TODO Spin2 links
+    set_config("Machine", "version", 5)
     writer = PacmanDataWriter.mock()
     set_config("Machine", "down_chips", "6,1")
     in_device = ApplicationFPGAVertex(
