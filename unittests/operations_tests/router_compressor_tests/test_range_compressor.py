@@ -16,7 +16,7 @@ import os
 import sys
 import unittest
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version.version_strings import VersionStrings
+from spinn_machine.version import FIVE
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables import MulticastRoutingTables
@@ -32,7 +32,8 @@ class TestRangeCompressor(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
-        set_config("Machine", "versions", VersionStrings.WRAPPABLE.text)
+        # tests against version 5 as Spin2 would not need compression
+        set_config("Machine", "version", FIVE)
         set_config(
             "Mapping", "router_table_compress_as_far_as_possible", True)
 
