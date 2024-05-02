@@ -209,7 +209,7 @@ def _search_route(
     if error_message != "":
         raise PacmanRoutingException(error_message)
     logger.debug(f"successful test between {source_placement.vertex.label} "
-                f"and {dest_placements}")
+                 f"and {dest_placements}")
 
 
 def _start_trace_via_routing_tables(
