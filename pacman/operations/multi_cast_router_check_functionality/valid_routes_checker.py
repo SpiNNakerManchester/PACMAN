@@ -60,7 +60,7 @@ class _Failure(NamedTuple):
 
 def validate_routes(routing_tables: MulticastRoutingTables):
     """
-    Go though the app partitions and check that the routing entries
+    Go through the app partitions and check that the routing entries
     within the routing tables support reach the correction destinations
     as well as not producing any cycles.
 
@@ -146,10 +146,10 @@ def _search_route(
     :raise PacmanRoutingException:
         when the trace completes and there are still destinations not visited
     """
-    logger.info(f"{source_placement=}")
+    logger.debug(f"{source_placement=}")
     if logger.isEnabledFor(logging.INFO):
         for dest in dest_placements:
-            logger.info("[{}:{}:{}]", dest.x, dest.y, dest.p)
+            logger.debug("[{}:{}:{}]", dest.x, dest.y, dest.p)
 
     located_destinations: Set[PlacementTuple] = set()
 
@@ -208,7 +208,7 @@ def _search_route(
     # raise error if required
     if error_message != "":
         raise PacmanRoutingException(error_message)
-    logger.info(f"successful test between {source_placement.vertex.label} "
+    logger.debug(f"successful test between {source_placement.vertex.label} "
                 f"and {dest_placements}")
 
 
