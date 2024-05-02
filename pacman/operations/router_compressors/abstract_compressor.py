@@ -22,12 +22,12 @@ from typing import List, cast
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_machine import MulticastRoutingEntry
 from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.exceptions import MinimisationFailedError
 from pacman.model.routing_tables import UnCompressedMulticastRoutingTable
-from .rt_entry import RTEntry
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -69,12 +69,12 @@ class AbstractCompressor(object):
     @abstractmethod
     def compress_table(
             self, router_table: UnCompressedMulticastRoutingTable) -> List[
-                RTEntry]:
+                MulticastRoutingEntry]:
         """
         :param UnCompressedMulticastRoutingTable router_table:
             Original routing table for a single chip
         :return: Raw compressed routing table entries for the same chip
-        :rtype: list(RTEntry)
+        :rtype: list(MulticastRoutingEntry)
         """
         raise NotImplementedError
 
@@ -108,8 +108,7 @@ class AbstractCompressor(object):
                 new_table = CompressedMulticastRoutingTable(table.x, table.y)
 
                 for entry in compressed_table:
-                    new_table.add_multicast_routing_entry(
-                        entry.to_MulticastRoutingEntry())
+                    new_table.add_multicast_routing_entry(entry)
                 if new_table.number_of_entries > target:
                     self._problems += (
                         f"(x:{new_table.x},y:{new_table.y})="

@@ -14,7 +14,7 @@
 from typing import (
     Dict, Iterable, List, Optional, Tuple, TypeVar, Generic)
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_tables import (
@@ -23,8 +23,6 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.routing_info import (
     RoutingInfo, AppVertexRoutingInfo, MachineVertexRoutingInfo)
 from pacman.model.graphs import AbstractVertex
-from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartitionEntry)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 
@@ -55,15 +53,14 @@ def merged_routing_table_generator() -> MulticastRoutingTables:
 def __create_routing_table(
         x: int, y: int,
         partitions_in_table: Dict[Tuple[AbstractVertex, str],
-                                  MulticastRoutingTableByPartitionEntry],
+                                  RoutingEntry],
         routing_info: RoutingInfo) -> UnCompressedMulticastRoutingTable:
     """
     :param int x:
     :param int y:
     :param partitions_in_table:
     :type partitions_in_table:
-        dict(((ApplicationVertex or MachineVertex), str),
-        MulticastRoutingTableByPartitionEntry)
+        dict(((ApplicationVertex or MachineVertex), str), RoutingEntry)
     :param RoutingInfo routing_infos:
     :rtype: MulticastRoutingTable
     """
@@ -92,8 +89,7 @@ def __create_routing_table(
         if isinstance(vertex, ApplicationVertex):
             table.add_multicast_routing_entry(
                 MulticastRoutingEntry(
-                    r_info.key, r_info.mask, defaultable=entry.defaultable,
-                    spinnaker_route=entry.spinnaker_route))
+                    r_info.key, r_info.mask, entry))
             continue
         # Otherwise it has to be a machine vertex...
         assert isinstance(vertex, MachineVertex)
@@ -102,9 +98,7 @@ def __create_routing_table(
         # If there is no application vertex, just add the entry
         if vertex.app_vertex is None:
             table.add_multicast_routing_entry(
-                MulticastRoutingEntry(
-                    r_info.key, r_info.mask, defaultable=entry.defaultable,
-                    spinnaker_route=entry.spinnaker_route))
+                MulticastRoutingEntry(r_info.key, r_info.mask, entry))
             continue
 
         # This has to be AppVertexRoutingInfo!
@@ -114,8 +108,7 @@ def __create_routing_table(
 
         # Get the entries to merge
         entries: List[Tuple[
-            MulticastRoutingTableByPartitionEntry,
-            MachineVertexRoutingInfo]] = [(entry, r_info)]
+            RoutingEntry, MachineVertexRoutingInfo]] = [(entry, r_info)]
         while __match(iterator, vertex, part_id, r_info, entry, routing_info,
                       app_r_info):
             (vertex, part_id), entry = iterator.pop()
@@ -155,7 +148,8 @@ def __match(
         return False
     app_src = vertex.app_vertex
     next_app_src = next_vertex.app_vertex
-    return next_app_src == app_src and entry.has_same_route(next_entry)
+    return (next_app_src == app_src and
+            entry.spinnaker_route == next_entry.spinnaker_route)
 
 
 def __mask_has_holes(mask: int) -> bool:
@@ -174,16 +168,13 @@ def __mask_has_holes(mask: int) -> bool:
 
 def __merged_keys_and_masks(
         app_r_info: AppVertexRoutingInfo,
-        entries: List[Tuple[
-            MulticastRoutingTableByPartitionEntry,
-            MachineVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:
+        entries: List[Tuple[RoutingEntry, MachineVertexRoutingInfo]]
+        ) -> Iterable[MulticastRoutingEntry]:
     if not entries:
         return
     (entry, r_info) = entries[0]
     if len(entries) == 1:
-        yield MulticastRoutingEntry(
-            r_info.key, r_info.mask, defaultable=entry.defaultable,
-            spinnaker_route=entry.spinnaker_route)
+        yield MulticastRoutingEntry(r_info.key, r_info.mask, entry)
     else:
         yield from app_r_info.merge_machine_entries(entries)
 
@@ -193,7 +184,14 @@ E = TypeVar("E")
 
 
 class _IteratorWithNext(Generic[E]):
+    """
+    An iterator wrapper which allows peek
+    """
+
     def __init__(self, iterable: Iterable[E]):
+        """
+        :param iterable: iterable  to be wrapped
+        """
         self.__iterator = iter(iterable)
         try:
             self.__next: Optional[E] = next(self.__iterator)
@@ -203,13 +201,24 @@ class _IteratorWithNext(Generic[E]):
             self.__has_next = False
 
     def peek(self) -> Optional[E]:
+        """
+        The Element if any that would be returned by a pop call
+        """
         return self.__next
 
     @property
     def has_next(self) -> bool:
+        """
+        True if there is another element for Peek or Pop to return
+        """
         return self.__has_next
 
     def pop(self) -> E:
+        """
+        The next element available.
+
+        :raises:  StopIteration if there is not more element available
+        """
         if not self.__has_next:
             raise StopIteration
         nxt = self.__next

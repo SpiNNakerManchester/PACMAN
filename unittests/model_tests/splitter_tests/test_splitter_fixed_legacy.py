@@ -13,6 +13,10 @@
 # limitations under the License.
 
 import unittest
+
+from spinn_utilities.config_holder import set_config
+from spinn_machine.version.version_strings import VersionStrings
+
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
@@ -26,6 +30,7 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         unittest_setup()
 
     def test_api(self):
+        set_config("Machine", "versions", VersionStrings.ANY.text)
         splitter = SplitterFixedLegacy()
         self.assertIsNotNone(str(splitter))
         self.assertIsNotNone(repr(splitter))

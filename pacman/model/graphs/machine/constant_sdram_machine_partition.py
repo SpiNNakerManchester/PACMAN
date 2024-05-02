@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Generic, Optional, Type, TypeVar, cast
-from pacman.model.graphs.machine import AbstractSDRAMPartition
-from pacman.model.graphs import AbstractSingleSourcePartition
+
 from spinn_utilities.overrides import overrides
+
 from pacman.exceptions import (
     PacmanConfigurationException, PartitionMissingEdgesException,
     SDRAMEdgeSizeException)
+from pacman.model.graphs.machine import AbstractSDRAMPartition
+from pacman.model.graphs import AbstractSingleSourcePartition
 from pacman.model.graphs.machine import SDRAMMachineEdge
+
 from .machine_vertex import MachineVertex
 
 #: :meta private:

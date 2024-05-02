@@ -16,13 +16,11 @@ import logging
 import math
 from typing import Iterable, List, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
-from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from .vertex_routing_info import VertexRoutingInfo
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
     from pacman.model.routing_info import BaseKeyAndMask
-    from pacman.model.routing_table_by_partition import (
-        MulticastRoutingTableByPartitionEntry)
     from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
 logger = logging.getLogger(__name__)
@@ -58,7 +56,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         self.__max_machine_index = max_machine_index
 
     def merge_machine_entries(self, entries: List[Tuple[
-            MulticastRoutingTableByPartitionEntry,
+            RoutingEntry,
             MachineVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:
         """
         Merge the machine entries.
@@ -66,8 +64,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         :param entries:
             The entries to merge
         :type entries:
-            list(tuple(
-                MulticastRoutingTableByPartitionEntry, VertexRoutingInfo))
+            list(tuple(RoutingEntry, VertexRoutingInfo))
         :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
         """
         n_entries = len(entries)
@@ -82,9 +79,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
             # If that is OK, we can just use them
             if next_entries <= (n_entries - i) or is_last:
                 mask = self.__group_mask(next_entries)
-                yield MulticastRoutingEntry(
-                    r_info.key, mask, defaultable=entry.defaultable,
-                    spinnaker_route=entry.spinnaker_route)
+                yield MulticastRoutingEntry(r_info.key, mask, entry)
                 i += next_entries
 
             # Otherwise, we have to break down into powers of two
@@ -94,10 +89,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                     next_entries = 2 ** int(math.log2(entries_to_go))
                     mask = self.__group_mask(next_entries)
                     (entry, r_info) = entries[i]
-                    yield MulticastRoutingEntry(
-                        r_info.key, mask,
-                        defaultable=entry.defaultable,
-                        spinnaker_route=entry.spinnaker_route)
+                    yield MulticastRoutingEntry(r_info.key, mask, entry)
                     entries_to_go -= next_entries
                     i += next_entries
 

@@ -18,6 +18,7 @@ import unittest
 
 from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
+from spinn_machine.version import FIVE
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
@@ -30,7 +31,8 @@ class TestPairCompressor(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
-        set_config("Machine", "version", 5)
+        # tests against version 5 as Spin2 would not need compression
+        set_config("Machine", "version", FIVE)
 
     def do_pair_big(self, c_sort):
         class_file = sys.modules[self.__module__].__file__
@@ -39,6 +41,8 @@ class TestPairCompressor(unittest.TestCase):
         original_tables = from_json(j_router)
         writer = PacmanDataWriter.mock()
         writer.set_precompressed(original_tables)
+        # This tests requires a full wrap machine
+        # The input includes Chips like 3, 8
         writer.set_machine(virtual_machine(24, 24))
 
         compressed_tables = pair_compressor(c_sort=c_sort)

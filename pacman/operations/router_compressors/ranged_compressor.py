@@ -18,7 +18,7 @@ from typing import cast
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_machine import MulticastRoutingEntry
+from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data import PacmanDataView
 from pacman.model.routing_tables import (
     CompressedMulticastRoutingTable, MulticastRoutingTables,
@@ -67,7 +67,7 @@ class RangeCompressor(object):
     """
     # pylint: disable=attribute-defined-outside-init
     __slots__ = (
-        # Router table to add merged rutes into
+        # Router table to add merged routes into
         "_compressed",
         # List of entries to be merged
         "_entries")
@@ -96,7 +96,7 @@ class RangeCompressor(object):
 
         # Step 1 get the entries and make sure they are sorted by key
         self._entries = list(uncompressed.multicast_routing_entries)
-        self._entries.sort(key=lambda x: x.routing_entry_key)
+        self._entries.sort(key=lambda x: x.key)
         if not self._validate():
             return uncompressed
 
@@ -141,7 +141,7 @@ class RangeCompressor(object):
         if index == len(self._entries):
             return sys.maxsize
         entry = self._entries[index]
-        return entry.routing_entry_key & entry.mask
+        return entry.key & entry.mask
 
     def _get_endpoint(self, index: int) -> int:
         """
@@ -155,7 +155,7 @@ class RangeCompressor(object):
             return 0
         entry = self._entries[index]
         # return the key plus the mask flipping ones and zeros
-        return (entry.routing_entry_key | ~entry.mask) & 0xFFFFFFFF
+        return (entry.key | ~entry.mask) & 0xFFFFFFFF
 
     def _merge_range(self, first: int, last: int):
         while True:
@@ -176,7 +176,7 @@ class RangeCompressor(object):
             dif = last_point - first_point
             power = 1 if dif < 1 else 1 << ((dif - 1).bit_length())
 
-            # Find the start range cutoffs
+            # Find the start range cut-off
             low_cut = first_point // power * power
             high_cut = low_cut + power
 
@@ -201,8 +201,10 @@ class RangeCompressor(object):
             # make the new router entry
             new_mask = 2 ** 32 - power
             route = self._entries[first].spinnaker_route
+
+            entry = RoutingEntry(spinnaker_route=route)
             self._compressed.add_multicast_routing_entry(MulticastRoutingEntry(
-                low_cut, new_mask,  spinnaker_route=route))
+                low_cut, new_mask, entry))
 
             # Check if we're done
             if full_last == last:

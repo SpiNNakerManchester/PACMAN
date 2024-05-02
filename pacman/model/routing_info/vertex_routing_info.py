@@ -13,11 +13,14 @@
 # limitations under the License.
 from typing import Optional, Union
 import numpy
-from pacman.exceptions import PacmanConfigurationException
+
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
-from .base_key_and_mask import BaseKeyAndMask
+
+from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
+
+from .base_key_and_mask import BaseKeyAndMask
 
 
 class VertexRoutingInfo(object, metaclass=AbstractBase):

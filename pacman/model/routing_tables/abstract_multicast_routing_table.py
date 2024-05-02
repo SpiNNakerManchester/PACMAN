@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Any, Collection
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_machine import Chip
-from pacman.data.pacman_data_view import PacmanDataView
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+from pacman.data.pacman_data_view import PacmanDataView
 
 
 class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):

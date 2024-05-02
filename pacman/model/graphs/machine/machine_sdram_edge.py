@@ -42,14 +42,29 @@ class SDRAMMachineEdge(MachineEdge):
 
     @property
     def sdram_size(self) -> int:
+        """
+        The sdram size reported by the pre_vertex
+
+        :rtype: int
+        """
         return self._sdram_size
 
     @property
     def sdram_base_address(self) -> Optional[int]:
+        """
+        The start address of the sdram if set
+
+        :rtype: int or None
+        """
         return self._sdram_base_address
 
     @sdram_base_address.setter
     def sdram_base_address(self, new_value: int):
+        """
+        Sets the start address without verification
+
+        :param int new_value:
+        """
         self._sdram_base_address = new_value
 
     def __repr__(self):

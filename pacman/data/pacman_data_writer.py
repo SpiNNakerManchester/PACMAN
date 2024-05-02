@@ -179,19 +179,78 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
                 "This call is only expected if requires mapping is True")
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
 
-    def add_monitor_all_chips(self, vertex: MachineVertex):
+    def add_sample_monitor_vertex(
+            self, vertex: MachineVertex, all_chips: bool):
         """
-        Reports that a monitor has been added to every chip.
-        Should be called once for each monitor added to all chips.
-        Should not be called for monitors only added to Ethernet-enabled chips.
+        Accepts a simple of the monitor cores to be added.
 
-        Only affect is to change the numbers reported by the `get_monitor`
-        methods.
+        Should be called once for each monitor added to all (Ethernet) chips.
+
+        Only affect is to change the numbers reported by the
+        get_all/ethernet_monitor methods.
 
         :param ~pacman.model.graphs.machine.MachineVertex vertex:
             One of the vertices added to each core, assumed to be typical of
             all.
+        :param bool all_chips:
+            If True assumes that this Vertex will be placed on all chips
+            including Ethernet ones.
+            If False assumes that this Vertex type will only be placed on
+            Ethernet Vertices
         """
-        self.__pacman_data._monitor_cores += 1
-        self.__pacman_data._monitor_sdram += \
-            vertex.sdram_required.get_total_sdram(self.get_plan_n_timestep())
+        self.add_monitor_core(all_chips)
+        self.__pacman_data._ethernet_monitor_vertices.append(vertex)
+        if all_chips:
+            self.__pacman_data._all_monitor_vertices.append(vertex)
+
+    def set_n_required(self, n_boards_required, n_chips_required):
+        """
+        Sets (if not `None`) the number of boards/chips requested by the user.
+
+        :param n_boards_required:
+            `None` or the number of boards requested by the user
+        :type n_boards_required: int or None
+        :param n_chips_required:
+            `None` or the number of chips requested by the user
+        :type n_chips_required: int or None
+        """
+        if n_boards_required is None:
+            if n_chips_required is None:
+                return
+            elif not isinstance(n_chips_required, int):
+                raise TypeError("n_chips_required must be an int (or None)")
+            if n_chips_required <= 0:
+                raise ValueError(
+                    "n_chips_required must be positive and not "
+                    f"{n_chips_required}")
+        else:
+            if n_chips_required is not None:
+                raise ValueError(
+                    "Illegal call with both both param provided as "
+                    f"{n_boards_required}, {n_chips_required}")
+            if not isinstance(n_boards_required, int):
+                raise TypeError("n_boards_required must be an int (or None)")
+            if n_boards_required <= 0:
+                raise ValueError(
+                    "n_boards_required must be positive and not "
+                    f"{n_boards_required}")
+        if self.__pacman_data._n_boards_required is not None or \
+                self.__pacman_data._n_chips_required is not None:
+            raise ValueError(
+                "Illegal second call to set_n_required")
+        self.__pacman_data._n_boards_required = n_boards_required
+        self.__pacman_data._n_chips_required = n_chips_required
+
+    def set_n_chips_in_graph(self, n_chips_in_graph):
+        """
+        Sets the number of chips needed by the graph.
+
+        :param int n_chips_in_graph:
+        """
+        if not isinstance(n_chips_in_graph, int):
+            raise TypeError("n_chips_in_graph must be an int (or None)")
+        if n_chips_in_graph <= 0:
+            raise ValueError(
+                "n_chips_in_graph must be positive and not "
+                f"{n_chips_in_graph}")
+        self.__pacman_data._n_chips_in_graph = n_chips_in_graph
