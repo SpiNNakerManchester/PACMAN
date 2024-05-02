@@ -611,7 +611,8 @@ class ApplicationPlacer(object):
                 f"No more chips to start with for {self.__app_vertex_label} "
                 f"Out of {self.__machine.n_chips} "
                 f"{len(self.__full_chips)} already full "
-                f"and {len(self.__starts_tried)} tried")
+                f"and {len(self.__starts_tried)} tried"
+                f"{PacmanDataView.get_chips_boards_required_str()}")
 
     def _get_next_neighbour(self, n_cores: int, plan_sdram: int):
         """
