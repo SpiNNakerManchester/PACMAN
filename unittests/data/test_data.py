@@ -447,7 +447,7 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(ValueError):
             writer.set_n_required(None, -5)
         with self.assertRaises(ValueError):
-             writer.set_n_required(0, None)
+            writer.set_n_required(0, None)
         with self.assertRaises(TypeError):
             writer.set_n_required(None, "five")
         with self.assertRaises(TypeError):
