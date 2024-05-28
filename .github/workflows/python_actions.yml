@@ -25,4 +25,5 @@ jobs:
       dependencies: SpiNNUtils SpiNNMachine
       test_directories: unittests
       flake8-packages: pacman unittests
+      check_prereleases: false
     secrets: inherit
