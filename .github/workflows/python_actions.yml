@@ -21,9 +21,11 @@ jobs:
   call:
     uses: SpiNNakerManchester/SupportScripts/.github/workflows/python_checks.yml@main
     with:
-      base-package: pacman
       dependencies: SpiNNUtils SpiNNMachine
       test_directories: unittests
+      coverage-package: pacman
       flake8-packages: pacman unittests
+      pylint-packages: pacman
+      mypy-packages: pacman
       check_prereleases: false
     secrets: inherit
