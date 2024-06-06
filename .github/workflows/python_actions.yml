@@ -27,5 +27,4 @@ jobs:
       flake8-packages: pacman unittests
       pylint-packages: pacman
       mypy-packages: pacman
-      check_prereleases: false
     secrets: inherit
