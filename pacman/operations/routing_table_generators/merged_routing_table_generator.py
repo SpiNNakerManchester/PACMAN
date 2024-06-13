@@ -24,6 +24,7 @@ from pacman.model.routing_info import (
     RoutingInfo, AppVertexRoutingInfo, MachineVertexRoutingInfo)
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 
 
 def merged_routing_table_generator() -> MulticastRoutingTables:
@@ -64,6 +65,8 @@ def __create_routing_table(
     :rtype: MulticastRoutingTable
     """
     table = UnCompressedMulticastRoutingTable(x, y)
+    sources_by_key_mask: Dict[BaseKeyAndMask,
+                              Tuple[AbstractVertex, str]] = dict()
     iterator = _IteratorWithNext(partitions_in_table.items())
     while iterator.has_next:
         (vertex, part_id), entry = iterator.pop()
@@ -71,6 +74,16 @@ def __create_routing_table(
         if r_info is None:
             raise PacmanRoutingException(
                 f"Missing Routing information for {vertex}, {part_id}")
+
+        if r_info.key_and_mask in sources_by_key_mask:
+            if (sources_by_key_mask[r_info.key_and_mask] != (vertex, part_id)):
+                raise KeyError(
+                    f"Source {vertex}, {part_id} is trying to "
+                    f"send to the same key and mask as "
+                    f"{sources_by_key_mask[r_info.key_and_mask]}")
+        else:
+            sources_by_key_mask[r_info.key_and_mask] = (
+                vertex, part_id)
 
         # If we have an application vertex, just put the entry in and move on
         if isinstance(vertex, ApplicationVertex):
