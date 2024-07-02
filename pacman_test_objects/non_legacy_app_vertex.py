@@ -15,8 +15,12 @@ from pacman.model.graphs.application import ApplicationVertex
 
 
 class NonLegacyApplicationVertex(ApplicationVertex):
+    """
+    Test vertex
+    """
     def __init__(self, label="test"):
         super().__init__(label=label)
 
+    @property
     def n_atoms(self):
-        pass
+        return 256

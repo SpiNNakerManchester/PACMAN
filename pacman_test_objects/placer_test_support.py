@@ -18,6 +18,9 @@ from pacman.model.resources import ConstantSDRAM
 
 
 def get_resourced_machine_vertex(lo_atom, hi_atom, label=None):
+    """
+    A test vertex with sdram set
+    """
     sdram_requirement = 4000 + 50 * (hi_atom - lo_atom)
     sdram = ConstantSDRAM(sdram_requirement)
     return SimpleMachineVertex(
