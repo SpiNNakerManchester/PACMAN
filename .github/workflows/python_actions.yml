@@ -26,5 +26,5 @@ jobs:
       coverage-package: pacman
       flake8-packages: pacman unittests
       pylint-packages: pacman
-      mypy-packages: pacman
+      mypy-packages: pacman pacman_test_objects
     secrets: inherit
