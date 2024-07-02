@@ -14,7 +14,7 @@
 
 """ test vertex used in many unit tests
 """
-from  typing import Optional
+from typing import Optional
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
     LegacyPartitionerAPI)

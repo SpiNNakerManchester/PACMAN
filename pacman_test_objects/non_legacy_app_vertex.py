@@ -20,4 +20,3 @@ class NonLegacyApplicationVertex(ApplicationVertex):
 
     def n_atoms(self):
         pass
-
