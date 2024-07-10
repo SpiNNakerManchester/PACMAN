@@ -19,7 +19,7 @@ from typing import (
 import sys
 from spinn_utilities.typing.coords import XY
 
-if sys.version_info > (3, 8):
+if sys.version_info.minor > 8:
     from contextlib import AbstractContextManager
 else:
     from typing import ContextManager as AbstractContextManager
