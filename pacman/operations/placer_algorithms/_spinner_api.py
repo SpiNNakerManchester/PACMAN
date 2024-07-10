@@ -14,16 +14,10 @@
 
 from dataclasses import dataclass
 import platform
+# pylint: disable=no-name-in-module
 from typing import (
-    Any, Callable, Dict, List, NewType, Union, Tuple)
-import sys
+    Any, Callable, ContextManager, Dict, List, NewType, Union, Tuple)
 from spinn_utilities.typing.coords import XY
-
-# pylint: disable=ungrouped-imports, no-name-in-module
-if sys.version_info.minor > 8:
-    from contextlib import AbstractContextManager
-else:
-    from typing import ContextManager as AbstractContextManager
 
 # Don't know or care what these next two types are; they're SpiNNer's
 _Boards = NewType("_Boards", list)
