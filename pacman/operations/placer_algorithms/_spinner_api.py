@@ -12,14 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from contextlib import AbstractContextManager
 from dataclasses import dataclass
 import platform
 from typing import (
     Any, Callable, Dict, List, NewType, Union, Tuple)
+import sys
 from spinn_utilities.typing.coords import XY
 
-# Don't know or care what these next two types are; they're SpiNNer's
+if sys.version_info > (3, 8):
+    from contextlib import AbstractContextManager
+else:
+    from typing import ContextManager as AbstractContextManager
+
+    # Don't know or care what these next two types are; they're SpiNNer's
 _Boards = NewType("_Boards", list)
 _Context = NewType("_Context", int)
 #: The type of colours. RGBA
@@ -32,8 +37,8 @@ class Spinner:
     Typed version of the API from SpiNNer that we actually use.
     """
     #: Open a drawing surface as a context
-    png_context_manager: Callable[[str, int, int],
-        AbstractContextManager[_Context]]
+    png_context_manager: Callable[[str, int, int], AbstractContextManager[
+        _Context]]
     aspect_ratio: Callable[[int, int], float]
     draw: Callable[
         [_Context, int, int, int, int, _Boards, Dict[Any, Any],
