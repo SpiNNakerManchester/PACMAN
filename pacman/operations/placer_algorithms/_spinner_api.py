@@ -20,10 +20,10 @@ import sys
 from spinn_utilities.typing.coords import XY
 
 if sys.version_info.minor > 8:
-    # pylint: disable = ungrouped-imports
+    # pylint: disable=ungrouped-imports
     from contextlib import AbstractContextManager
 else:
-    # pylint: disable = ungrouped-imports
+    # pylint: disable=ungrouped-imports
     from typing import ContextManager as AbstractContextManager
 
     # Don't know or care what these next two types are; they're SpiNNer's
