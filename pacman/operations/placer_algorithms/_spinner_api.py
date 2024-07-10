@@ -19,7 +19,7 @@ from typing import (
 import sys
 from spinn_utilities.typing.coords import XY
 
-# pylint: disable=ungrouped-imports
+# pylint: disable=ungrouped-imports, no-name-in-module
 if sys.version_info.minor > 8:
     from contextlib import AbstractContextManager
 else:
