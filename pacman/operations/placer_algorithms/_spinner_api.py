@@ -14,6 +14,7 @@
 
 from dataclasses import dataclass
 import platform
+# pylint: disable=no-name-in-module
 from typing import (
     Any, Callable, ContextManager, Dict, List, NewType, Union, Tuple)
 from spinn_utilities.typing.coords import XY
@@ -31,7 +32,8 @@ class Spinner:
     Typed version of the API from SpiNNer that we actually use.
     """
     #: Open a drawing surface as a context
-    png_context_manager: Callable[[str, int, int], ContextManager[_Context]]
+    png_context_manager: Callable[[str, int, int], ContextManager[
+        _Context]]
     aspect_ratio: Callable[[int, int], float]
     draw: Callable[
         [_Context, int, int, int, int, _Boards, Dict[Any, Any],
