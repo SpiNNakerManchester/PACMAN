@@ -524,10 +524,10 @@ class ApplicationPlacer(object):
         if plan_sdram <= self.__max_sdram and n_cores <= self.__max_cores:
             # should fit somewhere
             return
-        message = (
+        message = \
             f"{self.__app_vertex_label} will not fit on any possible Chip "
-            f"as a smae_chip_group ")
-
+        if n_cores > 1:
+            message += f" group has {n_cores=} "
         version = PacmanDataView.get_machine_version()
         if plan_sdram > self.__max_sdram:
             message += f"requires {plan_sdram} bytes but "
