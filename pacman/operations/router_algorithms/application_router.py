@@ -957,6 +957,7 @@ def _convert_a_route(
 
         processor_ids: List[int] = list()
         link_ids: List[int] = list()
+        next_incoming_link: _OptInt = None
         for (link, next_hop) in route.children:
             if link is not None:
                 link_ids.append(link)

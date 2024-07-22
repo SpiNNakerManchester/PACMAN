@@ -16,111 +16,15 @@
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
 name: Python Actions
-
 on: [push]
-env:
-  BASE_PKG: pacman
-
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    strategy:
-      matrix:
-        python-version: [3.8, 3.9, "3.10", "3.11", "3.12"]
-
-    steps:
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Checkout SupportScripts
-      uses: actions/checkout@v4
-      with:
-        repository: SpiNNakerManchester/SupportScripts
-        path: support
-
-    - name: Install pip, etc
-      uses: ./support/actions/python-tools
-    - name: Install mypy
-      run: pip install mypy
-
-    - name: Install Spinnaker Dependencies
-      uses: ./support/actions/install-spinn-deps
-      with:
-        repositories: SpiNNUtils SpiNNMachine
-        install: true
-
-    - name: Run Install
-      uses: ./support/actions/run-install
-
-    - name: Test with pytest
-      uses: ./support/actions/pytest
-      with:
-        tests: unittests
-        coverage: ${{ matrix.python-version == 3.12 }}
-        cover-packages: ${{ env.BASE_PKG }}
-        coveralls-token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Lint with flake8
-      run: flake8 $BASE_PKG unittests
-
-    - name: Lint with pylint
-      uses: ./support/actions/pylint
-      with:
-        package: ${{ env.BASE_PKG }}
-        exitcheck: 31 # Action fails on any message
-        language: en_GB
-        rcfile: global_strict
-
-    - name: Lint with mypy
-      run: mypy $BASE_PKG
-
-  validate:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    strategy:
-      matrix:
-        python-version: [3.12]
-
-    steps:
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Checkout SupportScripts
-      uses: actions/checkout@v4
-      with:
-        repository: SpiNNakerManchester/SupportScripts
-        path: support
-    - name: Install pip, etc
-      uses: ./support/actions/python-tools
-    - name: Install Spinnaker Dependencies
-      uses: ./support/actions/install-spinn-deps
-      with:
-        repositories: SpiNNUtils SpiNNMachine
-        install: true
-    - name: Run Install
-      uses: ./support/actions/run-install
-
-    - name: Run rat copyright enforcement
-      uses: ./support/actions/check-copyrights
-      with:
-        config_file: rat_asl20.xml
-    - name: Validate all XML
-      if: false
-      uses: ./support/actions/validate-xml
-      with:
-        package: ${{ env.BASE_PKG }}
-    - name: Build documentation with sphinx
-      uses: ./support/actions/sphinx
-      with:
-        directory: doc/source
-    - name: Validate CITATION.cff
-      uses: dieghernan/cff-validator@main
-
+  call:
+    uses: SpiNNakerManchester/SupportScripts/.github/workflows/python_checks.yml@main
+    with:
+      dependencies: SpiNNUtils SpiNNMachine
+      test_directories: unittests
+      coverage-package: pacman
+      flake8-packages: pacman unittests pacman_test_objects
+      pylint-packages: pacman pacman_test_objects
+      mypy-packages: pacman unittests pacman_test_objects
+    secrets: inherit
