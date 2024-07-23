@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import unittest
-from typing import Optional
+from typing import Optional, cast
+from typing_extensions import Self
 from spinn_utilities.config_holder import set_config
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
@@ -47,7 +48,7 @@ class FixedKeyAppVertex(AbstractOneAppOneMachineVertex):
             n_atoms=n_atoms)
         self.__fixed_key_and_mask = fixed_key_and_mask
         self._splitter = SplitterOneAppOneMachine()
-        self._splitter.set_governed_app_vertex(self)
+        self._splitter.set_governed_app_vertex(cast(Self, self))
 
     def get_fixed_key_and_mask(
             self, partition_id: str) -> Optional[BaseKeyAndMask]:
