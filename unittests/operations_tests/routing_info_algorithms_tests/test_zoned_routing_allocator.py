@@ -15,7 +15,6 @@ from typing import Optional
 from spinn_utilities.overrides import overrides
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
-from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.operations.routing_info_allocator_algorithms.\
     zoned_routing_info_allocator import (flexible_allocate, global_allocate)
 from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
@@ -299,13 +298,11 @@ def test_fixed_only():
 
 
 def test_overlap():
+    # This should work here; overlap is allowed provided routes don't overlap
+    # (which is found elsewhere)
     unittest_setup()
     create_graphs_only_fixed(overlap=True)
-    try:
-        flexible_allocate([])
-        raise ValueError
-    except PacmanRouteInfoAllocationException:
-        pass
+    flexible_allocate([])
 
 
 def test_no_edge():
