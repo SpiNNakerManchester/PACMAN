@@ -22,14 +22,18 @@ from pacman.exceptions import PacmanAlreadyPlacedError
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placement, Placements
 
+
 class ExtendedVertex1(SimpleMachineVertex):
     pass
+
 
 class ExtendedVertex2(SimpleMachineVertex):
     pass
 
+
 class ExtendedVertex3(SimpleMachineVertex):
     pass
+
 
 class TestPlacement(unittest.TestCase):
     """
@@ -67,7 +71,6 @@ class TestPlacement(unittest.TestCase):
         with self.assertRaises(PacmanAlreadyPlacedError):
             Placements(pl)
 
-
     def test_iterate_by_type(self):
         v1a = ExtendedVertex1(None)
         p1a = Placement(v1a, 0, 1, 1)
@@ -85,7 +88,7 @@ class TestPlacement(unittest.TestCase):
             (ExtendedVertex2, ExtendedVertex1)))
         self.assertListEqual(l2, [p1a, p1b, p2])
         l3 = list(placements.iterate_placements_by_xy_and_type(
-            (0,0), (ExtendedVertex3, ExtendedVertex2)))
+            (0, 0), (ExtendedVertex3, ExtendedVertex2)))
         self.assertListEqual(l3, [p2, p3])
         writer = PacmanDataWriter.setup()
         writer.set_placements(placements)
@@ -96,7 +99,7 @@ class TestPlacement(unittest.TestCase):
             (ExtendedVertex2, ExtendedVertex1)))
         self.assertListEqual(l2, [p1a, p1b, p2])
         l3 = list(writer.iterate_placements_by_xy_and_type(
-            (0,0), (ExtendedVertex3, ExtendedVertex2)))
+            (0, 0), (ExtendedVertex3, ExtendedVertex2)))
         self.assertListEqual(l3, [p2, p3])
 
 
