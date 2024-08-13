@@ -352,7 +352,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def iterate_placements_by_vertex_type(
-            cls, vertex_type: Union[type, Tuple[type]]) -> Iterable[Placement]:
+            cls, vertex_type: Union[
+                type, Tuple[type, ...]]) -> Iterable[Placement]:
         """
         Iterate over placements on any chip with this vertex_type.
 
@@ -383,8 +384,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def iterate_placements_by_xy_and_type(
-            cls, xy: XY,
-            vertex_type: Union[type, Tuple[type]]) -> Iterable[Placement]:
+            cls, xy: XY, vertex_type: Union[
+                type, Tuple[type, ...]]) -> Iterable[Placement]:
         """
         Iterate over placements with this x, y and type.
 

@@ -152,8 +152,8 @@ class Placements(object):
         return self._placements[xy].values()
 
     def iterate_placements_by_xy_and_type(
-            self, xy: XY,
-            vertex_type: Union[type, Tuple[type]]) -> Iterable[Placement]:
+            self, xy: XY, vertex_type: Union[
+                type, Tuple[type, ...]]) -> Iterable[Placement]:
         """
         Iterate over placements with this x, y and this vertex_type.
 
@@ -167,8 +167,8 @@ class Placements(object):
                 yield placement
 
     def iterate_placements_by_vertex_type(
-            self,
-            vertex_type: Union[type, Tuple[type]]) -> Iterable[Placement]:
+            self, vertex_type: Union[
+                type, Tuple[type, ...]]) -> Iterable[Placement]:
         """
         Iterate over placements on any chip with this vertex_type.
 
