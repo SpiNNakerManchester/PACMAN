@@ -13,8 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-from typing import (Iterable, List, Optional, Sequence, Type, TypeVar,
-                    TYPE_CHECKING)
+from typing import (Iterable, List, Optional, Sequence, Tuple, Type, TypeVar,
+                    TYPE_CHECKING, Union)
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.typing.coords import XY
@@ -352,11 +352,13 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def iterate_placements_by_vertex_type(
-            cls, vertex_type: Type[VTX]) -> Iterable[Placement]:
+            cls, vertex_type: Union[
+                Type[VTX], Tuple[Type[VTX]]]) -> Iterable[Placement]:
         """
         Iterate over placements on any chip with this vertex_type.
 
-        :param type vertex_type: Class of vertex to find
+        :param vertex_type: Class of vertex to find
+        :type vertex_type: type or tuple(type)
         :rtype: iterable(Placement)
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the placements are currently unavailable
@@ -382,11 +384,14 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def iterate_placements_by_xy_and_type(
-            cls, xy: XY, vertex_type: Type[VTX]) -> Iterable[Placement]:
+            cls, xy: XY, vertex_type: Union[
+                Type[VTX], Tuple[Type[VTX]]]) -> Iterable[Placement]:
         """
         Iterate over placements with this x, y and type.
 
         :param tuple(int, int) xy: x and y coordinates to find placements for.
+        :param vertex_type: Class of vertex to find
+        :type vertex_type: type or tuple(type)
         :param type vertex_type: Class of vertex to find
         :rtype: iterable(Placement)
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
