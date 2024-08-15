@@ -146,8 +146,8 @@ def _search_route(
     :raise PacmanRoutingException:
         when the trace completes and there are still destinations not visited
     """
-    logger.debug(f"{source_placement=}")
-    if logger.isEnabledFor(logging.INFO):
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"{source_placement=}")
         for dest in dest_placements:
             logger.debug("[{}:{}:{}]", dest.x, dest.y, dest.p)
 
