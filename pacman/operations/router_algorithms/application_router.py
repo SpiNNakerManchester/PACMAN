@@ -234,7 +234,8 @@ def route_application_graph() -> MulticastRoutingTableByPartition:
                 _route_source_to_source(source, partition, targets, self_xys)
 
         # Deal with internal multicast partitions
-        internal = source.splitter.get_internal_multicast_partitions()
+        internal = _get_filtered_internal_partitions(
+            source, partition.identifier)
         if internal:
             self_connected = True
             _route_internal(internal, targets, self_xys)
@@ -256,6 +257,12 @@ def route_application_graph() -> MulticastRoutingTableByPartition:
 
     # Return the routing tables
     return routing_tables
+
+
+def _get_filtered_internal_partitions(vertex, identifier):
+    for partition in vertex.splitter.get_internal_multicast_partitions():
+        if partition.identifier == identifier:
+            yield partition
 
 
 def _route_source_to_target(
@@ -628,7 +635,7 @@ def _get_outgoing_mapping(
     for m_vertex in app_vertex.splitter.get_out_going_vertices(partition_id):
         xy, route = vertex_xy_and_route(m_vertex)
         outgoing_mapping[xy].append(route)
-    for in_part in app_vertex.splitter.get_internal_multicast_partitions():
+    for in_part in _get_filtered_internal_partitions(app_vertex, partition_id):
         if in_part.identifier == partition_id:
             xy, route = vertex_xy_and_route(in_part.pre_vertex)
             outgoing_mapping[xy].append(route)
