@@ -17,7 +17,6 @@ from typing import Dict, FrozenSet, Iterable, Set, Tuple, cast
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
-from pacman.data import PacmanDataView
 from pacman.model.routing_info import (
     RoutingInfo, MachineVertexRoutingInfo, BaseKeyAndMask,
     AppVertexRoutingInfo)
@@ -28,6 +27,8 @@ from pacman.utilities.utility_calls import (
     get_key_ranges, allocator_bits_needed)
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
+from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
+    get_app_partitions)
 _XAlloc = Iterable[Tuple[ApplicationVertex, str]]
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -137,13 +138,8 @@ class ZonedRoutingInfoAllocator(object):
         """
         self.__vertex_partitions = OrderedSet(
             (p.pre_vertex, p.identifier)
-            for p in PacmanDataView.iterate_partitions())
+            for p in get_app_partitions())
         self.__vertex_partitions.update(extra_allocations)
-        self.__vertex_partitions.update(
-            (v, p.identifier)
-            for v in PacmanDataView.iterate_vertices()
-            if isinstance(v, ApplicationVertex)
-            for p in v.splitter.get_internal_multicast_partitions())
 
         self.__find_fixed()
         self.__calculate_zones()
