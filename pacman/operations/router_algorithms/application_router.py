@@ -204,8 +204,7 @@ def route_application_graph() -> MulticastRoutingTableByPartition:
         # Get all source chips coordinates
         all_source_xys = {
             vertex_xy(m_vertex)
-            for m_vertex in source.splitter.get_out_going_vertices(
-                partition.identifier)}
+            for m_vertex in source.machine_vertices}
 
         # Keep track of the source edge chips
         source_edge_xys: Set[XY] = set()
@@ -470,6 +469,7 @@ def _route_internal(
     """
     for in_part in internal_partitions:
         src = in_part.pre_vertex
+        xy = vertex_xy(src)
         for edge in in_part.edges:
             tgt = edge.post_vertex
             xy, (_vertex, core, link) = vertex_xy_and_route(tgt)
