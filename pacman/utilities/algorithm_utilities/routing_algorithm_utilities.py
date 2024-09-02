@@ -47,19 +47,18 @@ def get_app_partitions() -> List[ApplicationEdgePartition]:
     # Find all partitions that need to be dealt with
     # Make a copy which we can edit
     partitions = list(PacmanDataView.iterate_partitions())
-    sources = frozenset(p.pre_vertex for p in partitions)
+    sources = set((p.pre_vertex, p.identifier) for p in partitions)
 
     # Convert internal partitions to self-connected partitions
     for v in PacmanDataView.iterate_vertices():
         if not isinstance(v, ApplicationVertex) or not v.splitter:
             continue
         internal_partitions = v.splitter.get_internal_multicast_partitions()
-        if v not in sources and internal_partitions:
-            # guarantee order
-            for identifier in dict.fromkeys(
-                    p.identifier for p in internal_partitions):
+        for p in internal_partitions:
+            if (v, p.identifier) not in sources:
                 # Add a partition with no edges to identify this as internal
-                partitions.append(ApplicationEdgePartition(identifier, v))
+                partitions.append(ApplicationEdgePartition(p.identifier, v))
+                sources.add((v, p.identifier))
     return partitions
 
 
