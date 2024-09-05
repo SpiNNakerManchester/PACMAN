@@ -202,7 +202,9 @@ def route_application_graph() -> MulticastRoutingTableByPartition:
 
         source_xy = next(iter(source_mappings.keys()))
         # Get all source chips coordinates
-        all_source_xys = _get_all_xys(source)
+        all_source_xys = {
+            vertex_xy(m_vertex)
+            for m_vertex in source.machine_vertices}
 
         # Keep track of the source edge chips
         source_edge_xys: Set[XY] = set()
@@ -234,7 +236,8 @@ def route_application_graph() -> MulticastRoutingTableByPartition:
                 _route_source_to_source(source, partition, targets, self_xys)
 
         # Deal with internal multicast partitions
-        internal = source.splitter.get_internal_multicast_partitions()
+        internal = list(_get_filtered_internal_partitions(
+            source, partition.identifier))
         if internal:
             self_connected = True
             _route_internal(internal, targets, self_xys)
@@ -256,6 +259,12 @@ def route_application_graph() -> MulticastRoutingTableByPartition:
 
     # Return the routing tables
     return routing_tables
+
+
+def _get_filtered_internal_partitions(vertex, identifier):
+    for partition in vertex.splitter.get_internal_multicast_partitions():
+        if partition.identifier == identifier:
+            yield partition
 
 
 def _route_source_to_target(
@@ -313,7 +322,8 @@ def _route_source_to_target(
         overlaps = None
     else:
         # Find all coordinates for chips (xy) that are in the target
-        target_xys = _get_all_xys(target)
+        target_xys = {vertex_xy(m_vertex)
+                      for m_vertex, _srcs in target_vertices}
 
         # Pick one to actually use as a target
         target_xy, overlaps = _find_target_xy(
@@ -459,6 +469,7 @@ def _route_internal(
     """
     for in_part in internal_partitions:
         src = in_part.pre_vertex
+        xy = vertex_xy(src)
         for edge in in_part.edges:
             tgt = edge.post_vertex
             xy, (_vertex, core, link) = vertex_xy_and_route(tgt)
@@ -628,23 +639,11 @@ def _get_outgoing_mapping(
     for m_vertex in app_vertex.splitter.get_out_going_vertices(partition_id):
         xy, route = vertex_xy_and_route(m_vertex)
         outgoing_mapping[xy].append(route)
-    for in_part in app_vertex.splitter.get_internal_multicast_partitions():
+    for in_part in _get_filtered_internal_partitions(app_vertex, partition_id):
         if in_part.identifier == partition_id:
             xy, route = vertex_xy_and_route(in_part.pre_vertex)
             outgoing_mapping[xy].append(route)
     return outgoing_mapping
-
-
-def _get_all_xys(app_vertex: ApplicationVertex) -> Set[XY]:
-    """
-    Gets the list of all the x,y coordinates that the vertex's machine vertices
-    are placed on.
-
-    :param ApplicationVertex app_vertex:
-    :rtype: set(tuple(int, int))
-    """
-    return {vertex_xy(m_vertex)
-            for m_vertex in app_vertex.machine_vertices}
 
 
 def _route_to_xys(
