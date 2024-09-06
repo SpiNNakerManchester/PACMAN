@@ -268,6 +268,60 @@ class MockNearestEthernetSplitter(AbstractSplitterCommon):
         return self.__placements
 
 
+class MockInputOutputSplitter(AbstractSplitterCommon):
+    def __init__(self, n_incoming, n_outgoing):
+        super().__init__()
+        self.__n_incoming = n_incoming
+        self.__n_outgoing = n_outgoing
+        self.__incoming_machine_vertices = list()
+        self.__outgoing_machine_vertices = list()
+        self.__internal_multicast_partitions = list()
+
+    def create_machine_vertices(self, chip_counter):
+        self.__incoming_machine_vertices = [
+            SimpleMachineVertex(
+                ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
+                label=f"{self.governed_app_vertex.label}_input_{j}")
+            for j in range(self.__n_incoming)]
+        self.__outgoing_machine_vertices = [
+            SimpleMachineVertex(
+                ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
+                label=f"{self.governed_app_vertex.label}_output_{j}")
+            for j in range(self.__n_outgoing)]
+        for out_v in self.__outgoing_machine_vertices:
+            self.governed_app_vertex.remember_machine_vertex(out_v)
+        for in_v in self.__incoming_machine_vertices:
+            self.governed_app_vertex.remember_machine_vertex(in_v)
+
+        # The partition is from outgoing to incoming
+        for start_v in self.__outgoing_machine_vertices:
+            part = MulticastEdgePartition(start_v, "internal")
+            self.__internal_multicast_partitions.append(part)
+            for end_v in self.__incoming_machine_vertices:
+                part.add_edge(MachineEdge(start_v, end_v))
+
+    def get_out_going_slices(self):
+        return None
+
+    def get_in_coming_slices(self):
+        return None
+
+    def get_out_going_vertices(self, partition_id):
+        return self.__outgoing_machine_vertices
+
+    def get_in_coming_vertices(self, partition_id):
+        return self.__incoming_machine_vertices
+
+    def machine_vertices_for_recording(self, variable_to_record):
+        return []
+
+    def get_internal_multicast_partitions(self):
+        return self.__internal_multicast_partitions
+
+    def reset_called(self):
+        pass
+
+
 class MockAppVertex(ApplicationVertex):
     def __init__(self, n_atoms, label):
         super(MockAppVertex, self).__init__(label)
@@ -308,6 +362,15 @@ def _make_vertices_split(
     vertex = MockAppVertex(n_atoms, label)
     vertex.splitter = MockMultiInputSplitter(
         n_incoming, n_outgoing, n_groups, internal_multicast)
+    writer.add_vertex(vertex)
+    vertex.splitter.create_machine_vertices(None)
+    return vertex
+
+
+def _make_input_output_vertices(
+        writer, n_atoms, n_incoming, n_outgoing, label):
+    vertex = MockAppVertex(n_atoms, label)
+    vertex.splitter = MockInputOutputSplitter(n_incoming, n_outgoing)
     writer.add_vertex(vertex)
     vertex.splitter.create_machine_vertices(None)
     return vertex
@@ -826,3 +889,22 @@ def test_route_around():
 
     print(nodes)
     print(nodes_fixed)
+
+
+def test_internal_io_routes(params):
+    algorithm, _n_vertices, _n_m_vertices = params
+    unittest_setup()
+    set_config("Machine", "versions", VersionStrings.BIG.text)
+    machine = PacmanDataView.get_machine()
+    writer = PacmanDataWriter.mock()
+    writer.set_machine(machine)
+    vertex = _make_input_output_vertices(writer, 1, 1, 3, "app_vertex")
+    placements = Placements()
+    for i, m_vertex in enumerate(vertex.splitter.get_out_going_vertices(None)):
+        placements.add_placement(Placement(m_vertex, 0, 1, i))
+
+    for i, m_vertex in enumerate(vertex.splitter.get_in_coming_vertices(None)):
+        placements.add_placement(Placement(m_vertex, 0, 0, i))
+    writer.set_placements(placements)
+    routing_tables = _route_and_time(algorithm)
+    _check_edges(routing_tables)
