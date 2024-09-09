@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Collection, Dict, Iterable, Iterator
+from typing import Collection, Dict, Iterable, Iterator, Tuple, Union
 
 from spinn_utilities.typing.coords import XY
 
@@ -152,12 +152,14 @@ class Placements(object):
         return self._placements[xy].values()
 
     def iterate_placements_by_xy_and_type(
-            self, xy: XY, vertex_type: type) -> Iterable[Placement]:
+            self, xy: XY, vertex_type: Union[
+                type, Tuple[type, ...]]) -> Iterable[Placement]:
         """
         Iterate over placements with this x, y and this vertex_type.
 
         :param tuple(int, int) xy: x and y coordinate to find placements for.
-        :param class vertex_type: Class of vertex to find
+        :param vertex_type: Class of vertex to find
+        :type vertex_type: class or tuple(class)
         :rtype: iterable(Placement)
         """
         for placement in self._placements[xy].values():
@@ -165,11 +167,13 @@ class Placements(object):
                 yield placement
 
     def iterate_placements_by_vertex_type(
-            self, vertex_type: type) -> Iterable[Placement]:
+            self, vertex_type: Union[
+                type, Tuple[type, ...]]) -> Iterable[Placement]:
         """
         Iterate over placements on any chip with this vertex_type.
 
-        :param class vertex_type: Class of vertex to find
+        :param vertex_type: Class of vertex to find
+        :type vertex_type: type or tuple(type)
         :rtype: iterable(Placement)
         """
         for placement in self._machine_vertices.values():
