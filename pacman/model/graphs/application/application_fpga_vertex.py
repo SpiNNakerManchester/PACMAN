@@ -63,7 +63,6 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         self._incoming_fpga_connections = incoming_fpga_connections
         self._outgoing_fpga_connection = outgoing_fpga_connection
         self._n_machine_vertices_per_link = n_machine_vertices_per_link
-        self._
 
     @property
     @overrides(ApplicationVirtualVertex.n_atoms)
