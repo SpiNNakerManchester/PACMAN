@@ -15,8 +15,7 @@ from typing import Optional, Type, TYPE_CHECKING
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import ChipAndCore
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
-if TYPE_CHECKING:
-    from pacman.model.graphs import AbstractEdgePartition
+from .abstract_edge_partition import AbstractEdgePartition
 
 
 class AbstractVertex(object, metaclass=AbstractBase):

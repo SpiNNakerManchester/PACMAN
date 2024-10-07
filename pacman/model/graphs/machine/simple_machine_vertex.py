@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Type
 
 from spinn_utilities.overrides import overrides
 
@@ -21,6 +21,7 @@ from pacman.model.resources import IPtagResource
 from pacman.model.resources import ReverseIPtagResource
 
 from .machine_vertex import MachineVertex
+from pacman.model.graphs.abstract_edge_partition import AbstractEdgePartition
 
 
 class SimpleMachineVertex(MachineVertex):
@@ -62,3 +63,13 @@ class SimpleMachineVertex(MachineVertex):
     @overrides(MachineVertex.reverse_iptags)
     def reverse_iptags(self) -> Iterable[ReverseIPtagResource]:
         return self._reverse_iptags
+
+    def can_send_partition(
+            self, partition_id: str,
+            partition_type: Type[AbstractEdgePartition]) -> bool:
+        return True
+
+    def can_receive_partition(
+            self, partition_id: str,
+            partition_type: Type[AbstractEdgePartition]) -> bool:
+        return True
