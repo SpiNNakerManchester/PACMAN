@@ -68,6 +68,16 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
                 f" {self._allowed_edge_types}")
         if edge in self._edges:
             raise PacmanAlreadyExistsException("Edge", edge)
+        if not edge.pre_vertex.can_send_partition(self.identifier, type(self)):
+            raise PacmanInvalidParameterException(
+                "edge", str(edge),
+                "The pre_vertex of the edge cannot send to this partition")
+        if not edge.post_vertex.can_receive_partition(
+                self.identifier, type(self)):
+            raise PacmanInvalidParameterException(
+                "edge", str(edge),
+                "The post_vertex of the edge cannot receive from this "
+                "partition")
         self._edges.add(edge)
 
     @property

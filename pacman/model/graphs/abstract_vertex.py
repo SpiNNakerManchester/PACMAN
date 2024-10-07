@@ -11,12 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
+from typing import Optional, Type, TYPE_CHECKING
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import ChipAndCore
+from spinn_utilities.abstract_base import abstractmethod, AbstractBase
+if TYPE_CHECKING:
+    from pacman.model.graphs import AbstractEdgePartition
 
 
-class AbstractVertex(object):
+class AbstractVertex(object, metaclass=AbstractBase):
     """
     A vertex in a graph.
     """
@@ -110,3 +113,29 @@ class AbstractVertex(object):
             raise PacmanConfigurationException(
                 "Once set to a value fixed_location can not be changed")
         self._fixed_location = fixed_location
+
+    @abstractmethod
+    def can_send_partition(
+            self, partition_id: str,
+            partition_type: Type[AbstractEdgePartition]) -> bool:
+        """
+        Check if a given partition identifier can be sent by this vertex.
+
+        :param partition_id: The identifier of the partition
+        :param partition_type: The type of partition
+        :return: True if the partition can be sent, False otherwise
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def can_receive_partition(
+            self, partition_id: str,
+            partition_type: Type[AbstractEdgePartition]) -> bool:
+        """
+        Check if a given partition identifier can be received by this vertex.
+
+        :param partition_id: The identifier of the partition
+        :param partition_type: The type of partition
+        :return: True if the partition can be received, False otherwise
+        """
+        raise NotImplementedError
