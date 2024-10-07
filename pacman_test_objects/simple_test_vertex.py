@@ -14,7 +14,7 @@
 
 """ test vertex used in many unit tests
 """
-from typing import Optional
+from typing import Optional, Type
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
     LegacyPartitionerAPI)
@@ -22,6 +22,7 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
+from pacman.model.graphs import AbstractEdgePartition
 
 
 class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
@@ -62,3 +63,13 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
     @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self) -> int:
         return self._n_atoms
+
+    def can_send_partition(
+            self, partition_id: str,
+            partition_type: Type[AbstractEdgePartition]) -> bool:
+        return True
+
+    def can_receive_partition(
+            self, partition_id: str,
+            partition_type: Type[AbstractEdgePartition]) -> bool:
+        return True

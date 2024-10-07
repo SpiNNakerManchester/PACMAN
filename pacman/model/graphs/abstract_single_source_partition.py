@@ -41,6 +41,10 @@ class AbstractSingleSourcePartition(
             allowed_edge_types: Union[Type[E], Tuple[Type[E], ...]]):
         super().__init__(
             identifier=identifier, allowed_edge_types=allowed_edge_types)
+        if not pre_vertex.can_send_partition(identifier, type(self)):
+            raise PacmanConfigurationException(
+                "The vertex {} cannot send a partition of type {} with "
+                "identifier {}".format(pre_vertex, type(self), identifier))
         self._pre_vertex = pre_vertex
 
     @overrides(AbstractEdgePartition.add_edge)

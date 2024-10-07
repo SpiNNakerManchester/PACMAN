@@ -45,6 +45,10 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
 
         # hard code dict of lists so that only these are acceptable.
         for pre_vertex in pre_vertices:
+            if not pre_vertex.can_send_partition(identifier, type(self)):
+                raise PacmanConfigurationException(
+                    f"{pre_vertex} cannot send with the partition"
+                    f" {identifier} of type {type(self)}")
             self._pre_vertices[pre_vertex] = OrderedSet()
 
         # handle clones
