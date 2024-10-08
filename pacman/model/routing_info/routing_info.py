@@ -82,11 +82,7 @@ class RoutingInfo(object):
         if key in self._info:
             return self._info[key].key
         try:
-            if partition_id in vertex.send_partition_ids():
-                # if kept should be info_once (needs implementing)
-                logger.info(f"{vertex.label} not connected to send "
-                            f"partition {partition_id}")
-            else:
+            if partition_id not in vertex.send_partition_ids():
                 raise Exception(
                     f"{vertex.label} does not send partition {partition_id} "
                     f"as {type(vertex)} send_partition_id returns "
