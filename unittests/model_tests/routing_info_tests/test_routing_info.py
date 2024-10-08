@@ -40,6 +40,7 @@ class TestRoutingInfo(unittest.TestCase):
 
     def test_routing_info(self):
         pre_vertex = SimpleMachineVertex(ConstantSDRAM(0))
+        unconnected = SimpleMachineVertex(ConstantSDRAM(0))
         key = 12345
         info = MachineVertexRoutingInfo(
             BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
@@ -51,11 +52,16 @@ class TestRoutingInfo(unittest.TestCase):
 
         assert routing_info.get_routing_info_from_pre_vertex(
             pre_vertex, "Test") == info
+        self.assertEqual(info,
+                         routing_info.get_routing_info_from_pre_single(
+                             pre_vertex))
         assert routing_info.get_routing_info_from_pre_vertex(
             None, "Test") is None
         assert routing_info.get_routing_info_from_pre_vertex(
             pre_vertex, "None") is None
 
+        self.assertEqual(key, routing_info.get_first_key_from_single_pre(
+            pre_vertex))
         assert routing_info.get_first_key_from_pre_vertex(
             pre_vertex, "Test") == key
         assert routing_info.get_first_key_from_pre_vertex(
@@ -64,6 +70,11 @@ class TestRoutingInfo(unittest.TestCase):
             pre_vertex, "None") is None
 
         assert next(iter(routing_info)) == info
+
+        self.assertIsNone(routing_info.get_routing_info_from_pre_single(
+            unconnected))
+        self.assertIsNone(routing_info.get_first_key_from_single_pre(
+            unconnected))
 
         info2 = MachineVertexRoutingInfo(
             BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)

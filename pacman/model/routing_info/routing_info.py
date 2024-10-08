@@ -88,13 +88,14 @@ class RoutingInfo(object):
             The ID of the partition for which to get the routing information
         :rtype: VertexRoutingInfo
         """
-        vertex_info = self._info[vertex]
-        if len(vertex_info) == 1:
-            next(iter(vertex_info.values()))
-        elif len(vertex_info) == 0:
-            return None
+        if vertex in self._info:
+            vertex_info = self._info[vertex]
+            if len(vertex_info) == 1:
+                return next(iter(vertex_info.values()))
+            else:
+                raise PacmanException(f"{vertex=} has multiple keys")
         else:
-            raise PacmanException(f"{vertex=} has multiple keys")
+            return None
 
     def get_first_key_from_pre_vertex(
             self, vertex: AbstractVertex, partition_id: str) -> Optional[int]:
@@ -131,7 +132,7 @@ class RoutingInfo(object):
         if vertex in self._info:
             vertex_info = self._info[vertex]
             if len(vertex_info) == 1:
-                next(iter(vertex_info.values())).key
+                return next(iter(vertex_info.values())).key
             elif len(vertex_info) == 0:
                 return None
             else:
