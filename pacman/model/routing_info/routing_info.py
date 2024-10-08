@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Dict, Iterator, Optional, Tuple, TYPE_CHECKING
-from pacman.exceptions import PacmanAlreadyExistsException
+from collections import defaultdict
+from typing import Dict, Iterator, Optional, TYPE_CHECKING
+from pacman.exceptions import PacmanAlreadyExistsException, PacmanException
+from pacman.model.graphs.abstract_supports_multiple_partitions import (
+    AbstractSupportsMultiplePartitions)
 if TYPE_CHECKING:
     from .vertex_routing_info import VertexRoutingInfo
     from pacman.model.graphs import AbstractVertex
@@ -29,8 +32,8 @@ class RoutingInfo(object):
     def __init__(self) -> None:
         # Partition information indexed by edge pre-vertex and partition ID
         # name
-        self._info: Dict[
-            Tuple[AbstractVertex, str], VertexRoutingInfo] = dict()
+        self._info: Dict[AbstractVertex[Dict[str], VertexRoutingInfo]] = (
+            defaultdict(dict))
 
     def add_routing_info(self, info: VertexRoutingInfo):
         """
@@ -41,12 +44,23 @@ class RoutingInfo(object):
         :raise PacmanAlreadyExistsException:
             If the partition is already in the set of edges
         """
-        key = (info.vertex, info.partition_id)
-        if key in self._info:
-            raise PacmanAlreadyExistsException(
-                "Routing information", str(info))
-
-        self._info[key] = info
+        vertex = info.vertex
+        partition_id = info.partition_id
+        if vertex in self._info:
+            if partition_id in self._info[vertex]:
+                raise PacmanAlreadyExistsException(
+                    "Routing information", str(info))
+        if isinstance(vertex, AbstractSupportsMultiplePartitions):
+            if info.partition_id not in vertex.partition_ids_supported():
+                raise PacmanException(
+                    f"Unsupported partition {info.partition_id} "
+                    f"expected {vertex.partition_ids_supported()}")
+            self._info[vertex][partition_id] = info
+        else:
+            if vertex in self._info:
+                raise PacmanException(
+                    f"{vertex=} can not support multiple partitions")
+            self._info[vertex][partition_id] = info
 
     def get_routing_info_from_pre_vertex(
             self, vertex: AbstractVertex,
@@ -59,7 +73,28 @@ class RoutingInfo(object):
             The ID of the partition for which to get the routing information
         :rtype: VertexRoutingInfo
         """
-        return self._info.get((vertex, partition_id))
+        if vertex in self._info:
+            return self._info[vertex].get(partition_id)
+        else:
+            return None
+
+    def get_routing_info_from_pre_single(
+            self, vertex: AbstractVertex) -> Optional[VertexRoutingInfo]:
+        """
+        Get routing information for a given partition_id from a vertex.
+
+        :param AbstractVertex vertex: The vertex to search for
+        :param str partition_id:
+            The ID of the partition for which to get the routing information
+        :rtype: VertexRoutingInfo
+        """
+        vertex_info = self._info[vertex]
+        if len(vertex_info) == 1:
+            next(iter(vertex_info.values()))
+        elif len(vertex_info) == 0:
+            return None
+        else:
+            raise PacmanException(f"{vertex=} has multiple keys")
 
     def get_first_key_from_pre_vertex(
             self, vertex: AbstractVertex, partition_id: str) -> Optional[int]:
@@ -72,10 +107,35 @@ class RoutingInfo(object):
         :return: The routing key of the partition
         :rtype: int
         """
-        key = (vertex, partition_id)
-        if key in self._info:
-            return self._info[key].key
-        return None
+        if vertex in self._info:
+            vertex_info = self._info[vertex]
+            if partition_id in vertex_info:
+                return vertex_info[partition_id].key
+            if isinstance(vertex, AbstractSupportsMultiplePartitions):
+                if partition_id in vertex_info.partition_ids_supported():
+                    return None
+                raise PacmanException(
+                    f"{vertex} does not support {partition_id}")
+            else:
+                return None
+
+    def get_first_key_from_single_pre(
+            self, vertex: AbstractVertex) -> Optional[int]:
+        """
+        Get the first key for the partition starting at a vertex.
+
+        :param AbstractVertex vertex: The vertex which the partition starts at
+        :return: The routing key of the partition
+        :rtype: int
+        """
+        if vertex in self._info:
+            vertex_info = self._info[vertex]
+            if len(vertex_info) == 1:
+                next(iter(vertex_info.values())).key
+            elif len(vertex_info) == 0:
+                return None
+            else:
+                raise PacmanException(f"{vertex=} has multiple keys")
 
     def __iter__(self) -> Iterator[VertexRoutingInfo]:
         """
@@ -83,4 +143,5 @@ class RoutingInfo(object):
 
         :return: a iterator of routing information
         """
-        return iter(self._info.values())
+        for vertex_info in self._info.values():
+            yield from vertex_info.values()

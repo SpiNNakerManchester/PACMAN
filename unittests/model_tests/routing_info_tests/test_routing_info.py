@@ -13,14 +13,24 @@
 # limitations under the License.
 
 import unittest
+from typing import List
+
 from pacman.config_setup import unittest_setup
 from pacman.model.resources import ConstantSDRAM
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanConfigurationException)
+    PacmanAlreadyExistsException, PacmanConfigurationException,
+    PacmanException)
 from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask, MachineVertexRoutingInfo)
+from pacman.model.graphs.abstract_supports_multiple_partitions import (
+    AbstractSupportsMultiplePartitions)
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.utilities.constants import FULL_MASK
+
+
+class Multiple(SimpleMachineVertex, AbstractSupportsMultiplePartitions):
+    def partition_ids_supported(self) -> List[str]:
+        return ["Test", "Test2"]
 
 
 class TestRoutingInfo(unittest.TestCase):
@@ -64,14 +74,24 @@ class TestRoutingInfo(unittest.TestCase):
 
         info3 = MachineVertexRoutingInfo(
             BaseKeyAndMask(key, FULL_MASK), "Test2", pre_vertex, 0)
-        routing_info.add_routing_info(info3)
-        assert info != info3
+        with self.assertRaises(PacmanException):
+            routing_info.add_routing_info(info3)
+
+        multiple_vertex = Multiple(None)
+        info4 = MachineVertexRoutingInfo(
+            BaseKeyAndMask(key, FULL_MASK), "Test", multiple_vertex, 0)
+        routing_info.add_routing_info(info4)
+
+        info5 = MachineVertexRoutingInfo(
+            BaseKeyAndMask(key, FULL_MASK), "Test2", multiple_vertex, 0)
+        routing_info.add_routing_info(info5)
+        assert info4 != info5
         assert routing_info.get_routing_info_from_pre_vertex(
-                pre_vertex, "Test2") !=\
+                multiple_vertex, "Test2") !=\
             routing_info.get_routing_info_from_pre_vertex(
-                pre_vertex, "Test")
+                multiple_vertex, "Test")
         assert routing_info.get_routing_info_from_pre_vertex(
-            pre_vertex, "Test2").get_keys().tolist() == [key]
+            multiple_vertex, "Test2").get_keys().tolist() == [key]
 
     def test_base_key_and_mask(self):
         with self.assertRaises(PacmanConfigurationException):
