@@ -13,14 +13,24 @@
 # limitations under the License.
 
 import unittest
+from typing import List
+
 from pacman.config_setup import unittest_setup
 from pacman.model.resources import ConstantSDRAM
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanConfigurationException)
+    PacmanAlreadyExistsException, PacmanConfigurationException,
+    PacmanException)
 from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask, MachineVertexRoutingInfo)
+from pacman.model.graphs.abstract_supports_multiple_partitions import (
+    AbstractSupportsMultiplePartitions)
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.utilities.constants import FULL_MASK
+
+
+class Multiple(SimpleMachineVertex, AbstractSupportsMultiplePartitions):
+    def partition_ids_supported(self) -> List[str]:
+        return ["Test", "Test2"]
 
 
 class TestRoutingInfo(unittest.TestCase):
@@ -30,6 +40,7 @@ class TestRoutingInfo(unittest.TestCase):
 
     def test_routing_info(self):
         pre_vertex = SimpleMachineVertex(ConstantSDRAM(0))
+        unconnected = SimpleMachineVertex(ConstantSDRAM(0))
         key = 12345
         info = MachineVertexRoutingInfo(
             BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
@@ -41,11 +52,16 @@ class TestRoutingInfo(unittest.TestCase):
 
         assert routing_info.get_routing_info_from_pre_vertex(
             pre_vertex, "Test") == info
+        self.assertEqual(info,
+                         routing_info.get_routing_info_from_pre_single(
+                             pre_vertex))
         assert routing_info.get_routing_info_from_pre_vertex(
             None, "Test") is None
         assert routing_info.get_routing_info_from_pre_vertex(
             pre_vertex, "None") is None
 
+        self.assertEqual(key, routing_info.get_first_key_from_single_pre(
+            pre_vertex))
         assert routing_info.get_first_key_from_pre_vertex(
             pre_vertex, "Test") == key
         assert routing_info.get_first_key_from_pre_vertex(
@@ -54,6 +70,11 @@ class TestRoutingInfo(unittest.TestCase):
             pre_vertex, "None") is None
 
         assert next(iter(routing_info)) == info
+
+        self.assertIsNone(routing_info.get_routing_info_from_pre_single(
+            unconnected))
+        self.assertIsNone(routing_info.get_first_key_from_single_pre(
+            unconnected))
 
         info2 = MachineVertexRoutingInfo(
             BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
@@ -64,14 +85,24 @@ class TestRoutingInfo(unittest.TestCase):
 
         info3 = MachineVertexRoutingInfo(
             BaseKeyAndMask(key, FULL_MASK), "Test2", pre_vertex, 0)
-        routing_info.add_routing_info(info3)
-        assert info != info3
+        with self.assertRaises(PacmanException):
+            routing_info.add_routing_info(info3)
+
+        multiple_vertex = Multiple(None)
+        info4 = MachineVertexRoutingInfo(
+            BaseKeyAndMask(key, FULL_MASK), "Test", multiple_vertex, 0)
+        routing_info.add_routing_info(info4)
+
+        info5 = MachineVertexRoutingInfo(
+            BaseKeyAndMask(key, FULL_MASK), "Test2", multiple_vertex, 0)
+        routing_info.add_routing_info(info5)
+        assert info4 != info5
         assert routing_info.get_routing_info_from_pre_vertex(
-                pre_vertex, "Test2") !=\
+                multiple_vertex, "Test2") !=\
             routing_info.get_routing_info_from_pre_vertex(
-                pre_vertex, "Test")
+                multiple_vertex, "Test")
         assert routing_info.get_routing_info_from_pre_vertex(
-            pre_vertex, "Test2").get_keys().tolist() == [key]
+            multiple_vertex, "Test2").get_keys().tolist() == [key]
 
     def test_base_key_and_mask(self):
         with self.assertRaises(PacmanConfigurationException):
