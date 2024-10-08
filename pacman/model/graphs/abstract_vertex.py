@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
+from typing import List, Optional
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import ChipAndCore
 
@@ -110,3 +110,14 @@ class AbstractVertex(object):
             raise PacmanConfigurationException(
                 "Once set to a value fixed_location can not be changed")
         self._fixed_location = fixed_location
+
+    # Not Abstract for reverse compatibility reasons
+    def send_partition_ids(self) -> List[str]:
+        """
+        List of Partition Ids this vertex could send.
+
+        Used to verify an unconnected Partition Id
+
+        :return: A list (typically of length 1) of supported ids
+        """
+        raise NotImplementedError

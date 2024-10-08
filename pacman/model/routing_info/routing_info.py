@@ -12,11 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+import logging
 from typing import Dict, Iterator, Optional, Tuple, TYPE_CHECKING
+
+from spinn_utilities.log import FormatAdapter
+from spinn_utilities.logger_utils import warn_once
 from pacman.exceptions import PacmanAlreadyExistsException
 if TYPE_CHECKING:
     from .vertex_routing_info import VertexRoutingInfo
     from pacman.model.graphs import AbstractVertex
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class RoutingInfo(object):
@@ -75,6 +81,21 @@ class RoutingInfo(object):
         key = (vertex, partition_id)
         if key in self._info:
             return self._info[key].key
+        try:
+            if partition_id in vertex.send_partition_ids():
+                # if kept should be info_once (needs implementing)
+                logger.info(f"{vertex.label} not connected to send "
+                            f"partition {partition_id}")
+            else:
+                raise Exception(
+                    f"{vertex.label} does not send partition {partition_id} "
+                    f"as {type(vertex)} send_partition_id returns "
+                    f"{vertex.send_partition_ids()}")
+        except NotImplementedError:
+            warn_once(logger,
+                      f"Unable to determine if {vertex.label} can send "
+                      f"partition {partition_id} as {type(vertex)} "
+                      f"does not implement send_partition_id")
         return None
 
     def __iter__(self) -> Iterator[VertexRoutingInfo]:
