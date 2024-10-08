@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
 import unittest
 from pacman.config_setup import unittest_setup
 from pacman.model.resources import ConstantSDRAM
@@ -23,18 +24,34 @@ from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.utilities.constants import FULL_MASK
 
 
+class FooSender(SimpleMachineVertex):
+    def send_partition_ids(self) -> List[str]:
+        return ["foo"]
+
+
 class TestRoutingInfo(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
 
     def test_routing_info(self):
-        pre_vertex = SimpleMachineVertex(ConstantSDRAM(0))
+        pre_vertex = SimpleMachineVertex(ConstantSDRAM(0), label="pre_vertex")
         key = 12345
         info = MachineVertexRoutingInfo(
             BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
         routing_info = RoutingInfo()
+        info = MachineVertexRoutingInfo(
+            BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
         routing_info.add_routing_info(info)
+
+        foo_vertex = FooSender(ConstantSDRAM(0), label="foo_vertex")
+        foo_key = 6789
+        foo_info = MachineVertexRoutingInfo(
+            BaseKeyAndMask(foo_key, FULL_MASK), "foo", foo_vertex, 0)
+        routing_info.add_routing_info(foo_info)
+
+        unconnected_foo_vertex = FooSender(
+            ConstantSDRAM(0), label="unconnected")
 
         with self.assertRaises(PacmanAlreadyExistsException):
             routing_info.add_routing_info(info)
@@ -49,9 +66,17 @@ class TestRoutingInfo(unittest.TestCase):
         assert routing_info.get_first_key_from_pre_vertex(
             pre_vertex, "Test") == key
         assert routing_info.get_first_key_from_pre_vertex(
-            None, "Test") is None
+            pre_vertex, "Unconnected") is None
         assert routing_info.get_first_key_from_pre_vertex(
             pre_vertex, "None") is None
+
+        self.assertEquals(foo_key, routing_info.get_first_key_from_pre_vertex(
+            foo_vertex, "foo"))
+        self.assertEquals(None, routing_info.get_first_key_from_pre_vertex(
+            unconnected_foo_vertex, "foo"))
+        with self.assertRaises(Exception):
+            routing_info.get_first_key_from_pre_vertex(
+                foo_vertex, "unconnected")
 
         assert next(iter(routing_info)) == info
 
