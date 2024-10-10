@@ -13,8 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 from collections import defaultdict
-from deprecated import deprecated
 from typing import Dict, Iterator, Optional, Iterable, TYPE_CHECKING
+from deprecated import deprecated
 from pacman.exceptions import PacmanAlreadyExistsException
 if TYPE_CHECKING:
     from .vertex_routing_info import VertexRoutingInfo
