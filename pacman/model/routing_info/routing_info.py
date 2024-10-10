@@ -157,13 +157,13 @@ class RoutingInfo(object):
         return next(iter(info.values()))
 
     def get_single_first_key_from_pre_vertex(
-            self, vertex: AbstractVertex) -> int:
+            self, vertex: AbstractVertex) -> Optional[int]:
         """
         Get the first key for the partition starting at a vertex.  Fails if
         the vertex has more than one outgoing partition.
 
         :param AbstractVertex vertex: The vertex which the partition starts at
-        :rtype: int
+        :rtype: int or None
         :raise KeyError: If the vertex has more than one outgoing partition
         """
         info = self.get_single_routing_info_from_pre_vertex(vertex)
