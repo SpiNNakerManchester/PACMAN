@@ -69,7 +69,10 @@ class RoutingInfo(object):
             The ID of the partition for which to get the routing information
         :rtype: VertexRoutingInfo or None
         """
-        return self._info[vertex].get(partition_id)
+        # TODO: Replace (currently temporarily broken to make sure we don't
+        # call it)
+        raise NotImplementedError("Deprecated - shouldn't be used")
+        # return self._info[vertex].get(partition_id)
 
     def get_safe_routing_info_from_pre_vertex(
             self, vertex: AbstractVertex,
@@ -106,12 +109,16 @@ class RoutingInfo(object):
         :return: The routing key of the partition
         :rtype: int or None
         """
-        if vertex not in self._info:
-            return None
-        info = self._info[vertex]
-        if partition_id not in info:
-            return None
-        return info[partition_id].key
+        # TODO: Replace (currently temporarily broken to make sure we don't
+        # call it)
+        raise NotImplementedError("Deprecated - shouldn't be used")
+
+        # if vertex not in self._info:
+        #     return None
+        # info = self._info[vertex]
+        # if partition_id not in info:
+        #     return None
+        # return info[partition_id].key
 
     def get_safe_first_key_from_pre_vertex(
             self, vertex: AbstractVertex, partition_id: str) -> int:
