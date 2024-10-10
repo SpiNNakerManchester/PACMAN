@@ -63,11 +63,8 @@ def __create_routing_table(
     sources_by_key_mask: Dict[BaseKeyAndMask,
                               Tuple[AbstractVertex, str]] = dict()
     for source_vertex, partition_id in partitions_in_table:
-        r_info = routing_infos.get_routing_info_from_pre_vertex(
+        r_info = routing_infos.get_safe_routing_info_from_pre_vertex(
             source_vertex, partition_id)
-        # Should be there; skip if not
-        if r_info is None:
-            continue
         entry = partitions_in_table[source_vertex, partition_id]
         if r_info.key_and_mask in sources_by_key_mask:
             if (sources_by_key_mask[r_info.key_and_mask]
