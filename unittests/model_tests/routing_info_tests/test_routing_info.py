@@ -109,6 +109,17 @@ class TestRoutingInfo(unittest.TestCase):
         assert list(routing_info.get_partitions_outgoing_from_vertex(
             None)) == []
 
+        # This should work as can be either partition
+        routing_info.test_pre_vertex_partition_ids(
+            pre_vertex, {"Test", "Test2"})
+
+        # Works because None has no partitions!
+        routing_info.test_pre_vertex_partition_ids(None, {"Test"})
+
+        # This should not work
+        with self.assertRaises(KeyError):
+            routing_info.test_pre_vertex_partition_ids(pre_vertex, {"Test2"})
+
         assert routing_info.has_routing_info_from_pre_vertex(
             pre_vertex, "Test")
         assert not routing_info.has_routing_info_from_pre_vertex(

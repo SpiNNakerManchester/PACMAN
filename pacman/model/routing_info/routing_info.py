@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 from collections import defaultdict
-from typing import Dict, Iterator, Optional, Iterable, TYPE_CHECKING
+from typing import Dict, Iterator, Optional, Iterable, Set, TYPE_CHECKING
 from deprecated import deprecated
 from pacman.exceptions import PacmanAlreadyExistsException
 if TYPE_CHECKING:
@@ -161,6 +161,24 @@ class RoutingInfo(object):
             return False
         info = self._info[vertex]
         return partition_id in info
+
+    def test_pre_vertex_partition_ids(
+            self, vertex: AbstractVertex,
+            allowed_partition_ids: Set[str]):
+        """
+        Check that the partition ids for a vertex are in the allowed set.
+
+        :param AbstractVertex vertex: The vertex to search for
+        :param set[str] allowed_partition_ids: The allowed partition ids
+        :raise KeyError: If the vertex has an unknown partition ID
+        """
+        if vertex not in self._info:
+            return
+        info = self._info[vertex]
+        for partition_id in info:
+            if partition_id not in allowed_partition_ids:
+                raise KeyError(
+                    f"Vertex {vertex} has unknown partition ID {partition_id}")
 
     def get_single_routing_info_from_pre_vertex(
             self, vertex: AbstractVertex) -> Optional[VertexRoutingInfo]:
