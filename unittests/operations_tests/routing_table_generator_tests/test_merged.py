@@ -141,7 +141,7 @@ class TestMerged(unittest.TestCase):
         try:
             merged_routing_table_generator()
             raise PacmanRoutingException("Should not get here")
-        except PacmanRoutingException as ex:
+        except KeyError as ex:
             self.assertIn("Missing Routing information", str(ex))
 
     def test_iterator_with_next(self):
