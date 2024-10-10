@@ -28,7 +28,7 @@ class TestRoutingInfo(unittest.TestCase):
     def setUp(self):
         unittest_setup()
 
-    def test_routing_info(self):
+    def test_routing_info_deprecated(self):
         pre_vertex = SimpleMachineVertex(ConstantSDRAM(0))
         key = 12345
         info = MachineVertexRoutingInfo(
@@ -72,6 +72,61 @@ class TestRoutingInfo(unittest.TestCase):
                 pre_vertex, "Test")
         assert routing_info.get_routing_info_from_pre_vertex(
             pre_vertex, "Test2").get_keys().tolist() == [key]
+
+    def test_routing_info(self):
+        pre_vertex = SimpleMachineVertex(ConstantSDRAM(0))
+        key = 12345
+        info = MachineVertexRoutingInfo(
+            BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
+        routing_info = RoutingInfo()
+        routing_info.add_routing_info(info)
+
+        with self.assertRaises(PacmanAlreadyExistsException):
+            routing_info.add_routing_info(info)
+
+        assert routing_info.get_safe_routing_info_from_pre_vertex(
+            pre_vertex, "Test") == info
+        with self.assertRaises(KeyError):
+            routing_info.get_safe_routing_info_from_pre_vertex(
+                None, "Test")
+        with self.assertRaises(KeyError):
+            routing_info.get_safe_routing_info_from_pre_vertex(
+                pre_vertex, "None")
+
+        assert routing_info.get_safe_first_key_from_pre_vertex(
+            pre_vertex, "Test") == key
+        with self.assertRaises(KeyError):
+            routing_info.get_safe_first_key_from_pre_vertex(
+                None, "Test")
+        with self.assertRaises(KeyError):
+            routing_info.get_safe_first_key_from_pre_vertex(
+                pre_vertex, "None")
+
+        assert list(routing_info.get_partitions_outgoing_from_vertex(
+            pre_vertex)) == ["Test"]
+        assert list(routing_info.get_partitions_outgoing_from_vertex(
+            None)) == []
+
+        assert next(iter(routing_info)) == info
+
+        info2 = MachineVertexRoutingInfo(
+            BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
+
+        with self.assertRaises(PacmanAlreadyExistsException):
+            routing_info.add_routing_info(info2)
+        assert info != info2
+
+        info3 = MachineVertexRoutingInfo(
+            BaseKeyAndMask(key, FULL_MASK), "Test2", pre_vertex, 0)
+        routing_info.add_routing_info(info3)
+        assert info != info3
+        assert routing_info.get_safe_routing_info_from_pre_vertex(
+                pre_vertex, "Test2") !=\
+            routing_info.get_safe_routing_info_from_pre_vertex(
+                pre_vertex, "Test")
+        assert routing_info.get_safe_routing_info_from_pre_vertex(
+            pre_vertex, "Test2").get_keys().tolist() == [key]
+
 
     def test_base_key_and_mask(self):
         with self.assertRaises(PacmanConfigurationException):

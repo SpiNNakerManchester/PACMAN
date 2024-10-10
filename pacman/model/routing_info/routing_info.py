@@ -177,4 +177,6 @@ class RoutingInfo(object):
 
         :return: a iterator of routing information
         """
-        return iter(self._info.values())
+        for vertex_info in self._info.values():
+            for info in vertex_info.values():
+                yield info
