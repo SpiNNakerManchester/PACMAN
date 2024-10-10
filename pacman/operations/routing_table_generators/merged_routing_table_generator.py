@@ -16,7 +16,6 @@ from typing import (
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data import PacmanDataView
-from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.graphs.application import ApplicationVertex
