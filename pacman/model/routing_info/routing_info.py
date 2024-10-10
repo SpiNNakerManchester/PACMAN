@@ -57,6 +57,7 @@ class RoutingInfo(object):
                        "Use a combination of "
                        "get_safe_routing_info_from_pre_vertex, "
                        "get_partitions_outgoing_from_vertex, "
+                       "has_routing_info_from_pre_vertex, "
                        "or get_single_routing_info_from_pre_vertex")
     def get_routing_info_from_pre_vertex(
             self, vertex: AbstractVertex,
@@ -97,6 +98,7 @@ class RoutingInfo(object):
                        "Use a combination of "
                        "get_safe_first_key_from_pre_vertex, "
                        "get_partitions_outgoing_from_vertex, "
+                       "has_routing_info_from_pre_vertex, "
                        "or get_single_first_key_from_pre_vertex")
     def get_first_key_from_pre_vertex(
             self, vertex: AbstractVertex, partition_id: str) -> Optional[int]:
@@ -144,6 +146,21 @@ class RoutingInfo(object):
         :param AbstractVertex vertex: The vertex to search for
         """
         return self._info[vertex].keys()
+
+    def has_routing_info_from_pre_vertex(
+            self, vertex: AbstractVertex, partition_id: str) -> bool:
+        """
+        Check if there is routing information for a given vertex.
+
+        :param AbstractVertex vertex: The vertex to search for
+        :param str partition_id:
+            The ID of the partition for which to get the routing information
+        :rtype: bool
+        """
+        if vertex not in self._info:
+            return False
+        info = self._info[vertex]
+        return partition_id in info
 
     def get_single_routing_info_from_pre_vertex(
             self, vertex: AbstractVertex) -> Optional[VertexRoutingInfo]:
