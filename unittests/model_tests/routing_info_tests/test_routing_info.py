@@ -109,6 +109,13 @@ class TestRoutingInfo(unittest.TestCase):
         assert list(routing_info.get_partitions_outgoing_from_vertex(
             None)) == []
 
+        assert routing_info.has_routing_info_from_pre_vertex(
+            pre_vertex, "Test")
+        assert not routing_info.has_routing_info_from_pre_vertex(
+            None, "Test")
+        assert not routing_info.has_routing_info_from_pre_vertex(
+            pre_vertex, "None")
+
         assert next(iter(routing_info)) == info
 
         info2 = MachineVertexRoutingInfo(
