@@ -37,6 +37,7 @@ class TestRoutingTre(unittest.TestCase):
                              list(rt1.children))
         self.assertListEqual([rt1, "m_vertexA", "m_vertexB"],
                              list(iter(rt1)))
+        self.assertEqual(len(rt1), len(list(rt1)))
 
         rt2 = RoutingTree((4, 5), "foo")
         self.assertEqual("foo", rt2.label)
@@ -56,6 +57,7 @@ class TestRoutingTre(unittest.TestCase):
             [(None, (4, 5), {2, 3}), (3, (3, 4), {1, 2})],
             list(rt2.traverse())
         )
+        self.assertEqual(len(rt2), len(list(rt2)))
 
 
 if __name__ == '__main__':

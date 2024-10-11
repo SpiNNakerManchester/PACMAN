@@ -84,3 +84,6 @@ class RoutingInfo(object):
         :return: a iterator of routing information
         """
         return iter(self._info.values())
+
+    def __len__(self) -> int:
+        return len(self._info)

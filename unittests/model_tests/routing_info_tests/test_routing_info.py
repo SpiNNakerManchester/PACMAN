@@ -73,6 +73,8 @@ class TestRoutingInfo(unittest.TestCase):
         assert routing_info.get_routing_info_from_pre_vertex(
             pre_vertex, "Test2").get_keys().tolist() == [key]
 
+        self.assertEqual(len(routing_info), len(list(routing_info)))
+
     def test_base_key_and_mask(self):
         with self.assertRaises(PacmanConfigurationException):
             BaseKeyAndMask(0xF0, 0x40)
