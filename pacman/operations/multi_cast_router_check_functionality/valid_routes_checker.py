@@ -118,7 +118,7 @@ def validate_routes(routing_tables: MulticastRoutingTables):
             if isinstance(m_vertex, AbstractVirtual):
                 continue
             placement = PacmanDataView.get_placement_of_vertex(m_vertex)
-            r_info = routing_infos.get_safe_routing_info_from_pre_vertex(
+            r_info = routing_infos.get_info_from(
                 m_vertex, partition.identifier)
 
             # search for these destinations

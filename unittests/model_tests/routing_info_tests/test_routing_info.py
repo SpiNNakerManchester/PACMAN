@@ -86,45 +86,45 @@ class TestRoutingInfo(unittest.TestCase):
         with self.assertRaises(PacmanAlreadyExistsException):
             routing_info.add_routing_info(info)
 
-        assert routing_info.get_safe_routing_info_from_pre_vertex(
+        assert routing_info.get_info_from(
             pre_vertex, "Test") == info
         with self.assertRaises(KeyError):
-            routing_info.get_safe_routing_info_from_pre_vertex(
+            routing_info.get_info_from(
                 None, "Test")
         with self.assertRaises(KeyError):
-            routing_info.get_safe_routing_info_from_pre_vertex(
+            routing_info.get_info_from(
                 pre_vertex, "None")
 
-        assert routing_info.get_safe_first_key_from_pre_vertex(
+        assert routing_info.get_key_from(
             pre_vertex, "Test") == key
         with self.assertRaises(KeyError):
-            routing_info.get_safe_first_key_from_pre_vertex(
+            routing_info.get_key_from(
                 None, "Test")
         with self.assertRaises(KeyError):
-            routing_info.get_safe_first_key_from_pre_vertex(
+            routing_info.get_key_from(
                 pre_vertex, "None")
 
-        assert list(routing_info.get_partitions_outgoing_from_vertex(
+        assert list(routing_info.get_partitions_from(
             pre_vertex)) == ["Test"]
-        assert list(routing_info.get_partitions_outgoing_from_vertex(
+        assert list(routing_info.get_partitions_from(
             None)) == []
 
         # This should work as can be either partition
-        routing_info.test_pre_vertex_partition_ids(
+        routing_info.check_info_from(
             pre_vertex, {"Test", "Test2"})
 
         # Works because None has no partitions!
-        routing_info.test_pre_vertex_partition_ids(None, {"Test"})
+        routing_info.check_info_from(None, {"Test"})
 
         # This should not work
         with self.assertRaises(KeyError):
-            routing_info.test_pre_vertex_partition_ids(pre_vertex, {"Test2"})
+            routing_info.check_info_from(pre_vertex, {"Test2"})
 
-        assert routing_info.has_routing_info_from_pre_vertex(
+        assert routing_info.has_info_from(
             pre_vertex, "Test")
-        assert not routing_info.has_routing_info_from_pre_vertex(
+        assert not routing_info.has_info_from(
             None, "Test")
-        assert not routing_info.has_routing_info_from_pre_vertex(
+        assert not routing_info.has_info_from(
             pre_vertex, "None")
 
         assert next(iter(routing_info)) == info
@@ -140,17 +140,17 @@ class TestRoutingInfo(unittest.TestCase):
             BaseKeyAndMask(key, FULL_MASK), "Test2", pre_vertex, 0)
         routing_info.add_routing_info(info3)
         assert info != info3
-        assert routing_info.get_safe_routing_info_from_pre_vertex(
+        assert routing_info.get_info_from(
                 pre_vertex, "Test2") !=\
-            routing_info.get_safe_routing_info_from_pre_vertex(
+            routing_info.get_info_from(
                 pre_vertex, "Test")
-        assert routing_info.get_safe_routing_info_from_pre_vertex(
+        assert routing_info.get_info_from(
             pre_vertex, "Test2").get_keys().tolist() == [key]
         with self.assertRaises(KeyError):
-            routing_info.get_single_routing_info_from_pre_vertex(
+            routing_info.get_single_info_from(
                 pre_vertex)
         with self.assertRaises(KeyError):
-            routing_info.get_single_first_key_from_pre_vertex(pre_vertex)
+            routing_info.get_single_key_from(pre_vertex)
 
     def test_base_key_and_mask(self):
         with self.assertRaises(PacmanConfigurationException):
