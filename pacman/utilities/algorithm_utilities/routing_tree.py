@@ -146,6 +146,15 @@ class RoutingTree(object):
             else:
                 yield obj
 
+    def __len__(self) -> int:
+        count = 1  # self
+        for _route, obj in self._children:
+            if isinstance(obj, RoutingTree):
+                count += len(obj)
+            else:
+                count += 1
+        return count
+
     def __repr__(self) -> str:
         return f"<RoutingTree at {self.chip} with {len(self._children)}" \
                f" {'child' if len(self._children) == 1 else 'children'}>"

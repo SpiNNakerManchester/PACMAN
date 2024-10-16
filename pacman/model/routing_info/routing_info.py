@@ -215,3 +215,6 @@ class RoutingInfo(object):
         for vertex_info in self._info.values():
             for info in vertex_info.values():
                 yield info
+
+    def __len__(self) -> int:
+        return len(self._info)
