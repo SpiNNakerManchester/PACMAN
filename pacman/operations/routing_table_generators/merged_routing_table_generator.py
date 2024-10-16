@@ -16,7 +16,6 @@ from typing import (
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data import PacmanDataView
-from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.graphs.application import ApplicationVertex
@@ -70,10 +69,8 @@ def __create_routing_table(
     iterator = _IteratorWithNext(partitions_in_table.items())
     while iterator.has_next:
         (vertex, part_id), entry = iterator.pop()
-        r_info = routing_info.get_routing_info_from_pre_vertex(vertex, part_id)
-        if r_info is None:
-            raise PacmanRoutingException(
-                f"Missing Routing information for {vertex}, {part_id}")
+        r_info = routing_info.get_info_from(
+            vertex, part_id)
 
         if r_info.key_and_mask in sources_by_key_mask:
             if (sources_by_key_mask[r_info.key_and_mask] != (vertex, part_id)):
@@ -102,7 +99,7 @@ def __create_routing_table(
             continue
 
         # This has to be AppVertexRoutingInfo!
-        app_r_info = routing_info.get_routing_info_from_pre_vertex(
+        app_r_info = routing_info.get_info_from(
             vertex.app_vertex, part_id)
         assert isinstance(app_r_info, AppVertexRoutingInfo)
 
@@ -112,7 +109,7 @@ def __create_routing_table(
         while __match(iterator, vertex, part_id, r_info, entry, routing_info,
                       app_r_info):
             (vertex, part_id), entry = iterator.pop()
-            r_info = routing_info.get_routing_info_from_pre_vertex(
+            r_info = routing_info.get_info_from(
                 vertex, part_id)
             if r_info is not None:
                 assert isinstance(r_info, MachineVertexRoutingInfo)
@@ -139,11 +136,8 @@ def __match(
         return False
     if __mask_has_holes(r_info.mask):
         return False
-    next_r_info = routing_info.get_routing_info_from_pre_vertex(
+    next_r_info = routing_info.get_info_from(
         next_vertex, next_part_id)
-    if next_r_info is None:
-        raise KeyError(
-            f"No routing info found for {next_vertex}, {next_part_id}")
     if next_r_info.index != r_info.index + 1:
         return False
     app_src = vertex.app_vertex
