@@ -135,6 +135,9 @@ class MulticastRoutingTables(object):
         """
         return iter(self._routing_tables_by_chip.values())
 
+    def __len__(self) -> int:
+        return len(self._routing_tables_by_chip)
+
 
 def to_json(router_table: MulticastRoutingTables) -> JsonObjectArray:
     """

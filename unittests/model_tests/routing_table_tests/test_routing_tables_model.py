@@ -144,6 +144,7 @@ class TestRoutingTable(unittest.TestCase):
         mrt.append(t1)
         mrt.append(t2)
         tables = MulticastRoutingTables(mrt)
+        self.assertEqual(len(tables), len(list(tables)))
         retrieved_tables = tables.routing_tables
         self.assertEqual(len(retrieved_tables), len(mrt))
         for tab in retrieved_tables:
