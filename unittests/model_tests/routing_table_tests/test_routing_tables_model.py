@@ -147,6 +147,7 @@ class TestRoutingTable(unittest.TestCase):
         self.assertEqual(len(tables), len(list(tables)))
         retrieved_tables = tables.routing_tables
         self.assertEqual(len(retrieved_tables), len(mrt))
+        self.assertEqual(len(tables), len(mrt))
         for tab in retrieved_tables:
             self.assertIn(tab, mrt)
 
