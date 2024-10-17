@@ -23,4 +23,4 @@ utils="../SpiNNUtils/spinn_utilities"
 machine="../SpiNNMachine/spinn_machine"
 man="../SpiNNMan/spinnman"
 
-mypy $utils $machine $man pacman
+mypy --python-version 3.8 $utils $machine $man pacman
