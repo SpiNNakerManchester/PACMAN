@@ -236,7 +236,8 @@ def test_sdram_bigger_monitors():
     writer.add_sample_monitor_vertex(monitor, True)
     try:
         placer = ApplicationPlacer(Placements())
-        placer._check_could_fit(1, plan_sdram=max_sdram // 2 + 5)
+        sdram = ConstantSDRAM(max_sdram // 2 + 5)
+        placer._check_could_fit(1, sdram=sdram)
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
         assert ("after monitors only" in str(ex))
@@ -278,7 +279,7 @@ def test_more_cores_with_monitor():
     many = writer.get_machine_version().max_cores_per_chip - 1
     try:
         placer = ApplicationPlacer(Placements())
-        placer._check_could_fit(many, 500000)
+        placer._check_could_fit(many, ConstantSDRAM(500000))
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
         assert ("reserved for monitors" in str(ex))
@@ -292,4 +293,4 @@ def test_could_fit():
     writer.add_sample_monitor_vertex(monitor, True)
     placer = ApplicationPlacer(Placements())
     many = writer.get_machine_version().max_cores_per_chip - 2
-    placer._check_could_fit(many, 500000)
+    placer._check_could_fit(many, ConstantSDRAM(500000))
