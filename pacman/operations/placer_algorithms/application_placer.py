@@ -497,7 +497,7 @@ class ApplicationPlacer(object):
         self.__prepared_chips.add(chip)
 
         total_sdram = sdram_used + sdram
-        plan_sdram= total_sdram.get_total_sdram(self.__plan_n_timesteps)
+        plan_sdram = total_sdram.get_total_sdram(self.__plan_n_timesteps)
         if len(cores_free) < n_cores or plan_sdram > chip.sdram:
             self._check_could_fit(n_cores, sdram)
             return False
