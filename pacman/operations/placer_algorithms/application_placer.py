@@ -63,8 +63,8 @@ class ApplicationPlacer(object):
         "__plan_n_timesteps",
         # Sdram available on perfect none Ethernet Chip after Monitors placed
         "__max_sdram",
-        # Minimum sdram that should be available for a Chip to not be full
-        "__min_sdram",
+        # Maximum sdram that should be used for a Chip to not be full
+        "__cap_sdram",
         # N Cores free on perfect none Ethernet Chip after Monitors placed
         "__max_cores",
 
@@ -88,8 +88,8 @@ class ApplicationPlacer(object):
         "__current_chip",
         # List of cores available. Included ones for current group until used
         "__current_cores_free",
-        # Available sdram after the current group is placed
-        "__current_sdram_free",
+        # Used sdram after the current group is placed
+        "__current_sdram_used",
 
         # Data about the neighbouring Chips to ones used
         # Current board being placed on
@@ -116,7 +116,8 @@ class ApplicationPlacer(object):
         self.__max_cores = (
                 version.max_cores_per_chip - version.n_scamp_cores -
                 PacmanDataView.get_all_monitor_cores())
-        self.__min_sdram = self.__max_sdram // self.__max_cores
+        self.__cap_sdram = self.__max_sdram - (
+                self.__max_sdram // self.__max_cores)
 
         self.__placements = placements
         self.__chips = self._chip_order()
@@ -128,7 +129,7 @@ class ApplicationPlacer(object):
 
         self.__current_chip: Optional[Chip] = None
         self.__current_cores_free: List[int] = list()
-        self.__current_sdram_free = 0
+        self.__current_sdram_used = 0
         self.__app_vertex_label: Optional[str] = None
 
         # Set some value so no Optional needed
@@ -475,7 +476,7 @@ class ApplicationPlacer(object):
             If the requirements are too big for any chip
         """
         cores_free = list(chip.placable_processors_ids)
-        sdram_free = chip.sdram
+        sdram_used = 0
 
         # remove the already placed for other Application Vertices
         on_chip = self.__placements.placements_on_chip(chip)
@@ -485,10 +486,10 @@ class ApplicationPlacer(object):
 
         for placement in on_chip:
             cores_free.remove(placement.p)
-            sdram_free -= placement.vertex.sdram_required.get_total_sdram(
+            sdram_used += placement.vertex.sdram_required.get_total_sdram(
                 self.__plan_n_timesteps)
 
-        if sdram_free < self.__min_sdram:
+        if sdram_used > self.__cap_sdram:
             self.__full_chips.add(chip)
             return False
 
@@ -496,7 +497,8 @@ class ApplicationPlacer(object):
         # This assumes all groups are the same size so even if too small
         self.__prepared_chips.add(chip)
 
-        if len(cores_free) < n_cores or sdram_free < plan_sdram:
+        total_sdram = sdram_used + plan_sdram
+        if len(cores_free) < n_cores or total_sdram > chip.sdram :
             self._check_could_fit(n_cores, plan_sdram)
             return False
 
@@ -505,7 +507,7 @@ class ApplicationPlacer(object):
         # cores are popped out later to keep them here for now
         self.__current_cores_free = cores_free
         # sdram is the whole group so can be removed now
-        self.__current_sdram_free = sdram_free - plan_sdram
+        self.__current_sdram_used = total_sdram
 
         # adds the neighbours
         self._add_neighbours(chip)
@@ -653,10 +655,12 @@ class ApplicationPlacer(object):
         """
         if self.__current_chip is None:
             return self._get_next_start(n_cores, plan_sdram)
-        elif (len(self.__current_cores_free) >= n_cores and
-              self.__current_sdram_free >= plan_sdram):
+
+        total_sdram = plan_sdram + self.__current_sdram_used
+        if (len(self.__current_cores_free) >= n_cores and
+              total_sdram <= self.__current_chip.sdram):
             # Cores are popped out later
-            self.__current_sdram_free -= plan_sdram
+            self.__current_sdram_used = total_sdram
             return self.__current_chip
         else:
             return self._get_next_neighbour(n_cores, plan_sdram)
