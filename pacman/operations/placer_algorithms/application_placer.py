@@ -498,7 +498,7 @@ class ApplicationPlacer(object):
         self.__prepared_chips.add(chip)
 
         total_sdram = sdram_used + plan_sdram
-        if len(cores_free) < n_cores or total_sdram > chip.sdram :
+        if len(cores_free) < n_cores or total_sdram > chip.sdram:
             self._check_could_fit(n_cores, plan_sdram)
             return False
 
@@ -658,7 +658,7 @@ class ApplicationPlacer(object):
 
         total_sdram = plan_sdram + self.__current_sdram_used
         if (len(self.__current_cores_free) >= n_cores and
-              total_sdram <= self.__current_chip.sdram):
+                total_sdram <= self.__current_chip.sdram):
             # Cores are popped out later
             self.__current_sdram_used = total_sdram
             return self.__current_chip
