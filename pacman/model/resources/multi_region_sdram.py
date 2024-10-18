@@ -14,7 +14,7 @@
 from __future__ import annotations
 from enum import Enum
 import math
-from typing import Dict, Optional, TextIO, Union
+from typing import Any, Dict, Optional, TextIO, Union
 
 import numpy
 from typing_extensions import TypeAlias
@@ -144,6 +144,11 @@ class MultiRegionSDRAM(AbstractSDRAM):
         :return:
         """
         return self.__total.get_total_sdram(n_timesteps)
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, MultiRegionSDRAM):
+            return self.__total == other._MultiRegionSDRAM__total
+        return self.__total == other
 
     def __add__(self, other: AbstractSDRAM) -> AbstractSDRAM:
         """

@@ -84,12 +84,9 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
+    @abstractmethod
     def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, AbstractSDRAM):
-            return False
-        if other.fixed != self.fixed:
-            return False
-        return other.per_timestep == self.per_timestep
+        raise NotImplementedError
 
     @abstractmethod
     def report(self, timesteps: Optional[int], indent: str = "",

@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import math
-from typing import Optional, TextIO, Union
+from typing import Any, Optional, TextIO, Union
 
 import numpy
 
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from .abstract_sdram import AbstractSDRAM
-
+from .constant_sdram import ConstantSDRAM
 
 def _ceil(value: Union[int, float, numpy.integer, numpy.floating]) -> int:
     return math.ceil(value)
@@ -71,6 +71,20 @@ class VariableSDRAM(AbstractSDRAM):
     @overrides(AbstractSDRAM.per_timestep)
     def per_timestep(self) -> float:
         return self._per_timestep_sdram
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, VariableSDRAM):
+            if other.fixed != self.fixed:
+                return False
+            else:
+                return other.per_timestep == self.per_timestep
+        elif isinstance(other, ConstantSDRAM):
+            if self._per_timestep_sdram != 0:
+                return False
+            else:
+                return other.fixed == self.fixed
+        else:
+            return False
 
     def __add__(self, other: AbstractSDRAM) -> 'VariableSDRAM':
         return VariableSDRAM(
