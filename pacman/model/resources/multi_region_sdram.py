@@ -77,17 +77,11 @@ class MultiRegionSDRAM(AbstractSDRAM):
         :param per_timestep_sdram: The variable cost for this region is any
         :type per_timestep_sdram: int or numpy.integer
         """
-        sdram: AbstractSDRAM
         if per_timestep_sdram:
-            sdram = VariableSDRAM(
-                _ceil(fixed_sdram), _ceil(per_timestep_sdram))
+            self.nest(region, VariableSDRAM(
+                _ceil(fixed_sdram), _ceil(per_timestep_sdram)))
         else:
-            sdram = ConstantSDRAM(_ceil(fixed_sdram))
-        self.__total += sdram
-        if region in self.__regions:
-            self.__regions[region] += sdram
-        else:
-            self.__regions[region] = sdram
+            self.nest(region, ConstantSDRAM(_ceil(fixed_sdram)))
 
     def nest(self, region: _RegionKey, other: AbstractSDRAM):
         """
