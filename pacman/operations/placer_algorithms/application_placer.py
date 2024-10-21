@@ -475,7 +475,7 @@ class ApplicationPlacer(object):
             If the requirements are too big for any chip
         """
         cores_free = list(chip.placable_processors_ids)
-        sdram_used = ConstantSDRAM(0)
+        sdram_used: AbstractSDRAM = ConstantSDRAM(0)
 
         # remove the already placed for other Application Vertices
         on_chip = self.__placements.placements_on_chip(chip)
