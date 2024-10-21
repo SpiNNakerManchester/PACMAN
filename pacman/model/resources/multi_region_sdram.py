@@ -104,7 +104,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
                 if isinstance(r, MultiRegionSDRAM):
                     r.merge(other)
                 else:
-                    other.add_cost(region, r.fixed, r.per_timestep)
+                    other.nest(region, r)
                     self.__regions[region] = other
             else:
                 self.__regions[region] += other
