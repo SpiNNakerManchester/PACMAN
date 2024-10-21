@@ -27,7 +27,7 @@ from pacman.model.placements import Placements, Placement
 from pacman.model.graphs import AbstractVirtual
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.resources import AbstractSDRAM
+from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 from pacman.exceptions import (
     PacmanPlaceException, PacmanConfigurationException, PacmanTooBigToPlace)
 
@@ -63,8 +63,8 @@ class ApplicationPlacer(object):
         "__plan_n_timesteps",
         # Sdram available on perfect none Ethernet Chip after Monitors placed
         "__max_sdram",
-        # Minimum sdram that should be available for a Chip to not be full
-        "__min_sdram",
+        # Maximum sdram that should be used for a Chip to not be full
+        "__cap_sdram",
         # N Cores free on perfect none Ethernet Chip after Monitors placed
         "__max_cores",
 
@@ -88,8 +88,8 @@ class ApplicationPlacer(object):
         "__current_chip",
         # List of cores available. Included ones for current group until used
         "__current_cores_free",
-        # Available sdram after the current group is placed
-        "__current_sdram_free",
+        # Used sdram after the current group is placed
+        "__current_sdram_used",
 
         # Data about the neighbouring Chips to ones used
         # Current board being placed on
@@ -116,7 +116,8 @@ class ApplicationPlacer(object):
         self.__max_cores = (
                 version.max_cores_per_chip - version.n_scamp_cores -
                 PacmanDataView.get_all_monitor_cores())
-        self.__min_sdram = self.__max_sdram // self.__max_cores
+        self.__cap_sdram = self.__max_sdram - (
+                self.__max_sdram // self.__max_cores)
 
         self.__placements = placements
         self.__chips = self._chip_order()
@@ -128,7 +129,7 @@ class ApplicationPlacer(object):
 
         self.__current_chip: Optional[Chip] = None
         self.__current_cores_free: List[int] = list()
-        self.__current_sdram_free = 0
+        self.__current_sdram_used: AbstractSDRAM = ConstantSDRAM(0)
         self.__app_vertex_label: Optional[str] = None
 
         # Set some value so no Optional needed
@@ -239,11 +240,10 @@ class ApplicationPlacer(object):
             if len(vertices_to_place) == 0:
                 # Either placed (fixed) or virtual so skip group
                 continue
-            plan_sdram = sdram.get_total_sdram(self.__plan_n_timesteps)
             n_cores = len(vertices_to_place)
 
             # Try to find a chip with space
-            chip = self._get_next_chip_with_space(n_cores, plan_sdram)
+            chip = self._get_next_chip_with_space(n_cores, sdram)
             if chip is None:
                 return None
 
@@ -448,7 +448,7 @@ class ApplicationPlacer(object):
                     yield chip
 
     def _space_on_chip(
-            self, chip: Chip, n_cores: int, plan_sdram: int) -> bool:
+            self, chip: Chip, n_cores: int, sdram: AbstractSDRAM) -> bool:
         """
         Checks if the Chip has enough space for this group, Cache if yes
 
@@ -469,13 +469,13 @@ class ApplicationPlacer(object):
 
         :param Chip chip:
         :param int n_cores: number of cores needed
-        :param int plan_sdram:
+        :param sdram:
         :rtype: bool
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
         """
         cores_free = list(chip.placable_processors_ids)
-        sdram_free = chip.sdram
+        sdram_used = ConstantSDRAM(0)
 
         # remove the already placed for other Application Vertices
         on_chip = self.__placements.placements_on_chip(chip)
@@ -485,10 +485,10 @@ class ApplicationPlacer(object):
 
         for placement in on_chip:
             cores_free.remove(placement.p)
-            sdram_free -= placement.vertex.sdram_required.get_total_sdram(
-                self.__plan_n_timesteps)
+            sdram_used += placement.vertex.sdram_required
 
-        if sdram_free < self.__min_sdram:
+        if sdram_used.get_total_sdram(
+                self.__plan_n_timesteps) > self.__cap_sdram:
             self.__full_chips.add(chip)
             return False
 
@@ -496,8 +496,10 @@ class ApplicationPlacer(object):
         # This assumes all groups are the same size so even if too small
         self.__prepared_chips.add(chip)
 
-        if len(cores_free) < n_cores or sdram_free < plan_sdram:
-            self._check_could_fit(n_cores, plan_sdram)
+        total_sdram = sdram_used + sdram
+        plan_sdram = total_sdram.get_total_sdram(self.__plan_n_timesteps)
+        if len(cores_free) < n_cores or plan_sdram > chip.sdram:
+            self._check_could_fit(n_cores, sdram)
             return False
 
         # record the current Chip
@@ -505,14 +507,14 @@ class ApplicationPlacer(object):
         # cores are popped out later to keep them here for now
         self.__current_cores_free = cores_free
         # sdram is the whole group so can be removed now
-        self.__current_sdram_free = sdram_free - plan_sdram
+        self.__current_sdram_used = total_sdram
 
         # adds the neighbours
         self._add_neighbours(chip)
 
         return True
 
-    def _check_could_fit(self, n_cores: int, plan_sdram: int):
+    def _check_could_fit(self, n_cores: int, sdram: AbstractSDRAM):
         """
         Checks that the cores/SDRAM would fit on a empty perfect Chip
 
@@ -521,6 +523,7 @@ class ApplicationPlacer(object):
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
         """
+        plan_sdram = sdram.get_total_sdram(self.__plan_n_timesteps)
         if plan_sdram <= self.__max_sdram and n_cores <= self.__max_cores:
             # should fit somewhere
             return
@@ -556,14 +559,14 @@ class ApplicationPlacer(object):
                 f"are reserved for monitors")
         raise PacmanTooBigToPlace(message)
 
-    def _get_next_start(self, n_cores: int, plan_sdram: int) -> Chip:
+    def _get_next_start(self, n_cores: int, sdram: AbstractSDRAM) -> Chip:
         """
         Gets the next start Chip
 
         Also sets up the current_chip and starts a new neighbourhood
 
         :param int n_cores: number of cores needs
-        :param int plan_sdram: minimum amount of SDRAM needed
+        :param sdram: minimum amount of SDRAM needed
 
         :rtype: Chip
         :raises PacmanPlaceException: If no new start Chip is available
@@ -582,7 +585,7 @@ class ApplicationPlacer(object):
             # Set the Ethernet x and y in case space_on_chip adds neighbours
             self.__ethernet_x = start.nearest_ethernet_x
             self.__ethernet_y = start.nearest_ethernet_y
-            if self._space_on_chip(start, n_cores, plan_sdram):
+            if self._space_on_chip(start, n_cores, sdram):
                 break
 
         logger.debug("Starting placement from {}", start)
@@ -614,7 +617,7 @@ class ApplicationPlacer(object):
                 f"and {len(self.__starts_tried)} tried"
                 f"{PacmanDataView.get_chips_boards_required_str()}")
 
-    def _get_next_neighbour(self, n_cores: int, plan_sdram: int):
+    def _get_next_neighbour(self, n_cores: int, sdram: AbstractSDRAM):
         """
         Gets the next neighbour Chip
 
@@ -623,7 +626,7 @@ class ApplicationPlacer(object):
         This will return None if there are no more neighbouring Chip big enough
 
         :param int n_cores: number of cores needs
-        :param int plan_sdram: minimum amount of SDRAM needed
+        :param sdram: minimum amount of SDRAM needed
         :rtype: Chip or None
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
@@ -634,11 +637,11 @@ class ApplicationPlacer(object):
             if chip is None:
                 # Sign to consider preparation with this start a failure
                 return None
-            if self._space_on_chip(chip, n_cores, plan_sdram):
+            if self._space_on_chip(chip, n_cores, sdram):
                 return chip
 
     def _get_next_chip_with_space(
-            self, n_cores: int, plan_sdram: int) -> Optional[Chip]:
+            self, n_cores: int, sdram: AbstractSDRAM) -> Optional[Chip]:
         """
         Gets the next Chip with space
 
@@ -646,20 +649,24 @@ class ApplicationPlacer(object):
         If no neighbouring more Chips available returns None
 
         :param int n_cores: number of cores needs
-        :param int plan_sdram: minimum amount of SDRAM needed
+        :param sdram: minimum amount of SDRAM needed
         :raises PacmanPlaceException: If no new start Chip is available
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
         """
         if self.__current_chip is None:
-            return self._get_next_start(n_cores, plan_sdram)
-        elif (len(self.__current_cores_free) >= n_cores and
-              self.__current_sdram_free >= plan_sdram):
+            return self._get_next_start(n_cores, sdram)
+
+        total_sdram = sdram + self.__current_sdram_used
+        plan_sdram = total_sdram.get_total_sdram(
+            self.__plan_n_timesteps)
+        if (len(self.__current_cores_free) >= n_cores and
+                plan_sdram <= self.__current_chip.sdram):
             # Cores are popped out later
-            self.__current_sdram_free -= plan_sdram
+            self.__current_sdram_used = total_sdram
             return self.__current_chip
         else:
-            return self._get_next_neighbour(n_cores, plan_sdram)
+            return self._get_next_neighbour(n_cores, sdram)
 
     def _add_neighbours(self, chip: Chip):
         """
