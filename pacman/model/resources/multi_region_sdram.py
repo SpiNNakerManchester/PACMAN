@@ -49,7 +49,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
     __slots__ = (
         # The regions of SDRAM, each of which is an AbstractSDRAM
         "__regions",
-        # The todal cost of all the regions
+        # The total cost of all the regions
         "__total")
 
     def __init__(self) -> None:
@@ -177,6 +177,6 @@ class MultiRegionSDRAM(AbstractSDRAM):
         return self.__total.per_timestep
 
     @property
-    @overrides(AbstractSDRAM._str)
-    def _str(self):
-        return f"Multi:{self.__total._str}"
+    @overrides(AbstractSDRAM.short_str)
+    def short_str(self):
+        return f"Multi:{self.__total.short_str}"

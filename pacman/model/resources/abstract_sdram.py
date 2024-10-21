@@ -83,7 +83,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def _str(self) -> str:
+    def short_str(self) -> str:
         """
         A short string representation of this SDRAM.
 
@@ -92,4 +92,4 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     def __str__(self):
-        return f"SDRAM:{self._str}"
+        return f"SDRAM:{self.short_str}"

@@ -108,7 +108,7 @@ class VariableSDRAM(AbstractSDRAM):
               f"for a total of {self.get_total_sdram(timesteps)}", file=target)
 
     @property
-    @overrides(AbstractSDRAM._str)
-    def _str(self):
+    @overrides(AbstractSDRAM.short_str)
+    def short_str(self):
         return (f"fixed:{self._fixed_sdram} "
                 f"per_timestep:{self._per_timestep_sdram}")

@@ -121,16 +121,16 @@ class SharedSDRAM(AbstractSDRAM):
             sdram.report(timesteps, indent+"    ", key+":", target)
 
     @property
-    @overrides(AbstractSDRAM._str)
-    def _str(self):
+    @overrides(AbstractSDRAM.short_str)
+    def short_str(self):
         if self._per_core.fixed > 0 or self._per_core.per_timestep > 0:
-            per_core = f"per-core: {self._per_core._str} "
+            per_core = f"per-core: {self._per_core.short_str} "
         else:
             per_core = ""
         shared: Optional[str] = None
         for key, sdram in self._shared.items():
             if shared is None:
-                shared = f"shared:{key}: {sdram._str}"
+                shared = f"shared:{key}: {sdram.short_str}"
             else:
-                shared = f" {key}: {sdram._str}"
+                shared = f" {key}: {sdram.short_str}"
         return per_core + shared

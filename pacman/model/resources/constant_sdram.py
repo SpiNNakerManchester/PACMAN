@@ -68,6 +68,6 @@ class ConstantSDRAM(AbstractSDRAM):
         print(indent, preamble, f"Constant {self._sdram} bytes", file=target)
 
     @property
-    @overrides(AbstractSDRAM._str)
-    def _str(self):
+    @overrides(AbstractSDRAM.short_str)
+    def short_str(self):
         return f"fixed: {self._sdram}"
