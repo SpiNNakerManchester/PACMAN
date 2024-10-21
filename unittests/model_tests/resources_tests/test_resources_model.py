@@ -220,6 +220,12 @@ class TestResourceModels(unittest.TestCase):
         with self.assertRaises(PacmanConfigurationException):
             sh1 + sh3
 
+        sh4 = SharedSDRAM({"bar": var3})
+        multi4 = MultiRegionSDRAM()
+        multi4.nest(1, sh1)
+        multi4.nest(2, sh4)
+        self.assertEqual(multi4.get_total_sdram(10), 20 + 10 + 30 + 2 * 10)
+
 
 if __name__ == '__main__':
     unittest.main()
