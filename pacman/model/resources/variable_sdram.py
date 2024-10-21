@@ -87,7 +87,7 @@ class VariableSDRAM(AbstractSDRAM):
         else:
             return False
 
-    def __add__(self, other: AbstractSDRAM) -> 'VariableSDRAM':
+    def __add__(self, other: AbstractSDRAM) -> AbstractSDRAM:
         if isinstance(other, ConstantSDRAM):
             return VariableSDRAM(
                 self._fixed_sdram + other.fixed,  self._per_timestep_sdram)

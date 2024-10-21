@@ -54,7 +54,7 @@ class ConstantSDRAM(AbstractSDRAM):
             return False
         return other.fixed == self.fixed
 
-    def __add__(self, other):
+    def __add__(self, other: AbstractSDRAM) -> AbstractSDRAM:
         if isinstance(other, ConstantSDRAM):
             return ConstantSDRAM(
                 self._sdram + other.fixed)

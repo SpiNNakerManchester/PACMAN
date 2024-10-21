@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import Any, Dict, Optional, Self, TextIO, Union
+from typing import Any, Dict, Optional, TextIO, Union
 
 import numpy
 
@@ -96,7 +96,7 @@ class SharedSDRAM(AbstractSDRAM):
         return self._shared == other._shared
 
     @overrides(AbstractSDRAM.__add__)
-    def __add__(self, other: AbstractSDRAM) -> Self:
+    def __add__(self, other: AbstractSDRAM) -> AbstractSDRAM:
         if isinstance(other, (ConstantSDRAM, VariableSDRAM)):
             return SharedSDRAM(self._shared, self._per_core + other)
         elif isinstance(other, SharedSDRAM):
