@@ -66,3 +66,8 @@ class ConstantSDRAM(AbstractSDRAM):
     def report(self, timesteps: Optional[int], indent: str = "",
                preamble: str = "", target: Optional[TextIO] = None):
         print(indent, preamble, f"Constant {self._sdram} bytes", file=target)
+
+    @property
+    @overrides(AbstractSDRAM._str)
+    def _str(self):
+        return f"fixed: {self._sdram}"

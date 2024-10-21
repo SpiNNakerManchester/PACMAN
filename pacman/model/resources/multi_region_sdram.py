@@ -176,3 +176,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
         """
         return self.__total.per_timestep
 
+    @property
+    @overrides(AbstractSDRAM._str)
+    def _str(self):
+        return f"Multi:{self.__total._str}"

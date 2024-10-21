@@ -80,3 +80,16 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
             ``None`` is standard print
         """
         raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def _str(self) -> str:
+        """
+        A short string representation of this SDRAM.
+
+        To be used within main str methods
+        """
+        raise NotImplementedError
+
+    def __str__(self):
+        return f"SDRAM:{self._str}"
