@@ -22,6 +22,7 @@ from pacman.exceptions import PacmanConfigurationException
 from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
 
+
 def _ceil(value: Union[int, float, numpy.integer, numpy.floating]) -> int:
     return math.ceil(value)
 

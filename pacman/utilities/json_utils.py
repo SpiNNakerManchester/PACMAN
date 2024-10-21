@@ -22,10 +22,10 @@ from typing import cast, Iterable, List, Union
 from spinn_utilities.typing.json import JsonArray, JsonObject
 
 from pacman.data import PacmanDataView
-from pacman.model.graphs.machine import MachineVertex, SimpleMachineVertex
+from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.resources import (
-    IPtagResource, ReverseIPtagResource, VariableSDRAM)
+    IPtagResource, ReverseIPtagResource)
 from pacman.model.routing_info import BaseKeyAndMask
 
 

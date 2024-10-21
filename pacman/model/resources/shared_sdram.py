@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from copy import deepcopy
 import math
 from typing import Any, Dict, Optional, Self, TextIO, Union
 
@@ -43,7 +42,7 @@ class SharedSDRAM(AbstractSDRAM):
         "_shared"
         )
 
-    def __init__(self, shared: Dict[str,AbstractSDRAM],
+    def __init__(self, shared: Dict[str, AbstractSDRAM],
                  per_core: Optional[AbstractSDRAM] = None) -> None:
         """
         Creates an SDRAM of both per_core and shared requirements.
@@ -64,7 +63,6 @@ class SharedSDRAM(AbstractSDRAM):
             self._per_core = ConstantSDRAM(0)
         else:
             self._per_core = per_core
-
 
     @overrides(AbstractSDRAM.get_total_sdram)
     def get_total_sdram(self, n_timesteps: Optional[int]) -> int:
