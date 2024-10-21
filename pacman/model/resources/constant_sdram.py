@@ -62,23 +62,6 @@ class ConstantSDRAM(AbstractSDRAM):
             # The other is more complex so delegate to it
             return other.__add__(self)
 
-    def __sub__(self, other):
-        if isinstance(other, ConstantSDRAM):
-            return ConstantSDRAM(
-                self._sdram - other.fixed)
-        else:
-            # The other is more complex so delegate to it
-            return other.sub_from(self)
-
-    @overrides(AbstractSDRAM.sub_from)
-    def sub_from(self, other: AbstractSDRAM) -> AbstractSDRAM:
-        if isinstance(other, ConstantSDRAM):
-            return ConstantSDRAM(
-                other.fixed - self._sdram)
-        else:
-            # The other is more complex so delegate to it
-            return other - self
-
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps: Optional[int], indent: str = "",
                preamble: str = "", target: Optional[TextIO] = None):

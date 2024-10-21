@@ -115,14 +115,6 @@ class SharedSDRAM(AbstractSDRAM):
             # MultiRegionSDRAM
             return other + self
 
-    @overrides(AbstractSDRAM.__sub__)
-    def __sub__(self, other: AbstractSDRAM) -> 'VariableSDRAM':
-        raise NotImplementedError
-
-    @overrides(AbstractSDRAM.sub_from)
-    def sub_from(self, other: AbstractSDRAM) -> 'VariableSDRAM':
-        raise NotImplementedError
-
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps: Optional[int], indent: str = "",
                preamble: str = "", target: Optional[TextIO] = None):

@@ -43,28 +43,6 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    @abstractmethod
-    def __sub__(self, other: AbstractSDRAM) -> AbstractSDRAM:
-        """
-        Creates a new SDRAM which is this one less the other.
-
-        :param AbstractSDRAM other: another SDRAM resource
-        :return: a New AbstractSDRAM
-        :rtype: AbstractSDRAM
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def sub_from(self, other: AbstractSDRAM) -> AbstractSDRAM:
-        """
-        Creates a new SDRAM which is the other less this one.
-
-        :param AbstractSDRAM other: another SDRAM resource
-        :return: a New AbstractSDRAM
-        :rtype: AbstractSDRAM
-        """
-        raise NotImplementedError
-
     @property
     @abstractmethod
     def fixed(self) -> int:

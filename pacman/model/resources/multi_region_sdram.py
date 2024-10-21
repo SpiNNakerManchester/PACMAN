@@ -159,25 +159,6 @@ class MultiRegionSDRAM(AbstractSDRAM):
         """
         return self.__total + other
 
-    def __sub__(self, other: AbstractSDRAM) -> AbstractSDRAM:
-        """
-        Creates a new SDRAM which is this one less the other.
-
-        :param other: another SDRAM resource
-        :return: a New AbstractSDRAM
-        """
-        return self.__total - other
-
-    def sub_from(self, other: AbstractSDRAM) -> AbstractSDRAM:
-        """
-        Creates a new SDRAM which is the other less this one.
-
-        :param AbstractSDRAM other: another SDRAM resource
-        :return: a New AbstractSDRAM
-        :rtype: AbstractSDRAM
-        """
-        return self.__total.sub_from(other)
-
     @property
     def fixed(self) -> int:
         """

@@ -98,17 +98,6 @@ class VariableSDRAM(AbstractSDRAM):
             #  SharedSDRAM, MultiRegionSDRAM
             return other + self
 
-    def __sub__(self, other: AbstractSDRAM) -> 'VariableSDRAM':
-        return VariableSDRAM(
-            self._fixed_sdram - other.fixed,
-            self._per_timestep_sdram - other.per_timestep)
-
-    @overrides(AbstractSDRAM.sub_from)
-    def sub_from(self, other: AbstractSDRAM) -> 'VariableSDRAM':
-        return VariableSDRAM(
-            other.fixed - self._fixed_sdram,
-            other.per_timestep - self._per_timestep_sdram)
-
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps: Optional[int], indent: str = "",
                preamble: str = "", target: Optional[TextIO] = None):
