@@ -50,11 +50,11 @@ class MultiRegionSDRAM(AbstractSDRAM):
         # The regions of SDRAM, each of which is an AbstractSDRAM
         "__regions",
         # The total cost of all the regions
-        "__total")
+        "_total")
 
     def __init__(self) -> None:
         self.__regions: Dict[_RegionKey, AbstractSDRAM] = {}
-        self.__total: AbstractSDRAM = ConstantSDRAM(0)
+        self._total: AbstractSDRAM = ConstantSDRAM(0)
 
     @property
     def regions(self):
@@ -97,7 +97,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
         :param AbstractSDRAM other:
             Another SDRAM model to make combine by nesting
         """
-        self.__total += other
+        self._total += other
         if region in self.__regions:
             if isinstance(other, MultiRegionSDRAM):
                 r = self.__regions[region]
@@ -121,7 +121,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
 
         :param MultiRegionSDRAM other: Another mapping of costs by region
         """
-        self.__total += other
+        self._total += other
         for region in other.regions:
             if region in self.regions:
                 self.__regions[region] += other.regions[region]
@@ -131,7 +131,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps: Optional[int], indent: str = "",
                preamble: str = "", target: Optional[TextIO] = None):
-        self.__total.report(timesteps, indent, preamble, target)
+        self._total.report(timesteps, indent, preamble, target)
         for region in self.__regions:
             self.__regions[region].report(
                 timesteps, indent+"    ", str(region)+":", target)
@@ -143,12 +143,12 @@ class MultiRegionSDRAM(AbstractSDRAM):
         :param int n_timesteps: number of timesteps to cost for
         :return:
         """
-        return self.__total.get_total_sdram(n_timesteps)
+        return self._total.get_total_sdram(n_timesteps)
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, MultiRegionSDRAM):
-            return self.__total == other._MultiRegionSDRAM__total
-        return self.__total == other
+            return self._total == other._total
+        return self._total == other
 
     def __add__(self, other: AbstractSDRAM) -> AbstractSDRAM:
         """
@@ -157,14 +157,14 @@ class MultiRegionSDRAM(AbstractSDRAM):
         :param other: another SDRAM resource
         :return: a New AbstractSDRAM
         """
-        return self.__total + other
+        return self._total + other
 
     @property
     def fixed(self) -> int:
         """
         The fixed SDRAM cost.
         """
-        return self.__total.fixed
+        return self._total.fixed
 
     @property
     def per_timestep(self) -> float:
@@ -174,9 +174,9 @@ class MultiRegionSDRAM(AbstractSDRAM):
         .. warning::
             May well be zero.
         """
-        return self.__total.per_timestep
+        return self._total.per_timestep
 
     @property
     @overrides(AbstractSDRAM.short_str)
     def short_str(self) -> str:
-        return f"Multi:{self.__total.short_str}"
+        return f"Multi:{self._total.short_str}"
