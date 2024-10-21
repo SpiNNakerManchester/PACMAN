@@ -60,7 +60,7 @@ class SharedSDRAM(AbstractSDRAM):
         # create a shallow copy
         self._shared = shared.copy()
         if per_core is None:
-            self._per_core = ConstantSDRAM(0)
+            self._per_core: AbstractSDRAM = ConstantSDRAM(0)
         else:
             self._per_core = per_core
 
@@ -122,14 +122,14 @@ class SharedSDRAM(AbstractSDRAM):
 
     @property
     @overrides(AbstractSDRAM.short_str)
-    def short_str(self):
+    def short_str(self) -> str:
         if self._per_core.fixed > 0 or self._per_core.per_timestep > 0:
             per_core = f"per-core: {self._per_core.short_str} "
         else:
             per_core = ""
-        shared: Optional[str] = None
+        shared = ""
         for key, sdram in self._shared.items():
-            if shared is None:
+            if shared == "":
                 shared = f"shared:{key}: {sdram.short_str}"
             else:
                 shared = f" {key}: {sdram.short_str}"

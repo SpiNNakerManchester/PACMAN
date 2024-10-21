@@ -178,5 +178,5 @@ class MultiRegionSDRAM(AbstractSDRAM):
 
     @property
     @overrides(AbstractSDRAM.short_str)
-    def short_str(self):
+    def short_str(self) -> str:
         return f"Multi:{self.__total.short_str}"

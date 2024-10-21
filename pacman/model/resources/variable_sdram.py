@@ -109,6 +109,6 @@ class VariableSDRAM(AbstractSDRAM):
 
     @property
     @overrides(AbstractSDRAM.short_str)
-    def short_str(self):
+    def short_str(self) -> str:
         return (f"fixed:{self._fixed_sdram} "
                 f"per_timestep:{self._per_timestep_sdram}")
