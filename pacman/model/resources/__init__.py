@@ -17,8 +17,9 @@ from .constant_sdram import ConstantSDRAM
 from .iptag_resource import IPtagResource
 from .multi_region_sdram import MultiRegionSDRAM
 from .reverse_iptag_resource import ReverseIPtagResource
+from .shared_sdram import SharedSDRAM
 from .variable_sdram import VariableSDRAM
 
 __all__ = ["AbstractSDRAM", "ConstantSDRAM",
            "IPtagResource", "MultiRegionSDRAM",
-           "ReverseIPtagResource", "VariableSDRAM"]
+           "ReverseIPtagResource", "SharedSDRAM", "VariableSDRAM"]

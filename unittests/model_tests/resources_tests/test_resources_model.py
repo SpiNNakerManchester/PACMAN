@@ -22,7 +22,7 @@ from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import (
     ConstantSDRAM, IPtagResource, MultiRegionSDRAM, ReverseIPtagResource,
-    VariableSDRAM)
+    SharedSDRAM, VariableSDRAM)
 
 
 class MockEnum(Enum):
@@ -170,6 +170,22 @@ class TestResourceModels(unittest.TestCase):
         var4 = VariableSDRAM(28, 4)
         with self.assertRaises(PacmanConfigurationException):
             var4.get_total_sdram(None)
+
+    def test_shared(self):
+        var1 = VariableSDRAM(20, 1)
+        sh1 = SharedSDRAM({"foo": var1})
+        self.assertEqual(sh1.get_total_sdram(5), 25)
+        combo1 = sh1 + sh1
+        self.assertEqual(combo1.get_total_sdram(5), 25)
+        self.assertEqual(combo1, sh1)
+        combo2 = var1 + var1
+        self.assertEqual(combo2.get_total_sdram(5), 50)
+        con1 = ConstantSDRAM(12)
+        combo3 = sh1 + con1
+        self.assertEqual(combo3.get_total_sdram(5), 37)
+        combo4 = con1 + sh1
+        self.assertEqual(combo4.get_total_sdram(5), 37)
+        self.assertEqual(combo3, combo4)
 
 
 if __name__ == '__main__':
