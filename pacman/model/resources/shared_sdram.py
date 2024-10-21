@@ -118,7 +118,6 @@ class SharedSDRAM(AbstractSDRAM):
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps: Optional[int], indent: str = "",
                preamble: str = "", target: Optional[TextIO] = None):
-        print(indent, preamble,
-              f"Fixed {self._fixed_sdram} bytes "
-              f"Per_timestep {self._per_timestep_sdram} bytes "
-              f"for a total of {self.get_total_sdram(timesteps)}", file=target)
+        self._per_core.report(timesteps, indent, preamble, target)
+        for key, sdram in self._shared.items():
+            sdram.report(timesteps, indent+"    ", key+":", target)
