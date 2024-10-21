@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, TextIO
+from typing import Any, Optional, TextIO
 from spinn_utilities.overrides import overrides
 from .abstract_sdram import AbstractSDRAM
 
@@ -49,7 +49,12 @@ class ConstantSDRAM(AbstractSDRAM):
     def per_timestep(self) -> float:
         return 0
 
-    def __add__(self, other):
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, ConstantSDRAM):
+            return False
+        return other.fixed == self.fixed
+
+    def __add__(self, other: AbstractSDRAM) -> AbstractSDRAM:
         if isinstance(other, ConstantSDRAM):
             return ConstantSDRAM(
                 self._sdram + other.fixed)
@@ -57,24 +62,12 @@ class ConstantSDRAM(AbstractSDRAM):
             # The other is more complex so delegate to it
             return other.__add__(self)
 
-    def __sub__(self, other):
-        if isinstance(other, ConstantSDRAM):
-            return ConstantSDRAM(
-                self._sdram - other.fixed)
-        else:
-            # The other is more complex so delegate to it
-            return other.sub_from(self)
-
-    @overrides(AbstractSDRAM.sub_from)
-    def sub_from(self, other: AbstractSDRAM) -> AbstractSDRAM:
-        if isinstance(other, ConstantSDRAM):
-            return ConstantSDRAM(
-                other.fixed - self._sdram)
-        else:
-            # The other is more complex so delegate to it
-            return other - self
-
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps: Optional[int], indent: str = "",
                preamble: str = "", target: Optional[TextIO] = None):
         print(indent, preamble, f"Constant {self._sdram} bytes", file=target)
+
+    @property
+    @overrides(AbstractSDRAM.short_str)
+    def short_str(self) -> str:
+        return f"fixed: {self._sdram}"

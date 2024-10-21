@@ -13,13 +13,14 @@
 # limitations under the License.
 
 import math
-from typing import Optional, TextIO, Union
+from typing import Any, Optional, TextIO, Union
 
 import numpy
 
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from .abstract_sdram import AbstractSDRAM
+from .constant_sdram import ConstantSDRAM
 
 
 def _ceil(value: Union[int, float, numpy.integer, numpy.floating]) -> int:
@@ -72,21 +73,31 @@ class VariableSDRAM(AbstractSDRAM):
     def per_timestep(self) -> float:
         return self._per_timestep_sdram
 
-    def __add__(self, other: AbstractSDRAM) -> 'VariableSDRAM':
-        return VariableSDRAM(
-            self._fixed_sdram + other.fixed,
-            self._per_timestep_sdram + other.per_timestep)
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, VariableSDRAM):
+            if other.fixed != self.fixed:
+                return False
+            else:
+                return other.per_timestep == self.per_timestep
+        elif isinstance(other, ConstantSDRAM):
+            if self._per_timestep_sdram != 0:
+                return False
+            else:
+                return other.fixed == self.fixed
+        else:
+            return False
 
-    def __sub__(self, other: AbstractSDRAM) -> 'VariableSDRAM':
-        return VariableSDRAM(
-            self._fixed_sdram - other.fixed,
-            self._per_timestep_sdram - other.per_timestep)
-
-    @overrides(AbstractSDRAM.sub_from)
-    def sub_from(self, other: AbstractSDRAM) -> 'VariableSDRAM':
-        return VariableSDRAM(
-            other.fixed - self._fixed_sdram,
-            other.per_timestep - self._per_timestep_sdram)
+    def __add__(self, other: AbstractSDRAM) -> AbstractSDRAM:
+        if isinstance(other, ConstantSDRAM):
+            return VariableSDRAM(
+                self._fixed_sdram + other.fixed,  self._per_timestep_sdram)
+        elif isinstance(other, VariableSDRAM):
+            return VariableSDRAM(
+                self._fixed_sdram + other.fixed,
+                self._per_timestep_sdram + other.per_timestep)
+        else:
+            #  SharedSDRAM, MultiRegionSDRAM
+            return other + self
 
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps: Optional[int], indent: str = "",
@@ -95,3 +106,9 @@ class VariableSDRAM(AbstractSDRAM):
               f"Fixed {self._fixed_sdram} bytes "
               f"Per_timestep {self._per_timestep_sdram} bytes "
               f"for a total of {self.get_total_sdram(timesteps)}", file=target)
+
+    @property
+    @overrides(AbstractSDRAM.short_str)
+    def short_str(self) -> str:
+        return (f"fixed:{self._fixed_sdram} "
+                f"per_timestep:{self._per_timestep_sdram}")

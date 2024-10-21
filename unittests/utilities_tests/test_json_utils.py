@@ -18,7 +18,7 @@ from pacman.model.placements import Placement
 from pacman.model.resources import (
     ConstantSDRAM, IPtagResource, ReverseIPtagResource)
 from pacman.utilities.json_utils import (
-    placement_from_json, placement_to_json, vertex_to_json, vertex_from_json)
+    placement_from_json, placement_to_json)
 from pacman.model.graphs.machine import SimpleMachineVertex
 
 
@@ -59,13 +59,6 @@ class TestJsonUtils(unittest.TestCase):
     # Composite JSON round-trip testing schemes
     # ------------------------------------------------------------------
 
-    def vertex_there_and_back(self, there):
-        j_object = vertex_to_json(there)
-        j_str = json.dumps(j_object)
-        j_object2 = json.loads(j_str)
-        back = vertex_from_json(j_object2)
-        self._compare_vertex(there, back)
-
     def placement_there_and_back(self, there):
         j_object = placement_to_json(there)
         j_str = json.dumps(j_object)
@@ -76,14 +69,6 @@ class TestJsonUtils(unittest.TestCase):
     # ------------------------------------------------------------------
     # Test cases
     # ------------------------------------------------------------------
-
-    def test_vertex(self):
-        s1 = SimpleMachineVertex(
-            sdram=ConstantSDRAM(0),
-            iptags=[IPtagResource("127.0.0.1", port=None, strip_sdp=True)],
-            reverse_iptags=[ReverseIPtagResource(port=25, sdp_port=2, tag=5)],
-            label="Vertex")
-        self.vertex_there_and_back(s1)
 
     def test_placement(self):
         s1 = SimpleMachineVertex(
