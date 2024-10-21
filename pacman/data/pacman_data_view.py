@@ -562,7 +562,7 @@ class PacmanDataView(MachineDataView):
         """
         # Note the sdram can not be calculated in advance as some Vertices
         # require the hardware time step not available until simulator run
-        sdram = ConstantSDRAM(0)
+        sdram: AbstractSDRAM = ConstantSDRAM(0)
         for vertex in cls.__pacman_data._all_monitor_vertices:
             sdram += vertex.sdram_required
         return sdram
@@ -580,7 +580,7 @@ class PacmanDataView(MachineDataView):
 
         :rtype: AbstractSDRAM
         """
-        sdram = ConstantSDRAM(0)
+        sdram: AbstractSDRAM = ConstantSDRAM(0)
         for vertex in cls.__pacman_data._ethernet_monitor_vertices:
             sdram += vertex.sdram_required
         return sdram
