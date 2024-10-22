@@ -22,7 +22,7 @@ from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import (
     ConstantSDRAM, IPtagResource, MultiRegionSDRAM, ReverseIPtagResource,
-    VariableSDRAM)
+    SharedSDRAM, VariableSDRAM)
 
 
 class MockEnum(Enum):
@@ -48,28 +48,18 @@ class TestResourceModels(unittest.TestCase):
         const2 = ConstantSDRAM(256)
         combo = const1 + const2
         self.assertEqual(combo.get_total_sdram(None), 128+256)
-        combo = const1 - const2
-        self.assertEqual(combo.get_total_sdram(None), 128-256)
         combo = const2 + const1
         self.assertEqual(combo.get_total_sdram(None), 256+128)
-        combo = const2 - const1
-        self.assertEqual(combo.get_total_sdram(None), 256-128)
 
         var1 = VariableSDRAM(124, 8)
         self.assertEqual(var1.get_total_sdram(100), 124 + 8 * 100)
         combo = var1 + const1
         self.assertEqual(combo.get_total_sdram(100), 124 + 8 * 100 + 128)
-        combo = var1 - const1
-        self.assertEqual(combo.get_total_sdram(100), 124 + 8 * 100 - 128)
         combo = const1 + var1
         self.assertEqual(combo.get_total_sdram(100), 128 + 124 + 8 * 100)
-        combo = const1 - var1
-        self.assertEqual(combo.get_total_sdram(100), 128 - (124 + 8 * 100))
         var2 = VariableSDRAM(234, 6)
         combo = var2 + var1
         self.assertEqual(combo.get_total_sdram(150), 234 + 124 + (6 + 8) * 150)
-        combo = var2 - var1
-        self.assertEqual(combo.get_total_sdram(150), 234 - 124 + (6 - 8) * 150)
 
         multi1 = MultiRegionSDRAM()
         multi1.add_cost(1, 100, 4)
@@ -154,22 +144,87 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(riptr, riptr2)
         self.assertEqual(hash(riptr), hash(riptr2))
 
-    def test_sub(self):
-        const1 = ConstantSDRAM(128)
-        const2 = ConstantSDRAM(28)
-        self.assertEqual(ConstantSDRAM(100), const1 - const2)
-        self.assertEqual(ConstantSDRAM(100), const2.sub_from(const1))
-        var1 = VariableSDRAM(100, 5)
-        self.assertEqual(VariableSDRAM(28, -5), const1 - var1)
-        self.assertEqual(VariableSDRAM(-28, 5), var1 - const1)
-        self.assertEqual(VariableSDRAM(-28, 5), const1.sub_from(var1))
-
     def test_total(self):
         var0 = VariableSDRAM(28, 0)
         self.assertEqual(28, var0.get_total_sdram(None))
         var4 = VariableSDRAM(28, 4)
         with self.assertRaises(PacmanConfigurationException):
             var4.get_total_sdram(None)
+
+    def test_shared(self):
+        var1 = VariableSDRAM(20, 1)
+        sh1 = SharedSDRAM({"foo": var1})
+        sh1.report(10)
+        str(sh1)
+        self.assertEqual(sh1.get_total_sdram(5), 25)
+        combo1 = sh1 + sh1
+        self.assertEqual(combo1.get_total_sdram(5), 25)
+        self.assertEqual(combo1, sh1)
+        combo2 = var1 + var1
+        self.assertEqual(combo2.get_total_sdram(5), 50)
+        con1 = ConstantSDRAM(12)
+        combo3 = sh1 + con1
+        self.assertEqual(combo3.get_total_sdram(5), 37)
+        combo4 = con1 + sh1
+        self.assertEqual(combo4.get_total_sdram(5), 37)
+        self.assertEqual(combo3, combo4)
+
+    def test_sdram_multi(self):
+        multi1 = MultiRegionSDRAM()
+        multi1.add_cost(1, 100, 4)
+        sh1 = SharedSDRAM({"foo": multi1})
+        self.assertEqual(sh1.get_total_sdram(10), 100 + 4 * 10)
+
+        multi2 = MultiRegionSDRAM()
+        var2 = VariableSDRAM(20, 1)
+        sh2 = SharedSDRAM({"bar": var2})
+        multi2.nest(2, sh2)
+        self.assertEqual(multi2.get_total_sdram(10), 20 + 10)
+
+        combo = sh1 + sh2
+        self.assertEqual(combo.get_total_sdram(10), 100 + 4 * 10 + 20 + 10)
+
+    def test_nested_shared(self):
+        # nested sdram do not make sense but do work
+        # all but the outer sdram acts like a non shared sdram
+        c1 = ConstantSDRAM(45)
+        sh1 = SharedSDRAM({"foo": c1})
+        sh2 = SharedSDRAM({"bar": sh1})
+        self.assertEqual(sh2.get_total_sdram(None), 45)
+
+    def test_reused_key(self):
+        var1 = VariableSDRAM(20, 1)
+        sh1 = SharedSDRAM({"foo": var1})
+        var2 = VariableSDRAM(20, 1)
+        sh2 = SharedSDRAM({"foo": var2})
+
+        v_sum = var1 + var2
+        self.assertEqual(v_sum.get_total_sdram(10), 2 * (20 + 10))
+
+        # same shared entered more than once is the same as entered once
+        combo = sh1 + sh2
+        self.assertEqual(combo.get_total_sdram(10), 20 + 10)
+
+        # Same share inside a multiple is NOT summed!
+        multi = MultiRegionSDRAM()
+        multi.nest(1, sh1)
+        multi.nest(2, sh1)
+        self.assertEqual(combo.get_total_sdram(10), 20 + 10)
+
+        var3 = VariableSDRAM(30, 2)
+        # reusing key with different values is HIGHLy discouraged
+        sh3 = SharedSDRAM({"foo": var3})
+
+        # But will go boom it the shared are combined.
+        # Remember this will happen is placed on same Chip
+        with self.assertRaises(PacmanConfigurationException):
+            sh1 + sh3
+
+        sh4 = SharedSDRAM({"bar": var3})
+        multi4 = MultiRegionSDRAM()
+        multi4.nest(1, sh1)
+        multi4.nest(2, sh4)
+        self.assertEqual(multi4.get_total_sdram(10), 20 + 10 + 30 + 2 * 10)
 
 
 if __name__ == '__main__':

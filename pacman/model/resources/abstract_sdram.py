@@ -43,28 +43,6 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    @abstractmethod
-    def __sub__(self, other: AbstractSDRAM) -> AbstractSDRAM:
-        """
-        Creates a new SDRAM which is this one less the other.
-
-        :param AbstractSDRAM other: another SDRAM resource
-        :return: a New AbstractSDRAM
-        :rtype: AbstractSDRAM
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def sub_from(self, other: AbstractSDRAM) -> AbstractSDRAM:
-        """
-        Creates a new SDRAM which is the other less this one.
-
-        :param AbstractSDRAM other: another SDRAM resource
-        :return: a New AbstractSDRAM
-        :rtype: AbstractSDRAM
-        """
-        raise NotImplementedError
-
     @property
     @abstractmethod
     def fixed(self) -> int:
@@ -84,12 +62,9 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
+    @abstractmethod
     def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, AbstractSDRAM):
-            return False
-        if other.fixed != self.fixed:
-            return False
-        return other.per_timestep == self.per_timestep
+        raise NotImplementedError
 
     @abstractmethod
     def report(self, timesteps: Optional[int], indent: str = "",
@@ -105,3 +80,16 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
             ``None`` is standard print
         """
         raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def short_str(self) -> str:
+        """
+        A short string representation of this SDRAM.
+
+        To be used within main str methods
+        """
+        raise NotImplementedError
+
+    def __str__(self):
+        return f"SDRAM:{self.short_str}"

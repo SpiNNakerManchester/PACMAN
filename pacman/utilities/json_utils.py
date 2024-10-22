@@ -22,10 +22,10 @@ from typing import cast, Iterable, List, Union
 from spinn_utilities.typing.json import JsonArray, JsonObject
 
 from pacman.data import PacmanDataView
-from pacman.model.graphs.machine import MachineVertex, SimpleMachineVertex
+from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.resources import (
-    IPtagResource, ReverseIPtagResource, VariableSDRAM)
+    IPtagResource, ReverseIPtagResource)
 from pacman.model.routing_info import BaseKeyAndMask
 
 
@@ -183,47 +183,6 @@ def reverse_iptags_from_json(
     for json_dict in json_list:
         iptags.append(reverse_iptag_from_json(json_dict))
     return iptags
-
-
-def vertex_to_json(vertex: MachineVertex) -> JsonObject:
-    """
-    Converts a Machine Vertex to json.
-
-    :param MachineVertex vertex:
-    :rtype: dict(str, object)
-    """
-    json_dict: JsonObject = dict()
-    try:
-        json_dict["class"] = vertex.__class__.__name__
-        json_dict["label"] = vertex.label
-        json_dict["fixed_sdram"] = int(vertex.sdram_required.fixed)
-        json_dict["per_timestep_sdram"] = int(
-            vertex.sdram_required.per_timestep)
-        json_dict["iptags"] = iptag_resources_to_json(vertex.iptags)
-        json_dict["reverse_iptags"] = reverse_iptags_to_json(
-            vertex.reverse_iptags)
-    except Exception as ex:  # pylint: disable=broad-except
-        json_dict["exception"] = str(ex)
-    return json_dict
-
-
-def vertex_from_json(json_dict: JsonObject) -> SimpleMachineVertex:
-    """
-    Creates a simple Vertex based on the json
-
-    :param dict(str, object) json_dict:
-    :rtype:  SimpleMachineVertex
-    """
-    sdram = VariableSDRAM(
-        cast(int, json_dict["fixed_sdram"]),
-        cast(float, json_dict["per_timestep_sdram"]))
-    iptags = iptag_resources_from_json(
-        cast(List[JsonObject], json_dict["iptags"]))
-    reverse_iptags = reverse_iptags_from_json(
-        cast(List[JsonObject], json_dict["reverse_iptags"]))
-    return SimpleMachineVertex(
-        sdram=sdram, label=json_dict["label"], iptags=iptags,
-        reverse_iptags=reverse_iptags)
 
 
 def placement_to_json(placement: Placement) -> JsonObject:
