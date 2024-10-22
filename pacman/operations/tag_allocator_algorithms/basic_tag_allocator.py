@@ -125,9 +125,11 @@ def __find_free_tag(
 def __create_tag(
         eth_chip: Chip, placement: Placement, iptag: IPtagResource,
         tag: int) -> IPTag:
+    tag_ip = iptag.ip_address
+    assert tag_ip is not None
     return IPTag(
         eth_chip.ip_address, placement.x, placement.y,
-        tag, iptag.ip_address, iptag.port,
+        tag, tag_ip, iptag.port,
         iptag.strip_sdp, iptag.traffic_identifier)
 
 
