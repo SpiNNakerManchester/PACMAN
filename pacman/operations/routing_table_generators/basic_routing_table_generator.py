@@ -48,7 +48,7 @@ def basic_routing_table_generator() -> MulticastRoutingTables:
 def __create_routing_table(
         x: int, y: int, partitions_in_table: Dict[
             Tuple[AbstractVertex, str], RoutingEntry],
-        routing_infos: RoutingInfo):
+        routing_infos: RoutingInfo) -> UnCompressedMulticastRoutingTable:
     """
     :param int x:
     :param int y:
@@ -57,7 +57,6 @@ def __create_routing_table(
         dict(((ApplicationVertex or MachineVertex), str),
         RoutingEntry)
     :param RoutingInfo routing_infos:
-    :rtype: MulticastRoutingTable
     """
     table = UnCompressedMulticastRoutingTable(x, y)
     sources_by_key_mask: Dict[BaseKeyAndMask,

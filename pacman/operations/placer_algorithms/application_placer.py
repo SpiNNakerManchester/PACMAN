@@ -14,7 +14,7 @@
 from __future__ import annotations
 import logging
 import os
-from typing import Dict, List, Optional, Tuple, Sequence, Set
+from typing import Dict, Iterator, List, Optional, Tuple, Sequence, Set
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
@@ -176,7 +176,7 @@ class ApplicationPlacer(object):
 
         return self.__placements
 
-    def _place_vertex(self, app_vertex: ApplicationVertex):
+    def _place_vertex(self, app_vertex: ApplicationVertex) -> None:
         """
         Place the next application vertex
 
@@ -367,7 +367,7 @@ class ApplicationPlacer(object):
             f" {exception}."
             f" Report written to {report_file}.")
 
-    def _place_fixed_vertex(self, app_vertex: ApplicationVertex):
+    def _place_fixed_vertex(self, app_vertex: ApplicationVertex) -> None:
         """
         Place all vertices for this Application Vertex
 
@@ -383,7 +383,7 @@ class ApplicationPlacer(object):
             vertices_to_place = self._filter_vertices(vertices)
             self._do_fixed_location(vertices_to_place)
 
-    def _do_fixed_location(self, vertices: list[MachineVertex]):
+    def _do_fixed_location(self, vertices: list[MachineVertex]) -> None:
         """
         Do fixed placing for one group.
 
@@ -435,11 +435,10 @@ class ApplicationPlacer(object):
                     raise PacmanConfigurationException(
                         f"No more cores available on {x}, {y}: {on_chip}")
 
-    def _chip_order(self):
+    def _chip_order(self) -> Iterator[Chip]:
         """
         Iterate the Chips in a guaranteed order
 
-        :rtype: iterable(Chip)
         """
         for x in range(self.__machine.width):
             for y in range(self.__machine.height):
@@ -514,12 +513,12 @@ class ApplicationPlacer(object):
 
         return True
 
-    def _check_could_fit(self, n_cores: int, sdram: AbstractSDRAM):
+    def _check_could_fit(self, n_cores: int, sdram: AbstractSDRAM) -> None:
         """
         Checks that the cores/SDRAM would fit on a empty perfect Chip
 
         :param int n_cores: number of cores needs
-        :param int plan_sdram: minimum amount of SDRAM needed
+        :param sdram: minimum amount of SDRAM needed
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
         """
@@ -617,7 +616,8 @@ class ApplicationPlacer(object):
                 f"and {len(self.__starts_tried)} tried"
                 f"{PacmanDataView.get_chips_boards_required_str()}")
 
-    def _get_next_neighbour(self, n_cores: int, sdram: AbstractSDRAM):
+    def _get_next_neighbour(
+            self, n_cores: int, sdram: AbstractSDRAM) -> Optional[Chip]:
         """
         Gets the next neighbour Chip
 
@@ -668,7 +668,7 @@ class ApplicationPlacer(object):
         else:
             return self._get_next_neighbour(n_cores, sdram)
 
-    def _add_neighbours(self, chip: Chip):
+    def _add_neighbours(self, chip: Chip) -> None:
         """
         Adds the neighbours for this Chip to be used as the next chips.
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import (
-    Dict, Iterable, List, Optional, Tuple, TypeVar, Generic)
+    Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar, Generic)
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data import PacmanDataView
@@ -109,6 +109,7 @@ def __create_routing_table(
         while __match(iterator, vertex, part_id, r_info, entry, routing_info,
                       app_r_info):
             (vertex, part_id), entry = iterator.pop()
+            assert isinstance(vertex, MachineVertex)
             r_info = routing_info.get_info_from(
                 vertex, part_id)
             if r_info is not None:
@@ -121,10 +122,13 @@ def __create_routing_table(
 
     return table
 
+ #"_IteratorWithNext"[RoutingEntry]
 
 def __match(
-        iterator, vertex, part_id, r_info, entry, routing_info,
-        app_r_info) -> bool:
+        iterator, vertex: MachineVertex,
+        part_id: str, r_info: MachineVertexRoutingInfo, entry:  RoutingEntry,
+        routing_info:  RoutingInfo,
+        app_r_info: AppVertexRoutingInfo) -> bool:
     if not iterator.has_next:
         return False
     if r_info.mask != app_r_info.machine_mask:
@@ -138,6 +142,7 @@ def __match(
         return False
     next_r_info = routing_info.get_info_from(
         next_vertex, next_part_id)
+    assert isinstance(next_r_info, MachineVertexRoutingInfo)
     if next_r_info.index != r_info.index + 1:
         return False
     app_src = vertex.app_vertex

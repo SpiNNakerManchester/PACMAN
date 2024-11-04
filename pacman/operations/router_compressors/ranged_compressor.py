@@ -157,7 +157,7 @@ class RangeCompressor(object):
         # return the key plus the mask flipping ones and zeros
         return (entry.key | ~entry.mask) & 0xFFFFFFFF
 
-    def _merge_range(self, first: int, last: int):
+    def _merge_range(self, first: int, last: int) -> None:
         while True:
             # With a range of 1 just use the existing
             if first == last:

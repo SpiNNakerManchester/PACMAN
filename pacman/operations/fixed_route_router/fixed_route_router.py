@@ -77,7 +77,7 @@ class _FixedRouteRouter(object):
                 self._route_board(ethernet_chip)
         return self._fixed_route_tables
 
-    def _route_board(self, ethernet_chip: Chip):
+    def _route_board(self, ethernet_chip: Chip) -> None:
         """
         Handles this board through the quick routing process, based on a
         predefined routing table.
@@ -126,7 +126,7 @@ class _FixedRouteRouter(object):
 
     def __add_fixed_route_entry(self, key: Tuple[int, int],
                                 link_ids: List[int],
-                                processor_ids: List[int]):
+                                processor_ids: List[int]) -> None:
         """
         :param tuple(int,int) key:
         :param list(int) link_ids:
