@@ -40,7 +40,7 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex, Generic[V]):
         super().remember_machine_vertex(machine_vertex)
 
     @overrides(ApplicationVertex.remember_machine_vertex)
-    def remember_machine_vertex(self, machine_vertex: V):
+    def remember_machine_vertex(self, machine_vertex: V) -> None:
         assert (machine_vertex == self._machine_vertex)
 
     @property

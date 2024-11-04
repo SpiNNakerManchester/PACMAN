@@ -51,7 +51,7 @@ class DestinationSegmentedSDRAMMachinePartition(
         return self._sdram_base_address
 
     @sdram_base_address.setter
-    def sdram_base_address(self, new_value: int):
+    def sdram_base_address(self, new_value: int) -> None:
         if len(self.edges) == 0:
             raise PartitionMissingEdgesException(
                 f"Partition {self} has no edges")
@@ -61,7 +61,7 @@ class DestinationSegmentedSDRAMMachinePartition(
             new_value += edge.sdram_size
 
     @overrides(AbstractSingleSourcePartition.add_edge)
-    def add_edge(self, edge: SDRAMMachineEdge):
+    def add_edge(self, edge: SDRAMMachineEdge) -> None:
         if self._sdram_base_address is not None:
             raise PacmanConfigurationException(
                 "Illegal attempt to add an edge after sdram_base_address set")
