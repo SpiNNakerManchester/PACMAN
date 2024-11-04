@@ -56,7 +56,8 @@ class MulticastRoutingTables(object):
         for routing_table in routing_tables:
             self.add_routing_table(routing_table)
 
-    def add_routing_table(self, routing_table: AbstractMulticastRoutingTable):
+    def add_routing_table(
+            self, routing_table: AbstractMulticastRoutingTable) -> None:
         """
         Add a routing table.
 

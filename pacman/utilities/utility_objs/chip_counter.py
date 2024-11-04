@@ -40,7 +40,7 @@ class ChipCounter(object):
         # The number of chips used, including the current one
         "__n_chips")
 
-    def __init__(self):
+    def __init__(self) -> None:
         version = PacmanDataView.get_machine_version()
         self.__n_cores_per_chip = (
                 version.max_cores_per_chip - version.n_scamp_cores -
@@ -53,7 +53,7 @@ class ChipCounter(object):
         self.__sdram_free = 0
         self.__n_chips = 0
 
-    def add_core(self, resources: AbstractSDRAM):
+    def add_core(self, resources: AbstractSDRAM) -> None:
         """
         Adds a core (or if needed a Chip) to the count
 
