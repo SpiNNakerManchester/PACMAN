@@ -37,7 +37,7 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon[AV], Generic[AV, MV]):
     __slots__ = ()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
-    def set_governed_app_vertex(self, app_vertex: AV):
+    def set_governed_app_vertex(self, app_vertex: AV) -> None:
         if not isinstance(app_vertex, AbstractOneAppOneMachineVertex):
             raise PacmanConfigurationException(
                 f"The vertex {app_vertex.label} cannot be supported by the "
@@ -46,7 +46,7 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon[AV], Generic[AV, MV]):
         super().set_governed_app_vertex(app_vertex)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, chip_counter: ChipCounter):
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         chip_counter.add_core(
             self.governed_app_vertex.machine_vertex.sdram_required)
 
