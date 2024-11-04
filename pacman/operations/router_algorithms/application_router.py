@@ -1024,7 +1024,7 @@ def _add_routing_entry(
         raise e
 
 
-def _print_path(first_route: RoutingTree)  -> None:
+def _print_path(first_route: RoutingTree) -> None:
     to_process: List[Tuple[str, _OptInt, RoutingTree]] = [
         ("", None, first_route)]
     last_is_leaf = False

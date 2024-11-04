@@ -112,7 +112,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         self.__pacman_data._uncompressed = router_tables
 
     def set_precompressed(
-            self, router_tables: MulticastRoutingTables)  -> None:
+            self, router_tables: MulticastRoutingTables) -> None:
         """
         Sets the precompressed `router_tables` value.
 

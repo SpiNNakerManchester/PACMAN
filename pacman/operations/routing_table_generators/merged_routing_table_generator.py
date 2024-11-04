@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import (
-    Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar, Generic)
+    Dict, Iterable, List, Optional, Tuple, TypeVar, Generic)
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data import PacmanDataView
@@ -76,6 +76,7 @@ class _IteratorWithNext(Generic[E]):
             self.__next = None
             self.__has_next = False
         return nxt
+
 
 def merged_routing_table_generator() -> MulticastRoutingTables:
     """
@@ -174,7 +175,7 @@ def __create_routing_table(
     return table
 
 def __match(
-        iterator:_IteratorWithNext[
+        iterator: _IteratorWithNext[
             Tuple[Tuple[AbstractVertex, str], RoutingEntry]],
         vertex: MachineVertex,
         part_id: str, r_info: MachineVertexRoutingInfo, entry:  RoutingEntry,
@@ -230,4 +231,5 @@ def __merged_keys_and_masks(
         yield MulticastRoutingEntry(r_info.key, r_info.mask, entry)
     else:
         yield from app_r_info.merge_machine_entries(entries)
+
 
