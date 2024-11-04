@@ -41,6 +41,9 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
 
     def __str__(self) -> str:
         try:
+            if self.__governed_app_vertex is None:
+                return (
+                    f"{type(self).__name__} without an app vertex")
             return (
                 f"{type(self).__name__} on {self.__governed_app_vertex.label}")
         except AttributeError:
