@@ -23,4 +23,4 @@ utils="../SpiNNUtils/spinn_utilities"
 machine="../SpiNNMachine/spinn_machine"
 man="../SpiNNMan/spinnman"
 
-mypy --python-version 3.8 $utils $machine $man pacman unittests
+mypy --python-version 3.8 --disallow-untyped-defs $utils $machine $man pacman
