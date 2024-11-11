@@ -92,7 +92,7 @@ class Tags(object):
                 " the given board")
 
         if existing_tag is None:
-            self._ip_tags[(board_address, ip_tag.tag)] = ip_tag
+            self._ip_tags[(ip_tag.board_address, ip_tag.tag)] = ip_tag
             self._ip_tags_by_vertex[vertex].append(ip_tag)
         else:
             self._ip_tags_by_vertex[vertex].append(existing_tag)
