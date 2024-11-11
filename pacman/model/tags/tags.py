@@ -74,9 +74,8 @@ class Tags(object):
             raise PacmanInvalidParameterException(
                 "ip_tag", str(ip_tag), "Only add IP tags with this method.")
         existing_tag = None
-        board_address = ip_tag.board_address
-        if (board_address, ip_tag.tag) in self._ip_tags:
-            existing_tag = self._ip_tags[board_address, ip_tag.tag]
+        if (ip_tag.board_address, ip_tag.tag) in self._ip_tags:
+            existing_tag = self._ip_tags[ip_tag.board_address, ip_tag.tag]
             if (existing_tag.ip_address != ip_tag.ip_address or
                     not utility_calls.is_equal_or_none(
                         existing_tag.port, ip_tag.port) or
