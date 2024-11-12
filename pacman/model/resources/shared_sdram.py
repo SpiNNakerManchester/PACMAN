@@ -127,9 +127,9 @@ class SharedSDRAM(AbstractSDRAM):
             per_core = f"per-core: {self._per_core.short_str}"
         else:
             per_core = ""
-        shared = None
+        shared = ""
         for key, sdram in self._shared.items():
-            if shared is None:
+            if shared == "":
                 shared = f" shared: {key}: {sdram.short_str}"
             else:
                 shared += f", {key}: {sdram.short_str}"
