@@ -232,4 +232,3 @@ def __merged_keys_and_masks(
         yield MulticastRoutingEntry(r_info.key, r_info.mask, entry)
     else:
         yield from app_r_info.merge_machine_entries(entries)
-
