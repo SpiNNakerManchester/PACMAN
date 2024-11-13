@@ -127,11 +127,9 @@ def __create_tag(
         tag: int) -> IPTag:
     ethernet_ip = eth_chip.ip_address
     assert ethernet_ip is not None
-    tag_ip = iptag.ip_address
-    assert tag_ip is not None
     return IPTag(
         ethernet_ip, placement.x, placement.y,
-        tag, tag_ip, iptag.port,
+        tag, iptag.ip_address, iptag.port,
         iptag.strip_sdp, iptag.traffic_identifier)
 
 
