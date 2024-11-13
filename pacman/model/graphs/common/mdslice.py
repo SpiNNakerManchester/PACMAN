@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Tuple, Union
+from typing import Any, Tuple, Union
 import numpy
 from numpy.typing import NDArray
 from spinn_utilities.overrides import overrides
@@ -119,7 +119,7 @@ class MDSlice(Slice):
             value += f"({a_slice.start}:{a_slice.stop})"
         return f"{self.lo_atom}{self._atoms_shape}{value}"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, MDSlice):
             return False
         if not super().__eq__(other):

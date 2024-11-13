@@ -68,7 +68,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
 
     @abstractmethod
     def report(self, timesteps: Optional[int], indent: str = "",
-               preamble: str = "", target: Optional[TextIO] = None):
+               preamble: str = "", target: Optional[TextIO] = None) -> None:
         """
         Writes a description of this SDRAM to the target.
 
@@ -91,5 +91,5 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"SDRAM:{self.short_str}"

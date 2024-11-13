@@ -16,6 +16,8 @@ from typing import Iterable, Optional
 
 from spinn_utilities.overrides import overrides
 
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import AbstractSDRAM
 from pacman.model.resources import IPtagResource
 from pacman.model.resources import ReverseIPtagResource
@@ -33,11 +35,12 @@ class SimpleMachineVertex(MachineVertex):
     """
     __slots__ = ("_iptags", "_reverse_iptags", "_sdram")
 
-    def __init__(self, sdram, label=None,
-                 app_vertex=None, vertex_slice=None,
-                 iptags: Optional[Iterable[IPtagResource]] = None,
-                 reverse_iptags: Optional[Iterable[ReverseIPtagResource]]
-                 = None):
+    def __init__(
+            self, sdram: Optional[AbstractSDRAM], label:Optional[str]=None,
+            app_vertex: Optional[ApplicationVertex] = None,
+            vertex_slice: Optional[Slice]=None,
+            iptags: Optional[Iterable[IPtagResource]] = None,
+            reverse_iptags: Optional[Iterable[ReverseIPtagResource]] = None):
         super().__init__(
             label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self._sdram = sdram
@@ -51,6 +54,7 @@ class SimpleMachineVertex(MachineVertex):
     @property
     @overrides(MachineVertex.sdram_required)
     def sdram_required(self) -> AbstractSDRAM:
+        assert self._sdram is not None
         return self._sdram
 
     @property
