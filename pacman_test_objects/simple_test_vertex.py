@@ -15,12 +15,17 @@
 """ test vertex used in many unit tests
 """
 from typing import Optional
+
+from typing_extensions import Self
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
     LegacyPartitionerAPI)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 
 
@@ -30,8 +35,10 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
     """
     _model_based_max_atoms_per_core = None
 
-    def __init__(self, n_atoms, label="testVertex", max_atoms_per_core=256,
-                 fixed_sdram_value=None, splitter=None):
+    def __init__(self, n_atoms: int, label: str = "testVertex",
+                 max_atoms_per_core: int = 256,
+                 fixed_sdram_value: Optional[int] = None,
+                 splitter: Optional[AbstractSplitterCommon[Self]] = None):
         super().__init__(
             label=label, max_atoms_per_core=max_atoms_per_core,
             splitter=splitter)
@@ -43,7 +50,7 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
     def get_sdram_used_by_atoms(self, vertex_slice: Slice) -> ConstantSDRAM:
         return ConstantSDRAM(self.get_sdram_usage_for_atoms(vertex_slice))
 
-    def get_sdram_usage_for_atoms(self, vertex_slice):
+    def get_sdram_usage_for_atoms(self, vertex_slice: Slice) -> int:
         """
         :param vertex_slice: the atoms being considered
         :return: the amount of sdram (in bytes this model will use)
