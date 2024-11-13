@@ -108,7 +108,7 @@ class SharedSDRAM(AbstractSDRAM):
                             f"Shared {key} has different values")
                 else:
                     shared[key] = value
-            return SharedSDRAM(shared, self._per_core)
+            return SharedSDRAM(shared, self._per_core + other._per_core)
         else:
             # MultiRegionSDRAM
             return other + self
@@ -124,13 +124,13 @@ class SharedSDRAM(AbstractSDRAM):
     @overrides(AbstractSDRAM.short_str)
     def short_str(self) -> str:
         if self._per_core.fixed > 0 or self._per_core.per_timestep > 0:
-            per_core = f"per-core: {self._per_core.short_str} "
+            per_core = f"per-core: {self._per_core.short_str}"
         else:
             per_core = ""
         shared = ""
         for key, sdram in self._shared.items():
             if shared == "":
-                shared = f"shared:{key}: {sdram.short_str}"
+                shared = f" shared: {key}: {sdram.short_str}"
             else:
-                shared = f" {key}: {sdram.short_str}"
+                shared += f", {key}: {sdram.short_str}"
         return per_core + shared
