@@ -125,11 +125,11 @@ def __find_free_tag(
 def __create_tag(
         eth_chip: Chip, placement: Placement, iptag: IPtagResource,
         tag: int) -> IPTag:
-    tag_ip = iptag.ip_address
-    assert tag_ip is not None
+    ethernet_ip = eth_chip.ip_address
+    assert ethernet_ip is not None
     return IPTag(
-        eth_chip.ip_address, placement.x, placement.y,
-        tag, tag_ip, iptag.port,
+        ethernet_ip, placement.x, placement.y,
+        tag, iptag.ip_address, iptag.port,
         iptag.strip_sdp, iptag.traffic_identifier)
 
 
@@ -137,8 +137,10 @@ def __create_reverse_tag(
         eth_chip: Chip, placement: Placement,
         reverse_iptag: ReverseIPtagResource, tag: int,
         port: int) -> ReverseIPTag:
+    ethernet_ip_address = eth_chip.ip_address
+    assert ethernet_ip_address is not None
     return ReverseIPTag(
-        eth_chip.ip_address, tag, port, placement.x, placement.y, placement.p,
+        ethernet_ip_address, tag, port, placement.x, placement.y, placement.p,
         reverse_iptag.sdp_port)
 
 
