@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 
 class IPtagResource(object):
@@ -108,7 +108,7 @@ class IPtagResource(object):
             f"strip_sdp={self._strip_sdp}, tag={self._tag}, "
             f"traffic_identifier={self._traffic_identifier})")
 
-    def __eq__(self, other: Any) ->bool:
+    def __eq__(self, other: Any) -> bool:
         """
         For unit tests *only* so __hash__ and __eq__ pairing not done!
         """

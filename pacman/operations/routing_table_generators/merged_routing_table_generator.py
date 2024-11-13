@@ -174,6 +174,7 @@ def __create_routing_table(
 
     return table
 
+
 def __match(
         iterator: _IteratorWithNext[
             Tuple[Tuple[AbstractVertex, str], RoutingEntry]],
@@ -231,5 +232,4 @@ def __merged_keys_and_masks(
         yield MulticastRoutingEntry(r_info.key, r_info.mask, entry)
     else:
         yield from app_r_info.merge_machine_entries(entries)
-
 

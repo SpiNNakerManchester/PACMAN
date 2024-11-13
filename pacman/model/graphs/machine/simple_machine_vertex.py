@@ -36,9 +36,9 @@ class SimpleMachineVertex(MachineVertex):
     __slots__ = ("_iptags", "_reverse_iptags", "_sdram")
 
     def __init__(
-            self, sdram: Optional[AbstractSDRAM], label:Optional[str]=None,
+            self, sdram: Optional[AbstractSDRAM], label: Optional[str] = None,
             app_vertex: Optional[ApplicationVertex] = None,
-            vertex_slice: Optional[Slice]=None,
+            vertex_slice: Optional[Slice] = None,
             iptags: Optional[Iterable[IPtagResource]] = None,
             reverse_iptags: Optional[Iterable[ReverseIPtagResource]] = None):
         super().__init__(
