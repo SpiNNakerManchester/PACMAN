@@ -133,13 +133,12 @@ class Tags(object):
                     "reverse_ip_tag", reverse_ip_tag,
                     "The port has already been assigned on the given board")
 
+        board_address = reverse_ip_tag.board_address
         self._reverse_ip_tags[
-            (reverse_ip_tag.board_address,
-             reverse_ip_tag.tag)] = reverse_ip_tag
+            (board_address, reverse_ip_tag.tag)] = reverse_ip_tag
         self._reverse_ip_tags_by_vertex[vertex].append(reverse_ip_tag)
         if reverse_ip_tag.port is not None:
-            self._ports_assigned.add(
-                (reverse_ip_tag.board_address, reverse_ip_tag.port))
+            self._ports_assigned.add((board_address, reverse_ip_tag.port))
 
     @property
     def ip_tags_vertices(self) -> Iterable[Tuple[IPTag, MachineVertex]]:
