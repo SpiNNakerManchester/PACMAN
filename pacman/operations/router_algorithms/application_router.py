@@ -206,6 +206,9 @@ def route_application_graph() -> MulticastRoutingTableByPartition:
             vertex_xy(m_vertex)
             for m_vertex in source.splitter.get_out_going_vertices(
                 partition.identifier)}
+        internal_parts = source.splitter.get_internal_multicast_partitions()
+        all_source_xys.update(
+            vertex_xy(int_part.pre_vertex) for int_part in internal_parts)
 
         # Keep track of the source edge chips
         source_edge_xys: Set[XY] = set()
@@ -545,7 +548,7 @@ def _make_source_to_source_routes(
     for xy in source_mappings:
         source_routes: Dict[XY, RoutingTree] = dict()
         _route_to_xys(
-            xy, all_source_xys, machine, source_routes,
+            xy, all_source_xys.union(self_xys), machine, source_routes,
             source_edge_xys.union(self_xys),
             "Sources to Source (self)")
         for vertex, processor, link in source_mappings[xy]:
