@@ -34,7 +34,7 @@ class RoutingInfo(object):
         self._info: Dict[AbstractVertex,
                          Dict[str, VertexRoutingInfo]] = defaultdict(dict)
 
-    def add_routing_info(self, info: VertexRoutingInfo):
+    def add_routing_info(self, info: VertexRoutingInfo) -> None:
         """
         Add a routing information item.
 
@@ -157,7 +157,7 @@ class RoutingInfo(object):
 
     def check_info_from(
             self, vertex: AbstractVertex,
-            allowed_partition_ids: Set[str]):
+            allowed_partition_ids: Set[str]) -> None:
         """
         Check that the partition ids for a vertex are in the allowed set.
 

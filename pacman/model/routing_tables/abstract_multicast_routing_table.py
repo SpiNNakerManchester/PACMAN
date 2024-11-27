@@ -67,7 +67,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
 
     @abstractmethod
     def add_multicast_routing_entry(
-            self, multicast_routing_entry: MulticastRoutingEntry):
+            self, multicast_routing_entry: MulticastRoutingEntry) -> None:
         """
         Adds a routing entry to this table.
 

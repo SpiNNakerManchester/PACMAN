@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Tuple, Union
+from typing import Any, Tuple, Union
 import numpy
 from numpy.typing import NDArray
 from pacman.exceptions import PacmanValueError, PacmanTypeError
@@ -170,10 +170,10 @@ class Slice(object):
         """
         return numpy.array(range(self._lo_atom, self._lo_atom + self._n_atoms))
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (f"({self.lo_atom}:{self.hi_atom})")
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Slice):
             return False
         if self._lo_atom != other.lo_atom:
@@ -185,7 +185,7 @@ class Slice(object):
             return False
         return self._n_atoms == other.n_atoms
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         # Slices will generally only be hashed in sets for the same Vertex
         return self._lo_atom
 

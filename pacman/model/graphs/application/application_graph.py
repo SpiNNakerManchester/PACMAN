@@ -47,7 +47,7 @@ class ApplicationGraph(object):
         self._unlabelled_vertex_count = 0
         self._vertex_by_label: Dict[str, ApplicationVertex] = dict()
 
-    def add_vertex(self, vertex: ApplicationVertex):
+    def add_vertex(self, vertex: ApplicationVertex) -> None:
         """
         Add a vertex to the graph.
 
@@ -131,7 +131,7 @@ class ApplicationGraph(object):
         partition.add_edge(edge)
         return partition
 
-    def _check_edge(self, edge: ApplicationEdge):
+    def _check_edge(self, edge: ApplicationEdge) -> None:
         """
         Add an edge to the graph.
 
@@ -172,7 +172,7 @@ class ApplicationGraph(object):
             for edge in partition.edges]
 
     def _add_outgoing_edge_partition(
-            self, edge_partition: ApplicationEdgePartition):
+            self, edge_partition: ApplicationEdgePartition) -> None:
         """
         Add an edge partition to the graph.
 

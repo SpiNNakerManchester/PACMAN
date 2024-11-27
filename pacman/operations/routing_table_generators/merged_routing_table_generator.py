@@ -25,6 +25,58 @@ from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 
+#: :meta private:
+E = TypeVar("E")
+
+
+class _IteratorWithNext(Generic[E]):
+    """
+    An iterator wrapper which allows peek
+    """
+
+    def __init__(self, iterable: Iterable[E]):
+        """
+        :param iterable: iterable  to be wrapped
+        """
+        self.__iterator = iter(iterable)
+        try:
+            self.__next: Optional[E] = next(self.__iterator)
+            self.__has_next = True
+        except StopIteration:
+            self.__next = None
+            self.__has_next = False
+
+    def peek(self) -> Optional[E]:
+        """
+        The Element if any that would be returned by a pop call
+        """
+        return self.__next
+
+    @property
+    def has_next(self) -> bool:
+        """
+        True if there is another element for Peek or Pop to return
+        """
+        return self.__has_next
+
+    def pop(self) -> E:
+        """
+        The next element available.
+
+        :raises:  StopIteration if there is not more element available
+        """
+        if not self.__has_next:
+            raise StopIteration
+        nxt = self.__next
+        assert nxt is not None
+        try:
+            self.__next = next(self.__iterator)
+            self.__has_next = True
+        except StopIteration:
+            self.__next = None
+            self.__has_next = False
+        return nxt
+
 
 def merged_routing_table_generator() -> MulticastRoutingTables:
     """
@@ -109,6 +161,7 @@ def __create_routing_table(
         while __match(iterator, vertex, part_id, r_info, entry, routing_info,
                       app_r_info):
             (vertex, part_id), entry = iterator.pop()
+            assert isinstance(vertex, MachineVertex)
             r_info = routing_info.get_info_from(
                 vertex, part_id)
             if r_info is not None:
@@ -123,13 +176,19 @@ def __create_routing_table(
 
 
 def __match(
-        iterator, vertex, part_id, r_info, entry, routing_info,
-        app_r_info) -> bool:
+        iterator: _IteratorWithNext[
+            Tuple[Tuple[AbstractVertex, str], RoutingEntry]],
+        vertex: MachineVertex,
+        part_id: str, r_info: MachineVertexRoutingInfo, entry:  RoutingEntry,
+        routing_info:  RoutingInfo,
+        app_r_info: AppVertexRoutingInfo) -> bool:
     if not iterator.has_next:
         return False
     if r_info.mask != app_r_info.machine_mask:
         return False
-    (next_vertex, next_part_id), next_entry = iterator.peek()
+    peeked = iterator.peek()
+    assert peeked is not None
+    (next_vertex, next_part_id), next_entry = peeked
     if isinstance(next_vertex, ApplicationVertex):
         return False
     if part_id != next_part_id:
@@ -138,9 +197,11 @@ def __match(
         return False
     next_r_info = routing_info.get_info_from(
         next_vertex, next_part_id)
+    assert isinstance(next_r_info, MachineVertexRoutingInfo)
     if next_r_info.index != r_info.index + 1:
         return False
     app_src = vertex.app_vertex
+    assert isinstance(next_vertex, MachineVertex)
     next_app_src = next_vertex.app_vertex
     return (next_app_src == app_src and
             entry.spinnaker_route == next_entry.spinnaker_route)
@@ -171,56 +232,3 @@ def __merged_keys_and_masks(
         yield MulticastRoutingEntry(r_info.key, r_info.mask, entry)
     else:
         yield from app_r_info.merge_machine_entries(entries)
-
-
-#: :meta private:
-E = TypeVar("E")
-
-
-class _IteratorWithNext(Generic[E]):
-    """
-    An iterator wrapper which allows peek
-    """
-
-    def __init__(self, iterable: Iterable[E]):
-        """
-        :param iterable: iterable  to be wrapped
-        """
-        self.__iterator = iter(iterable)
-        try:
-            self.__next: Optional[E] = next(self.__iterator)
-            self.__has_next = True
-        except StopIteration:
-            self.__next = None
-            self.__has_next = False
-
-    def peek(self) -> Optional[E]:
-        """
-        The Element if any that would be returned by a pop call
-        """
-        return self.__next
-
-    @property
-    def has_next(self) -> bool:
-        """
-        True if there is another element for Peek or Pop to return
-        """
-        return self.__has_next
-
-    def pop(self) -> E:
-        """
-        The next element available.
-
-        :raises:  StopIteration if there is not more element available
-        """
-        if not self.__has_next:
-            raise StopIteration
-        nxt = self.__next
-        assert nxt is not None
-        try:
-            self.__next = next(self.__iterator)
-            self.__has_next = True
-        except StopIteration:
-            self.__next = None
-            self.__has_next = False
-        return nxt

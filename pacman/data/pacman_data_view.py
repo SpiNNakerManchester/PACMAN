@@ -139,7 +139,7 @@ class PacmanDataView(MachineDataView):
     # graph methods
 
     @classmethod
-    def add_vertex(cls, vertex: ApplicationVertex):
+    def add_vertex(cls, vertex: ApplicationVertex) -> None:
         """
         Adds an Application vertex to the user graph.
 
@@ -164,7 +164,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def add_edge(
-            cls, edge: ApplicationEdge, outgoing_edge_partition_name: str):
+            cls, edge: ApplicationEdge,
+            outgoing_edge_partition_name: str) -> None:
         """
         Adds an Application edge to the user graph.
 
@@ -588,7 +589,7 @@ class PacmanDataView(MachineDataView):
     # n_boards/chips required
 
     @classmethod
-    def has_n_boards_required(cls):
+    def has_n_boards_required(cls) -> bool:
         """
         Reports if a user has sets the number of boards requested during setup.
 
@@ -599,7 +600,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._n_boards_required is not None
 
     @classmethod
-    def get_n_boards_required(cls):
+    def get_n_boards_required(cls) -> int:
         """
         Gets the number of boards requested by the user during setup if known.
 
@@ -614,7 +615,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._n_boards_required
 
     @classmethod
-    def get_n_chips_needed(cls):
+    def get_n_chips_needed(cls) -> int:
         """
         Gets the number of chips needed, if set.
 
@@ -637,7 +638,7 @@ class PacmanDataView(MachineDataView):
         raise cls._exception("n_chips_requiredr")
 
     @classmethod
-    def has_n_chips_needed(cls):
+    def has_n_chips_needed(cls) -> bool:
         """
         Detects if the number of chips needed has been set.
 
@@ -651,7 +652,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._n_chips_in_graph is not None
 
     @classmethod
-    def get_chips_boards_required_str(cls):
+    def get_chips_boards_required_str(cls) -> str:
         """
         Gets a String to say what was required
         :return:

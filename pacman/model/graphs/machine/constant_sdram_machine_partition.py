@@ -52,7 +52,7 @@ class ConstantSDRAMMachinePartition(
         self._sdram_base_address: Optional[int] = None
 
     @overrides(AbstractSingleSourcePartition.add_edge)
-    def add_edge(self, edge: E):
+    def add_edge(self, edge: E) -> None:
         if self._sdram_size is None:
             self._sdram_size = edge.sdram_size
         elif self._sdram_size != edge.sdram_size:
@@ -82,7 +82,7 @@ class ConstantSDRAMMachinePartition(
         return self._sdram_base_address
 
     @sdram_base_address.setter
-    def sdram_base_address(self, new_value: int):
+    def sdram_base_address(self, new_value: int) -> None:
         if len(self.edges) == 0:
             raise PartitionMissingEdgesException(self.__missing_edge_msg())
         self._sdram_base_address = new_value

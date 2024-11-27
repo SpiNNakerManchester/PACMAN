@@ -65,7 +65,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         MachineDataWriter._soft_reset(self)
         self.__pacman_data._soft_reset()
 
-    def set_placements(self, placements: Placements):
+    def set_placements(self, placements: Placements) -> None:
         """
         Set the placements.
 
@@ -76,7 +76,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             raise TypeError("placements should be a Placements")
         self.__pacman_data._placements = placements
 
-    def set_routing_infos(self, routing_infos: RoutingInfo):
+    def set_routing_infos(self, routing_infos: RoutingInfo) -> None:
         """
         Set the routing_infos.
 
@@ -87,7 +87,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             raise TypeError("routing_infos should be a RoutingInfo")
         self.__pacman_data._routing_infos = routing_infos
 
-    def set_tags(self, tags: Tags):
+    def set_tags(self, tags: Tags) -> None:
         """
         Set the tags.
 
@@ -98,7 +98,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             raise TypeError("tags should be a Tags")
         self.__pacman_data._tags = tags
 
-    def set_uncompressed(self, router_tables: MulticastRoutingTables):
+    def set_uncompressed(self, router_tables: MulticastRoutingTables) -> None:
         """
         Sets the uncompressed `router_tables` value.
 
@@ -111,7 +111,8 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
                 "router_tables should be a MulticastRoutingTables")
         self.__pacman_data._uncompressed = router_tables
 
-    def set_precompressed(self, router_tables: MulticastRoutingTables):
+    def set_precompressed(
+            self, router_tables: MulticastRoutingTables) -> None:
         """
         Sets the precompressed `router_tables` value.
 
@@ -124,7 +125,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
                 "router_tables should be a MulticastRoutingTables")
         self.__pacman_data._precompressed = router_tables
 
-    def set_plan_n_timesteps(self, plan_n_timesteps: Optional[int]):
+    def set_plan_n_timesteps(self, plan_n_timesteps: Optional[int]) -> None:
         """
         Sets the `plan_n_timestep`. Use `None` for run forever.
 
@@ -144,7 +145,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     def set_routing_table_by_partition(
             self, routing_table_by_partition:
-            MulticastRoutingTableByPartition):
+            MulticastRoutingTableByPartition) -> None:
         """
         Sets the `_routing_table_by_partition`.
 
@@ -161,7 +162,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
             routing_table_by_partition
 
     @classmethod
-    def add_vertex(cls, vertex: ApplicationVertex):
+    def add_vertex(cls, vertex: ApplicationVertex) -> None:
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
         if not cls.get_requires_mapping():
@@ -171,7 +172,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
     @classmethod
     def add_edge(cls, edge: ApplicationEdge,
-                 outgoing_edge_partition_name: str):
+                 outgoing_edge_partition_name: str) -> None:
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
         if not cls.get_requires_mapping():
@@ -180,7 +181,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
 
     def add_sample_monitor_vertex(
-            self, vertex: MachineVertex, all_chips: bool):
+            self, vertex: MachineVertex, all_chips: bool) -> None:
         """
         Accepts a simple of the monitor cores to be added.
 
@@ -203,7 +204,8 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         if all_chips:
             self.__pacman_data._all_monitor_vertices.append(vertex)
 
-    def set_n_required(self, n_boards_required, n_chips_required):
+    def set_n_required(self, n_boards_required: Optional[int],
+                       n_chips_required: Optional[int]) -> None:
         """
         Sets (if not `None`) the number of boards/chips requested by the user.
 
@@ -241,11 +243,9 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         self.__pacman_data._n_boards_required = n_boards_required
         self.__pacman_data._n_chips_required = n_chips_required
 
-    def set_n_chips_in_graph(self, n_chips_in_graph):
+    def set_n_chips_in_graph(self, n_chips_in_graph: int) -> None:
         """
         Sets the number of chips needed by the graph.
-
-        :param int n_chips_in_graph:
         """
         if not isinstance(n_chips_in_graph, int):
             raise TypeError("n_chips_in_graph must be an int (or None)")

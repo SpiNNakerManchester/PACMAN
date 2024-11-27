@@ -53,7 +53,7 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
                 "There were clones in your list of acceptable pre vertices")
 
     @overrides(AbstractEdgePartition.add_edge)
-    def add_edge(self, edge: E):
+    def add_edge(self, edge: E) -> None:
         # safety checks
         if edge.pre_vertex not in self._pre_vertices:
             raise PacmanValueError(

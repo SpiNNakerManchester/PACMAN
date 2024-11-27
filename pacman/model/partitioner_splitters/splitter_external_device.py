@@ -58,7 +58,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         self.__outgoing_slice: Optional[Slice] = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
-    def set_governed_app_vertex(self, app_vertex: _Allowed):
+    def set_governed_app_vertex(self, app_vertex: _Allowed) -> None:
         super().set_governed_app_vertex(app_vertex)
 
         self.__incoming_vertices = list()
@@ -122,7 +122,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                 f"Unknown vertex type to splitter: {app_vertex}")
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, chip_counter: ChipCounter):
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         app_vertex = self.governed_app_vertex
         for vertex in self.__incoming_vertices:
             # machine_graph.add_vertex(vertex)

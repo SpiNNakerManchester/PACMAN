@@ -87,10 +87,10 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         self._max_atoms_per_dimension_per_core: Optional[Tuple[int, ...]]
         self._set_max_atoms_per_dimension_per_core(max_atoms_per_core)
 
-    def __str__(self):
-        return self.label
+    def __str__(self) -> str:
+        return str(self.label)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.get_fixed_location():
             return (f"ApplicationVertex({self.label},"
                     f" at{self.get_fixed_location()})")
@@ -117,7 +117,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         return s
 
     @splitter.setter
-    def splitter(self, new_value: AbstractSplitterCommon[Self]):
+    def splitter(self, new_value: AbstractSplitterCommon[Self]) -> None:
         """
         Sets the splitter object. Does not allow repeated settings.
 
@@ -134,7 +134,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         self._splitter = new_value
         self._splitter.set_governed_app_vertex(self)
 
-    def remember_machine_vertex(self, machine_vertex: MV):
+    def remember_machine_vertex(self, machine_vertex: MV) -> None:
         """
         Adds the machine vertex to the iterable returned by machine_vertices
 
@@ -202,7 +202,8 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         """
         return self._machine_vertices
 
-    def __check_atoms_per_core(self):
+    def __check_atoms_per_core(self) -> None:
+        assert self._max_atoms_per_dimension_per_core is not None
         if (len(self._max_atoms_per_dimension_per_core) !=
                 len(self.atoms_shape)):
             raise ValueError(
@@ -248,7 +249,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         return self._max_atoms_per_dimension_per_core
 
     def _set_max_atoms_per_dimension_per_core(
-            self, new_value: Optional[Union[int, Tuple[int, ...]]]):
+            self, new_value: Optional[Union[int, Tuple[int, ...]]]) -> None:
         """
         Set the maximum number of atoms per dimension per core.
 
@@ -273,7 +274,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             self._max_atoms_per_dimension_per_core = max_atoms_tuple
 
     def set_max_atoms_per_dimension_per_core(
-            self, new_value: Optional[Union[int, Tuple[int, ...]]]):
+            self, new_value: Optional[Union[int, Tuple[int, ...]]]) -> None:
         """
         Set the maximum number of atoms per dimension per core.
 
@@ -336,8 +337,8 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         # pylint: disable=unused-argument
         return None
 
-    def add_incoming_edge(
-            self, edge: ApplicationEdge, partition: ApplicationEdgePartition):
+    def add_incoming_edge(self, edge: ApplicationEdge,
+                          partition: ApplicationEdgePartition) -> None:
         """
         Add an edge incoming to this vertex.  This is ignored by default,
         but could be used to track incoming edges, and/or report faults.
@@ -349,7 +350,8 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             ~pacman.model.graphs.application.ApplicationEdgePartition
         """
 
-    def get_key_ordered_indices(self, indices=None):
+    def get_key_ordered_indices(
+            self, indices: Optional[numpy.ndarray] = None) -> numpy.ndarray:
         """
         Get indices of the vertex in the order that atoms appear when the
         vertex is split into cores as determined by max_atoms_per_core.  When
@@ -373,7 +375,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         atoms_per_core = self.get_max_atoms_per_dimension_per_core()
         remainders = numpy.array(indices)
         cum_per_core = 1
-        cum_cores_per_dim = 1
+        cum_cores_per_dim = 1.0
         core_index = numpy.zeros(len(indices))
         atom_index = numpy.zeros(len(indices))
         for n in range(n_dims):
@@ -403,7 +405,8 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         return ((core_index * self.get_max_atoms_per_core()) +
                 atom_index).astype(numpy.uint32)
 
-    def get_raster_ordered_indices(self, indices):
+    def get_raster_ordered_indices(
+            self, indices: numpy.ndarray) -> numpy.ndarray:
         """
         Convert indices from key order to raster order.
 
@@ -441,7 +444,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
 
         return global_index.astype(numpy.uint32)
 
-    def has_fixed_location(self):
+    def has_fixed_location(self) -> bool:
         """
         Check if this vertex or any machine vertex has a fixed location.
 

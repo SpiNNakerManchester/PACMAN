@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
+from typing import Any, Optional
 
 
 class ChipAndCore(object):
@@ -72,12 +72,12 @@ class ChipAndCore(object):
         else:
             return f"X:{self._x},Y:{self._y},P:{self._p}"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, ChipAndCore):
             return False
         return (self._x, self._y, self._p) == (other.x, other.y, other.p)
 
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other: Any) -> bool:
         return not self.__eq__(other)
 
     def __hash__(self) -> int:

@@ -39,14 +39,17 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
     def __init__(self) -> None:
         self.__governed_app_vertex: Optional[V] = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         try:
+            if self.__governed_app_vertex is None:
+                return (
+                    f"{type(self).__name__} without an app vertex")
             return (
                 f"{type(self).__name__} on {self.__governed_app_vertex.label}")
         except AttributeError:
             return f"{type(self).__name__} has no governed_app_vertex"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
     @property
@@ -63,7 +66,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
                 "This splitter has no governing app vertex set")
         return self.__governed_app_vertex
 
-    def set_governed_app_vertex(self, app_vertex: V):
+    def set_governed_app_vertex(self, app_vertex: V) -> None:
         """
         Sets a application vertex to be governed by this splitter object.
         Once set it can't be reset.
@@ -83,7 +86,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         app_vertex.splitter = self
 
     @abstractmethod
-    def create_machine_vertices(self, chip_counter: ChipCounter):
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         """
         Method for specific splitter objects to override.
 

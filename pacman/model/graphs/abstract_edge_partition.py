@@ -52,7 +52,7 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
         self._allowed_edge_types = allowed_edge_types
         self._edges: OrderedSet[E] = OrderedSet()
 
-    def add_edge(self, edge: E):
+    def add_edge(self, edge: E) -> None:
         """
         Add an edge to the edge partition.
 
@@ -101,14 +101,14 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
         """
         return len(self._edges)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"{self.__class__.__name__}(identifier={self.identifier}"
                 f", n_edges={self.n_edges})")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()
 
-    def __contains__(self, edge):
+    def __contains__(self, edge: AbstractEdge) -> bool:
         """
         Check if the edge is contained within this partition.
 

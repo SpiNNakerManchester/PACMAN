@@ -48,7 +48,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon[ApplicationVertex]):
         self._sdram: Optional[AbstractSDRAM] = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
-    def set_governed_app_vertex(self, app_vertex: ApplicationVertex):
+    def set_governed_app_vertex(self, app_vertex: ApplicationVertex) -> None:
         if not isinstance(app_vertex, LegacyPartitionerAPI):
             raise PacmanConfigurationException(
                 f"{self} is not a LegacyPartitionerAPI")
@@ -63,7 +63,7 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon[ApplicationVertex]):
         self.governed_app_vertex.remember_machine_vertex(self._machine_vertex)
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, chip_counter: ChipCounter):
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         assert self._sdram is not None
         chip_counter.add_core(self._sdram)
 

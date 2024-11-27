@@ -36,6 +36,6 @@ class MulticastEdgePartition(
             pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=MachineEdge)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"MulticastEdgePartition(pre_vertex={self.pre_vertex},"
                 f" identifier={self.identifier})")

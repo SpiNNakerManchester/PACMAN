@@ -44,7 +44,7 @@ class AbstractSingleSourcePartition(
         self._pre_vertex = pre_vertex
 
     @overrides(AbstractEdgePartition.add_edge)
-    def add_edge(self, edge: E):
+    def add_edge(self, edge: E) -> None:
         super().add_edge(edge)
         if edge.pre_vertex != self._pre_vertex:
             raise PacmanConfigurationException(

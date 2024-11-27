@@ -39,7 +39,7 @@ class AbstractSDRAMPartition(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @sdram_base_address.setter
-    def sdram_base_address(self, new_value: int):
+    def sdram_base_address(self, new_value: int) -> None:
         raise NotImplementedError
 
     @abstractmethod

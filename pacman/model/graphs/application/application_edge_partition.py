@@ -41,6 +41,6 @@ class ApplicationEdgePartition(
             allowed_edge_types=ApplicationEdge)
 
     @overrides(AbstractSingleSourcePartition.add_edge)
-    def add_edge(self, edge: ApplicationEdge):
+    def add_edge(self, edge: ApplicationEdge) -> None:
         super().add_edge(edge)
         edge.post_vertex.add_incoming_edge(edge, self)

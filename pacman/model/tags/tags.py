@@ -57,7 +57,7 @@ class Tags(object):
         # Set of ports already assigned on a board
         self._ports_assigned: Set[Tuple[str, int]] = set()
 
-    def add_ip_tag(self, ip_tag: IPTag, vertex: MachineVertex):
+    def add_ip_tag(self, ip_tag: IPTag, vertex: MachineVertex) -> None:
         """
         Add an IP tag.
 
@@ -102,7 +102,7 @@ class Tags(object):
                 existing_tag.port = ip_tag.port
 
     def add_reverse_ip_tag(
-            self, reverse_ip_tag: ReverseIPTag, vertex: MachineVertex):
+            self, reverse_ip_tag: ReverseIPTag, vertex: MachineVertex) -> None:
         """
         Add a reverse IP tag.
 

@@ -18,9 +18,9 @@ class NonLegacyApplicationVertex(ApplicationVertex):
     """
     Test vertex
     """
-    def __init__(self, label="test"):
+    def __init__(self, label: str = "test"):
         super().__init__(label=label)
 
     @property
-    def n_atoms(self):
+    def n_atoms(self) -> int:
         return 256

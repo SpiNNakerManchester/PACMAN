@@ -109,18 +109,18 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return self._index if self._index is not None else 0
 
     @index.setter
-    def index(self, value: int):
+    def index(self, value: int) -> None:
         """
         The index into the collection of machine vertices for an
         application vertex.
         """
         self._index = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         _l = self.label
         return self.__repr__() if _l is None else _l
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.get_fixed_location():
             return (f"MachineVertex({self.label}, "
                     f"at{self.get_fixed_location()})")
