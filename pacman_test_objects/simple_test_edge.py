@@ -22,6 +22,6 @@ class SimpleTestEdge(ApplicationEdge):
     test class for creating edges
     """
 
-    def __init__(self,pre_vertex: ApplicationVertex,
+    def __init__(self, pre_vertex: ApplicationVertex,
                  post_vertex: ApplicationVertex, label: Optional[str] = None):
         super().__init__(pre_vertex, post_vertex, label=label)
