@@ -58,7 +58,7 @@ class SourceSegmentedSDRAMMachinePartition(
         return self._sdram_base_address
 
     @sdram_base_address.setter
-    def sdram_base_address(self, new_value: int):
+    def sdram_base_address(self, new_value: int) -> None:
         if len(self.pre_vertices) != len(self.edges):
             raise PartitionMissingEdgesException(
                 f"There are {len(self.pre_vertices)} pre vertices "
@@ -73,7 +73,7 @@ class SourceSegmentedSDRAMMachinePartition(
             new_value += edge.sdram_size
 
     @overrides(AbstractMultiplePartition.add_edge)
-    def add_edge(self, edge: SDRAMMachineEdge):
+    def add_edge(self, edge: SDRAMMachineEdge) -> None:
         # check
         if len(self._destinations):
             if edge.post_vertex not in self._destinations:

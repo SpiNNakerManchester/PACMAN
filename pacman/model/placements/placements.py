@@ -61,7 +61,7 @@ class Placements(object):
         """
         return len(self._machine_vertices)
 
-    def add_placements(self, placements: Iterable[Placement]):
+    def add_placements(self, placements: Iterable[Placement]) -> None:
         """
         Add some placements.
 
@@ -70,7 +70,7 @@ class Placements(object):
         for placement in placements:
             self.add_placement(placement)
 
-    def add_placement(self, placement: Placement):
+    def add_placement(self, placement: Placement) -> None:
         """
         Add a placement.
 

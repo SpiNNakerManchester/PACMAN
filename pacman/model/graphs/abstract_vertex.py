@@ -48,7 +48,7 @@ class AbstractVertex(object):
         """
         return self._label
 
-    def set_label(self, label: str):
+    def set_label(self, label: str) -> None:
         """
         Changes the label for a vertex *not yet added* to a graph.
 
@@ -90,7 +90,8 @@ class AbstractVertex(object):
         """
         return self._fixed_location
 
-    def set_fixed_location(self, x: int, y: int, p: Optional[int] = None):
+    def set_fixed_location(
+            self, x: int, y: int, p: Optional[int] = None) -> None:
         """
         Set the location where the vertex must be placed.
 

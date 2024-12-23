@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
+from typing import Any, Optional
 
 
 class IPtagResource(object):
@@ -102,23 +102,13 @@ class IPtagResource(object):
         """
         return self._tag
 
-    def get_value(self):
-        """
-        :return: The description of the IP tag.
-        :rtype: list(str, int, bool, int, str)
-        """
-        return [
-            self._ip_address, self._port, self._strip_sdp, self._tag,
-            self._traffic_identifier
-        ]
-
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"IPTagResource(ip_address={self._ip_address}, port={self._port}, "
             f"strip_sdp={self._strip_sdp}, tag={self._tag}, "
             f"traffic_identifier={self._traffic_identifier})")
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         """
         For unit tests *only* so __hash__ and __eq__ pairing not done!
         """
@@ -128,10 +118,10 @@ class IPtagResource(object):
                 self._tag == other._tag and
                 self._traffic_identifier == other._traffic_identifier)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((
             self._ip_address, self._port, self._strip_sdp, self._tag,
             self._traffic_identifier))
 
-    def __ne__(self, other):
+    def __ne__(self, other: Any) -> bool:
         return not self.__eq__(other)

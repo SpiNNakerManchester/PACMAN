@@ -48,7 +48,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
         self.__slices: Optional[List[Slice]] = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
-    def set_governed_app_vertex(self, app_vertex: V):
+    def set_governed_app_vertex(self, app_vertex: V) -> None:
         if not isinstance(app_vertex, LegacyPartitionerAPI):
             raise PacmanConfigurationException(
                 f"{self} is not a LegacyPartitionerAPI")
@@ -83,7 +83,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
         return self.__slices
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, chip_counter: ChipCounter):
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         app_vertex = self.governed_app_vertex
         # The mypy needs to know the vertex implements LegacyPartitionerAPI
         # We know is does because we checked when setting

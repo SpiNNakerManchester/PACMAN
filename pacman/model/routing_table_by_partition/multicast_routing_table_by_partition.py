@@ -42,7 +42,7 @@ class MulticastRoutingTableByPartition(object):
     def add_path_entry(
             self, entry: RoutingEntry,
             router_x: int, router_y: int,
-            source_vertex: AbstractVertex, partition_id: str):
+            source_vertex: AbstractVertex, partition_id: str) -> None:
         """
         Adds a multicast routing path entry.
 

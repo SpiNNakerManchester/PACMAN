@@ -113,7 +113,7 @@ def compare_route(
         o_route: MulticastRoutingEntry,
         compressed_dict: Dict[str, MulticastRoutingEntry],
         o_code: Optional[str] = None, start: int = 0,
-        f: Optional[TextIO] = None):
+        f: Optional[TextIO] = None) -> None:
     """
     :param ~spinn_machine.MulticastRoutingEntry o_route: the original route
     :param dict(str, ~spinn_machine.MulticastRoutingEntry) compressed_dict:
@@ -159,7 +159,7 @@ def compare_route(
 
 def compare_tables(
         original: AbstractMulticastRoutingTable,
-        compressed: AbstractMulticastRoutingTable):
+        compressed: AbstractMulticastRoutingTable) -> None:
     """
     Compares the two tables without generating any output.
 

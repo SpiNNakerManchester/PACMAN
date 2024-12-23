@@ -109,7 +109,8 @@ class RoutingTree(object):
         yield from self._children
 
     def append_child(
-            self, child: Tuple[int, Union[RoutingTree, MachineVertex]]):
+            self, child: Tuple[int, Union[RoutingTree, MachineVertex]]
+            ) -> None:
         """
         :param child:
         :type child: tuple(int, RoutingTree or MachineVertex)
@@ -117,7 +118,8 @@ class RoutingTree(object):
         self._children.append(child)
 
     def remove_child(
-            self, child: Tuple[int, Union[RoutingTree, MachineVertex]]):
+            self, child: Tuple[int, Union[RoutingTree, MachineVertex]]
+            ) -> None:
         """
         :param child:
         :type child: tuple(int, RoutingTree or MachineVertex)

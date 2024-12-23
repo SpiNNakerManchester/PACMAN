@@ -57,7 +57,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
         self._total: AbstractSDRAM = ConstantSDRAM(0)
 
     @property
-    def regions(self):
+    def regions(self) -> dict[_RegionKey, AbstractSDRAM]:
         """
         The map from region identifiers to the amount of SDRAM required.
 
@@ -66,16 +66,13 @@ class MultiRegionSDRAM(AbstractSDRAM):
         return self.__regions
 
     def add_cost(self, region: _RegionKey, fixed_sdram: _Value,
-                 per_timestep_sdram: _Value = 0):
+                 per_timestep_sdram: _Value = 0) -> None:
         """
         Adds the cost for the specified region.
 
         :param region: Key to identify the region
-        :type region: int or str or enum
         :param fixed_sdram: The fixed cost for this region.
-        :type fixed_sdram: int or numpy.integer
         :param per_timestep_sdram: The variable cost for this region is any
-        :type per_timestep_sdram: int or numpy.integer
         """
         if per_timestep_sdram:
             self.nest(region, VariableSDRAM(
@@ -83,7 +80,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
         else:
             self.nest(region, ConstantSDRAM(_ceil(fixed_sdram)))
 
-    def nest(self, region: _RegionKey, other: AbstractSDRAM):
+    def nest(self, region: _RegionKey, other: AbstractSDRAM) -> None:
         """
         Combines the other SDRAM cost, in a nested fashion.
 
@@ -111,7 +108,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
         else:
             self.__regions[region] = other
 
-    def merge(self, other: MultiRegionSDRAM):
+    def merge(self, other: MultiRegionSDRAM) -> None:
         """
         Combines the other SDRAM costs keeping the region mappings.
 
@@ -130,7 +127,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
 
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps: Optional[int], indent: str = "",
-               preamble: str = "", target: Optional[TextIO] = None):
+               preamble: str = "", target: Optional[TextIO] = None) -> None:
         self._total.report(timesteps, indent, preamble, target)
         for region in self.__regions:
             self.__regions[region].report(
