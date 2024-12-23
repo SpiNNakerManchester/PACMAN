@@ -24,7 +24,7 @@ from .abstract_compressor import AbstractCompressor
 
 def pair_compressor(
         ordered: bool = True, accept_overflow: bool = False,
-        verify: bool = False, c_sort=False):
+        verify: bool = False, c_sort: bool = False) -> MulticastRoutingTables:
     """
     :param bool accept_overflow:
         A flag which should only be used in testing to stop raising an
@@ -42,7 +42,7 @@ def pair_compressor(
     return compressed
 
 
-def verify_lengths(compressed: MulticastRoutingTables):
+def verify_lengths(compressed: MulticastRoutingTables) -> None:
     """
     :param MulticastRoutingTables compressed:
     :raises PacmanElementAllocationException:
@@ -203,7 +203,7 @@ class _PairCompressor(AbstractCompressor):
         return self._compare_routes(route_a_entry.spinnaker_route,
                                     route_b_entry.spinnaker_route)
 
-    def _compare_routes(self, route_a: int, route_b: int):
+    def _compare_routes(self, route_a: int, route_b: int) -> int:
         """
         Compares two routes for sorting based on the frequency of each route.
 
@@ -229,7 +229,8 @@ class _PairCompressor(AbstractCompressor):
                 return -1
         raise PacmanElementAllocationException("Sorting error")
 
-    def _three_way_partition_table(self, low: int, high: int):
+    def _three_way_partition_table(
+            self, low: int, high: int) -> Tuple[int, int]:
         """
         Partitions the entries between low and high into three parts
 
@@ -260,7 +261,7 @@ class _PairCompressor(AbstractCompressor):
                 check += 1
         return low, check
 
-    def _quicksort_table(self, low: int, high: int):
+    def _quicksort_table(self, low: int, high: int) -> None:
         """
         Sorts the entries in place based on frequency of their route
 
@@ -272,7 +273,7 @@ class _PairCompressor(AbstractCompressor):
             self._quicksort_table(low, left - 1)
             self._quicksort_table(right, high)
 
-    def _swap_routes(self, index_a: int, index_b: int):
+    def _swap_routes(self, index_a: int, index_b: int) -> None:
         """
         Helper function to swap *both* the routes and routes frequency tables
 
@@ -312,7 +313,7 @@ class _PairCompressor(AbstractCompressor):
                 check += 1
         return low, check
 
-    def _quicksort_routes(self, low: int, high: int):
+    def _quicksort_routes(self, low: int, high: int) -> None:
         """
         Sorts the routes in place based on frequency.
 
@@ -359,7 +360,7 @@ class _PairCompressor(AbstractCompressor):
                 spinnaker_route=self._all_entries[left].spinnaker_route))
         return True
 
-    def _compress_by_route(self, left: int, right: int):
+    def _compress_by_route(self, left: int, right: int) -> None:
         """
         Compresses the entries between left and right.
 
@@ -389,7 +390,7 @@ class _PairCompressor(AbstractCompressor):
             #    self._all_entries[left] = None
             self._write_index += 1
 
-    def _update_frequency(self, entry: MulticastRoutingEntry):
+    def _update_frequency(self, entry: MulticastRoutingEntry) -> None:
         """
         :param ~spinn_machine.MulticastRoutingEntry entry:
         """

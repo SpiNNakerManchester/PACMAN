@@ -1,4 +1,6 @@
-# Copyright (c) 2017 The University of Manchester
+#!/bin/bash
+
+# Copyright (c) 2024 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.resources import ConstantSDRAM
+# This bash assumes that other repositories are installed in paralled
 
+# requires the latest mypy
+# pip install --upgrade mypy
 
-def get_resourced_machine_vertex(lo_atom, hi_atom, label=None):
-    """
-    A test vertex with sdram set
-    """
-    sdram_requirement = 4000 + 50 * (hi_atom - lo_atom)
-    sdram = ConstantSDRAM(sdram_requirement)
-    return SimpleMachineVertex(
-        sdram, label=label, vertex_slice=Slice(lo_atom, hi_atom))
+utils="../SpiNNUtils/spinn_utilities"
+machine="../SpiNNMachine/spinn_machine"
+man="../SpiNNMan/spinnman"
+
+mypy --python-version 3.8 --disallow-untyped-defs $utils $machine $man pacman pacman_test_objects

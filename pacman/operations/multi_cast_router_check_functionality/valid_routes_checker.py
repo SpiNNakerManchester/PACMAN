@@ -58,7 +58,7 @@ class _Failure(NamedTuple):
     source_mask: int
 
 
-def validate_routes(routing_tables: MulticastRoutingTables):
+def validate_routes(routing_tables: MulticastRoutingTables) -> None:
     """
     Go through the app partitions and check that the routing entries
     within the routing tables support reach the correction destinations
@@ -130,7 +130,7 @@ def validate_routes(routing_tables: MulticastRoutingTables):
 def _search_route(
         source_placement: Placement, dest_placements: Iterable[PlacementTuple],
         key_and_mask: BaseKeyAndMask, routing_tables: MulticastRoutingTables,
-        n_atoms: int):
+        n_atoms: int) -> None:
     """
     Locate if the routing tables work for the source to desks as defined.
 
@@ -215,7 +215,7 @@ def _start_trace_via_routing_tables(
         source_placement: Placement, key_and_mask: BaseKeyAndMask,
         reached_placements: Set[PlacementTuple],
         routing_tables: MulticastRoutingTables, n_atoms: int,
-        failed_to_cover_all_keys_routers: List[_Failure]):
+        failed_to_cover_all_keys_routers: List[_Failure]) -> None:
     """
     Start the trace, by using the source placement's router and tracing
     from the route.
@@ -274,7 +274,7 @@ def _recursive_trace_to_destinations(
         chip_x: int, chip_y: int, key_and_mask: BaseKeyAndMask,
         visited_routers: Set[Chip], reached_placements: Set[PlacementTuple],
         routing_tables: MulticastRoutingTables, n_atoms: int,
-        failed_to_cover_all_keys_routers: List[_Failure]):
+        failed_to_cover_all_keys_routers: List[_Failure]) -> None:
     """
     Recursively search though routing tables until no more entries are
     registered with this key.
@@ -294,8 +294,6 @@ def _recursive_trace_to_destinations(
     :param set(PlacementTuple) reached_placements:
         the placements reached during the trace
     :param MulticastRoutingTables routing_tables:
-    :param bool is_continuous:
-        whether the keys and atoms mapping is continuous
     :param int n_atoms: the number of atoms going through this path
     :param list(_Failure) failed_to_cover_all_keys_routers:
         list of failed routers for all keys
@@ -346,7 +344,7 @@ def _recursive_trace_to_destinations(
         _is_dest(processor_values, current_router, reached_placements)
 
 
-def _check_visited_routers(chip: Chip, visited_routers: Set[Chip]):
+def _check_visited_routers(chip: Chip, visited_routers: Set[Chip]) -> None:
     """
     Check if the trace has visited this router already.
 
@@ -364,7 +362,7 @@ def _check_visited_routers(chip: Chip, visited_routers: Set[Chip]):
 
 def _is_dest(processor_ids: Iterable[int],
              current_router: AbstractMulticastRoutingTable,
-             reached_placements: Set[PlacementTuple]):
+             reached_placements: Set[PlacementTuple]) -> None:
     """
     Collect processors to be removed.
 

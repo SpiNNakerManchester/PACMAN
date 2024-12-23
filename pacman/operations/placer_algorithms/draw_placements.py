@@ -41,7 +41,7 @@ def _next_colour() -> Colour:
 
 def draw_placements(
         placements: Placements, system_placements: Placements,
-        filename: str = "placements_error.png"):
+        filename: str = "placements_error.png") -> None:
     """
     Draw the placements as a PNG in the specified file.
 

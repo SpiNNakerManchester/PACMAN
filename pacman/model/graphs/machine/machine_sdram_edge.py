@@ -59,7 +59,7 @@ class SDRAMMachineEdge(MachineEdge):
         return self._sdram_base_address
 
     @sdram_base_address.setter
-    def sdram_base_address(self, new_value: int):
+    def sdram_base_address(self, new_value: int) -> None:
         """
         Sets the start address without verification
 
@@ -67,10 +67,10 @@ class SDRAMMachineEdge(MachineEdge):
         """
         self._sdram_base_address = new_value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"SDRAMMachineEdge(pre_vertex={self.pre_vertex},"
                 f" post_vertex={self.post_vertex}, label={self.label},"
                 f" sdram_size={self.sdram_size})")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()

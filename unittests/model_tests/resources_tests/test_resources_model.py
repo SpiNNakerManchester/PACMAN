@@ -126,7 +126,6 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(iptr.strip_sdp, 3)
         self.assertEqual(iptr.tag, 4)
         self.assertEqual(iptr.traffic_identifier, 5)
-        self.assertEqual(iptr.get_value(), ['1.2.3.4', 2, 3, 4, 5])
         self.assertEqual(str(iptr),
                          "IPTagResource(ip_address=1.2.3.4, port=2, "
                          "strip_sdp=3, tag=4, traffic_identifier=5)")
@@ -136,7 +135,6 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(riptr.port, 1)
         self.assertEqual(riptr.sdp_port, 2)
         self.assertEqual(riptr.tag, 3)
-        self.assertEqual(riptr.get_value(), [1, 2, 3])
         self.assertEqual(str(riptr),
                          "ReverseIPTagResource(port=1, sdp_port=2, tag=3)")
         riptr2 = ReverseIPtagResource(1, 2, 3)

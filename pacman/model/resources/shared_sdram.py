@@ -115,7 +115,7 @@ class SharedSDRAM(AbstractSDRAM):
 
     @overrides(AbstractSDRAM.report)
     def report(self, timesteps: Optional[int], indent: str = "",
-               preamble: str = "", target: Optional[TextIO] = None):
+               preamble: str = "", target: Optional[TextIO] = None) -> None:
         self._per_core.report(timesteps, indent, preamble, target)
         for key, sdram in self._shared.items():
             sdram.report(timesteps, indent+"    ", key+":", target)

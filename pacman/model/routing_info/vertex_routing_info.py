@@ -69,7 +69,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         return key_array
 
     @property
-    def key_and_mask(self):
+    def key_and_mask(self) -> BaseKeyAndMask:
         """
         The only key and mask.
 

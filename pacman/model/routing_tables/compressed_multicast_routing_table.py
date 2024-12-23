@@ -60,7 +60,7 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
 
     @overrides(AbstractMulticastRoutingTable.add_multicast_routing_entry)
     def add_multicast_routing_entry(
-            self, multicast_routing_entry: MulticastRoutingEntry):
+            self, multicast_routing_entry: MulticastRoutingEntry) -> None:
         self._multicast_routing_entries.append(multicast_routing_entry)
 
         # update default routed counter if required
