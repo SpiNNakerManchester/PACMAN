@@ -14,7 +14,7 @@
 
 from collections import deque, defaultdict
 from typing import (
-    Deque, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union)
+    Deque, Dict, Iterable, Iterator, List, Optional, Set, Tuple)
 from typing_extensions import TypeAlias
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.typing.coords import XY
@@ -150,8 +150,8 @@ class _Targets(object):
         for vtx in vertex.splitter.get_out_going_vertices(partition_id):
             self.__add_source(vtx, core, link)
 
-    def __add_source(
-            self, source: AbstractVertex, core: _OptInt, link: _OptInt) -> None:
+    def __add_source(self, source: AbstractVertex, core: _OptInt,
+                     link: _OptInt) -> None:
         """
         :param source:
         :param core:

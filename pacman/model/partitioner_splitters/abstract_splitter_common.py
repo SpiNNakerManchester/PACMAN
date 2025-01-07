@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import (
-    Iterable, Generic, Optional, Sequence, Tuple, TypeVar, Union)
+    Iterable, Generic, Optional, Sequence, Tuple, TypeVar)
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractVertex
