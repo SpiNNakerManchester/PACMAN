@@ -17,6 +17,7 @@ import numpy
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 
@@ -106,7 +107,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def vertex(self) -> Union[ApplicationVertex, MachineVertex]:
+    def vertex(self) -> AbstractVertex:
         """
         The vertex of the information.
 

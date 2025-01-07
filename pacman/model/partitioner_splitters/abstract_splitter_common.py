@@ -15,6 +15,7 @@ from typing import (
     Iterable, Generic, Optional, Sequence, Tuple, TypeVar, Union)
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.utility_objs import ChipCounter
 from pacman.model.graphs.common import Slice
@@ -150,8 +151,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
             partition_id: str) -> Sequence[Tuple[
-                MachineVertex, Sequence[
-                    Union[MachineVertex, ApplicationVertex]]]]:
+                MachineVertex, Sequence[AbstractVertex]]]:
         """
         Get machine post-vertices for a given source.
 
@@ -171,9 +171,6 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         :param str partition_id: The identifier of the incoming partition
         :return: A list of tuples of (target machine vertex, list of source
             machine or application vertices that should hit the target)
-        :rtype: list(tuple(~pacman.model.graphs.machine.MachineVertex,
-            list(~pacman.model.graphs.machine.MachineVertex or
-            ~pacman.model.graphs.application.ApplicationVertex)))
         """
         return [(m_vertex, [source_vertex])
                 for m_vertex in self.get_in_coming_vertices(partition_id)]

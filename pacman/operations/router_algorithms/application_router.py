@@ -21,6 +21,7 @@ from spinn_utilities.typing.coords import XY
 from spinn_machine import Machine, RoutingEntry
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
+from pacman.model.graphs import AbstractVertex
 from pacman.model.routing_table_by_partition import (
     MulticastRoutingTableByPartition)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
@@ -31,10 +32,9 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex, MulticastEdgePartition
 from pacman.model.graphs import AbstractEdgePartition
 
-_AnyVertex: TypeAlias = Union[ApplicationVertex, MachineVertex]
 _Node: TypeAlias = Tuple[int, XY]
 _OptInt: TypeAlias = Optional[int]
-_MappedSrc: TypeAlias = Tuple[_AnyVertex, _OptInt, _OptInt]
+_MappedSrc: TypeAlias = Tuple[AbstractVertex, _OptInt, _OptInt]
 
 
 class _Targets(object):
@@ -45,10 +45,10 @@ class _Targets(object):
 
     def __init__(self) -> None:
         self.__targets_by_source: Dict[
-            _AnyVertex, Tuple[List[int], List[int]]] = defaultdict(
+            AbstractVertex, Tuple[List[int], List[int]]] = defaultdict(
                 lambda: (list(), list()))
 
-    def ensure_source(self, source_vertex: _AnyVertex) -> None:
+    def ensure_source(self, source_vertex: AbstractVertex) -> None:
         """
         Ensure that a source exists, even if it targets nothing.
 
@@ -60,7 +60,8 @@ class _Targets(object):
 
     def add_sources_for_target(
             self, core: _OptInt, link: _OptInt,
-            source_vertices: Iterable[_AnyVertex], partition_id: str) -> None:
+            source_vertices: Iterable[AbstractVertex],
+            partition_id: str) -> None:
         """
         Add a set of vertices that target a given core or link.
 
@@ -78,14 +79,17 @@ class _Targets(object):
                     self.__add_m_vertices(vertex, partition_id, core, link)
                 else:
                     self.__add_source(vertex, core, link)
-            else:
+            elif isinstance(vertex, MachineVertex):
                 if vertex.app_vertex in self.__targets_by_source:
                     self.__replace_app_vertex(vertex.app_vertex, partition_id)
                 self.__add_source(vertex, core, link)
+            else:
+                raise TypeError(f"Unexpected {vertex=}")
 
     def add_machine_sources_for_target(
             self, core: _OptInt, link: _OptInt,
-            source_vertices: Iterable[_AnyVertex], partition_id: str) -> None:
+            source_vertices: Iterable[AbstractVertex],
+            partition_id: str) -> None:
         """
         Add a set of machine vertices that target a given core or link.
 
@@ -102,10 +106,12 @@ class _Targets(object):
                 if vertex in self.__targets_by_source:
                     self.__replace_app_vertex(vertex, partition_id)
                 self.__add_m_vertices(vertex, partition_id, core, link)
-            else:
+            elif isinstance(vertex, MachineVertex):
                 if vertex.app_vertex in self.__targets_by_source:
                     self.__replace_app_vertex(vertex.app_vertex, partition_id)
                 self.__add_source(vertex, core, link)
+            else:
+                raise TypeError(f"Unexpected {vertex=}")
 
     def __is_m_vertex(
             self, vertex: ApplicationVertex, partition_id: str) -> bool:
@@ -145,7 +151,7 @@ class _Targets(object):
             self.__add_source(vtx, core, link)
 
     def __add_source(
-            self, source: _AnyVertex, core: _OptInt, link: _OptInt) -> None:
+            self, source: AbstractVertex, core: _OptInt, link: _OptInt) -> None:
         """
         :param source:
         :param core:
@@ -159,7 +165,7 @@ class _Targets(object):
 
     @property
     def targets_by_source(self) -> Iterable[
-            Tuple[_AnyVertex, Tuple[List[int], List[int]]]]:
+            Tuple[AbstractVertex, Tuple[List[int], List[int]]]]:
         """
         List of (source, (list of cores, list of links)) to target.
 
@@ -168,8 +174,8 @@ class _Targets(object):
         """
         return self.__targets_by_source.items()
 
-    def get_targets_for_source(self, vertex: _AnyVertex) -> Tuple[
-            _AnyVertex, Tuple[List[int], List[int]]]:
+    def get_targets_for_source(self, vertex: AbstractVertex) -> Tuple[
+            AbstractVertex, Tuple[List[int], List[int]]]:
         """
         Get the cores and links for a specific source.
 
@@ -916,7 +922,7 @@ def _find_path(
 
 def _convert_a_route(
         routing_tables: MulticastRoutingTableByPartition,
-        source_vertex: _AnyVertex, partition_id: str,
+        source_vertex: AbstractVertex, partition_id: str,
         first_incoming_processor: _OptInt, first_incoming_link: _OptInt,
         first_route: RoutingTree, targets: Dict[XY, _Targets],
         use_source_for_targets: bool = False,
@@ -964,7 +970,7 @@ def _convert_a_route(
         if (x, y) in targets:
             chip_targets = targets[x, y]
             targets_by_source: Iterable[
-                Tuple[_AnyVertex, Tuple[List[int], List[int]]]]
+                Tuple[AbstractVertex, Tuple[List[int], List[int]]]]
             if use_source_for_targets:
                 targets_by_source = [
                     chip_targets.get_targets_for_source(source_vertex)]
@@ -978,8 +984,11 @@ def _convert_a_route(
             for (source, (add_cores, add_links)) in targets_by_source:
                 if isinstance(source, ApplicationVertex):
                     app_vertex_source = True
-                else:
+                elif isinstance(source, MachineVertex):
                     machine_vertex_sources.add(source)
+                else:
+                    raise TypeError(f"Unexpected vertex {source}")
+
                 entry = RoutingEntry(
                     link_ids=link_ids + add_links,
                     processor_ids=processor_ids + add_cores,
@@ -1016,7 +1025,7 @@ def _add_routing_entry(
         first_route: RoutingTree,
         routing_tables: MulticastRoutingTableByPartition,
         entry: RoutingEntry,
-        x: int, y: int, source: _AnyVertex, partition_id: str) -> None:
+        x: int, y: int, source: AbstractVertex, partition_id: str) -> None:
     try:
         routing_tables.add_path_entry(entry, x, y, source, partition_id)
     except Exception as e:
