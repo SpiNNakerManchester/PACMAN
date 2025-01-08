@@ -11,14 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional, Union
+from typing import Optional
 import numpy
 
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs import AbstractVertex
 
 from .base_key_and_mask import BaseKeyAndMask
 
@@ -106,7 +105,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def vertex(self) -> Union[ApplicationVertex, MachineVertex]:
+    def vertex(self) -> AbstractVertex:
         """
         The vertex of the information.
 
