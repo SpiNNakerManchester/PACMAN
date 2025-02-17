@@ -23,9 +23,9 @@ jobs:
     with:
       dependencies: SpiNNUtils SpiNNMachine
       test_directories: unittests
-      coverage-package: pacman
-      flake8-packages: pacman unittests pacman_test_objects
-      pylint-packages: pacman pacman_test_objects
-      mypy-full_packages: pacman pacman_test_objects
-      mypy-packages: unittests
+      coverage_package: pacman
+      flake8_packages: pacman unittests pacman_test_objects
+      pylint_packages: pacman pacman_test_objects
+      mypy_full_packages: pacman pacman_test_objects
+      mypy_packages: unittests
     secrets: inherit
