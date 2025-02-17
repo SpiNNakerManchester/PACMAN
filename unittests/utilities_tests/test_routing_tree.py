@@ -19,10 +19,10 @@ from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 
 class TestRoutingTre(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_call(self):
+    def test_call(self) -> None:
         # Note Vertices as string is incorrect but easier to do for test
 
         rt1 = RoutingTree((3, 4))

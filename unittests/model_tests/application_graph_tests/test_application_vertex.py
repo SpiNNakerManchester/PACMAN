@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Tuple
+
 import numpy
 import unittest
+
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
@@ -22,29 +25,33 @@ from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman_test_objects import SimpleTestVertex
+from spinn_utilities.overrides import overrides
 
 
 class MockSplitter(SplitterFixedLegacy):
 
     reset_seen = False
 
-    def reset_called(self):
+    def reset_called(self) -> None:
         self.reset_seen = True
 
 
 class SimpleMDVertex(ApplicationVertex):
 
-    def __init__(self, max_atoms_per_core, atoms_shape):
+    def __init__(self, max_atoms_per_core:Tuple[int, ...],
+                 atoms_shape: Tuple[int, ...]):
         super(SimpleMDVertex, self).__init__(
             max_atoms_per_core=max_atoms_per_core)
         self.__atoms_shape = atoms_shape
 
     @property
-    def n_atoms(self):
+    @overrides(ApplicationVertex.round_n_atoms)
+    def n_atoms(self) -> int:
         return numpy.prod(self.__atoms_shape)
 
     @property
-    def atoms_shape(self):
+    @overrides(ApplicationVertex.atoms_shape)
+    def atoms_shape(self) -> Tuple[int, ...]:
         return self.__atoms_shape
 
 
@@ -53,10 +60,10 @@ class TestApplicationGraphModel(unittest.TestCase):
     tests which test the application graph object
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_create_new_vertex(self):
+    def test_create_new_vertex(self) -> None:
         """
         test initialisation of a vertex
         """
@@ -64,16 +71,18 @@ class TestApplicationGraphModel(unittest.TestCase):
         self.assertEqual(vert.n_atoms, 10)
         self.assertEqual(vert.label, "New AbstractConstrainedVertex")
 
-    def test_create_new_vertex_without_label(self):
+    def test_create_new_vertex_without_label(self) -> None:
         """
         test initialisation of a vertex without a label
         """
         vert = SimpleTestVertex(10, "Population", 256)
         self.assertEqual(vert.n_atoms, 10)
-        pieces = vert.label.split(" ")
-        self.assertIn(pieces[0], "Population n")
+        label = vert.label
+        assert label is not None
+        pieces = label.split(" ")
+        assert pieces[0] in "Population n"
 
-    def test_create_new_vertex_add_fixed(self):
+    def test_create_new_vertex_add_fixed(self) -> None:
         """
         test that creating a vertex and then adding fixed_locations
         """
@@ -85,7 +94,7 @@ class TestApplicationGraphModel(unittest.TestCase):
             vert.set_fixed_location(0, 0)
         vert.set_fixed_location(0, 0, 1)
 
-    def test_new_create_vertex_from_vertex_no_fixed(self):
+    def test_new_create_vertex_from_vertex_no_fixed(self) -> None:
         """
         test the creating of a vertex by the
         create vertex method will actually create a vertex of the
@@ -97,7 +106,7 @@ class TestApplicationGraphModel(unittest.TestCase):
             vert.get_sdram_used_by_atoms(Slice(0, 9)))
         self.assertIsInstance(vertex, SimpleMachineVertex)
 
-    def test_new_create_vertex_from_vertex_check_resources(self):
+    def test_new_create_vertex_from_vertex_check_resources(self) -> None:
         """
         check that the creation of a vertex means that the resources
         calculated by the vertex is the same as what the
@@ -109,18 +118,19 @@ class TestApplicationGraphModel(unittest.TestCase):
         subv_from_vert = vert.create_machine_vertex(Slice(0, 9), sdram, "")
         self.assertEqual(subv_from_vert.sdram_required, sdram)
 
-    def test_round_n_atoms(self):
-        # .1 is not exact in floating point
+    def test_round_n_atoms(self) -> None:
+        # .1 is not exact an floating point
         near = .1 + .1 + .1 + .1 + .1 + .1 + .1 + .1 + .1 + .1
         self.assertNotEqual(1, near)
-        vert = SimpleTestVertex(near)
+        vert = SimpleTestVertex(near)   # type: ignore[arg-type]
         self.assertEqual(1, vert.n_atoms)
         with self.assertRaises(PacmanInvalidParameterException):
-            SimpleTestVertex(1.5)
-        vert = SimpleTestVertex(numpy.int64(23))
+            SimpleTestVertex(1.5)   # type: ignore[arg-type]
+        vert = SimpleTestVertex(numpy.int64(23))   # type: ignore[arg-type]
+        self.assertTrue(isinstance(numpy.int64(23), int))
         self.assertTrue(isinstance(vert.n_atoms, int))
 
-    def test_set_splitter(self):
+    def test_set_splitter(self) -> None:
         split1 = MockSplitter()
         vert = SimpleTestVertex(5, splitter=split1)
         self.assertEqual(split1, vert.splitter)
@@ -133,7 +143,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         vert.reset()
         self.assertTrue(split1.reset_seen)
 
-    def test_set_label(self):
+    def test_set_label(self) -> None:
         vert = SimpleTestVertex(5)
         vert.set_label("test 1")
         self.assertEqual("test 1", vert.label)
@@ -143,7 +153,7 @@ class TestApplicationGraphModel(unittest.TestCase):
             vert.set_label("test 2")
         self.assertTrue(vert.has_been_added_to_graph())
 
-    def test_get_key_ordered_indices(self):
+    def test_get_key_ordered_indices(self) -> None:
         vtx = SimpleMDVertex((3, 3), (6, 6))
         # From the interdimensional compatibility documentation diagram, we can
         # check we get what we expect
@@ -162,7 +172,7 @@ class TestApplicationGraphModel(unittest.TestCase):
         test_array[row_indices] += 1
         assert all(numpy.equal(test_array, 1))
 
-    def test_get_raster_ordered_indices(self):
+    def test_get_raster_ordered_indices(self) -> None:
         # Go forward to row indices then back to atoms
         vtx = SimpleMDVertex((3, 4, 5), (9, 16, 25))
         all_atoms = numpy.arange(9 * 16 * 25)

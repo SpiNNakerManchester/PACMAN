@@ -27,7 +27,7 @@ class TestJsonUtils(unittest.TestCase):
     # Basic graph comparators
     # ------------------------------------------------------------------
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
     def _compare_constraint(self, c1, c2, seen=None):
@@ -70,7 +70,7 @@ class TestJsonUtils(unittest.TestCase):
     # Test cases
     # ------------------------------------------------------------------
 
-    def test_placement(self):
+    def test_placement(self) -> None:
         s1 = SimpleMachineVertex(
             sdram=ConstantSDRAM(0),
             iptags=[IPtagResource("127.0.0.1", port=None, strip_sdp=True)],

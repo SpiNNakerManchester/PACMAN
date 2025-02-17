@@ -23,6 +23,7 @@ from pacman.model.graphs import (
 from pacman.model.graphs.machine import (
      ConstantSDRAMMachinePartition,
      DestinationSegmentedSDRAMMachinePartition,
+     MachineEdge,
      SDRAMMachineEdge, SimpleMachineVertex,
      SourceSegmentedSDRAMMachinePartition)
 from pacman.model.resources import ConstantSDRAM
@@ -41,14 +42,15 @@ class TestPartition(unittest.TestCase):
     tests which test the application graph object
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_constant(self):
+    def test_constant(self) -> None:
         """
         test ConstantSDRAMMachinePartition
         """
         v1 = MockSupportsSDRAMEdges(ConstantSDRAM(24))
+        part: ConstantSDRAMMachinePartition
         part = ConstantSDRAMMachinePartition("foo", v1)
         with self.assertRaises(PartitionMissingEdgesException):
             part.total_sdram_requirements()
@@ -79,7 +81,7 @@ class TestPartition(unittest.TestCase):
             part.add_edge(e4)
         self.assertEqual(2, len(part.edges))
 
-    def test_destination(self):
+    def test_destination(self) -> None:
         """
         test DestinationSegmentedSDRAMMachinePartition
         """
@@ -120,7 +122,7 @@ class TestPartition(unittest.TestCase):
         with self.assertRaises(PacmanValueError):
             part.get_sdram_base_address_for(v4)
 
-    def test_sdram_machine_edge(self):
+    def test_sdram_machine_edge(self) -> None:
         """
         test SDRAMMachineEdge
         """
@@ -132,7 +134,7 @@ class TestPartition(unittest.TestCase):
         with self.assertRaises(PacmanConfigurationException):
             SDRAMMachineEdge(v2, v1, "bar")
 
-    def test_source(self):
+    def test_source(self) -> None:
         """
         test DestinationSegmentedSDRAMMachinePartition
         """
@@ -177,12 +179,13 @@ class TestPartition(unittest.TestCase):
         self.assertEqual(100, part.get_sdram_base_address_for(v3))
         self.assertEqual(40 + 28, part.get_sdram_size_of_region_for(v3))
 
-    def test_abstract_multiple_partition(self):
+    # type: ignore[arg-type]
+    def test_abstract_multiple_partition(self) -> None:
         v1 = MockSupportsSDRAMEdges(ConstantSDRAM(12))
         v2 = MockSupportsSDRAMEdges(ConstantSDRAM(12))
         v3 = MockSupportsSDRAMEdges(ConstantSDRAM(12))
         with self.assertRaises(PacmanConfigurationException):
-            AbstractMultiplePartition([v1, v1], "foo", None)
-        part = AbstractMultiplePartition([v1, v2], "foo", None)
+            AbstractMultiplePartition([v1, v1], "foo", (MachineEdge))
+        part = AbstractMultiplePartition([v1, v2], "foo", (MachineEdge))
         with self.assertRaises(Exception):
             part.add_edge(SDRAMMachineEdge(v3, v1, "foo"))

@@ -23,15 +23,15 @@ class TestApplicationOther(unittest.TestCase):
     tests which test the application graph object
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_spinnaker_link(self):
+    def test_spinnaker_link(self) -> None:
         slv = ApplicationSpiNNakerLinkVertex(100, 2, "127.4.5.6")
         self.assertEqual(2, slv.spinnaker_link_id)
         self.assertEqual("127.4.5.6", slv.board_address)
 
-    def test_fpga_no_connection(self):
+    def test_fpga_no_connection(self) -> None:
         fpga = ApplicationFPGAVertex(100)
         self.assertEqual(0, len(list(fpga.incoming_fpga_connections)))
         self.assertIsNone(fpga.outgoing_fpga_connection)

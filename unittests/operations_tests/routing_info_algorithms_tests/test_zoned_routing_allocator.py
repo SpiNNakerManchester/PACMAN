@@ -37,13 +37,13 @@ class MockSplitter(AbstractSplitterCommon):
     def machine_vertices_for_recording(self, variable_to_record):
         return list(self.governed_app_vertex.machine_vertices)
 
-    def get_out_going_slices(self):
+    def get_out_going_slices(self) -> None:
         return [m.slice for m in self.governed_app_vertex.machine_vertices]
 
-    def get_in_coming_slices(self):
+    def get_in_coming_slices(self) -> None:
         return [m.slice for m in self.governed_app_vertex.machine_vertices]
 
-    def reset_called(self):
+    def reset_called(self) -> None:
         pass
 
 
@@ -94,7 +94,7 @@ class TestMacVertex(MachineVertex):
         return self.__n_keys_required[partition_id]
 
     @property
-    def sdram_required(self):
+    def sdram_required(self) -> None:
         # Not needed for test
         return None
 

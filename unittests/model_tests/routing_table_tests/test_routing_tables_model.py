@@ -32,10 +32,10 @@ class TestRoutingTable(unittest.TestCase):
     tests for the routing table object
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_new_multicast_routing_table_entry(self):
+    def test_new_multicast_routing_table_entry(self) -> None:
         """
         test that creating a multicast routing entry works
         """
@@ -47,7 +47,7 @@ class TestRoutingTable(unittest.TestCase):
         MulticastRoutingEntry(key_combo, mask, RoutingEntry(
             processor_ids=proc_ids, link_ids=link_ids))
 
-    def test_new_multicast_routing_table(self):
+    def test_new_multicast_routing_table(self) -> None:
         """
         test that creating a multicast routing entry and adding it to the table
         works
@@ -73,13 +73,13 @@ class TestRoutingTable(unittest.TestCase):
         for entry in mre:
             self.assertIn(entry, multicast_entries)
 
-    def test_new_multicast_routing_table_empty(self):
+    def test_new_multicast_routing_table_empty(self) -> None:
         """
         tests creating a basic multicast routing table
         """
         UnCompressedMulticastRoutingTable(0, 0)
 
-    def test_new_multicast_routing_table_duplicate_entry(self):
+    def test_new_multicast_routing_table_duplicate_entry(self) -> None:
         """
         test that adding multiple identical entries into a multicast table
         causes an error
@@ -104,7 +104,7 @@ class TestRoutingTable(unittest.TestCase):
                 key_combo, mask,
                 RoutingEntry(processor_ids=[], link_ids=link_ids)))
 
-    def test_new_multicast_routing_table_duplicate_key_combo(self):
+    def test_new_multicast_routing_table_duplicate_key_combo(self) -> None:
 
         key_combo = 0xff35
         mask = 0xffff
@@ -122,7 +122,7 @@ class TestRoutingTable(unittest.TestCase):
         # We can add entries that are exactly the same
         UnCompressedMulticastRoutingTable(0, 0, multicast_entries)
 
-    def test_new_multicast_routing_tables(self):
+    def test_new_multicast_routing_tables(self) -> None:
         key_combo = 0xff35
         mask = 0xffff
         proc_ids = list()
@@ -162,10 +162,10 @@ class TestRoutingTable(unittest.TestCase):
         self.assertEqual(new_tables.get_routing_table_for_chip(1, 0), t2)
         self.assertEqual(new_tables.get_routing_table_for_chip(2, 0), None)
 
-    def test_new_multicast_routing_tables_empty(self):
+    def test_new_multicast_routing_tables_empty(self) -> None:
         MulticastRoutingTables()
 
-    def test_add_routing_table_for_duplicate_chip(self):
+    def test_add_routing_table_for_duplicate_chip(self) -> None:
         key_combo = 0xff35
         mask = 0xffff
         proc_ids = list()
@@ -189,7 +189,7 @@ class TestRoutingTable(unittest.TestCase):
         with self.assertRaises(PacmanAlreadyExistsException):
             MulticastRoutingTables(mrt)
 
-    def test_multicast_routing_table_by_partition(self):
+    def test_multicast_routing_table_by_partition(self) -> None:
         mrt = MulticastRoutingTableByPartition()
         partition_id = "foo"
         source_vertex = SimpleMachineVertex(sdram=None)
@@ -209,7 +209,7 @@ class TestRoutingTable(unittest.TestCase):
         assert mre == mrt.get_entry_on_coords_for_edge(
             source_vertex, partition_id, 0, 0)
 
-    def test_multicast_routing_table_by_partition_entry(self):
+    def test_multicast_routing_table_by_partition_entry(self) -> None:
         with self.assertRaises(SpinnMachineInvalidParameterException):
             RoutingEntry(link_ids=range(6), processor_ids=range(18),
                          incoming_processor=4, incoming_link=3)

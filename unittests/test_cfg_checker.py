@@ -26,7 +26,7 @@ class TestCfgChecker(unittest.TestCase):
     def setUpClass(cls):
         unittest_setup()
 
-    def test_cfg_check(self):
+    def test_cfg_check(self) -> None:
         unittests = os.path.dirname(__file__)
         pacman_dir = pacman.__path__[0]
         uinit_test_objects = pacman_test_objects.__path__[0]

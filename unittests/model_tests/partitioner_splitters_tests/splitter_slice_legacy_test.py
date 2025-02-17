@@ -28,12 +28,12 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         unittest_setup()
 
     def test_no_api(self) -> None:
-        splitter = SplitterFixedLegacy()
+        splitter: SplitterFixedLegacy = SplitterFixedLegacy()
         vertex = NonLegacyApplicationVertex()
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(vertex)
 
     def test_with_api(self) -> None:
-        splitter = SplitterFixedLegacy()
+        splitter: SplitterFixedLegacy = SplitterFixedLegacy()
         vertex = SimpleTestVertex(12)
         splitter.set_governed_app_vertex(vertex)

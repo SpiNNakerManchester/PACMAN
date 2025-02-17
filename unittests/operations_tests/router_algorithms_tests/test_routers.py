@@ -67,10 +67,10 @@ class MockSplitter(AbstractSplitterCommon):
         for m_vertex in m_vertices:
             self.governed_app_vertex.remember_machine_vertex(m_vertex)
 
-    def get_out_going_slices(self):
+    def get_out_going_slices(self) -> None:
         return None
 
-    def get_in_coming_slices(self):
+    def get_in_coming_slices(self) -> None:
         return None
 
     def get_out_going_vertices(self, partition_id):
@@ -82,7 +82,7 @@ class MockSplitter(AbstractSplitterCommon):
     def machine_vertices_for_recording(self, variable_to_record):
         return []
 
-    def reset_called(self):
+    def reset_called(self) -> None:
         pass
 
 
@@ -132,10 +132,10 @@ class MockMultiInputSplitter(AbstractSplitterCommon):
                             in_part.add_edge(MachineEdge(this_in, last_in))
                 last_incoming = incoming
 
-    def get_out_going_slices(self):
+    def get_out_going_slices(self) -> None:
         return None
 
-    def get_in_coming_slices(self):
+    def get_in_coming_slices(self) -> None:
         return None
 
     def get_out_going_vertices(self, partition_id):
@@ -164,13 +164,13 @@ class MockMultiInputSplitter(AbstractSplitterCommon):
     def machine_vertices_for_recording(self, variable_to_record):
         return []
 
-    def get_internal_multicast_partitions(self):
+    def get_internal_multicast_partitions(self) -> None:
         return self.__internal_multicast_partitions
 
-    def reset_called(self):
+    def reset_called(self) -> None:
         pass
 
-    def get_same_chip_groups(self):
+    def get_same_chip_groups(self) -> None:
         return self.__same_chip_groups
 
 
@@ -189,10 +189,10 @@ class MockOneToOneSplitter(AbstractSplitterCommon):
         for m_vertex in m_vertices:
             self.governed_app_vertex.remember_machine_vertex(m_vertex)
 
-    def get_out_going_slices(self):
+    def get_out_going_slices(self) -> None:
         return None
 
-    def get_in_coming_slices(self):
+    def get_in_coming_slices(self) -> None:
         return None
 
     def get_out_going_vertices(self, partition_id):
@@ -204,7 +204,7 @@ class MockOneToOneSplitter(AbstractSplitterCommon):
     def machine_vertices_for_recording(self, variable_to_record):
         return []
 
-    def reset_called(self):
+    def reset_called(self) -> None:
         pass
 
     def get_source_specific_in_coming_vertices(
@@ -218,7 +218,7 @@ class MockOneToOneSplitter(AbstractSplitterCommon):
 
 class MockNearestEthernetSplitter(AbstractSplitterCommon):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.__placements = Placements()
         self.__m_vertex_by_ethernet = dict()
@@ -234,10 +234,10 @@ class MockNearestEthernetSplitter(AbstractSplitterCommon):
                 Placement(m_vertex, chip.x, chip.y, 1))
             self.__m_vertex_by_ethernet[chip.x, chip.y] = m_vertex
 
-    def get_out_going_slices(self):
+    def get_out_going_slices(self) -> None:
         return None
 
-    def get_in_coming_slices(self):
+    def get_in_coming_slices(self) -> None:
         return None
 
     def get_out_going_vertices(self, partition_id):
@@ -249,7 +249,7 @@ class MockNearestEthernetSplitter(AbstractSplitterCommon):
     def machine_vertices_for_recording(self, variable_to_record):
         return []
 
-    def reset_called(self):
+    def reset_called(self) -> None:
         pass
 
     def get_source_specific_in_coming_vertices(
@@ -264,7 +264,7 @@ class MockNearestEthernetSplitter(AbstractSplitterCommon):
         return [(target_m_vertex, [source_vertex])]
 
     @property
-    def placements(self):
+    def placements(self) -> None:
         return self.__placements
 
 
@@ -300,10 +300,10 @@ class MockInputOutputSplitter(AbstractSplitterCommon):
             for end_v in self.__incoming_machine_vertices:
                 part.add_edge(MachineEdge(start_v, end_v))
 
-    def get_out_going_slices(self):
+    def get_out_going_slices(self) -> None:
         return None
 
-    def get_in_coming_slices(self):
+    def get_in_coming_slices(self) -> None:
         return None
 
     def get_out_going_vertices(self, partition_id):
@@ -315,10 +315,10 @@ class MockInputOutputSplitter(AbstractSplitterCommon):
     def machine_vertices_for_recording(self, variable_to_record):
         return []
 
-    def get_internal_multicast_partitions(self):
+    def get_internal_multicast_partitions(self) -> None:
         return self.__internal_multicast_partitions
 
-    def reset_called(self):
+    def reset_called(self) -> None:
         pass
 
 
@@ -328,7 +328,7 @@ class MockAppVertex(ApplicationVertex):
         self.__n_atoms = n_atoms
 
     @property
-    def n_atoms(self):
+    def n_atoms(self) -> None:
         return self.__n_atoms
 
 

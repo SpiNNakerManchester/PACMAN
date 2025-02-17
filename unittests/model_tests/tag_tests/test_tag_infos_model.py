@@ -28,16 +28,16 @@ class TestTagsModel(unittest.TestCase):
     test that the tags object works as expected
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_new_tag_info(self):
+    def test_new_tag_info(self) -> None:
         """
         test that creating a empty tag object works
         """
         Tags()
 
-    def test_adding_a_iptag_to_tag_info(self):
+    def test_adding_a_iptag_to_tag_info(self) -> None:
         """
         check that adding a tag after initialisation works
         """
@@ -46,7 +46,7 @@ class TestTagsModel(unittest.TestCase):
         machine_vertex = SimpleMachineVertex(None, "")
         tag_info.add_ip_tag(iptag, machine_vertex)
 
-    def test_adding_a_reverse_iptag(self):
+    def test_adding_a_reverse_iptag(self) -> None:
         """
         check that adding a reverse iptag works correctly
         """
@@ -55,7 +55,7 @@ class TestTagsModel(unittest.TestCase):
         machine_vertex = SimpleMachineVertex(None, "")
         tag_info.add_reverse_ip_tag(reverse_iptag, machine_vertex)
 
-    def test_add_iptag_then_locate_tag(self):
+    def test_add_iptag_then_locate_tag(self) -> None:
         """
         check that locating a iptag via get_ip_tags_for_vertex function
         """
@@ -67,7 +67,7 @@ class TestTagsModel(unittest.TestCase):
         gotton_tag = tag_info.get_ip_tags_for_vertex(machine_vertex)
         self.assertEqual(gotton_tag[0], iptag)
 
-    def test_add_iptag_then_fail_to_locate(self):
+    def test_add_iptag_then_fail_to_locate(self) -> None:
         """
         test that asking for a invalid iptag returns a None value
         """
@@ -80,7 +80,7 @@ class TestTagsModel(unittest.TestCase):
         gotton_tag = tag_info.get_ip_tags_for_vertex(machine_vertex_2)
         self.assertEqual(gotton_tag, None)
 
-    def test_add_reverse_iptag_then_locate_tag(self):
+    def test_add_reverse_iptag_then_locate_tag(self) -> None:
         """
         check that asking for a reverse iptag for a specific machine vertex
         works
@@ -93,7 +93,7 @@ class TestTagsModel(unittest.TestCase):
             machine_vertex)
         self.assertEqual(gotton_tag[0], reverse_iptag)
 
-    def test_add_reverse_iptag_then_not_locate_tag(self):
+    def test_add_reverse_iptag_then_not_locate_tag(self) -> None:
         """
         check that asking for a reverse iptag with a incorrect machine vertex
         will cause a none returned
@@ -107,7 +107,7 @@ class TestTagsModel(unittest.TestCase):
             machine_vertex)
         self.assertEqual(gotton_tag, None)
 
-    def test_add_conflicting_ip_tag(self):
+    def test_add_conflicting_ip_tag(self) -> None:
         tags = Tags()
         tag1 = IPTag("", 0, 0, 1, "122.2.2.2", 1, False)
         tag2 = IPTag("", 0, 7, 1, "122.2.2.3", 1, False)
@@ -127,7 +127,7 @@ class TestTagsModel(unittest.TestCase):
         self.assertIn("Only add IP tags with this method.",
                       str(e.exception))
 
-    def test_add_conflicting_reverse_ip_tag(self):
+    def test_add_conflicting_reverse_ip_tag(self) -> None:
         tags = Tags()
         tag1 = ReverseIPTag("", 1, 23, 0, 0, 1, 1)
         tag2 = ReverseIPTag("", 1, 23, 0, 0, 1, 1)

@@ -51,10 +51,10 @@ class MockSplitter(AbstractSplitterCommon):
             self.__same_chip_groups.append(
                 (m_vertices, ConstantSDRAM(self.__sdram)))
 
-    def get_out_going_slices(self):
+    def get_out_going_slices(self) -> None:
         return None
 
-    def get_in_coming_slices(self):
+    def get_in_coming_slices(self) -> None:
         return None
 
     def get_out_going_vertices(self, partition_id):
@@ -66,10 +66,10 @@ class MockSplitter(AbstractSplitterCommon):
     def machine_vertices_for_recording(self, variable_to_record):
         return []
 
-    def reset_called(self):
+    def reset_called(self) -> None:
         pass
 
-    def get_same_chip_groups(self):
+    def get_same_chip_groups(self) -> None:
         return self.__same_chip_groups
 
 
@@ -79,7 +79,7 @@ class MockAppVertex(ApplicationVertex):
         self.__n_atoms = n_atoms
 
     @property
-    def n_atoms(self):
+    def n_atoms(self) -> None:
         return self.__n_atoms
 
 
