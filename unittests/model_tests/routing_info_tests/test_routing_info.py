@@ -92,9 +92,9 @@ class TestRoutingInfo(unittest.TestCase):
         with self.assertRaises(KeyError):
             routing_info.get_info_from(
                 None, "Test")  # type: ignore[arg-type]
-        #with self.assertRaises(KeyError):
-        #    routing_info.get_info_from(
-        #        pre_vertex, None)  # type: ignore[arg-type]
+        with self.assertRaises(KeyError):
+            routing_info.get_info_from(
+                pre_vertex, None)  # type: ignore[arg-type]
 
         assert routing_info.get_key_from(
             pre_vertex, "Test") == key

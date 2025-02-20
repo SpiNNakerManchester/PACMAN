@@ -45,7 +45,7 @@ class SimpleMDVertex(ApplicationVertex):
         self.__atoms_shape = atoms_shape
 
     @property
-    @overrides(ApplicationVertex.round_n_atoms)
+    @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self) -> int:
         return numpy.prod(self.__atoms_shape)
 
@@ -127,7 +127,6 @@ class TestApplicationGraphModel(unittest.TestCase):
         with self.assertRaises(PacmanInvalidParameterException):
             SimpleTestVertex(1.5)   # type: ignore[arg-type]
         vert = SimpleTestVertex(numpy.int64(23))   # type: ignore[arg-type]
-        self.assertTrue(isinstance(numpy.int64(23), int))
         self.assertTrue(isinstance(vert.n_atoms, int))
 
     def test_set_splitter(self) -> None:

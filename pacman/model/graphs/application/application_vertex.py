@@ -33,11 +33,12 @@ if TYPE_CHECKING:
     from .application_edge import ApplicationEdge
     from .application_edge_partition import ApplicationEdgePartition
 #: :meta private:
+APPV = TypeVar("APPV", bound='ApplicationVertex')
 MV = TypeVar("MV", bound='MachineVertex')
 logger = FormatAdapter(logging.getLogger(__file__))
 
 
-class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
+class ApplicationVertex(AbstractVertex, Generic[APPV], metaclass=AbstractBase):
     """
     A vertex that can be broken down into a number of smaller vertices
     based on the resources that the vertex requires.
@@ -62,7 +63,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
     def __init__(
             self, label: Optional[str] = None,
             max_atoms_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
-            splitter: Optional[AbstractSplitterCommon[Self]] = None):
+            splitter: Optional[AbstractSplitterCommon[ApplicationVertex]] = None):
         """
         :param str label: The optional name of the vertex.
         :param max_atoms_per_core: The max number of atoms that can be
@@ -105,7 +106,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         return self._splitter is not None
 
     @property
-    def splitter(self) -> AbstractSplitterCommon[Self]:
+    def splitter(self) -> AbstractSplitterCommon[APPV]:
         """
         :rtype: ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
@@ -117,7 +118,8 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         return s
 
     @splitter.setter
-    def splitter(self, new_value: AbstractSplitterCommon[Self]) -> None:
+    def splitter(self,
+                 new_value: AbstractSplitterCommon[APPV]) -> None:
         """
         Sets the splitter object. Does not allow repeated settings.
 

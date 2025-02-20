@@ -200,10 +200,11 @@ class TestRoutingTable(unittest.TestCase):
         entry = RoutingEntry(link_ids=range(4, 6), processor_ids=range(8, 12))
         mrt.add_path_entry(entry, 0, 0, source_vertex, partition_id)
         assert list(mrt.get_routers()) == [(0, 0)]
-        assert len(mrt.get_entries_for_router(0, 0)) == 1
-        assert next(iter(mrt.get_entries_for_router(0, 0))) == (
-            source_vertex, partition_id)
-        mre = mrt.get_entries_for_router(0, 0)[source_vertex, partition_id]
+        entries = mrt.get_entries_for_router(0, 0)
+        assert entries is not None
+        assert len(entries) == 1
+        assert next(iter(entries)) == (source_vertex, partition_id)
+        mre = entries[source_vertex, partition_id]
         assert str(mre) == (
             "{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}:{0, 1, 2, 3, 4, 5}")
         assert mre == mrt.get_entry_on_coords_for_edge(

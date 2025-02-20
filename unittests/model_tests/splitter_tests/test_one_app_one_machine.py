@@ -36,7 +36,7 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
 
     def test_legacy(self) -> None:
         set_config("Machine", "versions", VersionStrings.ANY.text)
-        splitter = SplitterOneAppOneMachine()
+        splitter: SplitterOneAppOneMachine = SplitterOneAppOneMachine()
         v1 = NonLegacyApplicationVertex("v1")
         a = str(splitter)
         self.assertIsNotNone(a)
@@ -62,5 +62,5 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
         v2.reset()
 
     def test_default_name(self) -> None:
-        splitter = SplitterOneAppOneMachine()
+        splitter: SplitterOneAppOneMachine = SplitterOneAppOneMachine()
         self.assertIn("SplitterOneAppOneMachine", str(splitter))

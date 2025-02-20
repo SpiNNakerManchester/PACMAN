@@ -29,7 +29,7 @@ class TestSplitterReset(unittest.TestCase):
         # With slitter
         v1 = SimpleTestVertex(1, "v1")
         PacmanDataView.add_vertex(v1)
-        splitter = SplitterFixedLegacy()
+        splitter: SplitterFixedLegacy = SplitterFixedLegacy()
         v1.splitter = splitter
         # no splitter
         v2 = SimpleTestVertex(1, "v2")
