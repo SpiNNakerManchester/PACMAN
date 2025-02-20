@@ -155,6 +155,19 @@ class TestRoutingInfo(unittest.TestCase):
 
         self.assertEqual(len(routing_info), len(list(routing_info)))
 
+    def test_multiple(self) -> None:
+        routing_info = RoutingInfo()
+        vertex1 = SimpleMachineVertex(ConstantSDRAM(0))
+        key = 12345
+        info = MachineVertexRoutingInfo(
+            BaseKeyAndMask(key, FULL_MASK), "Test", vertex1, 0)
+        routing_info.add_routing_info(info)
+        key = 67890
+        info = MachineVertexRoutingInfo(
+            BaseKeyAndMask(key, FULL_MASK), "Test2", vertex1, 0)
+        routing_info.add_routing_info(info)
+        self.assertEqual(len(routing_info), len(list(routing_info)))
+
     def test_base_key_and_mask(self) -> None:
         with self.assertRaises(PacmanConfigurationException):
             BaseKeyAndMask(0xF0, 0x40)
