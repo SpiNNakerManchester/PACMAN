@@ -217,4 +217,4 @@ class RoutingInfo(object):
                 yield info
 
     def __len__(self) -> int:
-        return len(self._info)
+        sum(len(v) for v in self._info.values())
