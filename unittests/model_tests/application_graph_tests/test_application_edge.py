@@ -64,7 +64,7 @@ class TestApplicationEdgeModel(unittest.TestCase):
         assert edge2 not in partition
         partition.add_edge(edge2)
         self.assertEqual(2, partition.n_edges)
-        self.assertIn(edge2, partition)
+        assert edge2 in partition
         self.assertIn("ApplicationEdgePartition", str(partition))
         self.assertIn("spikes", repr(partition))
         vert3 = SimpleTestVertex(5, "Vertex 3", 256)

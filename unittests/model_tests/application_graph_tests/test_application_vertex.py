@@ -47,7 +47,7 @@ class SimpleMDVertex(ApplicationVertex):
     @property
     @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self) -> int:
-        return numpy.prod(self.__atoms_shape)
+        return int(numpy.prod(self.__atoms_shape))
 
     @property
     @overrides(ApplicationVertex.atoms_shape)
