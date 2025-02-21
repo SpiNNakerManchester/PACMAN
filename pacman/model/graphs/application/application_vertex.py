@@ -17,7 +17,6 @@ from typing import (
     Collection, Generic, Optional, Tuple, TypeVar, Union, cast, TYPE_CHECKING)
 
 import numpy
-from typing_extensions import Self
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ordered_set import OrderedSet
@@ -62,7 +61,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
     def __init__(
             self, label: Optional[str] = None,
             max_atoms_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
-            splitter: Optional[AbstractSplitterCommon[Self]] = None):
+            splitter: Optional[AbstractSplitterCommon] = None):
         """
         :param str label: The optional name of the vertex.
         :param max_atoms_per_core: The max number of atoms that can be
@@ -77,7 +76,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
         # Need to set to None temporarily as add_constraint checks splitter
-        self._splitter: Optional[AbstractSplitterCommon[Self]] = None
+        self._splitter: Optional[AbstractSplitterCommon] = None
         super().__init__(label)
         self._machine_vertices: OrderedSet[MV] = OrderedSet()
         if splitter:
@@ -105,7 +104,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         return self._splitter is not None
 
     @property
-    def splitter(self) -> AbstractSplitterCommon[Self]:
+    def splitter(self) -> AbstractSplitterCommon:
         """
         :rtype: ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
@@ -117,7 +116,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         return s
 
     @splitter.setter
-    def splitter(self, new_value: AbstractSplitterCommon[Self]) -> None:
+    def splitter(self, new_value: AbstractSplitterCommon) -> None:
         """
         Sets the splitter object. Does not allow repeated settings.
 

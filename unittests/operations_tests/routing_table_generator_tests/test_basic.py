@@ -41,7 +41,8 @@ from pacman.model.partitioner_splitters import SplitterOneAppOneMachine
 class FixedKeyAppVertex(AbstractOneAppOneMachineVertex):
 
     def __init__(
-            self, fixed_key_and_mask, label: Optional[str] = None,
+            self, fixed_key_and_mask: Optional[BaseKeyAndMask],
+            label: Optional[str] = None,
             n_atoms: int = 1):
         AbstractOneAppOneMachineVertex.__init__(
             self, SimpleMachineVertex(ConstantSDRAM(1000)), label,
@@ -57,13 +58,13 @@ class FixedKeyAppVertex(AbstractOneAppOneMachineVertex):
 
 class TestBasic(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
         # TODO check after
         #  https://github.com/SpiNNakerManchester/PACMAN/pull/555
-        set_config("Machine", "version", 5)
+        set_config("Machine", "version", "5")
 
-    def create_graphs3(self, writer):
+    def create_graphs3(self, writer: PacmanDataWriter) -> None:
         v1 = SimpleTestVertex(
             300, "app1", max_atoms_per_core=10, splitter=SplitterFixedLegacy())
         v2 = SimpleTestVertex(
@@ -82,7 +83,8 @@ class TestBasic(unittest.TestCase):
         writer.add_edge(ApplicationEdge(v2, v4), "foo")
         writer.add_edge(ApplicationEdge(v1, v1), "foo")
 
-    def make_infos(self, writer, system_placements=None):
+    def make_infos(self, writer: PacmanDataWriter,
+                   system_placements: Optional[Placements] = None) -> None:
         if system_placements is None:
             system_placements = Placements()
         splitter_partitioner()
@@ -91,14 +93,14 @@ class TestBasic(unittest.TestCase):
         allocator = ZonedRoutingInfoAllocator()
         writer.set_routing_infos(allocator.allocate([]))
 
-    def test_empty(self):
+    def test_empty(self) -> None:
         writer = PacmanDataWriter.mock()
         self.make_infos(writer)
         data = basic_routing_table_generator()
         self.assertEqual(0, data.get_max_number_of_entries())
         self.assertEqual(0, len(list(data.routing_tables)))
 
-    def test_graph3_with_system(self):
+    def test_graph3_with_system(self) -> None:
         writer = PacmanDataWriter.mock()
         self.create_graphs3(writer)
         system_plaements = Placements()
@@ -110,7 +112,7 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(108, data.get_total_number_of_entries())
         self.assertEqual(5, len(list(data.routing_tables)))
 
-    def test_overlapping(self):
+    def test_overlapping(self) -> None:
         # Two vertices in the same router can't send with the same key
         writer = PacmanDataWriter.mock()
         v_target = SimpleTestVertex(1, splitter=SplitterFixedLegacy())
@@ -128,7 +130,7 @@ class TestBasic(unittest.TestCase):
         with self.assertRaises(KeyError):
             basic_routing_table_generator()
 
-    def test_overlapping_different_chips(self):
+    def test_overlapping_different_chips(self) -> None:
         # Two vertices in the same router can't send with the same key
         writer = PacmanDataWriter.mock()
         v_target = SimpleTestVertex(1, splitter=SplitterFixedLegacy())
@@ -146,7 +148,7 @@ class TestBasic(unittest.TestCase):
         with self.assertRaises(KeyError):
             basic_routing_table_generator()
 
-    def test_non_overlapping_different_chips(self):
+    def test_non_overlapping_different_chips(self) -> None:
         # Two vertices with non-overlapping routes can use the same key
         writer = PacmanDataWriter.mock()
         v_target_1 = FixedKeyAppVertex(None)

@@ -40,10 +40,10 @@ class TestPlacement(unittest.TestCase):
     tester for placement object in pacman.model.placements.placement
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_create_new_placement(self):
+    def test_create_new_placement(self) -> None:
         """
         test that creating a new placement puts stuff in the right place
         """
@@ -60,7 +60,7 @@ class TestPlacement(unittest.TestCase):
         self.assertEqual(hash(pl), hash(pl2))
         self.assertFalse(pl != pl2)
 
-    def test_create_new_placements_duplicate_vertex(self):
+    def test_create_new_placements_duplicate_vertex(self) -> None:
         """
         check that you cant put a vertex in multiple placements
         """
@@ -71,7 +71,7 @@ class TestPlacement(unittest.TestCase):
         with self.assertRaises(PacmanAlreadyPlacedError):
             Placements(pl)
 
-    def test_iterate_by_type(self):
+    def test_iterate_by_type(self) -> None:
         v1a = ExtendedVertex1(None)
         p1a = Placement(v1a, 0, 1, 1)
         v1b = ExtendedVertex1(None)

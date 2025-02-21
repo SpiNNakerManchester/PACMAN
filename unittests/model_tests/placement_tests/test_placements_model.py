@@ -29,10 +29,10 @@ class TestPlacements(unittest.TestCase):
     tester for placements object in pacman.model.placements.placements
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_create_new_placements(self):
+    def test_create_new_placements(self) -> None:
         """
         test creating a placements object
         """
@@ -40,7 +40,7 @@ class TestPlacements(unittest.TestCase):
         pl = Placement(subv, 0, 0, 1)
         Placements([pl])
 
-    def test_create_new_empty_placements(self):
+    def test_create_new_empty_placements(self) -> None:
         """
         checks that creating an empty placements object is valid
         """
@@ -48,7 +48,7 @@ class TestPlacements(unittest.TestCase):
         self.assertEqual(pls._placements, dict())
         self.assertEqual(pls._machine_vertices, dict())
 
-    def test_get_placement_of_vertex(self):
+    def test_get_placement_of_vertex(self) -> None:
         """
         checks the placements get placement method
         """
@@ -64,7 +64,7 @@ class TestPlacements(unittest.TestCase):
         for i in range(4):
             self.assertEqual(pls.get_placement_of_vertex(subv[i]), pl[i])
 
-    def test_get_vertex_on_processor(self):
+    def test_get_vertex_on_processor(self) -> None:
         """
         checks that from a placements object, you can get to the correct
         vertex using the get_vertex_on_processor() method
@@ -84,7 +84,7 @@ class TestPlacements(unittest.TestCase):
 
         self.assertEqual(pls.get_placement_of_vertex(subv[0]), pl[0])
 
-    def test_get_placements(self):
+    def test_get_placements(self) -> None:
         """
         tests the placements iterator functionality.
         """
@@ -100,7 +100,7 @@ class TestPlacements(unittest.TestCase):
         for i in range(4):
             self.assertIn(pl[i], pls)
 
-    def test_safety_code(self):
+    def test_safety_code(self) -> None:
         subv = SimpleMachineVertex(None, "1")
         pl = Placement(subv, 0, 0, 1)
         pls = Placements([pl])
@@ -115,7 +115,7 @@ class TestPlacements(unittest.TestCase):
         with self.assertRaises(PacmanNotPlacedError):
             pls.get_placement_of_vertex(subv2)
 
-    def test_infos_code(self):
+    def test_infos_code(self) -> None:
         subv = SimpleMachineVertex(None, "1")
         pl = Placement(subv, 0, 0, 1)
         pls = Placements([pl])

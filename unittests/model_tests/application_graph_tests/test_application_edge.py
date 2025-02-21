@@ -26,10 +26,10 @@ class TestApplicationEdgeModel(unittest.TestCase):
     tests which test the application graph object
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_create_new_edge(self):
+    def test_create_new_edge(self) -> None:
         """
         test that you can create a edge between two vertices
         """
@@ -39,7 +39,7 @@ class TestApplicationEdgeModel(unittest.TestCase):
         self.assertEqual(edge1.pre_vertex, vert1)
         self.assertEqual(edge1.post_vertex, vert2)
 
-    def test_create_new_edge_without_label(self):
+    def test_create_new_edge_without_label(self) -> None:
         """
         test initisation of a edge without a label
         """
@@ -50,7 +50,7 @@ class TestApplicationEdgeModel(unittest.TestCase):
         self.assertEqual(edge1.post_vertex, vert2)
         self.assertEqual(edge1.label, None)
 
-    def test_partition(self):
+    def test_partition(self) -> None:
         vert1 = SimpleTestVertex(10, "Vertex 1", 256)
         partition = ApplicationEdgePartition("spikes", vert1)
         vert2 = SimpleTestVertex(5, "Vertex 2", 256)
@@ -59,12 +59,12 @@ class TestApplicationEdgeModel(unittest.TestCase):
         with self.assertRaises(PacmanAlreadyExistsException):
             partition.add_edge(edge1)
         with self.assertRaises(PacmanInvalidParameterException):
-            partition.add_edge("edge")
+            partition.add_edge("edge")  # type: ignore[arg-type]
         edge2 = SimpleTestEdge(vert1, vert2)
-        self.assertNotIn(edge2, partition)
+        assert edge2 not in partition
         partition.add_edge(edge2)
         self.assertEqual(2, partition.n_edges)
-        self.assertIn(edge2, partition)
+        assert edge2 in partition
         self.assertIn("ApplicationEdgePartition", str(partition))
         self.assertIn("spikes", repr(partition))
         vert3 = SimpleTestVertex(5, "Vertex 3", 256)

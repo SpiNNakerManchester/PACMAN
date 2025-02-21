@@ -21,10 +21,10 @@ from pacman.model.graphs.common import MDSlice
 class TestSlice(unittest.TestCase):
     """Tests that Slices expose the correct options and are immutable."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_2d(self):
+    def test_2d(self) -> None:
         s = MDSlice(0, 8, (3, 3), (0, 0), (6, 6))
         self.assertEqual(9, s.n_atoms)  # 10 - 0 + 1
         self.assertEqual(0, s.lo_atom)  # As specified
@@ -37,7 +37,7 @@ class TestSlice(unittest.TestCase):
         s2 = MDSlice.from_string(str(s))
         self.assertEqual(s, s2)
 
-    def test_2a(self):
+    def test_2a(self) -> None:
         s = MDSlice(36, 44, (3, 3), (0, 6), (6, 12))
         self.assertEqual(9, s.n_atoms)  # 10 - 0 + 1
         self.assertEqual(36, s.lo_atom)  # As specified
@@ -48,7 +48,7 @@ class TestSlice(unittest.TestCase):
         s2 = MDSlice.from_string(str(s))
         self.assertEqual(s, s2)
 
-    def test_2b(self):
+    def test_2b(self) -> None:
         s = MDSlice(9, 17, (3, 3), (3, 0), (6, 12))
         self.assertEqual(9, s.n_atoms)  # 10 - 0 + 1
         self.assertEqual(9, s.lo_atom)  # As specified
@@ -61,7 +61,7 @@ class TestSlice(unittest.TestCase):
         s2 = MDSlice.from_string(str(s))
         self.assertEqual(s, s2)
 
-    def test_3b(self):
+    def test_3b(self) -> None:
         s = MDSlice(432, 455, (2, 3, 4), (6, 9, 16), (9, 15, 20))
         self.assertEqual(24, s.n_atoms)  # 10 - 0 + 1
         self.assertEqual(432, s.lo_atom)  # As specified
@@ -78,14 +78,14 @@ class TestSlice(unittest.TestCase):
         s2 = MDSlice.from_string(str(s))
         self.assertEqual(s, s2)
 
-    def test_get_relative_indices(self):
+    def test_get_relative_indices(self) -> None:
         s = MDSlice(22, 89, (2, 3, 2), (4, 3, 0), (6, 9, 4))
         # Going over the raster IDs should result in a line over the core
         self.assertListEqual(list(range(2 * 3 * 2)),
                              list((s.get_relative_indices(
                                  s.get_raster_ids()))))
 
-    def test_get_raster_indices(self):
+    def test_get_raster_indices(self) -> None:
         s = MDSlice(22, 89, (2, 3, 2), (4, 3, 0), (6, 9, 4))
         # Going from a line over the core should come back to the raster
         # indices

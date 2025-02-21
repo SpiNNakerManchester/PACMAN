@@ -39,37 +39,38 @@ class SimpleTestVertex2(SimpleTestVertex):
 
 class TestSimulatorData(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_setup(self):
+    def test_setup(self) -> None:
         # What happens before setup depends on the previous test
         # Use manual_check to verify this without dependency
         PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_n_placements()
 
-    def test_mock(self):
+    def test_mock(self) -> None:
         PacmanDataWriter.mock()
         # check there is a value not what it is
         PacmanDataView.get_run_dir_path()
 
-    def test_graph_functions(self):
+    def test_graph_functions(self) -> None:
         writer = PacmanDataWriter.setup()
+        sdram = ConstantSDRAM(123)
         app1 = SimpleTestVertex(12, "app1")
-        m11 = app1.create_machine_vertex(Slice(0, 6), None)
+        m11 = app1.create_machine_vertex(Slice(0, 6), sdram)
         app1.remember_machine_vertex(m11)
-        m12 = app1.create_machine_vertex(Slice(7, 12), None)
+        m12 = app1.create_machine_vertex(Slice(7, 12), sdram)
         app1.remember_machine_vertex(m12)
         app2 = SimpleTestVertex2(23, "app21")
-        m21 = app2.create_machine_vertex(Slice(0, 23), None)
+        m21 = app2.create_machine_vertex(Slice(0, 23), sdram)
         app2.remember_machine_vertex(m21)
         app3 = SimpleTestVertex2(33, "app3")
-        m31 = app3.create_machine_vertex(Slice(0, 11), None)
+        m31 = app3.create_machine_vertex(Slice(0, 11), sdram)
         app3.remember_machine_vertex(m31)
-        m32 = app3.create_machine_vertex(Slice(11, 22), None)
+        m32 = app3.create_machine_vertex(Slice(11, 22), sdram)
         app3.remember_machine_vertex(m32)
-        m33 = app3.create_machine_vertex(Slice(22, 33), None)
+        m33 = app3.create_machine_vertex(Slice(22, 33), sdram)
         app3.remember_machine_vertex(m33)
         edge12 = ApplicationEdge(app1, app2)
         edge32 = ApplicationEdge(app3, app2)
@@ -98,7 +99,7 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(2, PacmanDataView.get_n_partitions())
         ps = PacmanDataView.get_outgoing_edge_partitions_starting_at_vertex(
             app1)
-        self.assertEqual(1, len(ps))
+        self.assertEqual(1, len(list(ps)))
         self.assertEqual([edge12, edge13, edge11, edge32],
                          PacmanDataView.get_edges())
         self.assertEqual(6, PacmanDataView.get_n_machine_vertices())
@@ -123,18 +124,20 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(SimulatorShutdownException):
             PacmanDataView.add_edge(ApplicationEdge(app1, app2), "new")
 
-    def test_graph_safety_code(self):
+    def test_graph_safety_code(self) -> None:
         writer = PacmanDataWriter.setup()
         # there is always a graph so to hit safety code you need a hack
-        writer._PacmanDataWriter__pacman_data._graph = None
+        (writer.  # type: ignore[attr-defined]
+         _PacmanDataWriter__pacman_data)._graph = None
         with self.assertRaises(DataNotYetAvialable):
-            writer.add_vertex(None)
+            writer.add_vertex(SimpleTestVertex(1))
         with self.assertRaises(DataNotYetAvialable):
-            writer.add_edge(None, None)
+            writer.add_edge(ApplicationEdge(
+                SimpleTestVertex(1), SimpleTestVertex2(1)), "test")
         with self.assertRaises(DataNotYetAvialable):
             writer.iterate_vertices()
         with self.assertRaises(DataNotYetAvialable):
-            list(writer.get_vertices_by_type(None))
+            list(writer.get_vertices_by_type(SimpleTestVertex))
         with self.assertRaises(DataNotYetAvialable):
             writer.get_n_vertices()
         with self.assertRaises(DataNotYetAvialable):
@@ -142,7 +145,8 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             writer.get_n_partitions()
         with self.assertRaises(DataNotYetAvialable):
-            writer.get_outgoing_edge_partitions_starting_at_vertex(None)
+            writer.get_outgoing_edge_partitions_starting_at_vertex(
+                SimpleTestVertex(1))
         with self.assertRaises(DataNotYetAvialable):
             writer.get_edges()
         with self.assertRaises(DataNotYetAvialable):
@@ -150,47 +154,54 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             list(writer.iterate_machine_vertices())
 
-    def test_graph_never_changes(self):
+    def test_graph_never_changes(self) -> None:
         writer = PacmanDataWriter.setup()
         # graph is hidden so need a hack to get it.
-        graph1 = writer._PacmanDataWriter__pacman_data._graph
+        graph1 = (writer.  # type: ignore[attr-defined]
+                  _PacmanDataWriter__pacman_data._graph)
         writer.start_run()
-        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        graph2 = (writer.  # type: ignore[attr-defined]
+                  _PacmanDataWriter__pacman_data._graph)
         self.assertEqual(id(graph1), id(graph2))
         writer.finish_run()
-        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        graph1 = (writer.  # type: ignore[attr-defined]
+                  _PacmanDataWriter__pacman_data._graph)
         self.assertEqual(id(graph1), id(graph2))
         writer.soft_reset()
-        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        graph1 = (writer.  # type: ignore[attr-defined]
+                  _PacmanDataWriter__pacman_data._graph)
         self.assertEqual(id(graph1), id(graph2))
         writer.hard_reset()
-        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        graph1 = (writer.  # type: ignore[attr-defined]
+                  _PacmanDataWriter__pacman_data._graph)
         self.assertEqual(id(graph1), id(graph2))
         writer.start_run()
-        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        graph1 = (writer.  # type: ignore[attr-defined]
+                  _PacmanDataWriter__pacman_data._graph)
         self.assertEqual(id(graph1), id(graph2))
         writer.finish_run()
-        graph2 = writer._PacmanDataWriter__pacman_data._graph
+        graph1 = (writer.  # type: ignore[attr-defined]
+                  _PacmanDataWriter__pacman_data._graph)
         self.assertEqual(id(graph1), id(graph2))
 
-    def test_placements_safety_code(self):
+    def test_placements_safety_code(self) -> None:
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             writer.iterate_placemements()
         with self.assertRaises(DataNotYetAvialable):
-            writer.iterate_placements_by_vertex_type(None)
+            writer.iterate_placements_by_vertex_type(SimpleTestVertex)
         with self.assertRaises(DataNotYetAvialable):
-            writer.iterate_placements_on_core((None, None))
+            writer.iterate_placements_on_core((1, 2))
         with self.assertRaises(DataNotYetAvialable):
-            writer.iterate_placements_by_xy_and_type((None, None), None)
+            writer.iterate_placements_by_xy_and_type((1, 1), SimpleTestVertex)
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_n_placements()
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_placement_of_vertex(None)
+            PacmanDataView.get_placement_of_vertex(SimpleMachineVertex(None))
         with self.assertRaises(DataNotYetAvialable):
-            PacmanDataView.get_placement_on_processor(None, None, None)
+            PacmanDataView.get_placement_on_processor(1, 2, 3)
 
-    def test_placements(self):
+    def test_placements(self) -> None:
         writer = PacmanDataWriter.setup()
         info = Placements([])
         p1 = Placement(SimpleMachineVertex(None), 1, 2, 3)
@@ -209,9 +220,9 @@ class TestSimulatorData(unittest.TestCase):
             PacmanDataView.get_placement_of_vertex(SimpleMachineVertex(None))
 
         with self.assertRaises(TypeError):
-            writer.set_placements("Bacon")
+            writer.set_placements("Bacon")  # type: ignore[arg-type]
 
-    def test_routing_infos(self):
+    def test_routing_infos(self) -> None:
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_routing_infos()
@@ -219,9 +230,9 @@ class TestSimulatorData(unittest.TestCase):
         writer.set_routing_infos(info)
         self.assertEqual(info, PacmanDataView.get_routing_infos())
         with self.assertRaises(TypeError):
-            writer.set_routing_infos("Bacon")
+            writer.set_routing_infos("Bacon")  # type: ignore[arg-type]
 
-    def test_tags(self):
+    def test_tags(self) -> None:
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_tags()
@@ -229,9 +240,9 @@ class TestSimulatorData(unittest.TestCase):
         writer.set_tags(tags)
         self.assertEqual(tags, PacmanDataView.get_tags())
         with self.assertRaises(TypeError):
-            writer.set_tags("Bacon")
+            writer.set_tags("Bacon")  # type: ignore[arg-type]
 
-    def test_router_tables(self):
+    def test_router_tables(self) -> None:
         table = MulticastRoutingTables()
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
@@ -241,9 +252,9 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_precompressed()
         with self.assertRaises(TypeError):
-            writer.set_uncompressed("Bacon")
+            writer.set_uncompressed("Bacon")  # type: ignore[arg-type]
 
-    def test_precompressed_router_tables(self):
+    def test_precompressed_router_tables(self) -> None:
         table = MulticastRoutingTables()
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
@@ -254,18 +265,18 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_uncompressed()
         with self.assertRaises(TypeError):
-            writer.set_precompressed(None)
+            writer.set_precompressed(None)  # type: ignore[arg-type]
 
-    def test_plan_n_timesteps(self):
+    def test_plan_n_timesteps(self) -> None:
         writer = PacmanDataWriter.setup()
         writer.set_plan_n_timesteps(1234)
         self.assertEqual(1234, PacmanDataView.get_plan_n_timestep())
         with self.assertRaises(TypeError):
-            writer.set_plan_n_timesteps("Bacon")
+            writer.set_plan_n_timesteps("Bacon")  # type: ignore[arg-type]
         with self.assertRaises(PacmanConfigurationException):
             writer.set_plan_n_timesteps(-1)
 
-    def test_routing_table_by_partition(self):
+    def test_routing_table_by_partition(self) -> None:
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_routing_table_by_partition()
@@ -274,9 +285,10 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(
             table, PacmanDataView.get_routing_table_by_partition())
         with self.assertRaises(TypeError):
-            writer.set_routing_table_by_partition("Bacon")
+            writer.set_routing_table_by_partition(
+                "Bacon")  # type: ignore[arg-type]
 
-    def test_add_requires_mapping(self):
+    def test_add_requires_mapping(self) -> None:
         writer = PacmanDataWriter.setup()
         # before first run
         self.assertTrue(PacmanDataView.get_requires_mapping())
@@ -346,7 +358,7 @@ class TestSimulatorData(unittest.TestCase):
         writer.hard_reset()
         self.assertTrue(PacmanDataView.get_requires_mapping())
 
-    def test_get_monitors(self):
+    def test_get_monitors(self) -> None:
         writer = PacmanDataWriter.setup()
         self.assertEqual(0, PacmanDataView.get_all_monitor_cores())
         self.assertEqual(ConstantSDRAM(0),
@@ -374,7 +386,7 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(VariableSDRAM(200 + 100 + 55, 10 + 15),
                          PacmanDataView.get_ethernet_monitor_sdram())
 
-    def test_required(self):
+    def test_required(self) -> None:
         writer = PacmanDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             self.assertIsNone(PacmanDataView.get_n_boards_required())
@@ -449,6 +461,6 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(ValueError):
             writer.set_n_required(0, None)
         with self.assertRaises(TypeError):
-            writer.set_n_required(None, "five")
+            writer.set_n_required(None, "five")  # type: ignore[arg-type]
         with self.assertRaises(TypeError):
-            writer.set_n_required("2.3", None)
+            writer.set_n_required("2.3", None)  # type: ignore[arg-type]

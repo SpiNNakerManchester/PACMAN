@@ -35,10 +35,10 @@ class TestResourceModels(unittest.TestCase):
     unit tests on the resources object
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_sdram(self):
+    def test_sdram(self) -> None:
         """
         test that adding a SDRAM resource to a resource container works
         correctly
@@ -93,13 +93,13 @@ class TestResourceModels(unittest.TestCase):
             multi3.report(1000, target=target)
         multi3.report(1000, preamble="core (0,0,1):")
 
-    def test_add(self):
+    def test_add(self) -> None:
         multi1 = MultiRegionSDRAM()
         multi1.add_cost(1, 100, 4)
         multi1.add_cost(1, 50)
         self.assertEqual(multi1.regions[1], VariableSDRAM(150, 4))
 
-    def test_nest(self):
+    def test_nest(self) -> None:
         multi1 = MultiRegionSDRAM()
         multi1.add_cost(1, 100, 4)
         multi2 = MultiRegionSDRAM()
@@ -107,7 +107,7 @@ class TestResourceModels(unittest.TestCase):
         multi1.nest(1, multi2)
         self.assertEqual(multi1.regions[1], VariableSDRAM(150, 4))
 
-    def test_nest2(self):
+    def test_nest2(self) -> None:
         multi1 = MultiRegionSDRAM()
         multi1.add_cost(1, 100, 4)
         multi2 = MultiRegionSDRAM()
@@ -118,17 +118,17 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(multi3.regions[12], VariableSDRAM(150, 4))
         multi3.report(1000)
 
-    def test_tags_resources(self):
-        IPtagResource("1", 2, 3)  # Minimal args
-        iptr = IPtagResource("1.2.3.4", 2, 3, 4, 5)
+    def test_tags_resources(self) -> None:
+        IPtagResource("1", 2, True)  # Minimal args
+        iptr = IPtagResource("1.2.3.4", 2, False, 4, "bacon")
         self.assertEqual(iptr.ip_address, "1.2.3.4")
         self.assertEqual(iptr.port, 2)
-        self.assertEqual(iptr.strip_sdp, 3)
+        self.assertEqual(iptr.strip_sdp, False)
         self.assertEqual(iptr.tag, 4)
-        self.assertEqual(iptr.traffic_identifier, 5)
+        self.assertEqual(iptr.traffic_identifier, "bacon")
         self.assertEqual(str(iptr),
                          "IPTagResource(ip_address=1.2.3.4, port=2, "
-                         "strip_sdp=3, tag=4, traffic_identifier=5)")
+                         "strip_sdp=False, tag=4, traffic_identifier=bacon)")
 
         ReverseIPtagResource()  # Minimal args
         riptr = ReverseIPtagResource(1, 2, 3)
@@ -142,14 +142,14 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(riptr, riptr2)
         self.assertEqual(hash(riptr), hash(riptr2))
 
-    def test_total(self):
+    def test_total(self) -> None:
         var0 = VariableSDRAM(28, 0)
         self.assertEqual(28, var0.get_total_sdram(None))
         var4 = VariableSDRAM(28, 4)
         with self.assertRaises(PacmanConfigurationException):
             var4.get_total_sdram(None)
 
-    def test_shared(self):
+    def test_shared(self) -> None:
         var1 = VariableSDRAM(20, 1)
         sh1 = SharedSDRAM({"foo": var1})
         sh1.report(10)
@@ -167,7 +167,7 @@ class TestResourceModels(unittest.TestCase):
         self.assertEqual(combo4.get_total_sdram(5), 37)
         self.assertEqual(combo3, combo4)
 
-    def test_sdram_multi(self):
+    def test_sdram_multi(self) -> None:
         multi1 = MultiRegionSDRAM()
         multi1.add_cost(1, 100, 4)
         sh1 = SharedSDRAM({"foo": multi1})
@@ -182,7 +182,7 @@ class TestResourceModels(unittest.TestCase):
         combo = sh1 + sh2
         self.assertEqual(combo.get_total_sdram(10), 100 + 4 * 10 + 20 + 10)
 
-    def test_nested_shared(self):
+    def test_nested_shared(self) -> None:
         # nested sdram do not make sense but do work
         # all but the outer sdram acts like a non shared sdram
         c1 = ConstantSDRAM(45)
@@ -190,7 +190,7 @@ class TestResourceModels(unittest.TestCase):
         sh2 = SharedSDRAM({"bar": sh1})
         self.assertEqual(sh2.get_total_sdram(None), 45)
 
-    def test_reused_key(self):
+    def test_reused_key(self) -> None:
         var1 = VariableSDRAM(20, 1)
         sh1 = SharedSDRAM({"foo": var1})
         var2 = VariableSDRAM(20, 1)

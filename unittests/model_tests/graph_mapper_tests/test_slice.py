@@ -26,22 +26,22 @@ class TestSliceFunctions(unittest.TestCase):
     slice function tests
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_create_slice_valid(self):
+    def test_create_slice_valid(self) -> None:
         """
         test creating a empty slice
         """
         Slice(0, 1)
 
-    def test_slice_invalid_neg(self):
+    def test_slice_invalid_neg(self) -> None:
         """
         test that a invalid slice of negative value generates an error
         """
         self.assertRaises(PacmanValueError, Slice, -2, 0)
 
-    def test_slice_invalid_lo_higher_than_hi(self):
+    def test_slice_invalid_lo_higher_than_hi(self) -> None:
         """
         test that a invalid slice generates an error
         """

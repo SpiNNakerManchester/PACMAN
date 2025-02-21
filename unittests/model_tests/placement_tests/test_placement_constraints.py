@@ -21,10 +21,10 @@ class TestPlacementConstraints(unittest.TestCase):
     """ Tester for ChipAndCore
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_chip_and_core_constraint(self):
+    def test_chip_and_core_constraint(self) -> None:
         c1 = ChipAndCore(1, 2)
         self.assertEqual(c1.x, 1)
         self.assertEqual(c1.y, 2)

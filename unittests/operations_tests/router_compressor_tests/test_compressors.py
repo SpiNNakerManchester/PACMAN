@@ -32,7 +32,7 @@ from pacman.operations.router_compressors.ordered_covering_router_compressor \
 
 class TestCompressor(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         original_tables = MulticastRoutingTables()
         original_table = UnCompressedMulticastRoutingTable(x=0, y=0)
         original_table.add_multicast_routing_entry(
@@ -62,41 +62,43 @@ class TestCompressor(unittest.TestCase):
         original_tables.add_routing_table(original_table)
         unittest_setup()
         set_config(
-            "Mapping", "router_table_compress_as_far_as_possible", True)
+            "Mapping", "router_table_compress_as_far_as_possible", "True")
         set_config("Machine", "versions", VersionStrings.ANY.text)
         writer = PacmanDataWriter.mock()
         writer.set_uncompressed(original_tables)
         writer.set_precompressed(original_tables)
 
-    def check_compression(self, compressed_tables):
+    def check_compression(
+            self, compressed_tables: MulticastRoutingTables) -> None:
         for original in PacmanDataView.get_precompressed():
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)
+            assert compressed is not None
             assert compressed.number_of_entries < original.number_of_entries
             compare_tables(original, original)
 
-    def test_pair_compressor(self):
+    def test_pair_compressor(self) -> None:
         compressed_tables = pair_compressor()
         self.check_compression(compressed_tables)
 
-    def test_range_compressor_skipped(self):
+    def test_range_compressor_skipped(self) -> None:
         compressed_tables = range_compressor()
         for original in PacmanDataView.get_uncompressed():
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)
             self.assertEqual(original, compressed)
 
-    def test_checked_unordered_pair_compressor(self):
+    def test_checked_unordered_pair_compressor(self) -> None:
         compressed_tables = pair_compressor(
             ordered=False, accept_overflow=False)
         self.check_compression(compressed_tables)
 
-    def test_unordered_pair_compressor(self):
+    def test_unordered_pair_compressor(self) -> None:
         compressed_tables = pair_compressor(
             ordered=False, accept_overflow=True)
         self.check_compression(compressed_tables)
 
-    def test_ordered_covering_compressor(self):
+    def test_ordered_covering_compressor(self) -> None:
         compressed_tables = ordered_covering_compressor()
         self.check_compression(compressed_tables)
 

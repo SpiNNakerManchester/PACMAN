@@ -181,7 +181,7 @@ class Tags(object):
         return self._ip_tags_by_vertex.get(vertex)
 
     def get_reverse_ip_tags_for_vertex(
-            self, vertex: MachineVertex) -> Optional[Iterable[ReverseIPTag]]:
+            self, vertex: MachineVertex) -> Optional[List[ReverseIPTag]]:
         """
         Get the Reverse IP Tags assigned to a given machine vertex.
 

@@ -16,8 +16,6 @@
 """
 from typing import Optional
 
-from typing_extensions import Self
-
 from spinn_utilities.overrides import overrides
 
 from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
@@ -38,7 +36,7 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
     def __init__(self, n_atoms: int, label: str = "testVertex",
                  max_atoms_per_core: int = 256,
                  fixed_sdram_value: Optional[int] = None,
-                 splitter: Optional[AbstractSplitterCommon[Self]] = None):
+                 splitter: Optional[AbstractSplitterCommon] = None):
         super().__init__(
             label=label, max_atoms_per_core=max_atoms_per_core,
             splitter=splitter)

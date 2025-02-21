@@ -25,13 +25,13 @@ class TestApplicationGraphModel(unittest.TestCase):
     tests which test the application graph object
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_create_new_empty_graph(self):
+    def test_create_new_empty_graph(self) -> None:
         ApplicationGraph()
 
-    def test_create_new_graph(self):
+    def test_create_new_graph(self) -> None:
         vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1", 256)
         vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2", 256)
         vert3 = SimpleTestVertex(3, "New AbstractConstrainedVertex 3", 256)
@@ -49,10 +49,10 @@ class TestApplicationGraphModel(unittest.TestCase):
         assert frozenset(edges) == frozenset(graph.edges)
         graph.reset()
 
-    def test_add_vertex(self):
+    def test_add_vertex(self) -> None:
         graph = ApplicationGraph()
         with self.assertRaises(PacmanInvalidParameterException):
-            graph.add_vertex("vertex")
+            graph.add_vertex("vertex")  # type: ignore[arg-type]
         vert1 = SimpleTestVertex(10, "Test", 256)
         graph.add_vertex(vert1)
         with self.assertRaises(PacmanAlreadyExistsException):
@@ -64,10 +64,10 @@ class TestApplicationGraphModel(unittest.TestCase):
         self.assertNotEqual(vert1.label, vert2.label)
         self.assertEqual(vert1, graph.vertex_by_label("Test"))
 
-    def test_add_edge(self):
+    def test_add_edge(self) -> None:
         graph = ApplicationGraph()
         with self.assertRaises(PacmanInvalidParameterException):
-            graph.add_edge("edge", "spikes")
+            graph.add_edge("edge", "spikes")  # type: ignore[arg-type]
         vert1 = SimpleTestVertex(10, "Vertex 1", 256)
         vert2 = SimpleTestVertex(5, "Vertex 2", 256)
         edge1 = ApplicationEdge(vert1, vert2, label="First edge")

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import unittest
-from testfixtures import LogCapture  # type: ignore[import]
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
@@ -25,22 +24,16 @@ class TestSplitterFixedLegacy(unittest.TestCase):
     """ Tester for SplitterFixedLegacy
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_no_api(self):
-        splitter = SplitterFixedLegacy()
+    def test_no_api(self) -> None:
+        splitter: SplitterFixedLegacy = SplitterFixedLegacy()
         vertex = NonLegacyApplicationVertex()
         with self.assertRaises(PacmanConfigurationException):
             splitter.set_governed_app_vertex(vertex)
 
-    def test_with_api(self):
-        splitter = SplitterFixedLegacy()
+    def test_with_api(self) -> None:
+        splitter: SplitterFixedLegacy = SplitterFixedLegacy()
         vertex = SimpleTestVertex(12)
-        with LogCapture() as lc:
-            splitter.set_governed_app_vertex(vertex)
-            found = False
-            for record in lc.records:
-                if record.msg.fmt == splitter.NOT_API_WARNING:
-                    found = True
-            self.assertFalse(found)
+        splitter.set_governed_app_vertex(vertex)

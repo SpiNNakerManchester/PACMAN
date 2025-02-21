@@ -19,10 +19,10 @@ from pacman.utilities import constants
 
 class TestConstants(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_edges_enum(self):
+    def test_edges_enum(self) -> None:
         self.assertEqual(constants.EDGES.EAST.value, 0)
         self.assertEqual(constants.EDGES.NORTH_EAST.value, 1)
         self.assertEqual(constants.EDGES.NORTH.value, 2)

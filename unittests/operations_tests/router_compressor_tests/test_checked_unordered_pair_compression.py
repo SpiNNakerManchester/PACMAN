@@ -29,14 +29,15 @@ from pacman.operations.router_compressors import (
 
 class TestUnorderedPairCompressor(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
         # This tests needs exactly version 5 as on Spin2 it would fit
-        set_config("Machine", "version", FIVE)
+        set_config("Machine", "version", str(FIVE))
 
-    def test_onordered_pair_big(self):
+    def test_onordered_pair_big(self) -> None:
 
         class_file = sys.modules[self.__module__].__file__
+        assert class_file is not None
         path = os.path.dirname(os.path.abspath(class_file))
         j_router = os.path.join(path, "many_to_one.json.gz")
         original_tables = from_json(j_router)
