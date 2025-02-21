@@ -50,18 +50,18 @@ class TestSlice(unittest.TestCase):
         # Check for value sanity
         with self.assertRaises(Exception):
             # Check for int atom
-            Slice("1", 10)
+            Slice("1", 10)  # type: ignore[arg-type]
 
     def test_check_hi_atom_sanity(self) -> None:
         with self.assertRaises(ValueError):
             # Check for slice which goes backwards
-            Slice(5, 4)
+            Slice(5, 4)    # type: ignore[arg-type]
 
     def test_check_hi_atom_int(self) -> None:
         # Check for value sanity
         with self.assertRaises(Exception):
             # Check for int atom
-            Slice(1, "10")
+            Slice(1, "10")   # type: ignore[arg-type]
 
     def test_equal_hi_lo_atoms(self) -> None:
         # This should be fine...
@@ -82,19 +82,19 @@ class TestSlice(unittest.TestCase):
     def test_immutability_lo_atom(self) -> None:
         s = Slice(0, 10)
         with self.assertRaises(AttributeError):
-            s.lo_atom = 3
+            s.lo_atom = 3   # type: ignore[misc]
 
     def test_immutability_hi_atom(self) -> None:
         s = Slice(0, 10)
         with self.assertRaises(AttributeError):
-            s.hi_atom = 3
+            s.hi_atom = 3   # type: ignore[misc]
 
     def test_immutability_n_atoms(self) -> None:
         s = Slice(0, 10)
         with self.assertRaises(AttributeError):
-            s.n_atoms = 3
+            s.n_atoms = 3   # type: ignore[misc]
 
     def test_immutability_as_slice(self) -> None:
         s = Slice(0, 10)
         with self.assertRaises(AttributeError):
-            s.as_slice = slice(2, 10)
+            s.as_slice = slice(2, 10)    # type: ignore[misc]

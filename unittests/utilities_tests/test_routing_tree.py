@@ -14,6 +14,7 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
+from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 
 
@@ -23,35 +24,37 @@ class TestRoutingTre(unittest.TestCase):
         unittest_setup()
 
     def test_call(self) -> None:
-        # Note Vertices as string is incorrect but easier to do for test
-
+        m_vertex_a = SimpleMachineVertex(None, "m_vertex_a")
+        m_vertex_b = SimpleMachineVertex(None, "m_vertex_b")
+        m_vertex_1 = SimpleMachineVertex(None, "m_vertex_1")
+        m_vertex_2 = SimpleMachineVertex(None, "m_vertex_2")
         rt1 = RoutingTree((3, 4))
         self.assertIsNone(rt1.label)
         self.assertEqual(rt1.chip, (3, 4))
         self.assertTrue(rt1.is_leaf)
         self.assertIsNotNone(repr(rt1))
-        rt1.append_child((1, "m_vertexA"))
-        rt1.append_child((2, "m_vertexB"))
+        rt1.append_child((1, m_vertex_a))
+        rt1.append_child((2, m_vertex_b))
         self.assertFalse(rt1.is_leaf)
-        self.assertListEqual([(1, "m_vertexA"), (2, "m_vertexB")],
+        self.assertListEqual([(1, m_vertex_a), (2, m_vertex_b)],
                              list(rt1.children))
-        self.assertListEqual([rt1, "m_vertexA", "m_vertexB"],
+        self.assertListEqual([rt1, m_vertex_a, m_vertex_b],
                              list(iter(rt1)))
         self.assertEqual(len(rt1), len(list(rt1)))
 
         rt2 = RoutingTree((4, 5), "foo")
         self.assertEqual("foo", rt2.label)
-        rt2.append_child((2, "m_vertex1"))
+        rt2.append_child((2, m_vertex_1))
         self.assertFalse(rt2.is_leaf)
-        rt2.append_child((1, "m_vertex2"))
+        rt2.append_child((1, m_vertex_2))
         rt2.append_child((3, rt1))
 
-        self.assertListEqual([(2, "m_vertex1"), (1, "m_vertex2"), (3, rt1)],
+        self.assertListEqual([(2, m_vertex_1), (1, m_vertex_2), (3, rt1)],
                              list(rt2.children))
         self.assertIsNotNone(str(rt2))
-        rt2.remove_child((1, "m_vertex2"))
-        self.assertListEqual([(2, "m_vertex1"), (3, rt1)], list(rt2.children))
-        self.assertListEqual([rt2, "m_vertex1", rt1, "m_vertexA", "m_vertexB"],
+        rt2.remove_child((1, m_vertex_2))
+        self.assertListEqual([(2, m_vertex_1), (3, rt1)], list(rt2.children))
+        self.assertListEqual([rt2, m_vertex_1, rt1, m_vertex_a, m_vertex_b],
                              list(iter(rt2)))
         self.assertListEqual(
             [(None, (4, 5), {2, 3}), (3, (3, 4), {1, 2})],

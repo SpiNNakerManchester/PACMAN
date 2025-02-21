@@ -44,7 +44,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
             SimpleMachineVertex(
                 sdram=ConstantSDRAM(0),
                 iptags=[IPtagResource(
-                    "127.0.0.1", port=None, strip_sdp=True)],
+                    "127.0.0.1", port=123, strip_sdp=True)],
                 label="Vertex {}".format(i))
             for i in range(len(eth_chips))]
         print("Created {} vertices".format(len(vertices)))
@@ -57,6 +57,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
 
         for vertex, chip in zip(vertices, eth_chips):
             iptags = tags.get_ip_tags_for_vertex(vertex)
+            assert iptags is not None
             self.assertEqual(
                 len(iptags), 1, "Incorrect number of tags assigned")
             self.assertEqual(
@@ -122,7 +123,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
     def test_fixed_tag(self) -> None:
         writer = PacmanDataWriter.mock()
         machine = writer.get_machine()
-        chip00 = machine.get_chip_at(0, 0)
+        chip00 = machine[0, 0]
         procs = chip00.placable_processors_ids
         placements = Placements()
         for i in range(5):

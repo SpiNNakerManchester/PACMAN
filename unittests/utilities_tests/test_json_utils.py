@@ -73,7 +73,7 @@ class TestJsonUtils(unittest.TestCase):
     def test_placement(self) -> None:
         s1 = SimpleMachineVertex(
             sdram=ConstantSDRAM(0),
-            iptags=[IPtagResource("127.0.0.1", port=None, strip_sdp=True)],
+            iptags=[IPtagResource("127.0.0.1", port=456, strip_sdp=True)],
             reverse_iptags=[ReverseIPtagResource(port=25, sdp_port=2, tag=5)],
             label="PVertex")
         p1 = Placement(s1, 1, 2, 3)

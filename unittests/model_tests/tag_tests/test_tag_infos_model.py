@@ -65,6 +65,7 @@ class TestTagsModel(unittest.TestCase):
         tag_info.add_ip_tag(iptag, machine_vertex)
 
         gotton_tag = tag_info.get_ip_tags_for_vertex(machine_vertex)
+        assert gotton_tag is not None
         self.assertEqual(gotton_tag[0], iptag)
 
     def test_add_iptag_then_fail_to_locate(self) -> None:
@@ -91,6 +92,7 @@ class TestTagsModel(unittest.TestCase):
         tag_info.add_reverse_ip_tag(reverse_iptag, machine_vertex)
         gotton_tag = tag_info.get_reverse_ip_tags_for_vertex(
             machine_vertex)
+        assert gotton_tag is not None
         self.assertEqual(gotton_tag[0], reverse_iptag)
 
     def test_add_reverse_iptag_then_not_locate_tag(self) -> None:
@@ -123,7 +125,7 @@ class TestTagsModel(unittest.TestCase):
         self.assertIn("The tag has already been assigned on the given board",
                       str(e.exception))
         with self.assertRaises(PacmanInvalidParameterException) as e:
-            tags.add_ip_tag(tag3, machine_vertex)
+            tags.add_ip_tag(tag3, machine_vertex)  # type: ignore[arg-type]
         self.assertIn("Only add IP tags with this method.",
                       str(e.exception))
 
@@ -143,7 +145,8 @@ class TestTagsModel(unittest.TestCase):
         self.assertIn("The tag has already been assigned to a reverse IP tag"
                       " on the given board", str(e.exception))
         with self.assertRaises(PacmanInvalidParameterException) as e:
-            tags.add_reverse_ip_tag(tag3, machine_vertex)
+            tags.add_reverse_ip_tag(
+                tag3, machine_vertex)  # type: ignore[arg-type]
         self.assertIn("Only add reverse IP tags with this method.",
                       str(e.exception))
 

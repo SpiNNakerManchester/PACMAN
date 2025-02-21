@@ -11,19 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import Dict, Iterable, Sequence, Tuple
+from spinn_utilities.overrides import overrides
+
 from spinn_utilities.timer import Timer
 from spinn_utilities.config_holder import set_config
+
 from spinn_machine.version import FIVE
 from spinn_machine.version.version_strings import VersionStrings
 from spinn_machine.virtual_machine import (
     virtual_machine_by_boards, virtual_machine_by_cores)
+
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanRoutingException
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationEdge,
     ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex, FPGAConnection)
-from pacman.model.graphs.machine import MulticastEdgePartition, MachineEdge
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import (
+    MachineEdge, MachineVertex, MulticastEdgePartition)
 from pacman.model.partitioner_splitters import (
     SplitterExternalDevice, AbstractSplitterCommon)
 from pacman.utilities.utility_objs import ChipCounter
@@ -37,7 +46,7 @@ from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placements, Placement
-from pacman.model.resources import ConstantSDRAM
+from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 from pacman.model.graphs.machine import (
     MachineFPGAVertex, MachineSpiNNakerLinkVertex)
 
@@ -58,7 +67,8 @@ class MockSplitter(AbstractSplitterCommon):
         super().__init__()
         self.__n_machine_vertices = n_machine_vertices
 
-    def create_machine_vertices(self, chip_counter):
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         m_vertices = [
             SimpleMachineVertex(
                 ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
@@ -67,21 +77,30 @@ class MockSplitter(AbstractSplitterCommon):
         for m_vertex in m_vertices:
             self.governed_app_vertex.remember_machine_vertex(m_vertex)
 
-    def get_out_going_slices(self) -> None:
-        return None
+    @overrides(AbstractSplitterCommon.get_out_going_slices)
+    def get_out_going_slices(self) -> Sequence[Slice]:
+        raise NotImplementedError
 
-    def get_in_coming_slices(self) -> None:
-        return None
+    @overrides(AbstractSplitterCommon.get_in_coming_slices)
+    def get_in_coming_slices(self) -> Sequence[Slice]:
+        raise NotImplementedError
 
-    def get_out_going_vertices(self, partition_id):
+    @overrides(AbstractSplitterCommon.get_out_going_vertices)
+    def get_out_going_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return self.governed_app_vertex.machine_vertices
 
-    def get_in_coming_vertices(self, partition_id):
+    @overrides(AbstractSplitterCommon.get_in_coming_vertices)
+    def get_in_coming_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return self.governed_app_vertex.machine_vertices
 
-    def machine_vertices_for_recording(self, variable_to_record):
+    @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
+    def machine_vertices_for_recording(
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         return []
 
+    @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self) -> None:
         pass
 
@@ -102,7 +121,8 @@ class MockMultiInputSplitter(AbstractSplitterCommon):
         self.__outgoing_machine_vertices = list()
         self.__internal_multicast_partitions = list()
 
-    def create_machine_vertices(self, chip_counter):
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         last_incoming = None
         for i in range(self.__n_groups):
             incoming = [
@@ -132,20 +152,29 @@ class MockMultiInputSplitter(AbstractSplitterCommon):
                             in_part.add_edge(MachineEdge(this_in, last_in))
                 last_incoming = incoming
 
-    def get_out_going_slices(self) -> None:
-        return None
+    @overrides(AbstractSplitterCommon.get_out_going_slices)
+    def get_out_going_slices(self) -> Sequence[Slice]:
+        raise NotImplementedError
 
-    def get_in_coming_slices(self) -> None:
-        return None
+    @overrides(AbstractSplitterCommon.get_in_coming_slices)
+    def get_in_coming_slices(self) -> Sequence[Slice]:
+        raise NotImplementedError
 
-    def get_out_going_vertices(self, partition_id):
+    @overrides(AbstractSplitterCommon.get_out_going_vertices)
+    def get_out_going_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return self.__outgoing_machine_vertices
 
-    def get_in_coming_vertices(self, partition_id):
+    @overrides(AbstractSplitterCommon.get_in_coming_vertices)
+    def get_in_coming_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return [v for lst in self.__incoming_machine_vertices for v in lst]
 
+    @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
-            self, source_vertex, partition_id):
+            self, source_vertex: ApplicationVertex,
+            partition_id: str) -> Sequence[Tuple[
+                MachineVertex, Sequence[AbstractVertex]]]:
         sources = source_vertex.splitter.get_out_going_vertices(partition_id)
         n_sources = len(sources)
         sources_per_incoming = int(math.ceil(
@@ -161,16 +190,23 @@ class MockMultiInputSplitter(AbstractSplitterCommon):
                 result.append((i_vertex, source_range))
         return result
 
-    def machine_vertices_for_recording(self, variable_to_record):
+    @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
+    def machine_vertices_for_recording(
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         return []
 
-    def get_internal_multicast_partitions(self) -> None:
+    @overrides(AbstractSplitterCommon.get_internal_multicast_partitions)
+    def get_internal_multicast_partitions(
+            self) -> Sequence[MulticastEdgePartition]:
         return self.__internal_multicast_partitions
 
+    @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self) -> None:
         pass
 
-    def get_same_chip_groups(self) -> None:
+    @overrides(AbstractSplitterCommon.get_same_chip_groups)
+    def get_same_chip_groups(self) -> Sequence[
+            Tuple[Sequence[MachineVertex], AbstractSDRAM]]:
         return self.__same_chip_groups
 
 
@@ -180,7 +216,8 @@ class MockOneToOneSplitter(AbstractSplitterCommon):
         super().__init__()
         self.__n_machine_vertices = n_machine_vertices
 
-    def create_machine_vertices(self, chip_counter):
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         m_vertices = [
             SimpleMachineVertex(
                 ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
@@ -189,26 +226,38 @@ class MockOneToOneSplitter(AbstractSplitterCommon):
         for m_vertex in m_vertices:
             self.governed_app_vertex.remember_machine_vertex(m_vertex)
 
-    def get_out_going_slices(self) -> None:
-        return None
+    @overrides(AbstractSplitterCommon.get_out_going_slices)
+    def get_out_going_slices(self) -> Sequence[Slice]:
+        raise NotImplementedError
 
-    def get_in_coming_slices(self) -> None:
-        return None
+    @overrides(AbstractSplitterCommon.get_in_coming_slices)
+    def get_in_coming_slices(self) -> Sequence[Slice]:
+        raise NotImplementedError
 
-    def get_out_going_vertices(self, partition_id):
+    @overrides(AbstractSplitterCommon.get_out_going_vertices)
+    def get_out_going_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return self.governed_app_vertex.machine_vertices
 
-    def get_in_coming_vertices(self, partition_id):
+    @overrides(AbstractSplitterCommon.get_in_coming_vertices)
+    def get_in_coming_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return self.governed_app_vertex.machine_vertices
 
-    def machine_vertices_for_recording(self, variable_to_record):
+    @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
+    def machine_vertices_for_recording(
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         return []
 
+    @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self) -> None:
         pass
 
+    @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
-            self, source_vertex, partition_id):
+            self, source_vertex: ApplicationVertex,
+            partition_id: str) -> Sequence[Tuple[
+                MachineVertex, Sequence[AbstractVertex]]]:
         return [
             (target, [source])
             for source, target in zip(
@@ -221,9 +270,11 @@ class MockNearestEthernetSplitter(AbstractSplitterCommon):
     def __init__(self) -> None:
         super().__init__()
         self.__placements = Placements()
+        self.__m_vertex_by_ethernet: Dict[Tuple[int, int], MachineVertex]
         self.__m_vertex_by_ethernet = dict()
 
-    def create_machine_vertices(self, chip_counter):
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         machine = PacmanDataView.get_machine()
         for chip in machine.ethernet_connected_chips:
             m_vertex = SimpleMachineVertex(
@@ -234,26 +285,38 @@ class MockNearestEthernetSplitter(AbstractSplitterCommon):
                 Placement(m_vertex, chip.x, chip.y, 1))
             self.__m_vertex_by_ethernet[chip.x, chip.y] = m_vertex
 
-    def get_out_going_slices(self) -> None:
-        return None
+    @overrides(AbstractSplitterCommon.get_out_going_slices)
+    def get_out_going_slices(self) -> Sequence[Slice]:
+        raise NotImplementedError
 
-    def get_in_coming_slices(self) -> None:
-        return None
+    @overrides(AbstractSplitterCommon.get_in_coming_slices)
+    def get_in_coming_slices(self) -> Sequence[Slice]:
+        raise NotImplementedError
 
-    def get_out_going_vertices(self, partition_id):
+    @overrides(AbstractSplitterCommon.get_out_going_vertices)
+    def get_out_going_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return self.governed_app_vertex.machine_vertices
 
-    def get_in_coming_vertices(self, partition_id):
+    @overrides(AbstractSplitterCommon.get_in_coming_vertices)
+    def get_in_coming_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return self.governed_app_vertex.machine_vertices
 
-    def machine_vertices_for_recording(self, variable_to_record):
+    @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
+    def machine_vertices_for_recording(
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         return []
 
+    @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self) -> None:
         pass
 
+    @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
-            self, source_vertex, partition_id):
+            self, source_vertex: ApplicationVertex,
+            partition_id: str) -> Sequence[Tuple[
+                MachineVertex, Sequence[AbstractVertex]]]:
 
         m_vertex = next(iter(source_vertex.splitter.get_out_going_vertices(
             partition_id)))
@@ -264,7 +327,7 @@ class MockNearestEthernetSplitter(AbstractSplitterCommon):
         return [(target_m_vertex, [source_vertex])]
 
     @property
-    def placements(self) -> None:
+    def placements(self) -> Placements:
         return self.__placements
 
 
@@ -277,7 +340,8 @@ class MockInputOutputSplitter(AbstractSplitterCommon):
         self.__outgoing_machine_vertices = list()
         self.__internal_multicast_partitions = list()
 
-    def create_machine_vertices(self, chip_counter):
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         self.__incoming_machine_vertices = [
             SimpleMachineVertex(
                 ConstantSDRAM(0), app_vertex=self.governed_app_vertex,
@@ -300,24 +364,35 @@ class MockInputOutputSplitter(AbstractSplitterCommon):
             for end_v in self.__incoming_machine_vertices:
                 part.add_edge(MachineEdge(start_v, end_v))
 
-    def get_out_going_slices(self) -> None:
-        return None
+    @overrides(AbstractSplitterCommon.get_out_going_slices)
+    def get_out_going_slices(self) -> Sequence[Slice]:
+        raise NotImplementedError
 
-    def get_in_coming_slices(self) -> None:
-        return None
+    @overrides(AbstractSplitterCommon.get_in_coming_slices)
+    def get_in_coming_slices(self) -> Sequence[Slice]:
+        raise NotImplementedError
 
-    def get_out_going_vertices(self, partition_id):
+    @overrides(AbstractSplitterCommon.get_out_going_vertices)
+    def get_out_going_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return self.__outgoing_machine_vertices
 
-    def get_in_coming_vertices(self, partition_id):
-        return self.__incoming_machine_vertices
+    @overrides(AbstractSplitterCommon.get_in_coming_vertices)
+    def get_in_coming_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
+       return self.__incoming_machine_vertices
 
-    def machine_vertices_for_recording(self, variable_to_record):
+    @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
+    def machine_vertices_for_recording(
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         return []
 
-    def get_internal_multicast_partitions(self) -> None:
+    @overrides(AbstractSplitterCommon.get_internal_multicast_partitions)
+    def get_internal_multicast_partitions(
+            self) -> Sequence[MulticastEdgePartition]:
         return self.__internal_multicast_partitions
 
+    @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self) -> None:
         pass
 
@@ -328,7 +403,7 @@ class MockAppVertex(ApplicationVertex):
         self.__n_atoms = n_atoms
 
     @property
-    def n_atoms(self) -> None:
+    def n_atoms(self) -> int:
         return self.__n_atoms
 
 

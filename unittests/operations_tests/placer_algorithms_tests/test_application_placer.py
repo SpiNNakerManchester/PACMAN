@@ -11,17 +11,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import Iterable, Sequence, Tuple
+
 from spinn_utilities.config_holder import set_config
+from spinn_utilities.overrides import overrides
+
 from spinn_machine.virtual_machine import virtual_machine_by_cores
 from spinn_machine.version.version_strings import VersionStrings
+
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import (PacmanPlaceException, PacmanTooBigToPlace)
 from pacman.model.partitioner_splitters import (
     SplitterFixedLegacy, AbstractSplitterCommon)
 from pacman.operations.placer_algorithms.application_placer import (
     place_application_graph, ApplicationPlacer)
-from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.resources import ConstantSDRAM
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex, SimpleMachineVertex
+from pacman.model.resources import ConstantSDRAM, AbstractSDRAM
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.config_setup import unittest_setup
 from pacman.model.placements.placements import Placements
@@ -38,7 +45,8 @@ class MockSplitter(AbstractSplitterCommon):
         self.__same_chip_groups = list()
         self.__sdram = sdram
 
-    def create_machine_vertices(self, chip_counter):
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         for _ in range(self.__n_groups):
             m_vertices = [
                 SimpleMachineVertex(
@@ -51,25 +59,36 @@ class MockSplitter(AbstractSplitterCommon):
             self.__same_chip_groups.append(
                 (m_vertices, ConstantSDRAM(self.__sdram)))
 
-    def get_out_going_slices(self) -> None:
-        return None
+    @overrides(AbstractSplitterCommon.get_out_going_slices)
+    def get_out_going_slices(self) -> Sequence[Slice]:
+        raise NotImplementedError
 
-    def get_in_coming_slices(self) -> None:
-        return None
+    @overrides(AbstractSplitterCommon.get_in_coming_slices)
+    def get_in_coming_slices(self) -> Sequence[Slice]:
+        raise NotImplementedError
 
-    def get_out_going_vertices(self, partition_id):
+    @overrides(AbstractSplitterCommon.get_out_going_vertices)
+    def get_out_going_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return self.governed_app_vertex.machine_vertices
 
-    def get_in_coming_vertices(self, partition_id):
+    @overrides(AbstractSplitterCommon.get_in_coming_vertices)
+    def get_in_coming_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return self.governed_app_vertex.machine_vertices
 
-    def machine_vertices_for_recording(self, variable_to_record):
+    @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
+    def machine_vertices_for_recording(
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         return []
 
+    @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self) -> None:
         pass
 
-    def get_same_chip_groups(self) -> None:
+    @overrides(AbstractSplitterCommon.get_same_chip_groups)
+    def get_same_chip_groups(self) -> Sequence[
+            Tuple[Sequence[MachineVertex], AbstractSDRAM]]:
         return self.__same_chip_groups
 
 
@@ -79,7 +98,8 @@ class MockAppVertex(ApplicationVertex):
         self.__n_atoms = n_atoms
 
     @property
-    def n_atoms(self) -> None:
+    @overrides(ApplicationVertex.n_atoms)
+    def n_atoms(self) -> int:
         return self.__n_atoms
 
 
