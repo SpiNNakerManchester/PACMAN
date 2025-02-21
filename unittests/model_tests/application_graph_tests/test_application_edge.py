@@ -17,7 +17,6 @@ from pacman.config_setup import unittest_setup
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
     PacmanInvalidParameterException)
-from pacman.model.graphs import AbstractEdge
 from pacman.model.graphs.application import ApplicationEdgePartition
 from pacman_test_objects import SimpleTestEdge, SimpleTestVertex
 
@@ -65,7 +64,7 @@ class TestApplicationEdgeModel(unittest.TestCase):
         assert edge2 not in partition
         partition.add_edge(edge2)
         self.assertEqual(2, partition.n_edges)
-        #self.assertIn(edge2, partition)
+        self.assertIn(edge2, partition)
         self.assertIn("ApplicationEdgePartition", str(partition))
         self.assertIn("spikes", repr(partition))
         vert3 = SimpleTestVertex(5, "Vertex 3", 256)

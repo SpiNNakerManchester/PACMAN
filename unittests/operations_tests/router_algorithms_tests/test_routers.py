@@ -380,7 +380,7 @@ class MockInputOutputSplitter(AbstractSplitterCommon):
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(
             self, partition_id: str) -> Sequence[MachineVertex]:
-       return self.__incoming_machine_vertices
+        return self.__incoming_machine_vertices
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(

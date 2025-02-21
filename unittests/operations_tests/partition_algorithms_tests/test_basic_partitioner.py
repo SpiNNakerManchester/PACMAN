@@ -77,7 +77,8 @@ class TestBasicPartitioner(unittest.TestCase):
         splitter_partitioner()
         self.assertEqual(PacmanDataView.get_n_machine_vertices(), 2)
 
-    def test_partition_on_target_size_vertex_than_has_to_be_split(self) -> None:
+    def test_partition_on_target_size_vertex_than_has_to_be_split(
+            self) -> None:
         """
         test that fixed partitioning causes correct number of vertices
         """

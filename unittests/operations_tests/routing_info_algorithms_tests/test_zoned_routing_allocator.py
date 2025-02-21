@@ -124,7 +124,7 @@ def create_graphs1(with_fixed: bool) -> None:
     for app_index in range(5):
         fixed_keys_by_partition: Optional[Dict[str, BaseKeyAndMask]] = None
         fixed_machine_keys_by_partition: \
-                Optional[Dict[Tuple[MachineVertex, str], BaseKeyAndMask]] = None
+            Optional[Dict[Tuple[MachineVertex, str], BaseKeyAndMask]] = None
         if with_fixed:
             fixed_keys_by_partition = dict()
             fixed_machine_keys_by_partition = dict()

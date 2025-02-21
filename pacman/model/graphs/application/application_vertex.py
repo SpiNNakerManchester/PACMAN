@@ -17,7 +17,6 @@ from typing import (
     Collection, Generic, Optional, Tuple, TypeVar, Union, cast, TYPE_CHECKING)
 
 import numpy
-from typing_extensions import Self
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ordered_set import OrderedSet

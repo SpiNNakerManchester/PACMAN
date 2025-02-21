@@ -38,7 +38,7 @@ class MockSplitter(SplitterFixedLegacy):
 
 class SimpleMDVertex(ApplicationVertex):
 
-    def __init__(self, max_atoms_per_core:Tuple[int, ...],
+    def __init__(self, max_atoms_per_core: Tuple[int, ...],
                  atoms_shape: Tuple[int, ...]):
         super(SimpleMDVertex, self).__init__(
             max_atoms_per_core=max_atoms_per_core)
