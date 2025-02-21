@@ -28,10 +28,6 @@ from pacman.operations.partition_algorithms import splitter_partitioner
 from pacman_test_objects import SimpleTestVertex
 
 
-def _n_machine_vertices(graph):
-    return sum([len(v.machine_vertices) for v in graph.vertices])
-
-
 class TestBasicPartitioner(unittest.TestCase):
     """
     test for basic partitioning algorithm

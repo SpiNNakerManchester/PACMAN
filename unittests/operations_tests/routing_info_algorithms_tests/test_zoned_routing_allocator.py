@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Dict, Optional, Sequence, Tuple
+from typing import Dict, Iterable, Optional, Sequence, Tuple
 
 from spinn_utilities.overrides import overrides
 
@@ -45,7 +45,9 @@ class MockSplitter(AbstractSplitterCommon):
             self, partition_id: str) -> Sequence[MachineVertex]:
         return self.governed_app_vertex.machine_vertices
 
-    def machine_vertices_for_recording(self, variable_to_record):
+    @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
+    def machine_vertices_for_recording(
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
@@ -63,8 +65,12 @@ class MockSplitter(AbstractSplitterCommon):
 
 class MockAppVertex(ApplicationVertex):
 
-    def __init__(self, splitter=None, fixed_keys_by_partition=None,
-                 fixed_key=None, fixed_machine_keys_by_partition=None):
+    def __init__(self, splitter: Optional[AbstractSplitterCommon] = None,
+                 fixed_keys_by_partition:Optional[
+                     Dict[str, BaseKeyAndMask]] = None,
+                 fixed_key: Optional[BaseKeyAndMask] = None,
+                 fixed_machine_keys_by_partition:  Optional[
+                     Dict[Tuple[MachineVertex, str], BaseKeyAndMask]]=None):
         super(MockAppVertex, self).__init__(splitter=splitter)
         self.__fixed_keys_by_partition = fixed_keys_by_partition
         self.__fixed_key = fixed_key
@@ -98,8 +104,10 @@ class MockAppVertex(ApplicationVertex):
 class TestMacVertex(MachineVertex):
 
     def __init__(
-            self, label=None, app_vertex=None,
-            vertex_slice=None, n_keys_required=None):
+            self, label: Optional[str] = None,
+            app_vertex: Optional[ApplicationVertex] = None,
+            vertex_slice: Optional[Slice] = None,
+            n_keys_required: Optional[Dict[str, int]] = None):
         super(TestMacVertex, self).__init__(
             label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__n_keys_required = n_keys_required
@@ -257,7 +265,8 @@ def check_fixed(m_vertex: MachineVertex, part_id: str, key: int) -> bool:
     return True
 
 
-def check_keys_for_application_partition_pairs(routing_info, app_mask):
+def check_keys_for_application_partition_pairs(
+        routing_info: RoutingInfo, app_mask: int) -> None:
     # Check the key for each application vertex/ parition pair is the same
     # The bits that should be the same are all but the bottom 12
     for part in PacmanDataView.iterate_partitions():
@@ -277,7 +286,7 @@ def check_keys_for_application_partition_pairs(routing_info, app_mask):
                 assert (key & app_mask) != 0
 
 
-def test_global_allocator():
+def test_global_allocator() -> None:
     unittest_setup()
 
     # Allocate something and check it does the right thing
@@ -295,7 +304,7 @@ def test_global_allocator():
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
 
-def test_flexible_allocator_no_fixed():
+def test_flexible_allocator_no_fixed() -> None:
     unittest_setup()
 
     # Allocate something and check it does the right thing
@@ -309,7 +318,7 @@ def test_flexible_allocator_no_fixed():
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
 
-def test_fixed_only():
+def test_fixed_only() -> None:
     unittest_setup()
     create_graphs_only_fixed(overlap=False)
     flexible_allocate([])
@@ -317,7 +326,7 @@ def test_fixed_only():
     assert len(list(routing_info)) == 4
 
 
-def test_overlap():
+def test_overlap() -> None:
     # This should work here; overlap is allowed provided routes don't overlap
     # (which is found elsewhere)
     unittest_setup()
@@ -325,7 +334,7 @@ def test_overlap():
     flexible_allocate([])
 
 
-def test_no_edge():
+def test_no_edge() -> None:
     unittest_setup()
     create_graphs_no_edge()
     flexible_allocate([])
@@ -333,7 +342,7 @@ def test_no_edge():
     assert len(list(routing_info)) == 0
 
 
-def test_flexible_allocator_with_fixed():
+def test_flexible_allocator_with_fixed() -> None:
     unittest_setup()
     # Allocate something and check it does the right thing
     create_graphs1(True)
@@ -346,7 +355,7 @@ def test_flexible_allocator_with_fixed():
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
 
-def create_big(with_fixed):
+def create_big(with_fixed: bool) -> None:
     # This test shows how easy it is to trip up the allocator with a retina
     # Create a single "big" vertex
     fixed_key = None
@@ -386,7 +395,7 @@ def create_big(with_fixed):
         mid_app_vertex.remember_machine_vertex(mid_mac_vertex)
 
 
-def test_big_flexible_no_fixed():
+def test_big_flexible_no_fixed() -> None:
     unittest_setup()
     create_big(False)
 
@@ -399,7 +408,7 @@ def test_big_flexible_no_fixed():
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
 
-def test_big_global_no_fixed():
+def test_big_global_no_fixed() -> None:
     unittest_setup()
     create_big(False)
     routing_info = global_allocate([])
@@ -416,7 +425,7 @@ def test_big_global_no_fixed():
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
 
-def test_big_flexible_fixed():
+def test_big_flexible_fixed() -> None:
     unittest_setup()
     create_big(True)
 
@@ -428,7 +437,7 @@ def test_big_flexible_fixed():
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
 
-def test_big_global_fixed():
+def test_big_global_fixed() -> None:
     unittest_setup()
     create_big(True)
     routing_info = global_allocate([])

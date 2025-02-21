@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Sequence, Tuple
+from typing import Iterable, List, Optional, Sequence, Tuple
 
 from spinn_utilities.config_holder import set_config
 from spinn_utilities.overrides import overrides
@@ -38,15 +38,17 @@ from pacman_test_objects import SimpleTestVertex
 
 class MockSplitter(AbstractSplitterCommon):
 
-    def __init__(self, n_groups, n_machine_vertices, sdram=0):
+    def __init__(self, n_groups: int, n_machine_vertices: int, sdram: int = 0):
         super().__init__()
         self.__n_groups = n_groups
         self.__n_machine_vertices = n_machine_vertices
-        self.__same_chip_groups = list()
+        self.__same_chip_groups: List[Tuple[Sequence[MachineVertex],
+                AbstractSDRAM]] = list()
         self.__sdram = sdram
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
+    def create_machine_vertices(
+            self, chip_counter: Optional[ChipCounter]) -> None:
         for _ in range(self.__n_groups):
             m_vertices = [
                 SimpleMachineVertex(
@@ -93,7 +95,7 @@ class MockSplitter(AbstractSplitterCommon):
 
 
 class MockAppVertex(ApplicationVertex):
-    def __init__(self, n_atoms, label):
+    def __init__(self, n_atoms: int, label: str):
         super().__init__(label)
         self.__n_atoms = n_atoms
 
@@ -104,7 +106,8 @@ class MockAppVertex(ApplicationVertex):
 
 
 def _make_vertices(
-        writer, n_atoms, n_groups, n_machine_vertices, label, sdram=0):
+        writer: PacmanDataWriter, n_atoms: int, n_groups: int,
+        n_machine_vertices: int, label: str, sdram: int=0) -> MockAppVertex:
     vertex = MockAppVertex(n_atoms, label)
     vertex.splitter = MockSplitter(n_groups, n_machine_vertices, sdram)
     writer.add_vertex(vertex)
@@ -112,7 +115,7 @@ def _make_vertices(
     return vertex
 
 
-def test_application_placer():
+def test_application_placer() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
@@ -126,11 +129,11 @@ def test_application_placer():
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
     # Fudge factor needed as not filling chips well
     writer.set_machine(virtual_machine_by_cores(
-        n_cores=writer.get_n_machine_vertices() * 1.2))
+        n_cores=int(writer.get_n_machine_vertices() * 1.2)))
     place_application_graph(Placements())
 
 
-def test_application_placer_large_groups():
+def test_application_placer_large_groups() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
@@ -151,7 +154,7 @@ def test_application_placer_large_groups():
     place_application_graph(Placements())
 
 
-def test_application_placer_too_few_boards():
+def test_application_placer_too_few_boards() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
@@ -167,7 +170,7 @@ def test_application_placer_too_few_boards():
         _make_vertices(writer, 1000, 14, n_machine_vertices, f"app_vertex_{i}")
     # intentionally too small
     writer.set_machine(virtual_machine_by_cores(
-        n_cores=writer.get_n_machine_vertices() / 2))
+        n_cores=writer.get_n_machine_vertices() // 2))
     try:
         place_application_graph(Placements())
         raise AssertionError("Error not raise")
@@ -175,7 +178,7 @@ def test_application_placer_too_few_boards():
         assert ("No more chips to start" in str(ex))
 
 
-def test_application_placer_restart_needed():
+def test_application_placer_restart_needed() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
@@ -193,7 +196,7 @@ def test_application_placer_restart_needed():
     place_application_graph(Placements())
 
 
-def test_application_placer_late_fixed():
+def test_application_placer_late_fixed() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
@@ -211,7 +214,7 @@ def test_application_placer_late_fixed():
     place_application_graph(Placements())
 
 
-def test_application_placer_fill_chips():
+def test_application_placer_fill_chips() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
@@ -232,7 +235,7 @@ def test_application_placer_fill_chips():
     place_application_graph(Placements())
 
 
-def test_sdram_bigger_than_chip():
+def test_sdram_bigger_than_chip() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
@@ -246,7 +249,7 @@ def test_sdram_bigger_than_chip():
         assert ("a Chip only has" in str(ex))
 
 
-def test_sdram_bigger_monitors():
+def test_sdram_bigger_monitors() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
@@ -263,7 +266,7 @@ def test_sdram_bigger_monitors():
         assert ("after monitors only" in str(ex))
 
 
-def test_more_cores_than_chip():
+def test_more_cores_than_chip() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
@@ -276,7 +279,7 @@ def test_more_cores_than_chip():
         assert ("number of cores on a chip" in str(ex))
 
 
-def test_more_cores_than_user():
+def test_more_cores_than_user() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
@@ -289,7 +292,7 @@ def test_more_cores_than_user():
         assert ("the user cores" in str(ex))
 
 
-def test_more_cores_with_monitor():
+def test_more_cores_with_monitor() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
@@ -305,7 +308,7 @@ def test_more_cores_with_monitor():
         assert ("reserved for monitors" in str(ex))
 
 
-def test_could_fit():
+def test_could_fit() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
