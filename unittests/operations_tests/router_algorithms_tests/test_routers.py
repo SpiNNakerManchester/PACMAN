@@ -130,7 +130,8 @@ class MockMultiInputSplitter(AbstractSplitterCommon):
         self.__incoming_machine_vertices: List[List[MachineVertex]] = [
             list() for _ in range(n_incoming_machine_vertices)]
         self.__outgoing_machine_vertices: List[MachineVertex] = list()
-        self.__internal_multicast_partitions: List[MulticastEdgePartition] = list()
+        self.__internal_multicast_partitions: List[
+            MulticastEdgePartition] = list()
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
@@ -349,7 +350,8 @@ class MockInputOutputSplitter(AbstractSplitterCommon):
         self.__n_outgoing: int = n_outgoing
         self.__incoming_machine_vertices: List[MachineVertex] = list()
         self.__outgoing_machine_vertices: List[MachineVertex] = list()
-        self.__internal_multicast_partitions: List[MulticastEdgePartition] = list()
+        self.__internal_multicast_partitions: List[
+            MulticastEdgePartition] = list()
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter) -> None:

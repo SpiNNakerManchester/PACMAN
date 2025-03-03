@@ -56,8 +56,9 @@ def _check_setup(width: int, height: int) -> None:
     writer = PacmanDataWriter.mock()
     writer.set_machine(machine)
     ethernet_chips = machine.ethernet_connected_chips
-    writer.set_placements(Placements(
-        Placement(SimpleMachineVertex(None), ethernet_chip.x, ethernet_chip.y, 1)
+    writer.set_placements(
+        Placements(Placement(
+            SimpleMachineVertex(None), ethernet_chip.x, ethernet_chip.y, 1)
         for ethernet_chip in ethernet_chips))
 
     fixed_route_tables = fixed_route_router(SimpleMachineVertex)

@@ -66,11 +66,11 @@ class MockSplitter(AbstractSplitterCommon):
 class MockAppVertex(ApplicationVertex):
 
     def __init__(self, splitter: Optional[AbstractSplitterCommon] = None,
-                 fixed_keys_by_partition:Optional[
+                 fixed_keys_by_partition: Optional[
                      Dict[str, BaseKeyAndMask]] = None,
                  fixed_key: Optional[BaseKeyAndMask] = None,
                  fixed_machine_keys_by_partition:  Optional[
-                     Dict[Tuple[MachineVertex, str], BaseKeyAndMask]]=None):
+                     Dict[Tuple[MachineVertex, str], BaseKeyAndMask]] = None):
         super(MockAppVertex, self).__init__(splitter=splitter)
         self.__fixed_keys_by_partition = fixed_keys_by_partition
         self.__fixed_key = fixed_key

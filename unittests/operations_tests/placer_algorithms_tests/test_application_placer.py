@@ -42,8 +42,8 @@ class MockSplitter(AbstractSplitterCommon):
         super().__init__()
         self.__n_groups = n_groups
         self.__n_machine_vertices = n_machine_vertices
-        self.__same_chip_groups: List[Tuple[Sequence[MachineVertex],
-                AbstractSDRAM]] = list()
+        self.__same_chip_groups: List[
+            Tuple[Sequence[MachineVertex], AbstractSDRAM]] = list()
         self.__sdram = sdram
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
@@ -107,7 +107,7 @@ class MockAppVertex(ApplicationVertex):
 
 def _make_vertices(
         writer: PacmanDataWriter, n_atoms: int, n_groups: int,
-        n_machine_vertices: int, label: str, sdram: int=0) -> MockAppVertex:
+        n_machine_vertices: int, label: str, sdram: int = 0) -> MockAppVertex:
     vertex = MockAppVertex(n_atoms, label)
     vertex.splitter = MockSplitter(n_groups, n_machine_vertices, sdram)
     writer.add_vertex(vertex)
