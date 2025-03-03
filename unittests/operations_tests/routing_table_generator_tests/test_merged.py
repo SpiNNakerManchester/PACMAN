@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
 import unittest
+
 from spinn_utilities.config_holder import set_config
+
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanRoutingException
@@ -38,13 +41,13 @@ from .test_basic import FixedKeyAppVertex
 
 class TestMerged(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
         # TODO check after
         #  https://github.com/SpiNNakerManchester/PACMAN/pull/555
-        set_config("Machine", "version", 5)
+        set_config("Machine", "version", "5")
 
-    def create_graphs1(self, writer):
+    def create_graphs1(self, writer: PacmanDataWriter) -> None:
         v1 = SimpleTestVertex(
             10, "app1", max_atoms_per_core=10, splitter=SplitterFixedLegacy())
         v2 = SimpleTestVertex(
@@ -53,7 +56,7 @@ class TestMerged(unittest.TestCase):
         writer.add_vertex(v2)
         writer.add_edge(ApplicationEdge(v1, v2), "foo")
 
-    def create_graphs2(self, writer):
+    def create_graphs2(self, writer: PacmanDataWriter) -> None:
         v1 = SimpleTestVertex(
             10, "app1", max_atoms_per_core=10, splitter=SplitterFixedLegacy())
         v2 = SimpleTestVertex(
@@ -70,7 +73,7 @@ class TestMerged(unittest.TestCase):
         writer.add_edge(ApplicationEdge(v2, v3), "foo")
         writer.add_edge(ApplicationEdge(v3, v4), "foo")
 
-    def create_graphs3(self, writer):
+    def create_graphs3(self, writer: PacmanDataWriter) -> None:
         v1 = SimpleTestVertex(
             300, "app1", max_atoms_per_core=10, splitter=SplitterFixedLegacy())
         v2 = SimpleTestVertex(
@@ -89,7 +92,8 @@ class TestMerged(unittest.TestCase):
         writer.add_edge(ApplicationEdge(v2, v4), "foo")
         writer.add_edge(ApplicationEdge(v1, v1), "foo")
 
-    def make_infos(self, writer, system_placements=None):
+    def make_infos(self, writer: PacmanDataWriter,
+                   system_placements: Optional[Placements] = None) -> None:
         if system_placements is None:
             system_placements = Placements()
         splitter_partitioner()
@@ -98,14 +102,14 @@ class TestMerged(unittest.TestCase):
         allocator = ZonedRoutingInfoAllocator()
         writer.set_routing_infos(allocator.allocate([]))
 
-    def test_empty(self):
+    def test_empty(self) -> None:
         writer = PacmanDataWriter.mock()
         self.make_infos(writer)
         data = merged_routing_table_generator()
         self.assertEqual(0, data.get_max_number_of_entries())
         self.assertEqual(0, len(list(data.routing_tables)))
 
-    def test_graph1(self):
+    def test_graph1(self) -> None:
         writer = PacmanDataWriter.mock()
         self.create_graphs1(writer)
         self.make_infos(writer)
@@ -113,7 +117,7 @@ class TestMerged(unittest.TestCase):
         self.assertEqual(1, data.get_max_number_of_entries())
         self.assertEqual(1, len(list(data.routing_tables)))
 
-    def test_graph2(self):
+    def test_graph2(self) -> None:
         writer = PacmanDataWriter.mock()
         self.create_graphs3(writer)
         self.make_infos(writer)
@@ -121,7 +125,7 @@ class TestMerged(unittest.TestCase):
         self.assertEqual(6, data.get_max_number_of_entries())
         self.assertEqual(5, len(list(data.routing_tables)))
 
-    def test_graph3_with_system(self):
+    def test_graph3_with_system(self) -> None:
         writer = PacmanDataWriter.mock()
         self.create_graphs3(writer)
         system_plaements = Placements()
@@ -132,7 +136,7 @@ class TestMerged(unittest.TestCase):
         self.assertEqual(6, data.get_max_number_of_entries())
         self.assertEqual(5, len(list(data.routing_tables)))
 
-    def test_bad_infos(self):
+    def test_bad_infos(self) -> None:
         writer = PacmanDataWriter.mock()
         self.create_graphs1(writer)
         self.make_infos(writer)
@@ -144,8 +148,8 @@ class TestMerged(unittest.TestCase):
         except KeyError as ex:
             self.assertIn("foo", str(ex))
 
-    def test_iterator_with_next(self):
-        empty = _IteratorWithNext([])
+    def test_iterator_with_next(self) -> None:
+        empty: _IteratorWithNext = _IteratorWithNext([])
         self.assertFalse(empty.has_next)
         with self.assertRaises(StopIteration):
             empty.pop()
@@ -156,7 +160,7 @@ class TestMerged(unittest.TestCase):
             check.append(ten.pop())
         self.assertEqual(10, len(check))
 
-    def test_overlapping(self):
+    def test_overlapping(self) -> None:
         # Two vertices in the same router can't send with the same key
         writer = PacmanDataWriter.mock()
         v_target = SimpleTestVertex(1, splitter=SplitterFixedLegacy())
@@ -174,7 +178,7 @@ class TestMerged(unittest.TestCase):
         with self.assertRaises(KeyError):
             merged_routing_table_generator()
 
-    def test_overlapping_different_chips(self):
+    def test_overlapping_different_chips(self) -> None:
         # Two vertices in the same router can't send with the same key
         writer = PacmanDataWriter.mock()
         v_target = SimpleTestVertex(1, splitter=SplitterFixedLegacy())
@@ -192,7 +196,7 @@ class TestMerged(unittest.TestCase):
         with self.assertRaises(KeyError):
             merged_routing_table_generator()
 
-    def test_non_overlapping_different_chips(self):
+    def test_non_overlapping_different_chips(self) -> None:
         # Two vertices with non-overlapping routes can use the same key
         writer = PacmanDataWriter.mock()
         v_target_1 = FixedKeyAppVertex(None)

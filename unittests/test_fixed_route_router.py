@@ -13,32 +13,37 @@
 # limitations under the License.
 
 import pytest
+from typing import Dict, Set, Tuple
+
 from spinn_utilities.config_holder import set_config
-from spinn_machine import virtual_machine
+
+from spinn_machine import Machine, RoutingEntry, virtual_machine
 from spinn_machine.version import FIVE
+
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
+from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placements, Placement
 from pacman.operations.fixed_route_router import fixed_route_router
 from pacman.exceptions import PacmanRoutingException
 
 
-class DestinationVertex(object):
-    pass
-
-
-def _get_destinations(machine, fixed_route_tables, source_x, source_y):
+def _get_destinations(
+        machine: Machine,
+        fixed_route_tables: Dict[Tuple[int, int], RoutingEntry],
+        source_x: int, source_y: int) -> Set[Tuple[int, int, int]]:
     to_search = list([(source_x, source_y)])
     visited = set()
-    destinations = set()
+    destinations: Set[Tuple[int, int, int]] = set()
     while to_search:
         x, y = to_search.pop()
         assert (x, y) not in visited
         entry = fixed_route_tables[x, y]
         for link in entry.link_ids:
             assert machine.is_link_at(x, y, link)
-            chip = machine.get_chip_at(x, y)
+            chip = machine[x, y]
             link_obj = chip.router.get_link(link)
+            assert link_obj is not None
             to_search.append((link_obj.destination_x, link_obj.destination_y))
         for processor_id in entry.processor_ids:
             destinations.add((x, y, processor_id))
@@ -46,20 +51,21 @@ def _get_destinations(machine, fixed_route_tables, source_x, source_y):
     return destinations
 
 
-def _check_setup(width, height):
+def _check_setup(width: int, height: int) -> None:
     machine = virtual_machine(width=width, height=height)
     writer = PacmanDataWriter.mock()
     writer.set_machine(machine)
     ethernet_chips = machine.ethernet_connected_chips
-    writer.set_placements(Placements(
-        Placement(DestinationVertex(), ethernet_chip.x, ethernet_chip.y, 1)
-        for ethernet_chip in ethernet_chips))
+    writer.set_placements(
+        Placements(Placement(
+            SimpleMachineVertex(None), ethernet_chip.x, ethernet_chip.y, 1)
+                   for ethernet_chip in ethernet_chips))
 
-    fixed_route_tables = fixed_route_router(DestinationVertex)
+    fixed_route_tables = fixed_route_router(SimpleMachineVertex)
 
     for x, y in machine.chip_coordinates:
         assert (x, y) in fixed_route_tables
-        chip = machine.get_chip_at(x, y)
+        chip = machine[x, y]
         destinations = _get_destinations(machine, fixed_route_tables, x, y)
         assert len(destinations) == 1
         assert (
@@ -80,10 +86,10 @@ def _check_setup(width, height):
      (True, False),
      (False, True),
      (True, True)])
-def test_all_working(
-        width, height,  version, with_down_links, with_down_chips):
+def test_all_working(width: int, height: int,  version: int,
+                     with_down_links: bool, with_down_chips: bool) -> None:
     unittest_setup()
-    set_config("Machine", "version", version)
+    set_config("Machine", "version", str(version))
     temp_machine = virtual_machine(width=width, height=height)
     down_links = None
     if with_down_links:
@@ -103,20 +109,9 @@ def test_all_working(
     _check_setup(width, height)
 
 
-def test_unreachable():
+def test_unreachable() -> None:
     unittest_setup()
-    set_config("Machine", "version", FIVE)
+    set_config("Machine", "version", str(FIVE))
     set_config("Machine", "down_chips", "0,2:1,3:1,4")
     with pytest.raises(PacmanRoutingException):
         _check_setup(8, 8)
-
-
-if __name__ == '__main__':
-    _iterations = [
-        (False, False),
-        (True, False),
-        (False, True)]
-    _sizes = [2, 8, 12, 16]
-    for (_down_links, _down_chips) in _iterations:
-        for _size in _sizes:
-            test_all_working(_size, _size, _down_links, _down_chips)

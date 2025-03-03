@@ -27,10 +27,10 @@ from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 class TestSplitterFixedLegacy(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_api(self):
+    def test_api(self) -> None:
         set_config("Machine", "versions", VersionStrings.ANY.text)
         splitter = SplitterOneToOneLegacy()
         self.assertIsNotNone(str(splitter))
@@ -52,7 +52,7 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         self.assertEqual(splitter.machine_vertices_for_recording("foo"), mvs)
         splitter.reset_called()
 
-    def test_not_api(self):
+    def test_not_api(self) -> None:
         splitter = SplitterOneToOneLegacy()
         v1 = NonLegacyApplicationVertex("v1")
         with self.assertRaises(PacmanConfigurationException):

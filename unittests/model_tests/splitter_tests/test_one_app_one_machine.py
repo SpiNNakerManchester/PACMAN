@@ -31,12 +31,12 @@ from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 class TestSplitterOneAppOneMachine(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_legacy(self):
+    def test_legacy(self) -> None:
         set_config("Machine", "versions", VersionStrings.ANY.text)
-        splitter = SplitterOneAppOneMachine()
+        splitter: SplitterOneAppOneMachine = SplitterOneAppOneMachine()
         v1 = NonLegacyApplicationVertex("v1")
         a = str(splitter)
         self.assertIsNotNone(a)
@@ -61,6 +61,6 @@ class TestSplitterOneAppOneMachine(unittest.TestCase):
         self.assertEqual(6, v2.n_atoms)
         v2.reset()
 
-    def test_default_name(self):
-        splitter = SplitterOneAppOneMachine()
+    def test_default_name(self) -> None:
+        splitter: SplitterOneAppOneMachine = SplitterOneAppOneMachine()
         self.assertIn("SplitterOneAppOneMachine", str(splitter))

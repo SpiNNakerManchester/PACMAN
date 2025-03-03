@@ -20,10 +20,10 @@ from pacman.model.graphs.common import Slice
 class TestSlice(unittest.TestCase):
     """Tests that Slices expose the correct options and are immutable."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_basic(self):
+    def test_basic(self) -> None:
         s = Slice(0, 10)
         self.assertEqual(11, s.n_atoms)  # 10 - 0 + 1
         self.assertEqual(0, s.lo_atom)  # As specified
@@ -40,30 +40,30 @@ class TestSlice(unittest.TestCase):
         target = list(range(0, 20))[s.as_slice]
         self.assertListEqual(target, list(s.get_raster_ids()))
 
-    def test_check_lo_atom_sanity(self):
+    def test_check_lo_atom_sanity(self) -> None:
         # Check for value sanity
         with self.assertRaises(ValueError):
             # Check for negative atom
             Slice(-1, 10)
 
-    def test_check_lo_atom_int(self):
+    def test_check_lo_atom_int(self) -> None:
         # Check for value sanity
         with self.assertRaises(Exception):
             # Check for int atom
-            Slice("1", 10)
+            Slice("1", 10)  # type: ignore[arg-type]
 
-    def test_check_hi_atom_sanity(self):
+    def test_check_hi_atom_sanity(self) -> None:
         with self.assertRaises(ValueError):
             # Check for slice which goes backwards
-            Slice(5, 4)
+            Slice(5, 4)    # type: ignore[arg-type]
 
-    def test_check_hi_atom_int(self):
+    def test_check_hi_atom_int(self) -> None:
         # Check for value sanity
         with self.assertRaises(Exception):
             # Check for int atom
-            Slice(1, "10")
+            Slice(1, "10")   # type: ignore[arg-type]
 
-    def test_equal_hi_lo_atoms(self):
+    def test_equal_hi_lo_atoms(self) -> None:
         # This should be fine...
         s = Slice(4, 4)
         self.assertEqual(1, s.n_atoms)  # 10 - 0 + 1
@@ -79,22 +79,22 @@ class TestSlice(unittest.TestCase):
         self.assertEqual((4, ), s.start)
         self.assertEqual(s, s2)
 
-    def test_immutability_lo_atom(self):
+    def test_immutability_lo_atom(self) -> None:
         s = Slice(0, 10)
         with self.assertRaises(AttributeError):
-            s.lo_atom = 3
+            s.lo_atom = 3   # type: ignore[misc]
 
-    def test_immutability_hi_atom(self):
+    def test_immutability_hi_atom(self) -> None:
         s = Slice(0, 10)
         with self.assertRaises(AttributeError):
-            s.hi_atom = 3
+            s.hi_atom = 3   # type: ignore[misc]
 
-    def test_immutability_n_atoms(self):
+    def test_immutability_n_atoms(self) -> None:
         s = Slice(0, 10)
         with self.assertRaises(AttributeError):
-            s.n_atoms = 3
+            s.n_atoms = 3   # type: ignore[misc]
 
-    def test_immutability_as_slice(self):
+    def test_immutability_as_slice(self) -> None:
         s = Slice(0, 10)
         with self.assertRaises(AttributeError):
-            s.as_slice = slice(2, 10)
+            s.as_slice = slice(2, 10)    # type: ignore[misc]
