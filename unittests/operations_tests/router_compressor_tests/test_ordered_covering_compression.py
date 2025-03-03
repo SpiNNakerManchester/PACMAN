@@ -30,14 +30,16 @@ from pacman.operations.router_compressors.ordered_covering_router_compressor \
 
 class TestOrderedCoveringCompressor(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
         # tests against version 5 as Spin2 would not need compression
-        set_config("Machine", "version", FIVE)
+        set_config("Machine", "version", str(FIVE))
 
-    def test_oc_big(self):
+    def test_oc_big(self) -> None:
         class_file = sys.modules[self.__module__].__file__
+        assert class_file is not None
         path = os.path.dirname(os.path.abspath(class_file))
+        assert path is not None
         j_router = os.path.join(path,
                                 "many_to_one.json.gz")
         original_tables = from_json(j_router)
@@ -51,4 +53,5 @@ class TestOrderedCoveringCompressor(unittest.TestCase):
         for original in original_tables:
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)
+            assert compressed is not None
             compare_tables(original, compressed)

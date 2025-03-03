@@ -30,14 +30,16 @@ from pacman.operations.router_compressors import (
 
 class TestUnorderedPairCompressor(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
         # tests against version 5 as Spin2 would not need compression
-        set_config("Machine", "version", FIVE)
+        set_config("Machine", "version", str(FIVE))
 
-    def test_onordered_pair_big(self):
-        class_file = sys.modules[self.__module__].__file__
-        path = os.path.dirname(os.path.abspath(class_file))
+    def test_onordered_pair_big(self) -> None:
+        file_path = sys.modules[self.__module__].__file__
+        assert file_path is not None
+        path = os.path.dirname(file_path)
+        assert path is not None
         j_router = os.path.join(path, "many_to_one.json.gz")
         original_tables = from_json(j_router)
         writer = PacmanDataWriter.mock()
@@ -51,4 +53,5 @@ class TestUnorderedPairCompressor(unittest.TestCase):
         for original in original_tables:
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)
+            assert compressed is not None
             compare_tables(original, compressed)

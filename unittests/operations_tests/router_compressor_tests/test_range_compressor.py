@@ -30,30 +30,37 @@ from pacman.operations.router_compressors.routing_compression_checker import (
 
 class TestRangeCompressor(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
         # tests against version 5 as Spin2 would not need compression
-        set_config("Machine", "version", FIVE)
+        set_config("Machine", "version", str(FIVE))
         set_config(
-            "Mapping", "router_table_compress_as_far_as_possible", True)
+            "Mapping", "router_table_compress_as_far_as_possible", str(True))
 
-    def test_big(self):
-        path = os.path.dirname(sys.modules[self.__module__].__file__)
+    def test_big(self) -> None:
+        file_path = sys.modules[self.__module__].__file__
+        assert file_path is not None
+        path = os.path.dirname(file_path)
+        assert path is not None
         table_path = os.path.join(path, "table1.csv.gz")
         table = from_csv(table_path)
         compressor = RangeCompressor()
         compressed = compressor.compress_table(table)
         compare_tables(table, compressed)
 
-    def test_tables(self):
+    def test_tables(self) -> None:
         tables = MulticastRoutingTables()
-        path = os.path.dirname(sys.modules[self.__module__].__file__)
+        file_path = sys.modules[self.__module__].__file__
+        assert file_path is not None
+        path = os.path.dirname(file_path)
+        assert path is not None
         table_path = os.path.join(path, "table2.csv.gz")
         table = from_csv(table_path)
         tables.add_routing_table(table)
         PacmanDataWriter.mock().set_uncompressed(tables)
         compressed = range_compressor()
         c_table = compressed.get_routing_table_for_chip(0, 0)
+        assert c_table is not None
         compare_tables(table, c_table)
 
 

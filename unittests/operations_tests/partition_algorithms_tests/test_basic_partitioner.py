@@ -28,10 +28,6 @@ from pacman.operations.partition_algorithms import splitter_partitioner
 from pacman_test_objects import SimpleTestVertex
 
 
-def _n_machine_vertices(graph):
-    return sum([len(v.machine_vertices) for v in graph.vertices])
-
-
 class TestBasicPartitioner(unittest.TestCase):
     """
     test for basic partitioning algorithm
@@ -40,14 +36,14 @@ class TestBasicPartitioner(unittest.TestCase):
 
     TheTestAddress = "192.162.240.253"
 
-    def setUp(self):
+    def setUp(self) -> None:
         """
         setup for all basic partitioner tests
         """
         unittest_setup()
         set_config("Machine", "versions", VersionStrings.ANY.text)
 
-    def test_partition_with_no_fixed(self):
+    def test_partition_with_no_fixed(self) -> None:
         """
         test a partitioning with a graph with no fixed_location
         """
@@ -66,7 +62,7 @@ class TestBasicPartitioner(unittest.TestCase):
             for m_vert in vert.machine_vertices:
                 self.assertEqual(vert.n_atoms, m_vert.vertex_slice.n_atoms)
 
-    def test_partition_on_large_vertex_than_has_to_be_split(self):
+    def test_partition_on_large_vertex_than_has_to_be_split(self) -> None:
         """
         test that partitioning 1 large vertex can make it into 2 small ones
         """
@@ -77,7 +73,8 @@ class TestBasicPartitioner(unittest.TestCase):
         splitter_partitioner()
         self.assertEqual(PacmanDataView.get_n_machine_vertices(), 2)
 
-    def test_partition_on_target_size_vertex_than_has_to_be_split(self):
+    def test_partition_on_target_size_vertex_than_has_to_be_split(
+            self) -> None:
         """
         test that fixed partitioning causes correct number of vertices
         """
@@ -88,14 +85,14 @@ class TestBasicPartitioner(unittest.TestCase):
         splitter_partitioner()
         self.assertEqual(PacmanDataView.get_n_machine_vertices(), 100)
 
-    def test_partition_with_empty_graph(self):
+    def test_partition_with_empty_graph(self) -> None:
         """
         test that the partitioner can work with an empty graph
         """
         splitter_partitioner()
         self.assertEqual(PacmanDataView.get_n_machine_vertices(), 0)
 
-    def test_partition_with_fixed_atom(self):
+    def test_partition_with_fixed_atom(self) -> None:
         """
         test a partitioning with a graph with fixed atom constraint which\
         should fit but is close to the limit

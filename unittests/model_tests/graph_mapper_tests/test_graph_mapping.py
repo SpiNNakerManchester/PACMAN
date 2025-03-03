@@ -28,10 +28,10 @@ class TestGraphMapping(unittest.TestCase):
     graph mapper tests
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_get_vertices_from_vertex(self):
+    def test_get_vertices_from_vertex(self) -> None:
         """
         test getting the vertex from a graph mapper via the vertex
         """
@@ -53,7 +53,7 @@ class TestGraphMapping(unittest.TestCase):
         for v in vertices:
             self.assertNotIn(v, returned_vertices)
 
-    def test_get_vertex_from_vertex(self):
+    def test_get_vertex_from_vertex(self) -> None:
         """
         test that the graph mapper can retrieve a vertex from a given vertex
         """
