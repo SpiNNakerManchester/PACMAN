@@ -59,7 +59,7 @@ def _check_setup(width: int, height: int) -> None:
     writer.set_placements(
         Placements(Placement(
             SimpleMachineVertex(None), ethernet_chip.x, ethernet_chip.y, 1)
-        for ethernet_chip in ethernet_chips))
+                   for ethernet_chip in ethernet_chips))
 
     fixed_route_tables = fixed_route_router(SimpleMachineVertex)
 
