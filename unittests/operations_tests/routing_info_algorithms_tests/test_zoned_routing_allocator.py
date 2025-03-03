@@ -114,6 +114,7 @@ class TestMacVertex(MachineVertex):
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id: str) -> int:
+        assert self.__n_keys_required is not None
         return self.__n_keys_required[partition_id]
 
     @property

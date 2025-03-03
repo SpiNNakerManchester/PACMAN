@@ -14,9 +14,14 @@
 
 import unittest
 from collections import defaultdict
+from typing import Dict, Set
+
 from spinn_utilities.config_holder import set_config
+
+from spinn_machine import Machine
 from spinn_machine.version.version_strings import VersionStrings
 from spinn_machine.virtual_machine import virtual_machine_by_boards
+
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
@@ -69,13 +74,13 @@ class TestTagsBoardAddresses(unittest.TestCase):
             placement = placements.get_placement_of_vertex(vertex)
             print(placement, "has tag", iptags[0])
 
-    def do_too_many_ip_tags_for_1_board(self, machine):
+    def do_too_many_ip_tags_for_1_board(self, machine: Machine) -> None:
         writer = PacmanDataWriter.mock()
         n_extra_vertices = 3
         writer.set_machine(machine)
         eth_chips = machine.ethernet_connected_chips
         eth_chip = eth_chips[0]
-        eth_chip_2 = machine.get_chip_at(eth_chip.x + 1, eth_chip.y + 1)
+        eth_chip_2 = machine[eth_chip.x + 1, eth_chip.y + 1]
         eth_procs = list(eth_chip.placable_processors_ids)
         eth2_procs = list(eth_chip_2.placable_processors_ids)
         proc = eth2_procs[-1]
@@ -103,10 +108,11 @@ class TestTagsBoardAddresses(unittest.TestCase):
         writer.set_plan_n_timesteps(1000)
         tags = basic_tag_allocator()
 
-        tags_by_board = defaultdict(set)
+        tags_by_board: Dict[str, Set] = defaultdict(set)
         for vertices in (eth_vertices, eth2_vertices):
             for vertex in vertices:
                 iptags = tags.get_ip_tags_for_vertex(vertex)
+                assert iptags is not None
                 self.assertEqual(
                     len(iptags), 1, "Incorrect number of tags assigned")
                 placement = placements.get_placement_of_vertex(vertex)
@@ -116,8 +122,10 @@ class TestTagsBoardAddresses(unittest.TestCase):
                     "Tag used more than once")
                 tags_by_board[iptags[0].board_address].add(iptags[0].tag)
 
+        ip_address = eth_chip.ip_address
+        assert ip_address is not None
         self.assertEqual(
-            len(tags_by_board[eth_chip.ip_address]), len(eth_chip.tag_ids),
+            len(tags_by_board[ip_address]), len(eth_chip.tag_ids),
             "Wrong number of tags assigned to first Ethernet")
 
     def test_fixed_tag(self) -> None:
@@ -139,10 +147,10 @@ class TestTagsBoardAddresses(unittest.TestCase):
         self.assertEqual(5, len(list(tags.ip_tags)))
         self.assertEqual(5, len(list(tags.ip_tags_vertices)))
 
-    def do_fixed_repeat_tag(self, machine):
+    def do_fixed_repeat_tag(self, machine: Machine) -> None:
         writer = PacmanDataWriter.mock()
         writer.set_machine(machine)
-        chip00 = machine.get_chip_at(0, 0)
+        chip00 = machine[0, 0]
         procs = chip00.placable_processors_ids
         placements = Placements()
         for i in range(3):
@@ -177,10 +185,10 @@ class TestTagsBoardAddresses(unittest.TestCase):
         machine = virtual_machine_by_boards(3)
         self.do_fixed_repeat_tag(machine)
 
-    def do_reverse(self, machine):
+    def do_reverse(self, machine: Machine) -> None:
         writer = PacmanDataWriter.mock()
         writer.set_machine(machine)
-        chip00 = machine.get_chip_at(0, 0)
+        chip00 = machine[0, 0]
         processor = chip00.placable_processors_ids[0]
         placements = Placements()
         vertex = SimpleMachineVertex(

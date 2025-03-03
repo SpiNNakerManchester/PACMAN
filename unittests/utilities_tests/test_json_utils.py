@@ -30,26 +30,7 @@ class TestJsonUtils(unittest.TestCase):
     def setUp(self) -> None:
         unittest_setup()
 
-    def _compare_constraint(self, c1, c2, seen=None):
-        if seen is None:
-            seen = []
-        if c1 == c2:
-            return
-        if c1.__class__ != c2.__class__:
-            raise AssertionError("{} != {}".format(
-                c1.__class__, c2.__class__))
-        self._compare_vertex(c1.vertex, c2.vertex, seen)
-
-    def _compare_vertex(self, v1, v2, seen=None):
-        if seen is None:
-            seen = []
-        self.assertEqual(v1.label, v2.label)
-        if v1.label in seen:
-            return
-        self.assertEqual(v1.sdram_required, v2.sdram_required)
-        seen.append(v1.label)
-
-    def _compare_placement(self, p1, p2, seen=None):
+    def _compare_placement(self, p1: Placement, p2: Placement) -> None:
         self.assertEqual(p1.x, p2.x)
         self.assertEqual(p1.y, p2.y)
         self.assertEqual(p1.p, p2.p)
@@ -59,7 +40,7 @@ class TestJsonUtils(unittest.TestCase):
     # Composite JSON round-trip testing schemes
     # ------------------------------------------------------------------
 
-    def placement_there_and_back(self, there):
+    def placement_there_and_back(self, there: Placement) -> None:
         j_object = placement_to_json(there)
         j_str = json.dumps(j_object)
         j_object2 = json.loads(j_str)

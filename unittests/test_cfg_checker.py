@@ -23,7 +23,7 @@ import pacman_test_objects
 class TestCfgChecker(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         unittest_setup()
 
     def test_cfg_check(self) -> None:
