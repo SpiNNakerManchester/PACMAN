@@ -22,7 +22,6 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.log import FormatAdapter
 
-from pacman.data import PacmanDataView
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.model.graphs import AbstractVertex
@@ -291,6 +290,10 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         """
         self._set_max_atoms_per_dimension_per_core(new_value)
         self.__check_atoms_per_core()
+
+        # delayed import due to circular dependencies
+        # pylint: disable=import-outside-toplevel
+        from pacman.data import PacmanDataView
         PacmanDataView.set_requires_mapping()
 
     def reset(self) -> None:
