@@ -53,7 +53,7 @@ class ChipCounter(object):
         self.__sdram_free = 0
         self.__n_chips = 0
 
-    def add_core(self, resources: AbstractSDRAM, n_cores=1) -> None:
+    def add_core(self, resources: AbstractSDRAM, n_cores: int = 1) -> None:
         """
         Adds a core (or if needed a Chip) to the count
 
