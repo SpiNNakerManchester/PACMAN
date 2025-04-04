@@ -86,7 +86,6 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         self._max_atoms_per_dimension_per_core: Optional[Tuple[int, ...]]
         self._set_max_atoms_per_dimension_per_core(max_atoms_per_core)
 
-
     def __str__(self) -> str:
         return str(self.label)
 
