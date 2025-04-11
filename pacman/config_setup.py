@@ -13,8 +13,11 @@
 # limitations under the License.
 
 import os
+from typing import Set
+
 from spinn_utilities.config_holder import (
-    add_default_cfg, clear_cfg_files)
+    add_default_cfg, clear_cfg_files, get_config_bool)
+from spinn_utilities.configs.camel_case_config_parser import optionxform
 from spinn_machine.config_setup import add_spinn_machine_cfg
 from pacman.data.pacman_data_writer import PacmanDataWriter
 
@@ -40,3 +43,15 @@ def add_pacman_cfg() -> None:
     """
     add_spinn_machine_cfg()  # This add its dependencies too
     add_default_cfg(os.path.join(os.path.dirname(__file__), BASE_CONFIG_FILE))
+
+
+def packman_cfg_paths_skipped() -> Set[str]:
+    skipped =set()
+    # Code will not error if SpiNNaker-spinner missing but tests should
+    if not get_config_bool("Reports", "draw_placements"):
+        skipped.add(optionxform("path_placements"))
+    if not get_config_bool("Reports", "draw_placements_on_error"):
+        skipped.add(optionxform("path_placements_on_error"))
+    # only written if there is an error
+    skipped.add(optionxform("path_placement_errors_report"))
+    return skipped

@@ -16,7 +16,7 @@ import logging
 import os
 from typing import Dict, Iterator, List, Optional, Tuple, Sequence, Set
 
-from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.config_holder import get_config_bool, get_report_path
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -172,7 +172,8 @@ class ApplicationPlacer(object):
         if get_config_bool("Reports", "draw_placements"):
             # pylint: disable=import-outside-toplevel
             from .draw_placements import draw_placements as dp
-            dp(self.__placements, system_placements)
+            report_file = get_report_path("path_placements")
+            dp(self.__placements, system_placements, report_file)
 
         return self.__placements
 
@@ -308,8 +309,7 @@ class ApplicationPlacer(object):
             if not app_vertex_placed:
                 unplaceable.append(app_vertex)
 
-        report_file = os.path.join(
-            PacmanDataView.get_run_dir_path(), "placements_error.txt")
+        report_file = get_report_path("path_placement_errors_report")
         with open(report_file, 'w', encoding="utf-8") as f:
             f.write(f"Could not place {len(unplaceable)} of "
                     f"{PacmanDataView.get_n_vertices()} "
@@ -361,7 +361,8 @@ class ApplicationPlacer(object):
         if get_config_bool("Reports", "draw_placements_on_error"):
             # pylint: disable=import-outside-toplevel
             from .draw_placements import draw_placements as dp
-            dp(self.__placements, system_placements)
+            report_file = get_report_path("path_placements_on_error")
+            dp(self.__placements, system_placements, report_file)
 
         return PacmanPlaceException(
             f" {exception}."
