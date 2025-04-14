@@ -13,7 +13,6 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-import os
 from typing import Dict, Iterator, List, Optional, Tuple, Sequence, Set
 
 from spinn_utilities.config_holder import get_config_bool, get_report_path

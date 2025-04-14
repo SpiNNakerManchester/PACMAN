@@ -46,7 +46,7 @@ def add_pacman_cfg() -> None:
 
 
 def packman_cfg_paths_skipped() -> Set[str]:
-    skipped =set()
+    skipped = set()
     # Code will not error if SpiNNaker-spinner missing but tests should
     if not get_config_bool("Reports", "draw_placements"):
         skipped.add(optionxform("path_placements"))

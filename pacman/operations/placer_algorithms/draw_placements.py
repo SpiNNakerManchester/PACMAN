@@ -14,7 +14,6 @@
 
 from collections import defaultdict
 import math
-import os
 import logging
 import random
 from typing import Dict, Optional
