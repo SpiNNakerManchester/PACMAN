@@ -46,6 +46,11 @@ def add_pacman_cfg() -> None:
 
 
 def packman_cfg_paths_skipped() -> Set[str]:
+    """
+    Set of cfg path that may not be found based on other cfg settings
+
+    Assuming mode = Debug
+    """
     skipped = set()
     # Code will not error if SpiNNaker-spinner missing but tests should
     if not get_config_bool("Reports", "draw_placements"):
