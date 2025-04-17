@@ -14,7 +14,7 @@
 
 import os
 import unittest
-from spinn_utilities.config_holder import run_config_checks
+from spinn_utilities.configs.config_checker import ConfigChecker
 from pacman.config_setup import unittest_setup
 import pacman
 import pacman_test_objects
@@ -30,5 +30,4 @@ class TestCfgChecker(unittest.TestCase):
         unittests = os.path.dirname(__file__)
         pacman_dir = pacman.__path__[0]
         uinit_test_objects = pacman_test_objects.__path__[0]
-        run_config_checks(directories=[
-            pacman_dir, unittests, uinit_test_objects])
+        ConfigChecker([pacman_dir, unittests, uinit_test_objects]).check()
