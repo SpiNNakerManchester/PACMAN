@@ -36,7 +36,7 @@ class TestCfgChecker(unittest.TestCase):
         uinit_test_objects = pacman_test_objects.__path__[0]
         ConfigChecker([pacman_dir, unittests, uinit_test_objects]).check()
 
-    def test_cfg_documentor(self):
+    def test_cfg_documentor(self) -> None:
         class_file = sys.modules[self.__module__].__file__
         assert class_file is not None
         abs_class_file = os.path.abspath(class_file)
