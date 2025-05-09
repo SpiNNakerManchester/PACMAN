@@ -49,11 +49,6 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             PacmanDataView.get_n_placements()
 
-    def test_mock(self) -> None:
-        PacmanDataWriter.mock()
-        # check there is a value not what it is
-        PacmanDataView.get_run_dir_path()
-
     def test_graph_functions(self) -> None:
         writer = PacmanDataWriter.setup()
         sdram = ConstantSDRAM(123)

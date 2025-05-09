@@ -14,7 +14,6 @@
 
 from collections import defaultdict
 import math
-import os
 import logging
 import random
 from typing import Dict, Optional
@@ -41,7 +40,7 @@ def _next_colour() -> Colour:
 
 def draw_placements(
         placements: Placements, system_placements: Placements,
-        filename: str = "placements_error.png") -> None:
+        report_file: str) -> None:
     """
     Draw the placements as a PNG in the specified file.
 
@@ -49,16 +48,14 @@ def draw_placements(
         The application placements. Includes the system placements.
     :param Placements system_placements:
         The system placements.
-    :param str filename:
-        Name of file to make. Should have a ``.png`` suffix by convention.
+    :param str report_file:
+        Path of file to make. Should have a ``.png`` suffix by convention.
     """
     if isinstance(spinner_api, ImportError):
         logger.exception(
             "Unable to draw placements as no spinner install found",
             exc_info=spinner_api)
         return
-    report_file = os.path.join(PacmanDataView.get_run_dir_path(), filename)
-
     # Colour the boards by placements
     unused: Colour = (0.5, 0.5, 0.5, 1.0)
     vertex_colours: Dict[Optional[AbstractVertex], Colour] = defaultdict(
