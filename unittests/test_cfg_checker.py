@@ -13,8 +13,12 @@
 # limitations under the License.
 
 import os
+import sys
 import unittest
-from spinn_utilities.config_holder import run_config_checks
+
+from spinn_utilities.configs.config_checker import ConfigChecker
+from spinn_utilities.configs.config_documentor import ConfigDocumentor
+
 from pacman.config_setup import unittest_setup
 import pacman
 import pacman_test_objects
@@ -30,5 +34,14 @@ class TestCfgChecker(unittest.TestCase):
         unittests = os.path.dirname(__file__)
         pacman_dir = pacman.__path__[0]
         uinit_test_objects = pacman_test_objects.__path__[0]
-        run_config_checks(directories=[
-            pacman_dir, unittests, uinit_test_objects])
+        ConfigChecker([pacman_dir, unittests, uinit_test_objects]).check()
+
+    def test_cfg_documentor(self) -> None:
+        class_file = sys.modules[self.__module__].__file__
+        assert class_file is not None
+        abs_class_file = os.path.abspath(class_file)
+        class_dir = os.path.dirname(abs_class_file)
+        test_file = os.path.join(class_dir, 'test.md')
+
+        documentor = ConfigDocumentor()
+        documentor.md_configs(test_file)
