@@ -273,7 +273,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             self._max_atoms_per_dimension_per_core = max_atoms_tuple
 
     def set_max_atoms_per_dimension_per_core(
-            self, new_value: Optional[Union[int, Tuple[int, ...]]]) -> None:
+            self, new_value: Union[int, Tuple[int, ...]]) -> None:
         """
         Set the maximum number of atoms per dimension per core.
 
@@ -283,9 +283,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         :param new_value:
             Value to set.  If the vertex is n-dimensional where n > 1, a tuple
             of n values must be given.  If the vertex is 1 dimensional,
-            a 1-tuple or integer can be given.  If this is set to `None` the
-            vertex will have atoms_shape as the maximum.
-        :type new_value: None or int or tuple(int,...)
+            a 1-tuple or integer can be given.
         """
         self._set_max_atoms_per_dimension_per_core(new_value)
         self.__check_atoms_per_core()
