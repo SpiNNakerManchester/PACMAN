@@ -159,8 +159,6 @@ class ApplicationGraph(object):
 
     @property
     def edges(self) -> Sequence[ApplicationEdge]:
-        # pylint: disable=not-an-iterable
-        # https://github.com/PyCQA/pylint/issues/3105
         """
         The edges in the graph.
 
