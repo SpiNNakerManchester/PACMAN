@@ -65,7 +65,6 @@ class RangeCompressor(object):
     A compressor based on ranges.
     Use via :py:func:`range_compressor`.
     """
-    # pylint: disable=attribute-defined-outside-init
     __slots__ = (
         # Router table to add merged routes into
         "_compressed",
