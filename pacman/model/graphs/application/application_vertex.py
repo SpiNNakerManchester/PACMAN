@@ -322,7 +322,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             The identifier of the partition to get the key for
         :rtype: ~pacman.model.routing_info.BaseKeyAndMask or None
         """
-        # pylint: disable=unused-argument
+        _ = (machine_vertex, partition_id)
         return None
 
     def get_fixed_key_and_mask(
@@ -336,7 +336,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             The identifier of the partition to get the key for
         :rtype: ~pacman.model.routing_info.BaseKeyAndMask or None
         """
-        # pylint: disable=unused-argument
+        _ = (partition_id)
         return None
 
     def add_incoming_edge(self, edge: ApplicationEdge,
