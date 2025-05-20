@@ -428,6 +428,7 @@ class ApplicationPlacer(object):
                     self.__placements.add_placement(
                         Placement(vertex, x, y, next(next_cores)))
                 except StopIteration:
+                    # pylint: disable=raise-missing-from
                     raise PacmanConfigurationException(
                         f"No more cores available on {x}, {y}: {on_chip}")
 
