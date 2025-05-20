@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 import platform
-# pylint: disable=no-name-in-module
+
 from typing import (
     Any, Callable, ContextManager, Dict, List, NewType, Union, Tuple)
 from spinn_utilities.typing.coords import XY
