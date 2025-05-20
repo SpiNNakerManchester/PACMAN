@@ -95,7 +95,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         :return: The number of keys required
         :rtype: int
         """
-        # pylint: disable=unused-argument
+        _ = partition_id
         return 1 << get_n_bits(self.__vertex_slice.n_atoms)
 
     @property
