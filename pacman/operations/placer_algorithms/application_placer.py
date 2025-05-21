@@ -29,6 +29,7 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 from pacman.exceptions import (
     PacmanPlaceException, PacmanConfigurationException, PacmanTooBigToPlace)
+from .draw_placements import draw_placements as dp
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -169,8 +170,6 @@ class ApplicationPlacer(object):
             raise self._place_error(system_placements, e) from e
 
         if get_config_bool("Reports", "draw_placements"):
-            # pylint: disable=import-outside-toplevel
-            from .draw_placements import draw_placements as dp
             report_file = get_report_path("path_placements")
             dp(self.__placements, system_placements, report_file)
 
@@ -358,8 +357,6 @@ class ApplicationPlacer(object):
                             " free cores)\n")
 
         if get_config_bool("Reports", "draw_placements_on_error"):
-            # pylint: disable=import-outside-toplevel
-            from .draw_placements import draw_placements as dp
             report_file = get_report_path("path_placements_on_error")
             dp(self.__placements, system_placements, report_file)
 

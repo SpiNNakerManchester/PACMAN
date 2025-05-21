@@ -32,7 +32,6 @@ class TestBasicPartitioner(unittest.TestCase):
     """
     test for basic partitioning algorithm
     """
-    # pylint: disable=attribute-defined-outside-init
 
     TheTestAddress = "192.162.240.253"
 
