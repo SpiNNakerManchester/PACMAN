@@ -71,7 +71,7 @@ class RangeCompressor(object):
         # List of entries to be merged
         "_entries")
 
-    def __init__(self):
+    def __init__(self) -> None:
         # temp values to avoid Optional
         self._entries: List[MulticastRoutingEntry] = []
         self._compressed = CompressedMulticastRoutingTable(0, 0)
