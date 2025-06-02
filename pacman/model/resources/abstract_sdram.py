@@ -27,7 +27,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
         The total SDRAM.
 
-        :param int n_timesteps: number of timesteps to cost for
+        :param n_timesteps: number of timesteps to cost for
         :return:
         """
         raise NotImplementedError
@@ -39,7 +39,6 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
 
         :param AbstractSDRAM other: another SDRAM resource
         :return: a New AbstractSDRAM
-        :rtype: AbstractSDRAM
         """
         raise NotImplementedError
 
@@ -72,11 +71,11 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
         Writes a description of this SDRAM to the target.
 
-        :param int timesteps: Number of timesteps to do total cost for
-        :param str indent: Text at the start of this and all children
-        :param str preamble:
+        :param timesteps: Number of timesteps to do total cost for
+        :param indent: Text at the start of this and all children
+        :param preamble:
             Additional text at the start but not in children
-        :param file target: Where to write the output.
+        :param target: Where to write the output.
             ``None`` is standard print
         """
         raise NotImplementedError

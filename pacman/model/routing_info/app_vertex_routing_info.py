@@ -63,9 +63,6 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
 
         :param entries:
             The entries to merge
-        :type entries:
-            list(tuple(RoutingEntry, VertexRoutingInfo))
-        :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
         """
         n_entries = len(entries)
         (_, last_r_info) = entries[-1]
@@ -115,16 +112,12 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     def machine_mask(self) -> int:
         """
         The mask that covers a specific machine vertex.
-
-        :rtype: int
-        """
+       """
         return self.__machine_mask
 
     @property
     def n_bits_atoms(self) -> int:
         """
         The number of bits for the atoms.
-
-        :rtype: int
         """
         return self.__n_bits_atoms

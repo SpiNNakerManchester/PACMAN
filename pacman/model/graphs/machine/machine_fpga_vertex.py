@@ -69,8 +69,6 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
     def fpga_id(self) -> int:
         """
         The Field Programmable Gate Arrays id provided top the init.
-
-        :rtype: int
         """
         return self._fpga_id
 
@@ -78,8 +76,6 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
     def fpga_link_id(self) -> int:
         """
         The Field Programmable Gate Arrays link id provided to the init.
-
-        :rtype: int
         """
         return self._fpga_link_id
 

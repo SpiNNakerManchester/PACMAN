@@ -44,8 +44,6 @@ class SDRAMMachineEdge(MachineEdge):
     def sdram_size(self) -> int:
         """
         The sdram size reported by the pre_vertex
-
-        :rtype: int
         """
         return self._sdram_size
 
@@ -53,8 +51,6 @@ class SDRAMMachineEdge(MachineEdge):
     def sdram_base_address(self) -> Optional[int]:
         """
         The start address of the sdram if set
-
-        :rtype: int or None
         """
         return self._sdram_base_address
 

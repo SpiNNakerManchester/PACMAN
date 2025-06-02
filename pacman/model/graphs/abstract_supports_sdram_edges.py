@@ -34,9 +34,7 @@ class AbstractSupportsSDRAMEdges(object, metaclass=AbstractBase):
 
         :param sdram_machine_edge:
             The SDRAM edge in question
-        :type sdram_machine_edge:
             ~pacman.model.graphs.machine.SDRAMMachineEdge
         :return: The size in bytes this vertex needs for the SDRAM edge.
-        :rtype: int (most likely a multiple of 4)
         """
         raise NotImplementedError

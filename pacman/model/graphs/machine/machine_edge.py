@@ -38,12 +38,9 @@ class MachineEdge(AbstractEdge[_MV]):
     def __init__(self, pre_vertex: MachineVertex, post_vertex: MachineVertex,
                  label: Optional[str] = None):
         """
-        :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
-            The vertex at the start of the edge.
-        :param ~pacman.model.graphs.machine.MachineVertex post_vertex:
-            The vertex at the end of the edge.
+        :param pre_vertex: The vertex at the start of the edge.
+        :param post_vertex: The vertex at the end of the edge.
         :param label: The name of the edge.
-        :type label: str or None
         """
         self._label = label
         self._pre_vertex = pre_vertex
@@ -59,8 +56,6 @@ class MachineEdge(AbstractEdge[_MV]):
     def pre_vertex(self) -> MachineVertex:
         """
         The vertex at the start of the edge.
-
-        :rtype: ~pacman.model.graphs.machine.MachineVertex
         """
         return self._pre_vertex
 
@@ -69,8 +64,6 @@ class MachineEdge(AbstractEdge[_MV]):
     def post_vertex(self) -> MachineVertex:
         """
         The vertex at the end of the edge.
-
-        :rtype: ~pacman.model.graphs.machine.MachineVertex
         """
         return self._post_vertex
 

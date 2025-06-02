@@ -63,7 +63,7 @@ class _IteratorWithNext(Generic[E]):
         """
         The next element available.
 
-        :raises:  StopIteration if there is not more element available
+        :raises: StopIteration if there is not more element available
         """
         if not self.__has_next:
             raise StopIteration
@@ -82,8 +82,6 @@ def merged_routing_table_generator() -> MulticastRoutingTables:
     """
     Creates routing entries by merging adjacent entries from the same
     application vertex when possible.
-
-    :rtype: MulticastRoutingTables
     """
     routing_table_by_partitions = (
         PacmanDataView.get_routing_table_by_partition())
@@ -106,15 +104,6 @@ def __create_routing_table(
         partitions_in_table: Dict[Tuple[AbstractVertex, str],
                                   RoutingEntry],
         routing_info: RoutingInfo) -> UnCompressedMulticastRoutingTable:
-    """
-    :param int x:
-    :param int y:
-    :param partitions_in_table:
-    :type partitions_in_table:
-        dict(((ApplicationVertex or MachineVertex), str), RoutingEntry)
-    :param RoutingInfo routing_infos:
-    :rtype: MulticastRoutingTable
-    """
     table = UnCompressedMulticastRoutingTable(x, y)
     sources_by_key_mask: Dict[BaseKeyAndMask,
                               Tuple[AbstractVertex, str]] = dict()
@@ -211,8 +200,7 @@ def __mask_has_holes(mask: int) -> bool:
     """
     Detect if the mask has a "hole" somewhere other than at the bottom.
 
-    :param int mask: The mask to check
-    :rtype: bool
+    :param mask: The mask to check
     """
     # The mask is inverted and then add 1.  If this number is a power of 2,
     # the mask doesn't have holes

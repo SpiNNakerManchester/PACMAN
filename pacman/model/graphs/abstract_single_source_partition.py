@@ -54,8 +54,6 @@ class AbstractSingleSourcePartition(
     def pre_vertex(self) -> V:
         """
         The vertex at which all edges in this outgoing edge partition start.
-
-        :rtype: ~pacman.model.graphs.AbstractVertex
         """
         return self._pre_vertex
 

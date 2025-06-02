@@ -40,15 +40,13 @@ class IPtagResource(object):
             strip_sdp: bool, tag: Optional[int] = None,
             traffic_identifier: str = "DEFAULT"):
         """
-        :param str ip_address:
+        :param ip_address:
             The IP address of the host that will receive data from this tag
         :param port: The port that will
-        :type port: int or None
-        :param bool strip_sdp: Whether the tag requires that SDP headers are
+        :param strip_sdp: Whether the tag requires that SDP headers are
             stripped before transmission of data
         :param tag: A fixed tag ID to assign, or `None` if any tag is OK
-        :type tag: int or None
-        :param str traffic_identifier: The traffic to be sent using this tag;
+        :param traffic_identifier: The traffic to be sent using this tag;
             traffic with the same traffic_identifier can be sent using
             the same tag
         """
@@ -63,8 +61,6 @@ class IPtagResource(object):
     def ip_address(self) -> str:
         """
         The IP address to assign to the tag.
-
-        :rtype: str
         """
         return self._ip_address
 
@@ -72,8 +68,6 @@ class IPtagResource(object):
     def port(self) -> int:
         """
         The port of the tag.
-
-        :rtype: int
         """
         return self._port
 
@@ -88,8 +82,6 @@ class IPtagResource(object):
     def strip_sdp(self) -> bool:
         """
         Whether SDP headers should be stripped for this tag.
-
-        :rtype: bool
         """
         return self._strip_sdp
 
@@ -97,8 +89,6 @@ class IPtagResource(object):
     def tag(self) -> Optional[int]:
         """
         The tag required, or `None` if any tag is OK.
-
-        :rtype: int or None
         """
         return self._tag
 

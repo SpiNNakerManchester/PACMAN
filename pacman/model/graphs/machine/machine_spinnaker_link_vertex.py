@@ -70,8 +70,6 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractVirtual):
     def spinnaker_link_id(self) -> int:
         """
         The id of the spinnaker link as passed into the init.
-
-        :rtype: int
         """
         return self._spinnaker_link_id
 

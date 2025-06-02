@@ -168,8 +168,6 @@ def from_json(j_router: Union[str, JsonObjectArray]) -> MulticastRoutingTables:
     Creates Routing Tables based on json
 
     :param j_router:
-    :type: str or list
-    :rtype: MulticastRoutingTables
     """
     if isinstance(j_router, str):
         if j_router.endswith(".gz"):

@@ -35,12 +35,11 @@ class ApplicationEdge(AbstractEdge['ApplicationVertex']):
     def __init__(self, pre_vertex: ApplicationVertex,
                  post_vertex: ApplicationVertex, label: Optional[str] = None):
         """
-        :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:
+        :param pre_vertex:
             The application vertex at the start of the edge.
-        :param ~pacman.model.graphs.application.ApplicationVertex post_vertex:
+        :param post_vertex:
             The application vertex at the end of the edge.
         :param label: The name of the edge.
-        :type label: str or None
         """
         self._label = label
         self._pre_vertex = pre_vertex

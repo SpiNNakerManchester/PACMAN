@@ -30,10 +30,9 @@ class ChipAndCore(object):
 
     def __init__(self, x: int, y: int, p: Optional[int] = None):
         """
-        :param int x: the x-coordinate of the chip
-        :param int y: the y-coordinate of the chip
+        :param x: the x-coordinate of the chip
+        :param y: the y-coordinate of the chip
         :param p: the processor (if any) of the chip
-        :type p: int or None
         """
         self._x = int(x)
         self._y = int(y)
@@ -43,8 +42,6 @@ class ChipAndCore(object):
     def x(self) -> int:
         """
         The X-coordinate of the chip.
-
-        :rtype: int
         """
         return self._x
 
@@ -52,8 +49,6 @@ class ChipAndCore(object):
     def y(self) -> int:
         """
         The Y-coordinate of the chip.
-
-        :rtype: int
         """
         return self._y
 
@@ -61,8 +56,6 @@ class ChipAndCore(object):
     def p(self) -> Optional[int]:
         """
         The processor on the chip, or `None` if that is not constrained.
-
-        :rtype: int or None
         """
         return self._p
 

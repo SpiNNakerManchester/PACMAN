@@ -36,12 +36,12 @@ class Placement(object):
 
     def __init__(self, vertex: MachineVertex, x: int, y: int, p: int):
         """
-        :param MachineVertex vertex: The vertex that has been placed
-        :param int x:
+        :param vertex: The vertex that has been placed
+        :param x:
             the x-coordinate of the chip on which the vertex is placed
-        :param int y:
+        :param y:
             the y-coordinate of the chip on which the vertex is placed
-        :param int p: the ID of the processor on which the vertex is placed
+        :param p: the ID of the processor on which the vertex is placed
         """
         self._vertex = vertex
         self._x = x
@@ -52,8 +52,6 @@ class Placement(object):
     def vertex(self) -> MachineVertex:
         """
         The vertex that was placed.
-
-        :rtype: MachineVertex
         """
         return self._vertex
 
@@ -61,8 +59,6 @@ class Placement(object):
     def x(self) -> int:
         """
         The X-coordinate of the chip where the vertex is placed.
-
-        :rtype: int
         """
         return self._x
 
@@ -70,8 +66,6 @@ class Placement(object):
     def y(self) -> int:
         """
         The Y-coordinate of the chip where the vertex is placed.
-
-        :rtype: int
         """
         return self._y
 
@@ -79,8 +73,6 @@ class Placement(object):
     def p(self) -> int:
         """
         The ID of the processor of the chip where the vertex is placed.
-
-        :rtype: int
         """
         return self._p
 
@@ -88,8 +80,6 @@ class Placement(object):
     def location(self) -> XYP:
         """
         The (x,y,p) tuple that represents the location of this placement.
-
-        :rtype: tuple(int,int,int)
         """
         return (self._x, self._y, self._p)
 
@@ -97,8 +87,6 @@ class Placement(object):
     def xy(self) -> XY:
         """
         The (x,y) tuple that represents the chip of this placement.
-
-        :rtype: tuple(int,int)
         """
         return (self._x, self._y)
 
@@ -106,8 +94,6 @@ class Placement(object):
     def chip(self) -> Chip:
         """
         The chip of this placement.
-
-        :rtype: ~spinn_machine.Chip
         """
         return PacmanDataView.get_chip_at(self._x, self._y)
 

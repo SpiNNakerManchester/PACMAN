@@ -47,11 +47,10 @@ class MulticastRoutingTableByPartition(object):
         Adds a multicast routing path entry.
 
         :param RoutingEntry entry: the entry to add
-        :param int router_x: the X coordinate of the router
-        :param int router_y: the Y coordinate of the router
+        :param router_x: the X coordinate of the router
+        :param router_y: the Y coordinate of the router
         :param source_vertex: The source that will send via this entry
-        :type source_vertex: ApplicationVertex or MachineVertex
-        :param str partition_id: The ID of the partition being sent
+        :param partition_id: The ID of the partition being sent
         """
         # update router_to_entries_map
         key = (router_x, router_y)
@@ -89,8 +88,6 @@ class MulticastRoutingTableByPartition(object):
     def get_routers(self) -> Iterator[XY]:
         """
         Get the coordinates of all stored routers.
-
-        :rtype: iterable(tuple(int, int))
         """
         return iter(self._router_to_entries_map.keys())
 
@@ -98,8 +95,6 @@ class MulticastRoutingTableByPartition(object):
     def n_routers(self) -> int:
         """
         The number of routers stored.
-
-        :rtype: int
         """
         return len(self._router_to_entries_map)
 
@@ -108,11 +103,9 @@ class MulticastRoutingTableByPartition(object):
         """
         Get the set of multicast path entries assigned to this router.
 
-        :param int router_x: the X coordinate of the router
-        :param int router_y: the Y coordinate of the router
+        :param router_x: the X coordinate of the router
+        :param router_y: the Y coordinate of the router
         :return: all router_path_entries for the router.
-        :rtype: dict(tuple((ApplicationVertex or MachineVertex), str),
-            RoutingEntry)
         """
         key = (router_x, router_y)
         return self._router_to_entries_map.get(key)
@@ -124,11 +117,9 @@ class MulticastRoutingTableByPartition(object):
         Get an entry from a specific coordinate.
 
         :param source_vertex:
-        :type source_vertex: ApplicationVertex or MachineVertex
-        :param str partition_id:
-        :param int router_x: the X coordinate of the router
-        :param int router_y: the Y coordinate of the router
-        :rtype: RoutingEntry or None
+        :param partition_id:
+        :param router_x: the X coordinate of the router
+        :param router_y: the Y coordinate of the router
         """
         entries = self.get_entries_for_router(router_x, router_y)
         if entries is None:

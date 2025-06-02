@@ -29,8 +29,6 @@ class ApplicationVirtualVertex(ApplicationVertex):
         """
         Get the link data for outgoing connections from the machine.
 
-        :param ~spinn_machine.Machine machine:
-            The machine to get the link data from
-        :rtype: ~spinn_machine.link_data_objects.AbstractLinkData
+        :param machine: The machine to get the link data from
         """
         raise NotImplementedError

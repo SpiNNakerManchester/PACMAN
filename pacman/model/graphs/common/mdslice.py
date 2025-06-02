@@ -82,8 +82,7 @@ class MDSlice(Slice):
         """
         Get a slice in the `n`'Th dimension
 
-        :param int n: The 0-indexed dimension to get the shape of
-        :type: slice
+        :param n: The 0-indexed dimension to get the shape of
         """
         try:
             return slice(self.start[n], self.start[n] + self.shape[n])
@@ -137,8 +136,7 @@ class MDSlice(Slice):
         Convert the string form of a :py:class:`MDSlice` into an object
         instance.
 
-        :param str as_str: The string to parse
-        :rtype: MDSlice
+        :param as_str: The string to parse
         """
         if as_str[0] == "(":
             return Slice.from_string(as_str)

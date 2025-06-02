@@ -43,10 +43,9 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
     def __init__(self, identifier: str,
                  allowed_edge_types: Union[Type[E], Tuple[Type[E], ...]]):
         """
-        :param str identifier: The identifier of the partition
+        :param identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed
-        :type allowed_edge_types: type or tuple(type, ...)
-        :param str label: An optional label of the partition
+        :param label: An optional label of the partition
         """
         self._identifier = identifier
         self._allowed_edge_types = allowed_edge_types
@@ -56,7 +55,7 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
         """
         Add an edge to the edge partition.
 
-        :param ~pacman.model.graphs.AbstractEdge edge: the edge to add
+        :param edge: the edge to add
         :raises PacmanInvalidParameterException:
             If the edge does not belong in this edge partition
         """
@@ -74,8 +73,6 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
     def identifier(self) -> str:
         """
         The identifier of this edge partition.
-
-        :rtype: str
         """
         return self._identifier
 
@@ -87,8 +84,6 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
         .. note::
             The order in which the edges are added is preserved for when they
             are requested later. If not, please talk to the software team.
-
-        :rtype: iterable(~pacman.model.graphs.AbstractEdge)
         """
         return self._edges
 
@@ -96,8 +91,6 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
     def n_edges(self) -> int:
         """
         The number of edges in the edge partition.
-
-        :rtype: int
         """
         return len(self._edges)
 
@@ -112,8 +105,7 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
         """
         Check if the edge is contained within this partition.
 
-        :param ~pacman.model.graphs.AbstractEdge edge: the edge to search for.
-        :rtype: bool
+        :param edge: the edge to search for.
         """
         return edge in self._edges
 
@@ -128,6 +120,5 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
             :py:class:`AbstractSingleSourcePartition`
             and therefore provide the ``pre_vertex`` method.
 
-        :rtype: iterable(~pacman.model.graphs.AbstractVertex)
         """
         raise NotImplementedError

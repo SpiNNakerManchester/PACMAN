@@ -30,8 +30,8 @@ class Slice(object):
 
     def __init__(self, lo_atom: int, hi_atom: int):
         """
-        :param int lo_atom: Index of the lowest atom to represent.
-        :param int hi_atom: Index of the highest atom to represent.
+        :param lo_atom: Index of the lowest atom to represent.
+        :param hi_atom: Index of the highest atom to represent.
         :raises PacmanTypeError: If non-integer arguments are used.
         :raises PacmanValueError: If the bounds of the slice are invalid.
         """
@@ -54,8 +54,6 @@ class Slice(object):
     def lo_atom(self) -> int:
         """
         The lowest atom represented in the slice.
-
-        :rtype: int
         """
         return self._lo_atom
 
@@ -67,8 +65,6 @@ class Slice(object):
         .. note::
             Use of this method is *not* recommended.
             It fails for multi-dimensional slices and may be removed
-
-        :rtype: int
         """
         return self._lo_atom + self._n_atoms - 1
 
@@ -76,8 +72,6 @@ class Slice(object):
     def n_atoms(self) -> int:
         """
         The number of atoms represented by the slice.
-
-        :rtype: int
         """
         return self._n_atoms
 
@@ -86,8 +80,6 @@ class Slice(object):
         """
         The shape of the atoms over multiple dimensions.
         By default the shape will be 1-dimensional.
-
-        :rtype: tuple(int,...)
         """
         return (self._n_atoms, )
 
@@ -96,8 +88,6 @@ class Slice(object):
         """
         The start coordinates of the slice.
         By default this will be `lo_atom` in 1 dimension.
-
-        :rtype: tuple(int,...)
         """
         return (self._lo_atom, )
 
@@ -111,7 +101,6 @@ class Slice(object):
             It fails for multi-dimensional slices and may be removed.
 
         :return: a standard built-in slice object
-        :rtype: slice
         :raises NotImplementedError: If called on a multi-dimensional slice
         """
         # slice for accessing arrays of values
@@ -121,8 +110,7 @@ class Slice(object):
         """
         Get a slice in the `n`'Th dimension.
 
-        :param int n: Must be 0
-        :type: slice
+        :param n: Must be 0
         """
         if n == 0:
             return slice(self._lo_atom, self._lo_atom + self._n_atoms)
@@ -136,8 +124,6 @@ class Slice(object):
         This is the width and if available height, depth, etc., of the
         Slice/Grid as represented as slices form the origin along in that
         direction.
-
-        :rtype: tuple(slice, ...)
         """
         return (slice(self._lo_atom, self._lo_atom + self._n_atoms), )
 
@@ -145,8 +131,6 @@ class Slice(object):
     def end(self) -> Tuple[int, ...]:
         """
         The end positions of the slice in each dimension
-
-        :rtype: tuple(int, ...)
         """
         return (self._lo_atom + self._n_atoms, )
 
@@ -156,7 +140,6 @@ class Slice(object):
         otherwise as a list of IDs.
 
         :return: a slice or list of IDs
-        :rtype: slice or list(int)
         """
         return slice(self._lo_atom, self._lo_atom + self._n_atoms)
 
@@ -166,7 +149,6 @@ class Slice(object):
         "raster scan" of the atoms over the whole shape.
 
         :return: A list of the global raster IDs of the atoms in this slice
-        :rtype: ~numpy.ndarray
         """
         return numpy.array(range(self._lo_atom, self._lo_atom + self._n_atoms))
 
@@ -194,8 +176,7 @@ class Slice(object):
         """
         Convert the string form of a :py:class:`Slice` into an object instance.
 
-        :param str as_str: The string to parse
-        :rtype: Slice
+        :param as_str: The string to parse
         """
         if as_str[0] != "(":
             raise NotImplementedError("Please use MDSlice method")
@@ -213,7 +194,7 @@ class Slice(object):
         Note that no checking is done on the given indices; they should be
         within this slice!
 
-        :param numpy.ndarray app_vertex_indices:
+        :param app_vertex_indices:
             The raster application vertex indices to convert
         :return: The local core-level indices relative to this slice
         """
@@ -227,7 +208,7 @@ class Slice(object):
         Note that no checking is done on the given indices; they should be
         within this slice!
 
-        :param numpy.ndarray relative_indices:
+        :param relative_indices:
             The local core-level indices relative to this slice
         :return: The raster application vertex indices
         """

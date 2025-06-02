@@ -40,16 +40,12 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
                  vertex_slice: Optional[Slice] = None):
         """
         :param label: The optional name of the vertex
-        :type label: str or None
         :param app_vertex:
             The application vertex that caused this machine vertex to be
             created. If `None`, there is no such application vertex.
-        :type app_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex or None
         :param vertex_slice:
             The slice of the application vertex that this machine vertex
             implements.
-        :type vertex_slice: ~pacman.model.graphs.common.Slice or None
         :raises PacmanValueError: If the slice of the machine_vertex is too big
         :raise AttributeError:
             If a not-`None` app_vertex is not an ApplicationVertex
@@ -70,8 +66,6 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """
         The application vertex that caused this machine vertex to be
         created. If `None`, there is no such application vertex.
-
-        :rtype: ~pacman.model.graphs.application.ApplicationVertex or None
         """
         return self._app_vertex
 
@@ -81,8 +75,6 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """
         The slice of the application vertex that this machine vertex
         implements.
-
-        :rtype: ~pacman.model.graphs.common.Slice
         """
         return self.__vertex_slice
 
@@ -90,10 +82,9 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """
         Get the number of keys required by the given partition of edges.
 
-        :param str partition_id: The identifier of the partition; the
+        :param partition_id: The identifier of the partition; the
             partition_id param is only used by some MachineVertex subclasses
         :return: The number of keys required
-        :rtype: int
         """
         # pylint: disable=unused-argument
         return 1 << get_n_bits(self.__vertex_slice.n_atoms)
@@ -103,8 +94,6 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """
         The index into the collection of machine vertices for an
         application vertex.
-
-        :rtype: int
         """
         return self._index if self._index is not None else 0
 
@@ -132,8 +121,6 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     def sdram_required(self) -> AbstractSDRAM:
         """
         The SDRAM space required by the vertex.
-
-        :rtype: ~pacman.model.resources.AbstractSDRAM
         """
         raise NotImplementedError
 
@@ -142,8 +129,6 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """
         The :py:class:`~spinn_machine.tags.IPTag`\\s used by this vertex,
         if any.
-
-        :rtype: iterable(~pacman.model.resources.IPtagResource)
         """
         return []
 
@@ -152,8 +137,6 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         """
         The :py:class:`~spinn_machine.tags.ReverseIPTag`\\s used by this
         vertex, if any.
-
-        :rtype: iterable(~pacman.model.resources.ReverseIPtagResource)
         """
         return []
 
