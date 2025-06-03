@@ -43,14 +43,14 @@ class SourceSegmentedSDRAMMachinePartition(
 
     def total_sdram_requirements(self) -> int:
         """
-        The total of the smram size of each edge.
+        The total of the sdram size of each edge.
         """
         return sum(edge.sdram_size for edge in self.edges)
 
     @property
     def sdram_base_address(self) -> int:
         """
-        The staty of the sdram block reserved on Chip
+        The start of the sdram block reserved on Chip
         """
         if self._sdram_base_address is None:
             raise PacmanConfigurationException(
