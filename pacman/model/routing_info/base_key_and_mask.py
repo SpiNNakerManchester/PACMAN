@@ -29,8 +29,8 @@ class BaseKeyAndMask(object):
 
     def __init__(self, base_key: int, mask: int):
         """
-        :param int base_key: The routing key
-        :param int mask: The routing mask
+        :param base_key: The routing key
+        :param mask: The routing mask
         :raise PacmanConfigurationException:
             If key & mask != key i.e. the key is not valid for the given mask
         """
@@ -46,8 +46,6 @@ class BaseKeyAndMask(object):
     def key(self) -> int:
         """
         The base key.
-
-        :rtype: int
         """
         return self._base_key
 
@@ -55,8 +53,6 @@ class BaseKeyAndMask(object):
     def key_combo(self) -> int:
         """
         The key combined with the mask.
-
-        :rtype: int
         """
         return self._base_key & self._mask
 
@@ -64,8 +60,6 @@ class BaseKeyAndMask(object):
     def mask(self) -> int:
         """
         The mask.
-
-        :rtype: int
         """
         return self._mask
 
@@ -91,8 +85,6 @@ class BaseKeyAndMask(object):
     def n_keys(self) -> int:
         """
         The total number of keys that can be generated given the mask.
-
-        :rtype: int
         """
         # converts mask into array of bit representation
         unwrapped_mask = numpy.unpackbits(
@@ -110,16 +102,15 @@ class BaseKeyAndMask(object):
         """
         Get the ordered list of keys that the combination allows.
 
-        :param ~numpy.ndarray(int) key_array:
+        :param key_array:
             Optional array into which the returned keys will be placed
-        :param int offset:
+        :param offset:
             Optional offset into the array at which to start placing keys
-        :param int n_keys:
+        :param n_keys:
             Optional limit on the number of keys returned. If less than this
             number of keys are available, only the keys available will be added
         :return: A tuple of an array of keys and the number of keys added to
             the array
-        :rtype: tuple(~numpy.ndarray(int), int)
         """
         # Get the position of the zeros in the mask - assume 32-bits
         unwrapped_mask = numpy.unpackbits(
