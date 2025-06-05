@@ -61,7 +61,7 @@ def remove_default_routes(
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
         possible. If ``None`` then the table will be made as small as possible.
-    :param bool check_for_aliases:
+    :param check_for_aliases:
         If ``True`` (the default), default-route candidates are checked for
         aliased entries before suggesting a route may be default routed. This
         check is required to ensure correctness in the general case but has a

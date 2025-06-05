@@ -46,7 +46,7 @@ class MulticastRoutingTableByPartition(object):
         """
         Adds a multicast routing path entry.
 
-        :param RoutingEntry entry: the entry to add
+        :param entry: the entry to add
         :param router_x: the X coordinate of the router
         :param router_y: the Y coordinate of the router
         :param source_vertex: The source that will send via this entry

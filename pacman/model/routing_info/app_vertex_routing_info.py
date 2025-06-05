@@ -42,12 +42,12 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
             app_vertex: ApplicationVertex, machine_mask: int,
             n_bits_atoms: int, max_machine_index: int):
         """
-        :param BaseKeyAndMask key_and_mask:
-        :param str partition_id:
-        :param ApplicationVertex app_vertex:
-        :param int machine_mask:
-        :param int n_bits_atoms:
-        :param int max_machine_index:
+        :param key_and_mask:
+        :param partition_id:
+        :param app_vertex:
+        :param machine_mask:
+        :param n_bits_atoms:
+        :param max_machine_index:
         """
         super().__init__(key_and_mask, partition_id)
         self.__app_vertex = app_vertex

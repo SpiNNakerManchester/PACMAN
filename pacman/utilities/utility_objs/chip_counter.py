@@ -57,7 +57,7 @@ class ChipCounter(object):
         """
         Adds a core (or if needed a Chip) to the count
 
-        :param AbstractSDRAM resources:
+        :param resources:
         """
         sdram = resources.get_total_sdram(
             PacmanDataView.get_plan_n_timestep())
@@ -71,6 +71,6 @@ class ChipCounter(object):
     @property
     def n_chips(self) -> int:
         """
-        :rtype: int
+        The number of chips used, including the current one
         """
         return self.__n_chips

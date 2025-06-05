@@ -31,12 +31,12 @@ class MDSlice(Slice):
             self, lo_atom: int, hi_atom: int, shape: Tuple[int, ...],
             start: Tuple[int, ...], atoms_shape: Tuple[int, ...]):
         """
-        :param int lo_atom: Index of the lowest atom to represent.
-        :param int hi_atom: Index of the highest atom to represent.
-        :param tuple(int,...) shape: The size of each dimension in the slice.
-        :param tuple(int,...) start:
+        :param lo_atom: Index of the lowest atom to represent.
+        :param hi_atom: Index of the highest atom to represent.
+        :param shape: The size of each dimension in the slice.
+        :param start:
             The offset to the start index along each dimension.
-        :param list(int) atoms_shape: The shape of atoms (?)
+        :param atoms_shape: The shape of atoms (?)
         :raises PacmanValueError: If the bounds of the slice are invalid.
         """
         super().__init__(lo_atom, hi_atom)

@@ -41,7 +41,7 @@ class Placements(object):
 
     def __init__(self, placements: Iterable[Placement] = ()):
         """
-        :param iterable(Placement) placements: Any initial placements
+        :param placements: Any initial placements
         :raise PacmanAlreadyPlacedError:
             If there is any vertex with more than one placement.
         :raise PacmanProcessorAlreadyOccupiedError:

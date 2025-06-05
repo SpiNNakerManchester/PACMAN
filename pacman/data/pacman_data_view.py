@@ -145,7 +145,7 @@ class PacmanDataView(MachineDataView):
 
         Syntactic sugar for `get_graph().add_vertex()`
 
-        :param ~pacman.model.graphs.application.ApplicationVertex vertex:
+        :param vertex:
             The vertex to add to the graph
         :raises PacmanConfigurationException:
             when both graphs contain vertices
@@ -374,7 +374,7 @@ class PacmanDataView(MachineDataView):
 
         :param xy: x and y coordinates to find placements for.
         :param vertex_type: Class of vertex to find
-        :param type vertex_type: Class of vertex to find
+        :param vertex_type: Class of vertex to find
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the placements are currently unavailable
         """

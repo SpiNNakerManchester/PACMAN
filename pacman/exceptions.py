@@ -28,9 +28,9 @@ class PacmanInvalidParameterException(PacmanException):
 
     def __init__(self, parameter: str, value: Any, problem: str):
         """
-        :param str parameter: The name of the parameter
-        :param str value: The value of the parameter
-        :param str problem: The problem with the value of the parameter
+        :param parameter: The name of the parameter
+        :param value: The value of the parameter
+        :param problem: The problem with the value of the parameter
         """
         super().__init__(problem)
         self.parameter = parameter
@@ -44,8 +44,8 @@ class PacmanAlreadyExistsException(PacmanException):
 
     def __init__(self, item_type: str, item_id: Any):
         """
-        :param str item_type: The type of the item that already exists
-        :param str item_id: The ID of the item which is in conflict
+        :param item_type: The type of the item that already exists
+        :param item_id: The ID of the item which is in conflict
         """
         super().__init__(f"{item_type}({item_id}) already exists")
         self.item_type = item_type

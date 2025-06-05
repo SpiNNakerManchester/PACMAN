@@ -37,7 +37,7 @@ class AbstractSDRAM(object, metaclass=AbstractBase):
         """
         Combines this SDRAM resource with the other one and creates a new one.
 
-        :param AbstractSDRAM other: another SDRAM resource
+        :param other: another SDRAM resource
         :return: a New AbstractSDRAM
         """
         raise NotImplementedError

@@ -36,9 +36,9 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str):
         """
-        :param BaseKeyAndMask key_and_mask:
+        :param key_and_mask:
             The keys allocated to the machine partition
-        :param str partition_id: The partition to set the keys for
+        :param partition_id: The partition to set the keys for
         """
         assert isinstance(key_and_mask, BaseKeyAndMask)
         self.__key_and_mask = key_and_mask
@@ -48,9 +48,8 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         Get the ordered list of individual keys allocated to the edge.
 
-        :param int n_keys: Optional limit on the number of keys to return
+        :param n_keys: Optional limit on the number of keys to return
         :return: An array of keys
-        :rtype: ~numpy.ndarray
         """
         max_n_keys = self.__key_and_mask.n_keys
 
@@ -71,8 +70,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     def key_and_mask(self) -> BaseKeyAndMask:
         """
         The only key and mask.
-
-        :rtype: BaseKeyAndMask
         """
         return self.__key_and_mask
 
@@ -80,8 +77,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     def key(self) -> int:
         """
         The first key (or only one if there is only one).
-
-        :rtype: int
         """
         return self.__key_and_mask.key
 
@@ -89,8 +84,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     def mask(self) -> int:
         """
         The first mask (or only one if there is only one).
-
-        :rtype: int
         """
         return self.__key_and_mask.mask
 
@@ -98,8 +91,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     def partition_id(self) -> str:
         """
         The identifier of the partition.
-
-        :rtype: str
         """
         return self.__partition_id
 
@@ -108,7 +99,5 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     def vertex(self) -> AbstractVertex:
         """
         The vertex of the information.
-
-        :rtype: ApplicationVertex or MachineVertex
         """
         raise NotImplementedError

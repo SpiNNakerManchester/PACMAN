@@ -61,8 +61,8 @@ class Tags(object):
         """
         Add an IP tag.
 
-        :param ~spinn_machine.tags.IPTag ip_tag: The tag to add
-        :param MachineVertex vertex:
+        :param ip_tag: The tag to add
+        :param vertex:
             The machine vertex by which the tag is to be used
         :raises PacmanInvalidParameterException:
             * If the combination of (board-address, tag) has already been\
@@ -106,8 +106,8 @@ class Tags(object):
         """
         Add a reverse IP tag.
 
-        :param ~spinn_machine.tags.ReverseIPTag reverse_ip_tag: The tag to add
-        :param MachineVertex vertex: The vertex by which the tag is to be used
+        :param reverse_ip_tag: The tag to add
+        :param vertex: The vertex by which the tag is to be used
         :raises PacmanInvalidParameterException:
             * If the combination of (board-address, tag) has already been\
               assigned to an IP tag or Reverse IP tag
@@ -144,8 +144,6 @@ class Tags(object):
     def ip_tags_vertices(self) -> Iterable[Tuple[IPTag, MachineVertex]]:
         """
         The list of (IPTag, vertex) pairs stored.
-
-        :rtype: iterable(tuple(IPTag, MachineVertex))
         """
         yield from [(tag, vert)
                     for vert, tags in self._ip_tags_by_vertex.items()
@@ -155,8 +153,6 @@ class Tags(object):
     def ip_tags(self) -> Iterator[IPTag]:
         """
         The IP tags assigned.
-
-        :rtype: iterable(~spinn_machine.tags.IPTag)
         """
         return iter(self._ip_tags.values())
 
@@ -164,8 +160,6 @@ class Tags(object):
     def reverse_ip_tags(self) -> Iterator[ReverseIPTag]:
         """
         The reverse IP tags assigned.
-
-        :rtype: iterable(~spinn_machine.tags.ReverseIPTag)
         """
         return iter(self._reverse_ip_tags.values())
 
@@ -174,9 +168,8 @@ class Tags(object):
         """
         Get the IP Tags assigned to a given machine vertex.
 
-        :param MachineVertex vertex: The vertex to get the tags for
+        :param vertex: The vertex to get the tags for
         :return: An iterable of IPTag, or `None` if the vertex has no tags
-        :rtype: iterable(~spinn_machine.tags.IPTag) or None
         """
         return self._ip_tags_by_vertex.get(vertex)
 
@@ -185,9 +178,8 @@ class Tags(object):
         """
         Get the Reverse IP Tags assigned to a given machine vertex.
 
-        :param MachineVertex vertex: The vertex to get the tags for
+        :param vertex: The vertex to get the tags for
         :return:
             An iterable of ReverseIPTag, or `None` if the vertex has no tags
-        :rtype: iterable(~spinn_machine.tags.ReverseIPTag) or None
         """
         return self._reverse_ip_tags_by_vertex.get(vertex)

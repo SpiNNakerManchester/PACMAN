@@ -47,8 +47,6 @@ _all_bits = tuple(1 << i for i in range(32))
 def ordered_covering_compressor() -> MulticastRoutingTables:
     """
     Compressor from rig that has been tied into the main tool chain stack.
-
-    :rtype: MulticastRoutingTables
     """
     compressor = _OrderedCoveringCompressor()
     return compressor.compress_all_tables()

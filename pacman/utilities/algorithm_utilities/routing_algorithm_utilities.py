@@ -42,7 +42,6 @@ def get_app_partitions() -> List[ApplicationEdgePartition]:
             Where there are only internal multicast partitions, the partition
             will have no edges.  Caller should use
             `vertex.splitter.get_internal_multicast_partitions` for details.
-    :rtype: list(ApplicationEdgePartition)
     """
     # Find all partitions that need to be dealt with
     # Make a copy which we can edit
@@ -67,15 +66,14 @@ def longest_dimension_first(
     """
     List the (x, y) steps on a longest-dimension first route.
 
-    :param tuple(int,int,int) vector: (x, y, z)
+    :param vector: (x, y, z)
         The vector which the path should cover.
-    :param tuple(int,int) start: (x, y)
+    :param start: (x, y)
         The coordinates from which the path should start.
 
         .. note::
             This is a 2D coordinate.
     :return: min route
-    :rtype: list(tuple(int,tuple(int, int)))
     """
     return vector_to_nodes(
         sorted(enumerate(vector), key=(lambda x: abs(x[1])), reverse=True),
@@ -86,12 +84,11 @@ def vector_to_nodes(dm_vector: List[XY], start: XY) -> List[Tuple[int, XY]]:
     """
     Convert a vector to a set of nodes.
 
-    :param list(tuple(int,int)) dm_vector:
+    :param dm_vector:
         A vector made up of a list of (dimension, magnitude), where dimensions
         are x=0, y=1, z=diagonal=2
-    :param tuple(int,int) start: The x, y coordinates of the start
+    :param start: The x, y coordinates of the start
     :return: A list of (link_id, (target_x, target_y)) of nodes on a route
-    :rtype: list(tuple(int,tuple(int, int)))
     """
     machine = PacmanDataView.get_machine()
     x, y = start
@@ -140,8 +137,7 @@ def vector_to_nodes(dm_vector: List[XY], start: XY) -> List[Tuple[int, XY]]:
 
 def vertex_xy(vertex: MachineVertex) -> XY:
     """
-    :param MachineVertex vertex:
-    :rtype: tuple(int,int)
+    :param vertex:
     """
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)
@@ -152,8 +148,7 @@ def vertex_xy(vertex: MachineVertex) -> XY:
 
 def vertex_chip(vertex: MachineVertex) -> Chip:
     """
-    :param MachineVertex vertex:
-    :rtype: ~spinn_machine.Chip
+    :param vertex:
     """
     machine = PacmanDataView.get_machine()
     if not isinstance(vertex, AbstractVirtual):
@@ -169,12 +164,10 @@ def vertex_xy_and_route(vertex: MachineVertex) -> Tuple[
     Get the non-virtual chip coordinates, the vertex, and processor or
     link to follow to get to the vertex.
 
-    :param MachineVertex vertex:
+    :param vertex:
     :return: the (x,y) coordinates of the target vertex mapped to a tuple of
         the vertex, core and link.
         One of core or link is provided the other is `None`
-    :rtype: tuple(tuple(int, int), tuple(MachineVertex, int, None)) or
-        tuple(tuple(int, int), tuple(MachineVertex, None, int))
     """
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)

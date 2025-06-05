@@ -33,8 +33,8 @@ class SourceSegmentedSDRAMMachinePartition(
     def __init__(
             self, identifier: str, pre_vertices: Collection[MachineVertex]):
         """
-        :param str identifier: The identifier of the partition
-        :param iterable(~pacman.model.graphs.AbstractVertex) pre_vertices:
+        :param identifier: The identifier of the partition
+        :param pre_vertices:
             The vertices that an edge in this partition may originate at
         """
         super().__init__(

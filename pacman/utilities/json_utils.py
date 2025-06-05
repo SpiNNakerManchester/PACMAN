@@ -122,7 +122,7 @@ def reverse_iptag_to_json(iptag: ReverseIPtagResource) -> JsonObject:
     """
     Converts a reverse iptag to json
 
-    :param ReverseIPtagResource iptag:
+    :param iptag:
     """
     json_dict: JsonObject = dict()
     try:

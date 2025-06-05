@@ -52,7 +52,7 @@ class RoutingTree(object):
 
     def __init__(self, chip: XY, label: Optional[str] = None):
         """
-        :param tuple(int,int) chip:
+        :param chip:
             The chip the route is currently passing through.
         """
         self._chip_x, self._chip_y = chip

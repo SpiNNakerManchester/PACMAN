@@ -80,7 +80,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         Set the routing_infos.
 
-        :param RoutingInfo routing_infos:
+        :param routing_infos:
         :raises TypeError: if the routing_infos is not a RoutingInfo
         """
         if not isinstance(routing_infos, RoutingInfo):
@@ -148,7 +148,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         Sets the `_routing_table_by_partition`.
 
-        :param MulticastRoutingTableByPartition routing_table_by_partition:
+        :param routing_table_by_partition:
             raises TypeError: if routing_table_by_partition is no a
             MulticastRoutingTableByPartition
         """
@@ -189,7 +189,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         Only affect is to change the numbers reported by the
         get_all/ethernet_monitor methods.
 
-        :param ~pacman.model.graphs.machine.MachineVertex vertex:
+        :param vertex:
             One of the vertices added to each core, assumed to be typical of
             all.
         :param all_chips:

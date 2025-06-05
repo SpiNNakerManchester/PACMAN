@@ -59,7 +59,7 @@ class SDRAMMachineEdge(MachineEdge):
         """
         Sets the start address without verification
 
-        :param int new_value:
+        :param new_value:
         """
         self._sdram_base_address = new_value
 

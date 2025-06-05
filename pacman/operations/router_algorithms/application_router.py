@@ -497,7 +497,7 @@ def _make_source_to_source_routes(
         Set of chips that routes are going outward from the source
     :param self_xys: The actual chips that are targeted in the source
     :param source_mappings: The sources mapped to their routes
-    :param Machine machine: The machine to route on
+    :param machine: The machine to route on
     :param partition: The partition to route
     :param routing_tables: The tables to write
     :param targets: The target end-points of the routes
@@ -838,10 +838,10 @@ def _convert_a_route(
     :param targets:
         Targets for each chip.  When present for a chip, the route links and
         cores are added to each entry in the targets.
-    :param bool use_source_for_targets:
+    :param use_source_for_targets:
         If true, targets for the given source_vertex will be requested;
         If false all targets for matching chips will be used.
-    :param bool ensure_all_source:
+    :param ensure_all_source:
         If true, ensures that all machine vertices of the source application
         vertex are covered in routes that continue forward
     """

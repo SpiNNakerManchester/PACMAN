@@ -26,13 +26,12 @@ def pair_compressor(
         ordered: bool = True, accept_overflow: bool = False,
         verify: bool = False, c_sort: bool = False) -> MulticastRoutingTables:
     """
-    :param bool accept_overflow:
+    :param accept_overflow:
         A flag which should only be used in testing to stop raising an
         exception if result is too big
-    :param bool verify: If set to true will verify the length before returning
-    :param bool c_sort: If set will use the slower quick sort as it is
+    :param verify: If set to true will verify the length before returning
+    :param c_sort: If set will use the slower quick sort as it is
         implemented in c/ on cores
-    :rtype: MulticastRoutingTables
     """
     compressor = _PairCompressor(ordered, accept_overflow, c_sort)
     compressed = compressor.compress_all_tables()
@@ -44,7 +43,7 @@ def pair_compressor(
 
 def verify_lengths(compressed: MulticastRoutingTables) -> None:
     """
-    :param MulticastRoutingTables compressed:
+    :param compressed:
     :raises PacmanElementAllocationException:
         if the compressed table won't fit
     """
@@ -195,10 +194,7 @@ class _PairCompressor(AbstractCompressor):
         For two different routes but with the same frequency order is based on
         the (currently arbitrary) order they are in the self._routes table
 
-        :param MulticastRoutingEntry route_a_entry:
-        :param MulticastRoutingEntry route_b_entry:
         :return: ordering value (-1, 0, 1)
-        :rtype: int
         """
         return self._compare_routes(route_a_entry.spinnaker_route,
                                     route_b_entry.spinnaker_route)
@@ -215,10 +211,7 @@ class _PairCompressor(AbstractCompressor):
         For two different routes but with the same frequency order is based on
         the (currently arbitrary) order they are in the self._routes table
 
-        :param int route_a:
-        :param int route_b:
         :return: ordering value (-1, 0, 1)
-        :rtype: int
         """
         if route_a == route_b:
             return 0
@@ -236,10 +229,9 @@ class _PairCompressor(AbstractCompressor):
 
         based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
 
-        :param int low: Inclusive Lowest index to consider
-        :param int high: Inclusive Highest index to consider
+        :param low: Inclusive Lowest index to consider
+        :param high: Inclusive Highest index to consider
         :return: (last_index of lower, last_index_of_middle)
-        :rtype: tuple(int,int)
         """
         check = low + 1
         pivot = self._all_entries[low].spinnaker_route
@@ -265,8 +257,8 @@ class _PairCompressor(AbstractCompressor):
         """
         Sorts the entries in place based on frequency of their route
 
-        :param int low: Inclusive lowest index to consider
-        :param int high: Inclusive highest index to consider
+        :param low: Inclusive lowest index to consider
+        :param high: Inclusive highest index to consider
         """
         if low < high:
             left, right = self._three_way_partition_table(low, high)
@@ -276,9 +268,6 @@ class _PairCompressor(AbstractCompressor):
     def _swap_routes(self, index_a: int, index_b: int) -> None:
         """
         Helper function to swap *both* the routes and routes frequency tables
-
-        :param int index_a:
-        :param int index_b:
         """
         temp = self._routes_frequency[index_a]
         self._routes_frequency[index_a] = self._routes_frequency[index_b]
@@ -294,10 +283,9 @@ class _PairCompressor(AbstractCompressor):
 
         based on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
 
-        :param int low: Lowest index to consider
-        :param int high: Highest index to consider
+        :param low: Lowest index to consider
+        :param high: Highest index to consider
         :return: (last_index of lower, last_index_of_middle)
-        :rtype: tuple(int,int)
         """
         check = low + 1
         pivot = self._routes_frequency[low]
@@ -317,8 +305,8 @@ class _PairCompressor(AbstractCompressor):
         """
         Sorts the routes in place based on frequency.
 
-        :param int low: Inclusive lowest index to consider
-        :param int high: Inclusive highest index to consider
+        :param low: Inclusive lowest index to consider
+        :param high: Inclusive highest index to consider
         """
         if low < high:
             left, right = self._three_way_partition_routes(low, high)
@@ -334,10 +322,9 @@ class _PairCompressor(AbstractCompressor):
 
         If no intersect detected entry[left] is replaced with the merge
 
-        :param int left: Index of entry to merge and replace if possible
-        :param int index: Index of entry to merge with
+        :param left: Index of entry to merge and replace if possible
+        :param index: Index of entry to merge with
         :return: True if and only if a merge was found and done
-        :rtype: bool
         """
         m_key, m_mask, defaultable = self.merge(
             self._all_entries[left], self._all_entries[index])
@@ -364,8 +351,8 @@ class _PairCompressor(AbstractCompressor):
         """
         Compresses the entries between left and right.
 
-        :param int left: Inclusive index of first entry to merge
-        :param int right: Inclusive index of last entry to merge
+        :param left: Inclusive index of first entry to merge
+        :param right: Inclusive index of last entry to merge
         """
         while left < right:
             index = left + 1
@@ -391,9 +378,6 @@ class _PairCompressor(AbstractCompressor):
             self._write_index += 1
 
     def _update_frequency(self, entry: MulticastRoutingEntry) -> None:
-        """
-        :param ~spinn_machine.MulticastRoutingEntry entry:
-        """
         route = entry.spinnaker_route
         for i in range(self._routes_count):
             if self._routes[i] == route:
@@ -416,10 +400,9 @@ class _PairCompressor(AbstractCompressor):
         value of ordered passed into the initialisation method.
         Ordered tables may be shorted than unordered ones.
 
-        :param UnCompressedMulticastRoutingTable router_table:
+        :param router_table:
             Original Routing table for a single chip
         :return: Compressed routing table for the same chip
-        :rtype: list(MulticastRoutingEntry)
         """
         # Split the entries into buckets based on spinnaker_route
         self._all_entries = []
@@ -485,12 +468,11 @@ class _PairCompressor(AbstractCompressor):
             >>> intersect(0b0000, 0b1100, 0b1100, 0b1100)
             False
 
-        :param int key_a: The key of first key-mask pair
-        :param int mask_a: The mask of first key-mask pair
-        :param int key_b: The key of second key-mask pair
-        :param int mask_b: The mask of second key-mask pair
+        :param key_a: The key of first key-mask pair
+        :param mask_a: The mask of first key-mask pair
+        :param key_b: The key of second key-mask pair
+        :param mask_b: The mask of second key-mask pair
         :return: True if the two key-mask pairs intersect otherwise False.
-        :rtype: bool
         """
         return (key_a & mask_b) == (key_b & mask_a)
 
@@ -501,12 +483,9 @@ class _PairCompressor(AbstractCompressor):
 
         The assumption is that they both have the same known spinnaker_route
 
-        :param MulticastRoutingEntry entry1:
-            Key, Mask, defaultable from the first entry
-        :param MulticastRoutingEntry entry2:
-            Key, Mask, defaultable from the second entry
+        :param entry1: Key, Mask, defaultable from the first entry
+        :param entry2: Key, Mask, defaultable from the second entry
         :return: Key, Mask, defaultable from merged entry
-        :rtype: tuple(int, int, bool)
         """
         any_ones = entry1.key | entry2.key
         all_ones = entry1.key & entry2.key
@@ -523,7 +502,5 @@ class _PairCompressor(AbstractCompressor):
     def ordered(self) -> bool:
         """
         The ordered value passed into the init
-
-        :rtype: bool
         """
         return self._ordered

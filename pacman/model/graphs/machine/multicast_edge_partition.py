@@ -28,9 +28,8 @@ class MulticastEdgePartition(
 
     def __init__(self, pre_vertex: MachineVertex, identifier: str):
         """
-        :param ~pacman.model.graphs.machine.MachineVertex pre_vertex:
-            the pre vertex of this partition.
-        :param str identifier: The identifier of the partition
+        :param pre_vertex: the pre vertex of this partition.
+        :param identifier: The identifier of the partition
         """
         super().__init__(
             pre_vertex=pre_vertex, identifier=identifier,

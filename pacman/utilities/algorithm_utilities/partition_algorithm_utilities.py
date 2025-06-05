@@ -29,9 +29,8 @@ def get_multidimensional_slices(
     such that each is sized to the maximum atoms per dimension per core
     except the last, which might be smaller in one or more dimensions.
 
-    :param ApplicationVertex app_vertex: The vertex to get the slices of
+    :param app_vertex: The vertex to get the slices of
     :return: The slices
-    :rtype: list(~pacman.model.graphs.common.Slice)
     """
     atoms_per_core = app_vertex.get_max_atoms_per_dimension_per_core()
     n_atoms = app_vertex.atoms_shape
@@ -97,7 +96,7 @@ def get_single_dimension_slices(app_vertex: ApplicationVertex) -> List[Slice]:
         such that each is sized to the maximum atoms per dimension per core
         except the last which might be smaller in one or more dimensions
 
-    :param ApplicationVertex app_vertex: The vertex to get the slices of
+    :param app_vertex: The vertex to get the slices of
     """
     # If there is only one slice, get that
     if app_vertex.n_atoms < app_vertex.get_max_atoms_per_core():
