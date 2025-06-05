@@ -618,7 +618,6 @@ class PacmanDataView(MachineDataView):
     def get_chips_boards_required_str(cls) -> str:
         """
         Gets a String to say what was required
-        :return:
         """
         if cls.__pacman_data._n_boards_required:
             return (f"Setup asked for "
