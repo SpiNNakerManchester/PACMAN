@@ -40,7 +40,7 @@ def place_application_graph(system_placements: Placements) -> Placements:
     .. note::
         app_graph must have been partitioned
 
-    :param ystem_placements:
+    :param system_placements:
         The placements of cores doing system tasks. This is what we start from.
     :return: Placements for the application. *Includes the system placements.*
     """
@@ -101,7 +101,6 @@ class ApplicationPlacer(object):
     def __init__(self, placements: Placements):
         """
         :param placements:
-        :param plan_n_timesteps:
         """
         # Data cached for speed
         self.__machine = PacmanDataView.get_machine()

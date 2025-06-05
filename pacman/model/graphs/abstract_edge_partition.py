@@ -45,7 +45,6 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
         """
         :param identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed
-        :param label: An optional label of the partition
         """
         self._identifier = identifier
         self._allowed_edge_types = allowed_edge_types

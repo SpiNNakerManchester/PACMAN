@@ -40,8 +40,6 @@ def basic_tag_allocator() -> Tags:
         This does not actually allocate the tags, but just produces the plan
         of what to allocate. Allocations need access to the running machine.
 
-    :param machine: The machine to set up tags to be allocated.
-    :param placements: The placed vertices.
     :return: tag allocation holder
     """
     # Keep track of which tags are free by Ethernet chip

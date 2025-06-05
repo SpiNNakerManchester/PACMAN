@@ -833,8 +833,8 @@ def _convert_a_route(
 
     :param routing_tables: spinnaker format routing tables
     :param source_vertex: The source to be added to the table
-    :param incoming_processor: processor this link came from
-    :param incoming_link: link this link came from
+    :param first_incoming_processor: processor this link came from
+    :param first_incoming_link: link this link came from
     :param targets:
         Targets for each chip.  When present for a chip, the route links and
         cores are added to each entry in the targets.
