@@ -86,7 +86,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
             partition_id param is only used by some MachineVertex subclasses
         :return: The number of keys required
         """
-        # pylint: disable=unused-argument
+        _ = partition_id
         return 1 << get_n_bits(self.__vertex_slice.n_atoms)
 
     @property

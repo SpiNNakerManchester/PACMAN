@@ -300,7 +300,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         :param machine_vertex:
             The identifier of the partition to get the key for
         """
-        # pylint: disable=unused-argument
+        _ = (machine_vertex, partition_id)
         return None
 
     def get_fixed_key_and_mask(
@@ -313,7 +313,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         :param partition_id:
             The identifier of the partition to get the key for
         """
-        # pylint: disable=unused-argument
+        _ = (partition_id)
         return None
 
     def add_incoming_edge(self, edge: ApplicationEdge,

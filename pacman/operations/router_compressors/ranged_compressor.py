@@ -14,7 +14,7 @@
 
 import logging
 import sys
-from typing import cast
+from typing import cast, List
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
@@ -64,12 +64,16 @@ class RangeCompressor(object):
     A compressor based on ranges.
     Use via :py:func:`range_compressor`.
     """
-    # pylint: disable=attribute-defined-outside-init
     __slots__ = (
         # Router table to add merged routes into
         "_compressed",
         # List of entries to be merged
         "_entries")
+
+    def __init__(self) -> None:
+        # temp values to avoid Optional
+        self._entries: List[MulticastRoutingEntry] = []
+        self._compressed = CompressedMulticastRoutingTable(0, 0)
 
     def compress_table(
             self, uncompressed: UnCompressedMulticastRoutingTable

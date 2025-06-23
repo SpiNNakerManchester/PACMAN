@@ -83,7 +83,8 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
             The index of the connection on the FGPA link, for when
             n_machine_vertices_per_link > 1
         """
-        # pylint: disable=unused-argument
+        # link used in subclasses but not here
+        _ = link
         atoms_per_slice = self.n_atoms // self._n_machine_vertices_per_link
         low_atom = atoms_per_slice * index
         hi_atom = (atoms_per_slice * (index + 1)) - 1
