@@ -52,7 +52,6 @@ class IPtagResource(object):
             traffic with the same traffic_identifier can be sent using
             the same tag
         """
-        # pylint: disable=too-many-arguments
         self._ip_address = ip_address
         self._port = port
         self._strip_sdp = strip_sdp
