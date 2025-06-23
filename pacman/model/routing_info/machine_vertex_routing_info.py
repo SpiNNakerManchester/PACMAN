@@ -37,11 +37,11 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
     def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str,
                  machine_vertex: MachineVertex, index: int):
         """
-        :param BaseKeyAndMask key_and_mask:
+        :param key_and_mask:
             The key allocated to the machine partition
-        :param str partition_id: The partition to set the keys for
-        :param MachineVertex machine_vertex: The vertex to set the keys for
-        :param int index: The index of the machine vertex
+        :param partition_id: The partition to set the keys for
+        :param machine_vertex: The vertex to set the keys for
+        :param index: The index of the machine vertex
         """
         super().__init__(key_and_mask, partition_id)
         self.__machine_vertex = machine_vertex
@@ -51,8 +51,6 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
     def machine_vertex(self) -> MachineVertex:
         """
         The machine vertex.
-
-        :rtype: MachineVertex
         """
         return self.__machine_vertex
 
@@ -65,7 +63,5 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
     def index(self) -> int:
         """
         The index of the vertex.
-
-        :rtype: int
         """
         return self.__index

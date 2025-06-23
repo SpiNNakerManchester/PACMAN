@@ -31,12 +31,12 @@ class MDSlice(Slice):
             self, lo_atom: int, hi_atom: int, shape: Tuple[int, ...],
             start: Tuple[int, ...], atoms_shape: Tuple[int, ...]):
         """
-        :param int lo_atom: Index of the lowest atom to represent.
-        :param int hi_atom: Index of the highest atom to represent.
-        :param tuple(int,...) shape: The size of each dimension in the slice.
-        :param tuple(int,...) start:
+        :param lo_atom: Index of the lowest atom to represent.
+        :param hi_atom: Index of the highest atom to represent.
+        :param shape: The size of each dimension in the slice.
+        :param start:
             The offset to the start index along each dimension.
-        :param list(int) atoms_shape: The shape of atoms (?)
+        :param atoms_shape: The shape of atoms (?)
         :raises PacmanValueError: If the bounds of the slice are invalid.
         """
         super().__init__(lo_atom, hi_atom)
@@ -82,8 +82,7 @@ class MDSlice(Slice):
         """
         Get a slice in the `n`'Th dimension
 
-        :param int n: The 0-indexed dimension to get the shape of
-        :type: slice
+        :param n: The 0-indexed dimension to get the shape of
         """
         try:
             return slice(self.start[n], self.start[n] + self.shape[n])
@@ -137,8 +136,7 @@ class MDSlice(Slice):
         Convert the string form of a :py:class:`MDSlice` into an object
         instance.
 
-        :param str as_str: The string to parse
-        :rtype: MDSlice
+        :param as_str: The string to parse
         """
         if as_str[0] == "(":
             return Slice.from_string(as_str)

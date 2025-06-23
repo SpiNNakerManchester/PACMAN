@@ -45,7 +45,6 @@ class Spinner:
         """
         Loads the required imports and returns a Spinner
 
-        :rtype: Spinner
         :raises ImportError: if on Windows
         """
         # spinner as graphical library so

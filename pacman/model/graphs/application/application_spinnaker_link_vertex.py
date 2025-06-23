@@ -40,15 +40,15 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
             n_machine_vertices: int = 1,
             incoming: bool = True, outgoing: bool = True):
         """
-        :param int n_atoms: The number of atoms in the vertex
-        :param int spinnaker_link_id:
+        :param n_atoms: The number of atoms in the vertex
+        :param spinnaker_link_id:
             The index of the spinnaker link to which the device is connected
-        :param str board_address:
+        :param board_address:
             The optional IP address of the board to which the device is
             connected e.g. in a multi-board system
-        :param str label: The optional name of the vertex.
-        :param bool incoming:
-        :param bool outgoing:
+        :param label: The optional name of the vertex.
+        :param incoming:
+        :param outgoing:
         """
         super().__init__(label=label)
         self._n_atoms = self.round_n_atoms(n_atoms)
@@ -67,8 +67,6 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
     def spinnaker_link_id(self) -> int:
         """
         The SpiNNaker link to which this device is connected.
-
-        :rtype: int
         """
         return self._spinnaker_link_id
 
@@ -77,8 +75,6 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         """
         The board to which this device is connected, or `None` for the
         default board.
-
-        :rtype: str or None
         """
         return self._board_address
 
@@ -86,8 +82,6 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
     def n_machine_vertices(self) -> int:
         """
         The number of machine vertices to create.
-
-        :rtype: int
         """
         return self._n_machine_vertices
 
@@ -95,10 +89,8 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         """
         Get the slice to be given to the connection.
 
-        :param int index:
+        :param index:
             The index of the connection, for when n_machine_vertices > 1
-
-        :rtype: ~pacman.model.graphs.common.Slice
         """
         atoms_per_slice = int(math.ceil(
             self._n_atoms / self._n_machine_vertices))
@@ -110,8 +102,6 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
     def get_outgoing_slice(self) -> Slice:
         """
         Get the slice to be given to the outgoing connection.
-
-        :rtype: ~pacman.model.graphs.common.Slice
         """
         return Slice(0, self.n_atoms - 1)
 
@@ -119,8 +109,6 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
     def incoming(self) -> bool:
         """
         Reports if this vertex supports incoming links
-
-        :rtype: bool
         """
         return self._incoming
 
@@ -128,8 +116,6 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
     def outgoing(self) -> bool:
         """
         Reports if this vertex supports incoming links
-
-        :rtype: bool
         """
         return self._outgoing
 

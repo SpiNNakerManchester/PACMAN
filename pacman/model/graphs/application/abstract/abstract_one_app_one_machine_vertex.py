@@ -32,8 +32,8 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex, Generic[V]):
     def __init__(self, machine_vertex: V, label: Optional[str],
                  n_atoms: int = 1):
         """
-        :param MachineVertex machine_vertex: The fixed machine vertex.
-        :param str label: The optional name of the vertex.
+        :param machine_vertex: The fixed machine vertex.
+        :param label: The optional name of the vertex.
         """
         super().__init__(label, n_atoms)
         self._machine_vertex = machine_vertex
@@ -47,8 +47,6 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex, Generic[V]):
     def machine_vertex(self) -> V:
         """
         Provides access to the machine vertex at all times
-
-        :rtype: MachineVertex
         """
         return self._machine_vertex
 

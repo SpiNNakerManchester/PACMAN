@@ -40,25 +40,21 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
             outgoing_fpga_connection: Optional[FPGAConnection] = None,
             label: Optional[str] = None):
         """
-        :param int width: The width of the vertex in atoms
-        :param int height: The height of the vertex in atoms
-        :param int sub_width:
+        :param width: The width of the vertex in atoms
+        :param height: The height of the vertex in atoms
+        :param sub_width:
             The width of the sub-rectangle to break the vertex up into
-        :param int sub_height:
+        :param sub_height:
             The height of the sub-rectangle to break the vertex up into
         :param incoming_fpga_connections:
             The connections from one or more FPGAs that that packets are
             expected to be received from for this device, or `None` if no
             incoming traffic is expected from the device
-        :type incoming_fpga_connections:
-            list(~pacman.model.graphs.application.FPGAConnection) or None
         :param outgoing_fpga_connection:
             The connection to an FPGA that packets to be sent to this device
             should be sent down, or `None` if no outgoing traffic is expected
             to be sent to the device.
-        :type outgoing_fpga_connection:
-            ~pacman.model.graphs.application.FPGAConnection or None
-        :param str label: The optional name of the vertex.
+        :param label: The optional name of the vertex.
         """
         # Set variables first as this lets us call properties
         self.__width = width

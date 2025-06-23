@@ -39,14 +39,12 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
             self, x: int, y: int,
             multicast_routing_entries: Iterable[MulticastRoutingEntry] = ()):
         """
-        :param int x:
+        :param x:
             The x-coordinate of the chip for which this is the routing table
-        :param int y:
+        :param y:
             The y-coordinate of the chip for which this is the routing tables
         :param multicast_routing_entries:
             The routing entries to add to the table
-        :type multicast_routing_entries:
-            iterable(~spinn_machine.MulticastRoutingEntry)
         :raise pacman.exceptions.PacmanAlreadyExistsException:
             If any two routing entries contain the same key-mask combination
         """

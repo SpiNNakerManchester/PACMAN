@@ -45,7 +45,7 @@ class MulticastRoutingTables(object):
     def __init__(self,
                  routing_tables: Iterable[AbstractMulticastRoutingTable] = ()):
         """
-        :param iterable(AbstractMulticastRoutingTable) routing_tables:
+        :param routing_tables:
             The routing tables to add
         :raise PacmanAlreadyExistsException:
             If any two routing tables are for the same chip
@@ -61,8 +61,7 @@ class MulticastRoutingTables(object):
         """
         Add a routing table.
 
-        :param AbstractMulticastRoutingTable routing_table:
-            a routing table to add
+        :param routing_table: a routing table to add
         :raise PacmanAlreadyExistsException:
             If a routing table already exists for the chip
         """
@@ -81,7 +80,6 @@ class MulticastRoutingTables(object):
         The routing tables stored within.
 
         :return: an iterable of routing tables
-        :rtype: iterable(AbstractMulticastRoutingTable)
         """
         return self._routing_tables_by_chip.values()
 
@@ -91,8 +89,6 @@ class MulticastRoutingTables(object):
         multicast routing table.
 
         Will return zero if there are no routing tables
-
-        :rtype: int
         """
         if self._routing_tables_by_chip:
             return max(map((lambda x: x.number_of_entries),
@@ -106,8 +102,6 @@ class MulticastRoutingTables(object):
         multicast routing table.
 
         Will return zero if there are no routing tables
-
-        :rtype: int
         """
         if self._routing_tables_by_chip:
             return sum(map((lambda x: x.number_of_entries),
@@ -120,10 +114,9 @@ class MulticastRoutingTables(object):
         """
         Get a routing table for a particular chip.
 
-        :param int x: The X-coordinate of the chip
-        :param int y: The Y-coordinate of the chip
+        :param x: The X-coordinate of the chip
+        :param y: The Y-coordinate of the chip
         :return: The routing table, or `None` if no such table exists
-        :rtype: AbstractMulticastRoutingTable or None
         """
         return self._routing_tables_by_chip.get((x, y))
 
@@ -132,7 +125,6 @@ class MulticastRoutingTables(object):
         Iterator for the multicast routing tables stored within.
 
         :return: iterator of multicast_routing_table
-        :rtype: iterable(AbstractMulticastRoutingTable)
         """
         return iter(self._routing_tables_by_chip.values())
 
@@ -144,8 +136,7 @@ def to_json(router_table: MulticastRoutingTables) -> JsonObjectArray:
     """
     Converts RoutingTables to json
 
-    :param MulticastRoutingTables router_table:
-    :rtype: list(dict(str, object))
+    :param router_table:
     """
     return [
         {
@@ -168,8 +159,6 @@ def from_json(j_router: Union[str, JsonObjectArray]) -> MulticastRoutingTables:
     Creates Routing Tables based on json
 
     :param j_router:
-    :type: str or list
-    :rtype: MulticastRoutingTables
     """
     if isinstance(j_router, str):
         if j_router.endswith(".gz"):

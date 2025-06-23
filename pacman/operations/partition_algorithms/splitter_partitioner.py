@@ -23,7 +23,6 @@ def splitter_partitioner() -> int:
     needed.
 
     :return: The number of chips needed to satisfy this partitioning.
-    :rtype: int
     :raise PacmanPartitionException:
         If something goes wrong with the partitioning
     """

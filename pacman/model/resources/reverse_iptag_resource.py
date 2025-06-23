@@ -35,12 +35,10 @@ class ReverseIPtagResource(object):
         """
         :param port: The UDP port to listen to on the board for this tag
             or `None` for a default
-        :type port: int or None
-        :param int sdp_port:
+        :param sdp_port:
             The SDP port number to be used when constructing SDP packets from
             the received UDP packets for this tag
         :param tag: A fixed tag ID to assign, or `None` if any tag is OK
-        :type tag: int or None
         """
         self._port = port
         self._sdp_port = sdp_port
@@ -50,8 +48,6 @@ class ReverseIPtagResource(object):
     def port(self) -> Optional[int]:
         """
         The port of the tag.
-
-        :rtype: int
         """
         return self._port
 
@@ -60,8 +56,6 @@ class ReverseIPtagResource(object):
         """
         The SDP port to use when constructing the SDP message from the
         received UDP message.
-
-        :rtype: int
         """
         return self._sdp_port
 
@@ -69,8 +63,6 @@ class ReverseIPtagResource(object):
     def tag(self) -> Optional[int]:
         """
         The tag required, or `None` if any tag is OK.
-
-        :rtype: int or None
         """
         return self._tag
 

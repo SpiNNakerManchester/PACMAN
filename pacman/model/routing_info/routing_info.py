@@ -38,7 +38,7 @@ class RoutingInfo(object):
         """
         Add a routing information item.
 
-        :param VertexRoutingInfo info:
+        :param info:
             The routing information item to add
         :raise PacmanAlreadyExistsException:
             If the partition is already in the set of edges
@@ -65,10 +65,9 @@ class RoutingInfo(object):
         """
         Get routing information for a given partition_id from a vertex.
 
-        :param AbstractVertex vertex: The vertex to search for
-        :param str partition_id:
+        :param vertex: The vertex to search for
+        :param partition_id:
             The ID of the partition for which to get the routing information
-        :rtype: VertexRoutingInfo or None
         """
         return self._info[vertex].get(partition_id)
 
@@ -78,10 +77,9 @@ class RoutingInfo(object):
         """
         Get routing information for a given partition_id from a vertex.
 
-        :param AbstractVertex vertex: The vertex to search for
-        :param str partition_id:
+        :param vertex: The vertex to search for
+        :param partition_id:
             The ID of the partition for which to get the routing information
-        :rtype: VertexRoutingInfo
         :raise KeyError:
             If the vertex/partition_id combination is not in the routing
             information
@@ -102,11 +100,10 @@ class RoutingInfo(object):
         """
         Get the first key for the partition starting at a vertex.
 
-        :param AbstractVertex vertex: The vertex which the partition starts at
-        :param str partition_id:
+        :param vertex: The vertex which the partition starts at
+        :param partition_id:
             The ID of the partition for which to get the routing information
         :return: The routing key of the partition
-        :rtype: int or None
         """
         if vertex not in self._info:
             return None
@@ -120,11 +117,10 @@ class RoutingInfo(object):
         """
         Get the first key for the partition starting at a vertex.
 
-        :param AbstractVertex vertex: The vertex which the partition starts at
-        :param str partition_id:
+        :param vertex: The vertex which the partition starts at
+        :param partition_id:
             The ID of the partition for which to get the routing information
         :return: The routing key of the partition
-        :rtype: int
         :raise KeyError:
             If the vertex/partition_id combination is not in the routing
             information
@@ -136,7 +132,7 @@ class RoutingInfo(object):
         """
         Get the outgoing partitions from a vertex.
 
-        :param AbstractVertex vertex: The vertex to search for
+        :param vertex: The vertex to search for
         """
         return self._info[vertex].keys()
 
@@ -145,10 +141,9 @@ class RoutingInfo(object):
         """
         Check if there is routing information for a given vertex.
 
-        :param AbstractVertex vertex: The vertex to search for
-        :param str partition_id:
+        :param vertex: The vertex to search for
+        :param partition_id:
             The ID of the partition for which to get the routing information
-        :rtype: bool
         """
         if vertex not in self._info:
             return False
@@ -161,8 +156,8 @@ class RoutingInfo(object):
         """
         Check that the partition ids for a vertex are in the allowed set.
 
-        :param AbstractVertex vertex: The vertex to search for
-        :param set[str] allowed_partition_ids: The allowed partition ids
+        :param vertex: The vertex to search for
+        :param allowed_partition_ids: The allowed partition ids
         :raise KeyError: If the vertex has an unknown partition ID
         """
         if vertex not in self._info:
@@ -179,8 +174,7 @@ class RoutingInfo(object):
         Get routing information for a given vertex.  Fails if the vertex has
         more than one outgoing partition.
 
-        :param AbstractVertex vertex: The vertex to search for
-        :rtype: VertexRoutingInfo or None
+        :param vertex: The vertex to search for
         :raise KeyError: If the vertex has more than one outgoing partition
         """
         if vertex not in self._info:
@@ -197,8 +191,7 @@ class RoutingInfo(object):
         Get the first key for the partition starting at a vertex.  Fails if
         the vertex has more than one outgoing partition.
 
-        :param AbstractVertex vertex: The vertex which the partition starts at
-        :rtype: int or None
+        :param vertex: The vertex which the partition starts at
         :raise KeyError: If the vertex has more than one outgoing partition
         """
         info = self.get_single_info_from(vertex)

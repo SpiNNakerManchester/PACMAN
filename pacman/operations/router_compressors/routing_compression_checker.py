@@ -34,10 +34,9 @@ def codify(route: MulticastRoutingEntry, length: int = 32) -> str:
     Whenever a mask bit is zero the list of covered keys is doubled to
     include both the key with a zero and a one at that place.
 
-    :param ~spinn_machine.MulticastRoutingEntry route: single routing entry
-    :param int length: length in bits of the key and mask (defaults to 32)
+    :param route: single routing entry
+    :param length: length in bits of the key and mask (defaults to 32)
     :return: set of routing_keys covered by this route
-    :rtype: str
     """
     mask = route.mask
     key = route.key
@@ -62,10 +61,9 @@ def codify_table(
     """
     Apply :py:func:`codify` to all entries in a table.
 
-    :param AbstractMulticastRoutingTable table:
-    :param int length:
+    :param table:
+    :param length:
     :return: mapping from codified route to routing entry
-    :rtype: dict(str, ~spinn_machine.MulticastRoutingEntry)
     """
     return {
         codify(route, length): route
@@ -74,9 +72,8 @@ def codify_table(
 
 def covers(o_code: str, c_code: str) -> bool:
     """
-    :param str o_code:
-    :param str c_code:
-    :rtype: bool
+    :param o_code:
+    :param c_code:
     """
     if o_code == c_code:
         return True
@@ -91,9 +88,8 @@ def covers(o_code: str, c_code: str) -> bool:
 
 def calc_remainders(o_code: str, c_code: str) -> List[str]:
     """
-    :param str o_code: Codified original route
-    :param str c_code: Codified compressed route
-    :rtype: list(str)
+    :param o_code: Codified original route
+    :param c_code: Codified compressed route
     """
     if o_code == c_code:
         # "" = "" so also the terminator case
@@ -115,12 +111,11 @@ def compare_route(
         o_code: Optional[str] = None, start: int = 0,
         f: Optional[TextIO] = None) -> None:
     """
-    :param ~spinn_machine.MulticastRoutingEntry o_route: the original route
-    :param dict(str, ~spinn_machine.MulticastRoutingEntry) compressed_dict:
-        Compressed routes
-    :param str o_code: Codified original route (if known)
-    :param int start: Starting index in compressed routes
-    :param ~io.FileIO f: Where to write (part of) the route report
+    :param o_route: the original route
+    :param compressed_dict: Compressed routes
+    :param o_code: Codified original route (if known)
+    :param start: Starting index in compressed routes
+    :param f: Where to write (part of) the route report
     """
     if o_code is None:
         o_code = codify(o_route)
@@ -163,9 +158,8 @@ def compare_tables(
     """
     Compares the two tables without generating any output.
 
-    :param UnCompressedMulticastRoutingTable original:
-        The original routing tables
-    :param CompressedMulticastRoutingTable compressed:
+    :param original: The original routing tables
+    :param compressed:
         The compressed routing tables.
         Which will be considered in order.
     :raises: PacmanRoutingException if there is any error

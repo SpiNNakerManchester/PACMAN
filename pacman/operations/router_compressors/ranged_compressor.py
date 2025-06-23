@@ -30,10 +30,9 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 def range_compressor(accept_overflow: bool = True) -> MulticastRoutingTables:
     """
-    :param bool accept_overflow:
+    :param accept_overflow:
         A flag which should only be used in testing to stop raising an
         exception if result is too big
-    :rtype: MulticastRoutingTables
     """
     if accept_overflow:
         message = "Precompressing tables using Range Compressor"
@@ -85,10 +84,9 @@ class RangeCompressor(object):
         Compressed the entries for this unordered table
         returning a new table with possibly fewer entries
 
-        :param UnCompressedMulticastRoutingTable uncompressed:
+        :param uncompressed:
             Original Routing table for a single chip
         :return: Compressed routing table for the same chip
-        :rtype: AbstractMulticastRoutingTable
         """
         # Check you need to compress
         if not get_config_bool(
@@ -140,7 +138,6 @@ class RangeCompressor(object):
 
         if index == len(self._entries):
             return sys.maxsize
-        :param int index:
         """
         if index == len(self._entries):
             return sys.maxsize
@@ -152,8 +149,6 @@ class RangeCompressor(object):
         Get the end of the range covered by entry index's key and mask
 
         With support for index underflow
-
-        :param index:
         """
         if index < 0:
             return 0

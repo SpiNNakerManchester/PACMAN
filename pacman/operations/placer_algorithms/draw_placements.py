@@ -31,8 +31,6 @@ def _next_colour() -> Colour:
     """
     Get the next (random) RGBA colour to use for a vertex for placement
     drawings.
-
-    :rtype: tuple(float, float, float, float)
     """
     return (
         random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1.0)
@@ -44,11 +42,11 @@ def draw_placements(
     """
     Draw the placements as a PNG in the specified file.
 
-    :param Placements placements:
+    :param placements:
         The application placements. Includes the system placements.
-    :param Placements system_placements:
+    :param system_placements:
         The system placements.
-    :param str report_file:
+    :param report_file:
         Path of file to make. Should have a ``.png`` suffix by convention.
     """
     if isinstance(spinner_api, ImportError):

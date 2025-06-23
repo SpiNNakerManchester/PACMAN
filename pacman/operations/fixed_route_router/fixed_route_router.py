@@ -27,9 +27,7 @@ def fixed_route_router(
     Runs the fixed route generator for all boards on machine.
 
     :param destination_class: the destination class to route packets to
-    :type destination_class: type
     :return: router tables for fixed route paths
-    :rtype: dict((int, int)), ~spinn_machine.RoutingEntry)
     :raises PacmanConfigurationException: if no placement processor found
     :raises PacmanRoutingException:
     :raises PacmanAlreadyExistsException:
@@ -52,7 +50,6 @@ class _FixedRouteRouter(object):
         """
 
         :param destination_class: the destination class to route packets to
-        :type destination_class: type
         """
         self._machine = PacmanDataView.get_machine()
         self._destination_class = destination_class
@@ -64,7 +61,6 @@ class _FixedRouteRouter(object):
         Runs the fixed route generator for all boards on machine.
 
         :return: router tables for fixed route paths
-        :rtype: dict((int, int), ~spinn_machine.RoutingEntry)
         :raises PacmanConfigurationException: if no placement processor found
         :raises PacmanRoutingException:
         :raises PacmanAlreadyExistsException:
@@ -82,7 +78,7 @@ class _FixedRouteRouter(object):
         Handles this board through the quick routing process, based on a
         predefined routing table.
 
-        :param ~spinn_machine.Chip ethernet_chip:
+        :param ethernet_chip:
             the Ethernet-connected chip identifying the board
         :raises PacmanRoutingException:
         :raises PacmanAlreadyExistsException:
@@ -128,9 +124,6 @@ class _FixedRouteRouter(object):
                                 link_ids: List[int],
                                 processor_ids: List[int]) -> None:
         """
-        :param tuple(int,int) key:
-        :param list(int) link_ids:
-        :param list(int) processor_ids:
         :raises PacmanAlreadyExistsException:
         """
         if key in self._fixed_route_tables:
@@ -144,9 +137,7 @@ class _FixedRouteRouter(object):
         Locate destination vertex on an (Ethernet-connected) chip to send
         fixed data to.
 
-        :param ~spinn_machine.Chip chip:
         :return: processor ID as a int
-        :rtype: int
         :raises PacmanConfigurationException: if no placement processor found
         """
         for placement in PacmanDataView.iterate_placements_by_xy_and_type(

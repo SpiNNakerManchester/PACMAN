@@ -56,8 +56,6 @@ class AbstractCompressor(object):
     def compress_all_tables(self) -> MulticastRoutingTables:
         """
         Apply compression to all uncompressed tables.
-
-        :rtype: MulticastRoutingTables
         """
         router_tables = PacmanDataView.get_precompressed()
         # create progress bar
@@ -71,10 +69,9 @@ class AbstractCompressor(object):
             self, router_table: UnCompressedMulticastRoutingTable) -> List[
                 MulticastRoutingEntry]:
         """
-        :param UnCompressedMulticastRoutingTable router_table:
+        :param router_table:
             Original routing table for a single chip
         :return: Raw compressed routing table entries for the same chip
-        :rtype: list(MulticastRoutingEntry)
         """
         raise NotImplementedError
 
@@ -86,11 +83,9 @@ class AbstractCompressor(object):
 
         Tables who start of smaller than global_target are not compressed
 
-        :param MulticastRoutingTables router_tables: Routing tables
-        :param ~spinn_utilities.progress_bar.ProgressBar progress:
-            Progress bar to show while working
+        :param router_tables: Routing tables
+        :param progress: Progress bar to show while working
         :return: The compressed but still unordered routing tables
-        :rtype: MulticastRoutingTables
         :raises MinimisationFailedError: on failure
         """
         compressed_tables = MulticastRoutingTables()

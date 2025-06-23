@@ -52,7 +52,7 @@ class RoutingTree(object):
 
     def __init__(self, chip: XY, label: Optional[str] = None):
         """
-        :param tuple(int,int) chip:
+        :param chip:
             The chip the route is currently passing through.
         """
         self._chip_x, self._chip_y = chip
@@ -64,8 +64,6 @@ class RoutingTree(object):
     def label(self) -> Optional[str]:
         """
         The label value provided to the init (if applicable).
-
-        :rtype: str or None
         """
         return self._label
 
@@ -73,8 +71,6 @@ class RoutingTree(object):
     def chip(self) -> XY:
         """
         The chip the route is currently passing through.
-
-        :rtype: tuple(int,int)
         """
         return (self._chip_x, self._chip_y)
 
@@ -103,8 +99,6 @@ class RoutingTree(object):
         .. note::
             The direction may be `None` and so additional logic may be required
             to determine what core to target to reach the vertex.
-
-        :rtype: iterable(tuple(int, RoutingTree or MachineVertex))
         """
         yield from self._children
 
@@ -113,7 +107,6 @@ class RoutingTree(object):
             ) -> None:
         """
         :param child:
-        :type child: tuple(int, RoutingTree or MachineVertex)
         """
         self._children.append(child)
 
@@ -122,7 +115,6 @@ class RoutingTree(object):
             ) -> None:
         """
         :param child:
-        :type child: tuple(int, RoutingTree or MachineVertex)
         """
         self._children.remove(child)
 
@@ -130,7 +122,6 @@ class RoutingTree(object):
     def is_leaf(self) -> bool:
         """
         Detect if this is a leaf node, which is one with no children.
-        :return:
         """
         return not self._children
 
@@ -171,7 +162,6 @@ class RoutingTree(object):
             taken. At each step, we have the
             direction taken to reach a Node in the tree, the (x, y) coordinate
             of that Node and routes leading to children of the Node.
-        :rtype: iterable(tuple(int, tuple(int,int), set(int)))
         """
         # A queue of (direction, node) to visit. The direction is the Links
         # entry which describes the direction in which we last moved to reach

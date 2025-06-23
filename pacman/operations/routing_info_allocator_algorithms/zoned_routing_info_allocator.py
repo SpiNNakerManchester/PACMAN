@@ -107,7 +107,7 @@ class ZonedRoutingInfoAllocator(object):
 
     def __init__(self, flexible: bool = False):
         """
-        :param bool flexible: Determines if flexible can be use.
+        :param flexible: Determines if flexible can be use.
             If False, global settings will be attempted
         """
         self.__vertex_partitions: OrderedSet[
@@ -127,12 +127,11 @@ class ZonedRoutingInfoAllocator(object):
         """
         Perform routing information allocation.
 
-        :param list(tuple(ApplicationVertex,str)) extra_allocations:
+        :param extra_allocations:
             Additional (vertex, partition identifier) pairs to allocate
             keys to.  These might not appear in partitions in the graph
             due to being added by the system.
         :return: The routing information
-        :rtype: RoutingInfo
         :raise PacmanRouteInfoAllocationException:
             If something goes wrong with the allocation
         """
@@ -389,10 +388,6 @@ class ZonedRoutingInfoAllocator(object):
 
     @staticmethod
     def __mask(bits: int) -> int:
-        """
-        :param int bits:
-        :rtype int:
-        """
         return FULL_MASK - ((2 ** bits) - 1)
 
 
@@ -401,11 +396,10 @@ def flexible_allocate(extra_allocations: _XAlloc) -> RoutingInfo:
     Allocated with fixed bits for the Application/Partition index but
     with the size of the atom and machine bit changing.
 
-    :param list(tuple(ApplicationVertex,str)) extra_allocations:
+    :param extra_allocations:
         Additional (vertex, partition identifier) pairs to allocate
         keys to.  These might not appear in partitions in the graph
         due to being added by the system.
-    :rtype: RoutingInfo
     :raise PacmanRouteInfoAllocationException:
     """
     return ZonedRoutingInfoAllocator(True).allocate(extra_allocations)
@@ -413,11 +407,10 @@ def flexible_allocate(extra_allocations: _XAlloc) -> RoutingInfo:
 
 def global_allocate(extra_allocations: _XAlloc) -> RoutingInfo:
     """
-    :param list(tuple(ApplicationVertex,str)) extra_allocations:
+    :param extra_allocations:
         Additional (vertex, partition identifier) pairs to allocate
         keys to.  These might not appear in partitions in the graph
         due to being added by the system.
-    :rtype: RoutingInfo
     :raise PacmanRouteInfoAllocationException:
     """
     return ZonedRoutingInfoAllocator().allocate(extra_allocations)

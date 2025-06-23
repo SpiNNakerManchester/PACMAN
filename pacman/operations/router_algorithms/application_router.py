@@ -53,7 +53,6 @@ class _Targets(object):
         Ensure that a source exists, even if it targets nothing.
 
         :param source_vertex: The vertex to ensure exists
-        :type source_vertex: ApplicationVertex or MachineVertex
         """
         if source_vertex not in self.__targets_by_source:
             self.__targets_by_source[source_vertex] = (list(), list())
@@ -66,12 +65,9 @@ class _Targets(object):
         Add a set of vertices that target a given core or link.
 
         :param core: The core to target with the sources or `None` if no core
-        :type core: int or None
         :param link: The link to target with the sources or `None` if no link
-        :type link: int or None
         :param source_vertices: A list of sources which target something here
-        :type source_vertices: list(ApplicationVertex or MachineVertex)
-        :param str partition_id: The partition of the sources
+        :param partition_id: The partition of the sources
         """
         for vertex in source_vertices:
             if isinstance(vertex, ApplicationVertex):
@@ -94,12 +90,9 @@ class _Targets(object):
         Add a set of machine vertices that target a given core or link.
 
         :param core: The core to target with the sources or `None` if no core
-        :type core: int or None
         :param link: The link to target with the sources or `None` if no link
-        :type link: int or None
         :param source_vertices: A list of sources which target something here
-        :type source_vertices: list(ApplicationVertex or MachineVertex)
-        :param str partition_id: The partition of the sources
+        :param partition_id: The partition of the sources
         """
         for vertex in source_vertices:
             if isinstance(vertex, ApplicationVertex):
@@ -115,11 +108,6 @@ class _Targets(object):
 
     def __is_m_vertex(
             self, vertex: ApplicationVertex, partition_id: str) -> bool:
-        """
-        :param ApplicationVertex vertex:
-        :param str partition_id:
-        :rtype: bool
-        """
         if not vertex.has_splitter:
             return False
         return any(
@@ -128,10 +116,6 @@ class _Targets(object):
 
     def __replace_app_vertex(
             self, vertex: ApplicationVertex, partition_id: str) -> None:
-        """
-        :param ApplicationVertex vertex:
-        :param str partition_id:
-        """
         cores = self.__targets_by_source[vertex][0]
         links = self.__targets_by_source[vertex][1]
         del self.__targets_by_source[vertex]
@@ -141,22 +125,11 @@ class _Targets(object):
     def __add_m_vertices(
             self, vertex: ApplicationVertex, partition_id: str,
             core: _OptInt, link: _OptInt) -> None:
-        """
-        :param ApplicationVertex vertex:
-        :param str partition_id:
-        :param int core:
-        :param int link:
-        """
         for vtx in vertex.splitter.get_out_going_vertices(partition_id):
             self.__add_source(vtx, core, link)
 
     def __add_source(self, source: AbstractVertex, core: _OptInt,
                      link: _OptInt) -> None:
-        """
-        :param source:
-        :param core:
-        :param link:
-        """
         tgt = self.__targets_by_source[source]
         if core is not None:
             tgt[0].append(core)
@@ -168,9 +141,6 @@ class _Targets(object):
             Tuple[AbstractVertex, Tuple[List[int], List[int]]]]:
         """
         List of (source, (list of cores, list of links)) to target.
-
-        :rtype: tuple(MachineVertex or ApplicationVertex,
-                      tuple(list(int), list(int)))
         """
         return self.__targets_by_source.items()
 
@@ -180,7 +150,6 @@ class _Targets(object):
         Get the cores and links for a specific source.
 
         :return: tuple(list of cores, list of links)
-        :rtype: tuple(list(int), list(int))
         """
         return vertex, self.__targets_by_source[vertex]
 
@@ -289,23 +258,19 @@ def _route_source_to_target(
     Route from a source to a single application vertex target that is not
     the same as the source.
 
-    :param Machine machine: The machine to route on
-    :param ApplicationVertex source: The source application vertex
-    :param tuple(int,int) source_xy: A chip chosen in the source to route from
-    :param set(tuple(int,int) all_source_xys: All source chips
+    :param machine: The machine to route on
+    :param source: The source application vertex
+    :param source_xy: A chip chosen in the source to route from
+    :param all_source_xys: All source chips
     :param source_mappings: The sources mapped to their routes
-    :type source_mappings: dict(tuple(int, int),
-        list(tuple(MachineVertex, int,  None) or
-        tuple(MachineVertex, None, int)))
-    :param set(tuple(int,int)) source_edge_xys:
+    :param source_edge_xys:
         Set of chips that routes are currently going outward from the source
         (updated here)
-    :param ApplicationVertex target: The target application vertex
-    :param dict(tuple(int,int),_Targets) targets:
+    :param target: The target application vertex
+    :param targets:
         The set of actual targets to be added on chips (updated here)
-    :param AbstractEdgePartition partition: The partition being routed
-    :param dict(tuple(int,int), RoutingTree) routes:
-        The routes made by chip (updated here)
+    :param partition: The partition being routed
+    :param routes: The routes made by chip (updated here)
     """
     # Get which vertices are targeted by the source
     target_vertices = target.splitter.get_source_specific_in_coming_vertices(
@@ -365,22 +330,19 @@ def _route_single_source_to_target(
     Route from a single source connection point to all targets from the
     target edge chip.
 
-    :param Machine machine: The machine to route on
-    :param set(tuple(int,int)) source_edge_xys:
+    :param machine: The machine to route on
+    :param source_edge_xys:
         Set of chips that routes are currently going outward from the source
         (updated here)
-    :param tuple(int,int) source_edge_xy:
+    :param source_edge_xy:
         The x and y coordinate of the actual source edge chip to route from
     :param source_mappings: The sources mapped to their routes
-    :type source_mappings: dict(tuple(int, int),
-        list(tuple(MachineVertex, int,  None) or
-        tuple(MachineVertex, None, int)))
-    :param tuple(int,int) target_edge_xy:
+    :param target_edge_xy:
         The x and y coordinate of the actual target edge chip to route to
-    :param list(tuple(int,int)) target_xys: The chips in the target
-    :param set(tuple(int,int)) real_target_xys:
+    :param target_xys: The chips in the target
+    :param real_target_xys:
         The chips in the target that something in the source actually targets
-    :param dict(tuple(int,int), RoutingTree) routes:
+    :param routes:
         The routes already made and to add to (updated here)
     """
     # Route from target edge chip to all the targets
@@ -448,10 +410,10 @@ def _route_source_to_source(
     """
     Routes the source to itself.
 
-    :param ApplicationVertex source: The source vertex to route
-    :param AbstractEdgePartition partition: The partition being routed
-    :param dict(tuple(int,int),_Targets) targets: Actual targets on the chips
-    :param set(tuple(int,int)) self_xys:
+    :param source: The source vertex to route
+    :param partition: The partition being routed
+    :param targets: Actual targets on the chips
+    :param self_xys:
         The coordinates of chips that are targets
     """
     # Add the targets of the sources
@@ -470,10 +432,9 @@ def _route_internal(
     """
     Route internal_partitions multicast edges.
 
-    :param list(MulticastEdgePartition) internal_partitions:
-        A list of partitions to route
-    :param dict(tuple(int,int),_Targets) targets: Actual things to target
-    :param set(tuple(int,int)) self_xys: Chips to target
+    :param internal_partitions: A list of partitions to route
+    :param targets: Actual things to target
+    :param self_xys: Chips to target
     """
     for in_part in internal_partitions:
         src = in_part.pre_vertex
@@ -496,18 +457,14 @@ def _make_source_to_target_routes(
     """
     Convert the routes from source to targets into routing table entries.
 
-    :param ApplicationVertex source: The source application vertex
-    :param AbstractEdgePartition partition: The partition to route
-    :param set(tuple(int,int)) source_edge_xys:
+    :param source: The source application vertex
+    :param partition: The partition to route
+    :param source_edge_xys:
         Set of chips that routes are currently going outward from the source
     :param source_mappings: The sources mapped to their routes
-    :type source_mappings: dict(tuple(int, int),
-        list(tuple(MachineVertex, int,  None) or
-        tuple(MachineVertex, None, int)))
-    :param dict(tuple(int,int),_Targets) targets:
-        The actual targets to hit on each chip
-    :param MulticastRoutingTableByPartition routing_tables: The tables to write
-    :param dict(tuple(int,int),RoutingTree) routes: The routes to convert
+    :param targets:The actual targets to hit on each chip
+    :param routing_tables: The tables to write
+    :param routes: The routes to convert
     """
     for source_edge_xy in source_edge_xys:
         # Make sure that we add the machine sources on the source edge chip
@@ -540,7 +497,7 @@ def _make_source_to_source_routes(
         Set of chips that routes are going outward from the source
     :param self_xys: The actual chips that are targeted in the source
     :param source_mappings: The sources mapped to their routes
-    :param Machine machine: The machine to route on
+    :param machine: The machine to route on
     :param partition: The partition to route
     :param routing_tables: The tables to write
     :param targets: The target end-points of the routes
@@ -593,15 +550,11 @@ def _find_target_xy(
     """
     Find a target chip to use from the set of target chips.
 
-    :param set(tuple(int, int)) target_xys:
+    :param target_xys:
         The chips in the target; must not be empty
-    :param dict(tuple(int,int),RoutingTree) routes: The routes in existence
+    :param routes: The routes in existence
     :param source_mappings: The sources mapped to their routes
-    :type source_mappings: dict(tuple(int, int),
-        list(tuple(MachineVertex, int,  None) or
-        tuple(MachineVertex, None, int)))
     :return: A chip to use as a target, and the set of overlapping chips
-    :rtype: tuple(tuple(int, int), set(tuple(x, y)) or None)
     """
     overlaps = target_xys.intersection(source_mappings)
 
@@ -630,11 +583,8 @@ def _get_outgoing_mapping(
 
     For each tuple in the list either processor or link will be `None`.
 
-    :param ApplicationVertex app_vertex:
-    :param str partition_id:
-    :rtype: dict(tuple(int, int),
-        list(tuple(MachineVertex, int,  None) or
-             tuple(MachineVertex, None, int)))
+    :param app_vertex:
+    :param partition_id:
     """
     outgoing_mapping: Dict[XY, List[_MappedSrc]] = defaultdict(list)
     for m_vertex in app_vertex.splitter.get_out_going_vertices(partition_id):
@@ -651,14 +601,6 @@ def _route_to_xys(
         first_xy: XY, all_xys: Set[XY], machine: Machine,
         routes: Dict[XY, RoutingTree], targets: Iterable[XY],
         label: str) -> None:
-    """
-    :param first_xy:
-    :param all_xys:
-    :param machine:
-    :param routes:
-    :param targets:
-    :param str label:
-    """
     # Keep a queue of xy to visit, list of (parent xy, link from parent)
     xys_to_explore: Deque[Tuple[XY, List[Tuple[XY, int]]]] = deque(
         [(first_xy, list())])
@@ -713,12 +655,6 @@ def _find_reachable(
     allowed chips, but not looking at the disallowed chips.  A chip in
     the disallowed chips is not used unless it is the source even if in the
     allowed chips!
-
-    :param tuple(int,int) source_xy:
-    :param Machine machine:
-    :param set(tuple(int,int)) allowed_xys:
-    :param set(tuple(int,int)) disallowed_xys:
-    :rtype: set(tuple(int,int))
     """
     xys_to_explore = deque([source_xy])
     visited = set()
@@ -741,12 +677,7 @@ def _is_open_chip(
         xy: XY, xy_set: Set[XY], visited: Set[XY],
         machine: Machine) -> bool:
     """
-    :param tuple(int, int) xy: Coordinates
-    :param set(tuple(int, int) xy_set: List of legal coordinates
-    :param set(tuple(int, int) visited:
-    :param ~spinn_machine.Machine machine:
     :return: True if the coordinates point to an existing Chip not yet visited
-    :rtype: bool
     """
     return xy in xy_set and xy not in visited and machine.is_chip_at(*xy)
 
@@ -756,15 +687,7 @@ def _route_pre_to_post(
         machine: Machine, label: str, all_source_xy: Set[XY],
         target_xys: Set[XY]) -> Tuple[XY, XY]:
     """
-    :param tuple(int, int) source_xy:
-    :param tuple(int, int) dest_xy:
-    :param dict(tuple(int,int), RoutingTree) routes:
-    :param ~spinn_machine.Machine machine:
-    :param str label:
-    :param set(tuple(int, int)) all_source_xy:
-    :param set(tuple(int, int)) target_xys:
     :return: the pre- and post-vertex coordinates
-    :rtype: tuple(tuple(int,int), tuple(int, int))
     """
     # Find a route from source to target
     vector = machine.get_vector(source_xy, dest_xy)
@@ -818,12 +741,6 @@ def _route_pre_to_post(
 def _path_without_errors(
         source_xy: XY, nodes: List[_Node],
         machine: Machine) -> List[_Node]:
-    """
-    :param tuple(int, int) source_xy:
-    :param  list(tuple(int,tuple(int, int))) nodes:
-    :param ~spinn_machine.Machine machine:
-    :rtype: list(tuple(int,int))
-    """
     c_xy = source_xy
     pos = 0
     new_nodes = list()
@@ -851,11 +768,6 @@ def _path_without_errors(
 
 
 def _path_without_loops(start_xy: XY, nodes: List[_Node]) -> List[_Node]:
-    """
-    :param tuple(int, int) start_xy:
-    :param list(tuple(int,tuple(int,int))) nodes:
-    :rtype: list(tuple(int,int))
-    """
     seen_nodes = {start_xy: 0}
     i = 0
     while i < len(nodes):
@@ -871,12 +783,6 @@ def _path_without_loops(start_xy: XY, nodes: List[_Node]) -> List[_Node]:
 
 
 def _is_ok(xy: XY, node: _Node, machine: Machine) -> bool:
-    """
-    :param tuple(int, int) xy:
-    :param tuple(int,tuple(int, int)) node:
-    :param ~spinn_machine.Machine machine:
-    :rtype: bool
-    """
     c_x, c_y = xy
     direction, (n_x, n_y) = node
     return machine.is_link_at(c_x, c_y, direction) \
@@ -890,12 +796,6 @@ def _xy(node: _Node) -> XY:
 
 def _find_path(
         source_xy: XY, target_xy: XY, machine: Machine) -> List[_Node]:
-    """
-    :param tuple(int,int) source_xy:
-    :param tuple(int,int) target_xy:
-    :param Machine machine:
-    :rtype: list(tuple(int,tuple(int,int)))
-    """
     xys_to_explore: Deque[Tuple[XY, List[_Node]]] = deque(
         [(source_xy, list())])
     visited = set()
@@ -931,22 +831,17 @@ def _convert_a_route(
     Convert the algorithm specific partition_route back to SpiNNaker and
     adds it to the routing_tables.
 
-    :param MulticastRoutingTableByPartition routing_tables:
-        spinnaker format routing tables
+    :param routing_tables: spinnaker format routing tables
     :param source_vertex: The source to be added to the table
-    :type source_vertex: ApplicationVertex or MachineVertex
-    :param incoming_processor: processor this link came from
-    :type incoming_processor: int or None
-    :param incoming_link: link this link came from
-    :type incoming_link: int or None
+    :param first_incoming_processor: processor this link came from
+    :param first_incoming_link: link this link came from
     :param targets:
         Targets for each chip.  When present for a chip, the route links and
         cores are added to each entry in the targets.
-    :type targets: dict(tuple(int,int),_Targets) or None
-    :param bool use_source_for_targets:
+    :param use_source_for_targets:
         If true, targets for the given source_vertex will be requested;
         If false all targets for matching chips will be used.
-    :param bool ensure_all_source:
+    :param ensure_all_source:
         If true, ensures that all machine vertices of the source application
         vertex are covered in routes that continue forward
     """

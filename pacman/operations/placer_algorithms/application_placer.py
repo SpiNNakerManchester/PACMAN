@@ -41,10 +41,9 @@ def place_application_graph(system_placements: Placements) -> Placements:
     .. note::
         app_graph must have been partitioned
 
-    :param Placements system_placements:
+    :param system_placements:
         The placements of cores doing system tasks. This is what we start from.
     :return: Placements for the application. *Includes the system placements.*
-    :rtype: Placements
     """
     placer = ApplicationPlacer(system_placements)
     return placer.do_placements(system_placements)
@@ -102,8 +101,7 @@ class ApplicationPlacer(object):
 
     def __init__(self, placements: Placements):
         """
-        :param Placements placements:
-        :param int plan_n_timesteps:
+        :param placements:
         """
         # Data cached for speed
         self.__machine = PacmanDataView.get_machine()
@@ -145,11 +143,10 @@ class ApplicationPlacer(object):
         .. note::
             app_graph must have been partitioned
 
-        :param Placements system_placements:
+        :param system_placements:
             The placements of cores doing system tasks.
         :return: Placements for the application.
             *Includes the system placements.*
-        :rtype: Placements
         :raises PacmanPlaceException: If no new start Chip is available
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
@@ -179,7 +176,7 @@ class ApplicationPlacer(object):
         """
         Place the next application vertex
 
-        :param ApplicationVertex app_vertex:
+        :param app_vertex:
         :raises PacmanPlaceException: If no new start Chip is available
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
@@ -222,7 +219,7 @@ class ApplicationPlacer(object):
         or because its neighbours do not have enough space
 
 
-        :param list(list(MachineVertex), AbstractSdram) same_chip_groups:
+        :param same_chip_groups:
         :raises PacmanPlaceException: If no new start Chip is available
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
@@ -261,7 +258,6 @@ class ApplicationPlacer(object):
         Errors on groups that have both placed and unplaced vertices!
 
         :param vertices:
-        :rtype: List(MachineVertex)
         """
         # Remove any already placed
         vertices_to_place = [
@@ -279,11 +275,6 @@ class ApplicationPlacer(object):
 
     def _place_error(self, system_placements: Placements,
                      exception: Exception) -> PacmanPlaceException:
-        """
-        :param Placements system_placements:
-        :param PacmanPlaceException exception:
-        :rtype: PacmanPlaceException
-        """
         unplaceable = list()
         vertex_count = 0
         n_vertices = 0
@@ -369,8 +360,6 @@ class ApplicationPlacer(object):
         Place all vertices for this Application Vertex
 
         Checks that all MachineVertices are fixed or errors
-
-        :param ApplicationVertex app_vertex:
         """
         same_chip_groups = app_vertex.splitter.get_same_chip_groups()
         if not same_chip_groups:
@@ -386,7 +375,6 @@ class ApplicationPlacer(object):
 
         Errors if the group does not have a fixed location
 
-        :param list(MachineVertex) vertices:
         :raise PacmanConfigurationException:
             If the requested location is not available
         """
@@ -435,7 +423,6 @@ class ApplicationPlacer(object):
     def _chip_order(self) -> Iterator[Chip]:
         """
         Iterate the Chips in a guaranteed order
-
         """
         for x in range(self.__machine.width):
             for y in range(self.__machine.height):
@@ -463,10 +450,9 @@ class ApplicationPlacer(object):
         current_cores_free Including the ones for this group
         current_sdram_free Excluding the sdram needed fit this group
 
-        :param Chip chip:
-        :param int n_cores: number of cores needed
+        :param chip:
+        :param n_cores: number of cores needed
         :param sdram:
-        :rtype: bool
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
         """
@@ -514,7 +500,7 @@ class ApplicationPlacer(object):
         """
         Checks that the cores/SDRAM would fit on a empty perfect Chip
 
-        :param int n_cores: number of cores needs
+        :param n_cores: number of cores needs
         :param sdram: minimum amount of SDRAM needed
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
@@ -561,10 +547,8 @@ class ApplicationPlacer(object):
 
         Also sets up the current_chip and starts a new neighbourhood
 
-        :param int n_cores: number of cores needs
+        :param n_cores: number of cores needs
         :param sdram: minimum amount of SDRAM needed
-
-        :rtype: Chip
         :raises PacmanPlaceException: If no new start Chip is available
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
@@ -593,7 +577,6 @@ class ApplicationPlacer(object):
 
         Ignores any Chip that are already full
 
-        :rtype: Chip
         :raises PacmanPlaceException: If no new start Chip is available
         """
         while self.__restored_chips:
@@ -622,9 +605,8 @@ class ApplicationPlacer(object):
 
         This will return None if there are no more neighbouring Chip big enough
 
-        :param int n_cores: number of cores needs
+        :param n_cores: number of cores needs
         :param sdram: minimum amount of SDRAM needed
-        :rtype: Chip or None
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
         """
@@ -645,7 +627,7 @@ class ApplicationPlacer(object):
         If no start Chip is available raise an Exception
         If no neighbouring more Chips available returns None
 
-        :param int n_cores: number of cores needs
+        :param n_cores: number of cores needs
         :param sdram: minimum amount of SDRAM needed
         :raises PacmanPlaceException: If no new start Chip is available
         :raises PacmanTooBigToPlace:
@@ -668,9 +650,6 @@ class ApplicationPlacer(object):
     def _add_neighbours(self, chip: Chip) -> None:
         """
         Adds the neighbours for this Chip to be used as the next chips.
-
-        :param Chip chip:
-        :return:
         """
         for link in chip.router.links:
             target = self.__machine[link.destination_x, link.destination_y]
@@ -687,7 +666,6 @@ class ApplicationPlacer(object):
         Pops the next neighbour Chip with preference to ones on current board
 
         :return: A neighbour Chip or None if there are no More
-        :rtype: None
         """
         if self.__same_board_chips:
             k = next(iter(self.__same_board_chips))

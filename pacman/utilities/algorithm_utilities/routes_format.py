@@ -22,11 +22,6 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 def _reduce_route_value(
         processors_ids: Iterable[int], link_ids: Iterable[int]) -> int:
-    """
-    :param iterable(int) processors_ids:
-    :param iterable(int) link_ids:
-    :rtype: int
-    """
     value = 0
     for link in link_ids:
         value += 1 << link
@@ -40,10 +35,6 @@ def _expand_route_value(
     """
     Convert a 32-bit route word into a string which lists the target cores
     and links.
-
-    :param iterable(int) processors_ids:
-    :param iterable(int) link_ids:
-    :rtype: str
     """
     # Convert processor targets to readable values:
     processors = ", ".join(
@@ -60,8 +51,7 @@ def format_route(entry: MulticastRoutingEntry) -> str:
     """
     How to render a single routing entry.
 
-    :param ~spinn_machine.MulticastRoutingEntry entry:
-    :rtype: str
+    :param entry:
     """
     key = entry.key
     mask = entry.mask

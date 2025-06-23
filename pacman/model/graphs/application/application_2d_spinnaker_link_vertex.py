@@ -41,21 +41,21 @@ class Application2DSpiNNakerLinkVertex(
             label: Optional[str] = None,
             incoming: bool = True, outgoing: bool = False):
         """
-        :param int width: The width of the vertex in atoms
-        :param int height: The height of the vertex in atoms
-        :param int sub_width:
+        :param width: The width of the vertex in atoms
+        :param height: The height of the vertex in atoms
+        :param sub_width:
             The width of the sub-rectangle to break the vertex up into
-        :param int sub_height:
+        :param sub_height:
             The height of the sub-rectangle to break the vertex up into
-        :param int spinnaker_link_id:
+        :param spinnaker_link_id:
             The index of the spinnaker link to which the device is connected
-        :param str board_address:
+        :param board_address:
             The optional IP address of the board to which the device is
             connected e.g. in a multi-board system
-        :param str label: The optional name of the vertex.
-        :param bool incoming:
+        :param label: The optional name of the vertex.
+        :param incoming:
             Whether the device supports sending traffic into spinnaker
-        :param bool outgoing:
+        :param outgoing:
             Whether the device supports receiving traffic from spinnaker
         """
         # Set variables first as this lets us call properties

@@ -40,11 +40,10 @@ def intersect(key_a: int, mask_a: int, key_b: int, mask_b: int) -> bool:
         >>> intersect(0b0000, 0b1100, 0b1100, 0b1100)
         False
 
-    :param int key_a:
-    :param int mask_a: The first key-mask pair
-    :param int key_b:
-    :param int mask_b: The second key-mask pair
-    :rtype: bool
+    :param key_a:
+    :param mask_a: The first key-mask pair
+    :param key_b:
+    :param mask_b: The second key-mask pair
     :return: True if the two key-mask pairs intersect, otherwise False.
     """
     return (key_a & mask_b) == (key_b & mask_a)
@@ -57,14 +56,12 @@ def remove_default_routes(
     Remove from the routing table any entries which could be replaced by
     default routing.
 
-    :param list(router_table.multicast_routing_entries) table:
-        Routing entries to be merged.
+    :param table: Routing entries to be merged.
     :param target_length:
         Target length of the routing table; the minimisation procedure will
         halt once either this target is reached or no further minimisation is
         possible. If ``None`` then the table will be made as small as possible.
-    :type target_length: int or None
-    :param bool check_for_aliases:
+    :param check_for_aliases:
         If ``True`` (the default), default-route candidates are checked for
         aliased entries before suggesting a route may be default routed. This
         check is required to ensure correctness in the general case but has a
@@ -74,7 +71,6 @@ def remove_default_routes(
         If ``False``, the alias-check is skipped resulting in O(N) runtime.
         This option should only be used if the supplied table is guaranteed not
         to contain any aliased entries.
-    :rtype: list(MulticastRoutingEntry)
     :raises MinimisationFailedError:
         If the smallest table that can be produced is larger than
         ``target_length``.

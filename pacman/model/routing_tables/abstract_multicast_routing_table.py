@@ -31,8 +31,6 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
     def x(self) -> int:
         """
         The X-coordinate of the chip of this table.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -41,8 +39,6 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
     def y(self) -> int:
         """
         The Y-coordinate of the chip of this table.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -50,8 +46,6 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
     def chip(self) -> Chip:
         """
         The chip of this table.
-
-        :rtype: ~spinn_machine.Chip
         """
         return PacmanDataView.get_chip_at(self.x, self.y)
 
@@ -60,8 +54,6 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
     def multicast_routing_entries(self) -> Collection[MulticastRoutingEntry]:
         """
         The multicast routing entries in the table.
-
-        :rtype: iterable(~spinn_machine.MulticastRoutingEntry)
         """
         raise NotImplementedError
 
@@ -71,7 +63,7 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         """
         Adds a routing entry to this table.
 
-        :param ~spinn_machine.MulticastRoutingEntry multicast_routing_entry:
+        :param multicast_routing_entry:
             The route to add
         :raise PacmanAlreadyExistsException:
             If a routing entry with the same key-mask combination already
@@ -85,8 +77,6 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         """
         The number of multicast routing entries there are in the
         multicast routing table.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -96,8 +86,6 @@ class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
         """
         The number of multicast routing entries that are set to be
         defaultable within this multicast routing table.
-
-        :rtype: int
         """
         raise NotImplementedError
 

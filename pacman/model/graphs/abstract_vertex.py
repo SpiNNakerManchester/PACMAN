@@ -31,7 +31,7 @@ class AbstractVertex(object):
 
     def __init__(self, label: Optional[str] = None):
         """
-        :param str label: The optional name of the vertex
+        :param label: The optional name of the vertex
         """
         self._label = label
         self._added_to_graph = False
@@ -43,8 +43,6 @@ class AbstractVertex(object):
         The current label to the vertex.
 
         This label could change when the vertex is added to the graph.
-
-        :rtype: str
         """
         return self._label
 
@@ -52,7 +50,7 @@ class AbstractVertex(object):
         """
         Changes the label for a vertex *not yet added* to a graph.
 
-        :param str label: new value for the label
+        :param label: new value for the label
         :raises PacmanConfigurationException:
             If there is an attempt to change the label once the vertex has
             been added to a graph
@@ -85,8 +83,6 @@ class AbstractVertex(object):
         Typically `None`! Does not have the value of a normal placements.
 
         Used instead of `ChipAndCoreConstraint`.
-
-        :rtype: None or ~pacman.model.graphs.common.ChipAndCore
         """
         return self._fixed_location
 
@@ -98,9 +94,9 @@ class AbstractVertex(object):
         .. note::
             If called, must be called prior to the placement algorithms.
 
-        :param int x: X coordinate of fixed location
-        :param int y: Y coordinate of fixed location
-        :param int p: Processor ID of fixed location
+        :param x: X coordinate of fixed location
+        :param y: Y coordinate of fixed location
+        :param p: Processor ID of fixed location
         :raises PacmanConfigurationException:
             If a fixed location has already been set to a different location.
         """

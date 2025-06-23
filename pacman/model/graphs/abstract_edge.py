@@ -32,8 +32,6 @@ class AbstractEdge(Generic[V], metaclass=AbstractBase):
     def label(self) -> Optional[str]:
         """
         The label of the edge.
-
-        :rtype: str
         """
         raise NotImplementedError
 
@@ -42,8 +40,6 @@ class AbstractEdge(Generic[V], metaclass=AbstractBase):
     def pre_vertex(self) -> V:
         """
         The vertex at the start of the edge.
-
-        :rtype: ~pacman.model.graphs.AbstractVertex
         """
         raise NotImplementedError
 
@@ -52,7 +48,5 @@ class AbstractEdge(Generic[V], metaclass=AbstractBase):
     def post_vertex(self) -> V:
         """
         The vertex at the end of the edge.
-
-        :rtype: ~pacman.model.graphs.AbstractVertex
         """
         raise NotImplementedError

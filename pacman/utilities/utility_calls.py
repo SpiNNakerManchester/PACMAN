@@ -24,8 +24,7 @@ def expand_to_bit_array(value: int) -> numpy.ndarray:
     Expand a 32-bit value in to an array of length 32 of uint8 values,
     each of which is a 1 or 0.
 
-    :param int value: The value to expand
-    :rtype: ~numpy.ndarray(uint8)
+    :param value: The value to expand
     """
     return numpy.unpackbits(
         numpy.asarray([value], dtype=">u4").view(dtype="uint8"))
@@ -36,8 +35,7 @@ def compress_from_bit_array(bit_array: numpy.ndarray) -> int:
     Compress a bit array of 32 uint8 values, where each is a 1 or 0,
     into a 32-bit value.
 
-    :param ~numpy.ndarray(uint8) bit_array: The array to compress
-    :rtype: int
+    :param bit_array: The array to compress
     """
     return numpy.packbits(bit_array).view(dtype=">u4")[0].item()
 
@@ -48,12 +46,11 @@ def compress_bits_from_bit_array(
     Compress specific positions from a bit array of 32 uint8 value,
     where is a 1 or 0, into a 32-bit value.
 
-    :param ~numpy.ndarray(uint8) bit_array:
+    :param bit_array:
         The array to extract the value from
-    :param ~numpy.ndarray(int) bit_positions:
+    :param bit_positions:
         The positions of the bits to extract,
         each value being between 0 and 31
-    :rtype: int
     """
     expanded_value = numpy.zeros(32, dtype="uint8")
     expanded_value[-len(bit_positions):] = bit_array[bit_positions]
@@ -64,8 +61,6 @@ def is_equal_or_none(a: Any, b: Any) -> bool:
     """
     If a and b are both not `None`, return True if and only if they are equal,
     otherwise return True.
-
-    :rtype: bool
     """
     return (a is None or b is None or a == b)
 
@@ -73,8 +68,6 @@ def is_equal_or_none(a: Any, b: Any) -> bool:
 def is_single(iterable: Iterable[Any]) -> bool:
     """
     Test if there is exactly one item in the iterable.
-
-    :rtype: bool
     """
     iterator = iter(iterable)
 
@@ -94,8 +87,7 @@ def md5(string: str) -> str:
     """
     Get the MD5 hash of the given string, which is UTF-8 encoded.
 
-    :param str string:
-    :rtype: str
+    :param string:
     """
     return hashlib.md5(string.encode()).hexdigest()
 
@@ -105,9 +97,8 @@ def get_key_ranges(key: int, mask: int) -> Iterable[Tuple[int, int]]:
     Get a generator of base_key, n_keys pairs that represent ranges
     allowed by the mask.
 
-    :param int key: The base key
-    :param int mask: The mask
-    :rtype: iterable(tuple(int,int))
+    :param key: The base key
+    :param mask: The mask
     """
     unwrapped_mask = expand_to_bit_array(mask)
     first_zeros = list()
@@ -144,9 +135,8 @@ def get_n_bits(n_values: int) -> int:
     """
     Determine how many bits are required for the given number of values.
 
-    :param int n_values: the number of values (starting at 0)
+    :param n_values: the number of values (starting at 0)
     :return: the number of bits required to express that many values
-    :rtype: int
     """
     if n_values == 0:
         return 0
@@ -159,9 +149,8 @@ def allocator_bits_needed(size: int) -> int:
     """
     Get the bits needed for the routing info allocator.
 
-    :param int size: The size to calculate the number of bits for
+    :param size: The size to calculate the number of bits for
     :return: the number of bits required for that size
-    :rtype: int
     """
     if size == 0:
         return 0
@@ -174,11 +163,9 @@ def get_keys(
     """
     Get the keys for a given vertex slice.
 
-    :param int base_key: The base key for the vertex slice
-    :param Slice vertex_slice: The slice of the vertex to get keys for
-    :param int n_extra_bits: Additional right shift to apply to atoms
-
-    :rtype: iterable(int)
+    :param base_key: The base key for the vertex slice
+    :param vertex_slice: The slice of the vertex to get keys for
+    :param n_extra_bits: Additional right shift to apply to atoms
     """
     indices = numpy.arange(0, vertex_slice.n_atoms) << n_extra_bits
     return base_key + indices
@@ -188,7 +175,6 @@ def is_power_of_2(v: int) -> bool:
     """
     Determine if a value is a power of 2.
 
-    :param int v: The value to test
-    :rtype: bool
+    :param v: The value to test
     """
     return (v & (v - 1) == 0) and (v != 0)

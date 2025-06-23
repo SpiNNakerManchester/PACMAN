@@ -69,7 +69,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         Set the placements.
 
-        :param Placements placements:
+        :param placements:
         :raises TypeError: if the placements is not a Placements
         """
         if not isinstance(placements, Placements):
@@ -80,7 +80,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         Set the routing_infos.
 
-        :param RoutingInfo routing_infos:
+        :param routing_infos:
         :raises TypeError: if the routing_infos is not a RoutingInfo
         """
         if not isinstance(routing_infos, RoutingInfo):
@@ -91,7 +91,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         Set the tags.
 
-        :param Tags tags:
+        :param tags:
         :raises TypeError: if the tags is not a Tags
         """
         if not isinstance(tags, Tags):
@@ -102,7 +102,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         Sets the uncompressed `router_tables` value.
 
-        :param MulticastRoutingTables router_tables: new value
+        :param router_tables: new value
         :raises TypeError:
             if the router_tables is not a MulticastRoutingTables
         """
@@ -116,7 +116,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         Sets the precompressed `router_tables` value.
 
-        :param MulticastRoutingTables router_tables: new value
+        :param router_tables: new value
         :raises TypeError:
             if the router_tables is not a MulticastRoutingTables
         """
@@ -130,7 +130,6 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         Sets the `plan_n_timestep`. Use `None` for run forever.
 
         :param plan_n_timesteps:
-        :type plan_n_timesteps: int or None
         :raises TypeError: if the plan_n_timesteps are not an int or `None`
         :raises PacmanConfigurationException: On a negative plan_n_timesteps
         """
@@ -149,7 +148,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         """
         Sets the `_routing_table_by_partition`.
 
-        :param MulticastRoutingTableByPartition routing_table_by_partition:
+        :param routing_table_by_partition:
             raises TypeError: if routing_table_by_partition is no a
             MulticastRoutingTableByPartition
         """
@@ -190,10 +189,10 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
         Only affect is to change the numbers reported by the
         get_all/ethernet_monitor methods.
 
-        :param ~pacman.model.graphs.machine.MachineVertex vertex:
+        :param vertex:
             One of the vertices added to each core, assumed to be typical of
             all.
-        :param bool all_chips:
+        :param all_chips:
             If True assumes that this Vertex will be placed on all chips
             including Ethernet ones.
             If False assumes that this Vertex type will only be placed on
@@ -211,10 +210,8 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
 
         :param n_boards_required:
             `None` or the number of boards requested by the user
-        :type n_boards_required: int or None
         :param n_chips_required:
             `None` or the number of chips requested by the user
-        :type n_chips_required: int or None
         """
         if n_boards_required is None:
             if n_chips_required is None:

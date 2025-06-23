@@ -60,8 +60,6 @@ class MultiRegionSDRAM(AbstractSDRAM):
     def regions(self) -> dict[_RegionKey, AbstractSDRAM]:
         """
         The map from region identifiers to the amount of SDRAM required.
-
-        :rtype: dict(int or str or enum, AbstractSDRAM)
         """
         return self.__regions
 
@@ -90,8 +88,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
         *not* combined, but kept separate.
 
         :param region: Key to identify the summary region
-        :type region: int or str or enum
-        :param AbstractSDRAM other:
+        :param other:
             Another SDRAM model to make combine by nesting
         """
         self._total += other
@@ -116,7 +113,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
             This method should only be called when combining cost for the same
             core/ placement. Use + to combine for different cores
 
-        :param MultiRegionSDRAM other: Another mapping of costs by region
+        :param other: Another mapping of costs by region
         """
         self._total += other
         for region in other.regions:
@@ -137,7 +134,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
         """
         The total SDRAM.
 
-        :param int n_timesteps: number of timesteps to cost for
+        :param n_timesteps: number of timesteps to cost for
         :return:
         """
         return self._total.get_total_sdram(n_timesteps)

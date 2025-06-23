@@ -43,8 +43,6 @@ class AbstractVirtual(object):
         The IP address of the board to which the device is connected,
         or ``None`` for the boot board, or when using linked chip
         coordinates.
-
-        :rtype: str or None
         """
         raise NotImplementedError
 
@@ -54,8 +52,6 @@ class AbstractVirtual(object):
         """
         The coordinates of the chip to which the device is connected,
         or ``None`` for the boot board, or when using a board address.
-
-        :rtype: tuple(int, int) or None
         """
         raise NotImplementedError
 
@@ -64,8 +60,6 @@ class AbstractVirtual(object):
         """
         Get the keys sent by the device or `None` if there aren't any
         explicitly defined.
-
-        :rtype: list(~pacman.model.routing_info.BaseKeyAndMask) or None
         """
         raise NotImplementedError
 
@@ -74,8 +68,6 @@ class AbstractVirtual(object):
     def incoming(self) -> bool:
         """
         Whether this device sends traffic into SpiNNaker.
-
-        :rtype: bool
         """
         raise NotImplementedError
 
@@ -84,8 +76,6 @@ class AbstractVirtual(object):
     def outgoing(self) -> bool:
         """
         Whether this device receives traffic from SpiNNaker.
-
-        :rtype: bool
         """
         raise NotImplementedError
 
@@ -94,8 +84,6 @@ class AbstractVirtual(object):
         """
         Get link data from the machine.
 
-        :param ~spinn_machine.Machine machine:
-            The machine to get the data from
-        :rtype: ~spinn_machine.link_data_objects.AbstractLinkData
+        :param machine: The machine to get the data from
         """
         raise NotImplementedError

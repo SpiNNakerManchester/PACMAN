@@ -44,8 +44,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def width(self) -> int:
         """
         The width of the device.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -54,9 +52,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def height(self) -> int:
         """
         The height of the device.
-
-        :rtype: int
-        """
+       """
         raise NotImplementedError
 
     @property
@@ -64,8 +60,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def sub_width(self) -> int:
         """
         The width of the sub-rectangles to divide the input into.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -74,8 +68,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def sub_height(self) -> int:
         """
         The height of the sub-rectangles to divide the input into.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -88,8 +80,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         between the dimensions of the vertex.  By default everything is
         1-dimensional, so the value will be a 1-tuple but can be
         overridden by a vertex that supports multiple dimensions.
-
-        :rtype: tuple(int, ...)
         """
         raise NotImplementedError
 
@@ -116,8 +106,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def _n_sub_rectangles(self) -> int:
         """
         The number of sub-rectangles the device is made up of.
-
-        :rtype: int
         """
         return (int(math.ceil(self.width / self.sub_width)) *
                 int(math.ceil(self.height / self.sub_height)))
@@ -126,8 +114,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         Work out the x and y components of the index.
 
-        :param int index: The index of the sub square
-        :rtype: tuple(int, int)
+        :param index: The index of the sub square
         """
         n_squares_per_row = int(math.ceil(
             self.width / self.sub_width))
@@ -141,8 +128,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         Get the slice for the given machine vertex index.
 
-        :param int index: The machine vertex index
-        :rtype: Slice
+        :param index: The machine vertex index
         """
         x_index, y_index = self._sub_square_from_index(index)
         lo_atom_x = x_index * self.sub_width
@@ -158,9 +144,8 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         Get the key and mask of the given machine vertex index.
 
-        :param int base_key: The key to use (not shifted)
-        :param int index: The machine vertex index
-        :rtype: BaseKeyAndMask
+        :param base_key: The key to use (not shifted)
+        :param index: The machine vertex index
         """
         x_index, y_index = self._sub_square_from_index(index)
         key_bits = base_key << self._key_shift
@@ -173,8 +158,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def _mask(self) -> int:
         """
         The mask to be used for the key.
-
-        :rtype: int
         """
         n_key_bits = BITS_IN_KEY - self._key_shift
         key_mask = (1 << n_key_bits) - 1
@@ -188,8 +171,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def _x_bits(self) -> int:
         """
         The number of bits to use for X.
-
-        :rtype: int
         """
         return get_n_bits(self.width)
 
@@ -197,8 +178,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def _y_bits(self) -> int:
         """
         The number of bits to use for Y.
-
-        :rtype: int
         """
         return get_n_bits(self.height)
 
@@ -206,8 +185,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def _sub_x_bits(self) -> int:
         """
         The number of bits to use for the X coordinate of a sub-rectangle.
-
-        :rtype: int
         """
         n_per_row = int(math.ceil(self.width / self.sub_width))
         return get_n_bits(n_per_row)
@@ -216,8 +193,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def _sub_y_bits(self) -> int:
         """
         The number of bits to use for the Y coordinate of a sub-rectangle.
-
-        :rtype: int
         """
         n_per_col = int(math.ceil(self.height / self.sub_height))
         return get_n_bits(n_per_col)
@@ -226,8 +201,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def _x_index_shift(self) -> int:
         """
         The shift to apply to the key to get the sub-X coordinate.
-
-        :rtype: int
         """
         return self._source_x_shift + (self._x_bits - self._sub_x_bits)
 
@@ -235,8 +208,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def _y_index_shift(self) -> int:
         """
         The shift to apply to the key to get the sub-Y coordinate.
-
-        :rtype: int
         """
         return self._source_y_shift + (self._y_bits - self._sub_y_bits)
 
@@ -245,8 +216,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         The mask to apply to the key *before* shifting to get the
         X coordinate.
-
-        :rtype: int
         """
         return (1 << self._x_bits) - 1
 
@@ -255,8 +224,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         The shift to apply to the key *after* masking to get the
         X coordinate.
-
-        :rtype: int
         """
         return 0
 
@@ -265,8 +232,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         The mask to apply to the key *before* shifting to get the
         Y coordinate.
-
-        :rtype: int
         """
         return ((1 << self._y_bits) - 1) << self._x_bits
 
@@ -275,8 +240,6 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         The shift to apply to the key *after* masking to get the
         Y coordinate.
-
-        :rtype: int
         """
         return self._x_bits
 
@@ -284,7 +247,5 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     def _key_shift(self) -> int:
         """
         The shift to apply to the key to get the base key.
-
-        :rtype: int
         """
         return self._y_bits + self._x_bits

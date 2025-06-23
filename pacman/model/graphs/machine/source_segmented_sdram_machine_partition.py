@@ -33,8 +33,8 @@ class SourceSegmentedSDRAMMachinePartition(
     def __init__(
             self, identifier: str, pre_vertices: Collection[MachineVertex]):
         """
-        :param str identifier: The identifier of the partition
-        :param iterable(~pacman.model.graphs.AbstractVertex) pre_vertices:
+        :param identifier: The identifier of the partition
+        :param pre_vertices:
             The vertices that an edge in this partition may originate at
         """
         super().__init__(
@@ -43,14 +43,14 @@ class SourceSegmentedSDRAMMachinePartition(
 
     def total_sdram_requirements(self) -> int:
         """
-        :rtype: int
+        The total of the sdram size of each edge.
         """
         return sum(edge.sdram_size for edge in self.edges)
 
     @property
     def sdram_base_address(self) -> int:
         """
-        :rtype: int
+        The start of the sdram block reserved on Chip
         """
         if self._sdram_base_address is None:
             raise PacmanConfigurationException(

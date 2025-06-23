@@ -40,21 +40,17 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
             label: Optional[str] = None,
             n_machine_vertices_per_link: int = 1):
         """
-        :param int n_atoms: The number of atoms in the vertex
+        :param n_atoms: The number of atoms in the vertex
         :param incoming_fpga_connections:
             The connections from one or more FPGAs that that packets are
             expected to be received from for this device, or `None` if no
             incoming traffic is expected from the device
-        :type incoming_fpga_connections:
-            list(~pacman.model.graphs.application.FPGAConnection) or None
         :param outgoing_fpga_connection:
             The connection to an FPGA that packets to be sent to this device
             should be sent down, or `None` if no outgoing traffic is expected
             to be sent to the device.
-        :type outgoing_fpga_connection:
-            ~pacman.model.graphs.application.FPGAConnection or None
-        :param str label: The optional name of the vertex.
-        :param int n_machine_vertices_per_link:
+        :param label: The optional name of the vertex.
+        :param n_machine_vertices_per_link:
             The optional number of machine vertices to create for each FPGA
             link (1 by default)
         """
@@ -73,8 +69,6 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
     def n_machine_vertices_per_link(self) -> int:
         """
         The number of machine vertices to create for each link of the FPGA.
-
-        :rtype: int
         """
         return self._n_machine_vertices_per_link
 
@@ -83,12 +77,11 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         """
         Get the slice to be given to the connection from the given link.
 
-        :param ~pacman.model.graphs.application.FPGAConnection link:
+        :param link:
             The FPGA connection to get the slice for
-        :param int index:
+        :param index:
             The index of the connection on the FGPA link, for when
             n_machine_vertices_per_link > 1
-        :rtype: ~pacman.model.graphs.common.Slice
         """
         # link used in subclasses but not here
         _ = link
@@ -101,8 +94,6 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
     def get_outgoing_slice(self) -> Slice:
         """
         Get the slice to be given to the outgoing connection.
-
-        :rtype: ~pacman.model.graphs.common.Slice
         """
         return Slice(0, self.n_atoms - 1)
 
@@ -111,8 +102,6 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         """
         The connections from one or more FPGAs that packets are expected
         to be received from for this device.
-
-        :rtype: iterable(~pacman.model.graphs.application.FPGAConnection)
         """
         if self._incoming_fpga_connections:
             yield from self._incoming_fpga_connections
@@ -122,8 +111,6 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         """
         The connection to one FPGA via one link to which packets are sent
         to this device.
-
-        :rtype: ~pacman.model.graphs.application.FPGAConnection or None
         """
         return self._outgoing_fpga_connection
 

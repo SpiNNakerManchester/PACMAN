@@ -63,17 +63,14 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             max_atoms_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
             splitter: Optional[AbstractSplitterCommon] = None):
         """
-        :param str label: The optional name of the vertex.
+        :param label: The optional name of the vertex.
         :param max_atoms_per_core: The max number of atoms that can be
             placed on a core for each dimension, used in partitioning.
             If the vertex is n-dimensional, with n > 1, the value must be a
             tuple with a value for each dimension.  If it is single-dimensional
             the value can be a 1-tuple or an int.
-        :type max_atoms_per_core: None or int or tuple(int,...)
         :param splitter: The splitter object needed for this vertex.
             Leave as `None` to delegate the choice of splitter to the selector.
-        :type splitter: None or
-            ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
         # Need to set to None temporarily as add_constraint checks splitter
         self._splitter: Optional[AbstractSplitterCommon] = None
@@ -106,7 +103,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
     @property
     def splitter(self) -> AbstractSplitterCommon:
         """
-        :rtype: ~pacman.model.partitioner_splitters.AbstractSplitterCommon
+        The splitter assigned to this vertex.
         """
         s = self._splitter
         if s is None:
@@ -121,8 +118,6 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         Sets the splitter object. Does not allow repeated settings.
 
         :param new_value: The new splitter object
-        :type new_value:
-            ~pacman.model.partitioner_splitters.AbstractSplitterCommon
         """
         if self._splitter == new_value:
             return
@@ -137,8 +132,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         """
         Adds the machine vertex to the iterable returned by machine_vertices
 
-        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
-            A pointer to a machine_vertex
+        :param machine_vertex: A pointer to a machine_vertex
         """
         machine_vertex.index = len(self._machine_vertices)
         self._machine_vertices.add(machine_vertex)
@@ -150,8 +144,6 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         between the dimensions of the vertex.  By default everything is
         1-dimensional, so the value will be a 1-tuple but can be
         overridden by a vertex that supports multiple dimensions.
-
-        :rtype: tuple(int, ...)
         """
         return (self.n_atoms,)
 
@@ -160,8 +152,6 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
     def n_atoms(self) -> int:
         """
         The number of atoms in the vertex.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -172,9 +162,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         integer.
 
         :param n_atoms: Value convertible to int to be used for `n_atoms`
-        :type n_atoms: int or float or numpy.
         :return: Number of atoms.
-        :rtype: int
         :raises PacmanInvalidParameterException:
             If the value cannot be safely converted to an integer
         """
@@ -196,8 +184,6 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
     def machine_vertices(self) -> Collection[MV]:
         """
         The machine vertices that this application vertex maps to.
-
-        :rtype: iterable(~pacman.model.graphs.machine.MachineVertex)
         """
         return self._machine_vertices
 
@@ -226,8 +212,6 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         Gets the maximum number of atoms per core, which is either the
         number of atoms required across the whole application vertex,
         or a lower value set.
-
-        :rtype: int
         """
         if self._max_atoms_per_dimension_per_core is None:
             return self.n_atoms
@@ -239,8 +223,6 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         Gets the maximum number of atoms per dimension per core.  This
         will return a tuple with a number for each dimension of the vertex,
         which might be one if this is a single-dimension vertex.
-
-        :rtype: tuple(int,...)
         """
         if self._max_atoms_per_dimension_per_core is None:
             return self.atoms_shape
@@ -260,7 +242,6 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             of n values must be given.  If the vertex is 1 dimensional,
             a 1-tuple or integer can be given.  If this is set to `None` the
             vertex will have atoms_shape as the maximum.
-        :type new_value: None or int or tuple(int,...)
         """
         if new_value is None:
             self._max_atoms_per_dimension_per_core = None
@@ -316,11 +297,8 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         for this to return `None` and :py:meth:`get_fixed_key_and_mask` to
         return non-`None` if and only if there is only one machine vertex.
 
-        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
-            A source machine vertex of this application vertex
-        :param str partition_id:
+        :param machine_vertex:
             The identifier of the partition to get the key for
-        :rtype: ~pacman.model.routing_info.BaseKeyAndMask or None
         """
         _ = (machine_vertex, partition_id)
         return None
@@ -332,9 +310,8 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         fixed (the default).  See :py:meth:`get_machine_gixed_key_and_mask` for
         the conditions.
 
-        :param str partition_id:
+        :param partition_id:
             The identifier of the partition to get the key for
-        :rtype: ~pacman.model.routing_info.BaseKeyAndMask or None
         """
         _ = (partition_id)
         return None
@@ -345,11 +322,8 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         Add an edge incoming to this vertex.  This is ignored by default,
         but could be used to track incoming edges, and/or report faults.
 
-        :param ~pacman.model.graphs.application.ApplicationEdge edge:
-            The edge to add.
+        :param edge: The edge to add.
         :param partition: The partition to add the edge to.
-        :type partition:
-            ~pacman.model.graphs.application.ApplicationEdgePartition
         """
 
     def get_key_ordered_indices(
@@ -365,8 +339,6 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         :param indices:
             Optional subset of indices to convert.  If not provided all indices
             will be converted.
-        :type indices: numpy.ndarray or None.
-        :rtype: numpy.ndarray
         """
         if indices is None:
             indices = numpy.arange(self.n_atoms)
@@ -412,8 +384,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         """
         Convert indices from key order to raster order.
 
-        :param numpy.ndarray indices: The key-ordered indices to convert.
-        :rtype: numpy.ndarray
+        :param indices: The key-ordered indices to convert.
         """
         atoms_shape = self.atoms_shape
         n_dims = len(atoms_shape)
@@ -450,7 +421,6 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         """
         Check if this vertex or any machine vertex has a fixed location.
 
-        :rtype: bool
         :returns: True if the Application Vertex or any one of its
         Machine Vertices has a fixed location
         False if None of the Vertices has a none None fixed location

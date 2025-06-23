@@ -32,8 +32,7 @@ def validate(json_obj: Union[JsonArray, JsonObject, JsonObjectArray],
     given schema. The schema is given by filename relative to this package.
 
     :param json_obj: The entity to validate
-    :type json_obj: dict or list
-    :param str schema_filename:
+    :param schema_filename:
         The name of the file containing the schema (e.g., "routes.json")
     :raises IOError: If the schema file doesn't exist.
     :raises ~jsonschema.exceptions.ValidationError:
