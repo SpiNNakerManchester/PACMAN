@@ -70,7 +70,7 @@ def codify_table(
         for route in table.multicast_routing_entries}
 
 
-def covers(o_code: str, c_code: str) -> bool:
+def _covers(o_code: str, c_code: str) -> bool:
     """
     :param o_code:
     :param c_code:
@@ -86,7 +86,7 @@ def covers(o_code: str, c_code: str) -> bool:
     return True
 
 
-def calc_remainders(o_code: str, c_code: str) -> List[str]:
+def _calc_remainders(o_code: str, c_code: str) -> List[str]:
     """
     :param o_code: Codified original route
     :param c_code: Codified compressed route
@@ -95,7 +95,7 @@ def calc_remainders(o_code: str, c_code: str) -> List[str]:
         # "" = "" so also the terminator case
         return []
     remainders = []
-    for tail in calc_remainders(o_code[1:], c_code[1:]):
+    for tail in _calc_remainders(o_code[1:], c_code[1:]):
         remainders.append(o_code[0] + tail)
     if o_code[0] == WILDCARD:
         if c_code[0] == "0":
@@ -124,7 +124,7 @@ def compare_route(
     keys = list(compressed_dict.keys())
     for i in range(start, len(keys)):
         c_code = keys[i]
-        if covers(o_code, c_code):
+        if _covers(o_code, c_code):
             c_route = compressed_dict[c_code]
             if f is not None:
                 f.write(f"\t\t{format_route(c_route)}\n")
@@ -144,7 +144,7 @@ def compare_route(
                 compare_route(o_route, compressed_dict, o_code=o_code,
                               start=i + 1, f=f)
             else:
-                remainders = calc_remainders(o_code, c_code)
+                remainders = _calc_remainders(o_code, c_code)
                 for remainder in remainders:
                     compare_route(o_route, compressed_dict, o_code=remainder,
                                   start=i + 1, f=f)
