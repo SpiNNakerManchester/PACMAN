@@ -38,6 +38,11 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
     def __init__(
             self, pre_vertices: Collection[V], identifier: str,
             allowed_edge_types: Union[Type[E], Tuple[Type[E], ...]]):
+        """
+        :param pre_vertices: The vertices which send through this partition
+        :param identifier: The identifier of the partition
+        :param allowed_edge_types: The types of edges allowed
+        """
         super().__init__(
             identifier=identifier, allowed_edge_types=allowed_edge_types)
         self._pre_vertices: Dict[V, OrderedSet[E]] = dict()

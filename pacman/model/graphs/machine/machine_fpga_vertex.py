@@ -49,6 +49,23 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
             vertex_slice: Optional[Slice] = None,
             outgoing_keys_and_masks: Optional[List[BaseKeyAndMask]] = None,
             incoming: bool = True, outgoing: bool = False):
+        """
+        :param fpga_id: Field Programmable Gate Arrays id
+        :param fpga_link_id: The Field Programmable Gate Arrays link id
+        :param board_address: Ipaddress of the board
+        :param linked_chip_coordinates: The coordinates of the chip to which
+            the device is connected.
+        :param label: The optional name of the vertex
+        :param app_vertex:
+            The application vertex that caused this machine vertex to be
+            created. If `None`, there is no such application vertex.
+        :param vertex_slice:
+            The slice of the application vertex that this machine vertex
+            implements.
+        :param outgoing_keys_and_masks: keys sent by the device
+        :param incoming: Whether this device sends traffic into SpiNNaker.
+        :param outgoing:  Whether this device receives traffic from SpiNNaker.
+        """
         super().__init__(
             label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
 
@@ -68,7 +85,7 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
     @property
     def fpga_id(self) -> int:
         """
-        The Field Programmable Gate Arrays id provided top the init.
+        The Field Programmable Gate Arrays id provided to the init.
         """
         return self._fpga_id
 

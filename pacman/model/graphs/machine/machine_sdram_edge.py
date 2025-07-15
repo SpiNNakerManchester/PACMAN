@@ -33,6 +33,11 @@ class SDRAMMachineEdge(MachineEdge):
     def __init__(
             self, pre_vertex: MachineVertex, post_vertex: MachineVertex,
             label: str):
+        """
+        :param pre_vertex: The vertex at the start of the edge.
+        :param post_vertex: The vertex at the end of the edge.
+        :param label: The name of the edge.
+        """
         if not isinstance(pre_vertex, AbstractSupportsSDRAMEdges):
             raise PacmanConfigurationException(
                 f"Pre-vertex {pre_vertex} doesn't support SDRAM edges")

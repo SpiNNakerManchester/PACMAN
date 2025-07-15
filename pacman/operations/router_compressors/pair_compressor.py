@@ -168,6 +168,13 @@ class _PairCompressor(AbstractCompressor):
 
     def __init__(self, ordered: bool = True, accept_overflow: bool = False,
                  c_sort: bool = False):
+        """
+        :param ordered: Flag to say if the results can be order dependent
+        :param accept_overflow:
+            Flag to say that results too large should be ignored
+        :param c_sort:
+            Flag to use slower quick sort as it is implemented in c/ on cores
+        """
         super().__init__(ordered, accept_overflow)
         self._all_entries: List[MulticastRoutingEntry] = []
         self._c_sort = c_sort
