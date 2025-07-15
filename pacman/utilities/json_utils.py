@@ -51,6 +51,7 @@ def key_mask_to_json(key_mask: BaseKeyAndMask) -> JsonObject:
     Converts a BaseKeyAndMask into json
 
     :param  key_mask:
+    :returns: key and mask in json format
     """
     try:
         json_object: JsonObject = dict()
@@ -66,6 +67,7 @@ def iptag_resource_to_json(iptag: IPtagResource) -> JsonObject:
     Converts an iptag to json
 
     :param iptag:
+    :returns: iptag in json forMAT
     """
     json_dict: JsonObject = dict()
     try:
@@ -86,6 +88,7 @@ def iptag_resource_from_json(json_dict: JsonObject) -> IPtagResource:
     Creates an iptag from json
 
     :param json_dict:
+    :returns: The ip tag described by the json.
     """
     return IPtagResource(
         cast(str, json_dict["ip_address"]), cast(int, json_dict.get("port")),
@@ -98,6 +101,7 @@ def iptag_resources_to_json(iptags: Iterable[IPtagResource]) -> JsonArray:
     Converts a list of iptags to json.
 
     :param iptags:
+    :returns: json description of the iptags
     """
     json_list: JsonArray = []
     for iptag in iptags:
@@ -111,6 +115,7 @@ def iptag_resources_from_json(
     Creates a list of iptags from json.
 
     :param json_list:
+    :returns: ip tags described by the json
     """
     iptags = []
     for json_dict in json_list:
@@ -123,6 +128,7 @@ def reverse_iptag_to_json(iptag: ReverseIPtagResource) -> JsonObject:
     Converts a reverse iptag to json
 
     :param iptag:
+    :returns: json description of the reverse iptags
     """
     json_dict: JsonObject = dict()
     try:
@@ -141,6 +147,7 @@ def reverse_iptag_from_json(json_dict: JsonObject) -> ReverseIPtagResource:
     Creates a ReverseIPtagResource based on json
 
     :param json_dict:
+    :returns: reverse ip tags described by the json
     """
     port = cast(int, json_dict.get("port"))
     sdp_port = cast(int, json_dict["sdp_port"])
@@ -154,6 +161,7 @@ def reverse_iptags_to_json(
     Converts a list of reverse iptags to json
 
     :param iptags:
+    :returns: Json representation of the reverse iptags
     """
     json_list: JsonArray = []
     for iptag in iptags:
@@ -167,6 +175,7 @@ def reverse_iptags_from_json(
     Creates a list of ReverseIPtagResource from json
 
     :param json_list:
+    :returns: reverse iptags descibed by the json
     """
     iptags = []
     for json_dict in json_list:
@@ -179,6 +188,7 @@ def placement_to_json(placement: Placement) -> JsonObject:
     Converts a Placement to json
 
     :param placement:
+    :returns: json object describing the placement
     """
     json_dict: JsonObject = dict()
     try:
@@ -193,7 +203,7 @@ def placement_to_json(placement: Placement) -> JsonObject:
 
 def placements_to_json() -> JsonArray:
     """
-    Gets a json description of the placements (held in DataView)
+    :returns: A json description of the placements (held in DataView)
     """
     json_list: JsonArray = []
     for placement in PacmanDataView.iterate_placemements():
@@ -203,9 +213,8 @@ def placements_to_json() -> JsonArray:
 
 def placement_from_json(json_dict: JsonObject) -> Placement:
     """
-    Gets a Placement based on the json.
-
     :param json_dict:
+    :returns: a Placement based on the json.
     """
     vertex = SimpleMachineVertex(None, cast(str, json_dict["vertex_label"]))
     # The cast(int tells mypy to assume the value can be converted to an int

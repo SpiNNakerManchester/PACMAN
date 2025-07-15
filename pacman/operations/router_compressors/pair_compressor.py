@@ -32,6 +32,7 @@ def pair_compressor(
     :param verify: If set to true will verify the length before returning
     :param c_sort: If set will use the slower quick sort as it is
         implemented in c/ on cores
+    :returns: Compressed routing tables
     """
     compressor = _PairCompressor(ordered, accept_overflow, c_sort)
     compressed = compressor.compress_all_tables()

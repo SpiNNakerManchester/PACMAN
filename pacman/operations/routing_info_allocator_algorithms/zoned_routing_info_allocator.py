@@ -400,6 +400,7 @@ def flexible_allocate(extra_allocations: _XAlloc) -> RoutingInfo:
         Additional (vertex, partition identifier) pairs to allocate
         keys to.  These might not appear in partitions in the graph
         due to being added by the system.
+    :return: The routing information, including the keys to be used.
     :raise PacmanRouteInfoAllocationException:
     """
     return ZonedRoutingInfoAllocator(True).allocate(extra_allocations)
@@ -411,6 +412,7 @@ def global_allocate(extra_allocations: _XAlloc) -> RoutingInfo:
         Additional (vertex, partition identifier) pairs to allocate
         keys to.  These might not appear in partitions in the graph
         due to being added by the system.
+    :return: The routing information, including the keys to be used.
     :raise PacmanRouteInfoAllocationException:
     """
     return ZonedRoutingInfoAllocator().allocate(extra_allocations)

@@ -87,7 +87,7 @@ class MulticastRoutingTableByPartition(object):
 
     def get_routers(self) -> Iterator[XY]:
         """
-        Get the coordinates of all stored routers.
+        :returns: The coordinates of all stored routers.
         """
         return iter(self._router_to_entries_map.keys())
 
@@ -114,12 +114,11 @@ class MulticastRoutingTableByPartition(object):
             self, source_vertex: AbstractVertex, partition_id: str,
             router_x: int, router_y: int) -> Optional[RoutingEntry]:
         """
-        Get an entry from a specific coordinate.
-
         :param source_vertex:
         :param partition_id:
         :param router_x: the X coordinate of the router
         :param router_y: the Y coordinate of the router
+        :returns: entry from a specific coordinate.
         """
         entries = self.get_entries_for_router(router_x, router_y)
         if entries is None:

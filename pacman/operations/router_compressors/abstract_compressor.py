@@ -61,6 +61,8 @@ class AbstractCompressor(object):
     def compress_all_tables(self) -> MulticastRoutingTables:
         """
         Apply compression to all uncompressed tables.
+
+        :returns: Compressed routing tables
         """
         router_tables = PacmanDataView.get_precompressed()
         # create progress bar

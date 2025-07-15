@@ -110,7 +110,9 @@ class Slice(object):
         """
         Get a slice in the `n`'Th dimension.
 
-        :param n: Must be 0
+        :param n: The dimension (0 based) of interest.
+           In 1D slices this must be 0
+        :returns: A 1D slice
         """
         if n == 0:
             return slice(self._lo_atom, self._lo_atom + self._n_atoms)
@@ -177,6 +179,7 @@ class Slice(object):
         Convert the string form of a :py:class:`Slice` into an object instance.
 
         :param as_str: The string to parse
+        :returns: Slice described by the string
         """
         if as_str[0] != "(":
             raise NotImplementedError("Please use MDSlice method")

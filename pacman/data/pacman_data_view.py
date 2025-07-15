@@ -200,6 +200,7 @@ class PacmanDataView(MachineDataView):
         Syntactic sugar for `get_graph().vertices` except that the result is an
         iterable and not a list.
 
+        :returns: The vertices in the graph.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
         """
@@ -224,6 +225,7 @@ class PacmanDataView(MachineDataView):
 
         :param vertex_type: The type(s) to filter the vertices on
             (can be anything acceptable to the `isinstance` built-in).
+        :returns: The vertices of this type in the order they are in the graph
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
         """
@@ -240,6 +242,7 @@ class PacmanDataView(MachineDataView):
 
         Syntactic sugar for `get_graph().n_vertices`
 
+        :returns: The number of vertices in the graph.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
         """
@@ -254,6 +257,7 @@ class PacmanDataView(MachineDataView):
 
         Syntactic sugar for `get_graph().outgoing_edge_partitions`
 
+        :returns: The edge partitions in the graph.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
         """
@@ -268,6 +272,7 @@ class PacmanDataView(MachineDataView):
 
         Syntactic sugar for `get_graph().n_outgoing_edge_partitions`
 
+        :returns: The number of outgoing edge partitions in the graph.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the graph is currently unavailable
         """
@@ -286,6 +291,7 @@ class PacmanDataView(MachineDataView):
 
         :param vertex:
             The vertex at which the edge partitions to find starts
+        :returns: All the edge partitions that start at the given vertex.
         """
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
@@ -298,6 +304,8 @@ class PacmanDataView(MachineDataView):
         Get all the edges in the graph.
 
         Syntactic sugar for `get_graph().edges`
+
+        :returns: The edges in the graph.
         """
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
@@ -306,7 +314,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_n_machine_vertices(cls) -> int:
         """
-        Gets the number of machine vertices via the application graph.
+        :returns: The number of machine vertices via the application graph.
         """
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
@@ -316,7 +324,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def iterate_machine_vertices(cls) -> Iterable[MachineVertex]:
         """
-        Iterate over the Machine vertices via the application graph.
+        :returns: Iterator over the Machine vertices via the application graph.
         """
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
@@ -331,6 +339,8 @@ class PacmanDataView(MachineDataView):
         Iterates over the Placement objects.
 
         Syntactic sugar for `get_placements().placements`
+
+        :return: iterable of placements
         """
         if cls.__pacman_data._placements is None:
             raise cls._exception("placements")
@@ -341,9 +351,8 @@ class PacmanDataView(MachineDataView):
             cls, vertex_type: Union[
                 type, Tuple[type, ...]]) -> Iterable[Placement]:
         """
-        Iterate over placements on any chip with this vertex_type.
-
         :param vertex_type: Class of vertex to find
+        :returns: Iterator over placements on any chip with this vertex_type.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the placements are currently unavailable
         """
@@ -355,9 +364,8 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def iterate_placements_on_core(cls, xy: XY) -> Iterable[Placement]:
         """
-        Iterate over placements with this x and y.
-
         :param xy: x and y coordinates to find placements for.
+        :returns: Iterator over placements with this x and y.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the placements are currently unavailable
         """
@@ -370,11 +378,10 @@ class PacmanDataView(MachineDataView):
             cls, xy: XY, vertex_type: Union[
                 type, Tuple[type, ...]]) -> Iterable[Placement]:
         """
-        Iterate over placements with this x, y and type.
-
         :param xy: x and y coordinates to find placements for.
         :param vertex_type: Class of vertex to find
         :param vertex_type: Class of vertex to find
+        :returns: Iterate over placements with this x, y and type.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the placements are currently unavailable
         """
@@ -386,8 +393,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_n_placements(cls) -> int:
         """
-        The number of placements.
-
+        :returns: The number of placements.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the placements are currently unavailable
         """
@@ -442,8 +448,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_routing_infos(cls) -> RoutingInfo:
         """
-        The routing information, if known.
-
+        :returns: The routing information, if known.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the routing_infos is currently unavailable
         """
@@ -456,8 +461,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_tags(cls) -> Tags:
         """
-        The Tags object if known.
-
+        :returns: The Tags object if known.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the tags is currently unavailable
         """
@@ -512,8 +516,7 @@ class PacmanDataView(MachineDataView):
     def get_routing_table_by_partition(
             cls) -> MulticastRoutingTableByPartition:
         """
-        The MulticastRoutingTableByPartition, if it has been set.
-
+        :returns: The MulticastRoutingTableByPartition, if it has been set.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the tables is currently unavailable
         """
@@ -530,6 +533,8 @@ class PacmanDataView(MachineDataView):
         Ethernet-enabled chips may have more.
 
         Does not include the system SDRAM reserved by the machine/scamp.
+
+        :returns: SDRAM usage of the monitors expected to be added
         """
         # Note the sdram can not be calculated in advance as some Vertices
         # require the hardware time step not available until simulator run
@@ -548,6 +553,8 @@ class PacmanDataView(MachineDataView):
         some reason these are not on Ethernet chips.
 
         Does not include the system SDRAM reserved by the machine/scamp.
+
+        :returns: SDRAM usage of the monitors expected to be added
         """
         sdram: AbstractSDRAM = ConstantSDRAM(0)
         for vertex in cls.__pacman_data._ethernet_monitor_vertices:
@@ -561,6 +568,7 @@ class PacmanDataView(MachineDataView):
         """
         Reports if a user has sets the number of boards requested during setup.
 
+        :return: True if the user has sets the number of boards requested
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If n_boards_required is not set or set to `None`
         """
@@ -573,6 +581,7 @@ class PacmanDataView(MachineDataView):
 
         Guaranteed to be positive
 
+        :returns: The number of boards requested by the user
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the n_boards_required is currently unavailable
         """
@@ -593,6 +602,7 @@ class PacmanDataView(MachineDataView):
 
         Guaranteed to be positive if set
 
+        :returns: the number of chips needed
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If data for n_chips_needed is not available
         """
@@ -609,6 +619,8 @@ class PacmanDataView(MachineDataView):
 
         This will be the number of chips requested by the use during setup or
         what the partitioner requested.
+
+        :returns: True if the number of required chips is known
         """
         if cls.__pacman_data._n_chips_required is not None:
             return True
@@ -617,7 +629,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def get_chips_boards_required_str(cls) -> str:
         """
-        Gets a String to say what was required
+        :returns: a String to say what was required
         """
         if cls.__pacman_data._n_boards_required:
             return (f"Setup asked for "

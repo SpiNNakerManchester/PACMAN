@@ -52,6 +52,7 @@ def format_route(entry: MulticastRoutingEntry) -> str:
     How to render a single routing entry.
 
     :param entry:
+    :returns: A string representing the route
     """
     key = entry.key
     mask = entry.mask
