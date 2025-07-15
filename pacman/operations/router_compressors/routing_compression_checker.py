@@ -111,6 +111,8 @@ def compare_route(
         o_code: Optional[str] = None, start: int = 0,
         f: Optional[TextIO] = None) -> None:
     """
+    Compare that the compressed route is correct.
+
     :param o_route: the original route
     :param compressed_dict: Compressed routes
     :param o_code: Codified original route (if known)

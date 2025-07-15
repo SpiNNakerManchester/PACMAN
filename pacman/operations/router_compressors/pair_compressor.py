@@ -43,6 +43,8 @@ def pair_compressor(
 
 def verify_lengths(compressed: MulticastRoutingTables) -> None:
     """
+    Checks the length of every routing table in the compressed table.
+
     :param compressed:
     :raises PacmanElementAllocationException:
         if the compressed table won't fit
