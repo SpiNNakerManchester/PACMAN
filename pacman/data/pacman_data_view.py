@@ -380,7 +380,6 @@ class PacmanDataView(MachineDataView):
         """
         :param xy: x and y coordinates to find placements for.
         :param vertex_type: Class of vertex to find
-        :param vertex_type: Class of vertex to find
         :returns: Iterate over placements with this x, y and type.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the placements are currently unavailable

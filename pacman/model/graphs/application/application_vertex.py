@@ -162,6 +162,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         integer.
 
         :param n_atoms: Value convertible to int to be used for `n_atoms`
+        :param label: text for log or exception (if needed)
         :return: Number of atoms.
         :raises PacmanInvalidParameterException:
             If the value cannot be safely converted to an integer
@@ -304,6 +305,8 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         return non-`None` if and only if there is only one machine vertex.
 
         :param machine_vertex:
+            The identifier of the partition to get the key for
+        :param partition_id:
             The identifier of the partition to get the key for
         :returns: None or key and mask if fixed
         """

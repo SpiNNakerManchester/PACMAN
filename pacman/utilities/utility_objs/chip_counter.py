@@ -57,7 +57,8 @@ class ChipCounter(object):
         """
         Adds a core (or if needed a Chip) to the count
 
-        :param resources:
+        :param resources: SDRAM costs to add
+        :param n_cores: cores to add
         """
         sdram = resources.get_total_sdram(
             PacmanDataView.get_plan_n_timestep())

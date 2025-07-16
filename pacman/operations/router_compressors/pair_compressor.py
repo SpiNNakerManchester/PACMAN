@@ -26,6 +26,7 @@ def pair_compressor(
         ordered: bool = True, accept_overflow: bool = False,
         verify: bool = False, c_sort: bool = False) -> MulticastRoutingTables:
     """
+    :param ordered: Flag to say if the results can be order dependent
     :param accept_overflow:
         A flag which should only be used in testing to stop raising an
         exception if result is too big
