@@ -52,7 +52,7 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
         """
         :param fpga_id: Field Programmable Gate Arrays id
         :param fpga_link_id: The Field Programmable Gate Arrays link id
-        :param board_address: Ipaddress of the board
+        :param board_address: IP address of the board
         :param linked_chip_coordinates: The coordinates of the chip to which
             the device is connected.
         :param label: The optional name of the vertex
