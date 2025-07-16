@@ -88,7 +88,7 @@ class MulticastRoutingTables(object):
 
         Will return zero if there are no routing tables
 
-        :returns: The number of entries in the largets table.
+        :returns: The number of entries in the largest table.
         """
         if self._routing_tables_by_chip:
             return max(map((lambda x: x.number_of_entries),

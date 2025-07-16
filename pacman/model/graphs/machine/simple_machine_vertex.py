@@ -52,7 +52,7 @@ class SimpleMachineVertex(MachineVertex):
             The slice of the application vertex that this machine vertex
             implements.
         :param iptags: The forward tags used by this vertex
-        :param reverse_iptags: The reverse tags used bythis vertex
+        :param reverse_iptags: The reverse tags used by this vertex
         """
         super().__init__(
             label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)

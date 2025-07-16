@@ -93,7 +93,7 @@ def md5(string: str) -> str:
     Get the MD5 hash of the given string, which is UTF-8 encoded.
 
     :param string:
-    :returns: hashkey
+    :returns: the hash key
     """
     return hashlib.md5(string.encode()).hexdigest()
 

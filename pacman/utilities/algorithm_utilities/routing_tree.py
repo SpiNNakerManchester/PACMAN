@@ -108,7 +108,7 @@ class RoutingTree(object):
         """
         Adds the child to the tree
 
-        No check is donwe to see if it already exists.
+        No check is done to see if it already exists.
         """
         self._children.append(child)
 

@@ -88,7 +88,7 @@ def iptag_resource_from_json(json_dict: JsonObject) -> IPtagResource:
     Creates an iptag from json
 
     :param json_dict:
-    :returns: The ip tag described by the json.
+    :returns: The iptag described by the json.
     """
     return IPtagResource(
         cast(str, json_dict["ip_address"]), cast(int, json_dict.get("port")),
@@ -115,7 +115,7 @@ def iptag_resources_from_json(
     Creates a list of iptags from json.
 
     :param json_list:
-    :returns: ip tags described by the json
+    :returns: iptags described by the json
     """
     iptags = []
     for json_dict in json_list:
@@ -147,7 +147,7 @@ def reverse_iptag_from_json(json_dict: JsonObject) -> ReverseIPtagResource:
     Creates a ReverseIPtagResource based on json
 
     :param json_dict:
-    :returns: reverse ip tags described by the json
+    :returns: reverse iptags described by the json
     """
     port = cast(int, json_dict.get("port"))
     sdp_port = cast(int, json_dict["sdp_port"])
@@ -175,7 +175,7 @@ def reverse_iptags_from_json(
     Creates a list of ReverseIPtagResource from json
 
     :param json_list:
-    :returns: reverse iptags descibed by the json
+    :returns: reverse iptags described by the json
     """
     iptags = []
     for json_dict in json_list:
