@@ -179,9 +179,7 @@ class Placements(object):
     def placements(self) -> Iterable[Placement]:
         """
         All of the placements.
-
-        :return: iterable of placements
-         """
+        """
         return iter(self._machine_vertices.values())
 
     def placements_on_chip(self, xy: XY) -> Collection[Placement]:

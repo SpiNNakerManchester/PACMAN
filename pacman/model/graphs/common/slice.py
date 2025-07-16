@@ -94,13 +94,12 @@ class Slice(object):
     @property
     def as_slice(self) -> slice:
         """
-        Converts the Slice to a standard slice object *if possible.*
+        The Slice to a standard slice object *if possible.*
 
         .. note::
             Use of this method is *not* recommended.
             It fails for multi-dimensional slices and may be removed.
 
-        :return: a standard built-in slice object
         :raises NotImplementedError: If called on a multi-dimensional slice
         """
         # slice for accessing arrays of values

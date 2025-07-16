@@ -78,8 +78,6 @@ class MulticastRoutingTables(object):
     def routing_tables(self) -> Collection[AbstractMulticastRoutingTable]:
         """
         The routing tables stored within.
-
-        :return: an iterable of routing tables
         """
         return self._routing_tables_by_chip.values()
 
