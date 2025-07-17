@@ -28,7 +28,7 @@ class TestSlice(unittest.TestCase):
         self.assertEqual(11, s.n_atoms)  # 10 - 0 + 1
         self.assertEqual(0, s.lo_atom)  # As specified
         self.assertEqual(10, s.hi_atom)  # As specified
-        assert s.as_slice == slice(0, 11)  # Slice object supported by arrays
+        assert s.as_slice() == slice(0, 11)  # Slice object supported by arrays
         self.assertListEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                              list(s.get_raster_ids()))
         self.assertEqual(s.dimension, (slice(0, 11),))
@@ -37,7 +37,7 @@ class TestSlice(unittest.TestCase):
         self.assertEqual((11, ), s.shape)
         self.assertEqual((0, ), s.start)
         self.assertEqual(s, s2)
-        target = list(range(0, 20))[s.as_slice]
+        target = list(range(0, 20))[s.as_slice()]
         self.assertListEqual(target, list(s.get_raster_ids()))
 
     def test_check_lo_atom_sanity(self) -> None:
@@ -69,7 +69,7 @@ class TestSlice(unittest.TestCase):
         self.assertEqual(1, s.n_atoms)  # 10 - 0 + 1
         self.assertEqual(4, s.lo_atom)  # As specified
         self.assertEqual(4, s.hi_atom)  # As specified
-        assert s.as_slice == slice(4, 5)  # Slice object supported by arrays
+        assert s.as_slice() == slice(4, 5)  # Slice object supported by arrays
         self.assertListEqual([4], list(s.get_raster_ids()))
 
         self.assertEqual(s.dimension, (slice(4, 5),))
