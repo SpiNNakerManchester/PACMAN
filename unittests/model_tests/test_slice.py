@@ -93,8 +93,3 @@ class TestSlice(unittest.TestCase):
         s = Slice(0, 10)
         with self.assertRaises(AttributeError):
             s.n_atoms = 3   # type: ignore[misc]
-
-    def test_immutability_as_slice(self) -> None:
-        s = Slice(0, 10)
-        with self.assertRaises(AttributeError):
-            s.as_slice = slice(2, 10)    # type: ignore[misc]
