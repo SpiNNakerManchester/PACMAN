@@ -71,7 +71,6 @@ class MDSlice(Slice):
     def start(self) -> Tuple[int, ...]:
         return self._start
 
-    @property
     @overrides(Slice.as_slice)
     def as_slice(self) -> slice:
         raise NotImplementedError(

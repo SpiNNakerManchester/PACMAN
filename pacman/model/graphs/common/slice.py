@@ -91,7 +91,6 @@ class Slice(object):
         """
         return (self._lo_atom, )
 
-    @property
     def as_slice(self) -> slice:
         """
         The Slice to a standard slice object *if possible.*
