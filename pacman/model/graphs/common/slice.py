@@ -99,6 +99,7 @@ class Slice(object):
             Use of this method is *not* recommended.
             It fails for multi-dimensional slices and may be removed.
 
+        :returns: A standard python slice
         :raises NotImplementedError: If called on a multi-dimensional slice
         """
         # slice for accessing arrays of values
