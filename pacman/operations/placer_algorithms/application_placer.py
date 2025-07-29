@@ -62,8 +62,6 @@ class ApplicationPlacer(object):
         "__plan_n_timesteps",
         # Sdram available on perfect none Ethernet Chip after Monitors placed
         "__max_sdram",
-        # Maximum sdram that should be used for a Chip to not be full
-        "__cap_sdram",
         # N Cores free on perfect none Ethernet Chip after Monitors placed
         "__max_cores",
 
@@ -114,8 +112,6 @@ class ApplicationPlacer(object):
         self.__max_cores = (
                 version.max_cores_per_chip - version.n_scamp_cores -
                 PacmanDataView.get_all_monitor_cores())
-        self.__cap_sdram = self.__max_sdram - (
-                self.__max_sdram // self.__max_cores)
 
         self.__placements = placements
         self.__chips = self._chip_order()
@@ -468,11 +464,6 @@ class ApplicationPlacer(object):
         for placement in on_chip:
             cores_free.remove(placement.p)
             sdram_used += placement.vertex.sdram_required
-
-        if sdram_used.get_total_sdram(
-                self.__plan_n_timesteps) > self.__cap_sdram:
-            self.__full_chips.add(chip)
-            return False
 
         # Remember this chip so it is not tried again in this preparation
         # This assumes all groups are the same size so even if too small
