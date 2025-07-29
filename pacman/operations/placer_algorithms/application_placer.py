@@ -34,7 +34,7 @@ from .draw_placements import draw_placements as dp
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def place_application_graph(system_placements: Placements) -> Placements:
+def place_application_graph(system_placements: Placements) -> None:
     """
     Perform placement of an application graph on the machine.
 
@@ -43,10 +43,9 @@ def place_application_graph(system_placements: Placements) -> Placements:
 
     :param system_placements:
         The placements of cores doing system tasks. This is what we start from.
-    :return: Placements for the application. *Includes the system placements.*
     """
     placer = ApplicationPlacer(system_placements)
-    return placer.do_placements(system_placements)
+    placer.do_placements()
 
 
 class ApplicationPlacer(object):
@@ -132,15 +131,13 @@ class ApplicationPlacer(object):
         self.__same_board_chips: Dict[Chip, Chip] = dict()
         self.__other_board_chips:  Dict[Chip, Chip] = dict()
 
-    def do_placements(self, system_placements: Placements) -> Placements:
+    def do_placements(self) -> None:
         """
         Perform placement of an application graph on the machine.
 
         .. note::
             app_graph must have been partitioned
 
-        :param system_placements:
-            The placements of cores doing system tasks.
         :return: Placements for the application.
             *Includes the system placements.*
         :raises PacmanPlaceException: If no new start Chip is available
@@ -160,13 +157,11 @@ class ApplicationPlacer(object):
                 # as this checks if placed already not need to check if fixed
                 self._place_vertex(app_vertex)
         except PacmanPlaceException as e:
-            raise self._place_error(system_placements, e) from e
+            raise self._place_error(self.__placements, e) from e
 
         if get_config_bool("Reports", "draw_placements"):
             report_file = get_report_path("path_placements")
-            dp(self.__placements, system_placements, report_file)
-
-        return self.__placements
+            dp(self.__placements, self.__placements, report_file)
 
     def _place_vertex(self, app_vertex: ApplicationVertex) -> None:
         """
