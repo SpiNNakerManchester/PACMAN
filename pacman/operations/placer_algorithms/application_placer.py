@@ -668,7 +668,8 @@ class ApplicationPlacer(object):
             to_check = list(self.__other_board_chips)
             self.__other_board_chips.clear()
             for chip in to_check:
-                if chip.ip_address:
+                if (chip.nearest_ethernet_x == self.__ethernet_x and
+                        chip.nearest_ethernet_y == self.__ethernet_y):
                     self.__same_board_chips[chip] = chip
                 else:
                     self.__other_board_chips[chip] = chip
