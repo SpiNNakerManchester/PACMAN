@@ -457,7 +457,7 @@ class ApplicationPlacer(object):
             sdram_used = PacmanDataView.get_ethernet_monitor_sdram()
             monitor_cores = PacmanDataView.get_ethernet_monitor_cores()
         else:
-            sdram_used: PacmanDataView.get_all_monitor_sdram()
+            sdram_used = PacmanDataView.get_all_monitor_sdram()
             monitor_cores = PacmanDataView.get_all_monitor_cores()
 
         # remove the already placed for other Application Vertices
