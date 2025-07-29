@@ -455,7 +455,7 @@ class ApplicationPlacer(object):
 
         # remove the already placed for other Application Vertices
         on_chip = self.__placements.placements_on_chip(chip)
-        if len(on_chip) + monitor_cores >= len(cores_free) :
+        if len(on_chip) + monitor_cores >= len(cores_free):
             self.__full_chips.add(chip)
             return False
 
