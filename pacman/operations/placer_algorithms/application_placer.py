@@ -453,11 +453,16 @@ class ApplicationPlacer(object):
             If the requirements are too big for any chip
         """
         cores_free = list(chip.placable_processors_ids)
-        sdram_used: AbstractSDRAM = ConstantSDRAM(0)
+        if chip.ip_address:  # Ethernet
+            sdram_used = PacmanDataView.get_ethernet_monitor_sdram()
+            monitor_cores = PacmanDataView.get_ethernet_monitor_cores()
+        else:
+            sdram_used: PacmanDataView.get_all_monitor_sdram()
+            monitor_cores = PacmanDataView.get_all_monitor_cores()
 
         # remove the already placed for other Application Vertices
         on_chip = self.__placements.placements_on_chip(chip)
-        if len(on_chip) == len(cores_free):
+        if len(on_chip) + monitor_cores >= len(cores_free) :
             self.__full_chips.add(chip)
             return False
 
