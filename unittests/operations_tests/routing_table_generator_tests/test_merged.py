@@ -97,9 +97,8 @@ class TestMerged(unittest.TestCase):
         if system_placements is None:
             system_placements = Placements()
         splitter_partitioner()
-        placements = Placements()
-        writer.set_placements(placements)
-        place_application_graph(placements)
+        writer.set_placements(system_placements)
+        place_application_graph(system_placements)
         writer.set_routing_table_by_partition(route_application_graph())
         allocator = ZonedRoutingInfoAllocator()
         writer.set_routing_infos(allocator.allocate([]))
