@@ -138,8 +138,6 @@ class ApplicationPlacer(object):
         .. note::
             app_graph must have been partitioned
 
-        :return: Placements for the application.
-            *Includes the system placements.*
         :raises PacmanPlaceException: If no new start Chip is available
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
