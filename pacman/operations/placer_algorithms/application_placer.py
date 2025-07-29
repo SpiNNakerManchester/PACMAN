@@ -86,6 +86,8 @@ class ApplicationPlacer(object):
         "__current_cores_free",
         # Used sdram after the current group is placed
         "__current_sdram_used",
+        # Number of cores needed for monitors
+        "__current_monitor_cores",
 
         # Data about the neighbouring Chips to ones used
         # Current board being placed on
@@ -122,6 +124,7 @@ class ApplicationPlacer(object):
 
         self.__current_chip: Optional[Chip] = None
         self.__current_cores_free: List[int] = list()
+        self.__current_monitor_cores = 0
         self.__current_sdram_used: AbstractSDRAM = ConstantSDRAM(0)
         self.__app_vertex_label: Optional[str] = None
 
@@ -448,14 +451,16 @@ class ApplicationPlacer(object):
         cores_free = list(chip.placable_processors_ids)
         if chip.ip_address:  # Ethernet
             sdram_used = PacmanDataView.get_ethernet_monitor_sdram()
-            monitor_cores = PacmanDataView.get_ethernet_monitor_cores()
+            self.__current_monitor_cores = (
+                PacmanDataView.get_ethernet_monitor_cores())
         else:
             sdram_used = PacmanDataView.get_all_monitor_sdram()
-            monitor_cores = PacmanDataView.get_all_monitor_cores()
+            self.__current_monitor_cores = (
+                PacmanDataView.get_all_monitor_cores())
 
         # remove the already placed for other Application Vertices
         on_chip = self.__placements.placements_on_chip(chip)
-        if len(on_chip) + monitor_cores >= len(cores_free):
+        if len(on_chip) + self.__current_monitor_cores >= len(cores_free):
             self.__full_chips.add(chip)
             return False
 
@@ -469,7 +474,8 @@ class ApplicationPlacer(object):
 
         total_sdram = sdram_used + sdram
         plan_sdram = total_sdram.get_total_sdram(self.__plan_n_timesteps)
-        if len(cores_free) < n_cores or plan_sdram > chip.sdram:
+        if (len(cores_free) < n_cores + self.__current_monitor_cores
+                or plan_sdram > chip.sdram):
             self._check_could_fit(n_cores, sdram)
             return False
 
@@ -628,7 +634,8 @@ class ApplicationPlacer(object):
         total_sdram = sdram + self.__current_sdram_used
         plan_sdram = total_sdram.get_total_sdram(
             self.__plan_n_timesteps)
-        if (len(self.__current_cores_free) >= n_cores and
+        if (len(self.__current_cores_free) >=
+                n_cores + self.__current_monitor_cores and
                 plan_sdram <= self.__current_chip.sdram):
             # Cores are popped out later
             self.__current_sdram_used = total_sdram
