@@ -63,6 +63,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
 
         :param entries:
             The entries to merge
+        :returns: The routing info in the merged/ multicast format.
         """
         n_entries = len(entries)
         (_, last_r_info) = entries[-1]

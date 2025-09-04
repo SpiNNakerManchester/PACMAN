@@ -50,6 +50,11 @@ def packman_cfg_paths_skipped() -> Set[str]:
     Set of cfg path that may not be found based on other cfg settings
 
     Assuming mode = Debug
+
+    Used in function that check reports exists at the end of a debug node run.
+
+    :returns:
+       Set of cfg path that may not be found based on other cfg settings
     """
     skipped = set()
     # Code will not error if SpiNNaker-spinner missing but tests should

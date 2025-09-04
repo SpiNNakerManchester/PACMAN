@@ -122,6 +122,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         for external edges.
 
         :param partition_id: The identifier of the outgoing partition
+        :returns:  machine pre-vertices for this partition
         """
         raise NotImplementedError
 
@@ -139,6 +140,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
             for any source machine vertex in the given partition.
 
         :param partition_id: The identifier of the incoming partition
+        :returns: machine post-vertices for a given partition
         """
         raise NotImplementedError
 
@@ -191,9 +193,14 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
             Tuple[Sequence[MachineVertex], AbstractSDRAM]]:
         """
         Get a list of lists of vertices and SDRAM which must be
-        allocated on the same chip.  By default this returns a list of each
+        allocated on the same chip.
+
+        By default this returns a list of each
         machine vertex and its SDRAM; override if there are groups of
         machine vertices on the same chip.
+
+        :returns: A list of vertices and
+           the SDRAM cost that should be counted for that Vertex.
         """
         return [([v], v.sdram_required)
                 for v in self.governed_app_vertex.machine_vertices]
@@ -202,8 +209,12 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
             self) -> Sequence[MulticastEdgePartition]:
         """
         Get edge partitions between machine vertices that are to be
-        handled by Multicast.  Returns empty by default, override if there
-        are Multicast connections between internal vertices
+        handled by Multicast.
+
+        Returns empty by default,
+        override if there are Multicast connections between internal vertices
+
+        :returns: Only the partitions (if any) handled by Multicast
         """
         return []
 
@@ -211,7 +222,11 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
             self) -> Sequence[AbstractSDRAMPartition]:
         """
         Get edge partitions between machine vertices that are to be
-        handled by SDRAM.  Returns empty by default, override if there
+        handled by SDRAM.
+
+        Returns empty by default, override if there
         are SDRAM connections between internal vertices
+
+        :returns: Only the partitions (if any) handled by SDRAM
         """
         return []

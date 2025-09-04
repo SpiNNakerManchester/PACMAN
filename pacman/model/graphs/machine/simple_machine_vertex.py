@@ -41,6 +41,19 @@ class SimpleMachineVertex(MachineVertex):
             vertex_slice: Optional[Slice] = None,
             iptags: Optional[Iterable[IPtagResource]] = None,
             reverse_iptags: Optional[Iterable[ReverseIPtagResource]] = None):
+        """
+
+        :param sdram: The SDRAM space required by the vertex.
+        :param label: The optional name of the vertex
+        :param app_vertex:
+            The application vertex that caused this machine vertex to be
+            created. If `None`, there is no such application vertex.
+        :param vertex_slice:
+            The slice of the application vertex that this machine vertex
+            implements.
+        :param iptags: The forward tags used by this vertex
+        :param reverse_iptags: The reverse tags used by this vertex
+        """
         super().__init__(
             label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self._sdram = sdram

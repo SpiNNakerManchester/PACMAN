@@ -39,6 +39,12 @@ class AbstractSingleSourcePartition(
     def __init__(
             self, pre_vertex: V, identifier: str,
             allowed_edge_types: Union[Type[E], Tuple[Type[E], ...]]):
+        """
+
+        :param pre_vertex: The vertex at the start of all the edges
+        :param identifier: The identifier of the partition
+        :param allowed_edge_types: The types of edges allowed
+        """
         super().__init__(
             identifier=identifier, allowed_edge_types=allowed_edge_types)
         self._pre_vertex = pre_vertex

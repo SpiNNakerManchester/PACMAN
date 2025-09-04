@@ -25,6 +25,8 @@ from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 def basic_routing_table_generator() -> MulticastRoutingTables:
     """
     An basic algorithm that can produce routing tables.
+
+    :returns: The routing tables created.
     """
     routing_infos = PacmanDataView.get_routing_infos()
     routing_table_by_partitions = (

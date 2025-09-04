@@ -71,6 +71,7 @@ def remove_default_routes(
         If ``False``, the alias-check is skipped resulting in O(N) runtime.
         This option should only be used if the supplied table is guaranteed not
         to contain any aliased entries.
+    :returns: The none default entries.
     :raises MinimisationFailedError:
         If the smallest table that can be produced is larger than
         ``target_length``.

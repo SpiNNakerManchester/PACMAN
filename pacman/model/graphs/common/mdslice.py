@@ -44,10 +44,10 @@ class MDSlice(Slice):
         # The shape of the atoms in the slice is all the atoms in a line by
         if shape is None:
             raise PacmanValueError(
-                "shape must be specified if start is specified")
+                "shape must be specified")
         if start is None:
             raise PacmanValueError(
-                "start must be specified if shape is specified")
+                "start must be specified")
         if len(shape) != len(start):
             raise PacmanValueError(
                 "Both shape and start must have the same length")
@@ -82,6 +82,7 @@ class MDSlice(Slice):
         Get a slice in the `n`'Th dimension
 
         :param n: The 0-indexed dimension to get the shape of
+        :returns: A 1D slice
         """
         try:
             return slice(self.start[n], self.start[n] + self.shape[n])
@@ -136,6 +137,7 @@ class MDSlice(Slice):
         instance.
 
         :param as_str: The string to parse
+        :returns: Slice described by the string
         """
         if as_str[0] == "(":
             return Slice.from_string(as_str)

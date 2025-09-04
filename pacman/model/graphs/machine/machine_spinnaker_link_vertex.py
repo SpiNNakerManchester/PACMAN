@@ -52,6 +52,24 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractVirtual):
             vertex_slice: Optional[Slice] = None,
             outgoing_keys_and_masks: Optional[List[BaseKeyAndMask]] = None,
             incoming: bool = True, outgoing: bool = False):
+        """
+        :param spinnaker_link_id:
+            The id of the spinnaker link as passed into the init.
+        :param board_address:
+            The IP address of the board to which the device is connected,
+        :param linked_chip_coordinates:
+           The coordinates of the chip to which the device is connected,
+        :param label: The optional name of the vertex
+        :param app_vertex:
+            The application vertex that caused this machine vertex to be
+            created. If `None`, there is no such application vertex.
+        :param vertex_slice:
+            The slice of the application vertex that this machine vertex
+            implements.
+        :param outgoing_keys_and_masks:  key and mask to be used by the device
+        :param incoming: Whether this device sends traffic into SpiNNaker.
+        :param outgoing:  Whether this device receives traffic from SpiNNaker.
+        """
         super().__init__(
             label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self._spinnaker_link_id = spinnaker_link_id
