@@ -138,6 +138,7 @@ def vector_to_nodes(dm_vector: List[XY], start: XY) -> List[Tuple[int, XY]]:
 def vertex_xy(vertex: MachineVertex) -> XY:
     """
     :param vertex:
+    :returns: the location where this vertex is placed or linked to
     """
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)
@@ -149,6 +150,7 @@ def vertex_xy(vertex: MachineVertex) -> XY:
 def vertex_chip(vertex: MachineVertex) -> Chip:
     """
     :param vertex:
+    :returns: The Chip where the vertex is placed of linked to.
     """
     machine = PacmanDataView.get_machine()
     if not isinstance(vertex, AbstractVirtual):

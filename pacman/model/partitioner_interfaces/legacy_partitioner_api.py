@@ -37,10 +37,9 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
     @abstractmethod
     def get_sdram_used_by_atoms(self, vertex_slice: Slice) -> AbstractSDRAM:
         """
-        Get the separate SDRAM requirements for a range of atoms.
-
         :param vertex_slice:
             the low value of atoms to calculate resources from
+        :returns: The separate SDRAM requirements for a range of atoms.
         """
         raise NotImplementedError
 
@@ -63,7 +62,7 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
     @staticmethod
     def abstract_methods() -> FrozenSet[str]:
         """
-        Exposes the abstract methods and properties defined in this class.
+        :returns: The abstract methods and properties defined in this class.
         """
         return LegacyPartitionerAPI.\
             __abstractmethods__  # type: ignore[attr-defined]

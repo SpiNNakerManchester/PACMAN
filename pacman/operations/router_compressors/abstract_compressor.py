@@ -49,6 +49,11 @@ class AbstractCompressor(object):
         "_accept_overflow")
 
     def __init__(self, ordered: bool = True, accept_overflow: bool = False):
+        """
+        :param ordered: Flag to say if the results can be order dependent
+        :param accept_overflow:
+            Flag to say that results too large should be ignored
+        """
         self._ordered = ordered
         self._accept_overflow = accept_overflow
         self._problems = ""
@@ -56,6 +61,8 @@ class AbstractCompressor(object):
     def compress_all_tables(self) -> MulticastRoutingTables:
         """
         Apply compression to all uncompressed tables.
+
+        :returns: Compressed routing tables
         """
         router_tables = PacmanDataView.get_precompressed()
         # create progress bar

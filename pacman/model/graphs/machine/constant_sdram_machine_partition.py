@@ -45,6 +45,10 @@ class ConstantSDRAMMachinePartition(
         "_sdram_size")
 
     def __init__(self, identifier: str, pre_vertex: V):
+        """
+        :param identifier: The identifier of the partition
+        :param pre_vertex: The vertex at the start of all the edges
+        """
         super().__init__(
             pre_vertex, identifier,
             allowed_edge_types=cast(Type[E], SDRAMMachineEdge))

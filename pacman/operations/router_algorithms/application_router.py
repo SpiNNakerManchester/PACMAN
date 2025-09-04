@@ -157,6 +157,8 @@ class _Targets(object):
 def route_application_graph() -> MulticastRoutingTableByPartition:
     """
     Route the current application graph.
+
+    :returns: Routing tables
     """
     routing_tables = MulticastRoutingTableByPartition()
 
