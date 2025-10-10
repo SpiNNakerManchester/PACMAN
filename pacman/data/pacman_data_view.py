@@ -70,9 +70,6 @@ class _PacmanDataModel(object):
         "_precompressed",
         "_all_monitor_vertices",
         "_ethernet_monitor_vertices",
-        "_n_boards_required",
-        "_n_chips_required",
-        "_n_chips_in_graph",
         "_routing_infos",
         "_routing_table_by_partition",
         "_tags",
@@ -93,8 +90,6 @@ class _PacmanDataModel(object):
         self._graph = ApplicationGraph()
         # set at the start of every run
         self._plan_n_timesteps: Optional[int] = None
-        self._n_boards_required: Optional[int] = None
-        self._n_chips_required: Optional[int] = None
         self._hard_reset()
 
     def _hard_reset(self) -> None:
@@ -107,7 +102,6 @@ class _PacmanDataModel(object):
         self._precompressed: Optional[MulticastRoutingTables] = None
         self._all_monitor_vertices: List[MachineVertex] = []
         self._ethernet_monitor_vertices: List[MachineVertex] = []
-        self._n_chips_in_graph: Optional[int] = None
         self._uncompressed: Optional[MulticastRoutingTables] = None
         self._routing_infos: Optional[RoutingInfo] = None
         self._routing_table_by_partition: Optional[
@@ -559,84 +553,3 @@ class PacmanDataView(MachineDataView):
         for vertex in cls.__pacman_data._ethernet_monitor_vertices:
             sdram += vertex.sdram_required
         return sdram
-
-    # n_boards/chips required
-
-    @classmethod
-    def has_n_boards_required(cls) -> bool:
-        """
-        Reports if a user has sets the number of boards requested during setup.
-
-        :return: True if the user has sets the number of boards requested
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If n_boards_required is not set or set to `None`
-        """
-        return cls.__pacman_data._n_boards_required is not None
-
-    @classmethod
-    def get_n_boards_required(cls) -> int:
-        """
-        Gets the number of boards requested by the user during setup if known.
-
-        Guaranteed to be positive
-
-        :returns: The number of boards requested by the user
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the n_boards_required is currently unavailable
-        """
-        if cls.__pacman_data._n_boards_required is None:
-            raise cls._exception("n_boards_requiredr")
-        return cls.__pacman_data._n_boards_required
-
-    @classmethod
-    def get_n_chips_needed(cls) -> int:
-        """
-        Gets the number of chips needed, if set.
-
-        This will be the number of chips requested by the user during setup,
-        even if this is less that what the partitioner reported.
-
-        If the partitioner has run and the user has not specified a number,
-        this will be what the partitioner requested.
-
-        Guaranteed to be positive if set
-
-        :returns: the number of chips needed
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If data for n_chips_needed is not available
-        """
-        if cls.__pacman_data._n_chips_required:
-            return cls.__pacman_data._n_chips_required
-        if cls.__pacman_data._n_chips_in_graph:
-            return cls.__pacman_data._n_chips_in_graph
-        raise cls._exception("n_chips_requiredr")
-
-    @classmethod
-    def has_n_chips_needed(cls) -> bool:
-        """
-        Detects if the number of chips needed has been set.
-
-        This will be the number of chips requested by the use during setup or
-        what the partitioner requested.
-
-        :returns: True if the number of required chips is known
-        """
-        if cls.__pacman_data._n_chips_required is not None:
-            return True
-        return cls.__pacman_data._n_chips_in_graph is not None
-
-    @classmethod
-    def get_chips_boards_required_str(cls) -> str:
-        """
-        :returns: a String to say what was required
-        """
-        if cls.__pacman_data._n_boards_required:
-            return (f"Setup asked for "
-                    f"{cls.__pacman_data._n_boards_required} Boards")
-        if cls.__pacman_data._n_chips_required:
-            return (f"Setup asked for "
-                    f"{cls.__pacman_data._n_chips_required} Chips")
-        if cls.__pacman_data._n_chips_in_graph:
-            return (f"Graph requires "
-                    f"{cls.__pacman_data._n_chips_in_graph} Chips")
-        return "No requirements known"
