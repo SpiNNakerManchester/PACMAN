@@ -1,7 +1,6 @@
 [![PyPi version](https://img.shields.io/pypi/v/SpiNNaker_PACMAN.svg?style=flat)](https://pypi.org/project/SpiNNaker_PACMAN/)
 [![CI Check](https://github.com/SpiNNakerManchester/PACMAN/workflows/Python%20Actions/badge.svg?branch=master)](https://github.com/SpiNNakerManchester/PACMAN/actions?query=workflow%3A%22Python+Actions%22+branch%3Amaster)
 [![Documentation Status](https://readthedocs.org/projects/pacman/badge/?version=7.4.1)](https://pacman.readthedocs.io/en/7.4.1)
-[![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/PACMAN/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/PACMAN?branch=master)
 
 This package provides utilities for partitioning, placing a routing on a
 SpiNNaker machine
