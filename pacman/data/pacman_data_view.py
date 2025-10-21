@@ -21,17 +21,17 @@ from spinn_utilities.typing.coords import XY
 
 from spinn_machine.data import MachineDataView
 
+from pacman.model.graphs.application import (
+    ApplicationEdge, ApplicationEdgePartition, ApplicationVertex)
 from pacman.model.graphs.application.abstract import (
     AbstractOneAppOneMachineVertex)
-from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.machine import MachineEdge, MachineVertex
 from pacman.exceptions import PacmanNotPlacedError
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 
 if TYPE_CHECKING:
     from pacman.model.graphs import AbstractEdgePartition
-    from pacman.model.graphs.application import (
-        ApplicationEdge, ApplicationEdgePartition, ApplicationVertex)
     from pacman.model.placements import Placement, Placements
     from pacman.model.tags import Tags
     from pacman.model.routing_info import RoutingInfo
@@ -171,7 +171,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def add_edge(
-            cls, edge: ApplicationEdge,
+            cls, edge: ApplicationEdge | MachineEdge,
             outgoing_edge_partition_name: str) -> None:
         """
         Adds an Application edge to the user graph.
@@ -197,6 +197,14 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
         cls.set_requires_mapping()
+
+        if isinstance(edge, MachineEdge):
+            pre_app = edge.pre_vertex.app_vertex
+            assert pre_app is not None
+            post_app = edge.post_vertex.app_vertex
+            assert post_app is not None
+            edge = ApplicationEdge(pre_app, post_app)
+
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
 
     @classmethod
