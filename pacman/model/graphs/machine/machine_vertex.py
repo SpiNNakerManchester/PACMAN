@@ -74,7 +74,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return self._app_vertex
 
     @app_vertex.setter
-    def app_vertex(self, app_vertex: ApplicationVertex):
+    def app_vertex(self, app_vertex: ApplicationVertex) -> None:
         if self._app_vertex is not None:
             raise PacmanAlreadyExistsException("app_vertex", app_vertex)
         self._app_vertex = app_vertex
