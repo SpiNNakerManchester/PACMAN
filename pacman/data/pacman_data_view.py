@@ -216,7 +216,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def add_machine_edge(
-            cls, machine_edge: ApplicationEdge | MachineEdge,
+            cls, machine_edge: MachineEdge,
             outgoing_edge_partition_name: str) -> None:
         """
         Converts a Machine Edge to an application Edge and adds it the graph.
