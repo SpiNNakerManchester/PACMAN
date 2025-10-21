@@ -21,6 +21,9 @@ from spinn_utilities.typing.coords import XY
 
 from spinn_machine.data import MachineDataView
 
+from pacman.model.graphs.application.abstract import (
+    AbstractOneAppOneMachineVertex)
+from pacman.model.graphs.machine import MachineVertex
 from pacman.exceptions import PacmanNotPlacedError
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
@@ -29,7 +32,6 @@ if TYPE_CHECKING:
     from pacman.model.graphs import AbstractEdgePartition
     from pacman.model.graphs.application import (
         ApplicationEdge, ApplicationEdgePartition, ApplicationVertex)
-    from pacman.model.graphs.machine import MachineVertex
     from pacman.model.placements import Placement, Placements
     from pacman.model.tags import Tags
     from pacman.model.routing_info import RoutingInfo
@@ -133,11 +135,15 @@ class PacmanDataView(MachineDataView):
     # graph methods
 
     @classmethod
-    def add_vertex(cls, vertex: ApplicationVertex) -> None:
+    def add_vertex(cls, vertex: ApplicationVertex | MachineVertex) -> None:
         """
-        Adds an Application vertex to the user graph.
+        Adds an vertex to the user graph.
 
         Syntactic sugar for `get_graph().add_vertex()`
+
+        If vertex is a MachineVertex, this method will
+        wrap it in an ApplicationVertex
+        add the application to the graph and the MachineVertex
 
         :param vertex:
             The vertex to add to the graph
@@ -154,7 +160,14 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
         cls.set_requires_mapping()
-        cls.__pacman_data._graph.add_vertex(vertex)
+
+        if isinstance(vertex, MachineVertex):
+            app_vertex = AbstractOneAppOneMachineVertex(
+                vertex, vertex.label)
+            vertex.app_vertex = app_vertex
+            cls.__pacman_data._graph.add_vertex(app_vertex)
+        else:
+            cls.__pacman_data._graph.add_vertex(vertex)
 
     @classmethod
     def add_edge(

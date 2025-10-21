@@ -13,11 +13,15 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import Iterable, Optional, final, TYPE_CHECKING
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
+
+from pacman.exceptions import PacmanAlreadyExistsException
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_calls import get_n_bits
+
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
     from pacman.model.resources import AbstractSDRAM
@@ -68,6 +72,12 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         created. If `None`, there is no such application vertex.
         """
         return self._app_vertex
+
+    @app_vertex.setter
+    def app_vertex(self, app_vertex: ApplicationVertex):
+        if self._app_vertex is not None:
+            raise PacmanAlreadyExistsException("app_vertex", app_vertex)
+        self._app_vertex = app_vertex
 
     @property
     @final
