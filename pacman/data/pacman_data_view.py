@@ -169,7 +169,7 @@ class PacmanDataView(MachineDataView):
 
         Then calls add_vertex()
 
-        :param vertex:
+        :param machine_vertex:
             The vertex to add to the graph
         :raises PacmanConfigurationException:
             when both graphs contain vertices
