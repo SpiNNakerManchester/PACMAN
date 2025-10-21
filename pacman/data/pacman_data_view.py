@@ -135,15 +135,11 @@ class PacmanDataView(MachineDataView):
     # graph methods
 
     @classmethod
-    def add_vertex(cls, vertex: ApplicationVertex | MachineVertex) -> None:
+    def add_vertex(cls, vertex: ApplicationVertex) -> None:
         """
-        Adds an vertex to the user graph.
+        Adds an Application vertex to the user graph.
 
         Syntactic sugar for `get_graph().add_vertex()`
-
-        If vertex is a MachineVertex, this method will
-        wrap it in an ApplicationVertex
-        add the application to the graph and the MachineVertex
 
         :param vertex:
             The vertex to add to the graph
@@ -160,19 +156,38 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
         cls.set_requires_mapping()
-
-        if isinstance(vertex, MachineVertex):
-            app_vertex = AbstractOneAppOneMachineVertex(
-                vertex, vertex.label)
-            vertex.app_vertex = app_vertex
-            cls.__pacman_data._graph.add_vertex(app_vertex)
-        else:
-            cls.__pacman_data._graph.add_vertex(vertex)
+        cls.__pacman_data._graph.add_vertex(vertex)
 
     @classmethod
-    def add_edge(
-            cls, edge: ApplicationEdge | MachineEdge,
-            outgoing_edge_partition_name: str) -> None:
+    def add_machine_vertex(cls, machine_vertex: MachineVertex) -> None:
+        """
+        Adds a Machine vertex to the user graph.
+
+        This method will
+        wrap it in an ApplicationVertex
+        add the application to the graph and the MachineVertex
+
+        Then calls add_vertex()
+
+        :param vertex:
+            The vertex to add to the graph
+        :raises PacmanConfigurationException:
+            when both graphs contain vertices
+        :raises PacmanConfigurationException:
+            If there is an attempt to add the same vertex more than once
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        :raises SimulatorNotSetupException: If called before `sim.setup`
+        :raises SimulatorShutdownException: If called after `sim.end`
+        """
+        app_vertex = AbstractOneAppOneMachineVertex(
+            machine_vertex, machine_vertex.label)
+        machine_vertex.app_vertex = app_vertex
+        cls.add_vertex(app_vertex)
+
+    @classmethod
+    def add_edge(cls, edge: ApplicationEdge,
+                 outgoing_edge_partition_name: str) -> None:
         """
         Adds an Application edge to the user graph.
 
@@ -197,15 +212,39 @@ class PacmanDataView(MachineDataView):
         if cls.__pacman_data._graph is None:
             raise cls._exception("graph")
         cls.set_requires_mapping()
-
-        if isinstance(edge, MachineEdge):
-            pre_app = edge.pre_vertex.app_vertex
-            assert pre_app is not None
-            post_app = edge.post_vertex.app_vertex
-            assert post_app is not None
-            edge = ApplicationEdge(pre_app, post_app)
-
         cls.__pacman_data._graph.add_edge(edge, outgoing_edge_partition_name)
+
+    @classmethod
+    def add_machine_edge(
+            cls, machine_edge: ApplicationEdge | MachineEdge,
+            outgoing_edge_partition_name: str) -> None:
+        """
+        Converts a Machine Edge to an application Edge and adds it the graph.
+
+        Syntactic sugar for `get_graph().add_edge()`
+
+        :param machine_edge: The edge to add
+        :param outgoing_edge_partition_name:
+            The name of the edge partition to add the edge to; each edge
+            partition is the partition of edges that start at the same vertex
+        :raises PacmanConfigurationException:
+            when both graphs contain vertices
+        :raises PacmanInvalidParameterException:
+            If the edge is not of a valid type or if edges have already been
+            added to this partition that start at a different vertex to this
+            one
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If the graph is currently unavailable
+        :raises SimulatorNotSetupException: If called before `sim.setup`
+        :raises SimulatorShutdownException: If called after `sim.end`
+        """
+        pre_app = machine_edge.pre_vertex.app_vertex
+        assert pre_app is not None
+        post_app = machine_edge.post_vertex.app_vertex
+        assert post_app is not None
+        application_edge = ApplicationEdge(pre_app, post_app)
+
+        cls.add_edge(application_edge, outgoing_edge_partition_name)
 
     @classmethod
     def iterate_vertices(cls) -> Iterable[ApplicationVertex]:
