@@ -23,17 +23,19 @@ from spinn_utilities.log import FormatAdapter
 from spinn_machine import Chip, MulticastRoutingEntry
 from pacman.data import PacmanDataView
 from pacman.exceptions import (
-    PacmanConfigurationException, PacmanRoutingException)
+    PacmanConfigurationException, PacmanNotPlacedError, PacmanRoutingException)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs import AbstractVirtual
 from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     get_app_partitions)
-from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.machine import (
+    MachineFPGAVertex, MachineSpiNNakerLinkVertex, MachineVertex)
 from pacman.model.placements import Placement
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.routing_tables import (
     AbstractMulticastRoutingTable, MulticastRoutingTables)
+
 
 logger = FormatAdapter(logging.getLogger(__name__))
 range_masks = {FULL_MASK - ((2 ** i) - 1) for i in range(33)}
@@ -88,16 +90,25 @@ def validate_routes(routing_tables: MulticastRoutingTables) -> None:
                     source, partition.identifier)
 
             for tgt, srcs in target_vertices:
-                place = PacmanDataView.get_placement_of_vertex(tgt)
-                for src in srcs:
-                    if isinstance(src, ApplicationVertex):
-                        for s in src.splitter.get_out_going_vertices(
-                                partition.identifier):
-                            destinations[s].add(PlacementTuple(
+                try:
+                    place = PacmanDataView.get_placement_of_vertex(tgt)
+                    for src in srcs:
+                        if isinstance(src, ApplicationVertex):
+                            for s in src.splitter.get_out_going_vertices(
+                                    partition.identifier):
+                                destinations[s].add(PlacementTuple(
+                                    x=place.x, y=place.y, p=place.p))
+                        else:
+                            destinations[src].add(PlacementTuple(
                                 x=place.x, y=place.y, p=place.p))
+                except PacmanNotPlacedError:
+                    if (isinstance(tgt, MachineSpiNNakerLinkVertex) or
+                            isinstance(tgt, MachineFPGAVertex)):
+                        logger.exception(
+                            f"Unable to validate routes with {tgt}")
+                        return
                     else:
-                        destinations[src].add(PlacementTuple(
-                            x=place.x, y=place.y, p=place.p))
+                        raise
 
         outgoing: OrderedSet[MachineVertex] = OrderedSet(
             source.splitter.get_out_going_vertices(partition.identifier))
