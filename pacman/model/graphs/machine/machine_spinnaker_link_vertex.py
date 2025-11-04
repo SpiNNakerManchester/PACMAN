@@ -38,8 +38,6 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractVirtual):
         "_spinnaker_link_id",
         "_board_address",
         "_linked_chip_coordinates",
-        "_virtual_chip_x",
-        "_virtual_chip_y",
         "_outgoing_keys_and_masks",
         "_incoming",
         "_outgoing")
