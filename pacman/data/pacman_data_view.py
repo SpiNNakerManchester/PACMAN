@@ -23,8 +23,6 @@ from spinn_machine.data import MachineDataView
 
 from pacman.model.graphs.application import (
     ApplicationEdge, ApplicationEdgePartition, ApplicationVertex)
-from pacman.model.graphs.application.abstract import (
-    AbstractOneAppOneMachineVertex)
 from pacman.model.graphs.machine import MachineEdge, MachineVertex
 from pacman.exceptions import PacmanNotPlacedError
 from pacman.model.graphs.application import ApplicationGraph
