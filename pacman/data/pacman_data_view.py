@@ -180,10 +180,7 @@ class PacmanDataView(MachineDataView):
         :raises SimulatorNotSetupException: If called before `sim.setup`
         :raises SimulatorShutdownException: If called after `sim.end`
         """
-        app_vertex = AbstractOneAppOneMachineVertex(
-            machine_vertex, machine_vertex.label)
-        machine_vertex.app_vertex = app_vertex
-        cls.add_vertex(app_vertex)
+        cls.add_vertex(machine_vertex.app_vertex)
 
     @classmethod
     def add_edge(cls, edge: ApplicationEdge,
@@ -239,9 +236,7 @@ class PacmanDataView(MachineDataView):
         :raises SimulatorShutdownException: If called after `sim.end`
         """
         pre_app = machine_edge.pre_vertex.app_vertex
-        assert pre_app is not None
         post_app = machine_edge.post_vertex.app_vertex
-        assert post_app is not None
         application_edge = ApplicationEdge(pre_app, post_app)
 
         cls.add_edge(application_edge, outgoing_edge_partition_name)
