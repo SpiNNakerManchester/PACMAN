@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Dict, Tuple
+
+from pacman.model.graphs.machine import MachineVertex
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data import PacmanDataView
@@ -58,9 +60,11 @@ def __create_routing_table(
         if isinstance(source_vertex, ApplicationVertex):
             r_info = routing_infos.get_application_info(
                 source_vertex, partition_id)
-        else:
+        elif isinstance(source_vertex, MachineVertex):
             r_info = routing_infos.get_machine_info(
                 source_vertex, partition_id)
+        else:
+            raise NotImplementedError(type(source_vertex))
         entry = partitions_in_table[source_vertex, partition_id]
         if r_info.key_and_mask in sources_by_key_mask:
             if (sources_by_key_mask[r_info.key_and_mask]

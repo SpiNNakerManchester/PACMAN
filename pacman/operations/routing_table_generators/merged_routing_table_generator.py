@@ -126,11 +126,11 @@ def __create_routing_table(
     while iterator.has_next:
         (vertex, part_id), entry = iterator.pop()
         if isinstance(vertex, ApplicationVertex):
-            r_info = routing_info.get_application_info(vertex, part_id)
-            __add_source(r_info, sources_by_key_mask, vertex, part_id)
+            app_r_info  = routing_info.get_application_info(vertex, part_id)
+            __add_source(app_r_info , sources_by_key_mask, vertex, part_id)
             table.add_multicast_routing_entry(
                 MulticastRoutingEntry(
-                    r_info.key, r_info.mask, entry))
+                    app_r_info .key, app_r_info.mask, entry))
             continue
 
         # Otherwise it has to be a machine vertex...
@@ -188,6 +188,7 @@ def __match(
         return False
     if __mask_has_holes(r_info.mask):
         return False
+    assert isinstance(next_vertex, MachineVertex)
     next_r_info = routing_info.get_machine_info(next_vertex, next_part_id)
     if next_r_info.index != r_info.index + 1:
         return False
