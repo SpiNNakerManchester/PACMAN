@@ -36,9 +36,11 @@ class RoutingInfo(object):
         # Partition information indexed by edge pre-vertex and partition ID
         # name
         self._app_info: Dict[ApplicationVertex,
-            Dict[str, AppVertexRoutingInfo]] = defaultdict(dict)
+                             Dict[str, AppVertexRoutingInfo]] = (
+            defaultdict(dict))
         self._mac_info: Dict[MachineVertex,
-            Dict[str, MachineVertexRoutingInfo]] = defaultdict(dict)
+                             Dict[str, MachineVertexRoutingInfo]] = (
+            defaultdict(dict))
 
     def add_application_info(self, info: AppVertexRoutingInfo) -> None:
         """
