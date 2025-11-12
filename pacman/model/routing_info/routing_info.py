@@ -23,7 +23,6 @@ from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
 if TYPE_CHECKING:
     from .vertex_routing_info import VertexRoutingInfo
-    from pacman.model.graphs import AbstractVertex
 
 
 class RoutingInfo(object):
@@ -37,7 +36,7 @@ class RoutingInfo(object):
         # Partition information indexed by edge pre-vertex and partition ID
         # name
         self._app_info: Dict[ApplicationVertex,
-                         Dict[str, AppVertexRoutingInfo]] = defaultdict(dict)
+            Dict[str, AppVertexRoutingInfo]] = defaultdict(dict)
         self._mac_info: Dict[MachineVertex,
             Dict[str, MachineVertexRoutingInfo]] = defaultdict(dict)
 

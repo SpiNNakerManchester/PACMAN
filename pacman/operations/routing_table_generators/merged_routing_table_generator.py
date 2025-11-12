@@ -20,7 +20,8 @@ from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.routing_info import (
-    RoutingInfo, AppVertexRoutingInfo, MachineVertexRoutingInfo, VertexRoutingInfo)
+    RoutingInfo, AppVertexRoutingInfo, MachineVertexRoutingInfo,
+    VertexRoutingInfo)
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
@@ -99,6 +100,7 @@ def merged_routing_table_generator() -> MulticastRoutingTables:
 
     return routing_tables
 
+
 def __add_source(
         r_info: VertexRoutingInfo,
         sources_by_key_mask: Dict[BaseKeyAndMask, Tuple[AbstractVertex, str]],
@@ -126,8 +128,8 @@ def __create_routing_table(
     while iterator.has_next:
         (vertex, part_id), entry = iterator.pop()
         if isinstance(vertex, ApplicationVertex):
-            app_r_info  = routing_info.get_application_info(vertex, part_id)
-            __add_source(app_r_info , sources_by_key_mask, vertex, part_id)
+            app_r_info = routing_info.get_application_info(vertex, part_id)
+            __add_source(app_r_info, sources_by_key_mask, vertex, part_id)
             table.add_multicast_routing_entry(
                 MulticastRoutingEntry(
                     app_r_info .key, app_r_info.mask, entry))
