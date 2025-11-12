@@ -319,12 +319,12 @@ class ZonedRoutingInfoAllocator(object):
                 self.__fixed_partitions.items()):
             if isinstance(vertex, ApplicationVertex):
                 n_bits_atoms = self.__atom_bits_per_app_part[vertex, part_id]
-                routing_infos.add_routing_info(AppVertexRoutingInfo(
+                routing_infos.add_application_info(AppVertexRoutingInfo(
                     key_and_mask, part_id, vertex,
                     self.__mask(n_bits_atoms), n_bits_atoms,
                     len(vertex.machine_vertices)-1))
             elif isinstance(vertex, MachineVertex):
-                routing_infos.add_routing_info(MachineVertexRoutingInfo(
+                routing_infos.add_machine_info(MachineVertexRoutingInfo(
                     key_and_mask, part_id, vertex, vertex.index))
         return routing_infos
 
@@ -366,7 +366,7 @@ class ZonedRoutingInfoAllocator(object):
                     key = (key << n_bits_machine) | machine_index
                     key = key << n_bits_atoms
                     key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
-                routing_infos.add_routing_info(MachineVertexRoutingInfo(
+                routing_infos.add_machine_info(MachineVertexRoutingInfo(
                     key_and_mask, identifier, machine_vertex,
                     machine_index))
 
@@ -378,7 +378,7 @@ class ZonedRoutingInfoAllocator(object):
                 key = app_part_index << (n_bits_atoms + n_bits_machine)
                 mask = self.__mask(n_bits_atoms + n_bits_machine)
                 key_and_mask = BaseKeyAndMask(key, mask)
-            routing_infos.add_routing_info(AppVertexRoutingInfo(
+            routing_infos.add_application_info(AppVertexRoutingInfo(
                 key_and_mask, identifier, pre,
                 self.__mask(n_bits_atoms), n_bits_atoms,
                 len(machine_vertices) - 1))

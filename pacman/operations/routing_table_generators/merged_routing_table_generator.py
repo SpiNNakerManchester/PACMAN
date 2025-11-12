@@ -20,7 +20,7 @@ from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.routing_info import (
-    RoutingInfo, AppVertexRoutingInfo, MachineVertexRoutingInfo)
+    RoutingInfo, AppVertexRoutingInfo, MachineVertexRoutingInfo, VertexRoutingInfo)
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
@@ -99,6 +99,20 @@ def merged_routing_table_generator() -> MulticastRoutingTables:
 
     return routing_tables
 
+def __add_source(
+        r_info: VertexRoutingInfo,
+        sources_by_key_mask: Dict[BaseKeyAndMask, Tuple[AbstractVertex, str]],
+        vertex: AbstractVertex, part_id: str) -> None:
+    if r_info.key_and_mask in sources_by_key_mask:
+        if (sources_by_key_mask[r_info.key_and_mask] != (vertex, part_id)):
+            raise KeyError(
+                f"Source {vertex}, {part_id} is trying to "
+                f"send to the same key and mask as "
+                f"{sources_by_key_mask[r_info.key_and_mask]}")
+    else:
+        sources_by_key_mask[r_info.key_and_mask] = (
+            vertex, part_id)
+
 
 def __create_routing_table(
         x: int, y: int,
@@ -111,28 +125,18 @@ def __create_routing_table(
     iterator = _IteratorWithNext(partitions_in_table.items())
     while iterator.has_next:
         (vertex, part_id), entry = iterator.pop()
-        r_info = routing_info.get_info_from(
-            vertex, part_id)
-
-        if r_info.key_and_mask in sources_by_key_mask:
-            if (sources_by_key_mask[r_info.key_and_mask] != (vertex, part_id)):
-                raise KeyError(
-                    f"Source {vertex}, {part_id} is trying to "
-                    f"send to the same key and mask as "
-                    f"{sources_by_key_mask[r_info.key_and_mask]}")
-        else:
-            sources_by_key_mask[r_info.key_and_mask] = (
-                vertex, part_id)
-
-        # If we have an application vertex, just put the entry in and move on
         if isinstance(vertex, ApplicationVertex):
+            r_info = routing_info.get_application_info(vertex, part_id)
+            __add_source(r_info, sources_by_key_mask, vertex, part_id)
             table.add_multicast_routing_entry(
                 MulticastRoutingEntry(
                     r_info.key, r_info.mask, entry))
             continue
+
         # Otherwise it has to be a machine vertex...
         assert isinstance(vertex, MachineVertex)
-        assert isinstance(r_info, MachineVertexRoutingInfo)
+        r_info = routing_info.get_machine_info(vertex, part_id)
+        __add_source(r_info, sources_by_key_mask, vertex, part_id)
 
         # If there is no application vertex, just add the entry
         if vertex.app_vertex is None:
@@ -141,7 +145,7 @@ def __create_routing_table(
             continue
 
         # This has to be AppVertexRoutingInfo!
-        app_r_info = routing_info.get_info_from(
+        app_r_info = routing_info.get_application_info(
             vertex.app_vertex, part_id)
         assert isinstance(app_r_info, AppVertexRoutingInfo)
 
@@ -152,8 +156,7 @@ def __create_routing_table(
                       app_r_info):
             (vertex, part_id), entry = iterator.pop()
             assert isinstance(vertex, MachineVertex)
-            r_info = routing_info.get_info_from(
-                vertex, part_id)
+            r_info = routing_info.get_machine_info(vertex, part_id)
             if r_info is not None:
                 assert isinstance(r_info, MachineVertexRoutingInfo)
                 entries.append((entry, r_info))
@@ -185,9 +188,7 @@ def __match(
         return False
     if __mask_has_holes(r_info.mask):
         return False
-    next_r_info = routing_info.get_info_from(
-        next_vertex, next_part_id)
-    assert isinstance(next_r_info, MachineVertexRoutingInfo)
+    next_r_info = routing_info.get_machine_info(next_vertex, next_part_id)
     if next_r_info.index != r_info.index + 1:
         return False
     app_src = vertex.app_vertex

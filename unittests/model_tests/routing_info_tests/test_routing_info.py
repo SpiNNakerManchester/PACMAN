@@ -81,79 +81,74 @@ class TestRoutingInfo(unittest.TestCase):
         info = MachineVertexRoutingInfo(
             BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
         routing_info = RoutingInfo()
-        routing_info.add_routing_info(info)
+        routing_info.add_machine_info(info)
         orphan = SimpleMachineVertex(ConstantSDRAM(0))
 
         with self.assertRaises(PacmanAlreadyExistsException):
-            routing_info.add_routing_info(info)
+            routing_info.add_machine_info(info)
 
-        assert routing_info.get_info_from(
+        assert routing_info.get_machine_info(
             pre_vertex, "Test") == info
         with self.assertRaises(KeyError):
-            routing_info.get_info_from(
+            routing_info.get_machine_info(
                 None, "Test")  # type: ignore[arg-type]
         with self.assertRaises(KeyError):
-            routing_info.get_info_from(
+            routing_info.get_machine_info(
                 pre_vertex, None)  # type: ignore[arg-type]
 
-        assert routing_info.get_key_from(
-            pre_vertex, "Test") == key
+        assert routing_info.get_machine_key(pre_vertex, "Test") == key
         with self.assertRaises(KeyError):
-            routing_info.get_key_from(
+            routing_info.get_application_key(
                 None, "Test")  # type: ignore[arg-type]
         with self.assertRaises(KeyError):
-            routing_info.get_key_from(
+            routing_info.get_machine_key(
+                None, "Test")  # type: ignore[arg-type]
+        with self.assertRaises(KeyError):
+            routing_info.get_machine_key(
                 pre_vertex, "None")  # type: ignore[arg-type]
 
-        assert list(routing_info.get_partitions_from(
+        assert list(routing_info.get_machine_partitions(
             pre_vertex)) == ["Test"]
-        assert list(routing_info.get_partitions_from(
-            orphan)) == []
+        assert list(routing_info.get_machine_partitions(orphan)) == []
 
         # This should work as can be either partition
-        routing_info.check_info_from(
-            pre_vertex, {"Test", "Test2"})
+        routing_info.check_machine_info(pre_vertex, {"Test", "Test2"})
 
         # Works because orphan has no partitions!
-        routing_info.check_info_from(orphan, {"Test"})
+        routing_info.check_machine_info(orphan, {"Test"})
 
         # This should not work
         with self.assertRaises(KeyError):
-            routing_info.check_info_from(pre_vertex, {"Test2"})
+            routing_info.check_machine_info(pre_vertex, {"Test2"})
 
-        assert routing_info.has_info_from(
+        assert routing_info.has_machine_info(
             pre_vertex, "Test")
-        assert not routing_info.has_info_from(
+        assert not routing_info.has_machine_info(
             None, "Test")  # type: ignore[arg-type]
-        assert not routing_info.has_info_from(
+        assert not routing_info.has_machine_info(
             pre_vertex, "None")
-
-        assert next(iter(routing_info)) == info
 
         info2 = MachineVertexRoutingInfo(
             BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
 
         with self.assertRaises(PacmanAlreadyExistsException):
-            routing_info.add_routing_info(info2)
+            routing_info.add_machine_info(info2)
         assert info != info2
 
         info3 = MachineVertexRoutingInfo(
             BaseKeyAndMask(key, FULL_MASK), "Test2", pre_vertex, 0)
-        routing_info.add_routing_info(info3)
+        routing_info.add_machine_info(info3)
         assert info != info3
-        assert routing_info.get_info_from(
+        assert routing_info.get_machine_info(
                 pre_vertex, "Test2") !=\
-            routing_info.get_info_from(
+            routing_info.get_machine_info(
                 pre_vertex, "Test")
-        assert routing_info.get_info_from(
+        assert routing_info.get_machine_info(
             pre_vertex, "Test2").get_keys().tolist() == [key]
         with self.assertRaises(KeyError):
-            routing_info.get_single_info_from(
-                pre_vertex)
+            routing_info.get_single_machine_info(pre_vertex)
         with self.assertRaises(KeyError):
-            routing_info.get_single_key_from(pre_vertex)
-
-        self.assertEqual(len(routing_info), len(list(routing_info)))
+            routing_info.get_single_machine_key(pre_vertex)
 
     def test_multiple(self) -> None:
         routing_info = RoutingInfo()
@@ -161,12 +156,11 @@ class TestRoutingInfo(unittest.TestCase):
         key = 12345
         info = MachineVertexRoutingInfo(
             BaseKeyAndMask(key, FULL_MASK), "Test", vertex1, 0)
-        routing_info.add_routing_info(info)
+        routing_info.add_machine_info(info)
         key = 67890
         info = MachineVertexRoutingInfo(
             BaseKeyAndMask(key, FULL_MASK), "Test2", vertex1, 0)
-        routing_info.add_routing_info(info)
-        self.assertEqual(len(routing_info), len(list(routing_info)))
+        routing_info.add_machine_info(info)
 
     def test_base_key_and_mask(self) -> None:
         with self.assertRaises(PacmanConfigurationException):

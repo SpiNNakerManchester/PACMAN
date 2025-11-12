@@ -246,7 +246,7 @@ def check_masks_all_the_same(routing_info: RoutingInfo, mask: int) -> None:
     # Check the mask is the same for all, and allows for the space required
     # for the maximum number of keys in total
     seen_keys = set()
-    for r_info in routing_info:
+    for r_info in routing_info.get_machine_infos():
         if isinstance(r_info.vertex, MachineVertex):
             assert isinstance(r_info, MachineVertexRoutingInfo)
             assert (r_info.mask == mask or
@@ -274,8 +274,7 @@ def check_keys_for_application_partition_pairs(
         mapped_key = None
         for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
                 part.identifier):
-            key = routing_info.get_key_from(
-                m_vertex, part.identifier)
+            key = routing_info.get_machine_key(m_vertex, part.identifier)
             if check_fixed(m_vertex, part.identifier, key):
                 continue
 
@@ -324,7 +323,8 @@ def test_fixed_only() -> None:
     create_graphs_only_fixed(overlap=False)
     flexible_allocate([])
     routing_info = global_allocate([])
-    assert len(list(routing_info)) == 4
+    assert len(list(routing_info.get_application_infos())) == 2
+    assert len(list(routing_info.get_machine_infos())) == 2
 
 
 def test_overlap() -> None:
@@ -340,7 +340,8 @@ def test_no_edge() -> None:
     create_graphs_no_edge()
     flexible_allocate([])
     routing_info = global_allocate([])
-    assert len(list(routing_info)) == 0
+    assert len(list(routing_info.get_application_infos())) == 0
+    assert len(list(routing_info.get_machine_infos())) == 0
 
 
 def test_flexible_allocator_with_fixed() -> None:

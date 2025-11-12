@@ -14,8 +14,13 @@
 from __future__ import annotations
 from collections import defaultdict
 from typing import Dict, Iterator, Optional, Iterable, Set, TYPE_CHECKING
-from deprecated import deprecated
+
 from pacman.exceptions import PacmanAlreadyExistsException
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.machine import MachineVertex
+from .app_vertex_routing_info import AppVertexRoutingInfo
+from .machine_vertex_routing_info import MachineVertexRoutingInfo
+
 if TYPE_CHECKING:
     from .vertex_routing_info import VertexRoutingInfo
     from pacman.model.graphs import AbstractVertex
@@ -26,15 +31,17 @@ class RoutingInfo(object):
     An association of machine vertices to a non-overlapping set of keys
     and masks.
     """
-    __slots__ = ("_info", )
+    __slots__ = ("_app_info", "_mac_info")
 
     def __init__(self) -> None:
         # Partition information indexed by edge pre-vertex and partition ID
         # name
-        self._info: Dict[AbstractVertex,
-                         Dict[str, VertexRoutingInfo]] = defaultdict(dict)
+        self._app_info: Dict[ApplicationVertex,
+                         Dict[str, AppVertexRoutingInfo]] = defaultdict(dict)
+        self._mac_info: Dict[MachineVertex,
+            Dict[str, MachineVertexRoutingInfo]] = defaultdict(dict)
 
-    def add_routing_info(self, info: VertexRoutingInfo) -> None:
+    def add_application_info(self, info: AppVertexRoutingInfo) -> None:
         """
         Add a routing information item.
 
@@ -43,36 +50,32 @@ class RoutingInfo(object):
         :raise PacmanAlreadyExistsException:
             If the partition is already in the set of edges
         """
-        if (info.vertex in self._info and
-                info.partition_id in self._info[info.vertex]):
+        if (info.vertex in self._app_info and
+                info.partition_id in self._app_info[info.vertex]):
             raise PacmanAlreadyExistsException(
                 "Routing information", str(info))
 
-        self._info[info.vertex][info.partition_id] = info
+        self._app_info[info.vertex][info.partition_id] = info
 
-    @deprecated(reason="This method is unsafe, since it doesn't determine "
-                       "whether the info is missing because there is no "
-                       "outgoing edge, or if the outgoing edge is in another "
-                       "partition and the name is wrong. "
-                       "Use a combination of "
-                       "get_info_from, "
-                       "get_partitions_from, "
-                       "has_info_from, "
-                       "or get_single_info_from")
-    def get_routing_info_from_pre_vertex(
-            self, vertex: AbstractVertex,
-            partition_id: str) -> Optional[VertexRoutingInfo]:
+    def add_machine_info(self, info: MachineVertexRoutingInfo) -> None:
         """
-        :param vertex: The vertex to search for
-        :param partition_id:
-            The ID of the partition for which to get the routing information
-        :returns: Routing information for a given partition_id from a vertex.
-        """
-        return self._info[vertex].get(partition_id)
+        Add a routing information item.
 
-    def get_info_from(
-            self, vertex: AbstractVertex,
-            partition_id: str) -> VertexRoutingInfo:
+        :param info:
+            The routing information item to add
+        :raise PacmanAlreadyExistsException:
+            If the partition is already in the set of edges
+        """
+        if (info.vertex in self._mac_info and
+                info.partition_id in self._mac_info[info.vertex]):
+            raise PacmanAlreadyExistsException(
+                "Routing information", str(info))
+
+        self._mac_info[info.vertex][info.partition_id] = info
+
+    def get_application_info(
+            self, vertex: ApplicationVertex,
+            partition_id: str) -> AppVertexRoutingInfo:
         """
         :param vertex: The vertex to search for
         :param partition_id:
@@ -82,36 +85,24 @@ class RoutingInfo(object):
             If the vertex/partition_id combination is not in the routing
             information
         """
-        return self._info[vertex][partition_id]
+        return self._app_info[vertex][partition_id]
 
-    @deprecated(reason="This method is unsafe, since it doesn't determine "
-                       "whether the info is missing because there is no "
-                       "outgoing edge, or if the outgoing edge is in another "
-                       "partition and the name is wrong. "
-                       "Use a combination of "
-                       "get_key_from, "
-                       "get_partitions_from, "
-                       "has_info_from, "
-                       "or get_single_key_from")
-    def get_first_key_from_pre_vertex(
-            self, vertex: AbstractVertex, partition_id: str) -> Optional[int]:
+    def get_machine_info(
+            self, vertex: MachineVertex,
+            partition_id: str) -> MachineVertexRoutingInfo:
         """
-        Get the first key for the partition starting at a vertex.
-
-        :param vertex: The vertex which the partition starts at
+        :param vertex: The vertex to search for
         :param partition_id:
             The ID of the partition for which to get the routing information
-        :return: The routing key of the partition
+        :returns: Routing information for a given partition_id from a vertex.
+        :raise KeyError:
+            If the vertex/partition_id combination is not in the routing
+            information
         """
-        if vertex not in self._info:
-            return None
-        info = self._info[vertex]
-        if partition_id not in info:
-            return None
-        return info[partition_id].key
+        return self._mac_info[vertex][partition_id]
 
-    def get_key_from(
-            self, vertex: AbstractVertex, partition_id: str) -> int:
+    def get_application_key(
+            self, vertex: ApplicationVertex, partition_id: str) -> int:
         """
         Get the first key for the partition starting at a vertex.
 
@@ -123,20 +114,45 @@ class RoutingInfo(object):
             If the vertex/partition_id combination is not in the routing
             information
         """
-        return self._info[vertex][partition_id].key
+        return self._app_info[vertex][partition_id].key
 
-    def get_partitions_from(
-            self, vertex: AbstractVertex) -> Iterable[str]:
+    def get_machine_key(
+            self, vertex: MachineVertex, partition_id: str) -> int:
+        """
+        Get the first key for the partition starting at a vertex.
+
+        :param vertex: The vertex which the partition starts at
+        :param partition_id:
+            The ID of the partition for which to get the routing information
+        :return: The routing key of the partition
+        :raise KeyError:
+            If the vertex/partition_id combination is not in the routing
+            information
+        """
+        return self._mac_info[vertex][partition_id].key
+
+    def get_application_partitions(
+            self, vertex: ApplicationVertex) -> Iterable[str]:
         """
         Get the outgoing partitions from a vertex.
 
         :param vertex: The vertex to search for
         :returns: The partition ids for routes from this Vertex
         """
-        return self._info[vertex].keys()
+        return self._app_info[vertex].keys()
 
-    def has_info_from(
-            self, vertex: AbstractVertex, partition_id: str) -> bool:
+    def get_machine_partitions(
+            self, vertex: MachineVertex) -> Iterable[str]:
+        """
+        Get the outgoing partitions from a vertex.
+
+        :param vertex: The vertex to search for
+        :returns: The partition ids for routes from this Vertex
+        """
+        return self._mac_info[vertex].keys()
+
+    def has_machine_info(
+            self, vertex: MachineVertex, partition_id: str) -> bool:
         """
         Check if there is routing information for a given vertex and ID.
 
@@ -145,13 +161,14 @@ class RoutingInfo(object):
             The ID of the partition for which to get the routing information
         :returns: True if there is a route from this vertex for this partition.
         """
-        if vertex not in self._info:
+        if vertex in self._mac_info:
+            info = self._mac_info[vertex]
+            return partition_id in info
+        else:
             return False
-        info = self._info[vertex]
-        return partition_id in info
 
-    def check_info_from(
-            self, vertex: AbstractVertex,
+    def check_machine_info(
+            self, vertex: MachineVertex,
             allowed_partition_ids: Set[str]) -> None:
         """
         Check that the partition ids for a vertex are in the allowed set.
@@ -160,16 +177,15 @@ class RoutingInfo(object):
         :param allowed_partition_ids: The allowed partition ids
         :raise KeyError: If the vertex has an unknown partition ID
         """
-        if vertex not in self._info:
-            return
-        info = self._info[vertex]
-        for partition_id in info:
-            if partition_id not in allowed_partition_ids:
-                raise KeyError(
-                    f"Vertex {vertex} has unknown partition ID {partition_id}")
+        if vertex in self._mac_info:
+            info = self._mac_info[vertex]
+            for partition_id in info:
+                if partition_id not in allowed_partition_ids:
+                    raise KeyError(f"Vertex {vertex} has unknown "
+                                   f"partition ID {partition_id}")
 
-    def get_single_info_from(
-            self, vertex: AbstractVertex) -> Optional[VertexRoutingInfo]:
+    def get_single_machine_info(
+            self, vertex: MachineVertex) -> Optional[VertexRoutingInfo]:
         """
         Get routing information for a given vertex.  Fails if the vertex has
         more than one outgoing partition.
@@ -178,16 +194,17 @@ class RoutingInfo(object):
         :returns: The only routing from this vertex
         :raise KeyError: If the vertex has more than one outgoing partition
         """
-        if vertex not in self._info:
+        if vertex in self._mac_info:
+            info = self._mac_info[vertex]
+            if len(info) != 1:
+                raise KeyError(
+                    f"Vertex {vertex} has more than one outgoing partition")
+            return next(iter(info.values()))
+        else:
             return None
-        info = self._info[vertex]
-        if len(info) != 1:
-            raise KeyError(
-                f"Vertex {vertex} has more than one outgoing partition")
-        return next(iter(info.values()))
 
-    def get_single_key_from(
-            self, vertex: AbstractVertex) -> Optional[int]:
+    def get_single_machine_key(
+            self, vertex: MachineVertex) -> Optional[int]:
         """
         Get the first key for the partition starting at a vertex.  Fails if
         the vertex has more than one outgoing partition.
@@ -196,20 +213,27 @@ class RoutingInfo(object):
         :returns: The key of the only route from this vertex
         :raise KeyError: If the vertex has more than one outgoing partition
         """
-        info = self.get_single_info_from(vertex)
+        info = self.get_single_machine_info(vertex)
         if info is None:
             return None
         return info.key
 
-    def __iter__(self) -> Iterator[VertexRoutingInfo]:
+    def get_application_infos(self) -> Iterator[AppVertexRoutingInfo]:
         """
-        Gets an iterator for the routing information.
+        Gets an iterator for the Application routing information.
 
         :return: a iterator of routing information
         """
-        for vertex_info in self._info.values():
+        for vertex_info in self._app_info.values():
             for info in vertex_info.values():
                 yield info
 
-    def __len__(self) -> int:
-        return sum(len(v) for v in self._info.values())
+    def get_machine_infos(self) -> Iterator[MachineVertexRoutingInfo]:
+        """
+        Gets an iterator for the Machine routing information.
+
+        :return: a iterator of routing information
+        """
+        for vertex_info in self._mac_info.values():
+            for info in vertex_info.values():
+                yield info

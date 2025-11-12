@@ -15,10 +15,11 @@ from typing import Dict, Tuple
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data import PacmanDataView
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.graphs import AbstractVertex
-from pacman.model.routing_info import RoutingInfo
+from pacman.model.routing_info import RoutingInfo, VertexRoutingInfo
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 
 
@@ -52,9 +53,14 @@ def __create_routing_table(
     table = UnCompressedMulticastRoutingTable(x, y)
     sources_by_key_mask: Dict[BaseKeyAndMask,
                               Tuple[AbstractVertex, str]] = dict()
+    r_info: VertexRoutingInfo
     for source_vertex, partition_id in partitions_in_table:
-        r_info = routing_infos.get_info_from(
-            source_vertex, partition_id)
+        if isinstance(source_vertex, ApplicationVertex):
+            r_info = routing_infos.get_application_info(
+                source_vertex, partition_id)
+        else:
+            r_info = routing_infos.get_machine_info(
+                source_vertex, partition_id)
         entry = partitions_in_table[source_vertex, partition_id]
         if r_info.key_and_mask in sources_by_key_mask:
             if (sources_by_key_mask[r_info.key_and_mask]
