@@ -13,11 +13,16 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import Iterable, Optional, final, TYPE_CHECKING
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs import AbstractVertex
+from pacman.model.graphs.application.abstract import (
+    AbstractOneAppOneMachineVertex)
 from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_calls import get_n_bits
+
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
     from pacman.model.resources import AbstractSDRAM
@@ -53,6 +58,8 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         if label is None:
             label = str(type(self))
         super().__init__(label)
+        if app_vertex is None:
+            app_vertex = AbstractOneAppOneMachineVertex(self, self.label)
         self._added_to_graph = False
         self._app_vertex = app_vertex
         self._index: Optional[int] = None
@@ -62,7 +69,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
             self.__vertex_slice = self._DEFAULT_SLICE
 
     @property
-    def app_vertex(self) -> Optional[ApplicationVertex]:
+    def app_vertex(self) -> ApplicationVertex:
         """
         The application vertex that caused this machine vertex to be
         created. If `None`, there is no such application vertex.

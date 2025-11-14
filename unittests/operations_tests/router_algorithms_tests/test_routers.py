@@ -475,7 +475,6 @@ def _get_entry(
         source_vertex: MachineVertex, partition_id: str,
         allow_none: bool) -> Optional[RoutingEntry]:
     app_vertex = source_vertex.app_vertex
-    assert app_vertex is not None
     app_entry = routing_tables.get_entry_on_coords_for_edge(
         app_vertex, partition_id, x, y)
     entry = routing_tables.get_entry_on_coords_for_edge(
