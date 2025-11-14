@@ -18,8 +18,6 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.application.abstract import (
-    AbstractOneAppOneMachineVertex)
 from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_calls import get_n_bits
 
@@ -59,6 +57,10 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
             label = str(type(self))
         super().__init__(label)
         if app_vertex is None:
+            # delayed import due to circular dependencies
+            # pylint: disable=import-outside-toplevel
+            from pacman.model.graphs.application.abstract import (
+                AbstractOneAppOneMachineVertex)
             app_vertex = AbstractOneAppOneMachineVertex(self, self.label)
         self._added_to_graph = False
         self._app_vertex = app_vertex
