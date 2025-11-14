@@ -44,9 +44,10 @@ class FixedKeyAppVertex(AbstractOneAppOneMachineVertex):
             self, fixed_key_and_mask: Optional[BaseKeyAndMask],
             label: Optional[str] = None,
             n_atoms: int = 1):
+        machine_vertex = SimpleMachineVertex(
+            ConstantSDRAM(1000), app_vertex=self)
         AbstractOneAppOneMachineVertex.__init__(
-            self, SimpleMachineVertex(ConstantSDRAM(1000)), label,
-            n_atoms=n_atoms)
+            self, machine_vertex, label, n_atoms=n_atoms)
         self.__fixed_key_and_mask = fixed_key_and_mask
         self._splitter = SplitterOneAppOneMachine()
         self._splitter.set_governed_app_vertex(cast(Self, self))
