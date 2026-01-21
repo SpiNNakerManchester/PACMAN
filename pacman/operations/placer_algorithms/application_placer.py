@@ -34,7 +34,7 @@ from .draw_placements import draw_placements as dp
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def place_application_graph(system_placements: Placements) -> Placements:
+def place_application_graph(system_placements: Placements) -> None:
     """
     Perform placement of an application graph on the machine.
 
@@ -43,10 +43,9 @@ def place_application_graph(system_placements: Placements) -> Placements:
 
     :param system_placements:
         The placements of cores doing system tasks. This is what we start from.
-    :return: Placements for the application. *Includes the system placements.*
     """
     placer = ApplicationPlacer(system_placements)
-    return placer.do_placements(system_placements)
+    placer.do_placements()
 
 
 class ApplicationPlacer(object):
@@ -62,8 +61,6 @@ class ApplicationPlacer(object):
         "__plan_n_timesteps",
         # Sdram available on perfect none Ethernet Chip after Monitors placed
         "__max_sdram",
-        # Maximum sdram that should be used for a Chip to not be full
-        "__cap_sdram",
         # N Cores free on perfect none Ethernet Chip after Monitors placed
         "__max_cores",
 
@@ -89,6 +86,8 @@ class ApplicationPlacer(object):
         "__current_cores_free",
         # Used sdram after the current group is placed
         "__current_sdram_used",
+        # Number of cores needed for monitors
+        "__current_monitor_cores",
 
         # Data about the neighbouring Chips to ones used
         # Current board being placed on
@@ -114,8 +113,6 @@ class ApplicationPlacer(object):
         self.__max_cores = (
                 version.max_cores_per_chip - version.n_scamp_cores -
                 PacmanDataView.get_all_monitor_cores())
-        self.__cap_sdram = self.__max_sdram - (
-                self.__max_sdram // self.__max_cores)
 
         self.__placements = placements
         self.__chips = self._chip_order()
@@ -127,6 +124,7 @@ class ApplicationPlacer(object):
 
         self.__current_chip: Optional[Chip] = None
         self.__current_cores_free: List[int] = list()
+        self.__current_monitor_cores = 0
         self.__current_sdram_used: AbstractSDRAM = ConstantSDRAM(0)
         self.__app_vertex_label: Optional[str] = None
 
@@ -136,17 +134,13 @@ class ApplicationPlacer(object):
         self.__same_board_chips: Dict[Chip, Chip] = dict()
         self.__other_board_chips:  Dict[Chip, Chip] = dict()
 
-    def do_placements(self, system_placements: Placements) -> Placements:
+    def do_placements(self) -> None:
         """
         Perform placement of an application graph on the machine.
 
         .. note::
             app_graph must have been partitioned
 
-        :param system_placements:
-            The placements of cores doing system tasks.
-        :return: Placements for the application.
-            *Includes the system placements.*
         :raises PacmanPlaceException: If no new start Chip is available
         :raises PacmanTooBigToPlace:
             If the requirements are too big for any chip
@@ -164,13 +158,11 @@ class ApplicationPlacer(object):
                 # as this checks if placed already not need to check if fixed
                 self._place_vertex(app_vertex)
         except PacmanPlaceException as e:
-            raise self._place_error(system_placements, e) from e
+            raise self._place_error(self.__placements, e) from e
 
         if get_config_bool("Reports", "draw_placements"):
             report_file = get_report_path("path_placements")
-            dp(self.__placements, system_placements, report_file)
-
-        return self.__placements
+            dp(self.__placements, self.__placements, report_file)
 
     def _place_vertex(self, app_vertex: ApplicationVertex) -> None:
         """
@@ -457,11 +449,18 @@ class ApplicationPlacer(object):
             If the requirements are too big for any chip
         """
         cores_free = list(chip.placable_processors_ids)
-        sdram_used: AbstractSDRAM = ConstantSDRAM(0)
+        if chip.ip_address:  # Ethernet
+            sdram_used = PacmanDataView.get_ethernet_monitor_sdram()
+            self.__current_monitor_cores = (
+                PacmanDataView.get_ethernet_monitor_cores())
+        else:
+            sdram_used = PacmanDataView.get_all_monitor_sdram()
+            self.__current_monitor_cores = (
+                PacmanDataView.get_all_monitor_cores())
 
         # remove the already placed for other Application Vertices
         on_chip = self.__placements.placements_on_chip(chip)
-        if len(on_chip) == len(cores_free):
+        if len(on_chip) + self.__current_monitor_cores >= len(cores_free):
             self.__full_chips.add(chip)
             return False
 
@@ -469,18 +468,14 @@ class ApplicationPlacer(object):
             cores_free.remove(placement.p)
             sdram_used += placement.vertex.sdram_required
 
-        if sdram_used.get_total_sdram(
-                self.__plan_n_timesteps) > self.__cap_sdram:
-            self.__full_chips.add(chip)
-            return False
-
         # Remember this chip so it is not tried again in this preparation
         # This assumes all groups are the same size so even if too small
         self.__prepared_chips.add(chip)
 
         total_sdram = sdram_used + sdram
         plan_sdram = total_sdram.get_total_sdram(self.__plan_n_timesteps)
-        if len(cores_free) < n_cores or plan_sdram > chip.sdram:
+        if (len(cores_free) < n_cores + self.__current_monitor_cores
+                or plan_sdram > chip.sdram):
             self._check_could_fit(n_cores, sdram)
             return False
 
@@ -639,7 +634,8 @@ class ApplicationPlacer(object):
         total_sdram = sdram + self.__current_sdram_used
         plan_sdram = total_sdram.get_total_sdram(
             self.__plan_n_timesteps)
-        if (len(self.__current_cores_free) >= n_cores and
+        if (len(self.__current_cores_free) >=
+                n_cores + self.__current_monitor_cores and
                 plan_sdram <= self.__current_chip.sdram):
             # Cores are popped out later
             self.__current_sdram_used = total_sdram

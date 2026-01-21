@@ -609,7 +609,9 @@ def test_simple(params: Params) -> None:
     target_vertex = _make_vertices(writer, 1000, n_m_vertices, "target")
     writer.add_edge(ApplicationEdge(source_vertex, target_vertex), "Test")
 
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
@@ -622,7 +624,9 @@ def test_self(params: Params) -> None:
     source_vertex = _make_vertices(writer, 1000, n_m_vertices, "self")
     writer.add_edge(ApplicationEdge(source_vertex, source_vertex), "Test")
 
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
@@ -638,7 +642,9 @@ def test_simple_self(params: Params) -> None:
     writer.add_edge(ApplicationEdge(target_vertex, target_vertex), "Test")
     writer.add_edge(ApplicationEdge(source_vertex, target_vertex), "Test")
 
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
@@ -655,7 +661,9 @@ def test_multi(params: Params) -> None:
             if source != target:
                 writer.add_edge(ApplicationEdge(source, target), "Test")
 
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
@@ -671,7 +679,9 @@ def test_multi_self(params: Params) -> None:
         for target in writer.iterate_vertices():
             writer.add_edge(ApplicationEdge(source, target), "Test")
 
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
@@ -691,7 +701,9 @@ def test_multi_split(params: Params) -> None:
 
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
@@ -710,7 +722,9 @@ def test_multi_self_split(params: Params) -> None:
 
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
@@ -726,7 +740,9 @@ def test_multi_down_chips_and_links(params: Params) -> None:
         for target in writer.iterate_vertices():
             writer.add_edge(ApplicationEdge(source, target), "Test")
 
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
 
     # Pick a few of the chips and links used and take them out
@@ -767,7 +783,9 @@ def test_multi_down_chips_and_links(params: Params) -> None:
     print("Down links:", down_links[:-1].split(":"))
     set_config("Machine", "down_chips", down_chips[:-1])
     set_config("Machine", "down_links", down_links[:-1])
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
@@ -783,7 +801,9 @@ def test_internal_only(params: Params) -> None:
 
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
@@ -804,7 +824,9 @@ def test_internal_and_split(params: Params) -> None:
 
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
@@ -829,7 +851,9 @@ def test_spinnaker_link(params: Params) -> None:
         writer.add_edge(ApplicationEdge(in_device, app_vertex), "Test")
         writer.add_edge(ApplicationEdge(app_vertex, out_device), "Test")
 
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
@@ -857,7 +881,9 @@ def test_fpga_link(params: Params) -> None:
         writer.add_edge(ApplicationEdge(in_device, app_vertex), "Test")
         writer.add_edge(ApplicationEdge(app_vertex, out_device), "Test")
 
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
@@ -881,7 +907,9 @@ def test_fpga_link_overlap(params: Params) -> None:
 
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
-    writer.set_placements(place_application_graph(Placements()))
+    placements = Placements()
+    writer.set_placements(placements)
+    place_application_graph(placements)
     routing_tables = _route_and_time(algorithm)
     _check_edges(routing_tables)
 
