@@ -188,6 +188,7 @@ class SDRAMEdgeSizeException(PacmanException):
     inconsistent size requests.
     """
 
+
 class SysRAMEdgeSizeException(PacmanException):
     """
     A constant System RAM partition has discovered its edges have
