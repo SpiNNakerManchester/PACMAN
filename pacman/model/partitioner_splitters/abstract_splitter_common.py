@@ -20,7 +20,8 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.utilities.utility_objs import ChipCounter
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import (
-    MachineVertex, MulticastEdgePartition, AbstractSDRAMPartition)
+    MachineVertex, MulticastEdgePartition, AbstractSDRAMPartition,
+    AbstractSysRAMPartition)
 from pacman.model.resources import AbstractSDRAM
 
 #: The type of vertex that we split.
@@ -228,5 +229,18 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         are SDRAM connections between internal vertices
 
         :returns: Only the partitions (if any) handled by SDRAM
+        """
+        return []
+
+    def get_internal_sysram_partitions(
+            self) -> Sequence[AbstractSysRAMPartition]:
+        """
+        Get edge partitions between machine vertices that are to be
+        handled by System RAM.
+
+        Returns empty by default, override if there
+        are System RAM connections between internal vertices
+
+        :returns: Only the partitions (if any) handled by System RAM
         """
         return []

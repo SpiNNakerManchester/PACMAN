@@ -25,6 +25,13 @@ from .destination_segmented_sdram_machine_partition import (
 from .multicast_edge_partition import MulticastEdgePartition
 from .source_segmented_sdram_machine_partition import (
     SourceSegmentedSDRAMMachinePartition)
+from .machine_sysram_edge import SysRAMMachineEdge
+from .abstract_sysram_partition import AbstractSysRAMPartition
+from .constant_sysram_machine_partition import ConstantSysRAMMachinePartition
+from .source_segmented_sysram_machine_partition import (
+    SourceSegmentedSysRAMMachinePartition)
+from .destination_segmented_sysram_machine_partition import (
+    DestinationSegmentedSysRAMMachinePartition)
 
 __all__ = [
     "AbstractSDRAMPartition", "ConstantSDRAMMachinePartition",
@@ -32,4 +39,7 @@ __all__ = [
     "MachineEdge", "MachineFPGAVertex",
     "MachineSpiNNakerLinkVertex", "MachineVertex", "MulticastEdgePartition",
     "SDRAMMachineEdge", "SimpleMachineVertex",
-    "SourceSegmentedSDRAMMachinePartition"]
+    "SourceSegmentedSDRAMMachinePartition", "SysRAMMachineEdge",
+    "AbstractSysRAMPartition", "ConstantSysRAMMachinePartition",
+    "SourceSegmentedSysRAMMachinePartition",
+    "DestinationSegmentedSysRAMMachinePartition"]

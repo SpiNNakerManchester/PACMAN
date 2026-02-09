@@ -19,10 +19,11 @@ from .abstract_edge_partition import AbstractEdgePartition
 from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
 from .abstract_supports_sdram_edges import AbstractSupportsSDRAMEdges
+from .abstract_supports_sysram_edges import AbstractSupportsSysRAMEdges
 
 
 __all__ = [
     "AbstractEdge", "AbstractEdgePartition",
     "AbstractMultiplePartition", "AbstractSingleSourcePartition",
     "AbstractSupportsSDRAMEdges", "AbstractVertex",
-    "AbstractVirtual"]
+    "AbstractVirtual", "AbstractSupportsSysRAMEdges"]
