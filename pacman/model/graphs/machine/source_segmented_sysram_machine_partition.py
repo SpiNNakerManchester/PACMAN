@@ -70,7 +70,7 @@ class SourceSegmentedSysRAMMachinePartition(
             # allocate for the pre_vertex
             edge = self._pre_vertices[pre_vertex].peek()
             edge.sysram_base_address = new_value
-            new_value += edge.sdram_size
+            new_value += edge.sysram_size
 
     @overrides(AbstractMultiplePartition.add_edge)
     def add_edge(self, edge: SysRAMMachineEdge) -> None:

@@ -51,7 +51,7 @@ class SysRAMMachineEdge(MachineEdge):
         """
         The System RAM size reported by the pre_vertex
         """
-        return self._sdram_size
+        return self._sysram_size
 
     @property
     def sysram_base_address(self) -> Optional[int]:
@@ -67,12 +67,12 @@ class SysRAMMachineEdge(MachineEdge):
 
         :param new_value:
         """
-        self._sdram_base_address = new_value
+        self._sysram_base_address = new_value
 
     def __repr__(self) -> str:
         return (f"SysRAMMachineEdge(pre_vertex={self.pre_vertex},"
                 f" post_vertex={self.post_vertex}, label={self.label},"
-                f" sdram_size={self.sdram_size})")
+                f" sysram_size={self.sysram_size})")
 
     def __str__(self) -> str:
         return self.__repr__()

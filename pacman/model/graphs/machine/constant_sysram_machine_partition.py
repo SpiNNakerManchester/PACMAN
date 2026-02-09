@@ -52,14 +52,14 @@ class ConstantSysRAMMachinePartition(
         super().__init__(
             pre_vertex, identifier,
             allowed_edge_types=cast(Type[E], SysRAMMachineEdge))
-        self._sdram_size: Optional[int] = None
-        self._sdram_base_address: Optional[int] = None
+        self._sysram_size: Optional[int] = None
+        self._sysram_base_address: Optional[int] = None
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge: E) -> None:
-        if self._sdram_size is None:
-            self._sdram_size = edge.sdram_size
-        elif self._sdram_size != edge.sdram_size:
+        if self._sysram_size is None:
+            self._sysram_size = edge.sysram_size
+        elif self._sysram_size != edge.sysram_size:
             raise SysRAMEdgeSizeException(
                 f"The edges within the constant system RAM partition {self} "
                 "have inconsistent memory size requests.")
@@ -97,7 +97,7 @@ class ConstantSysRAMMachinePartition(
     def get_sysram_base_address_for(self, vertex: MachineVertex) -> int:
         if self._sysram_base_address is None:
             raise PartitionMissingEdgesException(self.__missing_edge_msg())
-        return self._sdram_base_address
+        return self._sysram_base_address
 
     @overrides(AbstractSysRAMPartition.get_sysram_size_of_region_for)
     def get_sysram_size_of_region_for(self, vertex: MachineVertex) -> int:
