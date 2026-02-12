@@ -26,9 +26,9 @@ class SysRAMMachineEdge(MachineEdge):
     """
 
     __slots__ = (
-        # The sysram size of this edge.
+        # The system RAM size of this edge.
         "_sysram_size",
-        # The sysram base address for this edge
+        # The system RAM base address for this edge
         "_sysram_base_address")
 
     def __init__(

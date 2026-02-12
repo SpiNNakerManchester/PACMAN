@@ -35,7 +35,6 @@ class AbstractSupportsSysRAMEdges(object, metaclass=AbstractBase):
 
         :param sysram_machine_edge:
             The SysRAM edge in question
-            ~pacman.model.graphs.machine.SysRAMMachineEdge
         :return: The size in bytes this vertex needs for the SysRAM edge.
         """
         raise NotImplementedError
