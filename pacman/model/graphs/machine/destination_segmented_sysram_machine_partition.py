@@ -44,7 +44,7 @@ class DestinationSegmentedSysRAMMachinePartition(
 
     @overrides(AbstractSysRAMPartition.total_sysram_requirements)
     def total_sysram_requirements(self) -> int:
-        return sum(edge.sdram_size for edge in self.edges)
+        return sum(edge.sysram_size for edge in self.edges)
 
     @property
     @overrides(AbstractSysRAMPartition.sysram_base_address)
@@ -62,7 +62,7 @@ class DestinationSegmentedSysRAMMachinePartition(
         self._sysram_base_address = new_value
         for edge in self.edges:
             edge.sysram_base_address = new_value
-            new_value += edge.sdram_size
+            new_value += edge.sysram_size
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge: SysRAMMachineEdge) -> None:
