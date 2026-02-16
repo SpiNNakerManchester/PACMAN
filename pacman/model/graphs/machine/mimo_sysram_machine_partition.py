@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Generic, Optional, Type, cast, Dict
+from typing import Optional, cast, Dict
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
@@ -28,7 +28,6 @@ from .machine_vertex import MachineVertex
 
 class MimoSysRAMMachinePartition(
         AbstractMultiplePartition[MachineVertex, SysRAMMachineEdge],
-        Generic[MachineVertex, SysRAMMachineEdge],
         AbstractSysRAMPartition):
     """
     A SysRAM partition that has multiple inputs and multiple outputs, and all
