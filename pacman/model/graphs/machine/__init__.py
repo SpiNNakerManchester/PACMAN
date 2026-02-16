@@ -32,6 +32,7 @@ from .source_segmented_sysram_machine_partition import (
     SourceSegmentedSysRAMMachinePartition)
 from .destination_segmented_sysram_machine_partition import (
     DestinationSegmentedSysRAMMachinePartition)
+from .mimo_sysram_machine_partition import MimoSysRAMMachinePartition
 
 __all__ = [
     "AbstractSDRAMPartition", "ConstantSDRAMMachinePartition",
@@ -42,4 +43,5 @@ __all__ = [
     "SourceSegmentedSDRAMMachinePartition", "SysRAMMachineEdge",
     "AbstractSysRAMPartition", "ConstantSysRAMMachinePartition",
     "SourceSegmentedSysRAMMachinePartition",
-    "DestinationSegmentedSysRAMMachinePartition"]
+    "DestinationSegmentedSysRAMMachinePartition",
+    "MimoSysRAMMachinePartition"]
