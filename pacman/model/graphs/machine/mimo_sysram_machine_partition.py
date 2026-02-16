@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Generic, Optional, Type, TypeVar, cast, Dict
+from typing import Generic, Optional, Type, cast, Dict
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
@@ -25,14 +25,10 @@ from pacman.model.graphs.machine import SysRAMMachineEdge
 
 from .machine_vertex import MachineVertex
 
-#: :meta private:
-V = TypeVar("V", bound=MachineVertex)
-#: :meta private:
-E = TypeVar("E", bound=SysRAMMachineEdge)
-
 
 class MimoSysRAMMachinePartition(
-        AbstractMultiplePartition[V, E], Generic[V, E],
+        AbstractMultiplePartition[MachineVertex, SysRAMMachineEdge],
+        Generic[MachineVertex, SysRAMMachineEdge],
         AbstractSysRAMPartition):
     """
     A SysRAM partition that has multiple inputs and multiple outputs, and all
@@ -50,20 +46,21 @@ class MimoSysRAMMachinePartition(
         # The system RAM address for each destination vertex.
         "_sysram_address_by_destination")
 
-    def __init__(self, pre_vertices: OrderedSet[V], identifier: str):
+    def __init__(self, pre_vertices: OrderedSet[MachineVertex],
+                 identifier: str):
         """
         :param pre_vertices: The vertices which send through this partition
         :param identifier: The identifier of the partition
         """
         super().__init__(
             pre_vertices, identifier,
-            allowed_edge_types=cast(Type[E], SysRAMMachineEdge))
-        self._sysram_size: Dict[V, int] = dict()
+            allowed_edge_types=SysRAMMachineEdge)
+        self._sysram_size: Dict[MachineVertex, int] = dict()
         self._sysram_base_address: Optional[int] = None
-        self._sysram_address_by_destination: Dict[V, int] = dict()
+        self._sysram_address_by_destination: Dict[MachineVertex, int] = dict()
 
     @overrides(AbstractMultiplePartition.add_edge)
-    def add_edge(self, edge: E) -> None:
+    def add_edge(self, edge: SysRAMMachineEdge) -> None:
         if edge.post_vertex not in self._sysram_size:
             self._sysram_size[edge.post_vertex] = edge.sysram_size
         elif self._sysram_size[edge.post_vertex] != edge.sysram_size:
@@ -88,7 +85,7 @@ class MimoSysRAMMachinePartition(
     @property
     @overrides(AbstractSysRAMPartition.sysram_base_address)
     def sysram_base_address(self) -> int:
-        if len(self.edges) == 0:
+        if self._sysram_base_address is None:
             raise PartitionMissingEdgesException(self.__missing_edge_msg())
         return self._sysram_base_address
 
@@ -101,12 +98,12 @@ class MimoSysRAMMachinePartition(
             self._sysram_address_by_destination[destination] = new_value
             new_value += self._sysram_size[destination]
         for edge in self.edges:
-            cast(E, edge).sysram_base_address = \
+            cast(SysRAMMachineEdge, edge).sysram_base_address = \
                 self._sysram_address_by_destination[edge.post_vertex]
 
     @overrides(AbstractSysRAMPartition.get_sysram_base_address_for)
     def get_sysram_base_address_for(self, vertex: MachineVertex) -> int:
-        if len(self.edges) == 0:
+        if self._sysram_base_address is None:
             raise PartitionMissingEdgesException(self.__missing_edge_msg())
         # This is a destination vertex, so return the address for it.
         if vertex in self._sysram_address_by_destination:
