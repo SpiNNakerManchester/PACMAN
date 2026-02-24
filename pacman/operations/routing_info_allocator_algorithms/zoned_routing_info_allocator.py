@@ -116,7 +116,7 @@ class ZonedRoutingInfoAllocator(object):
         self.__n_bits_machine = 0
         self.__n_bits_atoms = 0
         self.__atom_bits_per_app_part: Dict[
-            Tuple[AbstractVertex, str], int] = dict()
+            Tuple[ApplicationVertex, str], int] = dict()
         self.__flexible = flexible
         self.__fixed_partitions: Dict[
             Tuple[str, AbstractVertex], BaseKeyAndMask] = dict()
