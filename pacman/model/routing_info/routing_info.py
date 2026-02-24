@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 from collections import defaultdict
-from typing import Dict, Iterator, Optional, Iterable, Set, TYPE_CHECKING
+from typing import (
+    Dict, Iterator, Optional, Iterable, Set, Tuple, TYPE_CHECKING)
 from deprecated import deprecated
 from pacman.exceptions import PacmanAlreadyExistsException
 if TYPE_CHECKING:
@@ -26,13 +27,14 @@ class RoutingInfo(object):
     An association of machine vertices to a non-overlapping set of keys
     and masks.
     """
-    __slots__ = ("_info", )
+    __slots__ = ("_info", "_overlaps")
 
     def __init__(self) -> None:
         # Partition information indexed by edge pre-vertex and partition ID
         # name
         self._info: Dict[AbstractVertex,
                          Dict[str, VertexRoutingInfo]] = defaultdict(dict)
+        self._overlaps: Set[Tuple[str, AbstractVertex]] = set()
 
     def add_routing_info(self, info: VertexRoutingInfo) -> None:
         """
@@ -213,3 +215,40 @@ class RoutingInfo(object):
 
     def __len__(self) -> int:
         return sum(len(v) for v in self._info.values())
+
+    def add_overlap(self, partition_id: str, vertex: AbstractVertex):
+        """
+        Records that this vertex, partition pair overlaps top part of the key
+
+        These are the exceptions to the split between
+        the application vertex/ partition id bits and
+        the machine vertex / core parts
+
+        :param partition_id: Id of the partition
+        :param vertex: Application or Machine vertex
+        """
+        self._overlaps.add((partition_id, vertex))
+
+    def check_overlap(self, partition_id: str, vertex: AbstractVertex) -> bool:
+        """
+        Checks if this vertex, partition pair overlaps top part of the key
+
+        :param partition_id: Id of the partition
+        :param vertex: Application or Machine vertex
+        :return: True if and only if there is an overlap
+        """
+        return (partition_id, vertex) in self._overlaps
+
+    def get_overlaps(self) -> Iterator[Tuple[str, AbstractVertex]]:
+        """
+        Returns vertex, partition pairs that overlaps top part of the key
+        """
+        for pair in self._overlaps:
+            yield pair
+
+    def has_overlap(self) -> bool:
+        """
+        Checks if there are any overlaps top part of the key
+        :return: True if and only if there is at least one overlap
+        """
+        return len(self._overlaps) > 0

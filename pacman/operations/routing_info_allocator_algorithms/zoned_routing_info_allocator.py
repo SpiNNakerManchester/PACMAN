@@ -137,14 +137,16 @@ class ZonedRoutingInfoAllocator(object):
             for p in get_app_partitions())
         self.__vertex_partitions.update(extra_allocations)
 
+        routing_infos = RoutingInfo()
         self.__find_fixed()
         self.__calculate_zones()
-        self.__check_zones()
+        self.__check_zones(routing_infos)
 
         if self.__all_fixed:
-            return self.__allocate_all_fixed()
-
-        return self.__allocate()
+            self.__allocate_all_fixed(routing_infos)
+        else:
+            self.__allocate(routing_infos)
+        return routing_infos
 
     def __find_fixed(self) -> None:
         """
@@ -237,7 +239,7 @@ class ZonedRoutingInfoAllocator(object):
             else:
                 self.__atom_bits_per_app_part[pre, identifier] = 0
 
-    def __check_zones(self) -> None:
+    def __check_zones(self, routing_infos: RoutingInfo) -> None:
         # See if it could fit even before considering fixed
         app_part_bits = allocator_bits_needed(
             len(self.__atom_bits_per_app_part))
@@ -248,7 +250,7 @@ class ZonedRoutingInfoAllocator(object):
                 f"{self.__n_bits_atoms_and_mac} bits")
 
         # Reserve fixed and check it still works
-        self.__set_fixed_used()
+        self.__set_fixed_used(routing_infos)
         app_part_bits = allocator_bits_needed(
             len(self.__atom_bits_per_app_part) + len(self.__fixed_used))
         if app_part_bits + self.__n_bits_atoms_and_mac > BITS_IN_KEY:
@@ -274,7 +276,7 @@ class ZonedRoutingInfoAllocator(object):
                 self.__n_bits_atoms_and_mac = \
                     self.__n_bits_machine + self.__n_bits_atoms
 
-    def __set_fixed_used(self) -> None:
+    def __set_fixed_used(self, routing_infos: RoutingInfo) -> None:
         """
         Block the use of ``AP`` indexes that would clash with fixed keys
         """
@@ -293,7 +295,7 @@ class ZonedRoutingInfoAllocator(object):
         #           blocked from use
 
         n_app_part_bits = BITS_IN_KEY - self.__n_bits_atoms_and_mac
-        for key_and_mask in self.__fixed_partitions.values():
+        for (partition_id, vertex), key_and_mask in self.__fixed_partitions.items():
             # Get the key and mask that overlap with the A-P key and mask
             key = key_and_mask.key >> self.__n_bits_atoms_and_mac
             mask = key_and_mask.mask >> self.__n_bits_atoms_and_mac
@@ -304,11 +306,21 @@ class ZonedRoutingInfoAllocator(object):
 
             # Generate all possible combinations of keys for the remaining
             # mask
+            overlap = False
             for k, n_keys in get_key_ranges(key, mask):
                 self.__fixed_used.update(range(k, k + n_keys))
+                overlap = True
 
-    def __allocate_all_fixed(self) -> RoutingInfo:
-        routing_infos = RoutingInfo()
+            if overlap:
+                routing_infos.add_overlap(partition_id, vertex)
+                # for one app one outgoing the outgoing may not have fixed keys
+                if isinstance(vertex, ApplicationVertex):
+                    outgoing = list(
+                        vertex.splitter.get_out_going_vertices(partition_id))
+                    if len(outgoing) == 0:
+                        routing_infos.add_overlap(partition_id, outgoing)
+
+    def __allocate_all_fixed(self,  routing_infos: RoutingInfo) -> None:
         progress = ProgressBar(
             len(self.__fixed_partitions), "Allocating routing keys")
         for (part_id, vertex), key_and_mask in progress.over(
@@ -322,12 +334,10 @@ class ZonedRoutingInfoAllocator(object):
             elif isinstance(vertex, MachineVertex):
                 routing_infos.add_routing_info(MachineVertexRoutingInfo(
                     key_and_mask, part_id, vertex, vertex.index))
-        return routing_infos
 
-    def __allocate(self) -> RoutingInfo:
+    def __allocate(self, routing_infos: RoutingInfo) -> None:
         progress = ProgressBar(
             len(self.__vertex_partitions), "Allocating routing keys")
-        routing_infos = RoutingInfo()
         app_part_index = 0
         for pre, identifier in progress.over(self.__vertex_partitions):
             while app_part_index in self.__fixed_used:

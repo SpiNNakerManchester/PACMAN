@@ -303,6 +303,8 @@ def test_global_allocator() -> None:
     app_mask = 0xFFFF8000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
+    assert not routing_info.has_overlap()
+
 
 def test_flexible_allocator_no_fixed() -> None:
     unittest_setup()
@@ -317,6 +319,8 @@ def test_flexible_allocator_no_fixed() -> None:
     app_mask = 0xFFFF8000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
+    assert not routing_info.has_overlap()
+
 
 def test_fixed_only() -> None:
     unittest_setup()
@@ -325,13 +329,24 @@ def test_fixed_only() -> None:
     routing_info = global_allocate([])
     assert len(list(routing_info)) == 4
 
+    assert routing_info.has_overlap()
+    # all overlap
+    for partition in PacmanDataView.iterate_partitions():
+        assert routing_info.check_overlap(
+            partition.identifier, partition.pre_vertex)
 
 def test_overlap() -> None:
     # This should work here; overlap is allowed provided routes don't overlap
     # (which is found elsewhere)
     unittest_setup()
     create_graphs_only_fixed(overlap=True)
-    flexible_allocate([])
+    routing_info = flexible_allocate([])
+
+    assert routing_info.has_overlap()
+    # all overlap
+    for partition in PacmanDataView.iterate_partitions():
+        assert routing_info.check_overlap(
+            partition.identifier, partition.pre_vertex)
 
 
 def test_no_edge() -> None:
@@ -340,6 +355,7 @@ def test_no_edge() -> None:
     flexible_allocate([])
     routing_info = global_allocate([])
     assert len(list(routing_info)) == 0
+    assert not routing_info.has_overlap()
 
 
 def test_flexible_allocator_with_fixed() -> None:
@@ -353,6 +369,8 @@ def test_flexible_allocator_with_fixed() -> None:
     # all but the bottom 8 + 7 = 15 bits should be the same
     app_mask = 0xFFFF8000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
+
+    assert routing_info.has_overlap()
 
 
 def create_big(with_fixed: bool) -> None:
@@ -407,6 +425,8 @@ def test_big_flexible_no_fixed() -> None:
     app_mask = 0xFFE00000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
+    assert not routing_info.has_overlap()
+
 
 def test_big_global_no_fixed() -> None:
     unittest_setup()
@@ -424,6 +444,8 @@ def test_big_global_no_fixed() -> None:
     app_mask = 0x80000000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
+    assert not routing_info.has_overlap()
+
 
 def test_big_flexible_fixed() -> None:
     unittest_setup()
@@ -435,6 +457,8 @@ def test_big_flexible_fixed() -> None:
     # all but the bottom 18 bits should be the same
     app_mask = 0xFFFC0000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
+
+    assert routing_info.has_overlap()
 
 
 def test_big_global_fixed() -> None:
@@ -452,3 +476,5 @@ def test_big_global_fixed() -> None:
     # all but the top 1 bits should be the same
     app_mask = 0xFFFC0000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
+
+    assert routing_info.has_overlap()
