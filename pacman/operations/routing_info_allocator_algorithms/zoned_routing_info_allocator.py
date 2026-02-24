@@ -95,8 +95,6 @@ class ZonedRoutingInfoAllocator(object):
         "__n_bits_atoms",
         # Flag to say operating in flexible mode
         "__flexible",
-        # List of (key, n_keys) needed for fixed
-        "__fixed_keys",
         # Map of (partition identifier, machine_vertex) to fixed_key_and_mask
         "__fixed_partitions",
         # Set of app_part indexes used by fixed
