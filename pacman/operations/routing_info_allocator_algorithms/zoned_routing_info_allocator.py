@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Dict, FrozenSet, Iterable, Set, Tuple, cast
+from typing import Dict, Iterable, Set, Tuple, cast
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
@@ -101,7 +101,6 @@ class ZonedRoutingInfoAllocator(object):
         "__fixed_used",
         # True if all partitions are fixed
         "__all_fixed")
-    __FROZEN: FrozenSet = frozenset()
 
     def __init__(self, flexible: bool = False):
         """
@@ -118,7 +117,7 @@ class ZonedRoutingInfoAllocator(object):
         self.__flexible = flexible
         self.__fixed_partitions: Dict[
             Tuple[str, AbstractVertex], BaseKeyAndMask] = dict()
-        self.__fixed_used: Set[int] = cast(Set, self.__FROZEN)
+        self.__fixed_used: Set[int] = set()
         self.__all_fixed = True
 
     def allocate(self, extra_allocations: _XAlloc) -> RoutingInfo:
@@ -293,7 +292,6 @@ class ZonedRoutingInfoAllocator(object):
         #           combinations of AP within the 0s of the mask will be
         #           blocked from use
 
-        self.__fixed_used = set()
         n_app_part_bits = BITS_IN_KEY - self.__n_bits_atoms_and_mac
         for key_and_mask in self.__fixed_partitions.values():
             # Get the key and mask that overlap with the A-P key and mask
