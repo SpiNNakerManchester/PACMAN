@@ -18,7 +18,7 @@ from spinn_utilities.overrides import overrides
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.operations.routing_info_allocator_algorithms.\
-    zoned_routing_info_allocator import (flexible_allocate, global_allocate)
+    zoned_routing_info_allocator import ZonedRoutingInfoAllocator
 from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.resources import AbstractSDRAM
@@ -248,6 +248,9 @@ def check_masks_all_the_same(routing_info: RoutingInfo, mask: int) -> None:
     seen_keys = set()
     for r_info in routing_info:
         if isinstance(r_info.vertex, MachineVertex):
+            print(f"{hex(r_info.mask)} {r_info.machine_vertex.label}")
+    for r_info in routing_info:
+        if isinstance(r_info.vertex, MachineVertex):
             assert isinstance(r_info, MachineVertexRoutingInfo)
             assert (r_info.mask == mask or
                     r_info.machine_vertex.label == "RETINA")
@@ -286,14 +289,14 @@ def check_keys_for_application_partition_pairs(
                 assert (key & app_mask) != 0
 
 
-def test_global_allocator() -> None:
+def test_allocator_no_fixed() -> None:
     unittest_setup()
 
     # Allocate something and check it does the right thing
     create_graphs1(False)
 
     # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
-    routing_info = global_allocate([])
+    routing_info = ZonedRoutingInfoAllocator().allocate()
 
     # Last 8 for atom id
     mask = 0xFFFFFF00
@@ -306,27 +309,10 @@ def test_global_allocator() -> None:
     assert not routing_info.has_overlap()
 
 
-def test_flexible_allocator_no_fixed() -> None:
-    unittest_setup()
-
-    # Allocate something and check it does the right thing
-    create_graphs1(False)
-
-    # The number of bits is 8 + 7 + 6 = 21, so it shouldn't fail
-    routing_info = flexible_allocate([])
-
-    # all but the bottom 8 + 7 = 15 bits should be the same
-    app_mask = 0xFFFF8000
-    check_keys_for_application_partition_pairs(routing_info, app_mask)
-
-    assert not routing_info.has_overlap()
-
-
 def test_fixed_only() -> None:
     unittest_setup()
     create_graphs_only_fixed(overlap=False)
-    flexible_allocate([])
-    routing_info = global_allocate([])
+    routing_info = ZonedRoutingInfoAllocator().allocate()
     assert len(list(routing_info)) == 4
 
     assert routing_info.has_overlap()
@@ -335,12 +321,13 @@ def test_fixed_only() -> None:
         assert routing_info.check_overlap(
             partition.identifier, partition.pre_vertex)
 
+
 def test_overlap() -> None:
     # This should work here; overlap is allowed provided routes don't overlap
     # (which is found elsewhere)
     unittest_setup()
     create_graphs_only_fixed(overlap=True)
-    routing_info = flexible_allocate([])
+    routing_info = ZonedRoutingInfoAllocator().allocate()
 
     assert routing_info.has_overlap()
     # all overlap
@@ -352,19 +339,18 @@ def test_overlap() -> None:
 def test_no_edge() -> None:
     unittest_setup()
     create_graphs_no_edge()
-    flexible_allocate([])
-    routing_info = global_allocate([])
+    routing_info = ZonedRoutingInfoAllocator().allocate()
     assert len(list(routing_info)) == 0
     assert not routing_info.has_overlap()
 
 
-def test_flexible_allocator_with_fixed() -> None:
+def test_allocator_with_fixed() -> None:
     unittest_setup()
     # Allocate something and check it does the right thing
     create_graphs1(True)
 
     # The number of bits is 6 + 7 + 8 = 21, so it shouldn't fail
-    routing_info = flexible_allocate([])
+    routing_info = ZonedRoutingInfoAllocator().allocate()
 
     # all but the bottom 8 + 7 = 15 bits should be the same
     app_mask = 0xFFFF8000
@@ -412,26 +398,10 @@ def create_big(with_fixed: bool) -> None:
             app_vertex=mid_app_vertex)
         mid_app_vertex.remember_machine_vertex(mid_mac_vertex)
 
-
-def test_big_flexible_no_fixed() -> None:
-    unittest_setup()
-    create_big(False)
-
-    # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = flexible_allocate([])
-
-    # The number of bits is 1 + 21 = 22, so it shouldn't fail
-    # all but the bottom 21 bits should be the same
-    app_mask = 0xFFE00000
-    check_keys_for_application_partition_pairs(routing_info, app_mask)
-
-    assert not routing_info.has_overlap()
-
-
 def test_big_global_no_fixed() -> None:
     unittest_setup()
     create_big(False)
-    routing_info = global_allocate([])
+    routing_info = ZonedRoutingInfoAllocator().allocate()
 
     # 1 for app 11 for machine so where possible use 20 for atoms
     mask = 0xFFF00000
@@ -446,25 +416,10 @@ def test_big_global_no_fixed() -> None:
 
     assert not routing_info.has_overlap()
 
-
-def test_big_flexible_fixed() -> None:
-    unittest_setup()
-    create_big(True)
-
-    # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = flexible_allocate([])
-
-    # all but the bottom 18 bits should be the same
-    app_mask = 0xFFFC0000
-    check_keys_for_application_partition_pairs(routing_info, app_mask)
-
-    assert routing_info.has_overlap()
-
-
 def test_big_global_fixed() -> None:
     unittest_setup()
     create_big(True)
-    routing_info = global_allocate([])
+    routing_info = ZonedRoutingInfoAllocator().allocate()
 
     # 7 bit atoms is 7 as it ignore the retina
     mask = 0xFFFFFF80
