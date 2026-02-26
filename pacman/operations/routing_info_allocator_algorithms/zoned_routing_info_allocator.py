@@ -104,8 +104,6 @@ class ZonedRoutingInfoAllocator(object):
         "__fixed_partitions",
         # Set of app_part indexes used by fixed
         "__fixed_used",
-        # True if all partitions are fixed
-        "__all_fixed",
         # Size of the App vertex / Partition name zone
         "__size_app_part_bits",
         # Size of the machine and atoms part
@@ -137,7 +135,6 @@ class ZonedRoutingInfoAllocator(object):
         self.__target_machine_bits = -10000
         self.__target_atom_bits = -10000
 
-        self.__all_fixed = True
 
     def allocate(self) -> RoutingInfo:
         """
@@ -156,10 +153,7 @@ class ZonedRoutingInfoAllocator(object):
         self.__calculate_zones()
         self.__check_zones(routing_infos)
 
-        if self.__all_fixed:
-            self.__allocate_all_fixed(routing_infos)
-        else:
-            self.__allocate(routing_infos)
+        self.__allocate(routing_infos)
         return routing_infos
 
     def __find_fixed(self) -> None:
@@ -168,7 +162,6 @@ class ZonedRoutingInfoAllocator(object):
 
         See :py:meth:`__add_fixed`
         """
-        self.__all_fixed = True
         for pre, identifier in self.__vertex_partitions:
             app_key_and_mask = pre.get_fixed_key_and_mask(identifier)
             is_fixed_m_key = False
@@ -202,9 +195,7 @@ class ZonedRoutingInfoAllocator(object):
                             f" but not for all machine vertices of {pre}")
                     is_unfixed_m_key = True
 
-            if app_key_and_mask is None:
-                self.__all_fixed = False
-            else:
+            if app_key_and_mask is not None:
                 if not is_fixed_m_key:
                     if len(outgoing) > 1:
                         raise PacmanRouteInfoAllocationException(
@@ -351,6 +342,8 @@ class ZonedRoutingInfoAllocator(object):
             if not machine_vertices:
                 continue
 
+            n_bits_atoms = self.__atom_bits_per_app_part[pre, identifier]
+
             id_mv =(identifier, machine_vertices[0])
             fixed = id_mv in self.__fixed_partitions
 
@@ -362,14 +355,12 @@ class ZonedRoutingInfoAllocator(object):
                     routing_infos.add_routing_info(MachineVertexRoutingInfo(
                         key_and_mask, identifier, machine_vertex,
                         machine_index))
-                continue  # for pre
 
             else:
                 while app_part_index in self.__fixed_used:
                         app_part_index += 1
 
                 machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
-                n_bits_atoms = self.__atom_bits_per_app_part[pre, identifier]
                 if n_bits_atoms <= self.__target_atom_bits:
                     # OK it fits use global sizes
                     n_bits_machine = self.__target_machine_bits
