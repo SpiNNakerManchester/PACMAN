@@ -303,7 +303,7 @@ def test_allocator_no_fixed() -> None:
     app_mask = 0xFFFF8000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
-    assert not routing_info.has_overlap()
+    assert not routing_info.has_ap_overlap()
 
 
 def test_fixed_only() -> None:
@@ -312,11 +312,23 @@ def test_fixed_only() -> None:
     routing_info = ZonedRoutingInfoAllocator().allocate()
     assert len(list(routing_info)) == 4
 
-    assert routing_info.has_overlap()
+    assert routing_info.has_ap_overlap()
     # all overlap
     for partition in PacmanDataView.iterate_partitions():
-        assert routing_info.check_overlap(
+        assert routing_info.check_ap_overlap(
             partition.identifier, partition.pre_vertex)
+
+    [min_bits_atoms_and_mac,
+     max_bits_machine, max_bits_atoms,
+     size_app_part_bits, size_mac_atoms_bits,
+     target_machine_bits, target_atom_bits] = routing_info.get_zones()
+    assert min_bits_atoms_and_mac == 0
+    assert max_bits_machine == 0
+    assert max_bits_atoms == 0
+    assert size_app_part_bits == 3
+    assert size_mac_atoms_bits == 29
+    assert target_machine_bits == 29
+    assert target_atom_bits == 0
 
 
 def test_overlap() -> None:
@@ -326,11 +338,23 @@ def test_overlap() -> None:
     create_graphs_only_fixed(overlap=True)
     routing_info = ZonedRoutingInfoAllocator().allocate()
 
-    assert routing_info.has_overlap()
+    assert routing_info.has_ap_overlap()
     # all overlap
     for partition in PacmanDataView.iterate_partitions():
-        assert routing_info.check_overlap(
+        assert routing_info.check_ap_overlap(
             partition.identifier, partition.pre_vertex)
+
+    [min_bits_atoms_and_mac,
+     max_bits_machine, max_bits_atoms,
+     size_app_part_bits, size_mac_atoms_bits,
+     target_machine_bits, target_atom_bits] = routing_info.get_zones()
+    assert min_bits_atoms_and_mac == 0
+    assert max_bits_machine == 0
+    assert max_bits_atoms == 0
+    assert size_app_part_bits == 17
+    assert size_mac_atoms_bits == 15
+    assert target_machine_bits == 15
+    assert target_atom_bits == 0
 
 
 def test_no_edge() -> None:
@@ -338,7 +362,19 @@ def test_no_edge() -> None:
     create_graphs_no_edge()
     routing_info = ZonedRoutingInfoAllocator().allocate()
     assert len(list(routing_info)) == 0
-    assert not routing_info.has_overlap()
+    assert not routing_info.has_ap_overlap()
+    [min_bits_atoms_and_mac,
+     max_bits_machine, max_bits_atoms,
+     size_app_part_bits, size_mac_atoms_bits,
+     target_machine_bits, target_atom_bits] = routing_info.get_zones()
+    assert min_bits_atoms_and_mac == 0
+    assert max_bits_machine == 0
+    assert max_bits_atoms == 0
+    assert size_app_part_bits == 0
+    assert size_mac_atoms_bits == 32
+    assert target_machine_bits == 32
+    assert target_atom_bits == 0
+
 
 
 def test_allocator_with_fixed() -> None:
@@ -346,14 +382,26 @@ def test_allocator_with_fixed() -> None:
     # Allocate something and check it does the right thing
     create_graphs1(True)
 
-    # The number of bits is 6 + 7 + 8 = 21, so it shouldn't fail
+    # The number of bits is 6 + 7 + 8 = 21, so it should fit
     routing_info = ZonedRoutingInfoAllocator().allocate()
 
     # all but the bottom 8 + 7 = 15 bits should be the same
     app_mask = 0xFFFF8000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
-    assert routing_info.has_overlap()
+    assert routing_info.has_ap_overlap()
+    [min_bits_atoms_and_mac,
+     max_bits_machine, max_bits_atoms,
+     size_app_part_bits, size_mac_atoms_bits,
+     target_machine_bits, target_atom_bits] = routing_info.get_zones()
+    assert min_bits_atoms_and_mac == 15
+    assert max_bits_machine == 7
+    assert max_bits_atoms == 8
+    assert size_app_part_bits == 10
+    assert size_mac_atoms_bits == 22
+    assert target_machine_bits == 14
+    assert target_atom_bits == 8
+
 
 
 def create_big(with_fixed: bool) -> None:
@@ -411,7 +459,21 @@ def test_big_global_no_fixed() -> None:
     app_mask = 0x80000000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
-    assert not routing_info.has_overlap()
+    assert not routing_info.has_ap_overlap()
+    assert routing_info.has_mx_overlap()
+
+    [min_bits_atoms_and_mac,
+     max_bits_machine, max_bits_atoms,
+     size_app_part_bits, size_mac_atoms_bits,
+     target_machine_bits, target_atom_bits] = routing_info.get_zones()
+    assert min_bits_atoms_and_mac == 21
+    assert max_bits_machine == 11
+    assert max_bits_atoms == 21
+    assert size_app_part_bits == 1
+    assert size_mac_atoms_bits == 31
+    assert target_machine_bits == 11
+    assert target_atom_bits == 20
+
 
 def test_big_global_fixed() -> None:
     unittest_setup()
@@ -429,4 +491,17 @@ def test_big_global_fixed() -> None:
     app_mask = 0xFFFC0000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
-    assert routing_info.has_overlap()
+    assert routing_info.has_ap_overlap()
+    assert not routing_info.has_mx_overlap()
+
+    [min_bits_atoms_and_mac,
+     max_bits_machine, max_bits_atoms,
+     size_app_part_bits, size_mac_atoms_bits,
+     target_machine_bits, target_atom_bits] = routing_info.get_zones()
+    assert min_bits_atoms_and_mac == 18
+    assert max_bits_machine == 11
+    assert max_bits_atoms == 7  # Big is fixed
+    assert size_app_part_bits == 13  # After overlaps
+    assert size_mac_atoms_bits == 19
+    assert target_machine_bits == 12
+    assert target_atom_bits == 7

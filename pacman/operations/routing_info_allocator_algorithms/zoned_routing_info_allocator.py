@@ -92,11 +92,11 @@ class ZonedRoutingInfoAllocator(object):
         # For each App vertex / Partition name zone keep track of the number of
         # bites required for the mask for each machine vertex
         "__atom_bits_per_app_part",
-        # maximum number of bites to represent the keys and masks
+        # Minimun size needed for the machine and atoms zone
+        # This is the maximum represent the keys and masks
         # for a single app vertex / partition name zone
-        # This is therefor the minimum size for the combine zone
         "__min_bits_atoms_and_mac",
-        # Maximum number of bits to represent the machine for any vertex
+        # Maximum number of bits to represent the machines for any vertex
         "__max_bits_machine",
         # Maximum number of bits to represent the atoms for any vertex
         "__max_bits_atoms",
@@ -319,9 +319,9 @@ class ZonedRoutingInfoAllocator(object):
                 overlap = True
 
             if overlap:
-                routing_info.add_overlap(identifier, pre)
+                routing_info.add_ap_overlap(identifier, pre)
                 for outgoing in pre.splitter.get_out_going_vertices(identifier):
-                    routing_info.add_overlap(identifier, outgoing)
+                    routing_info.add_ap_overlap(identifier, outgoing)
 
             ap_keys_available = 2**self.__size_app_part_bits
             ap_keys_available -= len(self.__ap_keys_blocked_by_fixed)
@@ -361,11 +361,13 @@ class ZonedRoutingInfoAllocator(object):
                 # OK it fits use global sizes
                 n_bits_machine = self.__target_machine_bits
                 n_bits_atoms = self.__target_atom_bits
+                overlap = False
             else:
                 n_bits_machine = self.__size_mac_atoms_bits - n_bits_atoms
                 needed = allocator_bits_needed(len(machine_vertices))
                 assert (n_bits_machine >= needed)
-
+                overlap = True
+                routing_info.add_mx_overlap(identifier, pre)
             for machine_index, machine_vertex in enumerate(machine_vertices):
                 mask = self.__mask(n_bits_atoms)
                 key = app_part_index
@@ -375,6 +377,8 @@ class ZonedRoutingInfoAllocator(object):
                 routing_info.add_routing_info(MachineVertexRoutingInfo(
                     key_and_mask, identifier, machine_vertex,
                     machine_index))
+                if overlap:
+                    routing_info.add_mx_overlap(identifier, machine_vertex)
 
             # Add application-level routing information
             key = app_part_index << (n_bits_atoms + n_bits_machine)
@@ -386,6 +390,11 @@ class ZonedRoutingInfoAllocator(object):
                 len(machine_vertices) - 1))
             app_part_index += 1
 
+        routing_info.add_zones(
+            self.__min_bits_atoms_and_mac,
+            self.__max_bits_machine, self.__max_bits_atoms,
+            self.__size_app_part_bits, self.__size_mac_atoms_bits,
+            self.__target_machine_bits, self.__target_atom_bits)
         return routing_info
 
     @staticmethod
