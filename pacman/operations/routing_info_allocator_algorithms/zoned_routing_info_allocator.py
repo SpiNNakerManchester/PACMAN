@@ -234,7 +234,6 @@ class ZonedRoutingInfoAllocator(object):
         """
         self.__size_app_part_bits =  allocator_bits_needed(
             len(self.__vertex_partitions))
-        self.__size_mac_atoms_bits = BITS_IN_KEY - self.__size_app_part_bits
 
         progress = ProgressBar(
             len(self.__vertex_partitions), "Calculating zones")
