@@ -486,7 +486,7 @@ def test_big_fixed() -> None:
     assert routing_info.min_bits_atoms_and_mac == 18
     assert routing_info.max_bits_machine == 11
     assert routing_info.max_bits_atoms == 7  # Big is fixed
-    assert routing_info.size_app_part_bits == 12 # After overlaps
+    assert routing_info.size_app_part_bits == 12  # After overlaps
     assert routing_info.size_mac_atoms_bits == 20
     assert routing_info.target_machine_bits == 13
     assert routing_info.target_atom_bits == 7

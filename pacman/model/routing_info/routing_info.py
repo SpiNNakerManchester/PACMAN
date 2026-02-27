@@ -312,7 +312,7 @@ class RoutingInfo(object):
 
     def add_zones(
             self, min_bits_atoms_and_mac: int, max_bits_machine: int,
-            max_bits_atoms:int, size_app_part_bits: int,
+            max_bits_atoms: int, size_app_part_bits: int,
             size_mac_atoms_bits: int, target_machine_bits: int,
             target_atom_bits: int) -> None:
         """
@@ -332,7 +332,7 @@ class RoutingInfo(object):
         self._max_bits_atoms = max_bits_atoms
         self._size_app_part_bits = size_app_part_bits
         self._size_mac_atoms_bits = size_mac_atoms_bits
-        self._target_machine_bits =  target_machine_bits
+        self._target_machine_bits = target_machine_bits
         self._target_atom_bits = target_atom_bits
 
     @property

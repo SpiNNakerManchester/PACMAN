@@ -130,7 +130,6 @@ class ZonedRoutingInfoAllocator(object):
         self.__target_machine_bits = -10000
         self.__target_atom_bits = -10000
 
-
     def allocate(self) -> RoutingInfo:
         """
         Perform routing information allocation.
@@ -151,7 +150,8 @@ class ZonedRoutingInfoAllocator(object):
         self.__allocate(routing_info)
         return routing_info
 
-    def __check_no_fixed(self, pre: ApplicationVertex, identifier: str) -> None:
+    def __check_no_fixed(
+            self, pre: ApplicationVertex, identifier: str) -> None:
         for vert in pre.splitter.get_out_going_vertices(identifier):
             key_and_mask = pre.get_machine_fixed_key_and_mask(
                 vert, identifier)
@@ -169,8 +169,8 @@ class ZonedRoutingInfoAllocator(object):
             if key_and_mask != app_key_and_mask:
                 raise PacmanRouteInfoAllocationException(
                     f"For partition {part_id} {pre} has fixed key "
-                    f"{app_key_and_mask} while only outgoing machine vertex has"
-                    f" {key_and_mask}")
+                    f"{app_key_and_mask} while only outgoing machine vertex"
+                    f" has {key_and_mask}")
         routing_info.add_routing_info(MachineVertexRoutingInfo(
             app_key_and_mask, part_id, m_vertex, m_vertex.index))
         n_bits_atoms = m_vertex.get_n_keys_for_partition(part_id)
@@ -224,15 +224,15 @@ class ZonedRoutingInfoAllocator(object):
                                                outgoing, routing_info)
                 else:
                     raise PacmanRouteInfoAllocationException(
-                    "Application {pre} has fixed key {key_and_mask} "
-                    "for partition {identifier} but no out_going_vertices")
+                        "Application {pre} has fixed key {key_and_mask} for "
+                        "partition {identifier} but no out_going_vertices")
 
     def __calculate_zones(self, routing_info: RoutingInfo) -> None:
         """
         Computes the size for the zones.
 
         """
-        self.__size_app_part_bits =  allocator_bits_needed(
+        self.__size_app_part_bits = allocator_bits_needed(
             len(self.__vertex_partitions))
 
         progress = ProgressBar(
@@ -338,7 +338,8 @@ class ZonedRoutingInfoAllocator(object):
             if blocked:
                 self.__ap_keys_blocked_by_fixed.update(blocked)
                 routing_info.add_ap_overlap(identifier, pre)
-                for outgoing in pre.splitter.get_out_going_vertices(identifier):
+                for outgoing in pre.splitter.get_out_going_vertices(
+                        identifier):
                     routing_info.add_ap_overlap(identifier, outgoing)
 
             ap_keys_available = 2**self.__size_app_part_bits
@@ -372,7 +373,7 @@ class ZonedRoutingInfoAllocator(object):
             n_bits_atoms = self.__atom_bits_per_app_part[pre, identifier]
 
             while app_part_index in self.__ap_keys_blocked_by_fixed:
-                    app_part_index += 1
+                app_part_index += 1
 
             machine_vertices.sort(key=lambda x: x.vertex_slice.lo_atom)
             if n_bits_atoms <= self.__target_atom_bits:
