@@ -19,7 +19,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.routing_info import (
     RoutingInfo, MachineVertexRoutingInfo, BaseKeyAndMask,
-    AppVertexRoutingInfo, VertexRoutingInfo)
+    AppVertexRoutingInfo)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.utilities.utility_calls import (
@@ -289,18 +289,19 @@ class ZonedRoutingInfoAllocator(object):
 
     @classmethod
     def calc_overlaps(
-            cls, key_and_mask: VertexRoutingInfo, ap_zone: int) -> Set[int]:
+            cls, key: int, mask: int, ap_zone: int) -> Set[int]:
         """
         Which of the top bits could be used by this key and mask
 
-        :param key_and_mask: key and mask values (typically from fixed)
+        :param key: application vertex key
+        :param mask: application vertext mask
         :param ap_zone: number of bits in the application partition zone
         :return: Set of top zone values that need to be blocked.
         """
         mac_zone = BITS_IN_KEY - ap_zone
         # Get the key and mask that overlap with the A-P key and mask
-        key = key_and_mask.key >> mac_zone
-        mask = key_and_mask.mask >> mac_zone
+        key = key >> mac_zone
+        mask = mask >> mac_zone
         # Make the mask all 1s in the MSBs where it has been shifted
         mask |= (((1 << mac_zone) - 1) << ap_zone)
 
@@ -331,7 +332,8 @@ class ZonedRoutingInfoAllocator(object):
                 continue
             key_and_mask = routing_info.get_info_from(pre, identifier)
             blocked = self.calc_overlaps(
-                key_and_mask, self.__size_app_part_bits)
+                key_and_mask.key, key_and_mask.mask,
+                self.__size_app_part_bits)
 
             if blocked:
                 self.__ap_keys_blocked_by_fixed.update(blocked)

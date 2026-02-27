@@ -23,7 +23,6 @@ from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.resources import AbstractSDRAM
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-from pacman.model.routing_info.vertex_routing_info import VertexRoutingInfo
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.model.routing_info import RoutingInfo, MachineVertexRoutingInfo
@@ -496,9 +495,7 @@ def test_big_fixed() -> None:
 def test_blocked_simple() -> None:
     mask = 0xFF000000
     key = 0x10000000
-    key_and_mask = BaseKeyAndMask(key, mask)
-    info = VertexRoutingInfo(key_and_mask, "bacon")
-    blocked = ZonedRoutingInfoAllocator.calc_overlaps(info, 12)
+    blocked = ZonedRoutingInfoAllocator.calc_overlaps(key, mask, 12)
     assert len(blocked) == 16
     for block in [0x100, 0x101, 0x102, 0x103, 0x104, 0x105, 0x106, 0x107,
                   0x108, 0x109, 0x10a, 0x10b, 0x10c, 0x10d, 0x10e, 0x10f]:
@@ -508,9 +505,7 @@ def test_blocked_simple() -> None:
 def test_blocked_fancy() -> None:
     mask = 0xF0F00000
     key = 0x10000000
-    key_and_mask = BaseKeyAndMask(key, mask)
-    info = VertexRoutingInfo(key_and_mask, "bacon")
-    blocked = ZonedRoutingInfoAllocator.calc_overlaps(info, 12)
+    blocked = ZonedRoutingInfoAllocator.calc_overlaps(key, mask, 12)
     assert len(blocked) == 16
     for block in [0x100, 0x110, 0x120, 0x130, 0x140, 0x150, 0x160, 0x170,
                   0x180, 0x190, 0x1a0, 0x1b0, 0x1c0, 0x1d0, 0x1e0, 0x1f0]:
