@@ -235,6 +235,7 @@ class ZonedRoutingInfoAllocator(object):
         """
         self.__size_app_part_bits =  allocator_bits_needed(
             len(self.__vertex_partitions))
+        self.__size_mac_atoms_bits = BITS_IN_KEY - self.__size_app_part_bits
 
         progress = ProgressBar(
             len(self.__vertex_partitions), "Calculating zones")
@@ -282,6 +283,28 @@ class ZonedRoutingInfoAllocator(object):
                     self.__size_mac_atoms_bits - self.__max_bits_machine)
             self.__target_machine_bits = self.__max_bits_machine
 
+    @classmethod
+    def calc_overlaps(
+            cls, key_and_mask: BaseKeyAndMask, ap_zone: int) -> Set[int]:
+        """
+        Which of the top bits could be used by this key and mask
+
+        :param key_and_mask: key and mask values (typically from fixed)
+        :param ap_zone: number of bits in the application partition zone
+        :return: Set of top zone values that need to be blocked.
+        """
+        mac_zone = BITS_IN_KEY - ap_zone
+        # Get the key and mask that overlap with the A-P key and mask
+        key = key_and_mask.key >> mac_zone
+        mask = key_and_mask.mask >> mac_zone
+        # Make the mask all 1s in the MSBs where it has been shifted
+        mask |= (((1 << mac_zone) - 1) << ap_zone)
+
+        blocked: Set[int] = set()
+        for k, n_keys in get_key_ranges(key, mask):
+            blocked.update(range(k, k + n_keys))
+        return blocked
+
     def __set_fixed_used(self, routing_info: RoutingInfo) -> None:
         """
         Block the use of ``AP`` indexes that would clash with fixed keys
@@ -303,22 +326,11 @@ class ZonedRoutingInfoAllocator(object):
             if not routing_info.has_info_from(pre, identifier):
                 continue
             key_and_mask = routing_info.get_info_from(pre, identifier)
-            # Get the key and mask that overlap with the A-P key and mask
-            key = key_and_mask.key >> self.__min_bits_atoms_and_mac
-            mask = key_and_mask.mask >> self.__min_bits_atoms_and_mac
+            blocked = self.calc_overlaps(
+                key_and_mask, self.__size_app_part_bits)
 
-            # Make the mask all 1s in the MSBs where it has been shifted
-            mask |= (((1 << self.__min_bits_atoms_and_mac) - 1) <<
-                     self.__size_app_part_bits)
-
-            # Generate all possible combinations of keys for the remaining
-            # mask
-            overlap = False
-            for k, n_keys in get_key_ranges(key, mask):
-                self.__ap_keys_blocked_by_fixed.update(range(k, k + n_keys))
-                overlap = True
-
-            if overlap:
+            if blocked:
+                self.__ap_keys_blocked_by_fixed.update(blocked)
                 routing_info.add_ap_overlap(identifier, pre)
                 for outgoing in pre.splitter.get_out_going_vertices(identifier):
                     routing_info.add_ap_overlap(identifier, outgoing)

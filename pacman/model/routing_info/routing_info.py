@@ -333,11 +333,30 @@ class RoutingInfo(object):
         self._target_machine_bits =  target_machine_bits
         self._target_atom_bits = target_atom_bits
 
-    def get_zones(self) -> Tuple[int, int, int, int, int, int, int]:
-        """
-        Get the allocator zone info
-        """
-        return [self._min_bits_atoms_and_mac,
-                self._max_bits_machine, self._max_bits_atoms,
-                self._size_app_part_bits, self._size_mac_atoms_bits,
-                self._target_machine_bits, self._target_atom_bits]
+    @property
+    def min_bits_atoms_and_mac(self) -> int:
+        return self._min_bits_atoms_and_mac
+
+    @property
+    def max_bits_machine(self) -> int:
+        return self._max_bits_machine
+
+    @property
+    def max_bits_atoms(self) -> int:
+        return self._max_bits_atoms
+
+    @property
+    def size_app_part_bits(self) -> int:
+        return self._size_app_part_bits
+
+    @property
+    def size_mac_atoms_bits(self) -> int:
+        return self._size_mac_atoms_bits
+
+    @property
+    def target_machine_bits(self) -> int:
+        return self._target_machine_bits
+
+    @property
+    def target_atom_bits(self) -> int:
+        return self._target_atom_bits
