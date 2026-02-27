@@ -229,7 +229,8 @@ class RoutingInfo(object):
     def __len__(self) -> int:
         return sum(len(v) for v in self._info.values())
 
-    def add_ap_overlap(self, partition_id: str, vertex: AbstractVertex):
+    def add_ap_overlap(
+            self, partition_id: str, vertex: AbstractVertex) -> None:
         """
         Records that this vertex, partition pair overlaps top part of the key
 
@@ -267,7 +268,8 @@ class RoutingInfo(object):
         """
         return len(self._ap_overlaps) > 0
 
-    def add_mx_overlap(self, partition_id: str, vertex: AbstractVertex):
+    def add_mx_overlap(
+            self, partition_id: str, vertex: AbstractVertex) -> None:
         """
         Records that this vertex, partition pair's atoms keys
         overlap into the machine zone

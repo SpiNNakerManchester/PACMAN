@@ -19,8 +19,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.routing_info import (
     RoutingInfo, MachineVertexRoutingInfo, BaseKeyAndMask,
-    AppVertexRoutingInfo)
-from pacman.model.graphs import AbstractVertex
+    AppVertexRoutingInfo, VertexRoutingInfo)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.utilities.utility_calls import (
@@ -266,26 +265,32 @@ class ZonedRoutingInfoAllocator(object):
                 BITS_IN_KEY):
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator please select a "
-                f"different allocator as it needs {self.__app_part_bits} + "
-                f"{self.__min_bits_atoms_and_mac} bits")
+                f"different allocator as it needs {self.__size_app_part_bits} "
+                f"+ {self.__min_bits_atoms_and_mac} bits")
 
         # Reserve fixed and check it still works
         self.__set_fixed_used(routing_infos)
 
         self.__size_mac_atoms_bits = (
                 BITS_IN_KEY - self.__size_app_part_bits)
-        if self.__size_mac_atoms_bits >= (self.__max_bits_machine + self.__max_bits_atoms):
+
+        if self.__size_mac_atoms_bits >= (
+                self.__max_bits_machine + self.__max_bits_atoms):
+            # Fits nicely add extra bits to the machine zone
             self.__target_atom_bits = self.__max_bits_atoms
             self.__target_machine_bits = (
                     self.__size_mac_atoms_bits - self.__max_bits_atoms)
         else:
+            # Does not fit so remove bits from the atom zone
+            # Likely only a few very big machine vertices will need them
+            # they will then flow into the machine zone
             self.__target_atom_bits = (
                     self.__size_mac_atoms_bits - self.__max_bits_machine)
             self.__target_machine_bits = self.__max_bits_machine
 
     @classmethod
     def calc_overlaps(
-            cls, key_and_mask: BaseKeyAndMask, ap_zone: int) -> Set[int]:
+            cls, key_and_mask: VertexRoutingInfo, ap_zone: int) -> Set[int]:
         """
         Which of the top bits could be used by this key and mask
 
@@ -407,7 +412,6 @@ class ZonedRoutingInfoAllocator(object):
             self.__max_bits_machine, self.__max_bits_atoms,
             self.__size_app_part_bits, self.__size_mac_atoms_bits,
             self.__target_machine_bits, self.__target_atom_bits)
-        return routing_info
 
     @staticmethod
     def __mask(bits: int) -> int:

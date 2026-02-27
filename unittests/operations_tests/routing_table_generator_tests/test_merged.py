@@ -100,7 +100,7 @@ class TestMerged(unittest.TestCase):
         writer.set_placements(place_application_graph(system_placements))
         writer.set_routing_table_by_partition(route_application_graph())
         allocator = ZonedRoutingInfoAllocator()
-        writer.set_routing_infos(allocator.allocate([]))
+        writer.set_routing_infos(allocator.allocate())
 
     def test_empty(self) -> None:
         writer = PacmanDataWriter.mock()
