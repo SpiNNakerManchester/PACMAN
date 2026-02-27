@@ -256,7 +256,7 @@ class RoutingInfo(object):
 
     def get_ap_overlaps(self) -> Iterator[Tuple[str, AbstractVertex]]:
         """
-        Returns vertex, partition pairs that overlaps top part of the key
+        :returns:  vertex, partition pairs that overlaps top part of the key
         """
         for pair in self._ap_overlaps:
             yield pair
@@ -264,6 +264,7 @@ class RoutingInfo(object):
     def has_ap_overlap(self) -> bool:
         """
         Checks if there are any overlaps top part of the key
+
         :return: True if and only if there is at least one overlap
         """
         return len(self._ap_overlaps) > 0
@@ -299,6 +300,8 @@ class RoutingInfo(object):
         """
         Returns vertex, partition pairs whose atoms keys
         overlap into the machine zone
+
+        :returns: Partition ID, vertex pairs
         """
         for pair in self._mx_overlaps:
             yield pair
@@ -306,6 +309,7 @@ class RoutingInfo(object):
     def has_mx_overlap(self) -> bool:
         """
         Checks if there are any atoms into machine zone overlaps
+
         :return: True if and only if there is at least one overlap
         """
         return len(self._mx_overlaps) > 0
