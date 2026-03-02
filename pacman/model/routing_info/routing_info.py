@@ -314,7 +314,7 @@ class RoutingInfo(object):
         """
         Checks if there are any atoms into machine zone overlaps
 
-        Trie if there are any fixed key mask vertexes.
+        True if there are any fixed key mask vertexes.
 
         :return: True if and only if there is at least one overlap
         """
