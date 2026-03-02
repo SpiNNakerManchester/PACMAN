@@ -321,7 +321,7 @@ class RoutingInfo(object):
         return len(self._mx_overlaps) > 0
 
     def add_zones(
-            self, min_bits_machine_and_atoms : int, max_bits_machine: int,
+            self, min_bits_machine_and_atoms: int, max_bits_machine: int,
             max_bits_atoms: int, size_app_part_bits: int,
             size_mac_atoms_bits: int, target_machine_bits: int,
             target_atom_bits: int) -> None:
@@ -389,11 +389,11 @@ class RoutingInfo(object):
     def target_machine_bits(self) -> int:
         """
         Size of the machine part for vertex.
-        
+
         It will be at least max_bits_machine,
         but will include any extra bits if not all bits are needed.
-             
-        It may however not be respected on vertices with a very large number 
+
+        It may however not be respected on vertices with a very large number
         of atoms per core.
         """
         return self._target_machine_bits
