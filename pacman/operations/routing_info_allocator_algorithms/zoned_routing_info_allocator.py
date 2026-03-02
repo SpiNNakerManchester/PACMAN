@@ -104,7 +104,7 @@ class ZonedRoutingInfoAllocator(object):
         # Size of the App vertex / Partition name zone
         "__size_app_part_bits",
         # Size of the machine and atoms part
-        "__size_mac_atoms_bits",
+        "__size_machine_atoms_bits",
         # Size of the machine part for vertex that fit the normal case
         "__target_machine_bits",
         # Size of the atoms part for vertex that fit the normal case
@@ -126,7 +126,7 @@ class ZonedRoutingInfoAllocator(object):
 
         # temp values to init without optional
         self.__size_app_part_bits = -10000
-        self.__size_mac_atoms_bits = -10000
+        self.__size_machine_atoms_bits = -10000
         self.__target_machine_bits = -10000
         self.__target_atom_bits = -10000
 
@@ -270,21 +270,21 @@ class ZonedRoutingInfoAllocator(object):
         # Reserve fixed and check it still works
         self.__set_fixed_used(routing_infos)
 
-        self.__size_mac_atoms_bits = (
+        self.__size_machine_atoms_bits = (
                 BITS_IN_KEY - self.__size_app_part_bits)
 
-        if self.__size_mac_atoms_bits >= (
+        if self.__size_machine_atoms_bits >= (
                 self.__max_bits_machine + self.__max_bits_atoms):
             # Fits nicely add extra bits to the machine zone
             self.__target_atom_bits = self.__max_bits_atoms
             self.__target_machine_bits = (
-                    self.__size_mac_atoms_bits - self.__max_bits_atoms)
+                    self.__size_machine_atoms_bits - self.__max_bits_atoms)
         else:
             # Does not fit so remove bits from the atom zone
             # Likely only a few very big machine vertices will need them
             # they will then flow into the machine zone
             self.__target_atom_bits = (
-                    self.__size_mac_atoms_bits - self.__max_bits_machine)
+                    self.__size_machine_atoms_bits - self.__max_bits_machine)
             self.__target_machine_bits = self.__max_bits_machine
 
     @classmethod
@@ -382,7 +382,7 @@ class ZonedRoutingInfoAllocator(object):
                 n_bits_atoms = self.__target_atom_bits
                 overlap = False
             else:
-                n_bits_machine = self.__size_mac_atoms_bits - n_bits_atoms
+                n_bits_machine = self.__size_machine_atoms_bits - n_bits_atoms
                 needed = allocator_bits_needed(len(machine_vertices))
                 assert (n_bits_machine >= needed)
                 overlap = True
@@ -412,7 +412,7 @@ class ZonedRoutingInfoAllocator(object):
         routing_info.add_zones(
             self.__min_bits_atoms_and_mac,
             self.__max_bits_machine, self.__max_bits_atoms,
-            self.__size_app_part_bits, self.__size_mac_atoms_bits,
+            self.__size_app_part_bits, self.__size_machine_atoms_bits,
             self.__target_machine_bits, self.__target_atom_bits)
 
     @staticmethod
