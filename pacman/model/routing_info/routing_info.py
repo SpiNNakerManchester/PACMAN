@@ -28,7 +28,7 @@ class RoutingInfo(object):
     and masks.
     """
     __slots__ = ("_info", "_ap_overlaps", "_mx_overlaps",
-                 "_min_bits_atoms_and_mac",
+                 "_min_bits_machine_and_atoms",
                  "_max_bits_machine", "_max_bits_atoms",
                  "_size_app_part_bits", "_size_mac_atoms_bits",
                  "_target_machine_bits", "_target_atom_bits")
@@ -41,7 +41,7 @@ class RoutingInfo(object):
         self._ap_overlaps: Set[Tuple[str, AbstractVertex]] = set()
         self._mx_overlaps: Set[Tuple[str, AbstractVertex]] = set()
         # Temp values to avoid Optionals
-        self._min_bits_atoms_and_mac = -1000
+        self._min_bits_machine_and_atoms = -1000
         self._max_bits_machine = -1000
         self._max_bits_atoms = -1000
         self._size_app_part_bits = -1000
@@ -290,6 +290,8 @@ class RoutingInfo(object):
         Checks if this vertex, partition pair air's atoms keys
         overlap into the machine zone
 
+        All fixed key mask vertexes are included.
+
         :param partition_id: Id of the partition
         :param vertex: Application or Machine vertex
         :return: True if and only if there is an overlap
@@ -301,6 +303,8 @@ class RoutingInfo(object):
         Returns vertex, partition pairs whose atoms keys
         overlap into the machine zone
 
+        All fixed key mask vertexes are included.
+
         :returns: Partition ID, vertex pairs
         """
         for pair in self._mx_overlaps:
@@ -310,19 +314,21 @@ class RoutingInfo(object):
         """
         Checks if there are any atoms into machine zone overlaps
 
+        Trie if there are any fixed key mask vertexes.
+
         :return: True if and only if there is at least one overlap
         """
         return len(self._mx_overlaps) > 0
 
     def add_zones(
-            self, min_bits_atoms_and_mac: int, max_bits_machine: int,
+            self, min_bits_machine_and_atoms : int, max_bits_machine: int,
             max_bits_atoms: int, size_app_part_bits: int,
             size_mac_atoms_bits: int, target_machine_bits: int,
             target_atom_bits: int) -> None:
         """
         Copy in the zone info from the allocator
 
-        :param min_bits_atoms_and_mac:
+        :param min_bits_machine_and_atoms c:
         :param max_bits_machine:
         :param max_bits_atoms:
         :param size_app_part_bits:
@@ -331,7 +337,7 @@ class RoutingInfo(object):
         :param target_atom_bits:
         :return:
         """
-        self._min_bits_atoms_and_mac = min_bits_atoms_and_mac
+        self._min_bits_machine_and_atoms = min_bits_machine_and_atoms
         self._max_bits_machine = max_bits_machine
         self._max_bits_atoms = max_bits_atoms
         self._size_app_part_bits = size_app_part_bits
@@ -340,29 +346,65 @@ class RoutingInfo(object):
         self._target_atom_bits = target_atom_bits
 
     @property
-    def min_bits_atoms_and_mac(self) -> int:
-        return self._min_bits_atoms_and_mac
+    def min_bits_machine_and_atoms(self) -> int:
+        """
+       Minimum size needed for the combined machine and atoms zone
+
+       This is the maximum needed to represent the keys and masks
+       for a single app vertex / partition ID
+        """
+        return self._min_bits_machine_and_atoms
 
     @property
     def max_bits_machine(self) -> int:
+        """
+        Maximum number of bits to represent the machines for any vertex
+        """
         return self._max_bits_machine
 
     @property
     def max_bits_atoms(self) -> int:
+        """
+        Maximum number of bits to represent the atoms for any vertex
+        """
         return self._max_bits_atoms
 
     @property
     def size_app_part_bits(self) -> int:
+        """
+        Size of the App vertex / Partition name zone
+        """
         return self._size_app_part_bits
 
     @property
     def size_mac_atoms_bits(self) -> int:
+        """
+        Size of the machine and atoms part
+
+        This will always be 32 - size_app_part_bits
+        """
         return self._size_mac_atoms_bits
 
     @property
     def target_machine_bits(self) -> int:
+        """
+        Size of the machine part for vertex.
+        
+        It will be at least max_bits_machine,
+        but will include any extra bits if not all bits are needed.
+             
+        It may however not be respected on vertices with a very large number 
+        of atoms per core.
+        """
         return self._target_machine_bits
 
     @property
     def target_atom_bits(self) -> int:
+        """
+         Size of the atoms part for vertex that fit the normal case
+
+         Ideally this will be the max_bits_atoms but may be smaller
+         if there is a mix of application vertices with many outgoing
+         and others with atoms per core.
+         """
         return self._target_atom_bits

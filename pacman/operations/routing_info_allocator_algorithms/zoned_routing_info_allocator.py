@@ -91,10 +91,10 @@ class ZonedRoutingInfoAllocator(object):
         # For each App vertex / Partition name zone keep track of the number of
         # bites required for the mask for each machine vertex
         "__atom_bits_per_app_part",
-        # Minimun size needed for the machine and atoms zone
-        # This is the maximum represent the keys and masks
-        # for a single app vertex / partition name zone
-        "__min_bits_atoms_and_mac",
+        # Minimum size needed for the combined machine and atoms zone
+        # This is the maximum needed to represent the keys and masks
+        # for a single app vertex / partition ID
+        "__min_bits_machine_and_atoms",
         # Maximum number of bits to represent the machines for any vertex
         "__max_bits_machine",
         # Maximum number of bits to represent the atoms for any vertex
@@ -120,7 +120,7 @@ class ZonedRoutingInfoAllocator(object):
         self.__ap_keys_blocked_by_fixed: Set[int] = set()
 
         # Start at with values for an empty graph then as needed
-        self.__min_bits_atoms_and_mac = 0
+        self.__min_bits_machine_and_atoms = 0
         self.__max_bits_machine = 0
         self.__max_bits_atoms = 0
 
@@ -254,19 +254,21 @@ class ZonedRoutingInfoAllocator(object):
                 machine_bits = allocator_bits_needed(len(machine_vertices))
                 self.__max_bits_machine = max(
                     self.__max_bits_machine, machine_bits)
-                self.__min_bits_atoms_and_mac = max(
-                    self.__min_bits_atoms_and_mac, machine_bits + atom_bits)
+                self.__min_bits_machine_and_atoms = max(
+                    self.__min_bits_machine_and_atoms,
+                    machine_bits + atom_bits)
                 self.__atom_bits_per_app_part[pre, identifier] = atom_bits
             else:
                 self.__atom_bits_per_app_part[pre, identifier] = 0
 
         # See if it could fit even before considering fixed
-        if (self.__size_app_part_bits + self.__min_bits_atoms_and_mac >
+        if (self.__size_app_part_bits + self.__min_bits_machine_and_atoms >
                 BITS_IN_KEY):
             raise PacmanRouteInfoAllocationException(
                 "Unable to use ZonedRoutingInfoAllocator as it needs "
                 "{self.__size_app_part_bits} bits for application keys + "
-                f"{self.__min_bits_atoms_and_mac} for machine and atom bits")
+                f"{self.__min_bits_machine_and_atoms} "
+                f"for machine and atom bits")
 
     def __calculate_machine_atoms_zones(
             self, routing_info: RoutingInfo) -> None:
@@ -352,8 +354,8 @@ class ZonedRoutingInfoAllocator(object):
             if ap_keys_available < len(self.__vertex_partitions):
                 #  Oops need more bits
                 self.__size_app_part_bits += 1
-                if (self.__size_app_part_bits + self.__min_bits_atoms_and_mac >
-                        BITS_IN_KEY):
+                if (self.__size_app_part_bits +
+                        self.__min_bits_machine_and_atoms > BITS_IN_KEY):
                     raise PacmanRouteInfoAllocationException(
                         "Unable to allocate with fixed keys")
                 # clear used
@@ -415,7 +417,7 @@ class ZonedRoutingInfoAllocator(object):
             app_part_index += 1
 
         routing_info.add_zones(
-            self.__min_bits_atoms_and_mac,
+            self.__min_bits_machine_and_atoms,
             self.__max_bits_machine, self.__max_bits_atoms,
             self.__size_app_part_bits, self.__size_machine_atoms_bits,
             self.__target_machine_bits, self.__target_atom_bits)
