@@ -268,7 +268,6 @@ class ZonedRoutingInfoAllocator(object):
                 "{self.__size_app_part_bits} bits for application keys + "
                 f"{self.__min_bits_atoms_and_mac} for machine and atom bits")
 
-
     def __calculate_machine_atoms_zones(
             self, routing_info: RoutingInfo) -> None:
         # use all the bits not used by the application partition and overlaps
