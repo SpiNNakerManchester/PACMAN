@@ -23,7 +23,7 @@ from pacman.model.routing_info import (
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.utilities.utility_calls import (
-    get_key_ranges, allocator_bits_needed)
+    allocator_bits_needed, expand_to_bit_array, get_key_ranges)
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
@@ -306,6 +306,30 @@ class ZonedRoutingInfoAllocator(object):
         # assume all fixed (already have info) will overlap
         for info in routing_info:
             routing_info.add_mx_overlap(info.partition_id, info.vertex)
+
+    @classmethod
+    def get_key_zone(cls, mask: int):
+        start = None
+        end = None
+        bits = expand_to_bit_array(mask)
+        for i in range(32):
+            if bits[i] == 1:
+                if start is None:
+                    start = i
+                if end is not None:
+                    return None
+            else:
+                if start is not None:
+                    if end is None:
+                        end = i - 1
+        if start is not None:
+            if end is None:
+                end = 31
+
+        if start is None:
+            return None
+        else:
+            return (start, end)
 
     @classmethod
     def calc_overlaps(

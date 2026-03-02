@@ -598,3 +598,25 @@ def test_many_machine_mask() -> None:
         raise Exception("PacmanRouteInfoAllocationExceptio not raise")
     except PacmanRouteInfoAllocationException:
         pass
+
+
+def test_key_zone() -> None:
+    a_mask = 0xFF000000
+    zone = ZonedRoutingInfoAllocator.get_key_zone(a_mask)
+    assert zone == (0, 7)
+
+    m_mask = 0xFFFF0000
+    zone = ZonedRoutingInfoAllocator.get_key_zone(m_mask)
+    assert zone == (0, 15)
+
+    m_zone = a_mask ^ m_mask
+    zone = ZonedRoutingInfoAllocator.get_key_zone(m_zone)
+    assert zone == (8, 15)
+
+    b_mask = 0xFF0FF00
+    zone = ZonedRoutingInfoAllocator.get_key_zone(b_mask)
+    assert zone is None
+
+    e_mask = 0x000FFFF
+    zone = ZonedRoutingInfoAllocator.get_key_zone(e_mask)
+    assert zone == (16, 31)
