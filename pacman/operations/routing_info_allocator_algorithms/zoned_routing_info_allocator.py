@@ -294,7 +294,7 @@ class ZonedRoutingInfoAllocator(object):
         Which of the top bits could be used by this key and mask
 
         :param key: application vertex key
-        :param mask: application vertext mask
+        :param mask: application vertex mask
         :param ap_zone: number of bits in the application partition zone
         :return: Set of top zone values that need to be blocked.
         """
