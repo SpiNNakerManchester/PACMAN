@@ -328,7 +328,7 @@ class RoutingInfo(object):
         """
         Copy in the zone info from the allocator
 
-        :param min_bits_machine_and_atoms c:
+        :param min_bits_machine_and_atoms:
         :param max_bits_machine:
         :param max_bits_atoms:
         :param size_app_part_bits:
