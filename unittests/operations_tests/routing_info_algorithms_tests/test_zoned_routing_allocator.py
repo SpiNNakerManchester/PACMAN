@@ -17,6 +17,7 @@ from spinn_utilities.overrides import overrides
 
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
+from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.operations.routing_info_allocator_algorithms.\
     zoned_routing_info_allocator import ZonedRoutingInfoAllocator
 from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
@@ -27,7 +28,6 @@ from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.model.routing_info import RoutingInfo, MachineVertexRoutingInfo
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
-
 
 class MockSplitter(AbstractSplitterCommon):
 
@@ -558,3 +558,43 @@ def test_blocked_low() -> None:
     assert len(blocked) == 1
     for block in [0x000]:
         assert block in blocked
+
+
+def create_many_machine_mask() -> None:
+    fixed_machine_keys_by_partition: \
+        Optional[Dict[Tuple[MachineVertex, str], BaseKeyAndMask]] = dict()
+    fixed_app_vertex = MockAppVertex(
+        splitter=MockSplitter(), fixed_key=BaseKeyAndMask(0, 0xffffff00),
+        fixed_machine_keys_by_partition=fixed_machine_keys_by_partition)
+    PacmanDataView.add_vertex(fixed_app_vertex)
+    # Create a single output vertex (which won't send)
+    out_app_vertex = MockAppVertex(splitter=MockSplitter())
+    PacmanDataView.add_vertex(out_app_vertex)
+
+    PacmanDataView.add_edge(
+        ApplicationEdge(fixed_app_vertex, out_app_vertex), "Test")
+
+    # Create a single big machine vertex
+    fixed_mac_vertex1 = TestMacVertex(
+        label="fixed 1", n_keys_required={"Test": 8},
+        app_vertex=fixed_app_vertex)
+    fixed_app_vertex.remember_machine_vertex(fixed_mac_vertex1)
+    fixed_machine_keys_by_partition[(fixed_mac_vertex1, "Test")] = (
+        BaseKeyAndMask(0, 0xfffffff0))
+
+    fixed_mac_vertex2 = TestMacVertex(
+        label="fixed 2", n_keys_required={"Test": 8},
+        app_vertex=fixed_app_vertex)
+    fixed_app_vertex.remember_machine_vertex(fixed_mac_vertex2)
+    fixed_machine_keys_by_partition[(fixed_mac_vertex2, "Test")] = (
+        BaseKeyAndMask(0, 0xffffff0f))
+
+
+def test_many_machine_mask() -> None:
+    unittest_setup()
+    create_many_machine_mask()
+    try:
+        ZonedRoutingInfoAllocator().allocate()
+        raise Exception("PacmanRouteInfoAllocationExceptio not raise")
+    except PacmanRouteInfoAllocationException:
+        pass

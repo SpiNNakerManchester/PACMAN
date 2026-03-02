@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Dict, Iterable, List, Set, Tuple
+from typing import Dict, Iterable, List, Optional, Set, Tuple
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
@@ -177,7 +177,7 @@ class ZonedRoutingInfoAllocator(object):
         n_bits_atoms = m_vertex.get_n_keys_for_partition(part_id)
         routing_info.add_routing_info(AppVertexRoutingInfo(
             app_key_and_mask, part_id, pre,
-            self.__mask(n_bits_atoms), n_bits_atoms,
+            app_key_and_mask.mask, n_bits_atoms,
             len(pre.machine_vertices) - 1))
 
     def __allocate_many_fixed(
@@ -185,9 +185,19 @@ class ZonedRoutingInfoAllocator(object):
             app_key_and_mask: BaseKeyAndMask, outgoing: List[MachineVertex],
             routing_info: RoutingInfo) -> None:
         max_atom_bits = 0
+        machine_mask: Optional[int] = None
         for m_vertex in outgoing:
             key_and_mask = pre.get_machine_fixed_key_and_mask(
                 m_vertex, part_id)
+
+            if machine_mask is None:
+                machine_mask = key_and_mask.mask
+            elif machine_mask != key_and_mask.mask:
+                raise PacmanRouteInfoAllocationException(
+                    f"For partition {part_id} {pre} has different "
+                    f"machine_fixed_key_and_mask found {hex(machine_mask)} "
+                    f"and {hex(key_and_mask.mask)}")
+
             if key_and_mask is None:
                 raise PacmanRouteInfoAllocationException(
                     f"For partition {part_id} {pre} has fixed key "
@@ -204,9 +214,10 @@ class ZonedRoutingInfoAllocator(object):
                 key_and_mask, part_id, m_vertex, m_vertex.index))
             n_bits_atoms = m_vertex.get_n_keys_for_partition(part_id)
             max_atom_bits = max(max_atom_bits, n_bits_atoms)
+        assert machine_mask is not None
         routing_info.add_routing_info(AppVertexRoutingInfo(
             app_key_and_mask, part_id, pre,
-            self.__mask(n_bits_atoms), n_bits_atoms,
+            machine_mask, n_bits_atoms,
             len(pre.machine_vertices) - 1))
 
     def __allocate_fixed(self, routing_info: RoutingInfo) -> None:
