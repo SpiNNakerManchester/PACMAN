@@ -407,12 +407,13 @@ def test_allocator_with_fixed() -> None:
     assert 146 == len(list(routing_info.get_mx_overlaps()))
 
 
-def create_big(with_fixed: bool) -> None:
+def create_big(fixed_mask: Optional[int]) -> None:
     # This test shows how easy it is to trip up the allocator with a retina
     # Create a single "big" vertex
-    fixed_key = None
-    if with_fixed:
-        fixed_key = BaseKeyAndMask(0x0, 0x180000)
+    if fixed_mask is None:
+        fixed_key = None
+    else:
+        fixed_key = BaseKeyAndMask(0x0, fixed_mask)
     big_app_vertex = MockAppVertex(
         splitter=MockSplitter(), fixed_key=fixed_key)
     PacmanDataView.add_vertex(big_app_vertex)
@@ -449,7 +450,7 @@ def create_big(with_fixed: bool) -> None:
 
 def test_big_no_fixed() -> None:
     unittest_setup()
-    create_big(False)
+    create_big(None)
     routing_info = ZonedRoutingInfoAllocator().allocate()
 
     # 1 for app 11 for machine so where possible use 20 for atoms
@@ -475,9 +476,9 @@ def test_big_no_fixed() -> None:
     assert routing_info.target_atom_bits == 20
 
 
-def test_big_fixed() -> None:
+def test_big_fixed_high() -> None:
     unittest_setup()
-    create_big(True)
+    create_big(0x180000)
     routing_info = ZonedRoutingInfoAllocator().allocate()
 
     # 7 bit atoms is 7 as it ignore the retina
@@ -502,6 +503,33 @@ def test_big_fixed() -> None:
     assert routing_info.target_machine_bits == 13
     assert routing_info.target_atom_bits == 7
 
+def test_big_fixed_low() -> None:
+    unittest_setup()
+    create_big(0xFFF00000)
+    routing_info = ZonedRoutingInfoAllocator().allocate()
+
+    # 7 bit atoms is 7 as it ignore the retina
+    mask = 0xFFFFFF80
+    check_masks_all_the_same(routing_info, mask)
+
+    # The number of bits is 1 + 11 + 21, so it will not fit
+    # So flexible for the retina
+    # Others mask all bit minimum app bits (1)
+    # all but the top 1 bits should be the same
+    app_mask = 0xFFFC0000
+    check_keys_for_application_partition_pairs(routing_info, app_mask)
+
+    assert 2 == len(list(routing_info.get_ap_overlaps()))
+    assert 2 == len(list(routing_info.get_mx_overlaps()))
+
+    assert routing_info.min_bits_machine_and_atoms == 18
+    assert routing_info.max_bits_machine == 11
+    assert routing_info.max_bits_atoms == 7  # Big is fixed
+    assert routing_info.size_app_part_bits == 2
+    assert routing_info.size_mac_atoms_bits == 30
+    assert routing_info.target_machine_bits == 23
+    assert routing_info.target_atom_bits == 7
+
 
 def test_blocked_simple() -> None:
     mask = 0xFF000000
@@ -520,4 +548,13 @@ def test_blocked_fancy() -> None:
     assert len(blocked) == 16
     for block in [0x100, 0x110, 0x120, 0x130, 0x140, 0x150, 0x160, 0x170,
                   0x180, 0x190, 0x1a0, 0x1b0, 0x1c0, 0x1d0, 0x1e0, 0x1f0]:
+        assert block in blocked
+
+
+def test_blocked_low() -> None:
+    mask = 0xFFF00000
+    key = 0x00000000
+    blocked = ZonedRoutingInfoAllocator.calc_overlaps(key, mask, 12)
+    assert len(blocked) == 1
+    for block in [0x000]:
         assert block in blocked
