@@ -144,8 +144,9 @@ class ZonedRoutingInfoAllocator(object):
 
         routing_info = RoutingInfo()
         self.__allocate_fixed(routing_info)
-        self.__calculate_zones(routing_info)
-        self.__check_zones(routing_info)
+        self.__calculate_zone_sizes_needed(routing_info)
+        self.__set_fixed_used(routing_info)
+        self.__calculate_machine_atoms_zones(routing_info)
 
         self.__allocate(routing_info)
         return routing_info
@@ -227,7 +228,8 @@ class ZonedRoutingInfoAllocator(object):
                         "Application {pre} has fixed key {key_and_mask} for "
                         "partition {identifier} but no out_going_vertices")
 
-    def __calculate_zones(self, routing_info: RoutingInfo) -> None:
+    def __calculate_zone_sizes_needed(
+            self, routing_info: RoutingInfo) -> None:
         """
         Computes the size for the zones.
 
@@ -258,18 +260,18 @@ class ZonedRoutingInfoAllocator(object):
             else:
                 self.__atom_bits_per_app_part[pre, identifier] = 0
 
-    def __check_zones(self, routing_infos: RoutingInfo) -> None:
         # See if it could fit even before considering fixed
         if (self.__size_app_part_bits + self.__min_bits_atoms_and_mac >
                 BITS_IN_KEY):
             raise PacmanRouteInfoAllocationException(
-                "Unable to use ZonedRoutingInfoAllocator please select a "
-                f"different allocator as it needs {self.__size_app_part_bits} "
-                f"+ {self.__min_bits_atoms_and_mac} bits")
+                "Unable to use ZonedRoutingInfoAllocator as it needs "
+                "{self.__size_app_part_bits} bits for application keys + "
+                f"{self.__min_bits_atoms_and_mac} for machine and atom bits")
 
-        # Reserve fixed and check it still works
-        self.__set_fixed_used(routing_infos)
 
+    def __calculate_machine_atoms_zones(
+            self, routing_info: RoutingInfo) -> None:
+        # use all the bits not used by the application partition and overlaps
         self.__size_machine_atoms_bits = (
                 BITS_IN_KEY - self.__size_app_part_bits)
 
@@ -286,6 +288,10 @@ class ZonedRoutingInfoAllocator(object):
             self.__target_atom_bits = (
                     self.__size_machine_atoms_bits - self.__max_bits_machine)
             self.__target_machine_bits = self.__max_bits_machine
+
+        # assume all fixed (already have info) will overlap
+        for info in routing_info:
+            routing_info.add_mx_overlap(info.partition_id, info.vertex)
 
     @classmethod
     def calc_overlaps(

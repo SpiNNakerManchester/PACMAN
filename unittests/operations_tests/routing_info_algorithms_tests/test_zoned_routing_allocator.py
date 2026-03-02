@@ -304,6 +304,7 @@ def test_allocator_no_fixed() -> None:
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
     assert not routing_info.has_ap_overlap()
+    assert not routing_info.has_mx_overlap()
 
     assert routing_info.min_bits_atoms_and_mac == 15
     assert routing_info.max_bits_machine == 7
@@ -334,6 +335,9 @@ def test_fixed_only() -> None:
     assert routing_info.target_machine_bits == 30
     assert routing_info.target_atom_bits == 0
 
+    assert 4 == len(list(routing_info.get_ap_overlaps()))
+    assert 4 == len(list(routing_info.get_mx_overlaps()))
+
 
 def test_overlap() -> None:
     # This should work here; overlap is allowed provided routes don't overlap
@@ -356,6 +360,9 @@ def test_overlap() -> None:
     assert routing_info.target_machine_bits == 30
     assert routing_info.target_atom_bits == 0
 
+    assert 4 == len(list(routing_info.get_ap_overlaps()))
+    assert 4 == len(list(routing_info.get_mx_overlaps()))
+
 
 def test_no_edge() -> None:
     unittest_setup()
@@ -372,6 +379,9 @@ def test_no_edge() -> None:
     assert routing_info.target_machine_bits == 32
     assert routing_info.target_atom_bits == 0
 
+    assert not routing_info.has_ap_overlap()
+    assert not routing_info.has_mx_overlap()
+
 
 def test_allocator_with_fixed() -> None:
     unittest_setup()
@@ -385,8 +395,6 @@ def test_allocator_with_fixed() -> None:
     app_mask = 0xFFFF8000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
-    assert routing_info.has_ap_overlap()
-
     assert routing_info.min_bits_atoms_and_mac == 15
     assert routing_info.max_bits_machine == 7
     assert routing_info.max_bits_atoms == 8
@@ -394,6 +402,9 @@ def test_allocator_with_fixed() -> None:
     assert routing_info.size_mac_atoms_bits == 25
     assert routing_info.target_machine_bits == 17
     assert routing_info.target_atom_bits == 8
+
+    assert 146 == len(list(routing_info.get_ap_overlaps()))
+    assert 146 == len(list(routing_info.get_mx_overlaps()))
 
 
 def create_big(with_fixed: bool) -> None:
@@ -453,7 +464,7 @@ def test_big_no_fixed() -> None:
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
     assert not routing_info.has_ap_overlap()
-    assert routing_info.has_mx_overlap()
+    assert 2 == len(list(routing_info.get_mx_overlaps()))
 
     assert routing_info.min_bits_atoms_and_mac == 21
     assert routing_info.max_bits_machine == 11
@@ -480,8 +491,8 @@ def test_big_fixed() -> None:
     app_mask = 0xFFFC0000
     check_keys_for_application_partition_pairs(routing_info, app_mask)
 
-    assert routing_info.has_ap_overlap()
-    assert not routing_info.has_mx_overlap()
+    assert 2 == len(list(routing_info.get_ap_overlaps()))
+    assert 2 == len(list(routing_info.get_mx_overlaps()))
 
     assert routing_info.min_bits_atoms_and_mac == 18
     assert routing_info.max_bits_machine == 11
