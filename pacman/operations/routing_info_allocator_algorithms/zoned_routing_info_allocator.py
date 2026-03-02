@@ -190,14 +190,6 @@ class ZonedRoutingInfoAllocator(object):
             key_and_mask = pre.get_machine_fixed_key_and_mask(
                 m_vertex, part_id)
 
-            if machine_mask is None:
-                machine_mask = key_and_mask.mask
-            elif machine_mask != key_and_mask.mask:
-                raise PacmanRouteInfoAllocationException(
-                    f"For partition {part_id} {pre} has different "
-                    f"machine_fixed_key_and_mask found {hex(machine_mask)} "
-                    f"and {hex(key_and_mask.mask)}")
-
             if key_and_mask is None:
                 raise PacmanRouteInfoAllocationException(
                     f"For partition {part_id} {pre} has fixed key "
@@ -210,6 +202,16 @@ class ZonedRoutingInfoAllocator(object):
                     f"{app_key_and_mask} "
                     f"while outgoing {m_vertex} has {key_and_mask}"
                     f"these do not align")
+
+            if machine_mask is None:
+                machine_mask = key_and_mask.mask
+            elif machine_mask != key_and_mask.mask:
+                raise PacmanRouteInfoAllocationException(
+                    f"For partition {part_id} {pre} has different "
+                    f"machine_fixed_key_and_mask found {hex(machine_mask)} "
+                    f"and {hex(key_and_mask.mask)}")
+
+
             routing_info.add_routing_info(MachineVertexRoutingInfo(
                 key_and_mask, part_id, m_vertex, m_vertex.index))
             n_bits_atoms = m_vertex.get_n_keys_for_partition(part_id)

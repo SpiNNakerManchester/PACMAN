@@ -579,15 +579,15 @@ def create_many_machine_mask() -> None:
         label="fixed 1", n_keys_required={"Test": 8},
         app_vertex=fixed_app_vertex)
     fixed_app_vertex.remember_machine_vertex(fixed_mac_vertex1)
-    fixed_machine_keys_by_partition[(fixed_mac_vertex1, "Test")] = (
-        BaseKeyAndMask(0, 0xfffffff0))
+    fixed_machine_keys_by_partition[
+        fixed_mac_vertex1, "Test"] = BaseKeyAndMask(0, 0xfffffff0)
 
     fixed_mac_vertex2 = TestMacVertex(
         label="fixed 2", n_keys_required={"Test": 8},
         app_vertex=fixed_app_vertex)
     fixed_app_vertex.remember_machine_vertex(fixed_mac_vertex2)
-    fixed_machine_keys_by_partition[(fixed_mac_vertex2, "Test")] = (
-        BaseKeyAndMask(0, 0xffffff0f))
+    fixed_machine_keys_by_partition[
+        fixed_mac_vertex2, "Test"] = BaseKeyAndMask(0, 0xffffff0f)
 
 
 def test_many_machine_mask() -> None:
