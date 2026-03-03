@@ -314,7 +314,6 @@ def test_allocator_no_fixed() -> None:
     assert routing_info.target_machine_bits == 17
     assert routing_info.target_atom_bits == 8
 
-
 def test_fixed_only() -> None:
     unittest_setup()
     create_graphs_only_fixed(overlap=False)
@@ -337,6 +336,16 @@ def test_fixed_only() -> None:
 
     assert 4 == len(list(routing_info.get_ap_overlaps()))
     assert 4 == len(list(routing_info.get_mx_overlaps()))
+
+    for partition in PacmanDataView.iterate_partitions():
+        partition_id = partition.identifier
+        vertex = partition.pre_vertex
+        atom_zone = routing_info.get_atom_zone(partition_id, vertex)
+        print(partition_id, vertex, hex(atom_zone))
+        if partition_id == "Part0":
+            assert atom_zone == 0x1
+        else:  # partition_id == "Part1"
+            assert atom_zone == 0x0
 
 
 def test_overlap() -> None:
@@ -405,6 +414,23 @@ def test_allocator_with_fixed() -> None:
 
     assert 146 == len(list(routing_info.get_ap_overlaps()))
     assert 146 == len(list(routing_info.get_mx_overlaps()))
+
+    fixed = set()
+    fixed.add(("Part1", "MockAppVertex_4"))
+    fixed.add(("Part7", "MockAppVertex_4"))
+    fixed.add(("Part1", "MockAppVertex_5"))
+    for partition in PacmanDataView.iterate_partitions():
+        partition_id = partition.identifier
+        vertex = partition.pre_vertex
+        atom_zone = routing_info.get_atom_zone(partition_id, vertex)
+        machine_zone = routing_info.get_machine_zone(partition_id, vertex)
+        print(partition_id, vertex.label, hex(atom_zone), hex(machine_zone))
+        if (partition_id, vertex.label) in fixed:
+            assert atom_zone == 0x000000ff
+            assert machine_zone == 0x0000ff00
+        else:
+            assert atom_zone == -1000
+            assert machine_zone == -1000
 
 
 def create_big(fixed_mask: Optional[int]) -> None:

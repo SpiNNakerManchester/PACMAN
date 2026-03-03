@@ -28,6 +28,7 @@ class RoutingInfo(object):
     and masks.
     """
     __slots__ = ("_info", "_ap_overlaps", "_mx_overlaps",
+                 "_atom_zones", "_machine_zones",
                  "_min_bits_machine_and_atoms",
                  "_max_bits_machine", "_max_bits_atoms",
                  "_size_app_part_bits", "_size_mac_atoms_bits",
@@ -40,6 +41,8 @@ class RoutingInfo(object):
                          Dict[str, VertexRoutingInfo]] = defaultdict(dict)
         self._ap_overlaps: Set[Tuple[str, AbstractVertex]] = set()
         self._mx_overlaps: Set[Tuple[str, AbstractVertex]] = set()
+        self._atom_zones: Dict[Tuple[str, AbstractVertex], int] = dict()
+        self._machine_zones: Dict[Tuple[str, AbstractVertex], int] = dict()
         # Temp values to avoid Optionals
         self._min_bits_machine_and_atoms = -1000
         self._max_bits_machine = -1000
@@ -319,6 +322,30 @@ class RoutingInfo(object):
         :return: True if and only if there is at least one overlap
         """
         return len(self._mx_overlaps) > 0
+
+    def add_atom_zone(self, partition_id: str, vertex: AbstractVertex, mask: int) -> None:
+        self._atom_zones[(partition_id, vertex)] = mask
+
+    def get_atom_zones(self) -> Iterator[Tuple[str, AbstractVertex, int]]:
+        for (partition_id, vertex), mask in self._atom_zones.items():
+            yield partition_id, vertex, mask
+
+    def get_atom_zone(self, partition_id: str, vertex: AbstractVertex) -> int:
+        if (partition_id, vertex) in self._atom_zones:
+            return self._atom_zones[(partition_id, vertex)]
+        return -1000
+
+    def add_machine_zone(self, partition_id: str, vertex: AbstractVertex, mask: int) -> None:
+        self._machine_zones[(partition_id, vertex)] = mask
+
+    def get_machine_zones(self) -> Iterator[Tuple[str, AbstractVertex, int]]:
+        for (partition_id, vertex), mask in self._machine_zones.items():
+            yield partition_id, vertex, mask
+
+    def get_machine_zone(self, partition_id: str, vertex: AbstractVertex) -> int:
+        if (partition_id, vertex) in self._machine_zones:
+            return self._machine_zones[(partition_id, vertex)]
+        return -1000
 
     def add_zones(
             self, min_bits_machine_and_atoms: int, max_bits_machine: int,

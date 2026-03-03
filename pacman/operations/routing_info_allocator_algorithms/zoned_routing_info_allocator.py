@@ -180,6 +180,9 @@ class ZonedRoutingInfoAllocator(object):
             app_key_and_mask.mask, n_bits_atoms,
             len(pre.machine_vertices) - 1))
 
+        atom_mask = app_key_and_mask.mask ^ FULL_MASK
+        routing_info.add_atom_zone(part_id, pre, atom_mask)
+
     def __allocate_many_fixed(
             self, pre: ApplicationVertex, part_id: str,
             app_key_and_mask: BaseKeyAndMask, outgoing: List[MachineVertex],
@@ -205,6 +208,11 @@ class ZonedRoutingInfoAllocator(object):
 
             if machine_mask is None:
                 machine_mask = key_and_mask.mask
+                atom_zone = machine_mask ^ FULL_MASK
+                machine_zone = machine_mask ^ app_key_and_mask.mask
+                a = (hex(app_key_and_mask.mask), hex(machine_mask), hex(atom_zone), hex(machine_zone))
+                routing_info.add_atom_zone(part_id, m_vertex, atom_zone)
+                routing_info.add_machine_zone(part_id, m_vertex, machine_zone)
             elif machine_mask != key_and_mask.mask:
                 raise PacmanRouteInfoAllocationException(
                     f"For partition {part_id} {pre} has different "
@@ -214,13 +222,18 @@ class ZonedRoutingInfoAllocator(object):
 
             routing_info.add_routing_info(MachineVertexRoutingInfo(
                 key_and_mask, part_id, m_vertex, m_vertex.index))
+            routing_info.add_atom_zone(part_id, pre, atom_zone)
+            routing_info.add_machine_zone(part_id, pre, machine_zone)
             n_bits_atoms = m_vertex.get_n_keys_for_partition(part_id)
             max_atom_bits = max(max_atom_bits, n_bits_atoms)
+
         assert machine_mask is not None
         routing_info.add_routing_info(AppVertexRoutingInfo(
             app_key_and_mask, part_id, pre,
             machine_mask, n_bits_atoms,
             len(pre.machine_vertices) - 1))
+        routing_info.add_atom_zone(part_id, pre, atom_zone)
+        routing_info.add_machine_zone(part_id, pre, machine_zone)
 
     def __allocate_fixed(self, routing_info: RoutingInfo) -> None:
         for pre, part_id in self.__vertex_partitions:
@@ -283,6 +296,37 @@ class ZonedRoutingInfoAllocator(object):
                 f"{self.__min_bits_machine_and_atoms} "
                 f"for machine and atom bits")
 
+    def __get_atoms_bits_based_on_fixed(
+            self, routing_info: RoutingInfo) -> Optional[int]:
+        fixed_atom_zone = None
+        for _, _, atom_zone in routing_info.get_atom_zones():
+            if fixed_atom_zone is None:
+                fixed_atom_zone = atom_zone
+            elif atom_zone != fixed_atom_zone:
+                # multiple values so ignore all
+                return None
+
+        if fixed_atom_zone is None:
+            # no fixed so nothing to set
+            return None
+
+        key_zone = self.get_key_zone(fixed_atom_zone)
+        if key_zone is not None and key_zone[1] == BITS_IN_KEY - 1:
+            fixed_atoms_bits = BITS_IN_KEY - key_zone[0]
+        else:
+            # bad zone
+            return None
+
+        if fixed_atoms_bits < self.__max_bits_atoms:
+            # too small
+            return None
+
+        if self.__size_machine_atoms_bits < (
+            self.__max_bits_machine + fixed_atoms_bits):
+            # too big
+            return None
+
+
     def __calculate_machine_atoms_zones(
             self, routing_info: RoutingInfo) -> None:
         # use all the bits not used by the application partition and overlaps
@@ -291,10 +335,15 @@ class ZonedRoutingInfoAllocator(object):
 
         if self.__size_machine_atoms_bits >= (
                 self.__max_bits_machine + self.__max_bits_atoms):
-            # Fits nicely add extra bits to the machine zone
-            self.__target_atom_bits = self.__max_bits_atoms
+            fixed_atoms_bits = self.__get_atoms_bits_based_on_fixed()
+            if fixed_atoms_bits is not None:
+                # use a fixed atoms bits if it fits
+                self.__target_atom_bits = fixed_atoms_bits
+            else:
+                self.__target_atom_bits = self.__max_bits_atoms
+            # Add extra bits to the machine zone
             self.__target_machine_bits = (
-                    self.__size_machine_atoms_bits - self.__max_bits_atoms)
+                    self.__size_machine_atoms_bits - self.__target_atom_bits)
         else:
             # Does not fit so remove bits from the atom zone
             # Likely only a few very big machine vertices will need them
