@@ -14,26 +14,25 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
-from .vertex_routing_info import VertexRoutingInfo
+from .machine_vertex_routing_info import MachineVertexRoutingInfo
 if TYPE_CHECKING:
+    from .base_key_and_mask import BaseKeyAndMask
     from pacman.model.graphs.machine import MachineVertex
 
 
-class MachineVertexRoutingInfo(VertexRoutingInfo):
+class SpecificMachineVertexRoutingInfo(MachineVertexRoutingInfo):
     """
     Associates a machine vertex and partition identifier to its routing
     information (keys and masks).
+
+    The global application mask is still used
     """
 
     __slots__ = (
-        # The machine vertex that the keys are allocated to
-        "__machine_vertex",
+        # The keys allocated to the machine partition
+        "__machine_key_and_mask")
 
-        # The index of the machine vertex within the range of the application
-        # vertex
-        "__index")
-
-    def __init__(self, partition_id: str,
+    def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str,
                  machine_vertex: MachineVertex, index: int):
         """
         :param key_and_mask:
@@ -42,25 +41,29 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
         :param machine_vertex: The vertex to set the keys for
         :param index: The index of the machine vertex
         """
-        super().__init__(partition_id)
-        self.__machine_vertex = machine_vertex
-        self.__index = index
+        super().__init__(partition_id, machine_vertex, index)
+        self.__machine_key_and_mask = key_and_mask
 
-    @property
-    def machine_vertex(self) -> MachineVertex:
-        """
-        The machine vertex.
-        """
-        return self.__machine_vertex
+    @overrides(MachineVertexRoutingInfo.key_and_mask)
+    def key_and_mask(self) -> BaseKeyAndMask:
+        return self.__machine_key_and_mask
 
-    @property
-    @overrides(VertexRoutingInfo.vertex)
-    def vertex(self) -> MachineVertex:
-        return self.__machine_vertex
+    @overrides(MachineVertexRoutingInfo.app_mask)
+    def app_mask(self) -> int:
+        return self.global_app_mask
 
-    @property
-    def index(self) -> int:
-        """
-        The index of the vertex.
-        """
-        return self.__index
+    @overrides(MachineVertexRoutingInfo.machine_mask)
+    def machine_mask(self) -> int:
+        return self.__machine_key_and_mask
+
+    @overrides(MachineVertexRoutingInfo.has_global_masks)
+    def has_global_masks(self) -> bool:
+        return False
+
+    @overrides(MachineVertexRoutingInfo.has_shiftable_masks)
+    def has_shiftable_masks(self) -> bool:
+        return True
+
+    @overrides(MachineVertexRoutingInfo.has_fixed_keys)
+    def has_fixed_keys(self) -> bool:
+        return False
