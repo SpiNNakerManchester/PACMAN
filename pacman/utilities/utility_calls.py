@@ -16,7 +16,11 @@ import hashlib
 import math
 from typing import Any, Iterable, Tuple
 import numpy
+
+from pacman.exceptions import PacmanValueError
 from pacman.model.graphs.common import Slice
+from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
+
 
 
 def expand_to_bit_array(value: int) -> numpy.ndarray:
@@ -183,3 +187,42 @@ def is_power_of_2(v: int) -> bool:
     :returns: True if the value is a power of 2.
     """
     return (v & (v - 1) == 0) and (v != 0)
+
+
+def calc_shift(mask: int) -> bool:
+    bits = expand_to_bit_array(mask)
+    found_shift = False
+    shift = -1000
+    for i in range(32):
+        if bits[i] == 1:
+            # Check all 1 come before the zeros
+            if found_shift:
+                raise PacmanValueError(
+                    f"mask:{hex(mask)} does not support a clean shift."
+                    f" It has masked bits after the unmasked bits in {bits}")
+        else:
+            if not found_shift:
+                shift = BITS_IN_KEY - i
+                found_shift = True
+
+    if found_shift:
+        return shift
+
+    raise PacmanValueError(
+        "f{mask=} does not support a clean shift."
+        " It has no unmasked bits")
+
+
+def can_shift(mask: int) -> bool:
+    bits = expand_to_bit_array(mask)
+    found_shift = False
+    for i in range(32):
+        if bits[i] == 1:
+            # Check all 1 come before the zeros
+            if found_shift:
+                return False
+        else:
+            if not found_shift:
+                found_shift = True
+
+    return found_shift

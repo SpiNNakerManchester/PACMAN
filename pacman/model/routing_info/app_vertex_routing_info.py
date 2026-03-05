@@ -15,12 +15,15 @@ from __future__ import annotations
 import logging
 import math
 from typing import Iterable, List, Tuple, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
+
+from .base_key_and_mask import BaseKeyAndMask
 from .vertex_routing_info import VertexRoutingInfo
+
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
-    from pacman.model.routing_info import BaseKeyAndMask
     from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
 logger = logging.getLogger(__name__)
@@ -32,29 +35,33 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     """
 
     __slots__ = (
+        "__app_key",
         "__app_vertex",
-        "__machine_mask",
         "__n_bits_atoms",
         "__max_machine_index")
 
     def __init__(
-            self, key_and_mask: BaseKeyAndMask, partition_id: str,
-            app_vertex: ApplicationVertex, machine_mask: int,
+            self, app_key, int, partition_id: str,
+            app_vertex: ApplicationVertex,
             n_bits_atoms: int, max_machine_index: int):
         """
-        :param key_and_mask:
+        :param app_key:
         :param partition_id:
         :param app_vertex:
-        :param machine_mask:
         :param n_bits_atoms:
         :param max_machine_index:
         """
-        super().__init__(key_and_mask, partition_id)
+        super().__init__(partition_id)
+        self.__app_key = app_key
         self.__app_vertex = app_vertex
-        self.__machine_mask = machine_mask
         self.__n_bits_atoms = n_bits_atoms
         self.__max_machine_index = max_machine_index
 
+    @overrides(VertexRoutingInfo.key_and_mask)
+    def key_and_mask(self) -> BaseKeyAndMask:
+        return BaseKeyAndMask(self.__app_key, self.global_application_mask)
+
+    @overrides(VertexRoutingInfo)
     def merge_machine_entries(self, entries: List[Tuple[
             RoutingEntry,
             MachineVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:
@@ -92,7 +99,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                     i += next_entries
 
     def __group_mask(self, n_entries: int) -> int:
-        return self.__machine_mask - ((n_entries - 1) << self.__n_bits_atoms)
+        return self.machine_mask - ((n_entries - 1) << self.__n_bits_atoms)
 
     def __n_sequential_entries(self, i: int, n_entries: int) -> int:
         # This finds the maximum number of entries that can be joined following
@@ -108,13 +115,6 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     @overrides(VertexRoutingInfo.vertex)
     def vertex(self) -> ApplicationVertex:
         return self.__app_vertex
-
-    @property
-    def machine_mask(self) -> int:
-        """
-        The mask that covers a specific machine vertex.
-       """
-        return self.__machine_mask
 
     @property
     def n_bits_atoms(self) -> int:
