@@ -66,8 +66,11 @@ def __create_routing_table(
         else:
             sources_by_key_mask[r_info.key_and_mask] = (
                 source_vertex, partition_id)
+        key_and_mask = r_info.key_and_mask
+        if key_and_mask is None:
+            print(1)
         table.add_multicast_routing_entry(MulticastRoutingEntry(
-            key=r_info.key_and_mask.key_combo,
-            mask=r_info.key_and_mask.mask, routing_entry=entry))
+            key=key_and_mask.key_combo,
+            mask=key_and_mask.mask, routing_entry=entry))
 
     return table

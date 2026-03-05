@@ -27,9 +27,7 @@ class RoutingInfo(object):
     An association of machine vertices to a non-overlapping set of keys
     and masks.
     """
-    __slots__ = ("_info", "_ap_overlaps", "_mx_overlaps",
-                 "_atom_zones", "_machine_zones",
-                 "_min_bits_machine_and_atoms",
+    __slots__ = ("_info", "_min_bits_machine_and_atoms",
                  "_max_bits_machine", "_max_bits_atoms",
                  "_size_app_part_bits", "_size_mac_atoms_bits",
                  "_target_machine_bits", "_target_atom_bits")
@@ -39,10 +37,6 @@ class RoutingInfo(object):
         # name
         self._info: Dict[AbstractVertex,
                          Dict[str, VertexRoutingInfo]] = defaultdict(dict)
-        self._ap_overlaps: Set[Tuple[str, AbstractVertex]] = set()
-        self._mx_overlaps: Set[Tuple[str, AbstractVertex]] = set()
-        self._atom_zones: Dict[Tuple[str, AbstractVertex], int] = dict()
-        self._machine_zones: Dict[Tuple[str, AbstractVertex], int] = dict()
         # Temp values to avoid Optionals
         self._min_bits_machine_and_atoms = -1000
         self._max_bits_machine = -1000
@@ -231,121 +225,6 @@ class RoutingInfo(object):
 
     def __len__(self) -> int:
         return sum(len(v) for v in self._info.values())
-
-    def add_ap_overlap(
-            self, partition_id: str, vertex: AbstractVertex) -> None:
-        """
-        Records that this vertex, partition pair overlaps top part of the key
-
-        These are the exceptions to the split between
-        the application vertex/ partition id bits and
-        the machine vertex / core parts
-
-        :param partition_id: Id of the partition
-        :param vertex: Application or Machine vertex
-        """
-        self._ap_overlaps.add((partition_id, vertex))
-
-    def check_ap_overlap(
-            self, partition_id: str, vertex: AbstractVertex) -> bool:
-        """
-        Checks if this vertex, partition pair overlaps top part of the key
-
-        :param partition_id: Id of the partition
-        :param vertex: Application or Machine vertex
-        :return: True if and only if there is an overlap
-        """
-        return (partition_id, vertex) in self._ap_overlaps
-
-    def get_ap_overlaps(self) -> Iterator[Tuple[str, AbstractVertex]]:
-        """
-        :returns:  vertex, partition pairs that overlaps top part of the key
-        """
-        for pair in self._ap_overlaps:
-            yield pair
-
-    def has_ap_overlap(self) -> bool:
-        """
-        Checks if there are any overlaps top part of the key
-
-        :return: True if and only if there is at least one overlap
-        """
-        return len(self._ap_overlaps) > 0
-
-    def add_mx_overlap(
-            self, partition_id: str, vertex: AbstractVertex) -> None:
-        """
-        Records that this vertex, partition pair's atoms keys
-        overlap into the machine zone
-
-        These are the exceptions to the split between
-        the application vertex/ partition id bits and
-        the machine vertex / core parts
-
-        :param partition_id: Id of the partition
-        :param vertex: Application or Machine vertex
-        """
-        self._mx_overlaps.add((partition_id, vertex))
-
-    def check_mx_overlap(
-            self, partition_id: str, vertex: AbstractVertex) -> bool:
-        """
-        Checks if this vertex, partition pair air's atoms keys
-        overlap into the machine zone
-
-        All fixed key mask vertexes are included.
-
-        :param partition_id: Id of the partition
-        :param vertex: Application or Machine vertex
-        :return: True if and only if there is an overlap
-        """
-        return (partition_id, vertex) in self._mx_overlaps
-
-    def get_mx_overlaps(self) -> Iterator[Tuple[str, AbstractVertex]]:
-        """
-        Returns vertex, partition pairs whose atoms keys
-        overlap into the machine zone
-
-        All fixed key mask vertexes are included.
-
-        :returns: Partition ID, vertex pairs
-        """
-        for pair in self._mx_overlaps:
-            yield pair
-
-    def has_mx_overlap(self) -> bool:
-        """
-        Checks if there are any atoms into machine zone overlaps
-
-        True if there are any fixed key mask vertexes.
-
-        :return: True if and only if there is at least one overlap
-        """
-        return len(self._mx_overlaps) > 0
-
-    def add_atom_zone(self, partition_id: str, vertex: AbstractVertex, mask: int) -> None:
-        self._atom_zones[(partition_id, vertex)] = mask
-
-    def get_atom_zones(self) -> Iterator[Tuple[str, AbstractVertex, int]]:
-        for (partition_id, vertex), mask in self._atom_zones.items():
-            yield partition_id, vertex, mask
-
-    def get_atom_zone(self, partition_id: str, vertex: AbstractVertex) -> int:
-        if (partition_id, vertex) in self._atom_zones:
-            return self._atom_zones[(partition_id, vertex)]
-        return -1000
-
-    def add_machine_zone(self, partition_id: str, vertex: AbstractVertex, mask: int) -> None:
-        self._machine_zones[(partition_id, vertex)] = mask
-
-    def get_machine_zones(self) -> Iterator[Tuple[str, AbstractVertex, int]]:
-        for (partition_id, vertex), mask in self._machine_zones.items():
-            yield partition_id, vertex, mask
-
-    def get_machine_zone(self, partition_id: str, vertex: AbstractVertex) -> int:
-        if (partition_id, vertex) in self._machine_zones:
-            return self._machine_zones[(partition_id, vertex)]
-        return -1000
 
     def add_zones(
             self, min_bits_machine_and_atoms: int, max_bits_machine: int,

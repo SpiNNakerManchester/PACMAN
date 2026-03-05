@@ -15,6 +15,7 @@ from __future__ import annotations
 import logging
 from spinn_utilities.overrides import overrides
 from .app_vertex_routing_info import AppVertexRoutingInfo
+from .base_key_and_mask import BaseKeyAndMask
 
 logger = logging.getLogger(__name__)
 
@@ -26,22 +27,33 @@ class GlobalAppVertexRoutingInfo(AppVertexRoutingInfo):
 
     __slots__ = ()
 
+    @property
+    @overrides(AppVertexRoutingInfo.key_and_mask)
+    def key_and_mask(self) -> BaseKeyAndMask:
+        return BaseKeyAndMask(
+            self._app_key, self.get_global_application_mask())
+
+    @property
     @overrides(AppVertexRoutingInfo.app_mask)
     def app_mask(self) -> int:
-        return self.global_app_mask
+        return self.get_global_application_mask()
 
+    @property
     @overrides(AppVertexRoutingInfo.machine_mask)
     def machine_mask(self) -> int:
-        return self.global_machine_mask
+        return self.get_global_machine_mask()
 
+    @property
     @overrides(AppVertexRoutingInfo.has_global_masks)
     def has_global_masks(self) -> bool:
         return True
 
+    @property
     @overrides(AppVertexRoutingInfo.has_shiftable_masks)
     def has_shiftable_masks(self) -> bool:
         return True
 
+    @property
     @overrides(AppVertexRoutingInfo.has_fixed_keys)
     def has_fixed_keys(self) -> bool:
         return False

@@ -36,8 +36,6 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
     def __init__(self, partition_id: str,
                  machine_vertex: MachineVertex, index: int):
         """
-        :param key_and_mask:
-            The key allocated to the machine partition
         :param partition_id: The partition to set the keys for
         :param machine_vertex: The vertex to set the keys for
         :param index: The index of the machine vertex

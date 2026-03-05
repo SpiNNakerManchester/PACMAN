@@ -44,26 +44,32 @@ class SpecificMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         super().__init__(partition_id, machine_vertex, index)
         self.__machine_key_and_mask = key_and_mask
 
+    @property
     @overrides(MachineVertexRoutingInfo.key_and_mask)
     def key_and_mask(self) -> BaseKeyAndMask:
         return self.__machine_key_and_mask
 
+    @property
     @overrides(MachineVertexRoutingInfo.app_mask)
     def app_mask(self) -> int:
-        return self.global_app_mask
+        return self.get_global_application_mask()
 
+    @property
     @overrides(MachineVertexRoutingInfo.machine_mask)
     def machine_mask(self) -> int:
-        return self.__machine_key_and_mask
+        return self.__machine_key_and_mask.mask
 
+    @property
     @overrides(MachineVertexRoutingInfo.has_global_masks)
     def has_global_masks(self) -> bool:
         return False
 
+    @property
     @overrides(MachineVertexRoutingInfo.has_shiftable_masks)
     def has_shiftable_masks(self) -> bool:
         return True
 
+    @property
     @overrides(MachineVertexRoutingInfo.has_fixed_keys)
     def has_fixed_keys(self) -> bool:
         return False

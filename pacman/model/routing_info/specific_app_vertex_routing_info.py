@@ -16,9 +16,9 @@ import logging
 from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from .app_vertex_routing_info import AppVertexRoutingInfo
+from .base_key_and_mask import BaseKeyAndMask
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
-    from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
 logger = logging.getLogger(__name__)
 
@@ -45,26 +45,37 @@ class SpecificAppVertexRoutingInfo(AppVertexRoutingInfo):
         :param n_bits_atoms:
         :param max_machine_index:
         """
-        super().__init__(app_key, partition_id, app_vertex, machine_mask,
+        super().__init__(app_key, partition_id, app_vertex,
                          n_bits_atoms, max_machine_index)
         self.__machine_mask = machine_mask
 
+    @property
+    @overrides(AppVertexRoutingInfo.key_and_mask)
+    def key_and_mask(self) -> BaseKeyAndMask:
+        return BaseKeyAndMask(
+            self._app_key, self.get_global_application_mask())
+
+    @property
     @overrides(AppVertexRoutingInfo.app_mask)
     def app_mask(self) -> int:
-        return self.__machine_mask
+        return self.get_global_application_mask()
 
+    @property
     @overrides(AppVertexRoutingInfo.machine_mask)
     def machine_mask(self) -> int:
-        return self.global_machine_mask
+        return self.__machine_mask
 
-    @overrides(MachineVertexRoutingInfo.has_global_masks)
+    @property
+    @overrides(AppVertexRoutingInfo.has_global_masks)
     def has_global_masks(self) -> bool:
         return False
 
-    @overrides(MachineVertexRoutingInfo.has_shiftable_masks)
+    @property
+    @overrides(AppVertexRoutingInfo.has_shiftable_masks)
     def has_shiftable_masks(self) -> bool:
         return True
 
-    @overrides(MachineVertexRoutingInfo.has_fixed_keys)
+    @property
+    @overrides(AppVertexRoutingInfo.has_fixed_keys)
     def has_fixed_keys(self) -> bool:
         return False

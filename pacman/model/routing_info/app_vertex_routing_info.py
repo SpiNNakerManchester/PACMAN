@@ -35,13 +35,13 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     """
 
     __slots__ = (
-        "__app_key",
+        "_app_key",
         "__app_vertex",
         "__n_bits_atoms",
         "__max_machine_index")
 
     def __init__(
-            self, app_key, int, partition_id: str,
+            self, app_key: int, partition_id: str,
             app_vertex: ApplicationVertex,
             n_bits_atoms: int, max_machine_index: int):
         """
@@ -52,16 +52,11 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         :param max_machine_index:
         """
         super().__init__(partition_id)
-        self.__app_key = app_key
+        self._app_key = app_key
         self.__app_vertex = app_vertex
         self.__n_bits_atoms = n_bits_atoms
         self.__max_machine_index = max_machine_index
 
-    @overrides(VertexRoutingInfo.key_and_mask)
-    def key_and_mask(self) -> BaseKeyAndMask:
-        return BaseKeyAndMask(self.__app_key, self.global_application_mask)
-
-    @overrides(VertexRoutingInfo)
     def merge_machine_entries(self, entries: List[Tuple[
             RoutingEntry,
             MachineVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:

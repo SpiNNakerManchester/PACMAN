@@ -14,7 +14,7 @@
 from typing import Optional
 import numpy
 
-from spinn_utilities.abstract_base import abstractmethod, AbstractBase
+from spinn_utilities.abstract_base import abstractmethod
 
 from pacman.exceptions import PacmanConfigurationException, PacmanValueError
 from pacman.model.graphs import AbstractVertex
@@ -23,15 +23,17 @@ from pacman.utilities.utility_calls import calc_shift
 
 from .base_key_and_mask import BaseKeyAndMask
 
+NOT_SET = -1000
 
-class VertexRoutingInfo(object, metaclass=AbstractBase):
+
+class VertexRoutingInfo(object):
     """
     Associates a partition identifier to its routing information
     (keys and masks).
     """
 
-    __global_application_mask = -1000  # temp value until set
-    __global_machine_mask = -1000  # temp value until set
+    __global_application_mask = NOT_SET  # temp value until set
+    __global_machine_mask = NOT_SET  # temp value until set
 
     __slots__ = (
         # The partition identifier of the allocation
@@ -39,8 +41,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     def __init__(self, partition_id: str):
         """
-        :param key_and_mask:
-            The keys allocated to the machine partition
         :param partition_id: The partition to set the keys for
         """
         self.__partition_id = partition_id
@@ -63,7 +63,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
         key_array = numpy.zeros(n_keys, dtype=">u4")
         offset = 0
-        _, offset = self.__key_and_mask.get_keys(
+        _, offset = self.key_and_mask.get_keys(
             key_array=key_array, offset=offset, n_keys=(n_keys - offset))
         return key_array
 
@@ -201,15 +201,24 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     @classmethod
     def set_global_mask(cls, app_mask: int, machine_mask) -> None:
+        """
+        Sets the global masks once the allocator has picked them
+        """
         cls.__global_application_mask = app_mask
         cls.__global_machine_mask = machine_mask
 
-    @property
     @classmethod
-    def global_application_mask(cls) -> int:
+    def get_global_application_mask(cls) -> int:
+        """
+        The global application mask use dby the allocator
+        """
         return cls.__global_application_mask
 
-    @property
     @classmethod
-    def global_machine_mask(cls) -> int:
+    def get_global_machine_mask(cls) -> int:
+        """
+        The global machine mask used by the allocator
+
+        This covers both the atom index and machine index zones
+        """
         return cls.__global_machine_mask
