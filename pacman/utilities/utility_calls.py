@@ -189,7 +189,16 @@ def is_power_of_2(v: int) -> bool:
     return (v & (v - 1) == 0) and (v != 0)
 
 
-def calc_shift(mask: int) -> bool:
+def calc_shift(mask: int) -> int:
+    """
+    Calculate the shift for the given mask.
+
+    This requires a mask where all the 1 bits are before all the zero bits
+
+    :param mask:
+    :return: The shift
+    :raises PacmanValueError: If the mask does not support a clean shift
+    """
     bits = expand_to_bit_array(mask)
     found_shift = False
     shift = -1000

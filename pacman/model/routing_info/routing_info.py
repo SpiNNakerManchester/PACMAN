@@ -14,7 +14,7 @@
 from __future__ import annotations
 from collections import defaultdict
 from typing import (
-    Dict, Iterator, Optional, Iterable, Set, Tuple, TYPE_CHECKING)
+    Dict, Iterator, Optional, Iterable, Set, TYPE_CHECKING)
 from deprecated import deprecated
 from pacman.exceptions import PacmanAlreadyExistsException
 if TYPE_CHECKING:

@@ -19,7 +19,7 @@ from pacman.utilities.utility_calls import calc_shift, can_shift
 
 class TestItilityCalls(unittest.TestCase):
 
-    def test_calc_shift(self):
+    def test_calc_shift(self) -> None:
         self.assertEqual(8, calc_shift(0xFFFFFF00))
         self.assertEqual(30, calc_shift(0xc0000000))
 
@@ -34,7 +34,7 @@ class TestItilityCalls(unittest.TestCase):
         # weird but all unmasked is a full shift
         self.assertEqual(32, calc_shift(0x0))
 
-    def test_can_shift(self):
+    def test_can_shift(self) -> None:
         self.assertTrue(can_shift(0xFFFFFF00))
         self.assertTrue(can_shift(0xc0000000))
 

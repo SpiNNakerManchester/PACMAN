@@ -323,6 +323,7 @@ class ZonedRoutingInfoAllocator(object):
             # too big
             return None
 
+        return fixed_atoms_bits
 
     def __calculate_machine_atoms_zones(
             self, routing_info: RoutingInfo) -> None:
@@ -354,7 +355,7 @@ class ZonedRoutingInfoAllocator(object):
             self.__mask(self.__target_atom_bits))
 
     @classmethod
-    def get_key_zone(cls, mask: int):
+    def get_key_zone(cls, mask: int) -> Optional[Tuple[int, int]]:
         start = None
         end = None
         bits = expand_to_bit_array(mask)
@@ -491,16 +492,17 @@ class ZonedRoutingInfoAllocator(object):
 
             # Add application-level routing information
             key = app_part_index << (n_bits_atoms + n_bits_machine)
-            mask = self.__mask(n_bits_atoms + n_bits_machine)
             if overlap:
-                key_and_mask = BaseKeyAndMask(key, mask)
                 routing_info.add_routing_info(SpecificAppVertexRoutingInfo(
-                    key_and_mask, identifier, pre, self.__mask(n_bits_atoms),
-                    n_bits_atoms, len(machine_vertices) - 1))
+                    app_key=key, partition_id=identifier, app_vertex=pre,
+                    machine_mask=self.__mask(n_bits_atoms),
+                    n_bits_atoms=n_bits_atoms,
+                    max_machine_index=len(machine_vertices) - 1))
             else:
                 routing_info.add_routing_info(GlobalAppVertexRoutingInfo(
                     app_key=key, partition_id=identifier, app_vertex=pre,
-                    n_bits_atoms=n_bits_atoms, max_machine_index=len(machine_vertices) - 1))
+                    n_bits_atoms=n_bits_atoms,
+                    max_machine_index=len(machine_vertices) - 1))
             app_part_index += 1
 
         routing_info.add_zones(

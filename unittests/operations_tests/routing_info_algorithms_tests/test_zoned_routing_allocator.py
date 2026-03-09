@@ -534,8 +534,7 @@ def test_blocked_low() -> None:
 
 
 def create_many_machine_mask() -> None:
-    fixed_machine_keys_by_partition: \
-        Optional[Dict[Tuple[MachineVertex, str], BaseKeyAndMask]] = dict()
+    fixed_machine_keys_by_partition = dict()
     fixed_app_vertex = MockAppVertex(
         splitter=MockSplitter(), fixed_key=BaseKeyAndMask(0, 0xffffff00),
         fixed_machine_keys_by_partition=fixed_machine_keys_by_partition)

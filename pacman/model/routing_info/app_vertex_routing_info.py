@@ -19,7 +19,6 @@ from typing import Iterable, List, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
-from .base_key_and_mask import BaseKeyAndMask
 from .vertex_routing_info import VertexRoutingInfo
 
 if TYPE_CHECKING:

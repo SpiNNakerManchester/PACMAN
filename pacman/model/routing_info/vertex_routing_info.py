@@ -14,11 +14,11 @@
 from typing import Optional
 import numpy
 
-from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
-from pacman.exceptions import PacmanConfigurationException, PacmanValueError
+from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractVertex
-from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
+from pacman.utilities.constants import aFULL_MASK
 from pacman.utilities.utility_calls import calc_shift
 
 from .base_key_and_mask import BaseKeyAndMask
@@ -26,7 +26,7 @@ from .base_key_and_mask import BaseKeyAndMask
 NOT_SET = -1000
 
 
-class VertexRoutingInfo(object):
+class VertexRoutingInfo(object, metaclass=AbstractBase):
     """
     Associates a partition identifier to its routing information
     (keys and masks).
@@ -122,6 +122,7 @@ class VertexRoutingInfo(object):
 
         :raises PacmanValueError: If the mask is not shiftable
         """
+        raise NotImplementedError()
 
     @property
     @abstractmethod
@@ -131,6 +132,7 @@ class VertexRoutingInfo(object):
 
         This includes both the Application index and the machine index
         """
+        raise NotImplementedError()
 
     @property
     @abstractmethod
@@ -148,6 +150,7 @@ class VertexRoutingInfo(object):
         """
         The application mask as reported by the vertex
         """
+        raise NotImplementedError()
 
     @property
     @abstractmethod
@@ -180,27 +183,30 @@ class VertexRoutingInfo(object):
 
         Fixed keys may be shiftable and even global
         """
+        raise NotImplementedError()
 
     @property
     @abstractmethod
-    def has_shiftable_masks(self):
+    def has_shiftable_masks(self) -> bool:
         """
         True if all masks are shiftable.
 
         Only fixed key vertices should have none shiftable masks
         """
+        raise NotImplementedError()
 
     @property
     @abstractmethod
-    def has_global_masks(self):
+    def has_global_masks(self) -> bool:
         """
         True if all masks are the global ones defined by the zones
 
         Global masks are always shiftable.
         """
+        raise NotImplementedError()
 
     @classmethod
-    def set_global_mask(cls, app_mask: int, machine_mask) -> None:
+    def set_global_mask(cls, app_mask: int, machine_mask: int) -> None:
         """
         Sets the global masks once the allocator has picked them
         """
