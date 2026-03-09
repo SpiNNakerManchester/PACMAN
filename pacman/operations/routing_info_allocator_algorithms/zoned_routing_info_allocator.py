@@ -179,10 +179,9 @@ class ZonedRoutingInfoAllocator(object):
         routing_info.add_routing_info(FixedMachineVertexRoutingInfo(
             app_key_and_mask, part_id, m_vertex, app_key_and_mask.mask,
             m_vertex.index))
-        n_bits_atoms = m_vertex.get_n_keys_for_partition(part_id)
         routing_info.add_routing_info(FixedAppVertexRoutingInfo(
             app_key_and_mask, part_id, pre,
-            app_key_and_mask.mask, n_bits_atoms,
+            app_key_and_mask.mask,
             len(pre.machine_vertices) - 1))
 
         atom_mask = app_key_and_mask.mask ^ FULL_MASK
@@ -212,8 +211,6 @@ class ZonedRoutingInfoAllocator(object):
 
             if machine_mask is None:
                 machine_mask = key_and_mask.mask
-                atom_zone = machine_mask ^ FULL_MASK
-                machine_zone = machine_mask ^ app_key_and_mask.mask
             elif machine_mask != key_and_mask.mask:
                 raise PacmanRouteInfoAllocationException(
                     f"For partition {part_id} {pre} has different "
@@ -230,8 +227,7 @@ class ZonedRoutingInfoAllocator(object):
         assert machine_mask is not None
         routing_info.add_routing_info(FixedAppVertexRoutingInfo(
             app_key_and_mask, part_id, pre,
-            machine_mask, n_bits_atoms,
-            len(pre.machine_vertices) - 1))
+            machine_mask, len(pre.machine_vertices) - 1))
 
     def __allocate_fixed(self, routing_info: RoutingInfo) -> None:
         for pre, part_id in self.__vertex_partitions:
@@ -496,12 +492,10 @@ class ZonedRoutingInfoAllocator(object):
                 routing_info.add_routing_info(SpecificAppVertexRoutingInfo(
                     app_key=key, partition_id=identifier, app_vertex=pre,
                     machine_mask=self.__mask(n_bits_atoms),
-                    n_bits_atoms=n_bits_atoms,
                     max_machine_index=len(machine_vertices) - 1))
             else:
                 routing_info.add_routing_info(GlobalAppVertexRoutingInfo(
                     app_key=key, partition_id=identifier, app_vertex=pre,
-                    n_bits_atoms=n_bits_atoms,
                     max_machine_index=len(machine_vertices) - 1))
             app_part_index += 1
 

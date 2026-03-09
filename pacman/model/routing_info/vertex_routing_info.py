@@ -16,9 +16,9 @@ import numpy
 
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
-from pacman.exceptions import PacmanConfigurationException
+from pacman.exceptions import PacmanConfigurationException, PacmanValueError
 from pacman.model.graphs import AbstractVertex
-from pacman.utilities.constants import FULL_MASK
+from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 from pacman.utilities.utility_calls import calc_shift
 
 from .base_key_and_mask import BaseKeyAndMask
@@ -114,16 +114,29 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         return self.machine_mask ^ FULL_MASK
 
     @property
-    @abstractmethod
     def atom_shift(self) -> int:
         """
         The shitf for the atom zone.
 
         Likely zero or None
 
-        :raises PacmanValueError: If the mask is not shiftable
+        :raises PacmanValueError: If the masks are not shiftable
         """
-        raise NotImplementedError()
+        if self.has_shiftable_masks:
+            return 0
+        raise PacmanValueError("Due to weird masks the concept of "
+                               "atom shit can not be used")
+
+    @property
+    def n_bits_atoms(self) -> int:
+        """
+        The number of bits for the atoms.
+
+        Semantic sugar for machine_shift
+
+        :raises PacmanValueError: If the masks are not shiftable
+        """
+        return self.machine_shift
 
     @property
     @abstractmethod
@@ -136,7 +149,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         raise NotImplementedError()
 
     @property
-    @abstractmethod
     def machine_shift(self) -> int:
         """
         The shift for the machine zone.
@@ -154,7 +166,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         raise NotImplementedError()
 
     @property
-    @abstractmethod
     def app_shift(self) -> int:
         """
         The shift for the application zone.

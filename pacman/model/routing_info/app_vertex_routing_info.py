@@ -36,24 +36,20 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     __slots__ = (
         "_app_key",
         "__app_vertex",
-        "__n_bits_atoms",
         "__max_machine_index")
 
     def __init__(
             self, app_key: int, partition_id: str,
-            app_vertex: ApplicationVertex,
-            n_bits_atoms: int, max_machine_index: int):
+            app_vertex: ApplicationVertex, max_machine_index: int):
         """
         :param app_key:
         :param partition_id:
         :param app_vertex:
-        :param n_bits_atoms:
         :param max_machine_index:
         """
         super().__init__(partition_id)
         self._app_key = app_key
         self.__app_vertex = app_vertex
-        self.__n_bits_atoms = n_bits_atoms
         self.__max_machine_index = max_machine_index
 
     def merge_machine_entries(self, entries: List[Tuple[
@@ -65,6 +61,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         :param entries:
             The entries to merge
         :returns: The routing info in the merged/ multicast format.
+        :raises PacmanValueError: If the masks are not shiftable
         """
         n_entries = len(entries)
         (_, last_r_info) = entries[-1]
@@ -93,7 +90,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                     i += next_entries
 
     def __group_mask(self, n_entries: int) -> int:
-        return self.machine_mask - ((n_entries - 1) << self.__n_bits_atoms)
+        return self.machine_mask - ((n_entries - 1) << self.n_bits_atoms)
 
     def __n_sequential_entries(self, i: int, n_entries: int) -> int:
         # This finds the maximum number of entries that can be joined following
@@ -109,10 +106,3 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     @overrides(VertexRoutingInfo.vertex)
     def vertex(self) -> ApplicationVertex:
         return self.__app_vertex
-
-    @property
-    def n_bits_atoms(self) -> int:
-        """
-        The number of bits for the atoms.
-        """
-        return self.__n_bits_atoms
