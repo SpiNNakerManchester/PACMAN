@@ -210,7 +210,12 @@ class VertexRoutingInfo(object):
     @classmethod
     def get_global_application_mask(cls) -> int:
         """
-        The global application mask use dby the allocator
+        The global application mask use by the allocator.
+
+        As this is a class method this is reproted by ll infos even
+        ones that do not respect it.
+
+        :returns: The global masked
         """
         return cls.__global_application_mask
 
@@ -219,6 +224,9 @@ class VertexRoutingInfo(object):
         """
         The global machine mask used by the allocator
 
-        This covers both the atom index and machine index zones
+        As this is a class method this is reproted by ll infos even
+        ones that do not respect it.
+
+        :returns: The global masked
         """
         return cls.__global_machine_mask
