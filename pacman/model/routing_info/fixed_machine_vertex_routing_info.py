@@ -14,7 +14,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
-from pacman.utilities.utility_calls import can_shift, calc_shift
+from pacman.utilities.utility_calls import can_shift
 
 from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
