@@ -294,7 +294,7 @@ class ZonedRoutingInfoAllocator(object):
             if atom_mask is None:
                 atom_mask = info.atom_mask
             elif atom_mask != info.atom_mask:
-                # mutiple masks so ignore fixed
+                # multiple masks so ignore fixed
                 return None
         if atom_mask is None:
             # no fixed so nothing to set
@@ -350,6 +350,14 @@ class ZonedRoutingInfoAllocator(object):
 
     @classmethod
     def get_key_zone(cls, mask: int) -> Optional[Tuple[int, int]]:
+        """
+        Get the start and end of the ones in a mask
+
+        Only works if the mask has a single block of ones.
+
+        :param mask:
+        :return: int start and end or None i
+        """
         start = None
         end = None
         bits = expand_to_bit_array(mask)

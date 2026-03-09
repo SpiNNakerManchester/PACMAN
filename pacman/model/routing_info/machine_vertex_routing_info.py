@@ -13,13 +13,17 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
+from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
+
 from .vertex_routing_info import VertexRoutingInfo
+
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex
 
 
-class MachineVertexRoutingInfo(VertexRoutingInfo):
+class MachineVertexRoutingInfo(VertexRoutingInfo, metaclass=AbstractBase):
     """
     Associates a machine vertex and partition identifier to its routing
     information (keys and masks).

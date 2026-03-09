@@ -16,6 +16,7 @@ import logging
 import math
 from typing import Iterable, List, Tuple, TYPE_CHECKING
 
+from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
@@ -28,7 +29,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class AppVertexRoutingInfo(VertexRoutingInfo):
+class AppVertexRoutingInfo(VertexRoutingInfo, metaclass=AbstractBase):
     """
     Routing information for an application vertex.
     """
