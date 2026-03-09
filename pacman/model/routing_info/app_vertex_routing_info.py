@@ -16,7 +16,6 @@ import logging
 import math
 from typing import Iterable, List, Tuple, TYPE_CHECKING
 
-from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
@@ -28,8 +27,10 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+# pylint: disable=abstract-method
 
-class AppVertexRoutingInfo(VertexRoutingInfo, metaclass=AbstractBase):
+
+class AppVertexRoutingInfo(VertexRoutingInfo):
     """
     Routing information for an application vertex.
     """

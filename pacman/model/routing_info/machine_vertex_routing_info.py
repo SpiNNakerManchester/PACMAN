@@ -14,7 +14,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 
 from .vertex_routing_info import VertexRoutingInfo
@@ -22,8 +21,10 @@ from .vertex_routing_info import VertexRoutingInfo
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex
 
+# pylint: disable=abstract-method
 
-class MachineVertexRoutingInfo(VertexRoutingInfo, metaclass=AbstractBase):
+
+class MachineVertexRoutingInfo(VertexRoutingInfo):
     """
     Associates a machine vertex and partition identifier to its routing
     information (keys and masks).
