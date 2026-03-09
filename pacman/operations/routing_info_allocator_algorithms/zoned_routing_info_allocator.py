@@ -184,8 +184,6 @@ class ZonedRoutingInfoAllocator(object):
             app_key_and_mask.mask,
             len(pre.machine_vertices) - 1))
 
-        atom_mask = app_key_and_mask.mask ^ FULL_MASK
-
     def __allocate_many_fixed(
             self, pre: ApplicationVertex, part_id: str,
             app_key_and_mask: BaseKeyAndMask, outgoing: List[MachineVertex],
@@ -216,7 +214,6 @@ class ZonedRoutingInfoAllocator(object):
                     f"For partition {part_id} {pre} has different "
                     f"machine_fixed_key_and_mask found {hex(machine_mask)} "
                     f"and {hex(key_and_mask.mask)}")
-
 
             routing_info.add_routing_info(FixedMachineVertexRoutingInfo(
                 key_and_mask, part_id, m_vertex, app_key_and_mask.mask,
@@ -315,7 +312,7 @@ class ZonedRoutingInfoAllocator(object):
             return None
 
         if self.__size_machine_atoms_bits < (
-            self.__max_bits_machine + fixed_atoms_bits):
+                self.__max_bits_machine + fixed_atoms_bits):
             # too big
             return None
 
@@ -329,7 +326,8 @@ class ZonedRoutingInfoAllocator(object):
 
         if self.__size_machine_atoms_bits >= (
                 self.__max_bits_machine + self.__max_bits_atoms):
-            fixed_atoms_bits = self.__get_atoms_bits_based_on_fixed(routing_info)
+            fixed_atoms_bits = self.__get_atoms_bits_based_on_fixed(
+                routing_info)
             if fixed_atoms_bits is not None:
                 # use a fixed atoms bits if it fits
                 self.__target_atom_bits = fixed_atoms_bits

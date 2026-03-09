@@ -21,6 +21,7 @@ from .machine_vertex_routing_info import MachineVertexRoutingInfo
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex
 
+
 class GlobalMachineVertexRoutingInfo(MachineVertexRoutingInfo):
     """
     Associates a machine vertex and partition identifier to its key the global

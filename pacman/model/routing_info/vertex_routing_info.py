@@ -18,7 +18,7 @@ from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 from pacman.exceptions import PacmanConfigurationException, PacmanValueError
 from pacman.model.graphs import AbstractVertex
-from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
+from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.utility_calls import calc_shift
 
 from .base_key_and_mask import BaseKeyAndMask

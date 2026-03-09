@@ -19,8 +19,7 @@ import numpy
 
 from pacman.exceptions import PacmanValueError
 from pacman.model.graphs.common import Slice
-from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
-
+from pacman.utilities.constants import BITS_IN_KEY
 
 
 def expand_to_bit_array(value: int) -> numpy.ndarray:

@@ -57,4 +57,3 @@ class GlobalAppVertexRoutingInfo(AppVertexRoutingInfo):
     @overrides(AppVertexRoutingInfo.has_fixed_keys)
     def has_fixed_keys(self) -> bool:
         return False
-

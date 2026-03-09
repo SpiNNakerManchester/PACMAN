@@ -259,13 +259,12 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertFalse(info.has_fixed_keys)
         self.assertEqual(info.app_mask, global_app)
         self.assertEqual(info.app_shift, 24)
-        self.assertEqual( info.machine_mask, specific_mac)
+        self.assertEqual(info.machine_mask, specific_mac)
         self.assertEqual(info.machine_shift, 16)
         self.assertEqual(info.machine_index_mask, 0x00FF0000)
         self.assertEqual(info.atom_mask, 0x0000FFFF)
         self.assertEqual(info.atom_shift, 0)
         self.assertEqual(info.n_bits_atoms, 16)
-
 
     def test_gloabl_machine_vertex_routing_info(self) -> None:
         global_app = 0xff000000
@@ -283,7 +282,7 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertFalse(info.has_fixed_keys)
         self.assertEqual(info.app_mask, global_app)
         self.assertEqual(info.app_shift, 24)
-        self.assertEqual( info.machine_mask, global_mac)
+        self.assertEqual(info.machine_mask, global_mac)
         self.assertEqual(info.machine_shift, 8)
         self.assertEqual(info.machine_index_mask, 0x00FFFF00)
         self.assertEqual(info.atom_mask, 0x000000FF)
@@ -361,7 +360,7 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertFalse(info.has_fixed_keys)
         self.assertEqual(info.app_mask, global_app)
         self.assertEqual(info.app_shift, 24)
-        self.assertEqual( info.machine_mask, specific_mac)
+        self.assertEqual(info.machine_mask, specific_mac)
         self.assertEqual(info.machine_shift, 16)
         self.assertEqual(info.machine_index_mask, 0x00FF0000)
         self.assertEqual(info.atom_mask, 0x0000FFFF)
@@ -384,7 +383,7 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertFalse(info.has_fixed_keys)
         self.assertEqual(info.app_mask, global_app)
         self.assertEqual(info.app_shift, 24)
-        self.assertEqual( info.machine_mask, global_mac)
+        self.assertEqual(info.machine_mask, global_mac)
         self.assertEqual(info.machine_shift, 8)
         self.assertEqual(info.machine_index_mask, 0x00FFFF00)
         self.assertEqual(info.atom_mask, 0x000000FF)
