@@ -73,27 +73,6 @@ class RoutingInfo(object):
         if not info.has_global_masks:
             self._has_global_masks = False
 
-
-    @deprecated(reason="This method is unsafe, since it doesn't determine "
-                       "whether the info is missing because there is no "
-                       "outgoing edge, or if the outgoing edge is in another "
-                       "partition and the name is wrong. "
-                       "Use a combination of "
-                       "get_info_from, "
-                       "get_partitions_from, "
-                       "has_info_from, "
-                       "or get_single_info_from")
-    def get_routing_info_from_pre_vertex(
-            self, vertex: AbstractVertex,
-            partition_id: str) -> Optional[VertexRoutingInfo]:
-        """
-        :param vertex: The vertex to search for
-        :param partition_id:
-            The ID of the partition for which to get the routing information
-        :returns: Routing information for a given partition_id from a vertex.
-        """
-        return self._info[vertex].get(partition_id)
-
     def get_info_from(
             self, vertex: AbstractVertex,
             partition_id: str) -> VertexRoutingInfo:
@@ -107,32 +86,6 @@ class RoutingInfo(object):
             information
         """
         return self._info[vertex][partition_id]
-
-    @deprecated(reason="This method is unsafe, since it doesn't determine "
-                       "whether the info is missing because there is no "
-                       "outgoing edge, or if the outgoing edge is in another "
-                       "partition and the name is wrong. "
-                       "Use a combination of "
-                       "get_key_from, "
-                       "get_partitions_from, "
-                       "has_info_from, "
-                       "or get_single_key_from")
-    def get_first_key_from_pre_vertex(
-            self, vertex: AbstractVertex, partition_id: str) -> Optional[int]:
-        """
-        Get the first key for the partition starting at a vertex.
-
-        :param vertex: The vertex which the partition starts at
-        :param partition_id:
-            The ID of the partition for which to get the routing information
-        :return: The routing key of the partition
-        """
-        if vertex not in self._info:
-            return None
-        info = self._info[vertex]
-        if partition_id not in info:
-            return None
-        return info[partition_id].key
 
     def get_key_from(
             self, vertex: AbstractVertex, partition_id: str) -> int:
