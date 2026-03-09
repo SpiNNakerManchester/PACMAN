@@ -73,7 +73,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         The only key and mask.
         """
-    raise NotImplementedError()
+        raise NotImplementedError()
 
     @property
     def key(self) -> int:

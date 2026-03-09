@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Dict, Iterable, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterable, Optional, Sequence, Tuple
 
 from spinn_utilities.overrides import overrides
 
@@ -534,8 +534,8 @@ def test_blocked_low() -> None:
 
 
 def create_many_machine_mask() -> None:
-    fixed_machine_keys_by_partition = dict()
-    fixed_app_vertex: Dict = MockAppVertex(
+    fixed_machine_keys_by_partition: Any = dict()
+    fixed_app_vertex = MockAppVertex(
         splitter=MockSplitter(), fixed_key=BaseKeyAndMask(0, 0xffffff00),
         fixed_machine_keys_by_partition=fixed_machine_keys_by_partition)
     PacmanDataView.add_vertex(fixed_app_vertex)

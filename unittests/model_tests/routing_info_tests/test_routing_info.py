@@ -14,7 +14,6 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import ConstantSDRAM
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
