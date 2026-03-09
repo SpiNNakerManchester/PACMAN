@@ -373,7 +373,7 @@ class ZonedRoutingInfoAllocator(object):
             if end is None:
                 end = 31
 
-        if start is None:
+        if start is None or end is None:
             return None
         else:
             return (start, end)

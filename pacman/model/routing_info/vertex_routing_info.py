@@ -18,7 +18,7 @@ from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractVertex
-from pacman.utilities.constants import aFULL_MASK
+from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.utility_calls import calc_shift
 
 from .base_key_and_mask import BaseKeyAndMask
@@ -73,6 +73,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         The only key and mask.
         """
+    raise NotImplementedError()
 
     @property
     def key(self) -> int:

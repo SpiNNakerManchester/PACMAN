@@ -535,7 +535,7 @@ def test_blocked_low() -> None:
 
 def create_many_machine_mask() -> None:
     fixed_machine_keys_by_partition = dict()
-    fixed_app_vertex = MockAppVertex(
+    fixed_app_vertex: Dict = MockAppVertex(
         splitter=MockSplitter(), fixed_key=BaseKeyAndMask(0, 0xffffff00),
         fixed_machine_keys_by_partition=fixed_machine_keys_by_partition)
     PacmanDataView.add_vertex(fixed_app_vertex)
