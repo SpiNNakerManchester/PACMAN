@@ -116,7 +116,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     @property
     def atom_shift(self) -> int:
         """
-        The shitf for the atom zone.
+        The shift for the atom zone.
 
         Likely zero or None
 

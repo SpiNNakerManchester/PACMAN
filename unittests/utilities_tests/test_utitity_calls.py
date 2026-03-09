@@ -27,7 +27,7 @@ class TestItilityCalls(unittest.TestCase):
         with self.assertRaises(PacmanValueError):
             self.assertEqual(8, calc_shift(0xFFFF00FF))
 
-        # All masked does not shitf
+        # All masked does not shift
         with self.assertRaises(PacmanValueError):
             self.assertEqual(8, calc_shift(0xFFFFFFFF))
 
@@ -41,7 +41,7 @@ class TestItilityCalls(unittest.TestCase):
         # mask in the middle does not shift
         self.assertFalse(can_shift(0xFFFF00FF))
 
-        # All masked does not shitf
+        # All masked does not shift
         self.assertFalse(can_shift(0xFFFFFFFF))
 
         # weird but all unmasked is a full shift
