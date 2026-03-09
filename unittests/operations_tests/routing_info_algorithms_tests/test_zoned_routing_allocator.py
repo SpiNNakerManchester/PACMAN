@@ -29,6 +29,7 @@ from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.model.routing_info import RoutingInfo, MachineVertexRoutingInfo
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
+
 class MockSplitter(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
@@ -301,7 +302,7 @@ def test_allocator_no_fixed() -> None:
 
     # all but the bottom 8 + 7 = 15 bits should be the same
     app_mask = 0xFFFF8000
-    #check_keys_for_application_partition_pairs(routing_info, app_mask)
+    check_keys_for_application_partition_pairs(routing_info, app_mask)
 
     assert routing_info.min_bits_machine_and_atoms == 15
     assert routing_info.max_bits_machine == 7
@@ -313,6 +314,7 @@ def test_allocator_no_fixed() -> None:
     assert routing_info.has_global_masks
     assert routing_info.has_shiftable_masks
     assert not routing_info.has_fixed_keys
+
 
 def test_fixed_only() -> None:
     unittest_setup()
@@ -349,6 +351,7 @@ def test_overlap() -> None:
     assert not routing_info.has_global_masks
     assert routing_info.has_shiftable_masks
     assert routing_info.has_fixed_keys
+
 
 def test_no_edge() -> None:
     unittest_setup()
@@ -397,8 +400,6 @@ def test_allocator_with_fixed() -> None:
         info = routing_info.get_info_from(vertex, partition_id)
         atom_zone = info.atom_mask
         machine_zone = info.machine_mask
-        app_mask = info.app_mask
-        print(partition_id, vertex.label, hex(atom_zone), hex(machine_zone), hex(app_mask), info.has_fixed_keys)
         assert atom_zone == 0x000000ff
         assert machine_zone == 0xffffff00
 
