@@ -282,7 +282,7 @@ class RoutingInfo(object):
     @property
     def has_fixed_keys(self) -> bool:
         """
-        True if ANY vertex requires fixed kleys and masks
+        True if ANY vertex requires fixed keys and masks
 
         Fixed keys may be shiftable and even global
         """

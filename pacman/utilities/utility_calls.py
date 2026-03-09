@@ -222,6 +222,12 @@ def calc_shift(mask: int) -> int:
 
 
 def can_shift(mask: int) -> bool:
+    """
+    Checks if the mask can generate a clean shift.
+
+    :param mask:
+    :return: True if cal_shift will work or False if it will error.
+    """
     bits = expand_to_bit_array(mask)
     found_shift = False
     for i in range(32):

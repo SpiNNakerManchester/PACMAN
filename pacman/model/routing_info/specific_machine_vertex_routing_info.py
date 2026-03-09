@@ -30,7 +30,7 @@ class SpecificMachineVertexRoutingInfo(MachineVertexRoutingInfo):
 
     __slots__ = (
         # The keys allocated to the machine partition
-        "__machine_key_and_mask")
+        "__machine_key_and_mask",)
 
     def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str,
                  machine_vertex: MachineVertex, index: int):

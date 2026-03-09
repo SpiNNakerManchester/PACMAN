@@ -37,7 +37,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     __slots__ = (
         # The partition identifier of the allocation
-        "__partition_id")
+        "__partition_id",)
 
     def __init__(self, partition_id: str):
         """
@@ -230,7 +230,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         The global application mask use by the allocator.
 
-        As this is a class method this is reproted by ll infos even
+        As this is a class method this is reported by all infos even
         ones that do not respect it.
 
         :returns: The global masked
@@ -242,7 +242,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         The global machine mask used by the allocator
 
-        As this is a class method this is reproted by ll infos even
+        As this is a class method this is reported by all infos even
         ones that do not respect it.
 
         :returns: The global masked

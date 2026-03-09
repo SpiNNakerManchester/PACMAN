@@ -54,8 +54,7 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         elif not can_shift(key_and_mask.mask):
             self.__shiftable = False
         else:
-            self.__shiftable == (
-                calc_shift(app_mask) <= calc_shift(key_and_mask.mask))
+            self.__shiftable = self.app_shift >= self.machine_shift
 
     @property
     @overrides(MachineVertexRoutingInfo.key_and_mask)
