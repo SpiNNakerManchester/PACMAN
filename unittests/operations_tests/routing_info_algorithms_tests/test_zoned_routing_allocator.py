@@ -310,6 +310,9 @@ def test_allocator_no_fixed() -> None:
     assert routing_info.size_mac_atoms_bits == 25
     assert routing_info.target_machine_bits == 17
     assert routing_info.target_atom_bits == 8
+    assert routing_info.has_global_masks == True
+    assert routing_info.has_shiftable_masks == True
+    assert routing_info.has_fixed_keys == False
 
 def test_fixed_only() -> None:
     unittest_setup()
@@ -324,6 +327,9 @@ def test_fixed_only() -> None:
     assert routing_info.size_mac_atoms_bits == 30
     assert routing_info.target_machine_bits == 30
     assert routing_info.target_atom_bits == 0
+    assert routing_info.has_global_masks == False
+    assert routing_info.has_shiftable_masks == False
+    assert routing_info.has_fixed_keys == True
 
 
 def test_overlap() -> None:
@@ -340,7 +346,9 @@ def test_overlap() -> None:
     assert routing_info.size_mac_atoms_bits == 30
     assert routing_info.target_machine_bits == 30
     assert routing_info.target_atom_bits == 0
-
+    assert routing_info.has_global_masks == False
+    assert routing_info.has_shiftable_masks == True
+    assert routing_info.has_fixed_keys == True
 
 def test_no_edge() -> None:
     unittest_setup()
@@ -355,6 +363,9 @@ def test_no_edge() -> None:
     assert routing_info.size_mac_atoms_bits == 32
     assert routing_info.target_machine_bits == 32
     assert routing_info.target_atom_bits == 0
+    assert routing_info.has_global_masks == True
+    assert routing_info.has_shiftable_masks == True
+    assert routing_info.has_fixed_keys == False
 
 
 def test_allocator_with_fixed() -> None:
@@ -376,6 +387,9 @@ def test_allocator_with_fixed() -> None:
     assert routing_info.size_mac_atoms_bits == 25
     assert routing_info.target_machine_bits == 17
     assert routing_info.target_atom_bits == 8
+    assert routing_info.has_global_masks == False
+    assert routing_info.has_shiftable_masks == True
+    assert routing_info.has_fixed_keys == True
 
     for partition in PacmanDataView.iterate_partitions():
         partition_id = partition.identifier
@@ -453,6 +467,9 @@ def test_big_no_fixed() -> None:
     assert routing_info.size_mac_atoms_bits == 31
     assert routing_info.target_machine_bits == 11
     assert routing_info.target_atom_bits == 20
+    assert routing_info.has_global_masks == False
+    assert routing_info.has_shiftable_masks == True
+    assert routing_info.has_fixed_keys == False
 
 
 def test_big_fixed_high() -> None:
@@ -478,6 +495,9 @@ def test_big_fixed_high() -> None:
     assert routing_info.size_mac_atoms_bits == 20
     assert routing_info.target_machine_bits == 13
     assert routing_info.target_atom_bits == 7
+    assert routing_info.has_global_masks == False
+    assert routing_info.has_shiftable_masks == False
+    assert routing_info.has_fixed_keys == True
 
 def test_big_fixed_low() -> None:
     unittest_setup()
@@ -502,6 +522,9 @@ def test_big_fixed_low() -> None:
     assert routing_info.size_mac_atoms_bits == 30
     assert routing_info.target_machine_bits == 23
     assert routing_info.target_atom_bits == 7
+    assert routing_info.has_global_masks == False
+    assert routing_info.has_shiftable_masks == True
+    assert routing_info.has_fixed_keys == True
 
 
 def test_blocked_simple() -> None:

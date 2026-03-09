@@ -27,8 +27,10 @@ class RoutingInfo(object):
     An association of machine vertices to a non-overlapping set of keys
     and masks.
     """
-    __slots__ = ("_info", "_min_bits_machine_and_atoms",
+    __slots__ = ("_info", "_has_fixed_keys",
+                 "_has_global_masks", "_has_shiftable_masks",
                  "_max_bits_machine", "_max_bits_atoms",
+                 "_min_bits_machine_and_atoms",
                  "_size_app_part_bits", "_size_mac_atoms_bits",
                  "_target_machine_bits", "_target_atom_bits")
 
@@ -45,6 +47,9 @@ class RoutingInfo(object):
         self._size_mac_atoms_bits = -1000
         self._target_machine_bits = -1000
         self._target_atom_bits = -1000
+        self._has_fixed_keys = False
+        self._has_shiftable_masks = True
+        self._has_global_masks = True
 
     def add_routing_info(self, info: VertexRoutingInfo) -> None:
         """
@@ -61,6 +66,13 @@ class RoutingInfo(object):
                 "Routing information", str(info))
 
         self._info[info.vertex][info.partition_id] = info
+        if info.has_fixed_keys:
+            self._has_fixed_keys = True
+        if not info.has_shiftable_masks:
+            self._has_shiftable_masks = False
+        if not info.has_global_masks:
+            self._has_global_masks = False
+
 
     @deprecated(reason="This method is unsafe, since it doesn't determine "
                        "whether the info is missing because there is no "
@@ -314,3 +326,30 @@ class RoutingInfo(object):
          and others with atoms per core.
          """
         return self._target_atom_bits
+
+    @property
+    def has_fixed_keys(self) -> bool:
+        """
+        True if ANY vertex requires fixed kleys and masks
+
+        Fixed keys may be shiftable and even global
+        """
+        return self._has_fixed_keys
+
+    @property
+    def has_shiftable_masks(self) -> bool:
+        """
+        True if all masks in ALL infos are shiftable.
+
+        Only fixed key vertices should have none shiftable masks
+        """
+        return self._has_shiftable_masks
+
+    @property
+    def has_global_masks(self) -> bool:
+        """
+        True if all masks in ALL infos are global ones defined by the zones
+
+        Global masks are always shiftable.
+        """
+        return self._has_global_masks
