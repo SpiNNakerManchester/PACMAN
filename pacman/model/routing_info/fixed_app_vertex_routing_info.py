@@ -16,6 +16,7 @@ import logging
 from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.utilities.utility_calls import can_shift, calc_shift
+from pacman.exceptions import IrregularFixedMaskException
 from .app_vertex_routing_info import AppVertexRoutingInfo
 from .base_key_and_mask import BaseKeyAndMask
 
@@ -54,13 +55,20 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
                          max_machine_index)
         self.__app_mask = key_and_mask.mask
         self.__machine_mask = machine_mask
+        self.__shiftable = True
         if not can_shift(self.__app_mask):
-            self.__shiftable = False
+            raise IrregularFixedMaskException(
+                f"{app_vertex} has a fixed app mask {self.__app_mask} which"
+                f" is not shiftable")
         elif not can_shift(machine_mask):
-            self.__shiftable = False
+            raise IrregularFixedMaskException(
+                f"{app_vertex} has a fixed {machine_mask=} which"
+                f" is not shiftable")
         else:
-            self.__shiftable = (
-                calc_shift(self.__app_mask) >= calc_shift(machine_mask))
+            if self.app_shift < self.machine_shift:
+                raise IrregularFixedMaskException(
+                    f"{app_vertex} has a fixed app mask {self.__app_mask} "
+                    f"which is larger than fixed {machine_mask=}")
 
     @property
     @overrides(AppVertexRoutingInfo.key_and_mask)

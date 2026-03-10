@@ -199,3 +199,9 @@ class MinimisationFailedError(PacmanException):
     """
     A routing table could not be minimised to reach a specified target.
     """
+
+
+class IrregularFixedMaskException(PacmanException):
+    """
+    The fixed key and mask is not one we can easily handle
+    """

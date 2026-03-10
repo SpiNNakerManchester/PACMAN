@@ -14,6 +14,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
+from pacman.exceptions import IrregularFixedMaskException
 from pacman.utilities.utility_calls import can_shift
 
 from .machine_vertex_routing_info import MachineVertexRoutingInfo
@@ -50,11 +51,19 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         self.__machine_key_and_mask = key_and_mask
         self.__shiftable = True
         if not can_shift(app_mask):
-            self.__shiftable = False
+            raise IrregularFixedMaskException(
+                f"{machine_vertex} has a fixed {app_mask=} which"
+                f" is not shiftable")
         elif not can_shift(key_and_mask.mask):
-            self.__shiftable = False
+            raise IrregularFixedMaskException(
+                f"{machine_vertex} has a fixed machine_mask "
+                f"{key_and_mask.mask} which is not shiftable")
         else:
-            self.__shiftable = self.app_shift >= self.machine_shift
+            if self.app_shift < self.machine_shift:
+                raise IrregularFixedMaskException(
+                    f"{machine_vertex} has a fixed {app_mask=} "
+                    f"which is larger than fixed machine_mask "
+                    f"{key_and_mask.mask}")
 
     @property
     @overrides(MachineVertexRoutingInfo.key_and_mask)

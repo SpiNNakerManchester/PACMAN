@@ -17,7 +17,7 @@ from pacman.config_setup import unittest_setup
 from pacman.model.resources import ConstantSDRAM
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
-    PacmanValueError)
+    PacmanValueError, IrregularFixedMaskException)
 from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask, VertexRoutingInfo,
     FixedAppVertexRoutingInfo, FixedMachineVertexRoutingInfo,
@@ -222,25 +222,10 @@ class TestRoutingInfo(unittest.TestCase):
             app_mask=global_app, machine_mask=global_mac)
         bkm1 = BaseKeyAndMask(0x00100000, specific_mac)
         vertex1 = SimpleMachineVertex(ConstantSDRAM(0))
-        info = FixedMachineVertexRoutingInfo(
-            key_and_mask=bkm1, partition_id="test", machine_vertex=vertex1,
-            app_mask=specific_app, index=2)
-        self.assertEqual(info.key_and_mask, bkm1)
-        self.assertFalse(info.has_global_masks)
-        self.assertFalse(info.has_shiftable_masks)
-        self.assertTrue(info.has_fixed_keys)
-        self.assertEqual(info.app_mask, specific_app)
-        with self.assertRaises(PacmanValueError):
-            info.app_shift
-        self.assertEqual(info.machine_mask, specific_mac)
-        with self.assertRaises(PacmanValueError):
-            info.machine_shift
-        self.assertEqual(info.machine_index_mask, 0x00F00000)
-        self.assertEqual(info.atom_mask, 0x0F0FFFF0)
-        with self.assertRaises(PacmanValueError):
-            self.assertEqual(info.atom_shift, 0)
-        with self.assertRaises(PacmanValueError):
-            self.assertEqual(info.n_bits_atoms, 12)
+        with self.assertRaises(IrregularFixedMaskException):
+            FixedMachineVertexRoutingInfo(
+                key_and_mask=bkm1, partition_id="test", machine_vertex=vertex1,
+                app_mask=specific_app, index=2)
 
     def test_specific_machine_vertex_routing_info(self) -> None:
         global_app = 0xff000000
@@ -323,25 +308,10 @@ class TestRoutingInfo(unittest.TestCase):
             app_mask=global_app, machine_mask=global_mac)
         bkm1 = BaseKeyAndMask(0x10000001, specific_app)
         vertex1 = SimpleTestVertex(4, "fixed")
-        info = FixedAppVertexRoutingInfo(
-            key_and_mask=bkm1, partition_id="test", app_vertex=vertex1,
-            machine_mask=specific_mac, max_machine_index=3)
-        self.assertEqual(info.key_and_mask, bkm1)
-        self.assertFalse(info.has_global_masks)
-        self.assertFalse(info.has_shiftable_masks)
-        self.assertTrue(info.has_fixed_keys)
-        self.assertEqual(info.app_mask, specific_app)
-        with self.assertRaises(PacmanValueError):
-            info.app_shift
-        self.assertEqual(info.machine_mask, specific_mac)
-        with self.assertRaises(PacmanValueError):
-            info.machine_shift
-        self.assertEqual(info.machine_index_mask, 0x00F00000)
-        self.assertEqual(info.atom_mask, 0x0F0FFFF0)
-        with self.assertRaises(PacmanValueError):
-            info.atom_shift
-        with self.assertRaises(PacmanValueError):
-            info.n_bits_atoms
+        with self.assertRaises(IrregularFixedMaskException):
+            FixedAppVertexRoutingInfo(
+                key_and_mask=bkm1, partition_id="test", app_vertex=vertex1,
+                machine_mask=specific_mac, max_machine_index=3)
 
     def test_specific_app_vertex_routing_info(self) -> None:
         global_app = 0xff000000
