@@ -362,9 +362,9 @@ def test_no_edge() -> None:
     assert routing_info.min_bits_machine_and_atoms == 0
     assert routing_info.max_bits_machine == 0
     assert routing_info.max_bits_atoms == 0
-    assert routing_info.size_app_part_bits == 0
-    assert routing_info.size_mac_atoms_bits == 32
-    assert routing_info.target_machine_bits == 32
+    assert routing_info.size_app_part_bits == 1
+    assert routing_info.size_mac_atoms_bits == 31
+    assert routing_info.target_machine_bits == 31
     assert routing_info.target_atom_bits == 0
     assert routing_info.has_global_masks
     assert routing_info.has_shiftable_masks
