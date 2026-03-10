@@ -251,7 +251,7 @@ class ZonedRoutingInfoAllocator(object):
         Computes the size for the zones.
 
         """
-        bits_needed  = allocator_bits_needed(len(self.__vertex_partitions))
+        bits_needed = allocator_bits_needed(len(self.__vertex_partitions))
         self.__size_app_part_bits = max(1, bits_needed)
 
         progress = ProgressBar(
