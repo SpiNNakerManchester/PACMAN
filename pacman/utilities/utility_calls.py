@@ -240,3 +240,16 @@ def can_shift(mask: int) -> bool:
                 found_shift = True
 
     return found_shift
+
+
+def signifacant_zone(key: int):
+    bits = expand_to_bit_array(key)
+    first = 0
+    while first < BITS_IN_KEY and bits[first] == 0:
+        first += 1
+        if first >= BITS_IN_KEY:
+            return None
+    last = 31
+    while last > first and bits[last] == 0:
+        last -= 1
+    return (first, last)

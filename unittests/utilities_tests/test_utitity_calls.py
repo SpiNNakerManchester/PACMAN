@@ -14,7 +14,8 @@
 
 import unittest
 from pacman.exceptions import PacmanValueError
-from pacman.utilities.utility_calls import calc_shift, can_shift
+from pacman.utilities.utility_calls import (
+    calc_shift, can_shift, signifacant_zone)
 
 
 class TestItilityCalls(unittest.TestCase):
@@ -46,3 +47,14 @@ class TestItilityCalls(unittest.TestCase):
 
         # weird but all unmasked is a full shift
         self.assertTrue(can_shift(0x0))
+
+    def test_signifacant_zone(self) -> None:
+        self.assertEqual((0, 3), signifacant_zone(0xF0000000))
+        self.assertEqual((11, 11), signifacant_zone(0x00100000))
+        self.assertEqual((10, 18), signifacant_zone(0x00302000))
+        self.assertEqual((28, 31), signifacant_zone(0x0000000F))
+        self.assertEqual((3, 7), signifacant_zone(0x11000000))
+        self.assertEqual((18, 18), signifacant_zone(0x00002000))
+        self.assertIsNone(signifacant_zone(0x00000000))
+        self.assertFalse(0x00000000)
+

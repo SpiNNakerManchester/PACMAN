@@ -177,7 +177,7 @@ class ZonedRoutingInfoAllocator(object):
                     f"{app_key_and_mask} while only outgoing machine vertex"
                     f" has {key_and_mask}")
         routing_info.add_routing_info(FixedMachineVertexRoutingInfo(
-            app_key_and_mask, part_id, m_vertex, app_key_and_mask.mask,
+            app_key_and_mask, part_id, m_vertex, app_key_and_mask,
             m_vertex.index))
         routing_info.add_routing_info(FixedAppVertexRoutingInfo(
             app_key_and_mask, part_id, pre,
@@ -216,7 +216,7 @@ class ZonedRoutingInfoAllocator(object):
                     f"and {hex(key_and_mask.mask)}")
 
             routing_info.add_routing_info(FixedMachineVertexRoutingInfo(
-                key_and_mask, part_id, m_vertex, app_key_and_mask.mask,
+                key_and_mask, part_id, m_vertex, app_key_and_mask,
                 m_vertex.index))
             n_bits_atoms = m_vertex.get_n_keys_for_partition(part_id)
             max_atom_bits = max(max_atom_bits, n_bits_atoms)

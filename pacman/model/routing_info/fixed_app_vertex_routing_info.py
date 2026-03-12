@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
-from pacman.utilities.utility_calls import can_shift, calc_shift
+from pacman.utilities.utility_calls import can_shift
 from pacman.exceptions import IrregularFixedMaskException
 from .app_vertex_routing_info import AppVertexRoutingInfo
 from .base_key_and_mask import BaseKeyAndMask
