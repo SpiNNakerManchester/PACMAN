@@ -112,6 +112,21 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
     def has_fixed_keys(self) -> bool:
         return True
 
+    def get_atom_bits_needed_range(self) -> Tuple[int, int]:
+        app_key = self.__app_key_and_mask.key
+        app_used = signifacant_zone(app_key)
+        machine_index_key = self.key - app_key
+        machine_used = signifacant_zone(machine_index_key)
+        if app_used is None:
+            min_needed = 0
+        else:
+            min_needed = app_used[1] + 1
+        if machine_used is None:
+            max_needed = BITS_IN_KEY - self.machine_shift
+        else:
+            max_needed = machine_used[0]
+        return (min_needed, max_needed)
+
     def supported_app_shifts(self) -> Tuple[int, int]:
         """
         The range of app_shifts that this info can support.

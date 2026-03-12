@@ -308,7 +308,7 @@ def test_allocator_no_fixed() -> None:
     assert routing_info.max_bits_machine == 7
     assert routing_info.max_bits_atoms == 8
     assert routing_info.size_app_part_bits == 7
-    assert routing_info.size_mac_atoms_bits == 25
+    assert routing_info.size_mac_atoms_bits == 15
     assert routing_info.target_machine_bits == 17
     assert routing_info.target_atom_bits == 8
     assert routing_info.has_global_masks

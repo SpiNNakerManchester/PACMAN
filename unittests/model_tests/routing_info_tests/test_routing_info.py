@@ -214,6 +214,7 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.atom_shift, 0)
         self.assertEqual(info.n_bits_atoms, 12)
         self.assertEqual((14,24), info.supported_app_shifts())
+        self.assertEqual((8, 18), info.get_atom_bits_needed_range())
 
     def test_fixed_one_to_one_routing_info(self) -> None:
         global_app = 0xff000000
@@ -239,6 +240,7 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.atom_shift, 0)
         self.assertEqual(info.n_bits_atoms, 12)
         self.assertEqual((12,24), info.supported_app_shifts())
+        self.assertEqual((8, 20), info.get_atom_bits_needed_range())
 
     def test_weird_machine_vertex_routing_info(self) -> None:
         global_app = 0xff000000
