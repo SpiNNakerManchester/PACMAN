@@ -26,8 +26,7 @@ from pacman.model.routing_info import (
     VertexRoutingInfo)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
-from pacman.utilities.utility_calls import (
-    allocator_bits_needed, expand_to_bit_array, get_key_ranges)
+from pacman.utilities.utility_calls import allocator_bits_needed
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
@@ -103,13 +102,12 @@ class ZonedRoutingInfoAllocator(object):
         "__max_bits_machine",
         # Maximum number of bits to represent the atoms for any vertex
         "__max_bits_atoms",
+        # Needed size of the App vertex / Partition name zone
+        "__size_app_part_bits",
         # Set of app_part indexes used by fixed
         "__ap_keys_blocked_by_fixed",
-        # Size of the App vertex / Partition name zone
-        "__size_app_part_bits",
-        # Size of the machine and atoms part
-        "__size_machine_atoms_bits",
-        "__target_atom_bits",
+        # The size of the App vertex / Partition name zone
+        "__target_app_bits",
         # Size of the machine part for vertex that fit the normal case
         "__target_machine_bits",
         # Size of the atoms part for vertex that fit the normal case
@@ -131,8 +129,7 @@ class ZonedRoutingInfoAllocator(object):
 
         # temp values to init without optional
         self.__size_app_part_bits = -10000
-        self.__size_machine_atoms_bits = -10000
-        self.__target_atom_bits = -10000
+        self.__target_app_bits = -10000
         self.__target_machine_bits = -10000
         self.__target_atom_bits = -10000
 
@@ -151,9 +148,8 @@ class ZonedRoutingInfoAllocator(object):
         routing_info = RoutingInfo()
         self.__allocate_fixed(routing_info)
         self.__calculate_zone_sizes_needed(routing_info)
-        self.__set_fixed_used(routing_info)
         self.__set_target_zones(routing_info)
-
+        self.__set_fixed_used(routing_info)
         self.__allocate(routing_info)
         return routing_info
 
@@ -290,133 +286,53 @@ class ZonedRoutingInfoAllocator(object):
                 f"for machine and atom bits")
 
     def __set_target_zones(self, routing_info: RoutingInfo) -> None:
-        min_fix_atom = 0
-        max_fix_atom = 32
+        min_fix_app = self.__size_app_part_bits
+        max_fix_app = BITS_IN_KEY - self.__min_bits_machine_and_atoms
         for info in routing_info:
             if isinstance(info, FixedMachineVertexRoutingInfo):
                 v_min, v_max = info.get_atom_bits_needed_range()
-                min_fix_atom = max(min_fix_atom, v_min)
-                max_fix_atom = min(max_fix_atom, v_max)
-            if min_fix_atom > max_fix_atom:
-                raise PacmanRouteInfoAllocationException(
-                    "There is no n_atom_bit which works for for all fixed")
-
-        if min_fix_atom + self.__min_bits_machine_and_atoms > BITS_IN_KEY:
+                if v_min > max_fix_app:
+                    raise PacmanRouteInfoAllocationException(
+                        f"Vertex {info.vertex} fixed keys requires at least "
+                        f"{v_min} app bits but max allowed if {max_fix_app}")
+                min_fix_app = max(min_fix_app, v_min)
+                if v_max < min_fix_app:
+                    raise PacmanRouteInfoAllocationException(
+                        f"Vertex {info.vertex} fixed keys requires at most "
+                        f"{v_max} app bits but min allowed if {min_fix_app}")
+                max_fix_app = min(max_fix_app, v_max)
+        if min_fix_app > max_fix_app:
             raise PacmanRouteInfoAllocationException(
-                f"The fixed keys need at least {min_fix_atom} atom bits "
-                f"while the machine and atoms need "
-                f"{self.__min_bits_machine_and_atoms} bits")
+                "There is no n_atom_bit which works for for all fixed")
 
-        if max_fix_atom < self.__size_app_part_bits:
-            raise PacmanRouteInfoAllocationException(
-                f"The allocator needs {self.__size_app_part_bits} app bits "
-                f"while the fixed keys support a max of {max_fix_atom}")
-
-        self.__target_atom_bits = (
+        self.__target_app_bits = (
                 BITS_IN_KEY - self.__max_bits_machine - self.__max_bits_atoms)
-        if self.__target_atom_bits > max_fix_atom:
-            self.__target_atom_bits = max_fix_atom
-        if self.__target_atom_bits < min_fix_atom:
-            self.__target_atom_bits = min_fix_atom
+        if self.__target_app_bits > max_fix_app:
+            self.__target_app_bits = max_fix_app
+        if self.__target_app_bits < min_fix_app:
+            self.__target_app_bits = min_fix_app
 
-        if (self.__target_atom_bits + self.__min_bits_machine_and_atoms
+        if (self.__target_app_bits + self.__min_bits_machine_and_atoms
                 > BITS_IN_KEY):
             raise PacmanRouteInfoAllocationException(
                 "Unable to find a number of atom bits that works with fixed")
 
-        self.__size_machine_atoms_bits = (
-                BITS_IN_KEY - self.__target_atom_bits)
-        self.__target_atom_bits = self.__max_bits_atoms
-        # Add extra bits to the machine zone
-        self.__target_machine_bits = (
-                self.__size_machine_atoms_bits - self.__target_atom_bits)
+        self.__target_machine_bits = self.__max_bits_machine
+        self.__target_atom_bits = (BITS_IN_KEY - self.__target_app_bits -
+                                   self.__target_machine_bits)
 
         VertexRoutingInfo.set_global_mask(
             self.__mask(self.__target_machine_bits + self.__target_atom_bits),
             self.__mask(self.__target_atom_bits))
 
-    @classmethod
-    def get_key_zone(cls, mask: int) -> Optional[Tuple[int, int]]:
-        """
-        Get the start and end of the ones in a mask
-
-        Only works if the mask has a single block of ones.
-
-        :param mask:
-        :return: int start and end or None i
-        """
-        start = None
-        end = None
-        bits = expand_to_bit_array(mask)
-        for i in range(32):
-            if bits[i] == 1:
-                if start is None:
-                    start = i
-                if end is not None:
-                    return None
-            else:
-                if start is not None:
-                    if end is None:
-                        end = i - 1
-        if start is not None:
-            if end is None:
-                end = 31
-
-        if start is None or end is None:
-            return None
-        else:
-            return (start, end)
-
-    @classmethod
-    def calc_overlaps(
-            cls, key: int, mask: int, ap_zone: int) -> Set[int]:
-        """
-        Which of the top bits could be used by this key and mask
-
-        :param key: application vertex key
-        :param mask: application vertex mask
-        :param ap_zone: number of bits in the application partition zone
-        :return: Set of top zone values that need to be blocked.
-        """
-        mac_zone = BITS_IN_KEY - ap_zone
-        # Get the key and mask that overlap with the A-P key and mask
-        key = key >> mac_zone
-        mask = mask >> mac_zone
-        # Make the mask all 1s in the MSBs where it has been shifted
-        mask |= (((1 << mac_zone) - 1) << ap_zone)
-
-        blocked: Set[int] = set()
-        for k, n_keys in get_key_ranges(key, mask):
-            blocked.update(range(k, k + n_keys))
-        return blocked
-
     def __set_fixed_used(self, routing_info: RoutingInfo) -> None:
-        """
-        Block the use of ``AP`` indexes that would clash with fixed keys
-        """
-        # The idea below is to generate all combinations of the A-P keys that
-        # overlap with one of the fixed keys and masks. Example:
-        # | A | P | M | X |
-        # |1111000|0000000| (1)
-        # |1111111|1100000| (2)
-        # |1010110|0000000| (3)
-        # Case (1): the mask of the key is all within A and P, so it will
-        #           generate 16 AP values which need to be blocked out
-        # Case (2): the mask of the key goes beyond A and P, so it will
-        #           generate only one AP value that can't be used
-        # Case (3): the mask that overlaps AP is complex; all possible
-        #           combinations of AP within the 0s of the mask will be
-        #           blocked from use
         for pre, identifier in self.__vertex_partitions:
             if not routing_info.has_info_from(pre, identifier):
                 continue
             key_and_mask = routing_info.get_info_from(pre, identifier)
-            blocked = self.calc_overlaps(
-                key_and_mask.key, key_and_mask.mask,
-                self.__size_app_part_bits)
-
-            if blocked:
-                self.__ap_keys_blocked_by_fixed.update(blocked)
+            # Get the key and mask that overlap with the A-P key and mask
+            blocked = key_and_mask.key >> self.__target_app_bits
+            self.__ap_keys_blocked_by_fixed.add(blocked)
 
     def __allocate(self, routing_info: RoutingInfo) -> None:
         progress = ProgressBar(
@@ -433,7 +349,6 @@ class ZonedRoutingInfoAllocator(object):
                 continue
 
             n_bits_atoms = self.__atom_bits_per_app_part[pre, identifier]
-
             while app_part_index in self.__ap_keys_blocked_by_fixed:
                 app_part_index += 1
 
@@ -444,9 +359,11 @@ class ZonedRoutingInfoAllocator(object):
                 n_bits_atoms = self.__target_atom_bits
                 overlap = False
             else:
-                n_bits_machine = self.__size_machine_atoms_bits - n_bits_atoms
-                needed = allocator_bits_needed(len(machine_vertices))
-                assert (n_bits_machine >= needed)
+                n_bits_machine = allocator_bits_needed(len(machine_vertices))
+                assert (self.__target_app_bits + n_bits_machine +
+                        n_bits_atoms <= BITS_IN_KEY)
+                n_bits_machine = (
+                        BITS_IN_KEY - self.__target_app_bits - n_bits_atoms)
                 overlap = True
             for machine_index, machine_vertex in enumerate(machine_vertices):
                 mask = self.__mask(n_bits_atoms)
@@ -481,8 +398,9 @@ class ZonedRoutingInfoAllocator(object):
         routing_info.add_zones(
             self.__min_bits_machine_and_atoms,
             self.__max_bits_machine, self.__max_bits_atoms,
-            self.__size_app_part_bits, self.__size_machine_atoms_bits,
-            self.__target_machine_bits, self.__target_atom_bits)
+            self.__size_app_part_bits,
+            self.__target_app_bits, self.__target_machine_bits,
+            self.__target_atom_bits)
 
     @staticmethod
     def __mask(bits: int) -> int:

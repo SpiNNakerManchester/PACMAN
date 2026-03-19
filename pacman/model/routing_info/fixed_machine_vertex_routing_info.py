@@ -126,32 +126,3 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         else:
             max_needed = machine_used[0]
         return (min_needed, max_needed)
-
-    def supported_app_shifts(self) -> Tuple[int, int]:
-        """
-        The range of app_shifts that this info can support.
-
-        The amount will be large enough that shifting the app_key left and
-        then right by any of these values will result in the app_key
-
-        The amount will be small enough that shifting the machine_ket left
-        and then right give the app_key.
-
-        This takes into consideration the machine_mask to not leave
-        atoms bits after the shift.
-
-        It total ignores the app_mask suggested by the vertex.
-        """
-        app_key = self.__app_key_and_mask.key
-        app_used = signifacant_zone(app_key)
-        machine_index_key = self.key - app_key
-        machine_used = signifacant_zone(machine_index_key)
-        if app_used is None:
-            max_shift = BITS_IN_KEY
-        else:
-            max_shift = BITS_IN_KEY - app_used[1] - 1
-        if machine_used is None:
-            min_shift = self.machine_shift
-        else:
-            min_shift = BITS_IN_KEY -machine_used[0]
-        return (min_shift, max_shift)

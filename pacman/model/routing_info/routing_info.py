@@ -29,9 +29,9 @@ class RoutingInfo(object):
     __slots__ = ("_info", "_has_fixed_keys",
                  "_has_global_masks", "_has_shiftable_masks",
                  "_max_bits_machine", "_max_bits_atoms",
-                 "_min_bits_machine_and_atoms",
-                 "_size_app_part_bits", "_size_mac_atoms_bits",
-                 "_target_machine_bits", "_target_atom_bits")
+                 "_min_bits_machine_and_atoms", "_size_app_part_bits",
+                 "_target_app_bits", "_target_machine_bits",
+                 "_target_atom_bits")
 
     def __init__(self) -> None:
         # Partition information indexed by edge pre-vertex and partition ID
@@ -43,7 +43,7 @@ class RoutingInfo(object):
         self._max_bits_machine = -1000
         self._max_bits_atoms = -1000
         self._size_app_part_bits = -1000
-        self._size_mac_atoms_bits = -1000
+        self._target_app_bits = -1000
         self._target_machine_bits = -1000
         self._target_atom_bits = -1000
         self._has_fixed_keys = False
@@ -193,8 +193,8 @@ class RoutingInfo(object):
     def add_zones(
             self, min_bits_machine_and_atoms: int, max_bits_machine: int,
             max_bits_atoms: int, size_app_part_bits: int,
-            size_mac_atoms_bits: int, target_machine_bits: int,
-            target_atom_bits: int) -> None:
+            target_app_bits: int,
+            target_machine_bits: int, target_atom_bits: int) -> None:
         """
         Copy in the zone info from the allocator
 
@@ -202,7 +202,7 @@ class RoutingInfo(object):
         :param max_bits_machine:
         :param max_bits_atoms:
         :param size_app_part_bits:
-        :param size_mac_atoms_bits:
+        :param target_app_bits:
         :param target_machine_bits:
         :param target_atom_bits:
         :return:
@@ -211,7 +211,7 @@ class RoutingInfo(object):
         self._max_bits_machine = max_bits_machine
         self._max_bits_atoms = max_bits_atoms
         self._size_app_part_bits = size_app_part_bits
-        self._size_mac_atoms_bits = size_mac_atoms_bits
+        self._target_app_bits = target_app_bits
         self._target_machine_bits = target_machine_bits
         self._target_atom_bits = target_atom_bits
 
@@ -247,21 +247,33 @@ class RoutingInfo(object):
         return self._size_app_part_bits
 
     @property
-    def size_mac_atoms_bits(self) -> int:
+    def target_app_bits(self) -> int:
         """
-        Size of the machine and atoms part
+        Size of the application partition ID part for keys.
 
-        This will always be 32 - size_app_part_bits
+        This is the number of application bits used by all vertices.
+
+        It will be at least as big as size_app_part_bits
+
+        It may go as big as the bits not needed by
+        min_bits_machine_and_atoms.
+
+        Ideally it will be the bits not needed by
+        max_bits_machine and max_bits_atoms.
+
+        If there are fixed keys this will be a value that works with the fixed
+        keys and meets the above min and max.
         """
-        return self._size_mac_atoms_bits
+        return self._target_app_bits
 
     @property
     def target_machine_bits(self) -> int:
         """
-        Size of the machine part for vertex.
+        Size of the machine part for keys.
 
         It will be at least max_bits_machine,
-        but will include any extra bits if not all bits are needed.
+        but may include extra bits not needed by
+        target_app_bits and target_atom_bits
 
         It may however not be respected on vertices with a very large number
         of atoms per core.
