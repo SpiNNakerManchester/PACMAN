@@ -372,9 +372,8 @@ class ZonedRoutingInfoAllocator(object):
                 key = key << n_bits_atoms
                 m_info: MachineVertexRoutingInfo
                 if overlap:
-                    key_and_mask = BaseKeyAndMask(base_key=key, mask=mask)
                     m_info = SpecificMachineVertexRoutingInfo(
-                        key_and_mask, identifier, machine_vertex,
+                        key, mask, identifier, machine_vertex,
                         machine_index)
                 else:
                     m_info = GlobalMachineVertexRoutingInfo(

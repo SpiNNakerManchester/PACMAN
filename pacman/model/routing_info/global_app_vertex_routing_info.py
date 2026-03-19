@@ -28,15 +28,9 @@ class GlobalAppVertexRoutingInfo(AppVertexRoutingInfo):
     __slots__ = ()
 
     @property
-    @overrides(AppVertexRoutingInfo.key_and_mask)
-    def key_and_mask(self) -> BaseKeyAndMask:
-        return BaseKeyAndMask(
-            self._app_key, self.get_global_application_mask())
-
-    @property
-    @overrides(AppVertexRoutingInfo.app_mask)
-    def app_mask(self) -> int:
-        return self.get_global_application_mask()
+    @overrides(AppVertexRoutingInfo.mask)
+    def mask(self) -> int:
+        return self.app_mask
 
     @property
     @overrides(AppVertexRoutingInfo.machine_mask)

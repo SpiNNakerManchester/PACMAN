@@ -30,34 +30,29 @@ class SpecificMachineVertexRoutingInfo(MachineVertexRoutingInfo):
 
     __slots__ = (
         # The keys allocated to the machine partition
-        "__machine_key_and_mask",)
+        "__machine_mask",)
 
-    def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str,
+    def __init__(self, key: int, mask: int, partition_id: str,
                  machine_vertex: MachineVertex, index: int):
         """
-        :param key_and_mask:
+        :param key:
             The key allocated to the machine partition
         :param partition_id: The partition to set the keys for
         :param machine_vertex: The vertex to set the keys for
         :param index: The index of the machine vertex
         """
-        super().__init__(partition_id, machine_vertex, index)
-        self.__machine_key_and_mask = key_and_mask
+        super().__init__(key, partition_id, machine_vertex, index)
+        self.__machine_mask = mask
 
     @property
-    @overrides(MachineVertexRoutingInfo.key_and_mask)
-    def key_and_mask(self) -> BaseKeyAndMask:
-        return self.__machine_key_and_mask
-
-    @property
-    @overrides(MachineVertexRoutingInfo.app_mask)
-    def app_mask(self) -> int:
-        return self.get_global_application_mask()
+    @overrides(MachineVertexRoutingInfo.mask)
+    def mask(self) -> int:
+        return self.__machine_mask
 
     @property
     @overrides(MachineVertexRoutingInfo.machine_mask)
     def machine_mask(self) -> int:
-        return self.__machine_key_and_mask.mask
+        return self.__machine_mask
 
     @property
     @overrides(MachineVertexRoutingInfo.has_global_masks)

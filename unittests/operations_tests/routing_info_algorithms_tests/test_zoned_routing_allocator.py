@@ -509,7 +509,7 @@ def test_big_fixed_low() -> None:
     assert routing_info.target_app_bits == 12
     assert routing_info.target_machine_bits == 11
     assert routing_info.target_atom_bits == 9
-    assert not routing_info.has_global_masks
+    assert routing_info.has_global_masks
     assert routing_info.has_fixed_keys
 
 def create_many_machine_mask() -> None:

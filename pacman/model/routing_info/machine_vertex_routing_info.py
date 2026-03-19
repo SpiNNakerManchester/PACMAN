@@ -38,14 +38,14 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
         # vertex
         "__index")
 
-    def __init__(self, partition_id: str,
+    def __init__(self, machine_key: int,  partition_id: str,
                  machine_vertex: MachineVertex, index: int):
         """
         :param partition_id: The partition to set the keys for
         :param machine_vertex: The vertex to set the keys for
         :param index: The index of the machine vertex
         """
-        super().__init__(partition_id)
+        super().__init__(machine_key, partition_id)
         self.__machine_vertex = machine_vertex
         self.__index = index
 

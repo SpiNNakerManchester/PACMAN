@@ -36,7 +36,6 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     """
 
     __slots__ = (
-        "_app_key",
         "__app_vertex",
         "__max_machine_index")
 
@@ -49,10 +48,14 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         :param app_vertex:
         :param max_machine_index:
         """
-        super().__init__(partition_id)
-        self._app_key = app_key
+        super().__init__(app_key, partition_id)
         self.__app_vertex = app_vertex
         self.__max_machine_index = max_machine_index
+
+    @property
+    @overrides(VertexRoutingInfo.mask)
+    def mask(self) -> int:
+        return self.app_mask
 
     def merge_machine_entries(self, entries: List[Tuple[
             RoutingEntry,

@@ -17,7 +17,8 @@ from spinn_utilities.overrides import overrides
 
 from pacman.utilities.constants import BITS_IN_KEY
 from pacman.exceptions import IrregularFixedMaskException
-from pacman.utilities.utility_calls import can_shift, signifacant_zone
+from pacman.utilities.utility_calls import (
+    calc_shift, can_shift, signifacant_zone)
 
 from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
@@ -34,9 +35,9 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
 
     __slots__ = (
         # The mask allocated to the Application partition
-        "__app_key_and_mask",
-        # The keys allocated to the machine partition
-        "__machine_key_and_mask")
+        "__original_app_key_and_mask",
+        # The mask allocated to the machine partition
+        "__machine_mask")
 
     def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str,
                  machine_vertex: MachineVertex,
@@ -48,9 +49,9 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         :param machine_vertex: The vertex to set the keys for
         :param index: The index of the machine vertex
         """
-        super().__init__(partition_id, machine_vertex, index)
-        self.__app_key_and_mask = app_key_and_mask
-        self.__machine_key_and_mask = key_and_mask
+        super().__init__(key_and_mask.key, partition_id, machine_vertex, index)
+        self.__original_app_key_and_mask = app_key_and_mask
+        self.__machine_mask = key_and_mask.mask
 
         if not can_shift(app_key_and_mask.mask):
             raise IrregularFixedMaskException(
@@ -61,7 +62,9 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
                 f"{machine_vertex} has a fixed machine_mask "
                 f"{hex(key_and_mask.mask)} which is not shiftable")
         else:
-            if self.app_shift < self.machine_shift:
+            # Do not use the global as not yet set
+            app_shift = calc_shift(app_key_and_mask.mask)
+            if app_shift < self.machine_shift:
                 raise IrregularFixedMaskException(
                     f"{machine_vertex} has a fixed app_mask "
                     f"{hex(app_key_and_mask.mask)} which is larger than "
@@ -79,26 +82,23 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
                 f"{hex(unshifted)} which shifted is {hex(shifted)}")
 
     @property
-    @overrides(MachineVertexRoutingInfo.key_and_mask)
-    def key_and_mask(self) -> BaseKeyAndMask:
-        return self.__machine_key_and_mask
+    @overrides(MachineVertexRoutingInfo.mask)
+    def mask(self) -> int:
+        return self.__machine_mask
 
-    @property
-    @overrides(MachineVertexRoutingInfo.app_mask)
-    def app_mask(self) -> int:
-        return self.__app_key_and_mask.mask
+    def get_original_app_mask(self) -> int:
+        return self.__original_app_key_and_mask.mask
 
     @property
     @overrides(MachineVertexRoutingInfo.machine_mask)
     def machine_mask(self) -> int:
-        return self.__machine_key_and_mask.mask
+        return self.__machine_mask
 
     @property
     @overrides(MachineVertexRoutingInfo.has_global_masks)
     def has_global_masks(self) -> bool:
         # The allocator will try to use the fixed masks as the global ones
-        return (self.app_mask == self.get_global_application_mask() and
-                self.machine_mask == self.get_global_machine_mask())
+        return self.machine_mask == self.get_global_machine_mask()
 
     @property
     @overrides(MachineVertexRoutingInfo.has_fixed_keys)
@@ -106,7 +106,7 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         return True
 
     def get_atom_bits_needed_range(self) -> Tuple[int, int]:
-        app_key = self.__app_key_and_mask.key
+        app_key = self.__original_app_key_and_mask.key
         app_used = signifacant_zone(app_key)
         machine_index_key = self.key - app_key
         machine_used = signifacant_zone(machine_index_key)

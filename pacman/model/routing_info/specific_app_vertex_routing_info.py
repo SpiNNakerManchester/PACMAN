@@ -49,17 +49,6 @@ class SpecificAppVertexRoutingInfo(AppVertexRoutingInfo):
         self.__machine_mask = machine_mask
 
     @property
-    @overrides(AppVertexRoutingInfo.key_and_mask)
-    def key_and_mask(self) -> BaseKeyAndMask:
-        return BaseKeyAndMask(
-            self._app_key, self.get_global_application_mask())
-
-    @property
-    @overrides(AppVertexRoutingInfo.app_mask)
-    def app_mask(self) -> int:
-        return self.get_global_application_mask()
-
-    @property
     @overrides(AppVertexRoutingInfo.machine_mask)
     def machine_mask(self) -> int:
         return self.__machine_mask

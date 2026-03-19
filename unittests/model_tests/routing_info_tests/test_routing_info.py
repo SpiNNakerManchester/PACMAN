@@ -84,7 +84,7 @@ class TestRoutingInfo(unittest.TestCase):
         pre_vertex = SimpleMachineVertex(ConstantSDRAM(0))
         key = 12345
         info = SpecificMachineVertexRoutingInfo(
-            BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
+            key, FULL_MASK, "Test", pre_vertex, 0)
         routing_info = RoutingInfo()
         routing_info.add_routing_info(info)
         orphan = SimpleMachineVertex(ConstantSDRAM(0))
@@ -136,14 +136,14 @@ class TestRoutingInfo(unittest.TestCase):
         assert next(iter(routing_info)) == info
 
         info2 = SpecificMachineVertexRoutingInfo(
-            BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
+            key, FULL_MASK, "Test", pre_vertex, 0)
 
         with self.assertRaises(PacmanAlreadyExistsException):
             routing_info.add_routing_info(info2)
         assert info != info2
 
         info3 = SpecificMachineVertexRoutingInfo(
-            BaseKeyAndMask(key, FULL_MASK), "Test2", pre_vertex, 0)
+            key, FULL_MASK, "Test2", pre_vertex, 0)
         routing_info.add_routing_info(info3)
         assert info != info3
         assert routing_info.get_info_from(
@@ -165,11 +165,11 @@ class TestRoutingInfo(unittest.TestCase):
         vertex1 = SimpleMachineVertex(ConstantSDRAM(0))
         key = 12345
         info = SpecificMachineVertexRoutingInfo(
-            BaseKeyAndMask(key, FULL_MASK), "Test", vertex1, 0)
+            key, FULL_MASK, "Test", vertex1, 0)
         routing_info.add_routing_info(info)
         key = 67890
         info = SpecificMachineVertexRoutingInfo(
-            BaseKeyAndMask(key, FULL_MASK), "Test2", vertex1, 0)
+            key, FULL_MASK, "Test2", vertex1, 0)
         routing_info.add_routing_info(info)
         self.assertEqual(len(routing_info), len(list(routing_info)))
 
@@ -204,11 +204,14 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.key_and_mask, bkm1)
         self.assertFalse(info.has_global_masks)
         self.assertTrue(info.has_fixed_keys)
-        self.assertEqual(info.app_mask, specific_app)
-        self.assertEqual(info.app_shift, 20)
+        self.assertEqual(info.get_original_app_mask(), specific_app)
+        self.assertEqual(info.app_mask, global_app)
+        # uses global
+        self.assertEqual(info.app_shift, 24)
         self.assertEqual(info.machine_mask, specific_mac)
         self.assertEqual(info.machine_shift, 12)
-        self.assertEqual(info.machine_index_mask, 0x000FF000)
+        # based on global
+        self.assertEqual(info.machine_index_mask, 0x00FFF000)
         self.assertEqual(info.atom_mask, 0x00000FFF)
         self.assertEqual(info.n_bits_atoms, 12)
         self.assertEqual((8, 18), info.get_atom_bits_needed_range())
@@ -227,11 +230,14 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.key_and_mask, bk)
         self.assertFalse(info.has_global_masks)
         self.assertTrue(info.has_fixed_keys)
-        self.assertEqual(info.app_mask, specific)
-        self.assertEqual(info.app_shift, 12)
+        self.assertEqual(info.get_original_app_mask(), specific)
+        self.assertEqual(info.app_mask, global_app)
+        # uses global
+        self.assertEqual(info.app_shift, 24)
         self.assertEqual(info.machine_mask, specific)
         self.assertEqual(info.machine_shift, 12)
-        self.assertEqual(info.machine_index_mask, 0x00000000)
+        # uses global
+        self.assertEqual(info.machine_index_mask, 0x000fff000)
         self.assertEqual(info.atom_mask, 0x00000FFF)
         self.assertEqual(info.n_bits_atoms, 12)
         self.assertEqual((8, 20), info.get_atom_bits_needed_range())
@@ -257,10 +263,11 @@ class TestRoutingInfo(unittest.TestCase):
         specific_mac = 0xFFFF0000
         VertexRoutingInfo.set_global_mask(
             app_mask=global_app, machine_mask=global_mac)
-        bkm1 = BaseKeyAndMask(0x00110000, specific_mac)
+        mac_key = 0x00110000
+        bkm1 = BaseKeyAndMask(mac_key, specific_mac)
         vertex1 = SimpleMachineVertex(ConstantSDRAM(0))
         info = SpecificMachineVertexRoutingInfo(
-            key_and_mask=bkm1, partition_id="test", machine_vertex=vertex1,
+            mac_key, specific_mac, partition_id="test", machine_vertex=vertex1,
             index=2)
         self.assertEqual(info.key_and_mask, bkm1)
         self.assertFalse(info.has_global_masks)
@@ -273,7 +280,7 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.atom_mask, 0x0000FFFF)
         self.assertEqual(info.n_bits_atoms, 16)
 
-    def test_gloabl_machine_vertex_routing_info(self) -> None:
+    def test_global_machine_vertex_routing_info(self) -> None:
         global_app = 0xff000000
         global_mac = 0xffffff00
         VertexRoutingInfo.set_global_mask(
@@ -301,19 +308,24 @@ class TestRoutingInfo(unittest.TestCase):
         specific_mac = 0xFFFFF000
         VertexRoutingInfo.set_global_mask(
             app_mask=global_app, machine_mask=global_mac)
-        bkm1 = BaseKeyAndMask(0x11100000, specific_app)
+        key = 0x11000000
+        specific_bk = BaseKeyAndMask(key, specific_app)
+        global_bk = BaseKeyAndMask(key, global_app)
         vertex1 = SimpleTestVertex(4, "fixed")
         info = FixedAppVertexRoutingInfo(
-            key_and_mask=bkm1, partition_id="test", app_vertex=vertex1,
+            key_and_mask=specific_bk, partition_id="test", app_vertex=vertex1,
             machine_mask=specific_mac, max_machine_index=2)
-        self.assertEqual(info.key_and_mask, bkm1)
+        # The global mask is used!
+        self.assertEqual(info.mask, global_app)
+        self.assertEqual(info.key_and_mask, global_bk)
         self.assertFalse(info.has_global_masks)
         self.assertTrue(info.has_fixed_keys)
-        self.assertEqual(info.app_mask, specific_app)
-        self.assertEqual(info.app_shift, 20)
+        self.assertEqual(info.get_original_app_mask(), specific_app)
+        # global app shift
+        self.assertEqual(info.app_shift, 24)
         self.assertEqual(info.machine_mask, specific_mac)
         self.assertEqual(info.machine_shift, 12)
-        self.assertEqual(info.machine_index_mask, 0x000FF000)
+        self.assertEqual(info.machine_index_mask, 0x00FFF000)
         self.assertEqual(info.atom_mask, 0x00000FFF)
         self.assertEqual(info.n_bits_atoms, 12)
 
