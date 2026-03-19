@@ -16,7 +16,7 @@ import numpy
 
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
-from pacman.exceptions import PacmanConfigurationException, PacmanValueError
+from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractVertex
 from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.utility_calls import calc_shift

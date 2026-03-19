@@ -327,6 +327,7 @@ def test_fixed_only() -> None:
     assert not routing_info.has_global_masks
     assert routing_info.has_fixed_keys
 
+
 def test_bad_fixed_1() -> None:
     unittest_setup()
     fixed_keys_by_partition = {
@@ -339,6 +340,7 @@ def test_bad_fixed_1() -> None:
         raise AssertionError("Test did not fail")
     except PacmanRouteInfoAllocationException:
         pass
+
 
 def test_overlap() -> None:
     # This should work here; overlap is allowed provided routes don't overlap
@@ -511,6 +513,7 @@ def test_big_fixed_low() -> None:
     assert routing_info.target_atom_bits == 9
     assert routing_info.has_global_masks
     assert routing_info.has_fixed_keys
+
 
 def create_many_machine_mask() -> None:
     fixed_machine_keys_by_partition: Any = dict()

@@ -57,4 +57,3 @@ class TestItilityCalls(unittest.TestCase):
         self.assertEqual((18, 18), signifacant_zone(0x00002000))
         self.assertIsNone(signifacant_zone(0x00000000))
         self.assertFalse(0x00000000)
-

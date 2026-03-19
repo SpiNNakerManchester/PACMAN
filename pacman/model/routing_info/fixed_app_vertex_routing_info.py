@@ -55,8 +55,8 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
         self.__machine_mask = machine_mask
         if not can_shift(self.__original_app_mask):
             raise IrregularFixedMaskException(
-                f"{app_vertex} has a fixed app mask {self.__original_app_mask} which"
-                f" is not shiftable")
+                f"{app_vertex} has a fixed app mask {key_and_mask.mask} "
+                f"which is not shiftable")
         elif not can_shift(machine_mask):
             raise IrregularFixedMaskException(
                 f"{app_vertex} has a fixed {machine_mask=} which"
@@ -66,7 +66,8 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
             app_shift = calc_shift(self.__original_app_mask)
             if app_shift < self.machine_shift:
                 raise IrregularFixedMaskException(
-                    f"{app_vertex} has a fixed app mask {self.__original_app_mask} "
+                    f"{app_vertex} has a fixed app mask "
+                    f"{self.__original_app_mask} "
                     f"which is larger than fixed {machine_mask=}")
 
     def get_original_app_mask(self) -> int:

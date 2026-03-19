@@ -17,7 +17,7 @@ from pacman.config_setup import unittest_setup
 from pacman.model.resources import ConstantSDRAM
 from pacman.exceptions import (
     PacmanAlreadyExistsException, PacmanConfigurationException,
-    PacmanValueError, IrregularFixedMaskException)
+    IrregularFixedMaskException)
 from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask, VertexRoutingInfo,
     FixedAppVertexRoutingInfo, FixedMachineVertexRoutingInfo,

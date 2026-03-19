@@ -15,7 +15,6 @@ from __future__ import annotations
 import logging
 from spinn_utilities.overrides import overrides
 from .app_vertex_routing_info import AppVertexRoutingInfo
-from .base_key_and_mask import BaseKeyAndMask
 
 logger = logging.getLogger(__name__)
 

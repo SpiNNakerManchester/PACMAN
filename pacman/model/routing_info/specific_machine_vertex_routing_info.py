@@ -16,7 +16,6 @@ from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from .machine_vertex_routing_info import MachineVertexRoutingInfo
 if TYPE_CHECKING:
-    from .base_key_and_mask import BaseKeyAndMask
     from pacman.model.graphs.machine import MachineVertex
 
 

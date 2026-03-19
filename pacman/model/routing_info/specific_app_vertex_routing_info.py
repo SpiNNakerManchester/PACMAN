@@ -16,7 +16,6 @@ import logging
 from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from .app_vertex_routing_info import AppVertexRoutingInfo
-from .base_key_and_mask import BaseKeyAndMask
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
 
