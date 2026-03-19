@@ -14,7 +14,7 @@
 
 import hashlib
 import math
-from typing import Any, Iterable, Tuple
+from typing import Any, Iterable, Optional, Tuple
 import numpy
 
 from pacman.exceptions import PacmanValueError
@@ -202,7 +202,17 @@ def can_shift(mask: int) -> bool:
     return found_shift
 
 
-def signifacant_zone(key: int) -> Tuple[int, int]:
+def signifacant_zone(key: int) -> Optional[Tuple[int, int]]:
+    """
+    Gets the zone that is significant for this key.
+
+    This will be the first none zero bit to the last none zero bit
+
+    If the key is zero the result will be None
+
+    :param key:
+    :return: Zone that has none zero bits
+    """
     bits = expand_to_bit_array(key)
     first = 0
     while first < BITS_IN_KEY and bits[first] == 0:
