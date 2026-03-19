@@ -47,7 +47,6 @@ class RoutingInfo(object):
         self._target_machine_bits = -1000
         self._target_atom_bits = -1000
         self._has_fixed_keys = False
-        self._has_shiftable_masks = True
         self._has_global_masks = True
 
     def add_routing_info(self, info: VertexRoutingInfo) -> None:
@@ -67,8 +66,6 @@ class RoutingInfo(object):
         self._info[info.vertex][info.partition_id] = info
         if info.has_fixed_keys:
             self._has_fixed_keys = True
-        if not info.has_shiftable_masks:
-            self._has_shiftable_masks = False
         if not info.has_global_masks:
             self._has_global_masks = False
 
@@ -299,15 +296,6 @@ class RoutingInfo(object):
         Fixed keys may be shiftable and even global
         """
         return self._has_fixed_keys
-
-    @property
-    def has_shiftable_masks(self) -> bool:
-        """
-        True if all masks in ALL infos are shiftable.
-
-        Only fixed key vertices should have none shiftable masks
-        """
-        return self._has_shiftable_masks
 
     @property
     def has_global_masks(self) -> bool:

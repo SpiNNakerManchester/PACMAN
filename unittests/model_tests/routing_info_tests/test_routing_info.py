@@ -203,7 +203,6 @@ class TestRoutingInfo(unittest.TestCase):
             app_key_and_mask=bka, index=2)
         self.assertEqual(info.key_and_mask, bkm1)
         self.assertFalse(info.has_global_masks)
-        self.assertTrue(info.has_shiftable_masks)
         self.assertTrue(info.has_fixed_keys)
         self.assertEqual(info.app_mask, specific_app)
         self.assertEqual(info.app_shift, 20)
@@ -211,7 +210,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 12)
         self.assertEqual(info.machine_index_mask, 0x000FF000)
         self.assertEqual(info.atom_mask, 0x00000FFF)
-        self.assertEqual(info.atom_shift, 0)
         self.assertEqual(info.n_bits_atoms, 12)
         self.assertEqual((8, 18), info.get_atom_bits_needed_range())
 
@@ -228,7 +226,6 @@ class TestRoutingInfo(unittest.TestCase):
             app_key_and_mask=bk, index=0)
         self.assertEqual(info.key_and_mask, bk)
         self.assertFalse(info.has_global_masks)
-        self.assertTrue(info.has_shiftable_masks)
         self.assertTrue(info.has_fixed_keys)
         self.assertEqual(info.app_mask, specific)
         self.assertEqual(info.app_shift, 12)
@@ -236,7 +233,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 12)
         self.assertEqual(info.machine_index_mask, 0x00000000)
         self.assertEqual(info.atom_mask, 0x00000FFF)
-        self.assertEqual(info.atom_shift, 0)
         self.assertEqual(info.n_bits_atoms, 12)
         self.assertEqual((8, 20), info.get_atom_bits_needed_range())
 
@@ -268,7 +264,6 @@ class TestRoutingInfo(unittest.TestCase):
             index=2)
         self.assertEqual(info.key_and_mask, bkm1)
         self.assertFalse(info.has_global_masks)
-        self.assertTrue(info.has_shiftable_masks)
         self.assertFalse(info.has_fixed_keys)
         self.assertEqual(info.app_mask, global_app)
         self.assertEqual(info.app_shift, 24)
@@ -276,7 +271,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 16)
         self.assertEqual(info.machine_index_mask, 0x00FF0000)
         self.assertEqual(info.atom_mask, 0x0000FFFF)
-        self.assertEqual(info.atom_shift, 0)
         self.assertEqual(info.n_bits_atoms, 16)
 
     def test_gloabl_machine_vertex_routing_info(self) -> None:
@@ -291,7 +285,6 @@ class TestRoutingInfo(unittest.TestCase):
         bkm1 = BaseKeyAndMask(0x00110000, global_mac)
         self.assertEqual(info.key_and_mask, bkm1)
         self.assertTrue(info.has_global_masks)
-        self.assertTrue(info.has_shiftable_masks)
         self.assertFalse(info.has_fixed_keys)
         self.assertEqual(info.app_mask, global_app)
         self.assertEqual(info.app_shift, 24)
@@ -299,7 +292,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 8)
         self.assertEqual(info.machine_index_mask, 0x00FFFF00)
         self.assertEqual(info.atom_mask, 0x000000FF)
-        self.assertEqual(info.atom_shift, 0)
         self.assertEqual(info.n_bits_atoms, 8)
 
     def test_fixed_app_vertex_routing_info(self) -> None:
@@ -316,7 +308,6 @@ class TestRoutingInfo(unittest.TestCase):
             machine_mask=specific_mac, max_machine_index=2)
         self.assertEqual(info.key_and_mask, bkm1)
         self.assertFalse(info.has_global_masks)
-        self.assertTrue(info.has_shiftable_masks)
         self.assertTrue(info.has_fixed_keys)
         self.assertEqual(info.app_mask, specific_app)
         self.assertEqual(info.app_shift, 20)
@@ -324,7 +315,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 12)
         self.assertEqual(info.machine_index_mask, 0x000FF000)
         self.assertEqual(info.atom_mask, 0x00000FFF)
-        self.assertEqual(info.atom_shift, 0)
         self.assertEqual(info.n_bits_atoms, 12)
 
     def test_weird_app_vertex_routing_info(self) -> None:
@@ -354,7 +344,6 @@ class TestRoutingInfo(unittest.TestCase):
         bkm1 = BaseKeyAndMask(0x11000000, global_app)
         self.assertEqual(info.key_and_mask, bkm1)
         self.assertFalse(info.has_global_masks)
-        self.assertTrue(info.has_shiftable_masks)
         self.assertFalse(info.has_fixed_keys)
         self.assertEqual(info.app_mask, global_app)
         self.assertEqual(info.app_shift, 24)
@@ -362,7 +351,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 16)
         self.assertEqual(info.machine_index_mask, 0x00FF0000)
         self.assertEqual(info.atom_mask, 0x0000FFFF)
-        self.assertEqual(info.atom_shift, 0)
         self.assertEqual(info.n_bits_atoms, 16)
 
     def test_gloabl_app_vertex_routing_info(self) -> None:
@@ -377,7 +365,6 @@ class TestRoutingInfo(unittest.TestCase):
         bkm1 = BaseKeyAndMask(0x11000000, global_app)
         self.assertEqual(info.key_and_mask, bkm1)
         self.assertTrue(info.has_global_masks)
-        self.assertTrue(info.has_shiftable_masks)
         self.assertFalse(info.has_fixed_keys)
         self.assertEqual(info.app_mask, global_app)
         self.assertEqual(info.app_shift, 24)
@@ -385,7 +372,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 8)
         self.assertEqual(info.machine_index_mask, 0x00FFFF00)
         self.assertEqual(info.atom_mask, 0x000000FF)
-        self.assertEqual(info.atom_shift, 0)
         self.assertEqual(info.n_bits_atoms, 8)
 
 

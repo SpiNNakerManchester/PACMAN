@@ -65,11 +65,6 @@ class SpecificMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         return False
 
     @property
-    @overrides(MachineVertexRoutingInfo.has_shiftable_masks)
-    def has_shiftable_masks(self) -> bool:
-        return True
-
-    @property
     @overrides(MachineVertexRoutingInfo.has_fixed_keys)
     def has_fixed_keys(self) -> bool:
         return False

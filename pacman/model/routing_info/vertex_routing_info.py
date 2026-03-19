@@ -114,20 +114,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         return self.machine_mask ^ FULL_MASK
 
     @property
-    def atom_shift(self) -> int:
-        """
-        The shift for the atom zone.
-
-        Likely zero or None
-
-        :raises PacmanValueError: If the masks are not shiftable
-        """
-        if self.has_shiftable_masks:
-            return 0
-        raise PacmanValueError("Due to weird masks the concept of "
-                               "atom shit can not be used")
-
-    @property
     def n_bits_atoms(self) -> int:
         """
         The number of bits for the atoms.
@@ -194,16 +180,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         True if the vertex requires fixed
 
         Fixed keys may be shiftable and even global
-        """
-        raise NotImplementedError()
-
-    @property
-    @abstractmethod
-    def has_shiftable_masks(self) -> bool:
-        """
-        True if all masks are shiftable.
-
-        Only fixed key vertices should have none shiftable masks
         """
         raise NotImplementedError()
 

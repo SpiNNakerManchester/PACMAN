@@ -36,8 +36,7 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         # The mask allocated to the Application partition
         "__app_key_and_mask",
         # The keys allocated to the machine partition
-        "__machine_key_and_mask",
-        "__shiftable")
+        "__machine_key_and_mask")
 
     def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str,
                  machine_vertex: MachineVertex,
@@ -53,7 +52,6 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         self.__app_key_and_mask = app_key_and_mask
         self.__machine_key_and_mask = key_and_mask
 
-        self.__shiftable = True
         if not can_shift(app_key_and_mask.mask):
             raise IrregularFixedMaskException(
                 f"{machine_vertex} has a fixed app_mask "
@@ -101,11 +99,6 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         # The allocator will try to use the fixed masks as the global ones
         return (self.app_mask == self.get_global_application_mask() and
                 self.machine_mask == self.get_global_machine_mask())
-
-    @property
-    @overrides(MachineVertexRoutingInfo.has_shiftable_masks)
-    def has_shiftable_masks(self) -> bool:
-        return self.__shiftable
 
     @property
     @overrides(MachineVertexRoutingInfo.has_fixed_keys)
