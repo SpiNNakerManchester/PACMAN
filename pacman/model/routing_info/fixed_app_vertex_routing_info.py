@@ -71,6 +71,11 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
                     f"which is larger than fixed {machine_mask=}")
 
     def get_original_app_mask(self) -> int:
+        """
+        The fixed Application Mask requested by the Vertex
+
+        May not be the one actually used.
+        """
         return self.__original_app_mask
 
     @property

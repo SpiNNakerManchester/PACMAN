@@ -87,6 +87,11 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         return self.__machine_mask
 
     def get_original_app_mask(self) -> int:
+        """
+        The fixed Application Mask requested by the Vertex
+
+        May not be the one actually used.
+        """
         return self.__original_app_key_and_mask.mask
 
     @property
@@ -106,6 +111,19 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         return True
 
     def get_atom_bits_needed_range(self) -> Tuple[int, int]:
+        """
+        The range if atom bit values that this info can support.
+
+        Based on the Application and Machine keys it may be able to alter the
+        Application Mask without changing now results.
+
+        The number of atom bits will be large enough
+        to not blank out any ones in the application key
+        but also small enough to blank out the machine index.
+        (The part of the Machine key that are not also application key)
+
+        :return: Smallest and largest application zone supportable
+        """
         app_key = self.__original_app_key_and_mask.key
         app_used = signifacant_zone(app_key)
         machine_index_key = self.key - app_key

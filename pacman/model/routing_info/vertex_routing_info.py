@@ -131,7 +131,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     @property
     def app_mask(self) -> int:
         """
-        The application maskfor all vertices
+        The application mask for all vertices
 
         This includes both the Application index and the machine index
         """
