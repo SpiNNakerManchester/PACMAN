@@ -202,7 +202,7 @@ def can_shift(mask: int) -> bool:
     return found_shift
 
 
-def signifacant_zone(key: int):
+def signifacant_zone(key: int) -> Tuple[int, int]:
     bits = expand_to_bit_array(key)
     first = 0
     while first < BITS_IN_KEY and bits[first] == 0:
