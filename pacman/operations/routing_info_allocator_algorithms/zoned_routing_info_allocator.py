@@ -322,6 +322,7 @@ class ZonedRoutingInfoAllocator(object):
                     machine_shift = None
 
         if all_same:
+            assert app_mask is not None
             fix_app = calc_shift(app_mask)
             if fix_app <= max_app and fix_app >= min_app:
                 return fix_app, machine_shift

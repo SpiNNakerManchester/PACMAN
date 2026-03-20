@@ -56,7 +56,7 @@ class GlobalMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         return False
 
     @overrides(MachineVertexRoutingInfo.set_app_keys_overlap)
-    def set_app_keys_overlap(self):
+    def set_app_keys_overlap(self) -> None:
         raise NotImplementedError("Should never overlap")
 
     @property

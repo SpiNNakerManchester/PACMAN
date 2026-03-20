@@ -228,7 +228,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         raise NotImplementedError()
 
     @abstractmethod
-    def set_app_keys_overlap(self):
+    def set_app_keys_overlap(self) -> None:
         raise NotImplementedError()
 
     @classmethod

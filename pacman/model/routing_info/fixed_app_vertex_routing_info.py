@@ -100,7 +100,7 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
         return self.__app_key_overlap
 
     @overrides(AppVertexRoutingInfo.set_app_keys_overlap)
-    def set_app_keys_overlap(self):
+    def set_app_keys_overlap(self) -> None:
         self.__app_key_overlap = True
 
     @property
