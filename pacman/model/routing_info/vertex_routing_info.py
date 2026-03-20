@@ -229,6 +229,12 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
     @abstractmethod
     def set_app_keys_overlap(self) -> None:
+        """
+        Flags the info as sharing an app key with another info
+
+        That is the key here shifted by the global app shit will result in the
+        same value as another info with a different app_vertex or partition ID
+        """
         raise NotImplementedError()
 
     @classmethod
