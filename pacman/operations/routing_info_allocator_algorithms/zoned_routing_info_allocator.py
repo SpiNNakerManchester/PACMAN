@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Dict, Iterable, List, Optional, Set, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
@@ -293,7 +293,7 @@ class ZonedRoutingInfoAllocator(object):
         max_app = BITS_IN_KEY - self.__min_bits_machine_and_atoms
         min_app = self.__size_app_part_bits
         best_app = (BITS_IN_KEY -
-                   self.__max_bits_machine - self.__max_bits_atoms)
+                    self.__max_bits_machine - self.__max_bits_atoms)
         if best_app < min_app:
             best_app = min_app
 
@@ -354,10 +354,13 @@ class ZonedRoutingInfoAllocator(object):
         return best_app, None
 
     def __set_target_zones(self, routing_info: RoutingInfo) -> None:
-        self.__target_app_bits, atom_bits = self.__find_target_app_bits(routing_info)
+        self.__target_app_bits, atom_bits = (
+            self.__find_target_app_bits(routing_info))
 
         if atom_bits is not None:
-            if atom_bits >= self.__max_bits_atoms and self.__target_app_bits + self.__max_bits_machine + atom_bits <= BITS_IN_KEY:
+            if (atom_bits >=
+                    self.__max_bits_atoms and self.__target_app_bits +
+                    self.__max_bits_machine + atom_bits <= BITS_IN_KEY):
                 self.__target_machine_bits = (
                         BITS_IN_KEY - self.__target_app_bits - atom_bits)
                 self.__target_atom_bits = atom_bits

@@ -281,10 +281,7 @@ def check_keys_for_application_partition_pairs(
                 assert (mapped_key & app_mask) == (key & app_mask)
             else:
                 mapped_key = key
-                a = hex(mapped_key)
             if key != 0:
-                if key & app_mask == 0:
-                    b = hex(key & app_mask)
                 assert (key & app_mask) != 0
 
 
@@ -311,7 +308,6 @@ def test_allocator_no_fixed() -> None:
 
     check_masks_all_the_same(routing_info)
     check_keys_for_application_partition_pairs(routing_info)
-
 
 
 def test_fixed_only() -> None:
@@ -524,6 +520,7 @@ def test_big_fixed_low() -> None:
     assert not routing_info.has_global_machine_masks
     assert routing_info.has_fixed_keys
     assert not routing_info.has_app_keys_overlap
+
 
 def create_many_machine_mask() -> None:
     fixed_machine_keys_by_partition: Any = dict()
