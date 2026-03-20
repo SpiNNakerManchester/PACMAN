@@ -248,6 +248,8 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
         For Fixed Masks this may not be the shift of the actual Application
         mask but is a value that will work.
+
+        :returns: The global shift for the application zone.
         """
         return calc_shift(cls._global_application_mask)
 
