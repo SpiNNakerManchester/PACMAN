@@ -48,13 +48,23 @@ class SpecificAppVertexRoutingInfo(AppVertexRoutingInfo):
         self.__machine_mask = machine_mask
 
     @property
+    @overrides(AppVertexRoutingInfo.app_mask)
+    def app_mask(self) -> int:
+        return self._global_application_mask
+
+    @property
     @overrides(AppVertexRoutingInfo.machine_mask)
     def machine_mask(self) -> int:
         return self.__machine_mask
 
     @property
-    @overrides(AppVertexRoutingInfo.has_global_masks)
-    def has_global_masks(self) -> bool:
+    @overrides(AppVertexRoutingInfo.has_global_app_masks)
+    def has_global_app_masks(self) -> bool:
+        return True
+
+    @property
+    @overrides(AppVertexRoutingInfo.has_global_machine_masks)
+    def has_global_machine_masks(self) -> bool:
         return False
 
     @property

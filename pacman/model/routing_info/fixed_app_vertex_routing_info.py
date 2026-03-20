@@ -33,7 +33,7 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
 
     __slots__ = (
         # The mask allocated to the Application partition
-        "__original_app_mask",
+        "__app_mask",
         # The mask allocated to the machine (plus application) partition
         "__machine_mask"
     )
@@ -51,9 +51,9 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
         """
         super().__init__(key_and_mask.key, partition_id, app_vertex,
                          max_machine_index)
-        self.__original_app_mask = key_and_mask.mask
+        self.__app_mask = key_and_mask.mask
         self.__machine_mask = machine_mask
-        if not can_shift(self.__original_app_mask):
+        if not can_shift(self.__app_mask):
             raise IrregularFixedMaskException(
                 f"{app_vertex} has a fixed app mask {key_and_mask.mask} "
                 f"which is not shiftable")
@@ -63,20 +63,16 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
                 f" is not shiftable")
         else:
             # can not use global as not yet set
-            app_shift = calc_shift(self.__original_app_mask)
+            app_shift = calc_shift(self.__app_mask)
             if app_shift < self.machine_shift:
                 raise IrregularFixedMaskException(
-                    f"{app_vertex} has a fixed app mask "
-                    f"{self.__original_app_mask} "
+                    f"{app_vertex} has a fixed app mask {self.__app_mask} "
                     f"which is larger than fixed {machine_mask=}")
 
-    def get_original_app_mask(self) -> int:
-        """
-        The fixed Application Mask requested by the Vertex
-
-        May not be the one actually used.
-        """
-        return self.__original_app_mask
+    @property
+    @overrides(AppVertexRoutingInfo.app_mask)
+    def app_mask(self) -> int:
+        return self.__app_mask
 
     @property
     @overrides(AppVertexRoutingInfo.machine_mask)
@@ -84,10 +80,16 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
         return self.__machine_mask
 
     @property
-    @overrides(AppVertexRoutingInfo.has_global_masks)
-    def has_global_masks(self) -> bool:
+    @overrides(AppVertexRoutingInfo.has_global_app_masks)
+    def has_global_app_masks(self) -> bool:
         # The allocator will try to use the fixed masks as the global ones
-        return self.__machine_mask == self.get_global_machine_mask()
+        return self.__app_mask == self._global_application_mask
+
+    @property
+    @overrides(AppVertexRoutingInfo.has_global_machine_masks)
+    def has_global_machine_masks(self) -> bool:
+        # The allocator will try to use the fixed masks as the global ones
+        return self.__machine_mask == self._global_machine_mask
 
     @property
     @overrides(AppVertexRoutingInfo.has_fixed_keys)

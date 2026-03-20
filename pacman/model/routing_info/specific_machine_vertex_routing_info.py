@@ -44,6 +44,11 @@ class SpecificMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         self.__machine_mask = mask
 
     @property
+    @overrides(MachineVertexRoutingInfo.app_mask)
+    def app_mask(self) -> int:
+        return self._global_application_mask
+
+    @property
     @overrides(MachineVertexRoutingInfo.mask)
     def mask(self) -> int:
         return self.__machine_mask
@@ -54,8 +59,13 @@ class SpecificMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         return self.__machine_mask
 
     @property
-    @overrides(MachineVertexRoutingInfo.has_global_masks)
-    def has_global_masks(self) -> bool:
+    @overrides(MachineVertexRoutingInfo.has_global_app_masks)
+    def has_global_app_masks(self) -> bool:
+        return True
+
+    @property
+    @overrides(MachineVertexRoutingInfo.has_global_machine_masks)
+    def has_global_machine_masks(self) -> bool:
         return False
 
     @property

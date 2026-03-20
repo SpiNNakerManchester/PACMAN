@@ -35,7 +35,7 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
 
     __slots__ = (
         # The mask allocated to the Application partition
-        "__original_app_key_and_mask",
+        "__app_key_and_mask",
         # The mask allocated to the machine partition
         "__machine_mask")
 
@@ -50,7 +50,7 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         :param index: The index of the machine vertex
         """
         super().__init__(key_and_mask.key, partition_id, machine_vertex, index)
-        self.__original_app_key_and_mask = app_key_and_mask
+        self.__app_key_and_mask = app_key_and_mask
         self.__machine_mask = key_and_mask.mask
 
         if not can_shift(app_key_and_mask.mask):
@@ -86,13 +86,10 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
     def mask(self) -> int:
         return self.__machine_mask
 
-    def get_original_app_mask(self) -> int:
-        """
-        The fixed Application Mask requested by the Vertex
-
-        May not be the one actually used.
-        """
-        return self.__original_app_key_and_mask.mask
+    @property
+    @overrides(MachineVertexRoutingInfo.app_mask)
+    def app_mask(self) -> int:
+        return self.__app_key_and_mask.mask
 
     @property
     @overrides(MachineVertexRoutingInfo.machine_mask)
@@ -100,10 +97,16 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         return self.__machine_mask
 
     @property
-    @overrides(MachineVertexRoutingInfo.has_global_masks)
-    def has_global_masks(self) -> bool:
+    @overrides(MachineVertexRoutingInfo.has_global_app_masks)
+    def has_global_app_masks(self) -> bool:
         # The allocator will try to use the fixed masks as the global ones
-        return self.machine_mask == self.get_global_machine_mask()
+        return self.__app_key_and_mask.mask == self._global_application_mask
+
+    @property
+    @overrides(MachineVertexRoutingInfo.has_global_machine_masks)
+    def has_global_machine_masks(self) -> bool:
+        # The allocator will try to use the fixed masks as the global ones
+        return self.__machine_mask == self._global_machine_mask
 
     @property
     @overrides(MachineVertexRoutingInfo.has_fixed_keys)
@@ -124,7 +127,7 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
 
         :return: Smallest and largest application zone supportable
         """
-        app_key = self.__original_app_key_and_mask.key
+        app_key = self.__app_key_and_mask.key
         app_used = signifacant_zone(app_key)
         machine_index_key = self.key - app_key
         machine_used = signifacant_zone(machine_index_key)

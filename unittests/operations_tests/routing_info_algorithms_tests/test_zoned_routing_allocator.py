@@ -303,7 +303,8 @@ def test_allocator_no_fixed() -> None:
     assert routing_info.target_app_bits == 17
     assert routing_info.target_machine_bits == 7
     assert routing_info.target_atom_bits == 8
-    assert routing_info.has_global_masks
+    assert routing_info.has_global_app_masks
+    assert routing_info.has_global_machine_masks
     assert not routing_info.has_fixed_keys
 
 
@@ -324,7 +325,8 @@ def test_fixed_only() -> None:
     assert routing_info.target_app_bits == 16
     assert routing_info.target_machine_bits == 0
     assert routing_info.target_atom_bits == 16
-    assert not routing_info.has_global_masks
+    assert not routing_info.has_global_app_masks
+    assert not routing_info.has_global_machine_masks
     assert routing_info.has_fixed_keys
 
 
@@ -360,7 +362,8 @@ def test_overlap() -> None:
     assert routing_info.target_app_bits == 16
     assert routing_info.target_machine_bits == 0
     assert routing_info.target_atom_bits == 16
-    assert not routing_info.has_global_masks
+    assert not routing_info.has_global_app_masks
+    assert not routing_info.has_global_machine_masks
     assert routing_info.has_fixed_keys
 
 
@@ -377,7 +380,8 @@ def test_no_edge() -> None:
     assert routing_info._target_app_bits == 32
     assert routing_info.target_machine_bits == 0
     assert routing_info.target_atom_bits == 0
-    assert routing_info.has_global_masks
+    assert routing_info.has_global_app_masks
+    assert routing_info.has_global_machine_masks
     assert not routing_info.has_fixed_keys
 
 
@@ -400,7 +404,8 @@ def test_allocator_with_fixed() -> None:
     assert routing_info.target_app_bits == 17
     assert routing_info.target_machine_bits == 7
     assert routing_info.target_atom_bits == 8
-    assert not routing_info.has_global_masks
+    assert not routing_info.has_global_app_masks
+    assert not routing_info.has_global_machine_masks
     assert routing_info.has_fixed_keys
 
     for partition in PacmanDataView.iterate_partitions():
@@ -477,7 +482,8 @@ def test_big_no_fixed() -> None:
     assert routing_info.target_app_bits == 1
     assert routing_info.target_machine_bits == 11
     assert routing_info.target_atom_bits == 20
-    assert not routing_info.has_global_masks
+    assert routing_info.has_global_app_masks
+    assert not routing_info.has_global_machine_masks
     assert not routing_info.has_fixed_keys
 
 
@@ -511,7 +517,8 @@ def test_big_fixed_low() -> None:
     assert routing_info.target_app_bits == 12
     assert routing_info.target_machine_bits == 11
     assert routing_info.target_atom_bits == 9
-    assert routing_info.has_global_masks
+    assert not routing_info.has_global_app_masks
+    assert routing_info.has_global_machine_masks
     assert routing_info.has_fixed_keys
 
 

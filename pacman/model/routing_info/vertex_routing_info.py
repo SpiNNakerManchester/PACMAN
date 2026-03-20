@@ -32,8 +32,8 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     (keys and masks).
     """
 
-    __global_application_mask = NOT_SET  # temp value until set
-    __global_machine_mask = NOT_SET  # temp value until set
+    _global_application_mask = NOT_SET  # temp value until set
+    _global_machine_mask = NOT_SET  # temp value until set
 
     __slots__ = (
         # The key of this routing info
@@ -131,11 +131,11 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     @property
     def app_mask(self) -> int:
         """
-        The application mask for all vertices
+        The application mask for the vertices
 
         This includes both the Application index and the machine index
         """
-        return self.__global_application_mask
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -155,15 +155,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         :raises PacmanValueError: If the mask is not shiftable
         """
         return calc_shift(self.machine_mask)
-
-    @property
-    def app_shift(self) -> int:
-        """
-        The shift for the application zone.
-
-        :raises PacmanValueError: If the mask is not shiftable
-        """
-        return calc_shift(self.app_mask)
 
     @property
     def machine_index_mask(self) -> int:
@@ -189,8 +180,27 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         raise NotImplementedError()
 
     @property
-    @abstractmethod
     def has_global_masks(self) -> bool:
+        """
+        True if all masks are the global ones defined by the zones
+
+        Application Masks always are so this is about Machine Masks
+        """
+        return self.has_global_app_masks and self.has_global_machine_masks
+
+    @property
+    @abstractmethod
+    def has_global_app_masks(self) -> bool:
+        """
+        True if all masks are the global ones defined by the zones
+
+        Application Masks always are so this is about Machine Masks
+        """
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def has_global_machine_masks(self) -> bool:
         """
         True if all masks are the global ones defined by the zones
 
@@ -203,8 +213,32 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         Sets the global masks once the allocator has picked them
         """
-        cls.__global_application_mask = app_mask
-        cls.__global_machine_mask = machine_mask
+        cls._global_application_mask = app_mask
+        cls._global_machine_mask = machine_mask
+
+    @classmethod
+    def get_global_app_shift(cls) -> int:
+        """
+        The shift global for the application zone.
+
+        This is a class method so will be the same value for all Vertices.
+
+        For Fixed Masks this may not be the shift of the actual Application
+        mask but is a value that will work.
+        """
+        return calc_shift(cls._global_application_mask)
+
+    @classmethod
+    def get_global_app_mask(cls) -> int:
+        """
+        The global application mask used by the allocator
+
+        As this is a class method this is reported by all infos even
+        ones that do not respect it.
+
+        :returns: The global masked
+        """
+        return cls._global_application_mask
 
     @classmethod
     def get_global_machine_mask(cls) -> int:
@@ -216,4 +250,4 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
         :returns: The global masked
         """
-        return cls.__global_machine_mask
+        return cls._global_machine_mask

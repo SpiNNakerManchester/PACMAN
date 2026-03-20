@@ -27,7 +27,7 @@ class RoutingInfo(object):
     and masks.
     """
     __slots__ = ("_info", "_has_fixed_keys",
-                 "_has_global_masks", "_has_shiftable_masks",
+                 "_has_global_app_masks", "_has_global_machine_masks",
                  "_max_bits_machine", "_max_bits_atoms",
                  "_min_bits_machine_and_atoms", "_size_app_part_bits",
                  "_target_app_bits", "_target_machine_bits",
@@ -47,7 +47,8 @@ class RoutingInfo(object):
         self._target_machine_bits = -1000
         self._target_atom_bits = -1000
         self._has_fixed_keys = False
-        self._has_global_masks = True
+        self._has_global_app_masks = True
+        self._has_global_machine_masks = True
 
     def add_routing_info(self, info: VertexRoutingInfo) -> None:
         """
@@ -66,8 +67,10 @@ class RoutingInfo(object):
         self._info[info.vertex][info.partition_id] = info
         if info.has_fixed_keys:
             self._has_fixed_keys = True
-        if not info.has_global_masks:
-            self._has_global_masks = False
+        if not info.has_global_app_masks:
+            self._has_global_app_masks = False
+        if not info.has_global_machine_masks:
+            self._has_global_machine_masks = False
 
     def get_info_from(
             self, vertex: AbstractVertex,
@@ -298,10 +301,17 @@ class RoutingInfo(object):
         return self._has_fixed_keys
 
     @property
-    def has_global_masks(self) -> bool:
+    def has_global_app_masks(self) -> bool:
         """
-        True if all masks in ALL infos are global ones defined by the zones
+        True if all app masks in ALL infos are
+        global ones defined by the zones
+        """
+        return self._has_global_app_masks
 
-        Global masks are always shiftable.
+    @property
+    def has_global_machine_masks(self) -> bool:
         """
-        return self._has_global_masks
+        True if all app masks in ALL infos are
+        global ones defined by the zones
+        """
+        return self._has_global_machine_masks
