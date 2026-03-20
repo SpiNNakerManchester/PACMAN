@@ -238,7 +238,7 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_index_mask, 0x00000000)
         self.assertEqual(info.atom_mask, 0x00000FFF)
         self.assertEqual(info.n_bits_atoms, 12)
-        self.assertEqual((8, 20), info.get_atom_bits_needed_range())
+        self.assertEqual((0, 20), info.get_atom_bits_needed_range())
 
     def test_weird_machine_vertex_routing_info(self) -> None:
         global_app = 0xff000000

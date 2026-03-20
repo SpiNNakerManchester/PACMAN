@@ -176,9 +176,7 @@ def calc_shift(mask: int) -> int:
     if found_shift:
         return shift
 
-    raise PacmanValueError(
-        "f{mask=} does not support a clean shift."
-        " It has no unmasked bits")
+    return 0
 
 
 def can_shift(mask: int) -> bool:
@@ -189,17 +187,16 @@ def can_shift(mask: int) -> bool:
     :return: True if cal_shift will work or False if it will error.
     """
     bits = expand_to_bit_array(mask)
-    found_shift = False
+    found_zeros = False
     for i in range(32):
         if bits[i] == 1:
             # Check all 1 come before the zeros
-            if found_shift:
+            if found_zeros:
                 return False
         else:
-            if not found_shift:
-                found_shift = True
+            found_zeros = True
 
-    return found_shift
+    return True
 
 
 def signifacant_zone(key: int) -> Optional[Tuple[int, int]]:

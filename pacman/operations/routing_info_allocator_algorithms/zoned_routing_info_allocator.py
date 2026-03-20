@@ -14,9 +14,11 @@
 
 import logging
 from typing import Dict, Iterable, List, Optional, Set, Tuple
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
+
 from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask,
     FixedAppVertexRoutingInfo, FixedMachineVertexRoutingInfo,
@@ -26,7 +28,7 @@ from pacman.model.routing_info import (
     VertexRoutingInfo)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
-from pacman.utilities.utility_calls import allocator_bits_needed
+from pacman.utilities.utility_calls import allocator_bits_needed, calc_shift
 from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
@@ -285,41 +287,82 @@ class ZonedRoutingInfoAllocator(object):
                 f"{self.__min_bits_machine_and_atoms} "
                 f"for machine and atom bits")
 
-    def __set_target_zones(self, routing_info: RoutingInfo) -> None:
-        min_fix_app = self.__size_app_part_bits
-        max_fix_app = BITS_IN_KEY - self.__min_bits_machine_and_atoms
+    def __find_target_app_bits(
+            self, routing_info: RoutingInfo) -> Tuple[int, Optional[int]]:
+        max_app = BITS_IN_KEY - self.__min_bits_machine_and_atoms
+        min_app = self.__size_app_part_bits
+        best_app = (BITS_IN_KEY -
+                   self.__max_bits_machine - self.__max_bits_atoms)
+        if best_app < min_app:
+            best_app = min_app
+
+        # no fixed so easiest
+        if len(routing_info) == 0:
+            return best_app, None
+
+        # Is there a single or same fixed app_mask we can safely use
+        all_same = True
+        app_mask = None
+        machine_shift = None
+        vertex = None
+        for info in routing_info:
+            if app_mask is None:
+                app_mask = info.app_mask
+                machine_shift = info.machine_shift
+                vertex = info.vertex
+            elif app_mask != info.app_mask:
+                if all_same:
+                    all_same = False
+                    logger.warning(
+                        f"{vertex} has fixed app mask {hex(app_mask)} "
+                        f"while {info.vertex} has {hex(info.app_mask)} "
+                        f"which is not ideal.")
+                if machine_shift != info.machine_shift:
+                    machine_shift = None
+
+        if all_same:
+            fix_app = calc_shift(app_mask)
+            if fix_app <= max_app and fix_app >= min_app:
+                return fix_app, machine_shift
+
+        # See if there is a workable number
         for info in routing_info:
             if isinstance(info, FixedMachineVertexRoutingInfo):
                 v_min, v_max = info.get_atom_bits_needed_range()
-                if v_min > max_fix_app:
+                if v_min > max_app:
                     raise PacmanRouteInfoAllocationException(
                         f"Vertex {info.vertex} fixed keys requires at least "
-                        f"{v_min} app bits but max allowed if {max_fix_app}")
-                min_fix_app = max(min_fix_app, v_min)
-                if v_max < min_fix_app:
+                        f"{v_min} app bits but max allowed if {max_app}")
+                min_app = max(min_app, v_min)
+                if v_max < min_app:
                     raise PacmanRouteInfoAllocationException(
                         f"Vertex {info.vertex} fixed keys requires at most "
-                        f"{v_max} app bits but min allowed if {min_fix_app}")
-                max_fix_app = min(max_fix_app, v_max)
-        if min_fix_app > max_fix_app:
+                        f"{v_max} app bits but min allowed if {min_app}")
+                max_app = min(max_app, v_max)
+        if min_app > max_app:
             raise PacmanRouteInfoAllocationException(
                 "There is no n_atom_bit which works for for all fixed")
 
-        self.__target_app_bits = (
-                BITS_IN_KEY - self.__max_bits_machine - self.__max_bits_atoms)
-        if self.__target_app_bits > max_fix_app:
-            self.__target_app_bits = max_fix_app
-        if self.__target_app_bits < min_fix_app:
-            self.__target_app_bits = min_fix_app
+        # adjust best to fit inside range
+        if best_app > max_app:
+            best_app = max_app
+        elif best_app < min_app:
+            best_app = min_app
+        assert best_app + self.__min_bits_machine_and_atoms <= BITS_IN_KEY
+        return best_app, None
 
-        if (self.__target_app_bits + self.__min_bits_machine_and_atoms
-                > BITS_IN_KEY):
-            raise PacmanRouteInfoAllocationException(
-                "Unable to find a number of atom bits that works with fixed")
+    def __set_target_zones(self, routing_info: RoutingInfo) -> None:
+        self.__target_app_bits, atom_bits = self.__find_target_app_bits(routing_info)
 
-        self.__target_machine_bits = self.__max_bits_machine
-        self.__target_atom_bits = (BITS_IN_KEY - self.__target_app_bits -
-                                   self.__target_machine_bits)
+        if atom_bits is not None:
+            if atom_bits >= self.__max_bits_atoms and self.__target_app_bits + self.__max_bits_machine + atom_bits <= BITS_IN_KEY:
+                self.__target_machine_bits = (
+                        BITS_IN_KEY - self.__target_app_bits - atom_bits)
+                self.__target_atom_bits = atom_bits
+        else:
+            self.__target_machine_bits = self.__max_bits_machine
+            self.__target_atom_bits = (BITS_IN_KEY - self.__target_app_bits -
+                                       self.__target_machine_bits)
 
         VertexRoutingInfo.set_global_mask(
             self.__mask(self.__target_machine_bits + self.__target_atom_bits),

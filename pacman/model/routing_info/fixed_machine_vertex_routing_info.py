@@ -127,6 +127,11 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
 
         :return: Smallest and largest application zone supportable
         """
+        # If a possile one to One allow the split anywhere
+        if (self.__machine_mask == self.__app_key_and_mask.mask and
+                self.key == self.__app_key_and_mask.key):
+            return 0, BITS_IN_KEY - self.machine_shift
+
         app_key = self.__app_key_and_mask.key
         app_used = signifacant_zone(app_key)
         machine_index_key = self.key - app_key
