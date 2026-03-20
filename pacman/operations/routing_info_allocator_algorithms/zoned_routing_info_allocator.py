@@ -122,7 +122,8 @@ class ZonedRoutingInfoAllocator(object):
             Tuple[ApplicationVertex, str]] = OrderedSet()
         self.__atom_bits_per_app_part: Dict[
             Tuple[ApplicationVertex, str], int] = dict()
-        self.__ap_keys_blocked_by_fixed: Set[int] = set()
+        self.__ap_keys_blocked_by_fixed: \
+            Dict[int, Tuple[ApplicationVertex, str]] = dict()
 
         # Start at with values for an empty graph then as needed
         self.__min_bits_machine_and_atoms = 0
@@ -369,13 +370,32 @@ class ZonedRoutingInfoAllocator(object):
             self.__mask(self.__target_atom_bits))
 
     def __set_fixed_used(self, routing_info: RoutingInfo) -> None:
-        for pre, identifier in self.__vertex_partitions:
-            if not routing_info.has_info_from(pre, identifier):
-                continue
-            key_and_mask = routing_info.get_info_from(pre, identifier)
-            # Get the key and mask that overlap with the A-P key and mask
-            blocked = key_and_mask.key >> self.__target_app_bits
-            self.__ap_keys_blocked_by_fixed.add(blocked)
+        repeats = set()
+        for info in routing_info:
+            app_key = info.key >> self.__target_app_bits
+            if app_key in self.__ap_keys_blocked_by_fixed:
+                (vertex, partition_id) = (
+                    self.__ap_keys_blocked_by_fixed)[app_key]
+                if (vertex != info.app_vertex or
+                        partition_id != info.partition_id):
+                    repeats.add((info.app_vertex, info.partition_id))
+                    repeats.add(self.__ap_keys_blocked_by_fixed[app_key])
+            else:
+                self.__ap_keys_blocked_by_fixed[app_key] = (
+                    info.app_vertex, info.partition_id)
+
+        if len(repeats) > 0:
+            for info in routing_info:
+                if (info.app_vertex, info.partition_id) in repeats:
+                    info.set_app_keys_overlap()
+
+        # This triggers a check of already added infos
+        routing_info.add_zones(
+            self.__min_bits_machine_and_atoms,
+            self.__max_bits_machine, self.__max_bits_atoms,
+            self.__size_app_part_bits,
+            self.__target_app_bits, self.__target_machine_bits,
+            self.__target_atom_bits)
 
     def __allocate(self, routing_info: RoutingInfo) -> None:
         progress = ProgressBar(
@@ -436,13 +456,6 @@ class ZonedRoutingInfoAllocator(object):
                     app_key=key, partition_id=identifier, app_vertex=pre,
                     max_machine_index=len(machine_vertices) - 1))
             app_part_index += 1
-
-        routing_info.add_zones(
-            self.__min_bits_machine_and_atoms,
-            self.__max_bits_machine, self.__max_bits_atoms,
-            self.__size_app_part_bits,
-            self.__target_app_bits, self.__target_machine_bits,
-            self.__target_atom_bits)
 
     @staticmethod
     def __mask(bits: int) -> int:

@@ -22,6 +22,7 @@ from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.utility_calls import calc_shift
 
 from .base_key_and_mask import BaseKeyAndMask
+from ..graphs.application import ApplicationVertex
 
 NOT_SET = -1000
 
@@ -105,6 +106,16 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     def vertex(self) -> AbstractVertex:
         """
         The vertex of the information.
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def app_vertex(self) -> ApplicationVertex:
+        """
+        The Application vertex of the information.
+
+        If the vertex is a Machine Vertex returns its application vertex
         """
         raise NotImplementedError
 
@@ -206,6 +217,18 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
         Application Masks always are so this is about Machine Masks
         """
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def has_app_keys_overlap(self) -> bool:
+        """
+        True unless the allocator has marked this info as having an overlap
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def set_app_keys_overlap(self):
         raise NotImplementedError()
 
     @classmethod

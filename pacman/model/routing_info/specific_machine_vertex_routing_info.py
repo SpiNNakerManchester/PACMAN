@@ -69,6 +69,15 @@ class SpecificMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         return False
 
     @property
+    @overrides(MachineVertexRoutingInfo.has_app_keys_overlap)
+    def has_app_keys_overlap(self) -> bool:
+        return False
+
+    @overrides(MachineVertexRoutingInfo.set_app_keys_overlap)
+    def set_app_keys_overlap(self):
+        raise NotImplementedError("Should never overlap")
+
+    @property
     @overrides(MachineVertexRoutingInfo.has_fixed_keys)
     def has_fixed_keys(self) -> bool:
         return False

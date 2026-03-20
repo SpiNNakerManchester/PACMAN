@@ -307,6 +307,7 @@ def test_allocator_no_fixed() -> None:
     assert routing_info.has_global_app_masks
     assert routing_info.has_global_machine_masks
     assert not routing_info.has_fixed_keys
+    assert not routing_info.has_app_keys_overlap
 
     check_masks_all_the_same(routing_info)
     check_keys_for_application_partition_pairs(routing_info)
@@ -333,6 +334,7 @@ def test_fixed_only() -> None:
     assert not routing_info.has_global_app_masks
     assert not routing_info.has_global_machine_masks
     assert routing_info.has_fixed_keys
+    assert not routing_info.has_app_keys_overlap
 
 
 def test_weird() -> None:
@@ -353,6 +355,7 @@ def test_weird() -> None:
     assert not routing_info.has_global_app_masks
     assert not routing_info.has_global_machine_masks
     assert routing_info.has_fixed_keys
+    assert routing_info.has_app_keys_overlap
 
 
 def test_overlap() -> None:
@@ -376,6 +379,7 @@ def test_overlap() -> None:
     assert not routing_info.has_global_app_masks
     assert not routing_info.has_global_machine_masks
     assert routing_info.has_fixed_keys
+    assert routing_info.has_app_keys_overlap
 
 
 def test_no_edge() -> None:
@@ -394,6 +398,7 @@ def test_no_edge() -> None:
     assert routing_info.has_global_app_masks
     assert routing_info.has_global_machine_masks
     assert not routing_info.has_fixed_keys
+    assert not routing_info.has_app_keys_overlap
 
 
 def test_allocator_with_fixed() -> None:
@@ -416,6 +421,7 @@ def test_allocator_with_fixed() -> None:
     assert not routing_info.has_global_app_masks
     assert not routing_info.has_global_machine_masks
     assert routing_info.has_fixed_keys
+    assert not routing_info.has_app_keys_overlap
 
     for partition in PacmanDataView.iterate_partitions():
         partition_id = partition.identifier
@@ -481,6 +487,7 @@ def test_big_no_fixed() -> None:
     assert routing_info.has_global_app_masks
     assert not routing_info.has_global_machine_masks
     assert not routing_info.has_fixed_keys
+    assert not routing_info.has_app_keys_overlap
 
     check_masks_all_the_same(routing_info)
     check_keys_for_application_partition_pairs(routing_info)
@@ -514,9 +521,9 @@ def test_big_fixed_low() -> None:
     assert routing_info.target_machine_bits == 11
     assert routing_info.target_atom_bits == 9
     assert not routing_info.has_global_app_masks
-    assert routing_info.has_global_machine_masks
+    assert not routing_info.has_global_machine_masks
     assert routing_info.has_fixed_keys
-
+    assert not routing_info.has_app_keys_overlap
 
 def create_many_machine_mask() -> None:
     fixed_machine_keys_by_partition: Any = dict()

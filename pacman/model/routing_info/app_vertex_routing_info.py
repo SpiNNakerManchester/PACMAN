@@ -111,3 +111,8 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     @overrides(VertexRoutingInfo.vertex)
     def vertex(self) -> ApplicationVertex:
         return self.__app_vertex
+
+    @property
+    @overrides(VertexRoutingInfo.app_vertex)
+    def app_vertex(self) -> ApplicationVertex:
+        return self.__app_vertex

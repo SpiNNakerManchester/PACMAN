@@ -26,7 +26,7 @@ class RoutingInfo(object):
     An association of machine vertices to a non-overlapping set of keys
     and masks.
     """
-    __slots__ = ("_info", "_has_fixed_keys",
+    __slots__ = ("_info", "_has_fixed_keys", "_has_app_keys_overlap",
                  "_has_global_app_masks", "_has_global_machine_masks",
                  "_max_bits_machine", "_max_bits_atoms",
                  "_min_bits_machine_and_atoms", "_size_app_part_bits",
@@ -47,6 +47,7 @@ class RoutingInfo(object):
         self._target_machine_bits = -1000
         self._target_atom_bits = -1000
         self._has_fixed_keys = False
+        self._has_app_keys_overlap = False
         self._has_global_app_masks = True
         self._has_global_machine_masks = True
 
@@ -207,6 +208,16 @@ class RoutingInfo(object):
         :param target_atom_bits:
         :return:
         """
+        for info in self:
+            if info.has_fixed_keys:
+                self._has_fixed_keys = True
+            if not info.has_global_app_masks:
+                self._has_global_app_masks = False
+            if not info.has_global_machine_masks:
+                self._has_global_machine_masks = False
+            if info.has_app_keys_overlap:
+                self._has_app_keys_overlap = True
+
         self._min_bits_machine_and_atoms = min_bits_machine_and_atoms
         self._max_bits_machine = max_bits_machine
         self._max_bits_atoms = max_bits_atoms
@@ -296,9 +307,16 @@ class RoutingInfo(object):
         """
         True if ANY vertex requires fixed keys and masks
 
-        Fixed keys may be shiftable and even global
+        Fixed keys may be global
         """
         return self._has_fixed_keys
+
+    @property
+    def has_app_keys_overlap(self) -> bool:
+        """
+        True if infos have the same app_key for multiple Application vertices
+        """
+        return self._has_app_keys_overlap
 
     @property
     def has_global_app_masks(self) -> bool:

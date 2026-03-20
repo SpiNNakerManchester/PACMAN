@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 
 from .vertex_routing_info import VertexRoutingInfo
+from ..graphs.application import ApplicationVertex
 
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex
@@ -60,6 +61,11 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
     @overrides(VertexRoutingInfo.vertex)
     def vertex(self) -> MachineVertex:
         return self.__machine_vertex
+
+    @property
+    @overrides(VertexRoutingInfo.app_vertex)
+    def app_vertex(self) -> ApplicationVertex:
+        return self.__machine_vertex.app_vertex
 
     @property
     def index(self) -> int:

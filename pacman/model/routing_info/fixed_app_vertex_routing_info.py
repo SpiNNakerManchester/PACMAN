@@ -35,7 +35,9 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
         # The mask allocated to the Application partition
         "__app_mask",
         # The mask allocated to the machine (plus application) partition
-        "__machine_mask"
+        "__machine_mask",
+        # Records this has app keys overlap
+        "__app_key_overlap"
     )
 
     def __init__(
@@ -53,6 +55,7 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
                          max_machine_index)
         self.__app_mask = key_and_mask.mask
         self.__machine_mask = machine_mask
+        self.__app_key_overlap = False
         if not can_shift(self.__app_mask):
             raise IrregularFixedMaskException(
                 f"{app_vertex} has a fixed app mask {key_and_mask.mask} "
@@ -90,6 +93,15 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
     def has_global_machine_masks(self) -> bool:
         # The allocator will try to use the fixed masks as the global ones
         return self.__machine_mask == self._global_machine_mask
+
+    @property
+    @overrides(AppVertexRoutingInfo.has_app_keys_overlap)
+    def has_app_keys_overlap(self) -> bool:
+        return self.__app_key_overlap
+
+    @overrides(AppVertexRoutingInfo.set_app_keys_overlap)
+    def set_app_keys_overlap(self):
+        self.__app_key_overlap = True
 
     @property
     @overrides(AppVertexRoutingInfo.has_fixed_keys)
