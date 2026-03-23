@@ -375,7 +375,7 @@ class ZonedRoutingInfoAllocator(object):
             # Use enough for largest machine index
             self.__target_machine_bits = self.__max_bits_machine
             # Extra bits in the atom zone
-            # Ok if too small for large atom ones they will be exceptions
+            # OK if too small for large atom ones they will be exceptions
             self.__target_atom_bits = (BITS_IN_KEY - self.__target_app_bits -
                                        self.__target_machine_bits)
 
