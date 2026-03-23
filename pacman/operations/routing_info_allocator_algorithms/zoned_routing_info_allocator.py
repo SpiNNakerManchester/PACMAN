@@ -358,14 +358,24 @@ class ZonedRoutingInfoAllocator(object):
             self.__find_target_app_bits(routing_info))
 
         if atom_bits is not None:
-            if (atom_bits >=
-                    self.__max_bits_atoms and self.__target_app_bits +
-                    self.__max_bits_machine + atom_bits <= BITS_IN_KEY):
-                self.__target_machine_bits = (
-                        BITS_IN_KEY - self.__target_app_bits - atom_bits)
-                self.__target_atom_bits = atom_bits
+            # fixed is smaller than needed by other vertices
+            if atom_bits < self.__max_bits_atoms:
+                atom_bits = None
+            # fixed does not leave room for largest machine index
+            elif (self.__target_app_bits + self.__max_bits_machine +
+                  atom_bits <= BITS_IN_KEY):
+                atom_bits = None
+
+        if atom_bits is not None:
+            # Use recommended by fixed extra in machine index part
+            self.__target_machine_bits = (
+                    BITS_IN_KEY - self.__target_app_bits - atom_bits)
+            self.__target_atom_bits = atom_bits
         else:
+            # Use enough for largest machine index
             self.__target_machine_bits = self.__max_bits_machine
+            # Extra bits in the atom zone
+            # Ok if too small for large atom ones they will be exceptions
             self.__target_atom_bits = (BITS_IN_KEY - self.__target_app_bits -
                                        self.__target_machine_bits)
 
