@@ -363,7 +363,7 @@ class ZonedRoutingInfoAllocator(object):
                 atom_bits = None
             # fixed does not leave room for largest machine index
             elif (self.__target_app_bits + self.__max_bits_machine +
-                  atom_bits <= BITS_IN_KEY):
+                  atom_bits > BITS_IN_KEY):
                 atom_bits = None
 
         if atom_bits is not None:
