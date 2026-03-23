@@ -134,8 +134,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         The number of bits for the atoms.
 
         Semantic sugar for machine_shift
-
-        :raises PacmanValueError: If the masks are not shiftable
         """
         return self.machine_shift
 
@@ -191,21 +189,13 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         raise NotImplementedError()
 
     @property
-    def has_global_masks(self) -> bool:
-        """
-        True if all masks are the global ones defined by the zones
-
-        Application Masks always are so this is about Machine Masks
-        """
-        return self.has_global_app_masks and self.has_global_machine_masks
-
-    @property
     @abstractmethod
     def has_global_app_masks(self) -> bool:
         """
         True if all masks are the global ones defined by the zones
 
-        Application Masks always are so this is about Machine Masks
+        While all infos will work with the global shift they may not
+        actually have the global app mask.
         """
         raise NotImplementedError()
 
@@ -213,9 +203,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     @abstractmethod
     def has_global_machine_masks(self) -> bool:
         """
-        True if all masks are the global ones defined by the zones
-
-        Application Masks always are so this is about Machine Masks
+        True if all masks machine are the global ones defined by the zones
         """
         raise NotImplementedError()
 

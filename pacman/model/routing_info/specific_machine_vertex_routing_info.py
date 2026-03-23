@@ -1,4 +1,4 @@
-# Copyright (c) 2016 The University of Manchester
+# Copyright (c) 2026 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ class SpecificMachineVertexRoutingInfo(MachineVertexRoutingInfo):
     Associates a machine vertex and partition identifier to its routing
     information (keys and masks).
 
-    The global application mask is still used
+    The global Machine mask is not used,
+    the global application mask is still used
     """
 
     __slots__ = (

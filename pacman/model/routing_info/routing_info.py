@@ -239,7 +239,7 @@ class RoutingInfo(object):
     @property
     def max_bits_machine(self) -> int:
         """
-        Maximum number of bits to represent the machines for any vertex
+        Maximum number of bits to represent the machine indexes for any vertex
         """
         return self._max_bits_machine
 
@@ -254,6 +254,8 @@ class RoutingInfo(object):
     def size_app_part_bits(self) -> int:
         """
         Size of the App vertex / Partition name zone
+
+        This is the calculated size ignoring fixed keys.
         """
         return self._size_app_part_bits
 
@@ -282,12 +284,9 @@ class RoutingInfo(object):
         """
         Size of the machine part for keys.
 
-        It will be at least max_bits_machine,
-        but may include extra bits not needed by
-        target_app_bits and target_atom_bits
+        Ideally will be max_bits_machine.
 
-        It may however not be respected on vertices with a very large number
-        of atoms per core.
+        May be different if fixed masks suggested a workable different value.
         """
         return self._target_machine_bits
 
@@ -296,9 +295,10 @@ class RoutingInfo(object):
         """
          Size of the atoms part for vertex that fit the normal case
 
-         Ideally this will be the max_bits_atoms but may be smaller
-         if there is a mix of application vertices with many outgoing
-         and others with atoms per core.
+         Will be at least max_bits_atoms.
+         May be larger if there are extra bits.
+
+         May be larger if fixed masks suggested a workable different value.
          """
         return self._target_atom_bits
 

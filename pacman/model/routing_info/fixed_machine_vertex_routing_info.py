@@ -1,4 +1,4 @@
-# Copyright (c) 2016 The University of Manchester
+# Copyright (c) 2026 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,9 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
     """
     Associates a machine vertex and partition identifier to its routing
     information (keys and masks).
+
+    This is used then the Vertex has fixed masks
+    even if they are the global ones.
     """
 
     __slots__ = (
@@ -127,7 +130,7 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
 
     def get_atom_bits_needed_range(self) -> Tuple[int, int]:
         """
-        The range if atom bit values that this info can support.
+        The range of atom bit values that this info can support.
 
         Based on the Application and Machine keys it may be able to alter the
         Application Mask without changing now results.

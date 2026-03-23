@@ -1,4 +1,4 @@
-# Copyright (c) 2016 The University of Manchester
+# Copyright (c) 2026 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@ from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
 class GlobalMachineVertexRoutingInfo(MachineVertexRoutingInfo):
     """
-    Associates a machine vertex and partition identifier to its key the global
-    masks
+    Associates a machine vertex and partition identifier to its key.
+
+    The Vertex will not have fixed keys.
     """
 
     __slots__ = ()

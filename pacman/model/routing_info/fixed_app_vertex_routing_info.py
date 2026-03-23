@@ -1,4 +1,4 @@
-# Copyright (c) 2021 The University of Manchester
+# Copyright (c) 2026 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,7 +28,9 @@ logger = logging.getLogger(__name__)
 
 class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
     """
-    Routing information for an application vertex with fixed keys
+    Routing information for an application vertex with fixed keys and masks
+
+    This class is used even if the fixed masks are the global ones.
     """
 
     __slots__ = (
