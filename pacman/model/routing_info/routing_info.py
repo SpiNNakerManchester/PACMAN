@@ -309,7 +309,7 @@ class RoutingInfo(object):
         """
         Flag to say all infos are Machine mask shiftable
 
-        :return: True if no info.machine_shift will cause an exception
+        True if no info.machine_shift will cause an exception
         """
         return self._is_machine_shiftable
 

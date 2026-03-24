@@ -165,7 +165,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         Flag to say the Machine mask is shiftable
 
-        :return: True if machine_shift will not cause an exception
+        True if machine_shift will not cause an exception
         """
         return can_shift(self.machine_mask)
 

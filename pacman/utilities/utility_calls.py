@@ -207,6 +207,8 @@ def last_one(key:int) -> int:
     Assumes size of key is 32 bits
 
     If key is zero will return -1
+
+    :returns: index with the most significant bit being 0
     """
     last = -1
     bits = expand_to_bit_array(key)
@@ -224,31 +226,11 @@ def first_one(key:int) -> int:
     Assumes size of key is 32 bits
 
     If key is zero will return 32
+
+    :returns: index with the most significant bit being 0
     """
     bits = expand_to_bit_array(key)
     for i in range(BITS_IN_KEY):
         if bits[i] == 1:
             return i
     return 32
-
-def signifacant_zone(key: int) -> Optional[Tuple[int, int]]:
-    """
-    Gets the zone that is significant for this key.
-
-    This will be the first none zero bit to the last none zero bit
-
-    If the key is zero the result will be None
-
-    :param key:
-    :return: Zone that has none zero bits
-    """
-    bits = expand_to_bit_array(key)
-    first = 0
-    while first < BITS_IN_KEY and bits[first] == 0:
-        first += 1
-        if first >= BITS_IN_KEY:
-            return None
-    last = 31
-    while last > first and bits[last] == 0:
-        last -= 1
-    return (first, last)
