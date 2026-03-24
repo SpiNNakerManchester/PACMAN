@@ -17,8 +17,7 @@ from spinn_utilities.overrides import overrides
 
 from pacman.utilities.constants import BITS_IN_KEY
 from pacman.exceptions import IrregularFixedMaskException
-from pacman.utilities.utility_calls import (
-    calc_shift, can_shift, signifacant_zone)
+from pacman.utilities.utility_calls import can_shift, first_one, last_one
 
 from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
@@ -63,29 +62,6 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
             raise IrregularFixedMaskException(
                 f"{machine_vertex} has a fixed app_mask "
                 f"{hex(app_key_and_mask.mask)} which is not shiftable")
-        elif not can_shift(key_and_mask.mask):
-            raise IrregularFixedMaskException(
-                f"{machine_vertex} has a fixed machine_mask "
-                f"{hex(key_and_mask.mask)} which is not shiftable")
-        else:
-            # Do not use the global as not yet set
-            app_shift = calc_shift(app_key_and_mask.mask)
-            if app_shift < self.machine_shift:
-                raise IrregularFixedMaskException(
-                    f"{machine_vertex} has a fixed app_mask "
-                    f"{hex(app_key_and_mask.mask)} which is larger than "
-                    f"fixed machine_mask {hex(key_and_mask.mask)}")
-
-        # Currently we only support machine Zone == machine_index
-        # If different is needed the MachineVertex will have to say so
-        unshifted = self.key - app_key_and_mask.key
-        shifted = unshifted >> self.machine_shift
-        if self.index != shifted:
-            raise IrregularFixedMaskException(
-                f"{machine_vertex} has {index=} but "
-                f"fixed key {hex(self.key)} - "
-                f"fixed app key {hex(app_key_and_mask.key)} is "
-                f"{hex(unshifted)} which shifted is {hex(shifted)}")
 
     @property
     @overrides(MachineVertexRoutingInfo.mask)
@@ -148,15 +124,10 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
             return 0, BITS_IN_KEY - self.machine_shift
 
         app_key = self.__app_key_and_mask.key
-        app_used = signifacant_zone(app_key)
-        machine_index_key = self.key - app_key
-        machine_used = signifacant_zone(machine_index_key)
-        if app_used is None:
-            min_needed = 0
+        last_app_one = last_one(app_key)
+        machine_index_bit = self.key - app_key
+        first_machine_one = first_one(machine_index_bit)
+        if first_machine_one == -1:
+            return last_app_one + 1, BITS_IN_KEY
         else:
-            min_needed = app_used[1] + 1
-        if machine_used is None:
-            max_needed = BITS_IN_KEY - self.machine_shift
-        else:
-            max_needed = machine_used[0]
-        return (min_needed, max_needed)
+            return last_app_one + 1, first_machine_one

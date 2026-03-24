@@ -16,8 +16,8 @@ import unittest
 from pacman.config_setup import unittest_setup
 from pacman.model.resources import ConstantSDRAM
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanConfigurationException,
-    IrregularFixedMaskException)
+    IrregularFixedMaskException, PacmanAlreadyExistsException,
+    PacmanConfigurationException, PacmanValueError)
 from pacman.model.routing_info import (
     RoutingInfo, BaseKeyAndMask, VertexRoutingInfo,
     FixedAppVertexRoutingInfo, FixedMachineVertexRoutingInfo,
@@ -208,11 +208,43 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.app_mask, specific_app)
         self.assertEqual(info.get_global_app_shift(), 24)
         self.assertEqual(info.machine_mask, specific_mac)
+        self.assertTrue(info.is_machine_shiftable)
         self.assertEqual(info.machine_shift, 12)
         # based on global
         self.assertEqual(info.machine_index_mask, 0x000FF000)
         self.assertEqual(info.atom_mask, 0x00000FFF)
         self.assertEqual(info.n_bits_atoms, 12)
+        self.assertEqual((8, 18), info.get_atom_bits_needed_range())
+
+    def test_not_shiftable(self) -> None:
+        global_app = 0xff000000
+        global_mac = 0xffffff00
+        specific_app = 0xFFF00000
+        specific_mac = 0xFFF3b000
+        VertexRoutingInfo.set_global_mask(
+            app_mask=global_app, machine_mask=global_mac)
+        bkm1 = BaseKeyAndMask(0x11002000, specific_mac)
+        vertex1 = SimpleMachineVertex(ConstantSDRAM(0))
+        bka = BaseKeyAndMask(0x11000000, specific_app)
+        info = FixedMachineVertexRoutingInfo(
+            key_and_mask=bkm1, partition_id="test", machine_vertex=vertex1,
+            app_key_and_mask=bka, index=2)
+        self.assertEqual(info.key_and_mask, bkm1)
+        self.assertFalse(info.has_global_app_masks)
+        self.assertFalse(info.has_global_machine_masks)
+        self.assertTrue(info.has_fixed_keys)
+        self.assertEqual(info.app_mask, specific_app)
+        self.assertEqual(info.get_global_app_shift(), 24)
+        self.assertEqual(info.machine_mask, specific_mac)
+        self.assertFalse(info.has_global_app_masks)
+        self.assertFalse(info.is_machine_shiftable)
+        with self.assertRaises(PacmanValueError):
+            info.machine_shift
+        # based on global
+        self.assertEqual(info.machine_index_mask, 0x0003b000)
+        self.assertEqual(hex(info.atom_mask), hex(0x000c4FfF))
+        with self.assertRaises(PacmanValueError):
+            self.assertEqual(info.n_bits_atoms, 12)
         self.assertEqual((8, 18), info.get_atom_bits_needed_range())
 
     def test_fixed_one_to_one_routing_info(self) -> None:

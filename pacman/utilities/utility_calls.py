@@ -198,6 +198,38 @@ def can_shift(mask: int) -> bool:
 
     return True
 
+def last_one(key:int) -> int:
+    """
+    Index of last 1 value of the key as bits
+
+    The most significant bit is index 0
+
+    Assumes size of key is 32 bits
+
+    If key is zero will return -1
+    """
+    last = -1
+    bits = expand_to_bit_array(key)
+    for i in range(BITS_IN_KEY):
+        if bits[i] == 1:
+            last = i
+    return last
+
+def first_one(key:int) -> int:
+    """
+    Index of last 1 value of the key as bits
+
+    The most significant bit is index 0
+
+    Assumes size of key is 32 bits
+
+    If key is zero will return 32
+    """
+    bits = expand_to_bit_array(key)
+    for i in range(BITS_IN_KEY):
+        if bits[i] == 1:
+            return i
+    return 32
 
 def signifacant_zone(key: int) -> Optional[Tuple[int, int]]:
     """

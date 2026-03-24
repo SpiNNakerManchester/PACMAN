@@ -19,7 +19,7 @@ from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractVertex
 from pacman.utilities.constants import FULL_MASK
-from pacman.utilities.utility_calls import calc_shift
+from pacman.utilities.utility_calls import calc_shift, can_shift
 
 from .base_key_and_mask import BaseKeyAndMask
 from ..graphs.application import ApplicationVertex
@@ -133,7 +133,11 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         The number of bits for the atoms.
 
-        Semantic sugar for machine_shift
+        This will always work for an Application Info
+
+        For a Machine Info it is Semantic sugar for machine_shift
+
+        :raises PacmanValueError: If the machine mask is not shiftable
         """
         return self.machine_shift
 
@@ -155,6 +159,15 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         This includes both the Application index and the machine index
         """
         raise NotImplementedError()
+
+    @property
+    def is_machine_shiftable(self) -> bool:
+        """
+        Flag to say the Machine mask is shiftable
+
+        :return: True if machine_shift will not cause an exception
+        """
+        return can_shift(self.machine_mask)
 
     @property
     def machine_shift(self) -> int:

@@ -309,7 +309,8 @@ class ZonedRoutingInfoAllocator(object):
         for info in routing_info:
             if app_mask is None:
                 app_mask = info.app_mask
-                machine_shift = info.machine_shift
+                if info.is_machine_shiftable:
+                    machine_shift = info.machine_shift
                 vertex = info.vertex
             elif app_mask != info.app_mask:
                 if all_same:

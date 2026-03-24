@@ -26,7 +26,8 @@ class RoutingInfo(object):
     An association of machine vertices to a non-overlapping set of keys
     and masks.
     """
-    __slots__ = ("_info", "_has_fixed_keys", "_has_app_keys_overlap",
+    __slots__ = ("_info", "_is_machine_shiftable",
+                 "_has_fixed_keys", "_has_app_keys_overlap",
                  "_has_global_app_masks", "_has_global_machine_masks",
                  "_max_bits_machine", "_max_bits_atoms",
                  "_min_bits_machine_and_atoms", "_size_app_part_bits",
@@ -46,6 +47,7 @@ class RoutingInfo(object):
         self._target_app_bits = -1000
         self._target_machine_bits = -1000
         self._target_atom_bits = -1000
+        self._is_machine_shiftable = True
         self._has_fixed_keys = False
         self._has_app_keys_overlap = False
         self._has_global_app_masks = True
@@ -66,12 +68,7 @@ class RoutingInfo(object):
                 "Routing information", str(info))
 
         self._info[info.vertex][info.partition_id] = info
-        if info.has_fixed_keys:
-            self._has_fixed_keys = True
-        if not info.has_global_app_masks:
-            self._has_global_app_masks = False
-        if not info.has_global_machine_masks:
-            self._has_global_machine_masks = False
+        self._check_info(info)
 
     def get_info_from(
             self, vertex: AbstractVertex,
@@ -191,6 +188,18 @@ class RoutingInfo(object):
     def __len__(self) -> int:
         return sum(len(v) for v in self._info.values())
 
+    def _check_info(self, info: VertexRoutingInfo) -> None:
+        if info.has_fixed_keys:
+            self._has_fixed_keys = True
+        if not info.has_global_app_masks:
+            self._has_global_app_masks = False
+        if not info.has_global_machine_masks:
+            self._has_global_machine_masks = False
+        if info.has_app_keys_overlap:
+            self._has_app_keys_overlap = True
+        if not info.is_machine_shiftable:
+            self._is_machine_shiftable = False
+
     def add_zones(
             self, min_bits_machine_and_atoms: int, max_bits_machine: int,
             max_bits_atoms: int, size_app_part_bits: int,
@@ -209,14 +218,7 @@ class RoutingInfo(object):
         :return:
         """
         for info in self:
-            if info.has_fixed_keys:
-                self._has_fixed_keys = True
-            if not info.has_global_app_masks:
-                self._has_global_app_masks = False
-            if not info.has_global_machine_masks:
-                self._has_global_machine_masks = False
-            if info.has_app_keys_overlap:
-                self._has_app_keys_overlap = True
+            self._check_info(info)
 
         self._min_bits_machine_and_atoms = min_bits_machine_and_atoms
         self._max_bits_machine = max_bits_machine
@@ -301,6 +303,15 @@ class RoutingInfo(object):
          May be larger if fixed masks suggested a workable different value.
          """
         return self._target_atom_bits
+
+    @property
+    def is_machine_shiftable(self):
+        """
+        Flag to say all infos are Machine mask shiftable
+
+        :return: True if no info.machine_shift will cause an exception
+        """
+        return self._is_machine_shiftable
 
     @property
     def has_fixed_keys(self) -> bool:
