@@ -305,7 +305,7 @@ class RoutingInfo(object):
         return self._target_atom_bits
 
     @property
-    def is_machine_shiftable(self) -> None:
+    def is_machine_shiftable(self) -> bool:
         """
         Flag to say all infos are Machine mask shiftable
 
