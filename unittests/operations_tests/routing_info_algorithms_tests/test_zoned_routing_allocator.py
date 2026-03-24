@@ -185,7 +185,6 @@ def create_graphs1(with_fixed: bool, shiftable: bool = True) -> None:
                             mac_vertex, "Part1"] = BaseKeyAndMask(
                                 0x33000000 + (mac_index << 8), 0xFFFF0F00)
 
-
             app_vertex.remember_machine_vertex(mac_vertex)
 
         app_vertices.append(app_vertex)
@@ -441,6 +440,7 @@ def test_allocator_with_fixed() -> None:
         assert hex(info.atom_mask) == hex(0x000000ff)
         assert hex(info.machine_mask) == hex(0xffffff00)
 
+
 def test_allocator_not_shiftable() -> None:
     unittest_setup()
     # Allocate something and check it does the right thing
@@ -461,6 +461,7 @@ def test_allocator_not_shiftable() -> None:
     assert routing_info.has_fixed_keys
     assert not routing_info.has_app_keys_overlap
     assert not routing_info.is_machine_shiftable
+
 
 def create_big(fixed_mask: Optional[int]) -> None:
     # This test shows how easy it is to trip up the allocator with a retina

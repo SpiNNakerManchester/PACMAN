@@ -14,8 +14,7 @@
 
 import hashlib
 import math
-from typing import Any, Iterable, Optional, Tuple
-import numpy
+from typing import Any, Iterable
 
 from pacman.exceptions import PacmanValueError
 from pacman.model.graphs.common import Slice
@@ -198,7 +197,8 @@ def can_shift(mask: int) -> bool:
 
     return True
 
-def last_one(key:int) -> int:
+
+def last_one(key: int) -> int:
     """
     Index of last 1 value of the key as bits
 
@@ -217,7 +217,8 @@ def last_one(key:int) -> int:
             last = i
     return last
 
-def first_one(key:int) -> int:
+
+def first_one(key: int) -> int:
     """
     Index of last 1 value of the key as bits
 
