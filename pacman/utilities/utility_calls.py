@@ -16,6 +16,8 @@ import hashlib
 import math
 from typing import Any, Iterable
 
+import numpy
+
 from pacman.exceptions import PacmanValueError
 from pacman.model.graphs.common import Slice
 from pacman.utilities.constants import BITS_IN_KEY
