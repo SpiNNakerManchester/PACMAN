@@ -356,6 +356,11 @@ class RoutingInfo(object):
 
     @property
     def global_app_mask(self) -> int:
+        """
+        The default app mask for all infos.
+
+        Used for all info expcet possibley fixed ones
+        """
         if self._global_app_mask is None:
             raise PacmanRouteInfoAllocationException(
                 "Global app mask not set")
@@ -371,6 +376,12 @@ class RoutingInfo(object):
 
     @property
     def global_machine_mask(self) -> int:
+        """
+        The default Machine Masks for all infos.
+
+        May not be used if there are fixed masks or a combination of Vertices
+        with cores and others with a larger number of atoms per core.
+        """
         if self._global_machine_mask is None:
             raise PacmanRouteInfoAllocationException(
                 "Global machine mask not set")

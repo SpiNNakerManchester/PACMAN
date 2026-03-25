@@ -113,7 +113,7 @@ class ZonedRoutingInfoAllocator(object):
         "__target_machine_bits",
         # Size of the atoms part for vertex that fit the normal case
         "__target_atom_bits",
-        # Default Appliaction mask
+        # Default Application mask
         "__global_app_mask",
         # Default Machine mask
         "__global_machine_mask",
