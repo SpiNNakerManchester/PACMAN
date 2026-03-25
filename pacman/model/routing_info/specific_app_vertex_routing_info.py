@@ -30,7 +30,7 @@ class SpecificAppVertexRoutingInfo(AppVertexRoutingInfo):
     In these the global Machine Mask is not used.
     """
 
-    __slots__ = ("__global_machine_mask")
+    __slots__ = ("__global_machine_mask", )
 
     def __init__(
             self, key_and_mask: BaseKeyAndMask, partition_id: str,
