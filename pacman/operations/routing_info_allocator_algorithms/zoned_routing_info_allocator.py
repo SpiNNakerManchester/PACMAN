@@ -113,7 +113,11 @@ class ZonedRoutingInfoAllocator(object):
         # Size of the machine part for vertex that fit the normal case
         "__target_machine_bits",
         # Size of the atoms part for vertex that fit the normal case
-        "__target_atom_bits"
+        "__target_atom_bits",
+        # Default Appliaction mask
+        "__global_app_mask",
+        # Default Machine mask
+        "__global_machine_mask",
     )
 
     def __init__(self) -> None:
@@ -135,6 +139,8 @@ class ZonedRoutingInfoAllocator(object):
         self.__target_app_bits = -10000
         self.__target_machine_bits = -10000
         self.__target_atom_bits = -10000
+        self.__global_app_mask = -10000
+        self.__global_machine_mask = -10000
 
     def allocate(self) -> RoutingInfo:
         """
@@ -178,12 +184,10 @@ class ZonedRoutingInfoAllocator(object):
                     f"{app_key_and_mask} while only outgoing machine vertex"
                     f" has {key_and_mask}")
         routing_info.add_routing_info(FixedMachineVertexRoutingInfo(
-            app_key_and_mask, part_id, m_vertex, app_key_and_mask,
-            m_vertex.index))
+            app_key_and_mask, part_id, m_vertex, m_vertex.index, app_key_and_mask))
         routing_info.add_routing_info(FixedAppVertexRoutingInfo(
             app_key_and_mask, part_id, pre,
-            app_key_and_mask.mask,
-            len(pre.machine_vertices) - 1))
+            len(pre.machine_vertices) - 1, app_key_and_mask.mask))
 
     def __allocate_many_fixed(
             self, pre: ApplicationVertex, part_id: str,
@@ -217,15 +221,16 @@ class ZonedRoutingInfoAllocator(object):
                     f"and {hex(key_and_mask.mask)}")
 
             routing_info.add_routing_info(FixedMachineVertexRoutingInfo(
-                key_and_mask, part_id, m_vertex, app_key_and_mask,
-                m_vertex.index))
+                key_and_mask, part_id, m_vertex, m_vertex.index,
+                app_key_and_mask))
+
             n_bits_atoms = m_vertex.get_n_keys_for_partition(part_id)
             max_atom_bits = max(max_atom_bits, n_bits_atoms)
 
         assert machine_mask is not None
         routing_info.add_routing_info(FixedAppVertexRoutingInfo(
             app_key_and_mask, part_id, pre,
-            machine_mask, len(pre.machine_vertices) - 1))
+            len(pre.machine_vertices) - 1, machine_mask))
 
     def __allocate_fixed(self, routing_info: RoutingInfo) -> None:
         for pre, part_id in self.__vertex_partitions:
@@ -379,10 +384,9 @@ class ZonedRoutingInfoAllocator(object):
             # OK if too small for large atom ones they will be exceptions
             self.__target_atom_bits = (BITS_IN_KEY - self.__target_app_bits -
                                        self.__target_machine_bits)
-
-        VertexRoutingInfo.set_global_mask(
-            self.__mask(self.__target_machine_bits + self.__target_atom_bits),
-            self.__mask(self.__target_atom_bits))
+        self.__global_app_mask = self.__mask(
+            self.__target_machine_bits + self.__target_atom_bits)
+        self.__global_machine_mask = self.__mask(self.__target_atom_bits)
 
     def __set_fixed_used(self, routing_info: RoutingInfo) -> None:
         repeats = set()
@@ -444,32 +448,35 @@ class ZonedRoutingInfoAllocator(object):
                         BITS_IN_KEY - self.__target_app_bits - n_bits_atoms)
                 overlap = True
             for machine_index, machine_vertex in enumerate(machine_vertices):
-                mask = self.__mask(n_bits_atoms)
+                mac_mask = self.__mask(n_bits_atoms)
                 key = app_part_index
                 key = (key << n_bits_machine) | machine_index
                 key = key << n_bits_atoms
                 m_info: MachineVertexRoutingInfo
+                key_and_mask = BaseKeyAndMask(key, mac_mask)
                 if overlap:
                     m_info = SpecificMachineVertexRoutingInfo(
-                        key, mask, identifier, machine_vertex,
-                        machine_index)
+                        key_and_mask, identifier,
+                        machine_vertex, machine_index,
+                        self.__global_app_mask, self.__global_machine_mask)
                 else:
                     m_info = GlobalMachineVertexRoutingInfo(
-                        key, identifier, machine_vertex,
-                        machine_index)
+                        key_and_mask, identifier,
+                        machine_vertex, machine_index,
+                        self.__global_app_mask)
                 routing_info.add_routing_info(m_info)
 
             # Add application-level routing information
             key = app_part_index << (n_bits_atoms + n_bits_machine)
+            bka = BaseKeyAndMask(key, self.__global_app_mask)
             if overlap:
                 routing_info.add_routing_info(SpecificAppVertexRoutingInfo(
-                    app_key=key, partition_id=identifier, app_vertex=pre,
-                    machine_mask=self.__mask(n_bits_atoms),
-                    max_machine_index=len(machine_vertices) - 1))
+                    bka, identifier, pre, len(machine_vertices) - 1,
+                    mac_mask, self.__global_machine_mask))
             else:
                 routing_info.add_routing_info(GlobalAppVertexRoutingInfo(
-                    app_key=key, partition_id=identifier, app_vertex=pre,
-                    max_machine_index=len(machine_vertices) - 1))
+                    bka, identifier, pre, len(machine_vertices) - 1,
+                    mac_mask))
             app_part_index += 1
 
     @staticmethod

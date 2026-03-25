@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 from typing import Any, Dict, Iterable, Optional, Sequence, Tuple
 
 from spinn_utilities.overrides import overrides
@@ -278,7 +277,7 @@ def check_keys_for_application_partition_pairs(
         routing_info: RoutingInfo) -> None:
     # Check the key for each application vertex/ parition pair is the same
     # The bits that should be the same are all but the bottom 12
-    app_mask = VertexRoutingInfo.get_global_app_mask()
+    app_mask = routing_info.global_app_mask
     for part in PacmanDataView.iterate_partitions():
         mapped_key = None
         for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
@@ -295,7 +294,6 @@ def check_keys_for_application_partition_pairs(
             if key != 0:
                 assert (key & app_mask) != 0
 
-@pytest.mark.xdist_group(name="routing_info_global")
 def test_allocator_no_fixed() -> None:
     unittest_setup()
 
@@ -322,7 +320,6 @@ def test_allocator_no_fixed() -> None:
     check_keys_for_application_partition_pairs(routing_info)
 
 
-@pytest.mark.xdist_group(name="routing_info_global")
 def test_fixed_only() -> None:
     unittest_setup()
     fixed_keys_by_partition = {
@@ -347,7 +344,6 @@ def test_fixed_only() -> None:
     assert routing_info.is_machine_shiftable
 
 
-@pytest.mark.xdist_group(name="routing_info_global")
 def test_weird() -> None:
     unittest_setup()
     fixed_keys_by_partition = {
@@ -370,7 +366,6 @@ def test_weird() -> None:
     assert routing_info.is_machine_shiftable
 
 
-@pytest.mark.xdist_group(name="routing_info_global")
 def test_overlap() -> None:
     # This should work here; overlap is allowed provided routes don't overlap
     # (which is found elsewhere)
@@ -395,7 +390,6 @@ def test_overlap() -> None:
     assert routing_info.has_app_keys_overlap
 
 
-@pytest.mark.xdist_group(name="routing_info_global")
 def test_no_edge() -> None:
     unittest_setup()
     create_graphs_no_edge()
@@ -416,7 +410,6 @@ def test_no_edge() -> None:
     assert routing_info.is_machine_shiftable
 
 
-@pytest.mark.xdist_group(name="routing_info_global")
 def test_allocator_with_fixed() -> None:
     unittest_setup()
     # Allocate something and check it does the right thing
@@ -434,8 +427,8 @@ def test_allocator_with_fixed() -> None:
     assert routing_info.target_app_bits == 16
     assert routing_info.target_machine_bits == 8
     assert routing_info.target_atom_bits == 8
-    assert not routing_info.has_global_app_masks
-    assert not routing_info.has_global_machine_masks
+    assert routing_info.has_global_app_masks
+    assert routing_info.has_global_machine_masks
     assert routing_info.has_fixed_keys
     assert not routing_info.has_app_keys_overlap
     assert routing_info.is_machine_shiftable
@@ -448,7 +441,6 @@ def test_allocator_with_fixed() -> None:
         assert hex(info.machine_mask) == hex(0xffffff00)
 
 
-@pytest.mark.xdist_group(name="routing_info_global")
 def test_allocator_not_shiftable() -> None:
     unittest_setup()
     # Allocate something and check it does the right thing
@@ -512,7 +504,6 @@ def create_big(fixed_mask: Optional[int]) -> None:
         mid_app_vertex.remember_machine_vertex(mid_mac_vertex)
 
 
-@pytest.mark.xdist_group(name="routing_info_global")
 def test_big_no_fixed() -> None:
     unittest_setup()
     create_big(None)
@@ -535,7 +526,6 @@ def test_big_no_fixed() -> None:
     check_keys_for_application_partition_pairs(routing_info)
 
 
-@pytest.mark.xdist_group(name="routing_info_global")
 def test_big_fixed_high() -> None:
     unittest_setup()
     create_big(0x180000)
@@ -546,7 +536,6 @@ def test_big_fixed_high() -> None:
         pass
 
 
-@pytest.mark.xdist_group(name="routing_info_global")
 def test_big_fixed_low() -> None:
     unittest_setup()
     fixed_app_mask = 0xFFF00000
@@ -564,7 +553,7 @@ def test_big_fixed_low() -> None:
     assert routing_info.target_app_bits == 12
     assert routing_info.target_machine_bits == 11
     assert routing_info.target_atom_bits == 9
-    assert not routing_info.has_global_app_masks
+    assert routing_info.has_global_app_masks
     assert not routing_info.has_global_machine_masks
     assert routing_info.has_fixed_keys
     assert not routing_info.has_app_keys_overlap

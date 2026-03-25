@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from .app_vertex_routing_info import AppVertexRoutingInfo
 if TYPE_CHECKING:
+    from pacman.model.routing_info import BaseKeyAndMask
     from pacman.model.graphs.application import ApplicationVertex
 
 logger = logging.getLogger(__name__)
@@ -29,35 +30,22 @@ class SpecificAppVertexRoutingInfo(AppVertexRoutingInfo):
     In these the global Machine Mask is not used.
     """
 
-    __slots__ = (
-        # The mask allocated to the machine (plus application) partition
-        "__machine_mask",
-    )
+    __slots__ = ("__global_machine_mask")
 
     def __init__(
-            self, app_key: int, partition_id: str,
-            app_vertex: ApplicationVertex, machine_mask: int,
-            max_machine_index: int):
+            self, key_and_mask: BaseKeyAndMask, partition_id: str,
+            app_vertex: ApplicationVertex, max_machine_index: int,
+            machine_mask: int, global_machine_mask: int):
         """
-        :param app_key
+        :param key_and_mask:
         :param partition_id:
         :param app_vertex:
         :param machine_mask:
         :param max_machine_index:
         """
-        super().__init__(app_key, partition_id, app_vertex,
-                         max_machine_index)
-        self.__machine_mask = machine_mask
-
-    @property
-    @overrides(AppVertexRoutingInfo.app_mask)
-    def app_mask(self) -> int:
-        return self._global_application_mask
-
-    @property
-    @overrides(AppVertexRoutingInfo.machine_mask)
-    def machine_mask(self) -> int:
-        return self.__machine_mask
+        super().__init__(key_and_mask, partition_id, app_vertex,
+                         max_machine_index, machine_mask)
+        self.__global_machine_mask = global_machine_mask
 
     @property
     @overrides(AppVertexRoutingInfo.has_global_app_masks)
@@ -82,3 +70,13 @@ class SpecificAppVertexRoutingInfo(AppVertexRoutingInfo):
     @overrides(AppVertexRoutingInfo.has_fixed_keys)
     def has_fixed_keys(self) -> bool:
         return False
+
+    @property
+    @overrides(AppVertexRoutingInfo.global_app_mask)
+    def global_app_mask(self) -> int:
+        return self.mask
+
+    @property
+    @overrides(AppVertexRoutingInfo.global_machine_mask)
+    def global_machine_mask(self) -> int:
+        return self.__global_machine_mask

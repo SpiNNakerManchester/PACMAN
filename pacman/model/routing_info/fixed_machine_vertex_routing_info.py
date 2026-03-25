@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Tuple, TYPE_CHECKING
+from typing import Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 
 from pacman.utilities.constants import BITS_IN_KEY
@@ -36,27 +36,30 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
     """
 
     __slots__ = (
-        # The mask allocated to the Application partition
-        "__app_key_and_mask",
-        # The mask allocated to the machine partition
-        "__machine_mask",
         # Records this has app keys overlap
-        "__app_key_overlap")
+        "__app_key_overlap",
+        "__app_key",
+        "__global_app_mask",
+        "__global_machine_mask"
+    )
 
     def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str,
-                 machine_vertex: MachineVertex,
-                 app_key_and_mask: BaseKeyAndMask, index: int):
+                 machine_vertex: MachineVertex, index: int,
+                 app_key_and_mask: BaseKeyAndMask):
         """
         :param key_and_mask:
-            The key allocated to the machine partition
+            The key and mask associated to the partition
         :param partition_id: The partition to set the keys for
         :param machine_vertex: The vertex to set the keys for
         :param index: The index of the machine vertex
+        :param app_key_and_mask: The application key and mask
         """
-        super().__init__(key_and_mask.key, partition_id, machine_vertex, index)
-        self.__app_key_and_mask = app_key_and_mask
-        self.__machine_mask = key_and_mask.mask
+        super().__init__( key_and_mask, partition_id, machine_vertex, index,
+                          app_key_and_mask.mask)
         self.__app_key_overlap = False
+        self.__app_key = app_key_and_mask.key
+        self.__global_app_mask: Optional[int] = None
+        self.__global_machine_mask: Optional[int] = None
 
         if not can_shift(app_key_and_mask.mask):
             raise IrregularFixedMaskException(
@@ -64,31 +67,16 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
                 f"{hex(app_key_and_mask.mask)} which is not shiftable")
 
     @property
-    @overrides(MachineVertexRoutingInfo.mask)
-    def mask(self) -> int:
-        return self.__machine_mask
-
-    @property
-    @overrides(MachineVertexRoutingInfo.app_mask)
-    def app_mask(self) -> int:
-        return self.__app_key_and_mask.mask
-
-    @property
-    @overrides(MachineVertexRoutingInfo.machine_mask)
-    def machine_mask(self) -> int:
-        return self.__machine_mask
-
-    @property
     @overrides(MachineVertexRoutingInfo.has_global_app_masks)
     def has_global_app_masks(self) -> bool:
         # The allocator will try to use the fixed masks as the global ones
-        return self.__app_key_and_mask.mask == self._global_application_mask
+        return self.app_mask == self.global_app_mask
 
     @property
     @overrides(MachineVertexRoutingInfo.has_global_machine_masks)
     def has_global_machine_masks(self) -> bool:
         # The allocator will try to use the fixed masks as the global ones
-        return self.__machine_mask == self._global_machine_mask
+        return self.machine_mask == self.global_machine_mask
 
     @property
     @overrides(MachineVertexRoutingInfo.has_app_keys_overlap)
@@ -119,15 +107,33 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         :return: Smallest and largest application zone supportable
         """
         # If app and machine the same allow the split anywhere
-        if (self.__machine_mask == self.__app_key_and_mask.mask and
-                self.key == self.__app_key_and_mask.key):
+        if (self.machine_mask == self.app_mask and
+                self.key == self.__app_key):
             return 0, BITS_IN_KEY - self.machine_shift
 
-        app_key = self.__app_key_and_mask.key
-        last_app_one = last_one(app_key)
-        machine_index_bit = self.key - app_key
+        last_app_one = last_one(self.__app_key)
+        machine_index_bit = self.key - self.__app_key
         first_machine_one = first_one(machine_index_bit)
         if first_machine_one == -1:
             return last_app_one + 1, BITS_IN_KEY
         else:
             return last_app_one + 1, first_machine_one
+
+    @overrides(MachineVertexRoutingInfo.set_global_masks)
+    def set_global_masks(self, app_mask: int, machine_mask: int) -> None:
+        self.__global_app_mask = app_mask
+        self.__global_machine_mask = machine_mask
+
+    @property
+    @overrides(MachineVertexRoutingInfo.global_app_mask)
+    def global_app_mask(self) -> int:
+        if self.__global_app_mask is None:
+            raise IrregularFixedMaskException("No global app mask set")
+        return self.__global_app_mask
+
+    @property
+    @overrides(MachineVertexRoutingInfo.global_machine_mask)
+    def global_machine_mask(self) -> int:
+        if self.__global_machine_mask is None:
+            raise IrregularFixedMaskException("No global machine mask set")
+        return self.__global_machine_mask

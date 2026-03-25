@@ -16,13 +16,17 @@ import logging
 import math
 from typing import Iterable, List, Tuple, TYPE_CHECKING
 
+import numpy
+
 from spinn_utilities.overrides import overrides
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
+from pacman.utilities.constants import BITS_IN_KEY
 from .vertex_routing_info import VertexRoutingInfo
 
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
+    from pacman.model.routing_info import BaseKeyAndMask
     from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
 logger = logging.getLogger(__name__)
@@ -37,25 +41,25 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
 
     __slots__ = (
         "__app_vertex",
+        "__machine_mask",
         "__max_machine_index")
 
     def __init__(
-            self, app_key: int, partition_id: str,
-            app_vertex: ApplicationVertex, max_machine_index: int):
+            self, key_and_mask: BaseKeyAndMask, partition_id: str,
+            app_vertex: ApplicationVertex, max_machine_index: int,
+            machine_mask: int):
         """
-        :param app_key:
+        :param key_and_mask:
         :param partition_id:
         :param app_vertex:
         :param max_machine_index:
+        :param machine_mask:
         """
-        super().__init__(app_key, partition_id)
+        super().__init__(key_and_mask, partition_id)
+        a = hex(machine_mask)
         self.__app_vertex = app_vertex
+        self.__machine_mask = machine_mask
         self.__max_machine_index = max_machine_index
-
-    @property
-    @overrides(VertexRoutingInfo.mask)
-    def mask(self) -> int:
-        return self.app_mask
 
     def merge_machine_entries(self, entries: List[Tuple[
             RoutingEntry,
@@ -95,6 +99,11 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                     i += next_entries
 
     def __group_mask(self, n_entries: int) -> int:
+        a = hex(self.machine_mask)
+        b = ((n_entries - 1) << self.n_bits_atoms)
+        c = type(self.machine_mask)
+        d = self.machine_mask
+        e = d - b
         return self.machine_mask - ((n_entries - 1) << self.n_bits_atoms)
 
     def __n_sequential_entries(self, i: int, n_entries: int) -> int:
@@ -116,3 +125,24 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     @overrides(VertexRoutingInfo.app_vertex)
     def app_vertex(self) -> ApplicationVertex:
         return self.__app_vertex
+
+    @property
+    def machine_mask(self) -> int:
+        """
+        The mask that covers a specific machine vertex.
+       """
+        return self.__machine_mask
+
+    @property
+    @overrides(VertexRoutingInfo.app_mask)
+    def app_mask(self) -> int:
+        return self.mask
+
+    @property
+    def n_bits_atoms(self) -> int:
+        """
+        The number of bits for the atoms.
+        """
+        bits = numpy.unpackbits(
+            numpy.asarray([self.__machine_mask], dtype=">u4").view(dtype="uint8"))
+        return BITS_IN_KEY - int(sum(bits))

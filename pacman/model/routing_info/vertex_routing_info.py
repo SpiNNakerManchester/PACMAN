@@ -33,21 +33,18 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     (keys and masks).
     """
 
-    _global_application_mask = NOT_SET  # temp value until set
-    _global_machine_mask = NOT_SET  # temp value until set
-
     __slots__ = (
-        # The key of this routing info
-        "_key",
-        # Mask may be global or specific so not included here
+        # The keys allocated to the machine partition
+        "__key_and_mask",
         # The partition identifier of the allocation
         "__partition_id",)
 
-    def __init__(self, key: int, partition_id: str):
+    def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str):
         """
+        :param key_and_mask: The key and mask associated to the partition
         :param partition_id: The partition to set the keys for
         """
-        self._key = key
+        self.__key_and_mask = key_and_mask
         self.__partition_id = partition_id
 
     def get_keys(self, n_keys: Optional[int] = None) -> numpy.ndarray:
@@ -77,22 +74,21 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         The only key and mask.
         """
-        return BaseKeyAndMask(self.key, self.mask)
+        return self.__key_and_mask
 
     @property
     def key(self) -> int:
         """
         The key for this info
         """
-        return self._key
+        return self.__key_and_mask.key
 
     @property
-    @abstractmethod
     def mask(self) -> int:
         """
         The mask for this info
         """
-        raise NotImplementedError
+        return self.__key_and_mask.mask
 
     @property
     def partition_id(self) -> str:
@@ -238,16 +234,14 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         raise NotImplementedError()
 
-    @classmethod
-    def set_global_mask(cls, app_mask: int, machine_mask: int) -> None:
+    def set_global_masks(self, app_mask: int, machine_mask: int) -> None:
         """
         Sets the global masks once the allocator has picked them
         """
-        cls._global_application_mask = app_mask
-        cls._global_machine_mask = machine_mask
+        raise NotImplementedError()
 
-    @classmethod
-    def get_global_app_shift(cls) -> int:
+    @property
+    def global_app_shift(self) -> int:
         """
         The shift global for the application zone.
 
@@ -255,31 +249,31 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
         For Fixed Masks this may not be the shift of the actual Application
         mask but is a value that will work.
-
-        :returns: The global shift for the application zone.
         """
-        return calc_shift(cls._global_application_mask)
+        return calc_shift(self.global_app_mask)
 
-    @classmethod
-    def get_global_app_mask(cls) -> int:
+    @property
+    @abstractmethod
+    def global_app_mask(self) -> int:
         """
         The global application mask used by the allocator
 
         As this is a class method this is reported by all infos even
         ones that do not respect it.
-
-        :returns: The global masked
         """
-        return cls._global_application_mask
+        raise NotImplementedError()
 
-    @classmethod
-    def get_global_machine_mask(cls) -> int:
+    @property
+    @abstractmethod
+    def global_machine_mask(self) -> int:
         """
         The global machine mask used by the allocator
 
         As this is a class method this is reported by all infos even
         ones that do not respect it.
-
-        :returns: The global masked
         """
-        return cls._global_machine_mask
+        raise NotImplementedError()
+
+    def __str__(self):
+        return (f"{self.__class__.__name__} {self.vertex.label}"
+                f" {self.partition_id} {self.key_and_mask})")

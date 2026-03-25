@@ -15,7 +15,11 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import (
     Dict, Iterator, Optional, Iterable, Set, TYPE_CHECKING)
-from pacman.exceptions import PacmanAlreadyExistsException
+
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanRouteInfoAllocationException)
+from pacman.utilities.constants import FULL_MASK
+
 if TYPE_CHECKING:
     from .vertex_routing_info import VertexRoutingInfo
     from pacman.model.graphs import AbstractVertex
@@ -27,6 +31,7 @@ class RoutingInfo(object):
     and masks.
     """
     __slots__ = ("_info", "_is_machine_shiftable",
+                 "_global_app_mask", "_global_machine_mask",
                  "_has_fixed_keys", "_has_app_keys_overlap",
                  "_has_global_app_masks", "_has_global_machine_masks",
                  "_max_bits_machine", "_max_bits_atoms",
@@ -39,6 +44,8 @@ class RoutingInfo(object):
         # name
         self._info: Dict[AbstractVertex,
                          Dict[str, VertexRoutingInfo]] = defaultdict(dict)
+        self._global_app_mask: Optional[int] = None
+        self._global_machine_mask: Optional[int] = None
         # Temp values to avoid Optionals
         self._min_bits_machine_and_atoms = -1000
         self._max_bits_machine = -1000
@@ -68,7 +75,8 @@ class RoutingInfo(object):
                 "Routing information", str(info))
 
         self._info[info.vertex][info.partition_id] = info
-        self._check_info(info)
+        if self._global_app_mask is not None:
+            self._check_info(info)
 
     def get_info_from(
             self, vertex: AbstractVertex,
@@ -199,6 +207,8 @@ class RoutingInfo(object):
             self._has_app_keys_overlap = True
         if not info.is_machine_shiftable:
             self._is_machine_shiftable = False
+        assert(self._global_app_mask == info.global_app_mask)
+        assert(self._global_machine_mask == info.global_machine_mask)
 
     def add_zones(
             self, min_bits_machine_and_atoms: int, max_bits_machine: int,
@@ -217,7 +227,14 @@ class RoutingInfo(object):
         :param target_atom_bits:
         :return:
         """
+        bits = target_machine_bits + target_atom_bits
+        self._global_app_mask = FULL_MASK - ((2 ** bits) - 1)
+        self._global_machine_mask = (
+                FULL_MASK - ((2 ** target_atom_bits) - 1))
+
         for info in self:
+            info.set_global_masks(
+                self._global_app_mask, self._global_machine_mask)
             self._check_info(info)
 
         self._min_bits_machine_and_atoms = min_bits_machine_and_atoms
@@ -338,9 +355,23 @@ class RoutingInfo(object):
         return self._has_global_app_masks
 
     @property
+    def global_app_mask(self) -> int:
+        if self._global_app_mask is None:
+            raise PacmanRouteInfoAllocationException(
+                "Global app mask not set")
+        return self._global_app_mask
+
+    @property
     def has_global_machine_masks(self) -> bool:
         """
         True if all app masks in ALL infos are
         global ones defined by the zones
         """
         return self._has_global_machine_masks
+
+    @property
+    def global_machine_mask(self) -> int:
+        if self._global_machine_mask is None:
+            raise PacmanRouteInfoAllocationException(
+                "Global machine mask not set")
+        return self._global_machine_mask

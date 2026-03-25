@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.utilities.utility_calls import can_shift
 from pacman.exceptions import IrregularFixedMaskException
@@ -34,18 +34,16 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
     """
 
     __slots__ = (
-        # The mask allocated to the Application partition
-        "__app_mask",
-        # The mask allocated to the machine (plus application) partition
-        "__machine_mask",
         # Records this has app keys overlap
-        "__app_key_overlap"
+        "__app_key_overlap",
+        "__global_app_mask",
+        "__global_machine_mask"
     )
 
     def __init__(
             self, key_and_mask: BaseKeyAndMask, partition_id: str,
-            app_vertex: ApplicationVertex, machine_mask: int,
-            max_machine_index: int):
+            app_vertex: ApplicationVertex,
+            max_machine_index: int, machine_mask: int):
         """
         :param key_and_mask
         :param partition_id:
@@ -53,37 +51,26 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
         :param machine_mask:
         :param max_machine_index:
         """
-        super().__init__(key_and_mask.key, partition_id, app_vertex,
-                         max_machine_index)
-        self.__app_mask = key_and_mask.mask
-        self.__machine_mask = machine_mask
+        super().__init__(key_and_mask, partition_id, app_vertex,
+                         max_machine_index, machine_mask)
         self.__app_key_overlap = False
-        if not can_shift(self.__app_mask):
+        self.__global_app_mask: Optional[int] = None
+        self.__global_machine_mask: Optional[int] = None
+
+        if not can_shift(key_and_mask.mask):
             raise IrregularFixedMaskException(
                 f"{app_vertex} has a fixed app mask {key_and_mask.mask} "
                 f"which is not shiftable")
 
     @property
-    @overrides(AppVertexRoutingInfo.app_mask)
-    def app_mask(self) -> int:
-        return self.__app_mask
-
-    @property
-    @overrides(AppVertexRoutingInfo.machine_mask)
-    def machine_mask(self) -> int:
-        return self.__machine_mask
-
-    @property
     @overrides(AppVertexRoutingInfo.has_global_app_masks)
     def has_global_app_masks(self) -> bool:
-        # The allocator will try to use the fixed masks as the global ones
-        return self.__app_mask == self._global_application_mask
+        return self.mask == self.global_app_mask
 
     @property
     @overrides(AppVertexRoutingInfo.has_global_machine_masks)
     def has_global_machine_masks(self) -> bool:
-        # The allocator will try to use the fixed masks as the global ones
-        return self.__machine_mask == self._global_machine_mask
+        return self.machine_mask == self.global_machine_mask
 
     @property
     @overrides(AppVertexRoutingInfo.has_app_keys_overlap)
@@ -98,3 +85,22 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
     @overrides(AppVertexRoutingInfo.has_fixed_keys)
     def has_fixed_keys(self) -> bool:
         return True
+
+    @overrides(AppVertexRoutingInfo.set_global_masks)
+    def set_global_masks(self, app_mask: int, machine_mask: int) -> None:
+        self.__global_app_mask = app_mask
+        self.__global_machine_mask = machine_mask
+
+    @property
+    @overrides(AppVertexRoutingInfo.global_app_mask)
+    def global_app_mask(self) -> int:
+        if self.__global_app_mask is None:
+            raise IrregularFixedMaskException("No global app mask set")
+        return self.__global_app_mask
+
+    @property
+    @overrides(AppVertexRoutingInfo.global_machine_mask)
+    def global_machine_mask(self) -> int:
+        if self.__global_machine_mask is None:
+            raise IrregularFixedMaskException("No global machine mask set")
+        return self.__global_machine_mask

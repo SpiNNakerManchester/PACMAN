@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from .machine_vertex_routing_info import MachineVertexRoutingInfo
 if TYPE_CHECKING:
+    from pacman.model.routing_info import BaseKeyAndMask
     from pacman.model.graphs.machine import MachineVertex
 
 
@@ -30,34 +31,23 @@ class SpecificMachineVertexRoutingInfo(MachineVertexRoutingInfo):
 
     __slots__ = (
         # The keys allocated to the machine partition
-        "__machine_mask",)
+        "__global_machine_mask",)
 
-    def __init__(self, key: int, mask: int, partition_id: str,
-                 machine_vertex: MachineVertex, index: int):
+    def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str,
+                 machine_vertex: MachineVertex, index: int,
+                 app_mask: int, global_machine_mask: int):
         """
-        :param key:
-            The key allocated to the machine partition
+        :param key_and_mask:
+            The key and mask associated to the partition
         :param partition_id: The partition to set the keys for
         :param machine_vertex: The vertex to set the keys for
         :param index: The index of the machine vertex
+        :param app_mask: The application mask
+        :param global_machine_mask: The global machine mask
         """
-        super().__init__(key, partition_id, machine_vertex, index)
-        self.__machine_mask = mask
-
-    @property
-    @overrides(MachineVertexRoutingInfo.app_mask)
-    def app_mask(self) -> int:
-        return self._global_application_mask
-
-    @property
-    @overrides(MachineVertexRoutingInfo.mask)
-    def mask(self) -> int:
-        return self.__machine_mask
-
-    @property
-    @overrides(MachineVertexRoutingInfo.machine_mask)
-    def machine_mask(self) -> int:
-        return self.__machine_mask
+        super().__init__(
+            key_and_mask, partition_id, machine_vertex, index, app_mask)
+        self.__global_machine_mask = global_machine_mask
 
     @property
     @overrides(MachineVertexRoutingInfo.has_global_app_masks)
@@ -82,3 +72,13 @@ class SpecificMachineVertexRoutingInfo(MachineVertexRoutingInfo):
     @overrides(MachineVertexRoutingInfo.has_fixed_keys)
     def has_fixed_keys(self) -> bool:
         return False
+
+    @property
+    @overrides(MachineVertexRoutingInfo.global_app_mask)
+    def global_app_mask(self) -> int:
+        return self.app_mask
+
+    @property
+    @overrides(MachineVertexRoutingInfo.global_machine_mask)
+    def global_machine_mask(self) -> int:
+        return self.__global_machine_mask

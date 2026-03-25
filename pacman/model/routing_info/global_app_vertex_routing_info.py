@@ -29,21 +29,6 @@ class GlobalAppVertexRoutingInfo(AppVertexRoutingInfo):
     __slots__ = ()
 
     @property
-    @overrides(AppVertexRoutingInfo.mask)
-    def mask(self) -> int:
-        return self._global_application_mask
-
-    @property
-    @overrides(AppVertexRoutingInfo.app_mask)
-    def app_mask(self) -> int:
-        return self._global_application_mask
-
-    @property
-    @overrides(AppVertexRoutingInfo.machine_mask)
-    def machine_mask(self) -> int:
-        return self._global_machine_mask
-
-    @property
     @overrides(AppVertexRoutingInfo.has_global_app_masks)
     def has_global_app_masks(self) -> bool:
         return True
@@ -66,3 +51,13 @@ class GlobalAppVertexRoutingInfo(AppVertexRoutingInfo):
     @overrides(AppVertexRoutingInfo.has_fixed_keys)
     def has_fixed_keys(self) -> bool:
         return False
+
+    @property
+    @overrides(AppVertexRoutingInfo.global_app_mask)
+    def global_app_mask(self) -> int:
+        return self.mask
+
+    @property
+    @overrides(AppVertexRoutingInfo.global_machine_mask)
+    def global_machine_mask(self) -> int:
+        return self.machine_mask
