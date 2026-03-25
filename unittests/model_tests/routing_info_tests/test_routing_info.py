@@ -14,13 +14,12 @@
 
 import unittest
 from pacman.config_setup import unittest_setup
-from pacman.data import PacmanDataView
 from pacman.model.resources import ConstantSDRAM
 from pacman.exceptions import (
     IrregularFixedMaskException, PacmanAlreadyExistsException,
     PacmanConfigurationException, PacmanValueError)
 from pacman.model.routing_info import (
-    RoutingInfo, BaseKeyAndMask, VertexRoutingInfo,
+    RoutingInfo, BaseKeyAndMask,
     FixedAppVertexRoutingInfo, FixedMachineVertexRoutingInfo,
     GlobalAppVertexRoutingInfo, GlobalMachineVertexRoutingInfo,
     SpecificAppVertexRoutingInfo, SpecificMachineVertexRoutingInfo)
@@ -33,53 +32,6 @@ class TestRoutingInfo(unittest.TestCase):
 
     def setUp(self) -> None:
         unittest_setup()
-
-    # TODO: Replace (currently temporarily broken to make sure we don't
-    # call it)
-    # def test_routing_info_deprecated(self) -> None:
-    #     pre_vertex = SimpleMachineVertex(ConstantSDRAM(0))
-    #     key = 12345
-    #     info = MachineVertexRoutingInfo(
-    #         BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
-    #     routing_info = RoutingInfo()
-    #     routing_info.add_routing_info(info)
-    #
-    #     with self.assertRaises(PacmanAlreadyExistsException):
-    #         routing_info.add_routing_info(info)
-    #
-    #     assert routing_info.get_routing_info_from_pre_vertex(
-    #         pre_vertex, "Test") == info
-    #     assert routing_info.get_routing_info_from_pre_vertex(
-    #         None, "Test") is None
-    #     assert routing_info.get_routing_info_from_pre_vertex(
-    #         pre_vertex, "None") is None
-    #
-    #     assert routing_info.get_first_key_from_pre_vertex(
-    #         pre_vertex, "Test") == key
-    #     assert routing_info.get_first_key_from_pre_vertex(
-    #         None, "Test") is None
-    #     assert routing_info.get_first_key_from_pre_vertex(
-    #         pre_vertex, "None") is None
-    #
-    #     assert next(iter(routing_info)) == info
-    #
-    #     info2 = MachineVertexRoutingInfo(
-    #         BaseKeyAndMask(key, FULL_MASK), "Test", pre_vertex, 0)
-    #
-    #     with self.assertRaises(PacmanAlreadyExistsException):
-    #         routing_info.add_routing_info(info2)
-    #     assert info != info2
-    #
-    #     info3 = MachineVertexRoutingInfo(
-    #         BaseKeyAndMask(key, FULL_MASK), "Test2", pre_vertex, 0)
-    #     routing_info.add_routing_info(info3)
-    #     assert info != info3
-    #     assert routing_info.get_routing_info_from_pre_vertex(
-    #             pre_vertex, "Test2") !=\
-    #         routing_info.get_routing_info_from_pre_vertex(
-    #             pre_vertex, "Test")
-    #     assert routing_info.get_routing_info_from_pre_vertex(
-    #         pre_vertex, "Test2").get_keys().tolist() == [key]
 
     def test_routing_info(self) -> None:
         pre_vertex = SimpleMachineVertex(ConstantSDRAM(0))
@@ -201,7 +153,7 @@ class TestRoutingInfo(unittest.TestCase):
         bkm1 = BaseKeyAndMask(0x11002000, specific_mac)
         vertex1 = SimpleMachineVertex(ConstantSDRAM(0))
         info = FixedMachineVertexRoutingInfo(
-            bkm1, "test", vertex1,2, bka)
+            bkm1, "test", vertex1, 2, bka)
 
         # global masks set later so these fail until set
         with self.assertRaises(IrregularFixedMaskException):
@@ -285,8 +237,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual((0, 20), info.get_atom_bits_needed_range())
 
     def test_weird_machine_vertex_routing_info(self) -> None:
-        global_app = 0xff000000
-        global_mac = 0xffffff00
         specific_app = 0xF000000F
         specific_mac = 0xF0F0000F
         bkm1 = BaseKeyAndMask(0x00100000, specific_mac)
@@ -346,7 +296,7 @@ class TestRoutingInfo(unittest.TestCase):
         bkm = BaseKeyAndMask(key, specific_app)
         vertex1 = SimpleTestVertex(4, "fixed")
         info = FixedAppVertexRoutingInfo(
-            bkm, "test", vertex1, 2,specific_mac)
+            bkm, "test", vertex1, 2, specific_mac)
 
         # global masks set later so these fail until set
         with self.assertRaises(IrregularFixedMaskException):

@@ -28,8 +28,7 @@ from pacman.model.resources import AbstractSDRAM
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
-from pacman.model.routing_info import (
-    RoutingInfo, MachineVertexRoutingInfo, VertexRoutingInfo)
+from pacman.model.routing_info import (RoutingInfo, MachineVertexRoutingInfo)
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 
@@ -293,6 +292,7 @@ def check_keys_for_application_partition_pairs(
                 mapped_key = key
             if key != 0:
                 assert (key & app_mask) != 0
+
 
 def test_allocator_no_fixed() -> None:
     unittest_setup()

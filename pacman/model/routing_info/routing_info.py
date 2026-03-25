@@ -207,8 +207,8 @@ class RoutingInfo(object):
             self._has_app_keys_overlap = True
         if not info.is_machine_shiftable:
             self._is_machine_shiftable = False
-        assert(self._global_app_mask == info.global_app_mask)
-        assert(self._global_machine_mask == info.global_machine_mask)
+        assert self._global_app_mask == info.global_app_mask
+        assert self._global_machine_mask == info.global_machine_mask
 
     def add_zones(
             self, min_bits_machine_and_atoms: int, max_bits_machine: int,

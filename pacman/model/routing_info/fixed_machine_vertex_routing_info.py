@@ -54,8 +54,8 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
         :param index: The index of the machine vertex
         :param app_key_and_mask: The application key and mask
         """
-        super().__init__( key_and_mask, partition_id, machine_vertex, index,
-                          app_key_and_mask.mask)
+        super().__init__(key_and_mask, partition_id, machine_vertex, index,
+                         app_key_and_mask.mask)
         self.__app_key_overlap = False
         self.__app_key = app_key_and_mask.key
         self.__global_app_mask: Optional[int] = None

@@ -56,7 +56,6 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         :param machine_mask:
         """
         super().__init__(key_and_mask, partition_id)
-        a = hex(machine_mask)
         self.__app_vertex = app_vertex
         self.__machine_mask = machine_mask
         self.__max_machine_index = max_machine_index
@@ -99,11 +98,6 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                     i += next_entries
 
     def __group_mask(self, n_entries: int) -> int:
-        a = hex(self.machine_mask)
-        b = ((n_entries - 1) << self.n_bits_atoms)
-        c = type(self.machine_mask)
-        d = self.machine_mask
-        e = d - b
         return self.machine_mask - ((n_entries - 1) << self.n_bits_atoms)
 
     def __n_sequential_entries(self, i: int, n_entries: int) -> int:
@@ -144,5 +138,6 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         The number of bits for the atoms.
         """
         bits = numpy.unpackbits(
-            numpy.asarray([self.__machine_mask], dtype=">u4").view(dtype="uint8"))
+            numpy.asarray([self.__machine_mask], dtype=">u4").view(
+                dtype="uint8"))
         return BITS_IN_KEY - int(sum(bits))

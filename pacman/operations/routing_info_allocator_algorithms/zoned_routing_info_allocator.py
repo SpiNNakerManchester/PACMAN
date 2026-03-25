@@ -24,8 +24,7 @@ from pacman.model.routing_info import (
     FixedAppVertexRoutingInfo, FixedMachineVertexRoutingInfo,
     GlobalAppVertexRoutingInfo, GlobalMachineVertexRoutingInfo,
     MachineVertexRoutingInfo,
-    SpecificAppVertexRoutingInfo, SpecificMachineVertexRoutingInfo,
-    VertexRoutingInfo)
+    SpecificAppVertexRoutingInfo, SpecificMachineVertexRoutingInfo)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.utilities.utility_calls import allocator_bits_needed, calc_shift
@@ -184,7 +183,8 @@ class ZonedRoutingInfoAllocator(object):
                     f"{app_key_and_mask} while only outgoing machine vertex"
                     f" has {key_and_mask}")
         routing_info.add_routing_info(FixedMachineVertexRoutingInfo(
-            app_key_and_mask, part_id, m_vertex, m_vertex.index, app_key_and_mask))
+            app_key_and_mask, part_id, m_vertex, m_vertex.index,
+            app_key_and_mask))
         routing_info.add_routing_info(FixedAppVertexRoutingInfo(
             app_key_and_mask, part_id, pre,
             len(pre.machine_vertices) - 1, app_key_and_mask.mask))
