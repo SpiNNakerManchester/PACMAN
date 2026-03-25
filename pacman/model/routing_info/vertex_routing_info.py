@@ -274,6 +274,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         """
         raise NotImplementedError()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (f"{self.__class__.__name__} {self.vertex.label}"
                 f" {self.partition_id} {self.key_and_mask})")

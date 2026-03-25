@@ -213,7 +213,7 @@ class TestRoutingInfo(unittest.TestCase):
         with self.assertRaises(IrregularFixedMaskException):
             info.has_global_machine_masks
         with self.assertRaises(IrregularFixedMaskException):
-            info.global_app_shift()
+            info.global_app_shift
 
         # Regular stiff works right away
         self.assertEqual(info.key_and_mask, bkm1)
@@ -358,7 +358,7 @@ class TestRoutingInfo(unittest.TestCase):
         with self.assertRaises(IrregularFixedMaskException):
             info.has_global_machine_masks
         with self.assertRaises(IrregularFixedMaskException):
-            info.global_app_shift()
+            info.global_app_shift
 
         # Regular stiff works right away
         self.assertEqual(info.mask, specific_app)
