@@ -359,7 +359,7 @@ class RoutingInfo(object):
         """
         The default app mask for all infos.
 
-        Used for all info expcet possibley fixed ones
+        Used for all info except possibly fixed ones
         """
         if self._global_app_mask is None:
             raise PacmanRouteInfoAllocationException(
