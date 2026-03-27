@@ -19,8 +19,7 @@ from spinn_machine import Chip
 
 from pacman.data import PacmanDataView
 from pacman.model.graphs import AbstractVirtual
-from pacman.model.graphs.application import (
-    ApplicationEdgePartition, ApplicationVertex)
+from pacman.model.graphs.application import ApplicationEdgePartition
 from pacman.model.graphs.machine import MachineVertex
 
 
@@ -50,8 +49,6 @@ def get_app_partitions() -> List[ApplicationEdgePartition]:
 
     # Convert internal partitions to self-connected partitions
     for v in PacmanDataView.iterate_vertices():
-        if not isinstance(v, ApplicationVertex) or not v.splitter:
-            continue
         internal_partitions = v.splitter.get_internal_multicast_partitions()
         for p in internal_partitions:
             if (v, p.identifier) not in sources:
