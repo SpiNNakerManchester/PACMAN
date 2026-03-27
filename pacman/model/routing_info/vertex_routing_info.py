@@ -125,19 +125,6 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         return self.machine_mask ^ FULL_MASK
 
     @property
-    def n_bits_atoms(self) -> int:
-        """
-        The number of bits for the atoms.
-
-        This will always work for an Application Info
-
-        For a Machine Info it is Semantic sugar for machine_shift
-
-        :raises PacmanValueError: If the machine mask is not shiftable
-        """
-        return self.machine_shift
-
-    @property
     def app_mask(self) -> int:
         """
         The application mask for the vertices

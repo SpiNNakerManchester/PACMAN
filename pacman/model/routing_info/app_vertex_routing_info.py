@@ -98,7 +98,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                     i += next_entries
 
     def __group_mask(self, n_entries: int) -> int:
-        return self.machine_mask - ((n_entries - 1) << self.n_bits_atoms)
+        return self.machine_mask - ((n_entries - 1) << self.machine_shift)
 
     def __n_sequential_entries(self, i: int, n_entries: int) -> int:
         # This finds the maximum number of entries that can be joined following
@@ -131,13 +131,3 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     @overrides(VertexRoutingInfo.app_mask)
     def app_mask(self) -> int:
         return self.mask
-
-    @property
-    def n_bits_atoms(self) -> int:
-        """
-        The number of bits for the atoms.
-        """
-        bits = numpy.unpackbits(
-            numpy.asarray([self.__machine_mask], dtype=">u4").view(
-                dtype="uint8"))
-        return BITS_IN_KEY - int(sum(bits))

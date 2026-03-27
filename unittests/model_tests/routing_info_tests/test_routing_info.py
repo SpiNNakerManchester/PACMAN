@@ -176,7 +176,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 12)
         self.assertEqual(info.machine_index_mask, 0x000FF000)
         self.assertEqual(info.atom_mask, 0x00000FFF)
-        self.assertEqual(info.n_bits_atoms, 12)
         self.assertEqual((8, 18), info.get_atom_bits_needed_range())
 
         info.set_global_masks(global_app, global_mac)
@@ -209,8 +208,6 @@ class TestRoutingInfo(unittest.TestCase):
         # based on global
         self.assertEqual(info.machine_index_mask, 0x0003b000)
         self.assertEqual(hex(info.atom_mask), hex(0x000c4FfF))
-        with self.assertRaises(PacmanValueError):
-            self.assertEqual(info.n_bits_atoms, 12)
         self.assertEqual((8, 18), info.get_atom_bits_needed_range())
 
     def test_fixed_one_to_one_routing_info(self) -> None:
@@ -233,7 +230,6 @@ class TestRoutingInfo(unittest.TestCase):
         # uses global
         self.assertEqual(info.machine_index_mask, 0x00000000)
         self.assertEqual(info.atom_mask, 0x00000FFF)
-        self.assertEqual(info.n_bits_atoms, 12)
         self.assertEqual((0, 20), info.get_atom_bits_needed_range())
 
     def test_weird_machine_vertex_routing_info(self) -> None:
@@ -265,7 +261,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 16)
         self.assertEqual(info.machine_index_mask, 0x00FF0000)
         self.assertEqual(info.atom_mask, 0x0000FFFF)
-        self.assertEqual(info.n_bits_atoms, 16)
 
     def test_global_machine_vertex_routing_info(self) -> None:
         global_app = 0xff000000
@@ -284,7 +279,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 8)
         self.assertEqual(info.machine_index_mask, 0x00FFFF00)
         self.assertEqual(info.atom_mask, 0x000000FF)
-        self.assertEqual(info.n_bits_atoms, 8)
 
     def test_fixed_app_vertex_routing_info(self) -> None:
         unittest_setup()
@@ -318,7 +312,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 16)
         self.assertEqual(info.machine_index_mask, 0x000F0000)
         self.assertEqual(info.atom_mask, 0x0000FFFF)
-        self.assertEqual(info.n_bits_atoms, 16)
 
         info.set_global_masks(global_app, global_mac)
         self.assertFalse(info.has_global_app_masks)
@@ -357,7 +350,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 16)
         self.assertEqual(info.machine_index_mask, 0x00FF0000)
         self.assertEqual(info.atom_mask, 0x0000FFFF)
-        self.assertEqual(info.n_bits_atoms, 16)
 
     def test_global_app_vertex_routing_info(self) -> None:
         global_app = 0xff000000
@@ -379,7 +371,6 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertEqual(info.machine_shift, 8)
         self.assertEqual(info.machine_index_mask, 0x00FFFF00)
         self.assertEqual(info.atom_mask, 0x000000FF)
-        self.assertEqual(info.n_bits_atoms, 8)
 
 
 if __name__ == "__main__":
