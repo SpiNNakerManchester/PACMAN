@@ -16,12 +16,9 @@ import logging
 import math
 from typing import Iterable, List, Tuple, TYPE_CHECKING
 
-import numpy
-
 from spinn_utilities.overrides import overrides
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
-from pacman.utilities.constants import BITS_IN_KEY
 from .vertex_routing_info import VertexRoutingInfo
 
 if TYPE_CHECKING:
