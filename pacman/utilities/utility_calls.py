@@ -59,7 +59,7 @@ def compress_bits_from_bit_array(
         each value being between 0 and 31
     :returns: integer value of the specified part bit array
     """
-    expanded_value = numpy.zeros(32, dtype="uint8")
+    expanded_value = numpy.zeros(BITS_IN_KEY, dtype="uint8")
     expanded_value[-len(bit_positions):] = bit_array[bit_positions]
     return compress_from_bit_array(expanded_value)
 
@@ -161,8 +161,7 @@ def calc_shift(mask: int) -> int:
     """
     bits = expand_to_bit_array(mask)
     found_shift = False
-    shift = -1000
-    for i in range(32):
+    for i in range(BITS_IN_KEY):
         if bits[i] == 1:
             # Check all 1 come before the zeros
             if found_shift:
@@ -189,7 +188,7 @@ def can_shift(mask: int) -> bool:
     """
     bits = expand_to_bit_array(mask)
     found_zeros = False
-    for i in range(32):
+    for i in range(BITS_IN_KEY):
         if bits[i] == 1:
             # Check all 1 come before the zeros
             if found_zeros:
@@ -236,4 +235,4 @@ def first_one(key: int) -> int:
     for i in range(BITS_IN_KEY):
         if bits[i] == 1:
             return i
-    return 32
+    return BITS_IN_KEY

@@ -209,7 +209,7 @@ class ZonedRoutingInfoAllocator(object):
                 raise PacmanRouteInfoAllocationException(
                     f"For partition {part_id} {pre} has fixed key "
                     f"{app_key_and_mask} "
-                    f"while outgoing {m_vertex} has {key_and_mask}"
+                    f"while outgoing {m_vertex} has {key_and_mask} "
                     f"these do not align")
 
             if machine_mask is None:
