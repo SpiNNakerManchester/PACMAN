@@ -38,7 +38,7 @@ from pacman.model.routing_tables import (
 
 
 logger = FormatAdapter(logging.getLogger(__name__))
-range_masks = {FULL_MASK - ((2 ** i) - 1) for i in range(33)}
+range_masks = {FULL_MASK - ((2 ** i) - 1) for i in range(1, 33)}
 
 
 class PlacementTuple(NamedTuple):
