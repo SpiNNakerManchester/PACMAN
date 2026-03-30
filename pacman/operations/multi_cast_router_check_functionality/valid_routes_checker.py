@@ -177,11 +177,11 @@ def _search_route(
             f"[{dest.x}:{dest.y}:{dest.p}]"
             for dest in failed_to_reach_destinations)
         error_message += (
-            "failed to locate all destinations with vertex "
+            "Failed to locate all destinations with vertex "
             f"{source_placement.vertex.label} on processor "
             f"[{source_placement.x}:{source_placement.y}:{source_placement.p}]"
             f" with keys {key_and_mask} as it did not reach destinations "
-            f"{failures}")
+            f"{failures}\n")
 
     # check for error if the trace went to a destination it shouldn't have
     if located_destinations:
@@ -189,11 +189,10 @@ def _search_route(
              f"[{dest.x}:{dest.y}:{dest.p}]"
              for dest in located_destinations)
         error_message += (
-            "trace went to more failed to locate all destinations with "
+            "Extra destinations for "
             f"vertex {source_placement.vertex.label} on processor "
             f"[{source_placement.x}:{source_placement.y}:{source_placement.p}]"
-            f" with keys {key_and_mask} as it didn't reach destinations "
-            f"{failures}")
+            f" with keys {key_and_mask} it incorrectly went to {failures}\n")
 
     if failed_to_cover_all_keys_routers:
         failures = ", ".join(
