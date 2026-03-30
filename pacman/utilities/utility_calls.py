@@ -161,6 +161,7 @@ def calc_shift(mask: int) -> int:
     """
     bits = expand_to_bit_array(mask)
     found_shift = False
+    shift = -1000
     for i in range(BITS_IN_KEY):
         if bits[i] == 1:
             # Check all 1 come before the zeros
