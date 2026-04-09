@@ -15,15 +15,20 @@ from __future__ import annotations
 import logging
 import math
 from typing import Iterable, List, Tuple, TYPE_CHECKING
+
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
+
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
+
 from .vertex_routing_info import VertexRoutingInfo
+
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
     from pacman.model.routing_info import BaseKeyAndMask
     from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class AppVertexRoutingInfo(VertexRoutingInfo):
