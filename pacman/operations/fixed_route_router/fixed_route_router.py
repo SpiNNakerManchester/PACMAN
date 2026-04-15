@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, List, Tuple, Type
+from typing import Dict, List, Optional, Tuple, Type
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import Chip, RoutingEntry
 from pacman.data import PacmanDataView
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanConfigurationException,
-    PacmanRoutingException)
+    PacmanAlreadyExistsException, PacmanRoutingException)
 
 
 def fixed_route_router(
@@ -83,6 +82,12 @@ class _FixedRouteRouter(object):
         :raises PacmanRoutingException:
         :raises PacmanAlreadyExistsException:
         """
+        # locate where to put data on Ethernet chip
+        processor_id = self.__locate_destination(ethernet_chip)
+        if processor_id is None:
+            # board not used so no routes needed
+            return
+
         eth_x = ethernet_chip.x
         eth_y = ethernet_chip.y
 
@@ -115,8 +120,6 @@ class _FixedRouteRouter(object):
             routed |= found
 
         # create final fixed route entry
-        # locate where to put data on Ethernet chip
-        processor_id = self.__locate_destination(ethernet_chip)
         # build entry and add to tables
         self.__add_fixed_route_entry((eth_x, eth_y), [], [processor_id])
 
@@ -132,16 +135,14 @@ class _FixedRouteRouter(object):
         self._fixed_route_tables[key] = RoutingEntry(
             link_ids=link_ids, processor_ids=processor_ids)
 
-    def __locate_destination(self, chip: Chip) -> int:
+    def __locate_destination(self, chip: Chip) -> Optional[int]:
         """
         Locate destination vertex on an (Ethernet-connected) chip to send
         fixed data to.
 
-        :return: processor ID as a int
-        :raises PacmanConfigurationException: if no placement processor found
+        :return: processor ID as a int or None if not found
         """
         for placement in PacmanDataView.iterate_placements_by_xy_and_type(
                 chip, self._destination_class):
             return placement.p
-        raise PacmanConfigurationException(
-            f"no destination vertex found on Ethernet chip {chip.x}:{chip.y}")
+        return None
