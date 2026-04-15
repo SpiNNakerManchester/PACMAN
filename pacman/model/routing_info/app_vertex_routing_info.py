@@ -30,6 +30,8 @@ if TYPE_CHECKING:
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
+# pylint: disable=abstract-method
+
 
 class AppVertexRoutingInfo(VertexRoutingInfo):
     """
@@ -39,25 +41,22 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
     __slots__ = (
         "__app_vertex",
         "__machine_mask",
-        "__n_bits_atoms",
         "__max_machine_index")
 
     def __init__(
             self, key_and_mask: BaseKeyAndMask, partition_id: str,
-            app_vertex: ApplicationVertex, machine_mask: int,
-            n_bits_atoms: int, max_machine_index: int):
+            app_vertex: ApplicationVertex, max_machine_index: int,
+            machine_mask: int):
         """
         :param key_and_mask:
         :param partition_id:
         :param app_vertex:
-        :param machine_mask:
-        :param n_bits_atoms:
         :param max_machine_index:
+        :param machine_mask:
         """
         super().__init__(key_and_mask, partition_id)
         self.__app_vertex = app_vertex
         self.__machine_mask = machine_mask
-        self.__n_bits_atoms = n_bits_atoms
         self.__max_machine_index = max_machine_index
 
     def merge_machine_entries(self, entries: List[Tuple[
@@ -69,6 +68,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         :param entries:
             The entries to merge
         :returns: The routing info in the merged/ multicast format.
+        :raises PacmanValueError: If the masks are not shiftable
         """
         n_entries = len(entries)
         (_, last_r_info) = entries[-1]
@@ -97,7 +97,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
                     i += next_entries
 
     def __group_mask(self, n_entries: int) -> int:
-        return self.__machine_mask - ((n_entries - 1) << self.__n_bits_atoms)
+        return self.machine_mask - ((n_entries - 1) << self.machine_shift)
 
     def __n_sequential_entries(self, i: int, n_entries: int) -> int:
         # This finds the maximum number of entries that can be joined following
@@ -115,6 +115,11 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         return self.__app_vertex
 
     @property
+    @overrides(VertexRoutingInfo.app_vertex)
+    def app_vertex(self) -> ApplicationVertex:
+        return self.__app_vertex
+
+    @property
     def machine_mask(self) -> int:
         """
         The mask that covers a specific machine vertex.
@@ -122,8 +127,6 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         return self.__machine_mask
 
     @property
-    def n_bits_atoms(self) -> int:
-        """
-        The number of bits for the atoms.
-        """
-        return self.__n_bits_atoms
+    @overrides(VertexRoutingInfo.app_mask)
+    def app_mask(self) -> int:
+        return self.mask

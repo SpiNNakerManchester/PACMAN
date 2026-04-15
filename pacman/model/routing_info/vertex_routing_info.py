@@ -18,8 +18,13 @@ from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractVertex
+from pacman.utilities.constants import FULL_MASK
+from pacman.utilities.utility_calls import calc_shift, can_shift
 
 from .base_key_and_mask import BaseKeyAndMask
+from ..graphs.application import ApplicationVertex
+
+NOT_SET = -1000
 
 
 class VertexRoutingInfo(object, metaclass=AbstractBase):
@@ -32,15 +37,13 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         # The keys allocated to the machine partition
         "__key_and_mask",
         # The partition identifier of the allocation
-        "__partition_id")
+        "__partition_id",)
 
     def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str):
         """
-        :param key_and_mask:
-            The keys allocated to the machine partition
+        :param key_and_mask: The key and mask associated to the partition
         :param partition_id: The partition to set the keys for
         """
-        assert isinstance(key_and_mask, BaseKeyAndMask)
         self.__key_and_mask = key_and_mask
         self.__partition_id = partition_id
 
@@ -51,7 +54,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         :param n_keys: Optional limit on the number of keys to return
         :return: An array of keys
         """
-        max_n_keys = self.__key_and_mask.n_keys
+        max_n_keys = self.key_and_mask.n_keys
 
         if n_keys is None:
             n_keys = max_n_keys
@@ -62,7 +65,7 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
 
         key_array = numpy.zeros(n_keys, dtype=">u4")
         offset = 0
-        _, offset = self.__key_and_mask.get_keys(
+        _, offset = self.key_and_mask.get_keys(
             key_array=key_array, offset=offset, n_keys=(n_keys - offset))
         return key_array
 
@@ -76,14 +79,14 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
     @property
     def key(self) -> int:
         """
-        The first key (or only one if there is only one).
+        The key for this info
         """
         return self.__key_and_mask.key
 
     @property
     def mask(self) -> int:
         """
-        The first mask (or only one if there is only one).
+        The mask for this info
         """
         return self.__key_and_mask.mask
 
@@ -101,3 +104,163 @@ class VertexRoutingInfo(object, metaclass=AbstractBase):
         The vertex of the information.
         """
         raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def app_vertex(self) -> ApplicationVertex:
+        """
+        The Application vertex of the information.
+
+        If the vertex is a Machine Vertex returns its application vertex
+        """
+        raise NotImplementedError
+
+    @property
+    def atom_mask(self) -> int:
+        """
+        The mask for the atom zone
+
+        This is the inverse of the Machine mask
+        """
+        return self.machine_mask ^ FULL_MASK
+
+    @property
+    def app_mask(self) -> int:
+        """
+        The application mask for the vertices
+
+        This includes both the Application index and the machine index
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def machine_mask(self) -> int:
+        """
+        The machine mask as reported by the vertex
+
+        This includes both the Application index and the machine index
+        """
+        raise NotImplementedError()
+
+    @property
+    def is_machine_shiftable(self) -> bool:
+        """
+        Flag to say the Machine mask is shiftable
+
+        True if machine_shift will not cause an exception
+        """
+        return can_shift(self.machine_mask)
+
+    @property
+    def machine_shift(self) -> int:
+        """
+        The shift for the machine zone.
+
+        :raises PacmanValueError: If the mask is not shiftable
+        """
+        return calc_shift(self.machine_mask)
+
+    @property
+    def machine_index_mask(self) -> int:
+        """
+        The mask for the zone with the machine index.
+
+        Semantic sugar for app mask minus the machine mask.
+
+        This includes ONLY the machine index and not the Application index.
+
+        May be an empty mask for fixed vertices with one app one Machine
+        """
+        return self.app_mask ^ self.machine_mask
+
+    @property
+    @abstractmethod
+    def has_fixed_keys(self) -> bool:
+        """
+        True if the vertex requires fixed
+
+        Fixed keys may be shiftable and even global
+        """
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def has_global_app_masks(self) -> bool:
+        """
+        True if all masks are the global ones defined by the zones
+
+        While all infos will work with the global shift they may not
+        actually have the global app mask.
+        """
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def has_global_machine_masks(self) -> bool:
+        """
+        True if all masks machine are the global ones defined by the zones
+        """
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def has_app_keys_overlap(self) -> bool:
+        """
+        True unless the allocator has marked this info as having an overlap
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def set_app_keys_overlap(self) -> None:
+        """
+        Flags the info as sharing an app key with another info
+
+        That is the key here shifted by the global app shit will result in the
+        same value as another info with a different app_vertex or partition ID
+        """
+        raise NotImplementedError()
+
+    def set_global_masks(self, app_mask: int, machine_mask: int) -> None:
+        """
+        Sets the global masks once the allocator has picked them
+        """
+        raise NotImplementedError()
+
+    @property
+    def global_app_shift(self) -> int:
+        """
+        The shift global for the application zone.
+
+        This is a class method so will be the same value for all Vertices.
+
+        For Fixed Masks this may not be the shift of the actual Application
+        mask but is a value that will work.
+        """
+        return calc_shift(self.global_app_mask)
+
+    @property
+    @abstractmethod
+    def global_app_mask(self) -> int:
+        """
+        The global application mask used by the allocator
+
+        As this is a class method this is reported by all infos even
+        ones that do not respect it.
+        """
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def global_machine_mask(self) -> int:
+        """
+        The global machine mask used by the allocator
+
+        As this is a class method this is reported by all infos even
+        ones that do not respect it.
+        """
+        raise NotImplementedError()
+
+    def __str__(self) -> str:
+        return (f"{self.__class__.__name__} {self.vertex.label}"
+                f" {self.partition_id} {self.key_and_mask})")

@@ -220,4 +220,5 @@ def __merged_keys_and_masks(
     if len(entries) == 1:
         yield MulticastRoutingEntry(r_info.key, r_info.mask, entry)
     else:
+        # TODO handle weird fixed masks
         yield from app_r_info.merge_machine_entries(entries)
