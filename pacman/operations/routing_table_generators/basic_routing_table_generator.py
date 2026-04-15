@@ -69,5 +69,4 @@ def __create_routing_table(
         table.add_multicast_routing_entry(MulticastRoutingEntry(
             key=r_info.key_and_mask.key_combo,
             mask=r_info.key_and_mask.mask, routing_entry=entry))
-
     return table
