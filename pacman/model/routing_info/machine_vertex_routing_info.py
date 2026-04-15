@@ -13,11 +13,17 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+
 from .vertex_routing_info import VertexRoutingInfo
+from ..graphs.application import ApplicationVertex
+
 if TYPE_CHECKING:
     from .base_key_and_mask import BaseKeyAndMask
     from pacman.model.graphs.machine import MachineVertex
+
+# pylint: disable=abstract-method
 
 
 class MachineVertexRoutingInfo(VertexRoutingInfo):
@@ -29,16 +35,17 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
     __slots__ = (
         # The machine vertex that the keys are allocated to
         "__machine_vertex",
-
         # The index of the machine vertex within the range of the application
         # vertex
-        "__index")
+        "__index",
+        # application Mask for this routing info
+        "__app_mask")
 
     def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str,
-                 machine_vertex: MachineVertex, index: int):
+                 machine_vertex: MachineVertex, index: int, app_mask: int):
         """
         :param key_and_mask:
-            The key allocated to the machine partition
+            The key and mask associated to the partition
         :param partition_id: The partition to set the keys for
         :param machine_vertex: The vertex to set the keys for
         :param index: The index of the machine vertex
@@ -46,6 +53,7 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
         super().__init__(key_and_mask, partition_id)
         self.__machine_vertex = machine_vertex
         self.__index = index
+        self.__app_mask = app_mask
 
     @property
     def machine_vertex(self) -> MachineVertex:
@@ -55,9 +63,19 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
         return self.__machine_vertex
 
     @property
+    @overrides(VertexRoutingInfo.machine_mask)
+    def machine_mask(self) -> int:
+        return self.mask
+
+    @property
     @overrides(VertexRoutingInfo.vertex)
     def vertex(self) -> MachineVertex:
         return self.__machine_vertex
+
+    @property
+    @overrides(VertexRoutingInfo.app_vertex)
+    def app_vertex(self) -> ApplicationVertex:
+        return self.__machine_vertex.app_vertex
 
     @property
     def index(self) -> int:
@@ -65,3 +83,8 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
         The index of the vertex.
         """
         return self.__index
+
+    @property
+    @overrides(VertexRoutingInfo.app_mask)
+    def app_mask(self) -> int:
+        return self.__app_mask

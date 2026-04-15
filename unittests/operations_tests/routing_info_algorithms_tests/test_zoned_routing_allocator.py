@@ -11,21 +11,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Dict, Iterable, Optional, Sequence, Tuple
+
+from typing import Any, Dict, Iterable, Optional, Sequence, Tuple
 
 from spinn_utilities.overrides import overrides
 
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
+from pacman.exceptions import (
+    IrregularFixedMaskException, PacmanRouteInfoAllocationException)
 from pacman.operations.routing_info_allocator_algorithms.\
-    zoned_routing_info_allocator import (flexible_allocate, global_allocate)
+    zoned_routing_info_allocator import ZonedRoutingInfoAllocator
 from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.resources import AbstractSDRAM
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
-from pacman.model.routing_info import RoutingInfo, MachineVertexRoutingInfo
+from pacman.model.routing_info import (RoutingInfo, MachineVertexRoutingInfo)
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 
@@ -124,7 +127,7 @@ class TestMacVertex(MachineVertex):
         raise NotImplementedError()
 
 
-def create_graphs1(with_fixed: bool) -> None:
+def create_graphs1(with_fixed: bool, shiftable: bool = True) -> None:
     # An output vertex to aim things at (to make keys required)
     out_app_vertex = MockAppVertex(splitter=MockSplitter())
     PacmanDataView.add_vertex(out_app_vertex)
@@ -151,8 +154,12 @@ def create_graphs1(with_fixed: bool) -> None:
             fixed_keys_by_partition=fixed_keys_by_partition,
             fixed_machine_keys_by_partition=fixed_machine_keys_by_partition)
 
+        if shiftable:
+            max_index = (app_index * 2 * 10) + 1
+        else:
+            max_index = 4
         # For each, create up to (40 * 2) + 1 = 81 machine vertices (7 bits)
-        for mac_index in range((app_index * 2 * 10) + 1):
+        for mac_index in range(max_index):
 
             # Give the vertex up to (80 * 2) + 1 = 161 keys (8 bits)
             mac_vertex = TestMacVertex(
@@ -169,9 +176,14 @@ def create_graphs1(with_fixed: bool) -> None:
                         mac_vertex, "Part1"] = BaseKeyAndMask(
                             0x4c000000 + (mac_index << 8), 0xFFFFFF00)
                 if app_index == 3:
-                    fixed_machine_keys_by_partition[
-                        mac_vertex, "Part1"] = BaseKeyAndMask(
-                            0x33000000 + (mac_index << 8), 0xFFFFFF00)
+                    if shiftable:
+                        fixed_machine_keys_by_partition[
+                            mac_vertex, "Part1"] = BaseKeyAndMask(
+                                0x33000000 + (mac_index << 8), 0xFFFFFF00)
+                    else:
+                        fixed_machine_keys_by_partition[
+                            mac_vertex, "Part1"] = BaseKeyAndMask(
+                                0x33000000 + (mac_index << 8), 0xFFFF0F00)
 
             app_vertex.remember_machine_vertex(mac_vertex)
 
@@ -192,21 +204,12 @@ def create_graphs1(with_fixed: bool) -> None:
                 ApplicationEdge(app_vertex, out_app_vertex), f"Part{i}")
 
 
-def create_graphs_only_fixed(overlap: bool) -> None:
+def create_graphs_only_fixed(
+        fixed_keys_by_partition: Dict[str, BaseKeyAndMask]) -> None:
     # An output vertex to aim things at (to make keys required)
     out_app_vertex = MockAppVertex(splitter=MockSplitter())
     PacmanDataView.add_vertex(out_app_vertex)
 
-    if overlap:
-        fixed_keys_by_partition = {
-            "Part0": BaseKeyAndMask(0x0, 0xffff0000),
-            "Part1": BaseKeyAndMask(0x1000, 0xfffff800)
-        }
-    else:
-        fixed_keys_by_partition = {
-            "Part0": BaseKeyAndMask(0x0, 0xFFFFFFFE),
-            "Part1": BaseKeyAndMask(0x4c00000, 0xFFFFFFFF)
-        }
     app_vertex = MockAppVertex(
         splitter=MockSplitter(),
         fixed_keys_by_partition=fixed_keys_by_partition)
@@ -242,15 +245,19 @@ def create_graphs_no_edge() -> None:
     app_vertex.remember_machine_vertex(mac_vertex)
 
 
-def check_masks_all_the_same(routing_info: RoutingInfo, mask: int) -> None:
+def check_masks_all_the_same(routing_info: RoutingInfo) -> None:
     # Check the mask is the same for all, and allows for the space required
     # for the maximum number of keys in total
+    mask = -1
     seen_keys = set()
     for r_info in routing_info:
         if isinstance(r_info.vertex, MachineVertex):
             assert isinstance(r_info, MachineVertexRoutingInfo)
-            assert (r_info.mask == mask or
-                    r_info.machine_vertex.label == "RETINA")
+            if r_info.machine_vertex.label != "RETINA":
+                if mask == -1:
+                    mask = r_info.mask
+                else:
+                    assert (hex(r_info.mask) == hex(mask))
             assert r_info.key not in seen_keys
             seen_keys.add(r_info.key)
 
@@ -266,9 +273,10 @@ def check_fixed(m_vertex: MachineVertex, part_id: str, key: int) -> bool:
 
 
 def check_keys_for_application_partition_pairs(
-        routing_info: RoutingInfo, app_mask: int) -> None:
+        routing_info: RoutingInfo) -> None:
     # Check the key for each application vertex/ parition pair is the same
     # The bits that should be the same are all but the bottom 12
+    app_mask = routing_info.global_app_mask
     for part in PacmanDataView.iterate_partitions():
         mapped_key = None
         for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
@@ -286,81 +294,182 @@ def check_keys_for_application_partition_pairs(
                 assert (key & app_mask) != 0
 
 
-def test_global_allocator() -> None:
+def test_allocator_no_fixed() -> None:
     unittest_setup()
 
     # Allocate something and check it does the right thing
     create_graphs1(False)
 
     # The number of bits is 7 + 5 + 8 = 20, so it shouldn't fail
-    routing_info = global_allocate([])
+    routing_info = ZonedRoutingInfoAllocator().allocate()
 
-    # Last 8 for atom id
-    mask = 0xFFFFFF00
-    check_masks_all_the_same(routing_info,  mask)
+    assert routing_info.min_bits_machine_and_atoms == 15
+    assert routing_info.max_bits_machine == 7
+    assert routing_info.max_bits_atoms == 8
+    assert routing_info.size_app_part_bits == 7
+    assert routing_info.target_app_bits == 17
+    assert routing_info.target_machine_bits == 7
+    assert routing_info.target_atom_bits == 8
+    assert routing_info.has_global_app_masks
+    assert routing_info.has_global_machine_masks
+    assert not routing_info.has_fixed_keys
+    assert not routing_info.has_app_keys_overlap
+    assert routing_info.is_machine_shiftable
 
-    # all but the bottom 8 + 7 = 15 bits should be the same
-    app_mask = 0xFFFF8000
-    check_keys_for_application_partition_pairs(routing_info, app_mask)
-
-
-def test_flexible_allocator_no_fixed() -> None:
-    unittest_setup()
-
-    # Allocate something and check it does the right thing
-    create_graphs1(False)
-
-    # The number of bits is 8 + 7 + 6 = 21, so it shouldn't fail
-    routing_info = flexible_allocate([])
-
-    # all but the bottom 8 + 7 = 15 bits should be the same
-    app_mask = 0xFFFF8000
-    check_keys_for_application_partition_pairs(routing_info, app_mask)
+    check_masks_all_the_same(routing_info)
+    check_keys_for_application_partition_pairs(routing_info)
 
 
 def test_fixed_only() -> None:
     unittest_setup()
-    create_graphs_only_fixed(overlap=False)
-    flexible_allocate([])
-    routing_info = global_allocate([])
+    fixed_keys_by_partition = {
+        "Part0": BaseKeyAndMask(0x0, 0xFFFFFF00),
+        "Part1": BaseKeyAndMask(0x4c00000, 0xFFFF0000)
+    }
+    create_graphs_only_fixed(fixed_keys_by_partition)
+    routing_info = ZonedRoutingInfoAllocator().allocate()
     assert len(list(routing_info)) == 4
+
+    assert routing_info.min_bits_machine_and_atoms == 0
+    assert routing_info.max_bits_machine == 0
+    assert routing_info.max_bits_atoms == 0
+    assert routing_info.size_app_part_bits == 1
+    assert routing_info.target_app_bits == 16
+    assert routing_info.target_machine_bits == 0
+    assert routing_info.target_atom_bits == 16
+    assert not routing_info.has_global_app_masks
+    assert not routing_info.has_global_machine_masks
+    assert routing_info.has_fixed_keys
+    assert not routing_info.has_app_keys_overlap
+    assert routing_info.is_machine_shiftable
+
+
+def test_weird() -> None:
+    unittest_setup()
+    fixed_keys_by_partition = {
+        "Part0": BaseKeyAndMask(0x0, 0xffff0000),
+        "Part1": BaseKeyAndMask(0x1000, 0xfffff800)
+    }
+    create_graphs_only_fixed(fixed_keys_by_partition)
+    routing_info = ZonedRoutingInfoAllocator().allocate()
+    assert routing_info.min_bits_machine_and_atoms == 0
+    assert routing_info.max_bits_machine == 0
+    assert routing_info.max_bits_atoms == 0
+    assert routing_info.size_app_part_bits == 1
+    assert routing_info.target_app_bits == 16
+    assert routing_info.target_machine_bits == 0
+    assert routing_info.target_atom_bits == 16
+    assert not routing_info.has_global_app_masks
+    assert not routing_info.has_global_machine_masks
+    assert routing_info.has_fixed_keys
+    assert routing_info.has_app_keys_overlap
+    assert routing_info.is_machine_shiftable
 
 
 def test_overlap() -> None:
     # This should work here; overlap is allowed provided routes don't overlap
     # (which is found elsewhere)
     unittest_setup()
-    create_graphs_only_fixed(overlap=True)
-    flexible_allocate([])
+    fixed_keys_by_partition = {
+        "Part0": BaseKeyAndMask(0x4c00000, 0xFFFFFF00),
+        "Part1": BaseKeyAndMask(0x4c00000, 0xFFFF0000)
+    }
+    create_graphs_only_fixed(fixed_keys_by_partition)
+    routing_info = ZonedRoutingInfoAllocator().allocate()
+
+    assert routing_info.min_bits_machine_and_atoms == 0
+    assert routing_info.max_bits_machine == 0
+    assert routing_info.max_bits_atoms == 0
+    assert routing_info.size_app_part_bits == 1
+    assert routing_info.target_app_bits == 16
+    assert routing_info.target_machine_bits == 0
+    assert routing_info.target_atom_bits == 16
+    assert not routing_info.has_global_app_masks
+    assert not routing_info.has_global_machine_masks
+    assert routing_info.has_fixed_keys
+    assert routing_info.has_app_keys_overlap
 
 
 def test_no_edge() -> None:
     unittest_setup()
     create_graphs_no_edge()
-    flexible_allocate([])
-    routing_info = global_allocate([])
+    routing_info = ZonedRoutingInfoAllocator().allocate()
     assert len(list(routing_info)) == 0
 
+    assert routing_info.min_bits_machine_and_atoms == 0
+    assert routing_info.max_bits_machine == 0
+    assert routing_info.max_bits_atoms == 0
+    assert routing_info.size_app_part_bits == 0
+    assert routing_info._target_app_bits == 32
+    assert routing_info.target_machine_bits == 0
+    assert routing_info.target_atom_bits == 0
+    assert routing_info.has_global_app_masks
+    assert routing_info.has_global_machine_masks
+    assert not routing_info.has_fixed_keys
+    assert not routing_info.has_app_keys_overlap
+    assert routing_info.is_machine_shiftable
 
-def test_flexible_allocator_with_fixed() -> None:
+
+def test_allocator_with_fixed() -> None:
     unittest_setup()
     # Allocate something and check it does the right thing
     create_graphs1(True)
 
-    # The number of bits is 6 + 7 + 8 = 21, so it shouldn't fail
-    routing_info = flexible_allocate([])
+    # The number of bits is 6 + 7 + 8 = 21, so it should fit
+    routing_info = ZonedRoutingInfoAllocator().allocate()
 
-    # all but the bottom 8 + 7 = 15 bits should be the same
-    app_mask = 0xFFFF8000
-    check_keys_for_application_partition_pairs(routing_info, app_mask)
+    check_keys_for_application_partition_pairs(routing_info)
+
+    assert routing_info.min_bits_machine_and_atoms == 15
+    assert routing_info.max_bits_machine == 7
+    assert routing_info.max_bits_atoms == 8
+    assert routing_info.size_app_part_bits == 7
+    assert routing_info.target_app_bits == 16
+    assert routing_info.target_machine_bits == 8
+    assert routing_info.target_atom_bits == 8
+    assert routing_info.has_global_app_masks
+    assert routing_info.has_global_machine_masks
+    assert routing_info.has_fixed_keys
+    assert not routing_info.has_app_keys_overlap
+    assert routing_info.is_machine_shiftable
+
+    for partition in PacmanDataView.iterate_partitions():
+        partition_id = partition.identifier
+        vertex = partition.pre_vertex
+        info = routing_info.get_info_from(vertex, partition_id)
+        assert hex(info.atom_mask) == hex(0x000000ff)
+        assert hex(info.machine_mask) == hex(0xffffff00)
 
 
-def create_big(with_fixed: bool) -> None:
+def test_allocator_not_shiftable() -> None:
+    unittest_setup()
+    # Allocate something and check it does the right thing
+    create_graphs1(True, shiftable=False)
+
+    # The number of bits is 6 + 7 + 8 = 21, so it should fit
+    routing_info = ZonedRoutingInfoAllocator().allocate()
+
+    assert routing_info.min_bits_machine_and_atoms == 5
+    assert routing_info.max_bits_machine == 2
+    assert routing_info.max_bits_atoms == 3
+    assert routing_info.size_app_part_bits == 7
+    assert routing_info.target_app_bits == 16
+    assert routing_info.target_machine_bits == 8
+    assert routing_info.target_atom_bits == 8
+    assert routing_info.has_global_app_masks
+    assert not routing_info.has_global_machine_masks
+    assert routing_info.has_fixed_keys
+    assert not routing_info.has_app_keys_overlap
+    assert not routing_info.is_machine_shiftable
+
+
+def create_big(fixed_mask: Optional[int]) -> None:
     # This test shows how easy it is to trip up the allocator with a retina
     # Create a single "big" vertex
-    fixed_key = None
-    if with_fixed:
-        fixed_key = BaseKeyAndMask(0x0, 0x180000)
+    if fixed_mask is None:
+        fixed_key = None
+    else:
+        fixed_key = BaseKeyAndMask(0x0, fixed_mask)
     big_app_vertex = MockAppVertex(
         splitter=MockSplitter(), fixed_key=fixed_key)
     PacmanDataView.add_vertex(big_app_vertex)
@@ -395,60 +504,96 @@ def create_big(with_fixed: bool) -> None:
         mid_app_vertex.remember_machine_vertex(mid_mac_vertex)
 
 
-def test_big_flexible_no_fixed() -> None:
+def test_big_no_fixed() -> None:
     unittest_setup()
-    create_big(False)
+    create_big(None)
+    routing_info = ZonedRoutingInfoAllocator().allocate()
 
-    # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = flexible_allocate([])
+    assert routing_info.min_bits_machine_and_atoms == 21
+    assert routing_info.max_bits_machine == 11
+    assert routing_info.max_bits_atoms == 21
+    assert routing_info.size_app_part_bits == 1
+    assert routing_info.target_app_bits == 1
+    assert routing_info.target_machine_bits == 11
+    assert routing_info.target_atom_bits == 20
+    assert routing_info.has_global_app_masks
+    assert not routing_info.has_global_machine_masks
+    assert not routing_info.has_fixed_keys
+    assert not routing_info.has_app_keys_overlap
+    assert routing_info.is_machine_shiftable
 
-    # The number of bits is 1 + 21 = 22, so it shouldn't fail
-    # all but the bottom 21 bits should be the same
-    app_mask = 0xFFE00000
-    check_keys_for_application_partition_pairs(routing_info, app_mask)
+    check_masks_all_the_same(routing_info)
+    check_keys_for_application_partition_pairs(routing_info)
 
 
-def test_big_global_no_fixed() -> None:
+def test_big_fixed_high() -> None:
     unittest_setup()
-    create_big(False)
-    routing_info = global_allocate([])
-
-    # 1 for app 11 for machine so where possible use 20 for atoms
-    mask = 0xFFF00000
-    check_masks_all_the_same(routing_info, mask)
-
-    # The number of bits is 1 + 11 + 21, so it will not fit
-    # So flexible for the retina
-    # Others mask all bit minimum app bits (1)
-    # all but the top 1 bits should be the same
-    app_mask = 0x80000000
-    check_keys_for_application_partition_pairs(routing_info, app_mask)
+    create_big(0x180000)
+    try:
+        ZonedRoutingInfoAllocator().allocate()
+        raise AssertionError("Should go boom")
+    except IrregularFixedMaskException:
+        pass
 
 
-def test_big_flexible_fixed() -> None:
+def test_big_fixed_low() -> None:
     unittest_setup()
-    create_big(True)
+    fixed_app_mask = 0xFFF00000
+    create_big(fixed_app_mask)
+    routing_info = ZonedRoutingInfoAllocator().allocate()
 
-    # The number of bits is 1 + 11 + 21 = 33, so it shouldn't fail
-    routing_info = flexible_allocate([])
+    check_masks_all_the_same(routing_info)
 
-    # all but the bottom 18 bits should be the same
-    app_mask = 0xFFFC0000
-    check_keys_for_application_partition_pairs(routing_info, app_mask)
+    check_keys_for_application_partition_pairs(routing_info)
+
+    assert routing_info.min_bits_machine_and_atoms == 18
+    assert routing_info.max_bits_machine == 11
+    assert routing_info.max_bits_atoms == 7  # Big is fixed
+    assert routing_info.size_app_part_bits == 1
+    assert routing_info.target_app_bits == 12
+    assert routing_info.target_machine_bits == 11
+    assert routing_info.target_atom_bits == 9
+    assert routing_info.has_global_app_masks
+    assert not routing_info.has_global_machine_masks
+    assert routing_info.has_fixed_keys
+    assert not routing_info.has_app_keys_overlap
+    assert routing_info.is_machine_shiftable
 
 
-def test_big_global_fixed() -> None:
+def create_many_machine_mask() -> None:
+    fixed_machine_keys_by_partition: Any = dict()
+    fixed_app_vertex = MockAppVertex(
+        splitter=MockSplitter(), fixed_key=BaseKeyAndMask(0, 0xffffff00),
+        fixed_machine_keys_by_partition=fixed_machine_keys_by_partition)
+    PacmanDataView.add_vertex(fixed_app_vertex)
+    # Create a single output vertex (which won't send)
+    out_app_vertex = MockAppVertex(splitter=MockSplitter())
+    PacmanDataView.add_vertex(out_app_vertex)
+
+    PacmanDataView.add_edge(
+        ApplicationEdge(fixed_app_vertex, out_app_vertex), "Test")
+
+    # Create a single big machine vertex
+    fixed_mac_vertex1 = TestMacVertex(
+        label="fixed 1", n_keys_required={"Test": 8},
+        app_vertex=fixed_app_vertex)
+    fixed_app_vertex.remember_machine_vertex(fixed_mac_vertex1)
+    fixed_machine_keys_by_partition[
+        fixed_mac_vertex1, "Test"] = BaseKeyAndMask(0, 0xfffffff0)
+
+    fixed_mac_vertex2 = TestMacVertex(
+        label="fixed 2", n_keys_required={"Test": 8},
+        app_vertex=fixed_app_vertex)
+    fixed_app_vertex.remember_machine_vertex(fixed_mac_vertex2)
+    fixed_machine_keys_by_partition[
+        fixed_mac_vertex2, "Test"] = BaseKeyAndMask(0, 0xffffff0f)
+
+
+def test_many_machine_mask() -> None:
     unittest_setup()
-    create_big(True)
-    routing_info = global_allocate([])
-
-    # 7 bit atoms is 7 as it ignore the retina
-    mask = 0xFFFFFF80
-    check_masks_all_the_same(routing_info, mask)
-
-    # The number of bits is 1 + 11 + 21, so it will not fit
-    # So flexible for the retina
-    # Others mask all bit minimum app bits (1)
-    # all but the top 1 bits should be the same
-    app_mask = 0xFFFC0000
-    check_keys_for_application_partition_pairs(routing_info, app_mask)
+    create_many_machine_mask()
+    try:
+        ZonedRoutingInfoAllocator().allocate()
+        raise Exception("PacmanRouteInfoAllocationExceptio not raise")
+    except PacmanRouteInfoAllocationException:
+        pass

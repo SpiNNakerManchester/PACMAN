@@ -101,7 +101,7 @@ class TestMerged(unittest.TestCase):
         place_application_graph(system_placements)
         writer.set_routing_table_by_partition(route_application_graph())
         allocator = ZonedRoutingInfoAllocator()
-        writer.set_routing_infos(allocator.allocate([]))
+        writer.set_routing_infos(allocator.allocate())
 
     def test_empty(self) -> None:
         writer = PacmanDataWriter.mock()
@@ -165,8 +165,8 @@ class TestMerged(unittest.TestCase):
         # Two vertices in the same router can't send with the same key
         writer = PacmanDataWriter.mock()
         v_target = SimpleTestVertex(1, splitter=SplitterFixedLegacy())
-        v1 = FixedKeyAppVertex(BaseKeyAndMask(0x1, 0xFFFFFFFF))
-        v2 = FixedKeyAppVertex(BaseKeyAndMask(0x1, 0xFFFFFFFF))
+        v1 = FixedKeyAppVertex(BaseKeyAndMask(0x100, 0xFFFFFF00))
+        v2 = FixedKeyAppVertex(BaseKeyAndMask(0x100, 0xFFFFFF00))
         writer.add_vertex(v_target)
         writer.add_vertex(v1)
         writer.add_vertex(v2)
@@ -183,8 +183,8 @@ class TestMerged(unittest.TestCase):
         # Two vertices in the same router can't send with the same key
         writer = PacmanDataWriter.mock()
         v_target = SimpleTestVertex(1, splitter=SplitterFixedLegacy())
-        v1 = FixedKeyAppVertex(BaseKeyAndMask(0x1, 0xFFFFFFFF))
-        v2 = FixedKeyAppVertex(BaseKeyAndMask(0x1, 0xFFFFFFFF))
+        v1 = FixedKeyAppVertex(BaseKeyAndMask(0x100, 0xFFFFFF00))
+        v2 = FixedKeyAppVertex(BaseKeyAndMask(0x100, 0xFFFFFF00))
         writer.add_vertex(v_target)
         writer.add_vertex(v1)
         writer.add_vertex(v2)
@@ -202,8 +202,8 @@ class TestMerged(unittest.TestCase):
         writer = PacmanDataWriter.mock()
         v_target_1 = FixedKeyAppVertex(None)
         v_target_2 = FixedKeyAppVertex(None)
-        v1 = FixedKeyAppVertex(BaseKeyAndMask(0x1, 0xFFFFFFFF))
-        v2 = FixedKeyAppVertex(BaseKeyAndMask(0x1, 0xFFFFFFFF))
+        v1 = FixedKeyAppVertex(BaseKeyAndMask(0x100, 0xFFFFFF00))
+        v2 = FixedKeyAppVertex(BaseKeyAndMask(0x100, 0xFFFFFF00))
         writer.add_vertex(v_target_1)
         writer.add_vertex(v_target_2)
         writer.add_vertex(v1)

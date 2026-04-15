@@ -14,9 +14,13 @@
 
 import hashlib
 import math
-from typing import Any, Iterable, Tuple
+from typing import Any, Iterable
+
 import numpy
+
+from pacman.exceptions import PacmanValueError
 from pacman.model.graphs.common import Slice
+from pacman.utilities.constants import BITS_IN_KEY
 
 
 def expand_to_bit_array(value: int) -> numpy.ndarray:
@@ -55,7 +59,7 @@ def compress_bits_from_bit_array(
         each value being between 0 and 31
     :returns: integer value of the specified part bit array
     """
-    expanded_value = numpy.zeros(32, dtype="uint8")
+    expanded_value = numpy.zeros(BITS_IN_KEY, dtype="uint8")
     expanded_value[-len(bit_positions):] = bit_array[bit_positions]
     return compress_from_bit_array(expanded_value)
 
@@ -96,46 +100,6 @@ def md5(string: str) -> str:
     :returns: the hash key
     """
     return hashlib.md5(string.encode()).hexdigest()
-
-
-def get_key_ranges(key: int, mask: int) -> Iterable[Tuple[int, int]]:
-    """
-    Get a generator of base_key, n_keys pairs that represent ranges
-    allowed by the mask.
-
-    :param key: The base key
-    :param mask: The mask
-    :returns: tuples of base_key, n_keys pairs
-    """
-    unwrapped_mask = expand_to_bit_array(mask)
-    first_zeros = list()
-    remaining_zeros = list()
-    pos = len(unwrapped_mask) - 1
-
-    # Keep the indices of the first set of zeros
-    while pos >= 0 and unwrapped_mask[pos] == 0:
-        first_zeros.append(pos)
-        pos -= 1
-
-    # Find all the remaining zeros
-    while pos >= 0:
-        if unwrapped_mask[pos] == 0:
-            remaining_zeros.append(pos)
-        pos -= 1
-
-    # Loop over 2^len(remaining_zeros) to produce the base key,
-    # with n_keys being 2^len(first_zeros)
-    n_sets = 2 ** len(remaining_zeros)
-    n_keys = 2 ** len(first_zeros)
-    if not remaining_zeros:
-        yield key, n_keys
-        return
-    unwrapped_key = expand_to_bit_array(key)
-    for value in range(n_sets):
-        generated_key = numpy.copy(unwrapped_key)
-        generated_key[remaining_zeros] = \
-            expand_to_bit_array(value)[-len(remaining_zeros):]
-        yield compress_from_bit_array(generated_key), n_keys
 
 
 def get_n_bits(n_values: int) -> int:
@@ -183,3 +147,93 @@ def is_power_of_2(v: int) -> bool:
     :returns: True if the value is a power of 2.
     """
     return (v & (v - 1) == 0) and (v != 0)
+
+
+def calc_shift(mask: int) -> int:
+    """
+    Calculate the shift for the given mask.
+
+    This requires a mask where all the 1 bits are before all the zero bits
+
+    :param mask:
+    :return: The shift
+    :raises PacmanValueError: If the mask does not support a clean shift
+    """
+    bits = expand_to_bit_array(mask)
+    found_shift = False
+    shift = -1000
+    for i in range(BITS_IN_KEY):
+        if bits[i] == 1:
+            # Check all 1 come before the zeros
+            if found_shift:
+                raise PacmanValueError(
+                    f"mask:{hex(mask)} does not support a clean shift."
+                    f" It has masked bits after the unmasked bits in {bits}")
+        else:
+            if not found_shift:
+                shift = BITS_IN_KEY - i
+                found_shift = True
+
+    if found_shift:
+        return shift
+
+    return 0
+
+
+def can_shift(mask: int) -> bool:
+    """
+    Checks if the mask can generate a clean shift.
+
+    :param mask:
+    :return: True if cal_shift will work or False if it will error.
+    """
+    bits = expand_to_bit_array(mask)
+    found_zeros = False
+    for i in range(BITS_IN_KEY):
+        if bits[i] == 1:
+            # Check all 1 come before the zeros
+            if found_zeros:
+                return False
+        else:
+            found_zeros = True
+
+    return True
+
+
+def last_one(key: int) -> int:
+    """
+    Index of last 1 value of the key as bits
+
+    The most significant bit is index 0
+
+    Assumes size of key is 32 bits
+
+    If key is zero will return -1
+
+    :returns: index with the most significant bit being 0
+    """
+    last = -1
+    bits = expand_to_bit_array(key)
+    for i in range(BITS_IN_KEY):
+        if bits[i] == 1:
+            last = i
+    return last
+
+
+def first_one(key: int) -> int:
+    """
+    Index of last 1 value of the key as bits
+
+    The most significant bit is index 0
+
+    Assumes size of key is 32 bits
+
+    If key is zero will return 32
+
+    :returns: index with the most significant bit being 0
+    """
+    bits = expand_to_bit_array(key)
+    for i in range(BITS_IN_KEY):
+        if bits[i] == 1:
+            return i
+    return BITS_IN_KEY
