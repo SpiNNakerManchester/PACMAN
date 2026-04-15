@@ -71,8 +71,7 @@ class AbstractVertex(object):
 
     def has_been_added_to_graph(self) -> bool:
         """
-        State if the vertex has been added to the graph or not
-
+        :returns: True if the vertex has been added to the graph
         """
         return self._added_to_graph
 
@@ -83,6 +82,9 @@ class AbstractVertex(object):
         Typically `None`! Does not have the value of a normal placements.
 
         Used instead of `ChipAndCoreConstraint`.
+
+        :returns: None or the location constraint,
+
         """
         return self._fixed_location
 

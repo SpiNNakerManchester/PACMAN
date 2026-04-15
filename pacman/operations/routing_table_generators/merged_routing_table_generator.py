@@ -48,7 +48,7 @@ class _IteratorWithNext(Generic[E]):
 
     def peek(self) -> Optional[E]:
         """
-        The Element if any that would be returned by a pop call
+        :returns: The Element if any that would be returned by a pop call
         """
         return self.__next
 
@@ -61,8 +61,7 @@ class _IteratorWithNext(Generic[E]):
 
     def pop(self) -> E:
         """
-        The next element available.
-
+        :returns: The next element available.
         :raises: StopIteration if there is not more element available
         """
         if not self.__has_next:
@@ -82,6 +81,8 @@ def merged_routing_table_generator() -> MulticastRoutingTables:
     """
     Creates routing entries by merging adjacent entries from the same
     application vertex when possible.
+
+    :returns: The merged routing tables.
     """
     routing_table_by_partitions = (
         PacmanDataView.get_routing_table_by_partition())

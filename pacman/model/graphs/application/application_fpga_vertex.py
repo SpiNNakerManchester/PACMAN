@@ -75,13 +75,12 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
     def get_incoming_slice_for_link(
             self, link: FPGAConnection, index: int) -> Slice:
         """
-        Get the slice to be given to the connection from the given link.
-
         :param link:
             The FPGA connection to get the slice for
         :param index:
             The index of the connection on the FGPA link, for when
             n_machine_vertices_per_link > 1
+        :returns: The slice to be given to the connection from the given link.
         """
         # link used in subclasses but not here
         _ = link
@@ -93,7 +92,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     def get_outgoing_slice(self) -> Slice:
         """
-        Get the slice to be given to the outgoing connection.
+        :returns: The slice to be given to the outgoing connection.
         """
         return Slice(0, self.n_atoms - 1)
 

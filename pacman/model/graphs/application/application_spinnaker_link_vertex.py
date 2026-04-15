@@ -87,10 +87,9 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
 
     def get_incoming_slice(self, index: int) -> Slice:
         """
-        Get the slice to be given to the connection.
-
         :param index:
             The index of the connection, for when n_machine_vertices > 1
+        :returns: The slice to be given to the connection.
         """
         atoms_per_slice = int(math.ceil(
             self._n_atoms / self._n_machine_vertices))
@@ -101,7 +100,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
 
     def get_outgoing_slice(self) -> Slice:
         """
-        Get the slice to be given to the outgoing connection.
+        :returns: The slice to be given to the outgoing connection.
         """
         return Slice(0, self.n_atoms - 1)
 

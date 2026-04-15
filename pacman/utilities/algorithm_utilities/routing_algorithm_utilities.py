@@ -19,8 +19,7 @@ from spinn_machine import Chip
 
 from pacman.data import PacmanDataView
 from pacman.model.graphs import AbstractVirtual
-from pacman.model.graphs.application import (
-    ApplicationEdgePartition, ApplicationVertex)
+from pacman.model.graphs.application import ApplicationEdgePartition
 from pacman.model.graphs.machine import MachineVertex
 
 
@@ -50,8 +49,6 @@ def get_app_partitions() -> List[ApplicationEdgePartition]:
 
     # Convert internal partitions to self-connected partitions
     for v in PacmanDataView.iterate_vertices():
-        if not isinstance(v, ApplicationVertex) or not v.splitter:
-            continue
         internal_partitions = v.splitter.get_internal_multicast_partitions()
         for p in internal_partitions:
             if (v, p.identifier) not in sources:
@@ -138,6 +135,7 @@ def vector_to_nodes(dm_vector: List[XY], start: XY) -> List[Tuple[int, XY]]:
 def vertex_xy(vertex: MachineVertex) -> XY:
     """
     :param vertex:
+    :returns: the location where this vertex is placed or linked to
     """
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)
@@ -149,6 +147,7 @@ def vertex_xy(vertex: MachineVertex) -> XY:
 def vertex_chip(vertex: MachineVertex) -> Chip:
     """
     :param vertex:
+    :returns: The Chip where the vertex is placed of linked to.
     """
     machine = PacmanDataView.get_machine()
     if not isinstance(vertex, AbstractVirtual):

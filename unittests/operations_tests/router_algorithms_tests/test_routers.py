@@ -61,13 +61,13 @@ from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 from pacman.model.graphs.machine import (
     MachineFPGAVertex, MachineSpiNNakerLinkVertex)
 
-TA_ALG: TypeAlias = Callable[[], MulticastRoutingTableByPartition]
-TA_PARAMS: TypeAlias = Tuple[TA_ALG, int, int]
+Alr: TypeAlias = Callable[[], MulticastRoutingTableByPartition]
+Params: TypeAlias = Tuple[Alr, int, int]
 
 
 @pytest.fixture(params=[
     (route_application_graph, 10, 50)])
-def params(request: Any) -> TA_PARAMS:
+def params(request: Any) -> Params:
     return request.param
 
 
@@ -475,7 +475,6 @@ def _get_entry(
         source_vertex: MachineVertex, partition_id: str,
         allow_none: bool) -> Optional[RoutingEntry]:
     app_vertex = source_vertex.app_vertex
-    assert app_vertex is not None
     app_entry = routing_tables.get_entry_on_coords_for_edge(
         app_vertex, partition_id, x, y)
     entry = routing_tables.get_entry_on_coords_for_edge(
@@ -593,7 +592,7 @@ def _check_edges(routing_tables: MulticastRoutingTableByPartition) -> None:
             assert not actual_targets.difference(required_targets[m_vertex])
 
 
-def _route_and_time(algorithm: TA_ALG) -> MulticastRoutingTableByPartition:
+def _route_and_time(algorithm: Alr) -> MulticastRoutingTableByPartition:
     timer = Timer()
     with timer:
         result = algorithm()
@@ -601,7 +600,7 @@ def _route_and_time(algorithm: TA_ALG) -> MulticastRoutingTableByPartition:
     return result
 
 
-def test_simple(params: TA_PARAMS) -> None:
+def test_simple(params: Params) -> None:
     algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
@@ -617,7 +616,7 @@ def test_simple(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_self(params: TA_PARAMS) -> None:
+def test_self(params: Params) -> None:
     algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
     set_config("Machine", "version", "5")
@@ -632,7 +631,7 @@ def test_self(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_simple_self(params: TA_PARAMS) -> None:
+def test_simple_self(params: Params) -> None:
     algorithm, _n_vertices, n_m_vertices = params
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
@@ -650,7 +649,7 @@ def test_simple_self(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_multi(params: TA_PARAMS) -> None:
+def test_multi(params: Params) -> None:
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
@@ -669,7 +668,7 @@ def test_multi(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_multi_self(params: TA_PARAMS) -> None:
+def test_multi_self(params: Params) -> None:
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
@@ -687,7 +686,7 @@ def test_multi_self(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_multi_split(params: TA_PARAMS) -> None:
+def test_multi_split(params: Params) -> None:
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
@@ -709,7 +708,7 @@ def test_multi_split(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_multi_self_split(params: TA_PARAMS) -> None:
+def test_multi_self_split(params: Params) -> None:
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
@@ -730,7 +729,7 @@ def test_multi_self_split(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_multi_down_chips_and_links(params: TA_PARAMS) -> None:
+def test_multi_down_chips_and_links(params: Params) -> None:
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
@@ -791,7 +790,7 @@ def test_multi_down_chips_and_links(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_internal_only(params: TA_PARAMS) -> None:
+def test_internal_only(params: Params) -> None:
     algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.ANY.text)
@@ -809,7 +808,7 @@ def test_internal_only(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_internal_and_split(params: TA_PARAMS) -> None:
+def test_internal_and_split(params: Params) -> None:
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
@@ -832,7 +831,7 @@ def test_internal_and_split(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_spinnaker_link(params: TA_PARAMS) -> None:
+def test_spinnaker_link(params: Params) -> None:
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     # TODO SPIN2 spinnaker links
@@ -859,7 +858,7 @@ def test_spinnaker_link(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_fpga_link(params: TA_PARAMS) -> None:
+def test_fpga_link(params: Params) -> None:
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     # TODO spin2 fpga
@@ -889,7 +888,7 @@ def test_fpga_link(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_fpga_link_overlap(params: TA_PARAMS) -> None:
+def test_fpga_link_overlap(params: Params) -> None:
     algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
     # TODO Spin2 links
@@ -915,7 +914,7 @@ def test_fpga_link_overlap(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_odd_case(params: TA_PARAMS) -> None:
+def test_odd_case(params: Params) -> None:
     algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
@@ -950,7 +949,7 @@ def test_odd_case(params: TA_PARAMS) -> None:
     _check_edges(routing_tables)
 
 
-def test_with_ethernet_system_placements(params: TA_PARAMS) -> None:
+def test_with_ethernet_system_placements(params: Params) -> None:
     # This is a test of LPG-style functionality, where an application vertex
     # is placed on multiple ethernet chips, but the source is only connected
     # to one of them
@@ -1024,7 +1023,7 @@ def test_route_around() -> None:
     print(nodes_fixed)
 
 
-def test_internal_io_routes(params: TA_PARAMS) -> None:
+def test_internal_io_routes(params: Params) -> None:
     algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)

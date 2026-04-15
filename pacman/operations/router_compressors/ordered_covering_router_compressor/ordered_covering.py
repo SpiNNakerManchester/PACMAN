@@ -47,6 +47,8 @@ _all_bits = tuple(1 << i for i in range(32))
 def ordered_covering_compressor() -> MulticastRoutingTables:
     """
     Compressor from rig that has been tied into the main tool chain stack.
+
+    :returns: Compressed routing tables
     """
     compressor = _OrderedCoveringCompressor()
     return compressor.compress_all_tables()
@@ -200,6 +202,7 @@ def get_generality(key: int, mask: int) -> int:
 
     :param key: Routing key
     :param mask: Routing mask
+    :returns: number of *X*\\s in the key-mask pair
     """
     # 32-bit mask because Python uses infinite-precision ints
     xs = (~key) & (~mask) & 0xffffffff

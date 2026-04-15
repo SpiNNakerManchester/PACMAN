@@ -257,7 +257,6 @@ def check_masks_all_the_same(routing_info: RoutingInfo, mask: int) -> None:
 
 def check_fixed(m_vertex: MachineVertex, part_id: str, key: int) -> bool:
     app_vertex = m_vertex.app_vertex
-    assert app_vertex is not None
     key_and_mask = app_vertex.get_machine_fixed_key_and_mask(
         m_vertex, part_id)
     if key_and_mask is None:

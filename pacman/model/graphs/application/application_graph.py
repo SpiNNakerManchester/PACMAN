@@ -84,6 +84,7 @@ class ApplicationGraph(object):
         Looks up a vertex in the graph based on the label
 
         :param label:
+        :returns: Vertex with this label
         """
         return self._vertex_by_label[label]
 
@@ -190,10 +191,9 @@ class ApplicationGraph(object):
             self, vertex: ApplicationVertex) -> Iterable[
                 ApplicationEdgePartition]:
         """
-        Get all the edge partitions that start at the given vertex.
-
         :param vertex:
             The vertex at which the edge partitions to find starts
+        :returns: All the edge partitions that start at the given vertex.
         """
         return self._outgoing_edge_partitions_by_pre_vertex[vertex]
 

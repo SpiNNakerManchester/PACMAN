@@ -78,8 +78,6 @@ class MulticastRoutingTables(object):
     def routing_tables(self) -> Collection[AbstractMulticastRoutingTable]:
         """
         The routing tables stored within.
-
-        :return: an iterable of routing tables
         """
         return self._routing_tables_by_chip.values()
 
@@ -89,6 +87,8 @@ class MulticastRoutingTables(object):
         multicast routing table.
 
         Will return zero if there are no routing tables
+
+        :returns: The number of entries in the largest table.
         """
         if self._routing_tables_by_chip:
             return max(map((lambda x: x.number_of_entries),
@@ -102,6 +102,8 @@ class MulticastRoutingTables(object):
         multicast routing table.
 
         Will return zero if there are no routing tables
+
+        :returns: total number of multicast routing entries
         """
         if self._routing_tables_by_chip:
             return sum(map((lambda x: x.number_of_entries),
@@ -137,6 +139,7 @@ def to_json(router_table: MulticastRoutingTables) -> JsonObjectArray:
     Converts RoutingTables to json
 
     :param router_table:
+    :returns: tables in a json readable format
     """
     return [
         {
@@ -159,6 +162,7 @@ def from_json(j_router: Union[str, JsonObjectArray]) -> MulticastRoutingTables:
     Creates Routing Tables based on json
 
     :param j_router:
+    :returns: routing tables described by the json
     """
     if isinstance(j_router, str):
         if j_router.endswith(".gz"):

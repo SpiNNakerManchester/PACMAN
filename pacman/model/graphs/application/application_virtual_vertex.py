@@ -30,5 +30,6 @@ class ApplicationVirtualVertex(ApplicationVertex):
         Get the link data for outgoing connections from the machine.
 
         :param machine: The machine to get the link data from
+        :returns: the outgoing link data of the vertex's type
         """
         raise NotImplementedError

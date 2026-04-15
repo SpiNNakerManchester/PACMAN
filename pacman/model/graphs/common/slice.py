@@ -93,13 +93,13 @@ class Slice(object):
 
     def as_slice(self) -> slice:
         """
-        Converts the Slice to a standard slice object *if possible.*
+        The Slice to a standard slice object *if possible.*
 
         .. note::
             Use of this method is *not* recommended.
             It fails for multi-dimensional slices and may be removed.
 
-        :return: a standard built-in slice object
+        :returns: A standard python slice
         :raises NotImplementedError: If called on a multi-dimensional slice
         """
         # slice for accessing arrays of values
@@ -109,7 +109,9 @@ class Slice(object):
         """
         Get a slice in the `n`'Th dimension.
 
-        :param n: Must be 0
+        :param n: The dimension (0 based) of interest.
+           In 1D slices this must be 0
+        :returns: A 1D slice
         """
         if n == 0:
             return slice(self._lo_atom, self._lo_atom + self._n_atoms)
@@ -176,6 +178,7 @@ class Slice(object):
         Convert the string form of a :py:class:`Slice` into an object instance.
 
         :param as_str: The string to parse
+        :returns: Slice described by the string
         """
         if as_str[0] != "(":
             raise NotImplementedError("Please use MDSlice method")

@@ -26,12 +26,14 @@ def pair_compressor(
         ordered: bool = True, accept_overflow: bool = False,
         verify: bool = False, c_sort: bool = False) -> MulticastRoutingTables:
     """
+    :param ordered: Flag to say if the results can be order dependent
     :param accept_overflow:
         A flag which should only be used in testing to stop raising an
         exception if result is too big
     :param verify: If set to true will verify the length before returning
     :param c_sort: If set will use the slower quick sort as it is
         implemented in c/ on cores
+    :returns: Compressed routing tables
     """
     compressor = _PairCompressor(ordered, accept_overflow, c_sort)
     compressed = compressor.compress_all_tables()
@@ -43,6 +45,8 @@ def pair_compressor(
 
 def verify_lengths(compressed: MulticastRoutingTables) -> None:
     """
+    Checks the length of every routing table in the compressed table.
+
     :param compressed:
     :raises PacmanElementAllocationException:
         if the compressed table won't fit
@@ -168,6 +172,13 @@ class _PairCompressor(AbstractCompressor):
 
     def __init__(self, ordered: bool = True, accept_overflow: bool = False,
                  c_sort: bool = False):
+        """
+        :param ordered: Flag to say if the results can be order dependent
+        :param accept_overflow:
+            Flag to say that results too large should be ignored
+        :param c_sort:
+            Flag to use slower quick sort as it is implemented in c/ on cores
+        """
         super().__init__(ordered, accept_overflow)
         self._all_entries: List[MulticastRoutingEntry] = []
         self._c_sort = c_sort

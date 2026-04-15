@@ -43,7 +43,7 @@ class SourceSegmentedSDRAMMachinePartition(
 
     def total_sdram_requirements(self) -> int:
         """
-        The total of the sdram size of each edge.
+        :returns: The total of the sdram size of each edge.
         """
         return sum(edge.sdram_size for edge in self.edges)
 
@@ -95,6 +95,8 @@ class SourceSegmentedSDRAMMachinePartition(
         """
         Do we have a base address for the given vertex? If the edge does not
         connect to the vertex, this is an error.
+
+        :returns: True if the base address for the given vertex is known
         """
         if self._sdram_base_address is None:
             return False

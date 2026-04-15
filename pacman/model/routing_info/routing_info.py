@@ -63,11 +63,10 @@ class RoutingInfo(object):
             self, vertex: AbstractVertex,
             partition_id: str) -> Optional[VertexRoutingInfo]:
         """
-        Get routing information for a given partition_id from a vertex.
-
         :param vertex: The vertex to search for
         :param partition_id:
             The ID of the partition for which to get the routing information
+        :returns: Routing information for a given partition_id from a vertex.
         """
         return self._info[vertex].get(partition_id)
 
@@ -75,11 +74,10 @@ class RoutingInfo(object):
             self, vertex: AbstractVertex,
             partition_id: str) -> VertexRoutingInfo:
         """
-        Get routing information for a given partition_id from a vertex.
-
         :param vertex: The vertex to search for
         :param partition_id:
             The ID of the partition for which to get the routing information
+        :returns: Routing information for a given partition_id from a vertex.
         :raise KeyError:
             If the vertex/partition_id combination is not in the routing
             information
@@ -133,17 +131,19 @@ class RoutingInfo(object):
         Get the outgoing partitions from a vertex.
 
         :param vertex: The vertex to search for
+        :returns: The partition ids for routes from this Vertex
         """
         return self._info[vertex].keys()
 
     def has_info_from(
             self, vertex: AbstractVertex, partition_id: str) -> bool:
         """
-        Check if there is routing information for a given vertex.
+        Check if there is routing information for a given vertex and ID.
 
         :param vertex: The vertex to search for
         :param partition_id:
             The ID of the partition for which to get the routing information
+        :returns: True if there is a route from this vertex for this partition.
         """
         if vertex not in self._info:
             return False
@@ -175,6 +175,7 @@ class RoutingInfo(object):
         more than one outgoing partition.
 
         :param vertex: The vertex to search for
+        :returns: The only routing from this vertex
         :raise KeyError: If the vertex has more than one outgoing partition
         """
         if vertex not in self._info:
@@ -192,6 +193,7 @@ class RoutingInfo(object):
         the vertex has more than one outgoing partition.
 
         :param vertex: The vertex which the partition starts at
+        :returns: The key of the only route from this vertex
         :raise KeyError: If the vertex has more than one outgoing partition
         """
         info = self.get_single_info_from(vertex)

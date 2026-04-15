@@ -162,6 +162,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         integer.
 
         :param n_atoms: Value convertible to int to be used for `n_atoms`
+        :param label: text for log or exception (if needed)
         :return: Number of atoms.
         :raises PacmanInvalidParameterException:
             If the value cannot be safely converted to an integer
@@ -209,9 +210,12 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
 
     def get_max_atoms_per_core(self) -> int:
         """
-        Gets the maximum number of atoms per core, which is either the
-        number of atoms required across the whole application vertex,
-        or a lower value set.
+        Gets the maximum number of atoms per core.
+
+        Which is either the number of atoms required across the
+        whole application vertex or a lower value set.
+
+        :returns: The maximum number of atoms per core
         """
         if self._max_atoms_per_dimension_per_core is None:
             return self.n_atoms
@@ -220,9 +224,12 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
 
     def get_max_atoms_per_dimension_per_core(self) -> Tuple[int, ...]:
         """
-        Gets the maximum number of atoms per dimension per core.  This
-        will return a tuple with a number for each dimension of the vertex,
-        which might be one if this is a single-dimension vertex.
+        Gets the maximum number of atoms per dimension per core.
+
+        This will return a tuple with a number for each dimension
+        of the vertex, which might be one if this is a single-dimension vertex.
+
+        :returns: The maximum number of atoms per dimension per core
         """
         if self._max_atoms_per_dimension_per_core is None:
             return self.atoms_shape
@@ -299,6 +306,9 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
 
         :param machine_vertex:
             The identifier of the partition to get the key for
+        :param partition_id:
+            The identifier of the partition to get the key for
+        :returns: None or key and mask if fixed
         """
         _ = (machine_vertex, partition_id)
         return None
@@ -307,11 +317,12 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             self, partition_id: str) -> Optional[BaseKeyAndMask]:
         """
         Get a fixed key and mask for the application vertex or `None` if not
-        fixed (the default).  See :py:meth:`get_machine_gixed_key_and_mask` for
+        fixed (the default).  See :py:meth:`get_machine_fixed_key_and_mask` for
         the conditions.
 
         :param partition_id:
             The identifier of the partition to get the key for
+        :returns: None or key and mask if fixed
         """
         _ = (partition_id)
         return None
@@ -336,9 +347,13 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         the order of the atoms in the vertex as a whole is not the same as the
         order of the vertex when scanning over the cores.
 
+        ..Note::
+            For standard 1D vertices the key and raster order are the same.
+
         :param indices:
             Optional subset of indices to convert.  If not provided all indices
             will be converted.
+        :returns: indices in key order
         """
         if indices is None:
             indices = numpy.arange(self.n_atoms)
@@ -384,7 +399,11 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         """
         Convert indices from key order to raster order.
 
+        ..Note::
+            For standard 1D vertices the key and raster order are the same.
+
         :param indices: The key-ordered indices to convert.
+        :returns: The indices in raster order.
         """
         atoms_shape = self.atoms_shape
         n_dims = len(atoms_shape)

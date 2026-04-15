@@ -106,7 +106,9 @@ class RoutingTree(object):
             self, child: Tuple[int, Union[RoutingTree, MachineVertex]]
             ) -> None:
         """
-        :param child:
+        Adds the child to the tree
+
+        No check is done to see if it already exists.
         """
         self._children.append(child)
 
@@ -114,7 +116,7 @@ class RoutingTree(object):
             self, child: Tuple[int, Union[RoutingTree, MachineVertex]]
             ) -> None:
         """
-        :param child:
+        Removes a child which must have been in the tree
         """
         self._children.remove(child)
 

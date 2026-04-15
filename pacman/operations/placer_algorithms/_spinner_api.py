@@ -46,6 +46,7 @@ class Spinner:
         Loads the required imports and returns a Spinner
 
         :raises ImportError: if on Windows
+        :returns: A Spinner object
         """
         # spinner as graphical library so
         # pylint: disable=import-error,import-outside-toplevel

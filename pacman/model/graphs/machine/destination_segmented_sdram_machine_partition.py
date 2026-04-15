@@ -33,6 +33,10 @@ class DestinationSegmentedSDRAMMachinePartition(
         "_sdram_base_address", )
 
     def __init__(self, identifier: str, pre_vertex: MachineVertex):
+        """
+        :param identifier: The identifier of the partition
+        :param pre_vertex: The vertex at the start of all the edges
+        """
         super().__init__(
             pre_vertex=pre_vertex, identifier=identifier,
             allowed_edge_types=SDRAMMachineEdge)

@@ -107,9 +107,8 @@ class Placements(object):
 
     def is_vertex_placed(self, vertex: MachineVertex) -> bool:
         """
-        Determine if a vertex has been placed.
-
         :param vertex: The vertex to determine the status of
+        :returns: True if this vertex has already been placed
         """
         return vertex in self._machine_vertices
 
@@ -139,9 +138,8 @@ class Placements(object):
 
     def iterate_placements_on_core(self, xy: XY) -> Iterable[Placement]:
         """
-        Iterate over placements with this x and y.
-
         :param xy: x and y coordinates to find placements for.
+        :returns: Iterator over placements with this x and y.
         """
         return self._placements[xy].values()
 
@@ -149,10 +147,9 @@ class Placements(object):
             self, xy: XY, vertex_type: Union[
                 type, Tuple[type, ...]]) -> Iterable[Placement]:
         """
-        Iterate over placements with this x, y and this vertex_type.
-
         :param xy: x and y coordinate to find placements for.
         :param vertex_type: Class of vertex to find
+        :returns: Placements with this x, y and this vertex_type.
         """
         for placement in self._placements[xy].values():
             if isinstance(placement.vertex, vertex_type):
@@ -162,9 +159,8 @@ class Placements(object):
             self, vertex_type: Union[
                 type, Tuple[type, ...]]) -> Iterable[Placement]:
         """
-        Iterate over placements on any chip with this vertex_type.
-
         :param vertex_type: Class of vertex to find
+        :returns: Placements on any chip with this vertex_type.
         """
         for placement in self._machine_vertices.values():
             if isinstance(placement.vertex, vertex_type):
@@ -172,9 +168,8 @@ class Placements(object):
 
     def n_placements_on_chip(self, xy: XY) -> int:
         """
-        The number of placements on the given chip.
-
         :param xy: x and y coordinate of chip.
+        :returns: The number of placements on the given chip.
         """
         if xy not in self._placements:
             return 0
@@ -184,16 +179,13 @@ class Placements(object):
     def placements(self) -> Iterable[Placement]:
         """
         All of the placements.
-
-        :return: iterable of placements
-         """
+        """
         return iter(self._machine_vertices.values())
 
     def placements_on_chip(self, xy: XY) -> Collection[Placement]:
         """
-        Get the placements on a specific chip.
-
         :param xy: The x and y coordinates of the chip
+        :returns: The placements on a specific chip.
         """
         return self._placements[xy].values()
 

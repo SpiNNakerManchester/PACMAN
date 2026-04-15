@@ -25,6 +25,7 @@ def expand_to_bit_array(value: int) -> numpy.ndarray:
     each of which is a 1 or 0.
 
     :param value: The value to expand
+    :returns: Bit array representing the value
     """
     return numpy.unpackbits(
         numpy.asarray([value], dtype=">u4").view(dtype="uint8"))
@@ -36,6 +37,7 @@ def compress_from_bit_array(bit_array: numpy.ndarray) -> int:
     into a 32-bit value.
 
     :param bit_array: The array to compress
+    :returns: integer value of the whole bit array
     """
     return numpy.packbits(bit_array).view(dtype=">u4")[0].item()
 
@@ -51,6 +53,7 @@ def compress_bits_from_bit_array(
     :param bit_positions:
         The positions of the bits to extract,
         each value being between 0 and 31
+    :returns: integer value of the specified part bit array
     """
     expanded_value = numpy.zeros(32, dtype="uint8")
     expanded_value[-len(bit_positions):] = bit_array[bit_positions]
@@ -61,13 +64,15 @@ def is_equal_or_none(a: Any, b: Any) -> bool:
     """
     If a and b are both not `None`, return True if and only if they are equal,
     otherwise return True.
+
+    :returns: True if either value is None or they are equal
     """
     return (a is None or b is None or a == b)
 
 
 def is_single(iterable: Iterable[Any]) -> bool:
     """
-    Test if there is exactly one item in the iterable.
+    :returns: True if there is exactly one item in the iterable.
     """
     iterator = iter(iterable)
 
@@ -88,6 +93,7 @@ def md5(string: str) -> str:
     Get the MD5 hash of the given string, which is UTF-8 encoded.
 
     :param string:
+    :returns: the hash key
     """
     return hashlib.md5(string.encode()).hexdigest()
 
@@ -99,6 +105,7 @@ def get_key_ranges(key: int, mask: int) -> Iterable[Tuple[int, int]]:
 
     :param key: The base key
     :param mask: The mask
+    :returns: tuples of base_key, n_keys pairs
     """
     unwrapped_mask = expand_to_bit_array(mask)
     first_zeros = list()
@@ -161,11 +168,10 @@ def get_keys(
         base_key: int, vertex_slice: Slice,
         n_extra_bits: int = 0) -> numpy.ndarray:
     """
-    Get the keys for a given vertex slice.
-
     :param base_key: The base key for the vertex slice
     :param vertex_slice: The slice of the vertex to get keys for
     :param n_extra_bits: Additional right shift to apply to atoms
+    :returns: the keys for a given vertex slice.
     """
     indices = numpy.arange(0, vertex_slice.n_atoms) << n_extra_bits
     return base_key + indices
@@ -173,8 +179,7 @@ def get_keys(
 
 def is_power_of_2(v: int) -> bool:
     """
-    Determine if a value is a power of 2.
-
     :param v: The value to test
+    :returns: True if the value is a power of 2.
     """
     return (v & (v - 1) == 0) and (v != 0)

@@ -33,6 +33,7 @@ def range_compressor(accept_overflow: bool = True) -> MulticastRoutingTables:
     :param accept_overflow:
         A flag which should only be used in testing to stop raising an
         exception if result is too big
+    :returns: Compressed routing tables
     """
     if accept_overflow:
         message = "Precompressing tables using Range Compressor"

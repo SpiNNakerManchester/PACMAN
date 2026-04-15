@@ -60,6 +60,8 @@ class AbstractVirtual(object):
         """
         Get the keys sent by the device or `None` if there aren't any
         explicitly defined.
+
+        :returns: The keys and masks used by the vertex if any
         """
         raise NotImplementedError
 
@@ -85,5 +87,6 @@ class AbstractVirtual(object):
         Get link data from the machine.
 
         :param machine: The machine to get the data from
+        :returns: The link of the type used by the specific vertex.
         """
         raise NotImplementedError
