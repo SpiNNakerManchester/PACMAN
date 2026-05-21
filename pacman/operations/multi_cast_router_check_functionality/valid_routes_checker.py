@@ -21,6 +21,7 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinn_machine import Chip, MulticastRoutingEntry
+
 from pacman.data import PacmanDataView
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanRoutingException)
@@ -88,6 +89,8 @@ def validate_routes(routing_tables: MulticastRoutingTables) -> None:
                     source, partition.identifier)
 
             for tgt, srcs in target_vertices:
+                if isinstance(srcs, AbstractVirtual):
+                    continue
                 place = PacmanDataView.get_placement_of_vertex(tgt)
                 for src in srcs:
                     if isinstance(src, ApplicationVertex):
