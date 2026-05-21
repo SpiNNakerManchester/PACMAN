@@ -98,11 +98,9 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                     incoming=False, outgoing=True)
 
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
-            # So far this only handles one connection in total
-            label = f"Machine vertex for {app_vertex.label}"
-
             if app_vertex.incoming:
                 for i in range(app_vertex.n_machine_vertices):
+                    label = f"Incoming Machine vertex for {app_vertex.label}"
                     vertex_slice = app_vertex.get_incoming_slice(i)
                     self.__incoming_vertices.append(MachineSpiNNakerLinkVertex(
                         app_vertex.spinnaker_link_id, app_vertex.board_address,
@@ -111,6 +109,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
                         outgoing=False))
                     self.__incoming_slices.append(vertex_slice)
             if app_vertex.outgoing:
+                label = f"Outgoing Machine vertex for {app_vertex.label}"
                 self.__outgoing_slice = app_vertex.get_outgoing_slice()
                 self.__outgoing_vertex = MachineSpiNNakerLinkVertex(
                     app_vertex.spinnaker_link_id, app_vertex.board_address,
