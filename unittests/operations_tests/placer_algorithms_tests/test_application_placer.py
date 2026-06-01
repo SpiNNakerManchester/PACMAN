@@ -145,7 +145,8 @@ def test_application_placer_large_groups() -> None:
     writer.add_vertex(fixed)
     fixed.splitter.create_machine_vertices(ChipCounter())
     # make groups to fill chips
-    n_machine_vertices = version.max_cores_per_chip - 2
+    n_machine_vertices = (
+            version.max_cores_per_chip - version.n_scamp_cores - 1)
     for i in range(17):
         _make_vertices(
             writer, 1000, 14, n_machine_vertices, f"app_vertex_{i}")
@@ -299,7 +300,8 @@ def test_more_cores_with_monitor() -> None:
     monitor = SimpleMachineVertex(ConstantSDRAM(4000))
     # This is purely an info call so test check directly
     writer.add_sample_monitor_vertex(monitor, True)
-    many = writer.get_machine_version().max_cores_per_chip - 1
+    version = writer.get_machine_version()
+    many = version.max_cores_per_chip - version.n_scamp_cores
     try:
         placer = ApplicationPlacer(Placements())
         placer._check_could_fit(many, ConstantSDRAM(500000))
@@ -315,5 +317,6 @@ def test_could_fit() -> None:
     monitor = SimpleMachineVertex(ConstantSDRAM(0))
     writer.add_sample_monitor_vertex(monitor, True)
     placer = ApplicationPlacer(Placements())
-    many = writer.get_machine_version().max_cores_per_chip - 2
+    version = writer.get_machine_version()
+    many = version.max_cores_per_chip - version.n_scamp_cores - 1
     placer._check_could_fit(many, ConstantSDRAM(500000))
