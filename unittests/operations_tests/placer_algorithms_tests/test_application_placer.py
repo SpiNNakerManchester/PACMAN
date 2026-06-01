@@ -300,7 +300,8 @@ def test_more_cores_with_monitor() -> None:
     monitor = SimpleMachineVertex(ConstantSDRAM(4000))
     # This is purely an info call so test check directly
     writer.add_sample_monitor_vertex(monitor, True)
-    many = writer.get_machine_version().max_cores_per_chip - 1
+    version = writer.get_machine_version()
+    many = version.max_cores_per_chip - version.n_scamp_cores
     try:
         placer = ApplicationPlacer(Placements())
         placer._check_could_fit(many, ConstantSDRAM(500000))
