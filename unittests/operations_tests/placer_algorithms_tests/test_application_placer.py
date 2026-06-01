@@ -145,7 +145,8 @@ def test_application_placer_large_groups() -> None:
     writer.add_vertex(fixed)
     fixed.splitter.create_machine_vertices(ChipCounter())
     # make groups to fill chips
-    n_machine_vertices = version.max_cores_per_chip - 2
+    n_machine_vertices = (
+            version.max_cores_per_chip - version.n_scamp_cores - 1)
     for i in range(17):
         _make_vertices(
             writer, 1000, 14, n_machine_vertices, f"app_vertex_{i}")
