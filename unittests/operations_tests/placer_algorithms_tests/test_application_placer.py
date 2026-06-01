@@ -316,5 +316,6 @@ def test_could_fit() -> None:
     monitor = SimpleMachineVertex(ConstantSDRAM(0))
     writer.add_sample_monitor_vertex(monitor, True)
     placer = ApplicationPlacer(Placements())
-    many = writer.get_machine_version().max_cores_per_chip - 2
+    version = writer.get_machine_version()
+    many = version.max_cores_per_chip - version.n_scamp_cores - 1
     placer._check_could_fit(many, ConstantSDRAM(500000))
