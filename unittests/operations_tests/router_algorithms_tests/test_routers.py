@@ -270,6 +270,7 @@ class MockOneToOneSplitter(AbstractSplitterCommon):
 
 class MockNearestEthernetSplitter(AbstractSplitterCommon):
 
+
     def __init__(self) -> None:
         super().__init__()
         self.__placements = Placements()
