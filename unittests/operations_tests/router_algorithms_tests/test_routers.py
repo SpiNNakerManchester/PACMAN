@@ -15,10 +15,7 @@
 from collections import defaultdict
 import math
 from typing import (
-    Any, Callable, cast, Dict, Iterable, Optional, List, Sequence, Set, Tuple)
-from typing_extensions import TypeAlias
-
-import pytest
+    cast, Dict, Iterable, Optional, List, Sequence, Set, Tuple)
 
 from spinn_utilities.config_holder import set_config
 from spinn_utilities.overrides import overrides
@@ -61,14 +58,8 @@ from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 from pacman.model.graphs.machine import (
     MachineFPGAVertex, MachineSpiNNakerLinkVertex)
 
-Alr: TypeAlias = Callable[[], MulticastRoutingTableByPartition]
-Params: TypeAlias = Tuple[Alr, int, int]
-
-
-@pytest.fixture(params=[
-    (route_application_graph, 10, 50)])
-def params(request: Any) -> Params:
-    return request.param
+N_VERTICES = 10
+N_M_VERTICES = 50
 
 
 class MockSplitter(AbstractSplitterCommon):
@@ -592,97 +583,91 @@ def _check_edges(routing_tables: MulticastRoutingTableByPartition) -> None:
             assert not actual_targets.difference(required_targets[m_vertex])
 
 
-def _route_and_time(algorithm: Alr) -> MulticastRoutingTableByPartition:
+def _route_and_time() -> MulticastRoutingTableByPartition:
     timer = Timer()
     with timer:
-        result = algorithm()
+        result = route_application_graph()
     print(f"Routing took {timer.measured_interval}")
     return result
 
 
-def test_simple(params: Params) -> None:
-    algorithm, _n_vertices, n_m_vertices = params
+def test_simple() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
-    source_vertex = _make_vertices(writer, 1000, n_m_vertices, "source")
-    target_vertex = _make_vertices(writer, 1000, n_m_vertices, "target")
+    source_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "source")
+    target_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "target")
     writer.add_edge(ApplicationEdge(source_vertex, target_vertex), "Test")
 
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_self(params: Params) -> None:
-    algorithm, _n_vertices, n_m_vertices = params
+def test_self() -> None:
     unittest_setup()
     set_config("Machine", "version", "5")
     writer = PacmanDataWriter.mock()
-    source_vertex = _make_vertices(writer, 1000, n_m_vertices, "self")
+    source_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "self")
     writer.add_edge(ApplicationEdge(source_vertex, source_vertex), "Test")
 
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_simple_self(params: Params) -> None:
-    algorithm, _n_vertices, n_m_vertices = params
+def test_simple_self() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
-    source_vertex = _make_vertices(writer, 1000, n_m_vertices, "source")
-    target_vertex = _make_vertices(writer, 1000, n_m_vertices, "target")
+    source_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "source")
+    target_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "target")
     writer.add_edge(ApplicationEdge(source_vertex, source_vertex), "Test")
     writer.add_edge(ApplicationEdge(target_vertex, target_vertex), "Test")
     writer.add_edge(ApplicationEdge(source_vertex, target_vertex), "Test")
 
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_multi(params: Params) -> None:
-    algorithm, n_vertices, n_m_vertices = params
+def test_multi() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
-    for i in range(n_vertices):
-        _make_vertices(writer, 1000, n_m_vertices, f"app_vertex_{i}")
+    for i in range(N_VERTICES):
+        _make_vertices(writer, 1000, N_M_VERTICES, f"app_vertex_{i}")
     for source in writer.iterate_vertices():
         for target in writer.iterate_vertices():
             if source != target:
                 writer.add_edge(ApplicationEdge(source, target), "Test")
 
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_multi_self(params: Params) -> None:
-    algorithm, n_vertices, n_m_vertices = params
+def test_multi_self() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
-    for i in range(n_vertices):
-        _make_vertices(writer, 1000, n_m_vertices, f"app_vertex_{i}")
+    for i in range(N_VERTICES):
+        _make_vertices(writer, 1000, N_M_VERTICES, f"app_vertex_{i}")
     for source in writer.iterate_vertices():
         for target in writer.iterate_vertices():
             writer.add_edge(ApplicationEdge(source, target), "Test")
 
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_multi_split(params: Params) -> None:
-    algorithm, n_vertices, n_m_vertices = params
+def test_multi_split() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
-    for i in range(n_vertices):
-        _make_vertices_split(writer, 1000, 3, 2, n_m_vertices,
+    for i in range(N_VERTICES):
+        _make_vertices_split(writer, 1000, 3, 2, N_M_VERTICES,
                              f"app_vertex_{i}")
     for source in writer.iterate_vertices():
         for target in writer.iterate_vertices():
@@ -692,17 +677,16 @@ def test_multi_split(params: Params) -> None:
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_multi_self_split(params: Params) -> None:
-    algorithm, n_vertices, n_m_vertices = params
+def test_multi_self_split() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
-    for i in range(n_vertices):
-        _make_vertices_split(writer, 1000, 3, 2, n_m_vertices,
+    for i in range(N_VERTICES):
+        _make_vertices_split(writer, 1000, 3, 2, N_M_VERTICES,
                              f"app_vertex_{i}")
     for source in writer.iterate_vertices():
         for target in writer.iterate_vertices():
@@ -711,23 +695,22 @@ def test_multi_self_split(params: Params) -> None:
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_multi_down_chips_and_links(params: Params) -> None:
-    algorithm, n_vertices, n_m_vertices = params
+def test_multi_down_chips_and_links() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
-    for i in range(n_vertices):
-        _make_vertices(writer, 1000, n_m_vertices, f"app_vertex_{i}")
+    for i in range(N_VERTICES):
+        _make_vertices(writer, 1000, N_M_VERTICES, f"app_vertex_{i}")
     for source in writer.iterate_vertices():
         for target in writer.iterate_vertices():
             writer.add_edge(ApplicationEdge(source, target), "Test")
 
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
 
     # Pick a few of the chips and links used and take them out
     chosen_entries: List[Tuple[int, int, RoutingEntry]] = list()
@@ -768,12 +751,11 @@ def test_multi_down_chips_and_links(params: Params) -> None:
     set_config("Machine", "down_chips", down_chips[:-1])
     set_config("Machine", "down_links", down_links[:-1])
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_internal_only(params: Params) -> None:
-    algorithm, _n_vertices, _n_m_vertices = params
+def test_internal_only() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = PacmanDataWriter.mock()
@@ -784,18 +766,16 @@ def test_internal_only(params: Params) -> None:
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
-
-def test_internal_and_split(params: Params) -> None:
-    algorithm, n_vertices, n_m_vertices = params
+def test_internal_and_split() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
-    for i in range(n_vertices):
+    for i in range(N_VERTICES):
         _make_vertices_split(
-            writer, 1000, 3, 2, n_m_vertices, f"app_vertex_{i}",
+            writer, 1000, 3, 2, N_M_VERTICES, f"app_vertex_{i}",
             internal_multicast=True)
     for source in writer.iterate_vertices():
         for target in writer.iterate_vertices():
@@ -805,12 +785,11 @@ def test_internal_and_split(params: Params) -> None:
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_spinnaker_link(params: Params) -> None:
-    algorithm, n_vertices, n_m_vertices = params
+def test_spinnaker_link() -> None:
     unittest_setup()
     # TODO SPIN2 spinnaker links
     set_config("Machine", "version", str(FIVE))
@@ -823,19 +802,18 @@ def test_spinnaker_link(params: Params) -> None:
     out_device.splitter = SplitterExternalDevice()
     out_device.splitter.create_machine_vertices(ChipCounter())
     writer.add_vertex(out_device)
-    for i in range(n_vertices):
+    for i in range(N_VERTICES):
         app_vertex = _make_vertices(
-            writer, 1000, n_m_vertices, f"app_vertex_{i}")
+            writer, 1000, N_M_VERTICES, f"app_vertex_{i}")
         writer.add_edge(ApplicationEdge(in_device, app_vertex), "Test")
         writer.add_edge(ApplicationEdge(app_vertex, out_device), "Test")
 
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_fpga_link(params: Params) -> None:
-    algorithm, n_vertices, n_m_vertices = params
+def test_fpga_link() -> None:
     unittest_setup()
     # TODO spin2 fpga
     set_config("Machine", "version", "5")
@@ -851,19 +829,18 @@ def test_fpga_link(params: Params) -> None:
     out_device.splitter = SplitterExternalDevice()
     out_device.splitter.create_machine_vertices(ChipCounter())
     writer.add_vertex(out_device)
-    for i in range(n_vertices):
+    for i in range(N_VERTICES):
         app_vertex = _make_vertices(
-            writer, 1000, n_m_vertices, f"app_vertex_{i}")
+            writer, 1000, N_M_VERTICES, f"app_vertex_{i}")
         writer.add_edge(ApplicationEdge(in_device, app_vertex), "Test")
         writer.add_edge(ApplicationEdge(app_vertex, out_device), "Test")
 
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_fpga_link_overlap(params: Params) -> None:
-    algorithm, _n_vertices, _n_m_vertices = params
+def test_fpga_link_overlap() -> None:
     unittest_setup()
     # TODO Spin2 links
     set_config("Machine", "version", "5")
@@ -882,12 +859,11 @@ def test_fpga_link_overlap(params: Params) -> None:
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(place_application_graph(Placements()))
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_odd_case(params: Params) -> None:
-    algorithm, _n_vertices, _n_m_vertices = params
+def test_odd_case() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
@@ -917,15 +893,14 @@ def test_odd_case(params: Params) -> None:
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
     writer.set_placements(placements)
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
-def test_with_ethernet_system_placements(params: Params) -> None:
+def test_with_ethernet_system_placements() -> None:
     # This is a test of LPG-style functionality, where an application vertex
     # is placed on multiple ethernet chips, but the source is only connected
     # to one of them
-    algorithm, _n_vertices, _n_m_vertices = params
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     writer = PacmanDataWriter.mock()
@@ -939,7 +914,7 @@ def test_with_ethernet_system_placements(params: Params) -> None:
     for m_vertex, chip in zip(source_vertex.machine_vertices, chips_to_use):
         placements.add_placement(Placement(m_vertex, chip[0], chip[1], 2))
     writer.set_placements(placements)
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
 
@@ -995,8 +970,7 @@ def test_route_around() -> None:
     print(nodes_fixed)
 
 
-def test_internal_io_routes(params: Params) -> None:
-    algorithm, _n_vertices, _n_m_vertices = params
+def test_internal_io_routes() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.BIG.text)
     machine = PacmanDataView.get_machine()
@@ -1011,5 +985,5 @@ def test_internal_io_routes(params: Params) -> None:
             vertex.splitter.get_in_coming_vertices("")):
         placements.add_placement(Placement(m_vertex, 0, 0, i))
     writer.set_placements(placements)
-    routing_tables = _route_and_time(algorithm)
+    routing_tables = _route_and_time()
     _check_edges(routing_tables)
