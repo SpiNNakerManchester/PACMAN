@@ -18,8 +18,10 @@ test for partitioning
 
 import unittest
 
+from parameterized import parameterized
+
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version.version_strings import VersionStrings
+from spinn_machine.version import ALL_BOARD_TYPES
 
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
@@ -40,8 +42,9 @@ class TestBasicPartitioner(unittest.TestCase):
         setup for all basic partitioner tests
         """
         unittest_setup()
-        set_config("Machine", "versions", VersionStrings.ANY.text)
+        #set_config("Machine", "versions", VersionStrings.ANY.text)
 
+    @parameterized.expand(ALL_BOARD_TYPES)
     def test_partition_with_no_fixed(self) -> None:
         """
         test a partitioning with a graph with no fixed_location
@@ -61,6 +64,7 @@ class TestBasicPartitioner(unittest.TestCase):
             for m_vert in vert.machine_vertices:
                 self.assertEqual(vert.n_atoms, m_vert.vertex_slice.n_atoms)
 
+    @parameterized.expand(ALL_BOARD_TYPES)
     def test_partition_on_large_vertex_than_has_to_be_split(self) -> None:
         """
         test that partitioning 1 large vertex can make it into 2 small ones
@@ -72,6 +76,7 @@ class TestBasicPartitioner(unittest.TestCase):
         splitter_partitioner()
         self.assertEqual(PacmanDataView.get_n_machine_vertices(), 2)
 
+    @parameterized.expand(ALL_BOARD_TYPES)
     def test_partition_on_target_size_vertex_than_has_to_be_split(
             self) -> None:
         """
@@ -84,6 +89,7 @@ class TestBasicPartitioner(unittest.TestCase):
         splitter_partitioner()
         self.assertEqual(PacmanDataView.get_n_machine_vertices(), 100)
 
+    @parameterized.expand(ALL_BOARD_TYPES)
     def test_partition_with_empty_graph(self) -> None:
         """
         test that the partitioner can work with an empty graph
@@ -91,6 +97,7 @@ class TestBasicPartitioner(unittest.TestCase):
         splitter_partitioner()
         self.assertEqual(PacmanDataView.get_n_machine_vertices(), 0)
 
+    @parameterized.expand(ALL_BOARD_TYPES)
     def test_partition_with_fixed_atom(self) -> None:
         """
         test a partitioning with a graph with fixed atom constraint which\

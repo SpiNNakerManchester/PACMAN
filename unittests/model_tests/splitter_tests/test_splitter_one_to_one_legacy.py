@@ -14,8 +14,10 @@
 
 import unittest
 
+from parameterized import parameterized
+
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version.version_strings import VersionStrings
+from spinn_machine.version import ALL_BOARD_TYPES
 
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
@@ -30,6 +32,7 @@ class TestSplitterFixedLegacy(unittest.TestCase):
     def setUp(self) -> None:
         unittest_setup()
 
+    @parameterized.expand(ALL_BOARD_TYPES)
     def test_api(self) -> None:
         set_config("Machine", "versions", VersionStrings.ANY.text)
         splitter = SplitterOneToOneLegacy()

@@ -17,6 +17,8 @@ import math
 from typing import (
     cast, Dict, Iterable, Optional, List, Sequence, Set, Tuple)
 
+from parameterized import parameterized
+
 from spinn_utilities.config_holder import set_config
 from spinn_utilities.overrides import overrides
 from spinn_utilities.timer import Timer
@@ -24,8 +26,7 @@ from spinn_utilities.typing.coords import XY
 
 from spinn_machine import Machine, RoutingEntry
 from spinn_machine.link_data_objects import AbstractLinkData
-from spinn_machine.version import FIVE
-from spinn_machine.version.version_strings import VersionStrings
+from spinn_machine.version import ALL_BOARD_TYPES, BIG_BOARD_TYPES, FIVE
 from spinn_machine.virtual_machine import (
     virtual_machine_by_boards, virtual_machine_by_cores)
 
@@ -591,9 +592,10 @@ def _route_and_time() -> MulticastRoutingTableByPartition:
     return result
 
 
-def test_simple() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_simple(_: str, version: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", version)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "source")
     target_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "target")
@@ -616,9 +618,10 @@ def test_self() -> None:
     _check_edges(routing_tables)
 
 
-def test_simple_self() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_simple_self(_: str, version: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", version)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "source")
     target_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "target")
@@ -631,9 +634,10 @@ def test_simple_self() -> None:
     _check_edges(routing_tables)
 
 
-def test_multi() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_multi(_: str, version: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", version)
     writer = PacmanDataWriter.mock()
     for i in range(N_VERTICES):
         _make_vertices(writer, 1000, N_M_VERTICES, f"app_vertex_{i}")
@@ -647,9 +651,10 @@ def test_multi() -> None:
     _check_edges(routing_tables)
 
 
-def test_multi_self() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_multi_self(_: str, version: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", version)
     writer = PacmanDataWriter.mock()
     for i in range(N_VERTICES):
         _make_vertices(writer, 1000, N_M_VERTICES, f"app_vertex_{i}")
@@ -662,9 +667,10 @@ def test_multi_self() -> None:
     _check_edges(routing_tables)
 
 
-def test_multi_split() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_multi_split(_: str, version: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", version)
     writer = PacmanDataWriter.mock()
     for i in range(N_VERTICES):
         _make_vertices_split(writer, 1000, 3, 2, N_M_VERTICES,
@@ -681,9 +687,10 @@ def test_multi_split() -> None:
     _check_edges(routing_tables)
 
 
-def test_multi_self_split() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_multi_self_split(_: str, version: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", version)
     writer = PacmanDataWriter.mock()
     for i in range(N_VERTICES):
         _make_vertices_split(writer, 1000, 3, 2, N_M_VERTICES,
@@ -699,9 +706,10 @@ def test_multi_self_split() -> None:
     _check_edges(routing_tables)
 
 
-def test_multi_down_chips_and_links() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_multi_down_chips_and_links(_: str, version: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", version)
     writer = PacmanDataWriter.mock()
     for i in range(N_VERTICES):
         _make_vertices(writer, 1000, N_M_VERTICES, f"app_vertex_{i}")
@@ -755,9 +763,10 @@ def test_multi_down_chips_and_links() -> None:
     _check_edges(routing_tables)
 
 
-def test_internal_only() -> None:
+@parameterized.expand(ALL_BOARD_TYPES)
+def test_internal_only(_: str, version: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.text)
+    set_config("Machine", "version", version)
     writer = PacmanDataWriter.mock()
     _make_vertices_split(
         writer, 1000, 3, 2, 2, "app_vertex",
@@ -769,10 +778,10 @@ def test_internal_only() -> None:
     routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
-
-def test_internal_and_split() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_internal_and_split(_: str, version: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", version)
     writer = PacmanDataWriter.mock()
     for i in range(N_VERTICES):
         _make_vertices_split(
@@ -864,9 +873,10 @@ def test_fpga_link_overlap() -> None:
     _check_edges(routing_tables)
 
 
-def test_odd_case() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_odd_case(_: str, version: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", version)
     writer = PacmanDataWriter.mock()
     target_vertex = _make_vertices(writer, 200, 20, "app_vertex")
     delay_vertex = _make_one_to_one_vertices(writer, 200, 20, "delay_vtx")
@@ -898,12 +908,13 @@ def test_odd_case() -> None:
     _check_edges(routing_tables)
 
 
-def test_with_ethernet_system_placements() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_with_ethernet_system_placements(_: str, version: str) -> None:
     # This is a test of LPG-style functionality, where an application vertex
     # is placed on multiple ethernet chips, but the source is only connected
     # to one of them
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", version)
     writer = PacmanDataWriter.mock()
     writer.set_machine(virtual_machine_by_boards(4))
     source_vertex = _make_vertices(writer, 200, 3, "app_vertex")
@@ -946,9 +957,10 @@ def _check_path(source: XY, nodes_fixed: List[Tuple[int, XY]],
             f"Route doesn't end at (5, 5): {nodes_fixed}")
 
 
-def test_route_around() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_route_around(_: str, version: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", version)
     # Take out all the chips around 3,3 except one then make a path that goes
     # through it
     #      3,4 4,4
@@ -971,9 +983,10 @@ def test_route_around() -> None:
     print(nodes_fixed)
 
 
-def test_internal_io_routes() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_internal_io_routes(_: str, version: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", version)
     machine = PacmanDataView.get_machine()
     writer = PacmanDataWriter.mock()
     writer.set_machine(machine)

@@ -12,14 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
+
 from collections import defaultdict
 from typing import Dict, Set
+import unittest
+
+from parameterized import parameterized
 
 from spinn_utilities.config_holder import set_config
 
 from spinn_machine import Machine
-from spinn_machine.version.version_strings import VersionStrings
+from spinn_machine.version import BIG_BOARD_TYPES
 from spinn_machine.virtual_machine import virtual_machine_by_boards
 
 from pacman.config_setup import unittest_setup
@@ -38,9 +41,11 @@ class TestTagsBoardAddresses(unittest.TestCase):
     """
     def setUp(self) -> None:
         unittest_setup()
-        set_config("Machine", "versions", VersionStrings.BIG.text)
+        #set_config("Machine", "versions", VersionStrings.BIG.text)
 
-    def test_ip_tags(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_ip_tags(self, _: str, version: str) -> None:
+        set_config("Machine", "version", version)
         writer = PacmanDataWriter.mock()
         machine = virtual_machine_by_boards(3)
         writer.set_machine(machine)
@@ -128,7 +133,9 @@ class TestTagsBoardAddresses(unittest.TestCase):
             len(tags_by_board[ip_address]), len(eth_chip.tag_ids),
             "Wrong number of tags assigned to first Ethernet")
 
-    def test_fixed_tag(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_fixed_tag(self, _: str, version: str) -> None:
+        set_config("Machine", "version", version)
         writer = PacmanDataWriter.mock()
         machine = writer.get_machine()
         chip00 = machine[0, 0]
@@ -167,21 +174,29 @@ class TestTagsBoardAddresses(unittest.TestCase):
         tags = basic_tag_allocator()
         self.assertEqual(6, len(list(tags.ip_tags_vertices)))
 
-    def test_too_many_ip_tags_for_1_board(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_too_many_ip_tags_for_1_board(self, _: str, version: str) -> None:
+        set_config("Machine", "version", version)
         machine = PacmanDataView.get_machine()
         with self.assertRaises(PacmanNotFoundError):
             self.do_too_many_ip_tags_for_1_board(machine)
 
-    def test_spread_ip_tags(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_spread_ip_tags(self, _: str, version: str) -> None:
+        set_config("Machine", "version", version)
         machine = virtual_machine_by_boards(3)
         self.do_too_many_ip_tags_for_1_board(machine)
 
-    def test_fixed_repeat_tag_1_board(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_fixed_repeat_tag_1_board(self, _: str, version: str) -> None:
+        set_config("Machine", "version", version)
         machine = PacmanDataView.get_machine()
         with self.assertRaises(PacmanNotFoundError):
             self.do_fixed_repeat_tag(machine)
 
-    def test_fixed_repeat_tag_3_boards(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_fixed_repeat_tag_3_boards(self, _: str, version: str) -> None:
+        set_config("Machine", "version", version)
         machine = virtual_machine_by_boards(3)
         self.do_fixed_repeat_tag(machine)
 
@@ -200,6 +215,8 @@ class TestTagsBoardAddresses(unittest.TestCase):
         tags = basic_tag_allocator()
         self.assertEqual(1, len(list(tags.reverse_ip_tags)))
 
-    def test_do_reverse_3_boards(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_do_reverse_3_boards(self, _: str, version: str) -> None:
+        set_config("Machine", "version", version)
         machine = virtual_machine_by_boards(3)
         self.do_reverse(machine)

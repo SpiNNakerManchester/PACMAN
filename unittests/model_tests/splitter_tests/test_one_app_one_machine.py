@@ -14,8 +14,11 @@
 
 import unittest
 
+from parameterized import parameterized
+
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version.version_strings import VersionStrings
+
+from spinn_machine.version import ALL_BOARD_TYPES
 
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
