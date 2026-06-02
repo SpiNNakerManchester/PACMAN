@@ -270,7 +270,6 @@ class MockOneToOneSplitter(AbstractSplitterCommon):
 
 class MockNearestEthernetSplitter(AbstractSplitterCommon):
 
-
     def __init__(self) -> None:
         super().__init__()
         self.__placements = Placements()
@@ -769,6 +768,7 @@ def test_internal_only() -> None:
     writer.set_placements(place_application_graph(Placements()))
     routing_tables = _route_and_time()
     _check_edges(routing_tables)
+
 
 def test_internal_and_split() -> None:
     unittest_setup()
