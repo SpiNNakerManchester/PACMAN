@@ -33,8 +33,8 @@ class TestSplitterFixedLegacy(unittest.TestCase):
         unittest_setup()
 
     @parameterized.expand(ALL_BOARD_TYPES)
-    def test_api(self) -> None:
-        set_config("Machine", "versions", VersionStrings.ANY.text)
+    def test_api(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         splitter: SplitterFixedLegacy = SplitterFixedLegacy()
         self.assertIsNotNone(str(splitter))
         self.assertIsNotNone(repr(splitter))

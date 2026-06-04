@@ -44,8 +44,8 @@ class TestTagsBoardAddresses(unittest.TestCase):
         #set_config("Machine", "versions", VersionStrings.BIG.text)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_ip_tags(self, _: str, version: str) -> None:
-        set_config("Machine", "version", version)
+    def test_ip_tags(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         writer = PacmanDataWriter.mock()
         machine = virtual_machine_by_boards(3)
         writer.set_machine(machine)
@@ -134,8 +134,8 @@ class TestTagsBoardAddresses(unittest.TestCase):
             "Wrong number of tags assigned to first Ethernet")
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_fixed_tag(self, _: str, version: str) -> None:
-        set_config("Machine", "version", version)
+    def test_fixed_tag(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         writer = PacmanDataWriter.mock()
         machine = writer.get_machine()
         chip00 = machine[0, 0]
@@ -175,28 +175,28 @@ class TestTagsBoardAddresses(unittest.TestCase):
         self.assertEqual(6, len(list(tags.ip_tags_vertices)))
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_too_many_ip_tags_for_1_board(self, _: str, version: str) -> None:
-        set_config("Machine", "version", version)
+    def test_too_many_ip_tags_for_1_board(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         machine = PacmanDataView.get_machine()
         with self.assertRaises(PacmanNotFoundError):
             self.do_too_many_ip_tags_for_1_board(machine)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_spread_ip_tags(self, _: str, version: str) -> None:
-        set_config("Machine", "version", version)
+    def test_spread_ip_tags(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         machine = virtual_machine_by_boards(3)
         self.do_too_many_ip_tags_for_1_board(machine)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_fixed_repeat_tag_1_board(self, _: str, version: str) -> None:
-        set_config("Machine", "version", version)
+    def test_fixed_repeat_tag_1_board(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         machine = PacmanDataView.get_machine()
         with self.assertRaises(PacmanNotFoundError):
             self.do_fixed_repeat_tag(machine)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_fixed_repeat_tag_3_boards(self, _: str, version: str) -> None:
-        set_config("Machine", "version", version)
+    def test_fixed_repeat_tag_3_boards(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         machine = virtual_machine_by_boards(3)
         self.do_fixed_repeat_tag(machine)
 
@@ -216,7 +216,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         self.assertEqual(1, len(list(tags.reverse_ip_tags)))
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_do_reverse_3_boards(self, _: str, version: str) -> None:
-        set_config("Machine", "version", version)
+    def test_do_reverse_3_boards(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         machine = virtual_machine_by_boards(3)
         self.do_reverse(machine)
