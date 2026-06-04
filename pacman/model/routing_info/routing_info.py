@@ -13,9 +13,13 @@
 # limitations under the License.
 from __future__ import annotations
 from collections import defaultdict
-from typing import Dict, Iterator, Optional, Iterable, Set, TYPE_CHECKING
-from deprecated import deprecated
-from pacman.exceptions import PacmanAlreadyExistsException
+from typing import (
+    Dict, Iterator, Optional, Iterable, Set, TYPE_CHECKING)
+
+from pacman.exceptions import (
+    PacmanAlreadyExistsException, PacmanRouteInfoAllocationException)
+from pacman.utilities.constants import FULL_MASK
+
 if TYPE_CHECKING:
     from .vertex_routing_info import VertexRoutingInfo
     from pacman.model.graphs import AbstractVertex
@@ -26,13 +30,35 @@ class RoutingInfo(object):
     An association of machine vertices to a non-overlapping set of keys
     and masks.
     """
-    __slots__ = ("_info", )
+    __slots__ = ("_info", "_is_machine_shiftable",
+                 "_global_app_mask", "_global_machine_mask",
+                 "_has_fixed_keys", "_has_app_keys_overlap",
+                 "_has_global_app_masks", "_has_global_machine_masks",
+                 "_max_bits_machine", "_max_bits_atoms",
+                 "_min_bits_machine_and_atoms", "_size_app_part_bits",
+                 "_target_app_bits", "_target_machine_bits",
+                 "_target_atom_bits")
 
     def __init__(self) -> None:
         # Partition information indexed by edge pre-vertex and partition ID
         # name
         self._info: Dict[AbstractVertex,
                          Dict[str, VertexRoutingInfo]] = defaultdict(dict)
+        self._global_app_mask: Optional[int] = None
+        self._global_machine_mask: Optional[int] = None
+        # Temp values to avoid Optionals
+        self._min_bits_machine_and_atoms = -1000
+        self._max_bits_machine = -1000
+        self._max_bits_atoms = -1000
+        self._size_app_part_bits = -1000
+        self._target_app_bits = -1000
+        self._target_machine_bits = -1000
+        self._target_atom_bits = -1000
+        self._is_machine_shiftable = True
+        self._has_fixed_keys = False
+        self._has_app_keys_overlap = False
+        self._has_global_app_masks = True
+        self._has_global_machine_masks = True
 
     def add_routing_info(self, info: VertexRoutingInfo) -> None:
         """
@@ -49,26 +75,8 @@ class RoutingInfo(object):
                 "Routing information", str(info))
 
         self._info[info.vertex][info.partition_id] = info
-
-    @deprecated(reason="This method is unsafe, since it doesn't determine "
-                       "whether the info is missing because there is no "
-                       "outgoing edge, or if the outgoing edge is in another "
-                       "partition and the name is wrong. "
-                       "Use a combination of "
-                       "get_info_from, "
-                       "get_partitions_from, "
-                       "has_info_from, "
-                       "or get_single_info_from")
-    def get_routing_info_from_pre_vertex(
-            self, vertex: AbstractVertex,
-            partition_id: str) -> Optional[VertexRoutingInfo]:
-        """
-        :param vertex: The vertex to search for
-        :param partition_id:
-            The ID of the partition for which to get the routing information
-        :returns: Routing information for a given partition_id from a vertex.
-        """
-        return self._info[vertex].get(partition_id)
+        if self._global_app_mask is not None:
+            self._check_info(info)
 
     def get_info_from(
             self, vertex: AbstractVertex,
@@ -83,32 +91,6 @@ class RoutingInfo(object):
             information
         """
         return self._info[vertex][partition_id]
-
-    @deprecated(reason="This method is unsafe, since it doesn't determine "
-                       "whether the info is missing because there is no "
-                       "outgoing edge, or if the outgoing edge is in another "
-                       "partition and the name is wrong. "
-                       "Use a combination of "
-                       "get_key_from, "
-                       "get_partitions_from, "
-                       "has_info_from, "
-                       "or get_single_key_from")
-    def get_first_key_from_pre_vertex(
-            self, vertex: AbstractVertex, partition_id: str) -> Optional[int]:
-        """
-        Get the first key for the partition starting at a vertex.
-
-        :param vertex: The vertex which the partition starts at
-        :param partition_id:
-            The ID of the partition for which to get the routing information
-        :return: The routing key of the partition
-        """
-        if vertex not in self._info:
-            return None
-        info = self._info[vertex]
-        if partition_id not in info:
-            return None
-        return info[partition_id].key
 
     def get_key_from(
             self, vertex: AbstractVertex, partition_id: str) -> int:
@@ -213,3 +195,194 @@ class RoutingInfo(object):
 
     def __len__(self) -> int:
         return sum(len(v) for v in self._info.values())
+
+    def _check_info(self, info: VertexRoutingInfo) -> None:
+        if info.has_fixed_keys:
+            self._has_fixed_keys = True
+        if not info.has_global_app_masks:
+            self._has_global_app_masks = False
+        if not info.has_global_machine_masks:
+            self._has_global_machine_masks = False
+        if info.has_app_keys_overlap:
+            self._has_app_keys_overlap = True
+        if not info.is_machine_shiftable:
+            self._is_machine_shiftable = False
+        assert self._global_app_mask == info.global_app_mask
+        assert self._global_machine_mask == info.global_machine_mask
+
+    def add_zones(
+            self, min_bits_machine_and_atoms: int, max_bits_machine: int,
+            max_bits_atoms: int, size_app_part_bits: int,
+            target_app_bits: int,
+            target_machine_bits: int, target_atom_bits: int) -> None:
+        """
+        Copy in the zone info from the allocator
+
+        :param min_bits_machine_and_atoms:
+        :param max_bits_machine:
+        :param max_bits_atoms:
+        :param size_app_part_bits:
+        :param target_app_bits:
+        :param target_machine_bits:
+        :param target_atom_bits:
+        :return:
+        """
+        bits = target_machine_bits + target_atom_bits
+        self._global_app_mask = FULL_MASK - ((2 ** bits) - 1)
+        self._global_machine_mask = (
+                FULL_MASK - ((2 ** target_atom_bits) - 1))
+
+        for info in self:
+            info.set_global_masks(
+                self._global_app_mask, self._global_machine_mask)
+            self._check_info(info)
+
+        self._min_bits_machine_and_atoms = min_bits_machine_and_atoms
+        self._max_bits_machine = max_bits_machine
+        self._max_bits_atoms = max_bits_atoms
+        self._size_app_part_bits = size_app_part_bits
+        self._target_app_bits = target_app_bits
+        self._target_machine_bits = target_machine_bits
+        self._target_atom_bits = target_atom_bits
+
+    @property
+    def min_bits_machine_and_atoms(self) -> int:
+        """
+       Minimum size needed for the combined machine and atoms zone
+
+       This is the maximum needed to represent the keys and masks
+       for a single app vertex / partition ID
+        """
+        return self._min_bits_machine_and_atoms
+
+    @property
+    def max_bits_machine(self) -> int:
+        """
+        Maximum number of bits to represent the machine indexes for any vertex
+        """
+        return self._max_bits_machine
+
+    @property
+    def max_bits_atoms(self) -> int:
+        """
+        Maximum number of bits to represent the atoms for any vertex
+        """
+        return self._max_bits_atoms
+
+    @property
+    def size_app_part_bits(self) -> int:
+        """
+        Size of the App vertex / Partition name zone
+
+        This is the calculated size ignoring fixed keys.
+        """
+        return self._size_app_part_bits
+
+    @property
+    def target_app_bits(self) -> int:
+        """
+        Size of the application partition ID part for keys.
+
+        This is the number of application bits used by all vertices.
+
+        It will be at least as big as size_app_part_bits
+
+        It may go as big as the bits not needed by
+        min_bits_machine_and_atoms.
+
+        Ideally it will be the bits not needed by
+        max_bits_machine and max_bits_atoms.
+
+        If there are fixed keys this will be a value that works with the fixed
+        keys and meets the above min and max.
+        """
+        return self._target_app_bits
+
+    @property
+    def target_machine_bits(self) -> int:
+        """
+        Size of the machine part for keys.
+
+        Ideally will be max_bits_machine.
+
+        May be different if fixed masks suggested a workable different value.
+        """
+        return self._target_machine_bits
+
+    @property
+    def target_atom_bits(self) -> int:
+        """
+         Size of the atoms part for vertex that fit the normal case
+
+         Will be at least max_bits_atoms.
+         May be larger if there are extra bits.
+
+         May be larger if fixed masks suggested a workable different value.
+         """
+        return self._target_atom_bits
+
+    @property
+    def is_machine_shiftable(self) -> bool:
+        """
+        Flag to say all infos are Machine mask shiftable
+
+        True if no info.machine_shift will cause an exception
+        """
+        return self._is_machine_shiftable
+
+    @property
+    def has_fixed_keys(self) -> bool:
+        """
+        True if ANY vertex requires fixed keys and masks
+
+        Fixed keys may be global
+        """
+        return self._has_fixed_keys
+
+    @property
+    def has_app_keys_overlap(self) -> bool:
+        """
+        True if infos have the same app_key for multiple Application vertices
+        """
+        return self._has_app_keys_overlap
+
+    @property
+    def has_global_app_masks(self) -> bool:
+        """
+        True if all app masks in ALL infos are
+        global ones defined by the zones
+        """
+        return self._has_global_app_masks
+
+    @property
+    def global_app_mask(self) -> int:
+        """
+        The default app mask for all infos.
+
+        Used for all info except possibly fixed ones
+        """
+        if self._global_app_mask is None:
+            raise PacmanRouteInfoAllocationException(
+                "Global app mask not set")
+        return self._global_app_mask
+
+    @property
+    def has_global_machine_masks(self) -> bool:
+        """
+        True if all app masks in ALL infos are
+        global ones defined by the zones
+        """
+        return self._has_global_machine_masks
+
+    @property
+    def global_machine_mask(self) -> int:
+        """
+        The default Machine Masks for all infos.
+
+        May not be used if there are fixed masks or a combination of Vertices
+        with cores and others with a larger number of atoms per core.
+        """
+        if self._global_machine_mask is None:
+            raise PacmanRouteInfoAllocationException(
+                "Global machine mask not set")
+        return self._global_machine_mask

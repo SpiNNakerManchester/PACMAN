@@ -12,11 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .base_key_and_mask import BaseKeyAndMask
-from .routing_info import RoutingInfo
-from .machine_vertex_routing_info import MachineVertexRoutingInfo
 from .app_vertex_routing_info import AppVertexRoutingInfo
+from .base_key_and_mask import BaseKeyAndMask
+from .fixed_app_vertex_routing_info import FixedAppVertexRoutingInfo
+from .fixed_machine_vertex_routing_info import FixedMachineVertexRoutingInfo
+from .global_app_vertex_routing_info import GlobalAppVertexRoutingInfo
+from .global_machine_vertex_routing_info import GlobalMachineVertexRoutingInfo
+from .machine_vertex_routing_info import MachineVertexRoutingInfo
+from .routing_info import RoutingInfo
+from .specific_app_vertex_routing_info import SpecificAppVertexRoutingInfo
+from .specific_machine_vertex_routing_info import (
+    SpecificMachineVertexRoutingInfo)
 from .vertex_routing_info import VertexRoutingInfo
 
-__all__ = ["BaseKeyAndMask", "MachineVertexRoutingInfo",
-           "RoutingInfo", "AppVertexRoutingInfo", "VertexRoutingInfo"]
+__all__ = ["AppVertexRoutingInfo", "BaseKeyAndMask",
+           "FixedAppVertexRoutingInfo", "FixedMachineVertexRoutingInfo",
+           "GlobalAppVertexRoutingInfo", "GlobalMachineVertexRoutingInfo",
+           "MachineVertexRoutingInfo", "RoutingInfo",
+           "SpecificAppVertexRoutingInfo", "SpecificMachineVertexRoutingInfo",
+           "VertexRoutingInfo"]

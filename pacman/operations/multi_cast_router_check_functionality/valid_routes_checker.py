@@ -21,6 +21,7 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinn_machine import Chip, MulticastRoutingEntry
+
 from pacman.data import PacmanDataView
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanRoutingException)
@@ -35,8 +36,9 @@ from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.routing_tables import (
     AbstractMulticastRoutingTable, MulticastRoutingTables)
 
+
 logger = FormatAdapter(logging.getLogger(__name__))
-range_masks = {FULL_MASK - ((2 ** i) - 1) for i in range(33)}
+range_masks = {FULL_MASK - ((2 ** i) - 1) for i in range(1, 33)}
 
 
 class PlacementTuple(NamedTuple):
@@ -88,6 +90,10 @@ def validate_routes(routing_tables: MulticastRoutingTables) -> None:
                     source, partition.identifier)
 
             for tgt, srcs in target_vertices:
+                if isinstance(tgt, AbstractVirtual):
+                    continue
+                if isinstance(srcs, AbstractVirtual):
+                    continue
                 place = PacmanDataView.get_placement_of_vertex(tgt)
                 for src in srcs:
                     if isinstance(src, ApplicationVertex):
@@ -174,11 +180,11 @@ def _search_route(
             f"[{dest.x}:{dest.y}:{dest.p}]"
             for dest in failed_to_reach_destinations)
         error_message += (
-            "failed to locate all destinations with vertex "
+            "Failed to locate all destinations with vertex "
             f"{source_placement.vertex.label} on processor "
             f"[{source_placement.x}:{source_placement.y}:{source_placement.p}]"
             f" with keys {key_and_mask} as it did not reach destinations "
-            f"{failures}")
+            f"{failures}\n")
 
     # check for error if the trace went to a destination it shouldn't have
     if located_destinations:
@@ -186,11 +192,10 @@ def _search_route(
              f"[{dest.x}:{dest.y}:{dest.p}]"
              for dest in located_destinations)
         error_message += (
-            "trace went to more failed to locate all destinations with "
+            "Extra destinations for "
             f"vertex {source_placement.vertex.label} on processor "
             f"[{source_placement.x}:{source_placement.y}:{source_placement.p}]"
-            f" with keys {key_and_mask} as it didn't reach destinations "
-            f"{failures}")
+            f" with keys {key_and_mask} it incorrectly went to {failures}\n")
 
     if failed_to_cover_all_keys_routers:
         failures = ", ".join(
