@@ -42,7 +42,6 @@ class TestBasicPartitioner(unittest.TestCase):
         setup for all basic partitioner tests
         """
         unittest_setup()
-        #set_config("Machine", "versions", VersionStrings.ANY.text)
 
     @parameterized.expand(ALL_BOARD_TYPES)
     def test_partition_with_no_fixed(self, _: str, ver_num: str) -> None:

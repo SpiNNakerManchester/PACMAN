@@ -41,7 +41,6 @@ class TestTagsBoardAddresses(unittest.TestCase):
     """
     def setUp(self) -> None:
         unittest_setup()
-        #set_config("Machine", "versions", VersionStrings.BIG.text)
 
     @parameterized.expand(BIG_BOARD_TYPES)
     def test_ip_tags(self, _: str, ver_num: str) -> None:
