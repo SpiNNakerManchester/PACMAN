@@ -65,7 +65,8 @@ class TestBasicPartitioner(unittest.TestCase):
                 self.assertEqual(vert.n_atoms, m_vert.vertex_slice.n_atoms)
 
     @parameterized.expand(ALL_BOARD_TYPES)
-    def test_partition_on_large_vertex_than_has_to_be_split(self, _: str, ver_num: str) -> None:
+    def test_partition_on_large_vertex_than_has_to_be_split(
+            self, _: str, ver_num: str) -> None:
         """
         test that partitioning 1 large vertex can make it into 2 small ones
         """

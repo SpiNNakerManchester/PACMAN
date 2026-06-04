@@ -117,6 +117,7 @@ def _make_vertices(
     vertex.splitter.create_machine_vertices(None)
     return vertex
 
+
 @parameterized.expand(BIG_BOARD_TYPES)
 def test_application_placer(_: str, ver_num: str) -> None:
     unittest_setup()
@@ -242,6 +243,7 @@ def test_application_placer_fill_chips(_: str, ver_num: str) -> None:
         n_cores=writer.get_n_machine_vertices()))
     place_application_graph(Placements())
 
+
 @parameterized.expand(ALL_BOARD_TYPES)
 def test_sdram_bigger_than_chip(_: str, ver_num: str) -> None:
     unittest_setup()
@@ -319,6 +321,7 @@ def test_more_cores_with_monitor(_: str, ver_num: str) -> None:
         raise AssertionError("Error not raise")
     except PacmanTooBigToPlace as ex:
         assert ("reserved for monitors" in str(ex))
+
 
 @parameterized.expand(ALL_BOARD_TYPES)
 def test_could_fit(_: str, ver_num: str) -> None:

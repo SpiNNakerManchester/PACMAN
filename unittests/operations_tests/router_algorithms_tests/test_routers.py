@@ -778,6 +778,7 @@ def test_internal_only(_: str, ver_num: str) -> None:
     routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
+
 @parameterized.expand(BIG_BOARD_TYPES)
 def test_internal_and_split(_: str, ver_num: str) -> None:
     unittest_setup()
