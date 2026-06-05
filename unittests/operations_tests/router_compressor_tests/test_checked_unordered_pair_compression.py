@@ -18,7 +18,7 @@ import unittest
 
 from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
-from spinn_machine.version import FIVE
+from spinn_machine.version import SPIN1_GEN
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
@@ -32,7 +32,7 @@ class TestUnorderedPairCompressor(unittest.TestCase):
     def setUp(self) -> None:
         unittest_setup()
         # This tests needs exactly version 5 as on Spin2 it would fit
-        set_config("Machine", "version", str(FIVE))
+        set_config("Machine", "version", str(SPIN1_GEN.FIVE))
 
     def test_onordered_pair_big(self) -> None:
 
