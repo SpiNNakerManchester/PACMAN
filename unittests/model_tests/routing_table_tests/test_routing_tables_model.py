@@ -17,7 +17,7 @@ import unittest
 from spinn_utilities.config_holder import set_config
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from spinn_machine.exceptions import SpinnMachineInvalidParameterException
-from spinn_machine.version import SPIN1_GEN
+from spinn_machine.version import Spin1Gen
 
 from pacman.config_setup import unittest_setup
 from pacman.model.routing_tables import (
@@ -194,7 +194,7 @@ class TestRoutingTable(unittest.TestCase):
             MulticastRoutingTables(mrt)
 
     def test_multicast_routing_table_by_partition(self) -> None:
-        set_config("Machine", "version", str(SPIN1_GEN.FIVE))
+        set_config("Machine", "version", str(Spin1Gen.FIVE))
         mrt = MulticastRoutingTableByPartition()
         partition_id = "foo"
         source_vertex = SimpleMachineVertex(sdram=None)
@@ -216,7 +216,7 @@ class TestRoutingTable(unittest.TestCase):
             source_vertex, partition_id, 0, 0)
 
     def test_multicast_routing_table_by_partition_entry(self) -> None:
-        set_config("Machine", "version", str(SPIN1_GEN.FIVE))
+        set_config("Machine", "version", str(Spin1Gen.FIVE))
         with self.assertRaises(SpinnMachineInvalidParameterException):
             RoutingEntry(link_ids=range(6), processor_ids=range(18),
                          incoming_processor=4, incoming_link=3)

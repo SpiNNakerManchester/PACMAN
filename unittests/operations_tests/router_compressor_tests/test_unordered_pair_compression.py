@@ -18,7 +18,7 @@ import unittest
 
 from spinn_utilities.config_holder import set_config
 from spinn_machine import virtual_machine
-from spinn_machine.version import SPIN1_GEN
+from spinn_machine.version import Spin1Gen
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables.multicast_routing_tables import (from_json)
@@ -33,7 +33,7 @@ class TestUnorderedPairCompressor(unittest.TestCase):
     def setUp(self) -> None:
         unittest_setup()
         # tests against version 5 as Spin2 would not need compression
-        set_config("Machine", "version", str(SPIN1_GEN.FIVE))
+        set_config("Machine", "version", str(Spin1Gen.FIVE))
 
     def test_onordered_pair_big(self) -> None:
         file_path = sys.modules[self.__module__].__file__

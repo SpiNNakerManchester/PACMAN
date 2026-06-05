@@ -18,7 +18,7 @@ from typing import Dict, Set, Tuple
 from spinn_utilities.config_holder import set_config
 
 from spinn_machine import Machine, RoutingEntry, virtual_machine
-from spinn_machine.version import SPIN1_GEN
+from spinn_machine.version import Spin1Gen
 
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
@@ -111,7 +111,7 @@ def test_all_working(width: int, height: int,  version: int,
 
 def test_unreachable() -> None:
     unittest_setup()
-    set_config("Machine", "version", str(SPIN1_GEN.FIVE))
+    set_config("Machine", "version", str(Spin1Gen.FIVE))
     set_config("Machine", "down_chips", "0,2:1,3:1,4")
     with pytest.raises(PacmanRoutingException):
         _check_setup(8, 8)

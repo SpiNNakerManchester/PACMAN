@@ -27,7 +27,7 @@ from spinn_utilities.typing.coords import XY
 
 from spinn_machine import Machine, RoutingEntry
 from spinn_machine.link_data_objects import AbstractLinkData
-from spinn_machine.version import SPIN1_GEN
+from spinn_machine.version import Spin1Gen
 from spinn_machine.version.version_strings import VersionStrings
 from spinn_machine.virtual_machine import (
     virtual_machine_by_boards, virtual_machine_by_cores)
@@ -813,7 +813,7 @@ def test_spinnaker_link(params: Params) -> None:
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     # TODO SPIN2 spinnaker links
-    set_config("Machine", "version", str(SPIN1_GEN.FIVE))
+    set_config("Machine", "version", str(Spin1Gen.FIVE))
     writer = PacmanDataWriter.mock()
     in_device = ApplicationSpiNNakerLinkVertex(100, 0)
     in_device.splitter = SplitterExternalDevice()
