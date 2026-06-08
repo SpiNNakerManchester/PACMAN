@@ -216,7 +216,7 @@ class TestRoutingTable(unittest.TestCase):
             source_vertex, partition_id, 0, 0)
 
     def test_multicast_routing_table_by_partition_entry(self) -> None:
-        set_config("Machine", "version", str(Spin1Gen.value))
+        set_config("Machine", "version", str(Spin1Gen.FIVE.value))
         with self.assertRaises(SpinnMachineInvalidParameterException):
             RoutingEntry(link_ids=range(6), processor_ids=range(18),
                          incoming_processor=4, incoming_link=3)
