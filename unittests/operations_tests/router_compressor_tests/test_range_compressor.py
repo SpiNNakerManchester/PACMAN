@@ -33,7 +33,7 @@ class TestRangeCompressor(unittest.TestCase):
     def setUp(self) -> None:
         unittest_setup()
         # tests against version 5 as Spin2 would not need compression
-        set_config("Machine", "version", str(Spin1Gen.FIVE))
+        set_config("Machine", "version", str(Spin1Gen.FIVE.value))
         set_config(
             "Mapping", "router_table_compress_as_far_as_possible", str(True))
 

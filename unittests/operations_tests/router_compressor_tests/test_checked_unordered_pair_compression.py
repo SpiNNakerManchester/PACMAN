@@ -32,7 +32,7 @@ class TestUnorderedPairCompressor(unittest.TestCase):
     def setUp(self) -> None:
         unittest_setup()
         # This tests needs exactly version 5 as on Spin2 it would fit
-        set_config("Machine", "version", str(Spin1Gen.FIVE))
+        set_config("Machine", "version", str(Spin1Gen.FIVE.value))
 
     def test_onordered_pair_big(self) -> None:
 

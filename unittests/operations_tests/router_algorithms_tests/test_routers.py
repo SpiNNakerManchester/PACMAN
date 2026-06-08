@@ -813,7 +813,7 @@ def test_spinnaker_link(params: Params) -> None:
     algorithm, n_vertices, n_m_vertices = params
     unittest_setup()
     # TODO SPIN2 spinnaker links
-    set_config("Machine", "version", str(Spin1Gen.FIVE))
+    set_config("Machine", "version", str(Spin1Gen.FIVE.value))
     writer = PacmanDataWriter.mock()
     in_device = ApplicationSpiNNakerLinkVertex(100, 0)
     in_device.splitter = SplitterExternalDevice()

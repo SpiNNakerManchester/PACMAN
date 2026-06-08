@@ -111,7 +111,7 @@ def test_all_working(width: int, height: int,  version: int,
 
 def test_unreachable() -> None:
     unittest_setup()
-    set_config("Machine", "version", str(Spin1Gen.FIVE))
+    set_config("Machine", "version", str(Spin1Gen.FIVE.value))
     set_config("Machine", "down_chips", "0,2:1,3:1,4")
     with pytest.raises(PacmanRoutingException):
         _check_setup(8, 8)

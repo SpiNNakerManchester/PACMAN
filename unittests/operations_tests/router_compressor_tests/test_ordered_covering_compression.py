@@ -33,7 +33,7 @@ class TestOrderedCoveringCompressor(unittest.TestCase):
     def setUp(self) -> None:
         unittest_setup()
         # tests against version 5 as Spin2 would not need compression
-        set_config("Machine", "version", str(Spin1Gen.FIVE))
+        set_config("Machine", "version", str(Spin1Gen.FIVE.value))
 
     def test_oc_big(self) -> None:
         class_file = sys.modules[self.__module__].__file__
