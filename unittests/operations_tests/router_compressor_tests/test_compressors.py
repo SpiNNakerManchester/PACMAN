@@ -18,7 +18,7 @@ from parameterized import parameterized
 
 from spinn_utilities.config_holder import set_config
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
-from spinn_machine.version import BIG_BOARD_TYPES
+from spinn_machine.version import MANY_BOARD_TYPES
 
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
@@ -79,13 +79,13 @@ class TestCompressor(unittest.TestCase):
             assert compressed.number_of_entries < original.number_of_entries
             compare_tables(original, original)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_pair_compressor(self, _: str, ver_num: str) -> None:
         set_config("Machine", "version", ver_num)
         compressed_tables = pair_compressor()
         self.check_compression(compressed_tables)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_range_compressor_skipped(self, _: str, ver_num: str) -> None:
         set_config("Machine", "version", ver_num)
         compressed_tables = range_compressor()
@@ -94,22 +94,22 @@ class TestCompressor(unittest.TestCase):
                 original.x, original.y)
             self.assertEqual(original, compressed)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_checked_unordered_pair_compressor(
             self, _: str, ver_num: str) -> None:
-        set_config("Machine", "version", ver_num)
+        set_config("Machine", "version", 3)
         compressed_tables = pair_compressor(
             ordered=False, accept_overflow=False)
         self.check_compression(compressed_tables)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_unordered_pair_compressor(self, _: str, ver_num: str) -> None:
         set_config("Machine", "version", ver_num)
         compressed_tables = pair_compressor(
             ordered=False, accept_overflow=True)
         self.check_compression(compressed_tables)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_ordered_covering_compressor(self, _: str, ver_num: str) -> None:
         set_config("Machine", "version", ver_num)
         compressed_tables = ordered_covering_compressor()

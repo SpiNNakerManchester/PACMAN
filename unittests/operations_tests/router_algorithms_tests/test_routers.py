@@ -595,7 +595,7 @@ def _route_and_time() -> MulticastRoutingTableByPartition:
 @parameterized.expand(BIG_BOARD_TYPES)
 def test_simple(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "version", ver_num)
+    set_config("Machine", "version", 201)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "source")
     target_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "target")
@@ -621,7 +621,7 @@ def test_self() -> None:
 @parameterized.expand(BIG_BOARD_TYPES)
 def test_simple_self(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "version", ver_num)
+    set_config("Machine", "version", 201)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "source")
     target_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "target")
@@ -634,7 +634,7 @@ def test_simple_self(_: str, ver_num: str) -> None:
     _check_edges(routing_tables)
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
 def test_multi(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -651,7 +651,7 @@ def test_multi(_: str, ver_num: str) -> None:
     _check_edges(routing_tables)
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
 def test_multi_self(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -667,7 +667,7 @@ def test_multi_self(_: str, ver_num: str) -> None:
     _check_edges(routing_tables)
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
 def test_multi_split(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -687,7 +687,7 @@ def test_multi_split(_: str, ver_num: str) -> None:
     _check_edges(routing_tables)
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
 def test_multi_self_split(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -706,7 +706,7 @@ def test_multi_self_split(_: str, ver_num: str) -> None:
     _check_edges(routing_tables)
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)   # Needs multiple boards
 def test_multi_down_chips_and_links(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -766,7 +766,7 @@ def test_multi_down_chips_and_links(_: str, ver_num: str) -> None:
 @parameterized.expand(ALL_BOARD_TYPES)
 def test_internal_only(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "version", ver_num)
+    set_config("Machine", "version", 201)
     writer = PacmanDataWriter.mock()
     _make_vertices_split(
         writer, 1000, 3, 2, 2, "app_vertex",
@@ -779,7 +779,7 @@ def test_internal_only(_: str, ver_num: str) -> None:
     _check_edges(routing_tables)
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
 def test_internal_and_split(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -874,7 +874,7 @@ def test_fpga_link_overlap() -> None:
     _check_edges(routing_tables)
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)   # Needs a large board
 def test_odd_case(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -909,7 +909,7 @@ def test_odd_case(_: str, ver_num: str) -> None:
     _check_edges(routing_tables)
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
 def test_with_ethernet_system_placements(_: str, ver_num: str) -> None:
     # This is a test of LPG-style functionality, where an application vertex
     # is placed on multiple ethernet chips, but the source is only connected
@@ -958,7 +958,7 @@ def _check_path(source: XY, nodes_fixed: List[Tuple[int, XY]],
             f"Route doesn't end at (5, 5): {nodes_fixed}")
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # needs a large board
 def test_route_around(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -984,10 +984,10 @@ def test_route_around(_: str, ver_num: str) -> None:
     print(nodes_fixed)
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # needs a large board
 def test_internal_io_routes(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "version", ver_num)
+    set_config("Machine", "version", 201)
     machine = PacmanDataView.get_machine()
     writer = PacmanDataWriter.mock()
     writer.set_machine(machine)

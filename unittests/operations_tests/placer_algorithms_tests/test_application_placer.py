@@ -118,7 +118,7 @@ def _make_vertices(
     return vertex
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
 def test_application_placer(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -137,7 +137,7 @@ def test_application_placer(_: str, ver_num: str) -> None:
     place_application_graph(Placements())
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
 def test_application_placer_large_groups(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -159,7 +159,7 @@ def test_application_placer_large_groups(_: str, ver_num: str) -> None:
     place_application_graph(Placements())
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
 def test_application_placer_too_few_boards(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -184,7 +184,7 @@ def test_application_placer_too_few_boards(_: str, ver_num: str) -> None:
         assert ("No more chips to start" in str(ex))
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES) # Needs multiple boards
 def test_application_placer_restart_needed(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -203,7 +203,7 @@ def test_application_placer_restart_needed(_: str, ver_num: str) -> None:
     place_application_graph(Placements())
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
 def test_application_placer_late_fixed(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
