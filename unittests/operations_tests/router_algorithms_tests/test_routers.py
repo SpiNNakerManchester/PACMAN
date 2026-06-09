@@ -592,10 +592,10 @@ def _route_and_time() -> MulticastRoutingTableByPartition:
     return result
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # Does not work on a 4 chip
 def test_simple(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "version", 201)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "source")
     target_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "target")
@@ -618,10 +618,10 @@ def test_self() -> None:
     _check_edges(routing_tables)
 
 
-@parameterized.expand(BIG_BOARD_TYPES)
+@parameterized.expand(BIG_BOARD_TYPES)  # Does not work on a 4 chip board
 def test_simple_self(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "version", 201)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "source")
     target_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "target")
@@ -766,7 +766,7 @@ def test_multi_down_chips_and_links(_: str, ver_num: str) -> None:
 @parameterized.expand(MANY_BOARD_TYPES)
 def test_internal_only(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "version", 201)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     _make_vertices_split(
         writer, 1000, 3, 2, 2, "app_vertex",
@@ -987,7 +987,7 @@ def test_route_around(_: str, ver_num: str) -> None:
 @parameterized.expand(BIG_BOARD_TYPES)  # needs a large board
 def test_internal_io_routes(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "version", 201)
+    set_config("Machine", "version", ver_num)
     machine = PacmanDataView.get_machine()
     writer = PacmanDataWriter.mock()
     writer.set_machine(machine)
