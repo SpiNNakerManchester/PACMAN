@@ -97,7 +97,7 @@ class TestCompressor(unittest.TestCase):
     @parameterized.expand(MANY_BOARD_TYPES)
     def test_checked_unordered_pair_compressor(
             self, _: str, ver_num: str) -> None:
-        set_config("Machine", "version", 3)
+        set_config("Machine", "version", ver_num)
         compressed_tables = pair_compressor(
             ordered=False, accept_overflow=False)
         self.check_compression(compressed_tables)
