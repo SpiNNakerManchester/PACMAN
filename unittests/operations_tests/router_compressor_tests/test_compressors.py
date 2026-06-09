@@ -13,9 +13,12 @@
 # limitations under the License.
 
 import unittest
+
+from parameterized import parameterized
+
 from spinn_utilities.config_holder import set_config
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
-from spinn_machine.version.version_strings import VersionStrings
+from spinn_machine.version import MANY_BOARD_TYPES
 
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
@@ -63,7 +66,6 @@ class TestCompressor(unittest.TestCase):
         unittest_setup()
         set_config(
             "Mapping", "router_table_compress_as_far_as_possible", "True")
-        set_config("Machine", "versions", VersionStrings.ANY.text)
         writer = PacmanDataWriter.mock()
         writer.set_uncompressed(original_tables)
         writer.set_precompressed(original_tables)
@@ -77,28 +79,39 @@ class TestCompressor(unittest.TestCase):
             assert compressed.number_of_entries < original.number_of_entries
             compare_tables(original, original)
 
-    def test_pair_compressor(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_pair_compressor(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         compressed_tables = pair_compressor()
         self.check_compression(compressed_tables)
 
-    def test_range_compressor_skipped(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_range_compressor_skipped(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         compressed_tables = range_compressor()
         for original in PacmanDataView.get_uncompressed():
             compressed = compressed_tables.get_routing_table_for_chip(
                 original.x, original.y)
             self.assertEqual(original, compressed)
 
-    def test_checked_unordered_pair_compressor(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_checked_unordered_pair_compressor(
+            self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         compressed_tables = pair_compressor(
             ordered=False, accept_overflow=False)
         self.check_compression(compressed_tables)
 
-    def test_unordered_pair_compressor(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_unordered_pair_compressor(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         compressed_tables = pair_compressor(
             ordered=False, accept_overflow=True)
         self.check_compression(compressed_tables)
 
-    def test_ordered_covering_compressor(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_ordered_covering_compressor(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         compressed_tables = ordered_covering_compressor()
         self.check_compression(compressed_tables)
 
