@@ -21,7 +21,7 @@ from spinn_utilities.config_holder import set_config
 from spinn_utilities.overrides import overrides
 
 from spinn_machine.virtual_machine import virtual_machine_by_cores
-from spinn_machine.version import ALL_BOARD_TYPES, BIG_BOARD_TYPES
+from spinn_machine.version import MANY_BOARD_TYPES, BIG_BOARD_TYPES
 
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import (PacmanPlaceException, PacmanTooBigToPlace)
@@ -244,7 +244,7 @@ def test_application_placer_fill_chips(_: str, ver_num: str) -> None:
     place_application_graph(Placements())
 
 
-@parameterized.expand(ALL_BOARD_TYPES)
+@parameterized.expand(MANY_BOARD_TYPES)
 def test_sdram_bigger_than_chip(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -259,7 +259,7 @@ def test_sdram_bigger_than_chip(_: str, ver_num: str) -> None:
         assert ("a Chip only has" in str(ex))
 
 
-@parameterized.expand(ALL_BOARD_TYPES)
+@parameterized.expand(MANY_BOARD_TYPES)
 def test_sdram_bigger_monitors(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -277,7 +277,7 @@ def test_sdram_bigger_monitors(_: str, ver_num: str) -> None:
         assert ("after monitors only" in str(ex))
 
 
-@parameterized.expand(ALL_BOARD_TYPES)
+@parameterized.expand(MANY_BOARD_TYPES)
 def test_more_cores_than_chip(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -291,7 +291,7 @@ def test_more_cores_than_chip(_: str, ver_num: str) -> None:
         assert ("number of cores on a chip" in str(ex))
 
 
-@parameterized.expand(ALL_BOARD_TYPES)
+@parameterized.expand(MANY_BOARD_TYPES)
 def test_more_cores_than_user(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -305,7 +305,7 @@ def test_more_cores_than_user(_: str, ver_num: str) -> None:
         assert ("the user cores" in str(ex))
 
 
-@parameterized.expand(ALL_BOARD_TYPES)
+@parameterized.expand(MANY_BOARD_TYPES)
 def test_more_cores_with_monitor(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
@@ -323,7 +323,7 @@ def test_more_cores_with_monitor(_: str, ver_num: str) -> None:
         assert ("reserved for monitors" in str(ex))
 
 
-@parameterized.expand(ALL_BOARD_TYPES)
+@parameterized.expand(MANY_BOARD_TYPES)
 def test_could_fit(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)

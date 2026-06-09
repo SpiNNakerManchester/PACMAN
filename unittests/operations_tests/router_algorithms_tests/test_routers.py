@@ -26,7 +26,7 @@ from spinn_utilities.typing.coords import XY
 
 from spinn_machine import Machine, RoutingEntry
 from spinn_machine.link_data_objects import AbstractLinkData
-from spinn_machine.version import ALL_BOARD_TYPES, BIG_BOARD_TYPES, FIVE
+from spinn_machine.version import BIG_BOARD_TYPES, FIVE, MANY_BOARD_TYPES
 from spinn_machine.virtual_machine import (
     virtual_machine_by_boards, virtual_machine_by_cores)
 
@@ -763,7 +763,7 @@ def test_multi_down_chips_and_links(_: str, ver_num: str) -> None:
     _check_edges(routing_tables)
 
 
-@parameterized.expand(ALL_BOARD_TYPES)
+@parameterized.expand(MANY_BOARD_TYPES)
 def test_internal_only(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", 201)
