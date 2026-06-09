@@ -18,8 +18,10 @@ test for partitioning
 
 import unittest
 
+from parameterized import parameterized
+
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version.version_strings import VersionStrings
+from spinn_machine.version import MANY_BOARD_TYPES
 
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
@@ -40,12 +42,13 @@ class TestBasicPartitioner(unittest.TestCase):
         setup for all basic partitioner tests
         """
         unittest_setup()
-        set_config("Machine", "versions", VersionStrings.ANY.text)
 
-    def test_partition_with_no_fixed(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_partition_with_no_fixed(self, _: str, ver_num: str) -> None:
         """
         test a partitioning with a graph with no fixed_location
         """
+        set_config("Machine", "version", ver_num)
         vert1 = SimpleTestVertex(10, "New AbstractConstrainedVertex 1")
         vert1.splitter = SplitterFixedLegacy()
         vert2 = SimpleTestVertex(5, "New AbstractConstrainedVertex 2")
@@ -61,10 +64,13 @@ class TestBasicPartitioner(unittest.TestCase):
             for m_vert in vert.machine_vertices:
                 self.assertEqual(vert.n_atoms, m_vert.vertex_slice.n_atoms)
 
-    def test_partition_on_large_vertex_than_has_to_be_split(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_partition_on_large_vertex_than_has_to_be_split(
+            self, _: str, ver_num: str) -> None:
         """
         test that partitioning 1 large vertex can make it into 2 small ones
         """
+        set_config("Machine", "version", ver_num)
         large_vertex = SimpleTestVertex(300, "Large vertex")
         large_vertex.splitter = SplitterFixedLegacy()
         PacmanDataView.add_vertex(large_vertex)
@@ -72,11 +78,13 @@ class TestBasicPartitioner(unittest.TestCase):
         splitter_partitioner()
         self.assertEqual(PacmanDataView.get_n_machine_vertices(), 2)
 
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_partition_on_target_size_vertex_than_has_to_be_split(
-            self) -> None:
+            self, _: str, ver_num: str) -> None:
         """
         test that fixed partitioning causes correct number of vertices
         """
+        set_config("Machine", "version", ver_num)
         large_vertex = SimpleTestVertex(
             1000, "Large vertex", max_atoms_per_core=10)
         large_vertex.splitter = SplitterFixedLegacy()
@@ -84,19 +92,22 @@ class TestBasicPartitioner(unittest.TestCase):
         splitter_partitioner()
         self.assertEqual(PacmanDataView.get_n_machine_vertices(), 100)
 
-    def test_partition_with_empty_graph(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_partition_with_empty_graph(self, _: str, ver_num: str) -> None:
         """
         test that the partitioner can work with an empty graph
         """
+        set_config("Machine", "version", ver_num)
         splitter_partitioner()
         self.assertEqual(PacmanDataView.get_n_machine_vertices(), 0)
 
-    def test_partition_with_fixed_atom(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_partition_with_fixed_atom(self, _: str, ver_num: str) -> None:
         """
         test a partitioning with a graph with fixed atom constraint which\
         should fit but is close to the limit
         """
-
+        set_config("Machine", "version", ver_num)
         # Create a vertex which will be split perfectly into 4 cores
         vertex = SimpleTestVertex(16, max_atoms_per_core=4)
         vertex.splitter = SplitterFixedLegacy()

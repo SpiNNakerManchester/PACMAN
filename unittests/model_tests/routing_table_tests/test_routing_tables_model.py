@@ -13,9 +13,15 @@
 # limitations under the License.
 
 import unittest
-from pacman.config_setup import unittest_setup
+from parameterized import parameterized
+
+from spinn_utilities.config_holder import set_config
+
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from spinn_machine.exceptions import SpinnMachineInvalidParameterException
+from spinn_machine.version import MANY_BOARD_TYPES
+
+from pacman.config_setup import unittest_setup
 from pacman.model.routing_tables import (
     UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.routing_tables.multicast_routing_tables import (
@@ -189,7 +195,10 @@ class TestRoutingTable(unittest.TestCase):
         with self.assertRaises(PacmanAlreadyExistsException):
             MulticastRoutingTables(mrt)
 
-    def test_multicast_routing_table_by_partition(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_multicast_routing_table_by_partition(
+            self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         mrt = MulticastRoutingTableByPartition()
         partition_id = "foo"
         source_vertex = SimpleMachineVertex(sdram=None)
@@ -210,7 +219,10 @@ class TestRoutingTable(unittest.TestCase):
         assert mre == mrt.get_entry_on_coords_for_edge(
             source_vertex, partition_id, 0, 0)
 
-    def test_multicast_routing_table_by_partition_entry(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_multicast_routing_table_by_partition_entry(
+            self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         with self.assertRaises(SpinnMachineInvalidParameterException):
             RoutingEntry(link_ids=range(6), processor_ids=range(18),
                          incoming_processor=4, incoming_link=3)
