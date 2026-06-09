@@ -184,7 +184,7 @@ def test_application_placer_too_few_boards(_: str, ver_num: str) -> None:
         assert ("No more chips to start" in str(ex))
 
 
-@parameterized.expand(BIG_BOARD_TYPES) # Needs multiple boards
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
 def test_application_placer_restart_needed(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)

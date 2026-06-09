@@ -109,6 +109,7 @@ def test_all_working(width: int, height: int,  version: int,
         set_config("Machine", "down_chips", down_str)
     _check_setup(width, height)
 
+
 @parameterized.expand(BIG_BOARD_TYPES)  # Needs an 8 x 8 board
 def test_unreachable(_: str, ver_num: str) -> None:
     unittest_setup()

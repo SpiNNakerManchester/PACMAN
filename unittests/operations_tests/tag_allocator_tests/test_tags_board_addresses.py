@@ -42,7 +42,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
     def setUp(self) -> None:
         unittest_setup()
 
-    @parameterized.expand(BIG_BOARD_TYPES)   #Needs multiple boards
+    @parameterized.expand(BIG_BOARD_TYPES)   # Needs multiple boards
     def test_ip_tags(self, _: str, ver_num: str) -> None:
         set_config("Machine", "version", ver_num)
         writer = PacmanDataWriter.mock()
