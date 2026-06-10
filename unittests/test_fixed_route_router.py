@@ -19,7 +19,7 @@ from parameterized import parameterized
 from spinn_utilities.config_holder import set_config
 
 from spinn_machine import Machine, RoutingEntry, virtual_machine
-from spinn_machine.version import BIG_BOARD_TYPES, Spin1Gen
+from spinn_machine.version import BIG_BOARD_TYPES, Spin1Gen, Spin2Gen
 
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
@@ -76,11 +76,14 @@ def _check_setup(width: int, height: int) -> None:
 
 @pytest.mark.parametrize(
     "version, width,height",
-    [(3, 2, 2),
-     (5, 8, 8),
-     (5, 12, 12),
-     (5, 16, 16),
-     (201, 1, 1)])
+    [(Spin1Gen.THREE.value, 2, 2),
+     (Spin1Gen.FIVE.value, 8, 8),
+     (Spin1Gen.FIVE.value, 12, 12),
+     (Spin1Gen.FIVE.value, 16, 16),
+     (Spin2Gen.SPIN2_1CHIP.value, 1, 1),
+     (Spin2Gen.SPIN2_48CHIP.value, 8, 8),
+     (Spin2Gen.SPIN2_48CHIP.value, 12, 12),
+     (Spin2Gen.SPIN2_48CHIP.value, 16, 16)])
 @pytest.mark.parametrize(
     "with_down_links,with_down_chips",
     [(False, False),
