@@ -19,7 +19,7 @@ from spinn_utilities.config_holder import set_config
 
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from spinn_machine.exceptions import SpinnMachineInvalidParameterException
-from spinn_machine.version import MANY_BOARD_TYPES, Spin1Gen
+from spinn_machine.version import MANY_BOARD_TYPES
 
 from pacman.config_setup import unittest_setup
 from pacman.model.routing_tables import (
