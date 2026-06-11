@@ -161,7 +161,8 @@ class TestBasic(unittest.TestCase):
             basic_routing_table_generator()
 
     @parameterized.expand(MANY_BOARD_TYPES)
-    def test_non_overlapping_different_chips(self, _: str, ver_num: str) -> None:
+    def test_non_overlapping_different_chips(
+            self, _: str, ver_num: str) -> None:
         set_config("Machine", "version", ver_num)
         # Two vertices with non-overlapping routes can use the same key
         writer = PacmanDataWriter.mock()

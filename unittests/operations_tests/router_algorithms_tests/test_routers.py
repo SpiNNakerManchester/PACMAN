@@ -605,6 +605,7 @@ def test_simple(_: str, ver_num: str) -> None:
     routing_tables = _route_and_time()
     _check_edges(routing_tables)
 
+
 @parameterized.expand(MANY_BOARD_TYPES)
 def test_self(_: str, ver_num: str) -> None:
     unittest_setup()
