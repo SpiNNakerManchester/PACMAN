@@ -115,9 +115,14 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     @overrides(ApplicationVirtualVertex.get_outgoing_link_data)
     def get_outgoing_link_data(self, machine: Machine) -> FPGALinkData:
+        _ = machine
         fpga = self._outgoing_fpga_connection
         if fpga is None:
             raise NotImplementedError("This vertex doesn't have outgoing data")
-        return machine.get_fpga_link_with_id(
+        # delayed import due to circular dependencies
+        # pylint: disable=import-outside-topleve
+        from pacman.data import PacmanDataView
+        fpga_links = PacmanDataView.get_fpga_links()
+        return fpga_links.get_fpga_link_with_id(
             fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
             fpga.chip_coords)
