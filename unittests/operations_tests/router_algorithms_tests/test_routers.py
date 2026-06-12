@@ -26,7 +26,7 @@ from spinn_utilities.typing.coords import XY
 
 from spinn_machine import Machine, RoutingEntry
 from spinn_machine.link_data_objects import AbstractLinkData
-from spinn_machine.version import BIG_BOARD_TYPES, FIVE, MANY_BOARD_TYPES
+from spinn_machine.version import BIG_BOARD_TYPES, MANY_BOARD_TYPES, Spin1Gen
 from spinn_machine.virtual_machine import (
     virtual_machine_by_boards, virtual_machine_by_cores)
 
@@ -606,9 +606,10 @@ def test_simple(_: str, ver_num: str) -> None:
     _check_edges(routing_tables)
 
 
-def test_self() -> None:
+@parameterized.expand(MANY_BOARD_TYPES)
+def test_self(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "version", "5")
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     source_vertex = _make_vertices(writer, 1000, N_M_VERTICES, "self")
     writer.add_edge(ApplicationEdge(source_vertex, source_vertex), "Test")
@@ -802,8 +803,8 @@ def test_internal_and_split(_: str, ver_num: str) -> None:
 
 def test_spinnaker_link() -> None:
     unittest_setup()
-    # TODO SPIN2 spinnaker links
-    set_config("Machine", "version", str(FIVE))
+    # Needs more than 4 Chips. Spin2 has different links
+    set_config("Machine", "version", str(Spin1Gen.FIVE.value))
     writer = PacmanDataWriter.mock()
     in_device = ApplicationSpiNNakerLinkVertex(100, 0)
     in_device.splitter = SplitterExternalDevice()
@@ -826,8 +827,8 @@ def test_spinnaker_link() -> None:
 
 def test_fpga_link() -> None:
     unittest_setup()
-    # TODO spin2 fpga
-    set_config("Machine", "version", "5")
+    # Needs more than 4 Chips and Spin2 has different links
+    set_config("Machine", "version", str(Spin1Gen.FIVE.value))
     writer = PacmanDataWriter.mock()
     in_device = ApplicationFPGAVertex(
         100, [FPGAConnection(0, 0, None, None)], None)
@@ -853,8 +854,8 @@ def test_fpga_link() -> None:
 
 def test_fpga_link_overlap() -> None:
     unittest_setup()
-    # TODO Spin2 links
-    set_config("Machine", "version", "5")
+    # Needs more than 4 Chips and Spin2 has different links
+    set_config("Machine", "version", str(Spin1Gen.FIVE.value))
     writer = PacmanDataWriter.mock()
     set_config("Machine", "down_chips", "6,1")
     in_device = ApplicationFPGAVertex(
