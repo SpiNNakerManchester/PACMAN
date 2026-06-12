@@ -15,8 +15,8 @@
 import math
 from typing import Optional
 from spinn_utilities.overrides import overrides
-from spinn_machine import Machine
 from spinn_machine.link_data_objects import SpinnakerLinkData
+from spinn_machine.spinnaker_links import SpinnakerLinks
 from pacman.model.graphs.common.slice import Slice
 from .application_virtual_vertex import ApplicationVirtualVertex
 
@@ -57,6 +57,8 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         self._n_machine_vertices = n_machine_vertices
         self._incoming = incoming
         self._outgoing = outgoing
+        # Fail fast if wrong version
+        SpinnakerLinks.get_spinnaker_version()
 
     @property
     @overrides(ApplicationVirtualVertex.n_atoms)
@@ -119,13 +121,15 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         return self._outgoing
 
     @overrides(ApplicationVirtualVertex.get_outgoing_link_data)
-    def get_outgoing_link_data(self, machine: Machine) -> SpinnakerLinkData:
+    def get_outgoing_link_data(self) -> SpinnakerLinkData:
         if not self._outgoing:
             raise NotImplementedError("This vertex doesn't have outgoing data")
-        link = machine.get_spinnaker_link_with_id(
+        # delayed import due to circular dependencies
+        # pylint: disable=import-outside-topleve
+        from pacman.data import PacmanDataView
+        spinnaker_links = PacmanDataView.get_spinnaker_links()
+        return spinnaker_links.get_spinnaker_link_with_id(
             self._spinnaker_link_id, self._board_address)
-        assert link is not None, f"no link data for {self} on {machine}"
-        return link
 
     @overrides(ApplicationVirtualVertex.get_max_atoms_per_core)
     def get_max_atoms_per_core(self) -> int:

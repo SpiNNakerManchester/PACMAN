@@ -22,7 +22,6 @@ from pacman.model.graphs.common.slice import Slice
 from .application_virtual_vertex import ApplicationVirtualVertex
 if TYPE_CHECKING:
     from spinn_machine.link_data_objects import FPGALinkData
-    from spinn_machine import Machine
     from .fpga_connection import FPGAConnection
 
 
@@ -120,8 +119,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         return self._outgoing_fpga_connection
 
     @overrides(ApplicationVirtualVertex.get_outgoing_link_data)
-    def get_outgoing_link_data(self, machine: Machine) -> FPGALinkData:
-        _ = machine
+    def get_outgoing_link_data(self) -> FPGALinkData:
         fpga = self._outgoing_fpga_connection
         if fpga is None:
             raise NotImplementedError("This vertex doesn't have outgoing data")

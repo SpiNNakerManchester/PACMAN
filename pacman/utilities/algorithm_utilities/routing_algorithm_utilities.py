@@ -140,7 +140,7 @@ def vertex_xy(vertex: MachineVertex) -> XY:
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)
         return placement.x, placement.y
-    link_data = vertex.get_link_data(PacmanDataView.get_machine())
+    link_data = vertex.get_link_data()
     return link_data.connected_chip_x, link_data.connected_chip_y
 
 
@@ -153,7 +153,7 @@ def vertex_chip(vertex: MachineVertex) -> Chip:
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)
         return machine[placement.x, placement.y]
-    link_data = vertex.get_link_data(machine)
+    link_data = vertex.get_link_data()
     return machine[link_data.connected_chip_x, link_data.connected_chip_y]
 
 
@@ -171,7 +171,6 @@ def vertex_xy_and_route(vertex: MachineVertex) -> Tuple[
     if not isinstance(vertex, AbstractVirtual):
         placement = PacmanDataView.get_placement_of_vertex(vertex)
         return (placement.x, placement.y), (vertex, placement.p, None)
-    machine = PacmanDataView.get_machine()
-    link_data = vertex.get_link_data(machine)
+    link_data = vertex.get_link_data()
     return ((link_data.connected_chip_x, link_data.connected_chip_y),
             (vertex, None, link_data.connected_link))

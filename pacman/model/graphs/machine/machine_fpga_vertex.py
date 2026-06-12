@@ -20,7 +20,6 @@ from pacman.model.resources import ConstantSDRAM
 from .machine_vertex import MachineVertex
 if TYPE_CHECKING:
     from spinn_utilities.typing.coords import XY
-    from spinn_machine import Machine
     from spinn_machine.link_data_objects import FPGALinkData
     from pacman.model.graphs.application import ApplicationVertex
     from pacman.model.graphs.common import Slice
@@ -122,8 +121,7 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
         return self._outgoing
 
     @overrides(AbstractVirtual.get_link_data)
-    def get_link_data(self, machine: Machine) -> FPGALinkData:
-        _ = machine
+    def get_link_data(self) -> FPGALinkData:
         # delayed import due to circular dependencies
         # pylint: disable=import-outside-topleve
         from pacman.data import PacmanDataView

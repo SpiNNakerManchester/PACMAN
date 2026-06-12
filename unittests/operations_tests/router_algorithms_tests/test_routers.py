@@ -538,7 +538,8 @@ def _add_virtual(expected_virtual: Set[Tuple[int, int, int]],
         link_data = PacmanDataView.get_fpga_links().get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)
     elif isinstance(vertex, MachineSpiNNakerLinkVertex):
-        link_data = PacmanDataView.get_machine().get_spinnaker_link_with_id(
+        s_links = PacmanDataView.get_spinnaker_links()
+        link_data = s_links.get_spinnaker_link_with_id(
             vertex.spinnaker_link_id, vertex.board_address)
     if link_data is not None:
         expected_virtual.add((

@@ -18,7 +18,6 @@ from spinn_utilities.require_subclass import require_subclass
 from pacman.model.graphs import AbstractVertex
 if TYPE_CHECKING:
     from spinn_utilities.typing.coords import XY
-    from spinn_machine import Machine
     from spinn_machine.link_data_objects import AbstractLinkData
     from pacman.model.routing_info import BaseKeyAndMask
 
@@ -82,11 +81,10 @@ class AbstractVirtual(object):
         raise NotImplementedError
 
     @abstractmethod
-    def get_link_data(self, machine: Machine) -> AbstractLinkData:
+    def get_link_data(self) -> AbstractLinkData:
         """
         Get link data from the machine.
 
-        :param machine: The machine to get the data from
         :returns: The link of the type used by the specific vertex.
         """
         raise NotImplementedError

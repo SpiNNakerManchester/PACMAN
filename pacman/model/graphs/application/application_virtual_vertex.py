@@ -14,7 +14,6 @@
 from typing import Optional
 
 from spinn_utilities.abstract_base import abstractmethod
-from spinn_machine import Machine
 from spinn_machine.link_data_objects import AbstractLinkData
 from .application_vertex import ApplicationVertex
 
@@ -27,11 +26,10 @@ class ApplicationVirtualVertex(ApplicationVertex):
     __slots__ = ()
 
     @abstractmethod
-    def get_outgoing_link_data(self, machine: Machine) -> AbstractLinkData:
+    def get_outgoing_link_data(self) -> AbstractLinkData:
         """
         Get the link data for outgoing connections from the machine.
 
-        :param machine: The machine to get the link data from
         :returns: the outgoing link data of the vertex's type
         """
         raise NotImplementedError
