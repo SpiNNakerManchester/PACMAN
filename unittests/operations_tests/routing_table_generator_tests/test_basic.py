@@ -14,8 +14,14 @@
 
 import unittest
 from typing import Optional, cast
+
+from parameterized import parameterized
 from typing_extensions import Self
+
 from spinn_utilities.config_holder import set_config
+
+from spinn_machine.version import BIG_BOARD_TYPES, MANY_BOARD_TYPES, Spin1Gen
+
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.application import ApplicationEdge
@@ -61,9 +67,6 @@ class TestBasic(unittest.TestCase):
 
     def setUp(self) -> None:
         unittest_setup()
-        # TODO check after
-        #  https://github.com/SpiNNakerManchester/PACMAN/pull/555
-        set_config("Machine", "version", "5")
 
     def create_graphs3(self, writer: PacmanDataWriter) -> None:
         v1 = SimpleTestVertex(
@@ -94,7 +97,9 @@ class TestBasic(unittest.TestCase):
         allocator = ZonedRoutingInfoAllocator()
         writer.set_routing_infos(allocator.allocate())
 
-    def test_empty(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_empty(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         writer = PacmanDataWriter.mock()
         self.make_infos(writer)
         data = basic_routing_table_generator()
@@ -102,6 +107,8 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(0, len(list(data.routing_tables)))
 
     def test_graph3_with_system(self) -> None:
+        # Hard coded values that only work on version 5
+        set_config("Machine", "version", str(Spin1Gen.FIVE.value))
         writer = PacmanDataWriter.mock()
         self.create_graphs3(writer)
         system_plaements = Placements()
@@ -114,6 +121,8 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(5, len(list(data.routing_tables)))
 
     def test_overlapping(self) -> None:
+        # Hard coded values that only work on version 5
+        set_config("Machine", "version", str(Spin1Gen.FIVE.value))
         # Two vertices in the same router can't send with the same key
         writer = PacmanDataWriter.mock()
         v_target = SimpleTestVertex(1, splitter=SplitterFixedLegacy())
@@ -131,7 +140,9 @@ class TestBasic(unittest.TestCase):
         with self.assertRaises(KeyError):
             basic_routing_table_generator()
 
-    def test_overlapping_different_chips(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple chips
+    def test_overlapping_different_chips(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         # Two vertices in the same router can't send with the same key
         writer = PacmanDataWriter.mock()
         v_target = SimpleTestVertex(1, splitter=SplitterFixedLegacy())
@@ -149,7 +160,10 @@ class TestBasic(unittest.TestCase):
         with self.assertRaises(KeyError):
             basic_routing_table_generator()
 
-    def test_non_overlapping_different_chips(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_non_overlapping_different_chips(
+            self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         # Two vertices with non-overlapping routes can use the same key
         writer = PacmanDataWriter.mock()
         v_target_1 = FixedKeyAppVertex(None)
