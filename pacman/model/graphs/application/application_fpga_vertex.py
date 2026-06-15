@@ -16,7 +16,7 @@ from typing import Iterable, List, Optional, TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
-from spinn_machine.fpga_links import FpgaLinks
+from spinn_machine.fpga_links import FPGALinks
 
 from pacman.model.graphs.common.slice import Slice
 from .application_virtual_vertex import ApplicationVirtualVertex
@@ -63,7 +63,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         self._outgoing_fpga_connection = outgoing_fpga_connection
         self._n_machine_vertices_per_link = n_machine_vertices_per_link
         # Fail fast if wrong version
-        FpgaLinks.get_fpga_version()
+        FPGALinks.get_fpga_version()
 
     @property
     @overrides(ApplicationVirtualVertex.n_atoms)
