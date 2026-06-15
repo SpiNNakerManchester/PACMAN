@@ -124,7 +124,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         if fpga is None:
             raise NotImplementedError("This vertex doesn't have outgoing data")
         # delayed import due to circular dependencies
-        # pylint: disable=import-outside-topleve
+        # pylint: disable=import-outside-toplevel
         from pacman.data import PacmanDataView
         fpga_links = PacmanDataView.get_fpga_links()
         return fpga_links.get_fpga_link_with_id(

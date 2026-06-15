@@ -125,7 +125,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         if not self._outgoing:
             raise NotImplementedError("This vertex doesn't have outgoing data")
         # delayed import due to circular dependencies
-        # pylint: disable=import-outside-topleve
+        # pylint: disable=import-outside-toplevel
         from pacman.data import PacmanDataView
         spinnaker_links = PacmanDataView.get_spinnaker_links()
         return spinnaker_links.get_spinnaker_link_with_id(
