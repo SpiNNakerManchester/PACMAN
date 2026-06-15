@@ -14,11 +14,12 @@
 
 import pytest
 from typing import Dict, Set, Tuple
+from parameterized import parameterized
 
 from spinn_utilities.config_holder import set_config
 
 from spinn_machine import Machine, RoutingEntry, virtual_machine
-from spinn_machine.version import FIVE
+from spinn_machine.version import BIG_BOARD_TYPES, Spin1Gen, Spin2Gen
 
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
@@ -75,11 +76,14 @@ def _check_setup(width: int, height: int) -> None:
 
 @pytest.mark.parametrize(
     "version, width,height",
-    [(3, 2, 2),
-     (5, 8, 8),
-     (5, 12, 12),
-     (5, 16, 16),
-     (201, 1, 1)])
+    [(Spin1Gen.THREE.value, 2, 2),
+     (Spin1Gen.FIVE.value, 8, 8),
+     (Spin1Gen.FIVE.value, 12, 12),
+     (Spin1Gen.FIVE.value, 16, 16),
+     (Spin2Gen.SPIN2_1CHIP.value, 1, 1),
+     (Spin2Gen.SPIN2_48CHIP.value, 8, 8),
+     (Spin2Gen.SPIN2_48CHIP.value, 12, 12),
+     (Spin2Gen.SPIN2_48CHIP.value, 16, 16)])
 @pytest.mark.parametrize(
     "with_down_links,with_down_chips",
     [(False, False),
@@ -109,9 +113,10 @@ def test_all_working(width: int, height: int,  version: int,
     _check_setup(width, height)
 
 
-def test_unreachable() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs an 8 x 8 board
+def test_unreachable(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "version", str(FIVE))
+    set_config("Machine", "version", ver_num)
     set_config("Machine", "down_chips", "0,2:1,3:1,4")
     with pytest.raises(PacmanRoutingException):
         _check_setup(8, 8)

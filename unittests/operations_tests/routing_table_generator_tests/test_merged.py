@@ -15,7 +15,11 @@
 from typing import Optional
 import unittest
 
+from parameterized import parameterized
+
 from spinn_utilities.config_holder import set_config
+
+from spinn_machine.version import BIG_BOARD_TYPES, MANY_BOARD_TYPES, Spin1Gen
 
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
@@ -43,9 +47,6 @@ class TestMerged(unittest.TestCase):
 
     def setUp(self) -> None:
         unittest_setup()
-        # TODO check after
-        #  https://github.com/SpiNNakerManchester/PACMAN/pull/555
-        set_config("Machine", "version", "5")
 
     def create_graphs1(self, writer: PacmanDataWriter) -> None:
         v1 = SimpleTestVertex(
@@ -102,14 +103,18 @@ class TestMerged(unittest.TestCase):
         allocator = ZonedRoutingInfoAllocator()
         writer.set_routing_infos(allocator.allocate())
 
-    def test_empty(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_empty(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         writer = PacmanDataWriter.mock()
         self.make_infos(writer)
         data = merged_routing_table_generator()
         self.assertEqual(0, data.get_max_number_of_entries())
         self.assertEqual(0, len(list(data.routing_tables)))
 
-    def test_graph1(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_graph1(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         writer = PacmanDataWriter.mock()
         self.create_graphs1(writer)
         self.make_infos(writer)
@@ -118,6 +123,8 @@ class TestMerged(unittest.TestCase):
         self.assertEqual(1, len(list(data.routing_tables)))
 
     def test_graph2(self) -> None:
+        # test has specific version 5 values
+        set_config("Machine", "version", str(Spin1Gen.FIVE.value))
         writer = PacmanDataWriter.mock()
         self.create_graphs3(writer)
         self.make_infos(writer)
@@ -126,6 +133,8 @@ class TestMerged(unittest.TestCase):
         self.assertEqual(5, len(list(data.routing_tables)))
 
     def test_graph3_with_system(self) -> None:
+        # test has specific version 5 values
+        set_config("Machine", "version", str(Spin1Gen.FIVE.value))
         writer = PacmanDataWriter.mock()
         self.create_graphs3(writer)
         system_plaements = Placements()
@@ -136,7 +145,9 @@ class TestMerged(unittest.TestCase):
         self.assertEqual(6, data.get_max_number_of_entries())
         self.assertEqual(5, len(list(data.routing_tables)))
 
-    def test_bad_infos(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_bad_infos(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         writer = PacmanDataWriter.mock()
         self.create_graphs1(writer)
         self.make_infos(writer)
@@ -160,7 +171,9 @@ class TestMerged(unittest.TestCase):
             check.append(ten.pop())
         self.assertEqual(10, len(check))
 
-    def test_overlapping(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_overlapping(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         # Two vertices in the same router can't send with the same key
         writer = PacmanDataWriter.mock()
         v_target = SimpleTestVertex(1, splitter=SplitterFixedLegacy())
@@ -172,13 +185,15 @@ class TestMerged(unittest.TestCase):
         writer.add_edge(ApplicationEdge(v1, v_target), "Test")
         writer.add_edge(ApplicationEdge(v2, v_target), "Test")
         system_placements = Placements()
-        system_placements.add_placement(Placement(v1.machine_vertex, 0, 0, 1))
-        system_placements.add_placement(Placement(v2.machine_vertex, 0, 0, 2))
+        system_placements.add_placement(Placement(v1.machine_vertex, 0, 0, 3))
+        system_placements.add_placement(Placement(v2.machine_vertex, 0, 0, 4))
         self.make_infos(writer, system_placements)
         with self.assertRaises(KeyError):
             merged_routing_table_generator()
 
-    def test_overlapping_different_chips(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple Chips
+    def test_overlapping_different_chips(self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         # Two vertices in the same router can't send with the same key
         writer = PacmanDataWriter.mock()
         v_target = SimpleTestVertex(1, splitter=SplitterFixedLegacy())
@@ -196,7 +211,10 @@ class TestMerged(unittest.TestCase):
         with self.assertRaises(KeyError):
             merged_routing_table_generator()
 
-    def test_non_overlapping_different_chips(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_non_overlapping_different_chips(
+            self, _: str, ver_num: str) -> None:
+        set_config("Machine", "version", ver_num)
         # Two vertices with non-overlapping routes can use the same key
         writer = PacmanDataWriter.mock()
         v_target_1 = FixedKeyAppVertex(None)

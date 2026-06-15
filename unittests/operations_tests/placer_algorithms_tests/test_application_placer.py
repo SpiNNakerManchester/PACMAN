@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from typing import Iterable, List, Optional, Sequence, Tuple
+
+from parameterized import parameterized
 
 from spinn_utilities.config_holder import set_config
 from spinn_utilities.overrides import overrides
 
 from spinn_machine.virtual_machine import virtual_machine_by_cores
-from spinn_machine.version.version_strings import VersionStrings
+from spinn_machine.version import MANY_BOARD_TYPES, BIG_BOARD_TYPES
 
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import (PacmanPlaceException, PacmanTooBigToPlace)
@@ -115,9 +118,10 @@ def _make_vertices(
     return vertex
 
 
-def test_application_placer() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
+def test_application_placer(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
@@ -133,9 +137,10 @@ def test_application_placer() -> None:
     place_application_graph(Placements())
 
 
-def test_application_placer_large_groups() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
+def test_application_placer_large_groups(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     version = writer.get_machine_version()
     # fixed early works as this vertex is looked at first
@@ -145,8 +150,7 @@ def test_application_placer_large_groups() -> None:
     writer.add_vertex(fixed)
     fixed.splitter.create_machine_vertices(ChipCounter())
     # make groups to fill chips
-    n_machine_vertices = (
-            version.max_cores_per_chip - version.n_scamp_cores - 1)
+    n_machine_vertices = version.max_cores_per_chip - version.n_scamp_cores - 1
     for i in range(17):
         _make_vertices(
             writer, 1000, 14, n_machine_vertices, f"app_vertex_{i}")
@@ -155,9 +159,10 @@ def test_application_placer_large_groups() -> None:
     place_application_graph(Placements())
 
 
-def test_application_placer_too_few_boards() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
+def test_application_placer_too_few_boards(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
@@ -179,9 +184,10 @@ def test_application_placer_too_few_boards() -> None:
         assert ("No more chips to start" in str(ex))
 
 
-def test_application_placer_restart_needed() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
+def test_application_placer_restart_needed(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     for (x, y) in [(1, 0), (1, 1), (0, 1)]:
         fixed = SimpleTestVertex(15, f"FIXED {x}:{y}", max_atoms_per_core=1)
@@ -197,9 +203,10 @@ def test_application_placer_restart_needed() -> None:
     place_application_graph(Placements())
 
 
-def test_application_placer_late_fixed() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)  # Needs multiple boards
+def test_application_placer_late_fixed(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     for i in range(56):
         _make_vertices(writer, 1000, 14, 5, f"app_vertex_{i}")
@@ -215,9 +222,10 @@ def test_application_placer_late_fixed() -> None:
     place_application_graph(Placements())
 
 
-def test_application_placer_fill_chips() -> None:
+@parameterized.expand(BIG_BOARD_TYPES)
+def test_application_placer_fill_chips(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.BIG.text)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     # fixed early works as this vertex is looked at first
     fixed = SimpleTestVertex(10, "FIXED", max_atoms_per_core=1)
@@ -236,9 +244,10 @@ def test_application_placer_fill_chips() -> None:
     place_application_graph(Placements())
 
 
-def test_sdram_bigger_than_chip() -> None:
+@parameterized.expand(MANY_BOARD_TYPES)
+def test_sdram_bigger_than_chip(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.text)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     max_sdram = writer.get_machine_version().max_sdram_per_chip
     _make_vertices(writer, 1, 1, 5, "big_app_vertex",
@@ -250,9 +259,10 @@ def test_sdram_bigger_than_chip() -> None:
         assert ("a Chip only has" in str(ex))
 
 
-def test_sdram_bigger_monitors() -> None:
+@parameterized.expand(MANY_BOARD_TYPES)
+def test_sdram_bigger_monitors(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.text)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     max_sdram = writer.get_machine_version().max_sdram_per_chip
     monitor = SimpleMachineVertex(ConstantSDRAM(max_sdram // 2))
@@ -267,9 +277,10 @@ def test_sdram_bigger_monitors() -> None:
         assert ("after monitors only" in str(ex))
 
 
-def test_more_cores_than_chip() -> None:
+@parameterized.expand(MANY_BOARD_TYPES)
+def test_more_cores_than_chip(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.text)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     many = writer.get_machine_version().max_cores_per_chip + 1
     _make_vertices(writer, 1, 1, many, "big_app_vertex")
@@ -280,9 +291,10 @@ def test_more_cores_than_chip() -> None:
         assert ("number of cores on a chip" in str(ex))
 
 
-def test_more_cores_than_user() -> None:
+@parameterized.expand(MANY_BOARD_TYPES)
+def test_more_cores_than_user(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.text)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     many = writer.get_machine_version().max_cores_per_chip
     _make_vertices(writer, 1, 1, many, "big_app_vertex")
@@ -293,9 +305,10 @@ def test_more_cores_than_user() -> None:
         assert ("the user cores" in str(ex))
 
 
-def test_more_cores_with_monitor() -> None:
+@parameterized.expand(MANY_BOARD_TYPES)
+def test_more_cores_with_monitor(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.text)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(4000))
     # This is purely an info call so test check directly
@@ -310,9 +323,10 @@ def test_more_cores_with_monitor() -> None:
         assert ("reserved for monitors" in str(ex))
 
 
-def test_could_fit() -> None:
+@parameterized.expand(MANY_BOARD_TYPES)
+def test_could_fit(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.text)
+    set_config("Machine", "version", ver_num)
     writer = PacmanDataWriter.mock()
     monitor = SimpleMachineVertex(ConstantSDRAM(0))
     writer.add_sample_monitor_vertex(monitor, True)
