@@ -29,7 +29,7 @@ class TestApplicationOther(unittest.TestCase):
     def setUp(self) -> None:
         unittest_setup()
 
-    def test_spinnaker_fail_fast(self):
+    def test_spinnaker_fail_fast(self) -> None:
         set_config("Machine", "version", str(Spin2Gen.SPIN2_48CHIP.value))
         with self.assertRaises(SpinnMachineException):
             ApplicationSpiNNakerLinkVertex(100, 2, "127.4.5.6")
