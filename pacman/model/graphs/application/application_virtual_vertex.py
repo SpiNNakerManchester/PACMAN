@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from spinn_utilities.abstract_base import abstractmethod
-from spinn_machine import Machine
 from spinn_machine.link_data_objects import AbstractLinkData
 from .application_vertex import ApplicationVertex
 
@@ -25,11 +25,10 @@ class ApplicationVirtualVertex(ApplicationVertex):
     __slots__ = ()
 
     @abstractmethod
-    def get_outgoing_link_data(self, machine: Machine) -> AbstractLinkData:
+    def get_outgoing_link_data(self) -> AbstractLinkData:
         """
         Get the link data for outgoing connections from the machine.
 
-        :param machine: The machine to get the link data from
         :returns: the outgoing link data of the vertex's type
         """
         raise NotImplementedError

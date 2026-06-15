@@ -14,12 +14,12 @@
 from __future__ import annotations
 from typing import List, Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs import AbstractVirtual
 from pacman.model.resources import ConstantSDRAM
 from .machine_vertex import MachineVertex
 if TYPE_CHECKING:
     from spinn_utilities.typing.coords import XY
-    from spinn_machine import Machine
     from spinn_machine.link_data_objects import FPGALinkData
     from pacman.model.graphs.application import ApplicationVertex
     from pacman.model.graphs.common import Slice
@@ -121,7 +121,11 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
         return self._outgoing
 
     @overrides(AbstractVirtual.get_link_data)
-    def get_link_data(self, machine: Machine) -> FPGALinkData:
-        return machine.get_fpga_link_with_id(
+    def get_link_data(self) -> FPGALinkData:
+        # delayed import due to circular dependencies
+        # pylint: disable=import-outside-toplevel
+        from pacman.data import PacmanDataView
+        fpga_links = PacmanDataView.get_fpga_links()
+        return fpga_links.get_fpga_link_with_id(
             self._fpga_id, self._fpga_link_id, self._board_address,
             self._linked_chip_coordinates)

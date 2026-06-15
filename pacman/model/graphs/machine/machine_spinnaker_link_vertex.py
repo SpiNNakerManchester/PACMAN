@@ -22,7 +22,6 @@ from .machine_vertex import MachineVertex
 
 if TYPE_CHECKING:
     from spinn_utilities.typing.coords import XY
-    from spinn_machine import Machine
     from spinn_machine.link_data_objects import SpinnakerLinkData
     from pacman.model.graphs.application import ApplicationVertex
     from pacman.model.graphs.common import Slice
@@ -114,7 +113,11 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractVirtual):
         return self._outgoing
 
     @overrides(AbstractVirtual.get_link_data)
-    def get_link_data(self, machine: Machine) -> SpinnakerLinkData:
-        return machine.get_spinnaker_link_with_id(
+    def get_link_data(self) -> SpinnakerLinkData:
+        # delayed import due to circular dependencies
+        # pylint: disable=import-outside-toplevel
+        from pacman.data import PacmanDataView
+        spinnaker_links = PacmanDataView.get_spinnaker_links()
+        return spinnaker_links.get_spinnaker_link_with_id(
             self._spinnaker_link_id, self._board_address,
             self._linked_chip_coordinates)

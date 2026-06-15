@@ -13,6 +13,9 @@
 # limitations under the License.
 
 import unittest
+from spinn_utilities.config_holder import set_config
+from spinn_machine.exceptions import SpinnMachineException
+from spinn_machine.version import Spin1Gen, Spin2Gen
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex)
@@ -26,12 +29,24 @@ class TestApplicationOther(unittest.TestCase):
     def setUp(self) -> None:
         unittest_setup()
 
+    def test_spinnaker_fail_fast(self) -> None:
+        set_config("Machine", "version", str(Spin2Gen.SPIN2_48CHIP.value))
+        with self.assertRaises(SpinnMachineException):
+            ApplicationSpiNNakerLinkVertex(100, 2, "127.4.5.6")
+
     def test_spinnaker_link(self) -> None:
+        set_config("Machine", "version", str(Spin1Gen.FIVE.value))
         slv = ApplicationSpiNNakerLinkVertex(100, 2, "127.4.5.6")
         self.assertEqual(2, slv.spinnaker_link_id)
         self.assertEqual("127.4.5.6", slv.board_address)
 
+    def test_fpga_fail_fast(self) -> None:
+        set_config("Machine", "version", str(Spin2Gen.SPIN2_48CHIP.value))
+        with self.assertRaises(SpinnMachineException):
+            ApplicationFPGAVertex(100)
+
     def test_fpga_no_connection(self) -> None:
+        set_config("Machine", "version", str(Spin1Gen.FIVE.value))
         fpga = ApplicationFPGAVertex(100)
         self.assertEqual(0, len(list(fpga.incoming_fpga_connections)))
         self.assertIsNone(fpga.outgoing_fpga_connection)

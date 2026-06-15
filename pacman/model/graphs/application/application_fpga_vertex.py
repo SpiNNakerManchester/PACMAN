@@ -13,12 +13,15 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import Iterable, List, Optional, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+
+from spinn_machine.fpga_links import FPGALinks
+
 from pacman.model.graphs.common.slice import Slice
 from .application_virtual_vertex import ApplicationVirtualVertex
 if TYPE_CHECKING:
     from spinn_machine.link_data_objects import FPGALinkData
-    from spinn_machine import Machine
     from .fpga_connection import FPGAConnection
 
 
@@ -59,6 +62,8 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         self._incoming_fpga_connections = incoming_fpga_connections
         self._outgoing_fpga_connection = outgoing_fpga_connection
         self._n_machine_vertices_per_link = n_machine_vertices_per_link
+        # Fail fast if wrong version
+        FPGALinks.get_fpga_version()
 
     @property
     @overrides(ApplicationVirtualVertex.n_atoms)
@@ -114,10 +119,14 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
         return self._outgoing_fpga_connection
 
     @overrides(ApplicationVirtualVertex.get_outgoing_link_data)
-    def get_outgoing_link_data(self, machine: Machine) -> FPGALinkData:
+    def get_outgoing_link_data(self) -> FPGALinkData:
         fpga = self._outgoing_fpga_connection
         if fpga is None:
             raise NotImplementedError("This vertex doesn't have outgoing data")
-        return machine.get_fpga_link_with_id(
+        # delayed import due to circular dependencies
+        # pylint: disable=import-outside-toplevel
+        from pacman.data import PacmanDataView
+        fpga_links = PacmanDataView.get_fpga_links()
+        return fpga_links.get_fpga_link_with_id(
             fpga.fpga_id, fpga.fpga_link_id, fpga.board_address,
             fpga.chip_coords)
