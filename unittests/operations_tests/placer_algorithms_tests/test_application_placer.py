@@ -238,7 +238,8 @@ def test_application_placer_fill_chips(_: str, ver_num: str) -> None:
     for i in range(17):
         _make_vertices(writer, 1000, 14, half, f"app_vertex_{i}")
     for i in range(17):
-        _make_vertices(writer, 1000, 14, half - 1, f"app_vertex_{i}")
+        _make_vertices(writer, 1000, 14,
+                       half - version.n_scamp_cores, f"app_vertex_{i}")
     writer.set_machine(virtual_machine_by_cores(
         n_cores=writer.get_n_machine_vertices()))
     place_application_graph(Placements())
