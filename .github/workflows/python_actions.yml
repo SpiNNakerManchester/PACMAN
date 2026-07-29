@@ -27,5 +27,5 @@ jobs:
       flake8-packages: pacman unittests pacman_test_objects
       pylint-packages: pacman pacman_test_objects
       mypy-full-packages: pacman pacman_test_objects unittests
-      ruff_packages: pacman pacman_test_objects unittests
+      ruff-packages: pacman pacman_test_objects unittests
     secrets: inherit
