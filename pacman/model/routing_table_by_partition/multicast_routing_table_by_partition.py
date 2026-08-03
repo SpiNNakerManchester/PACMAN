@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
-from typing import Dict, Iterator, Optional, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, Iterator, Optional, Tuple
+
 from spinn_utilities.typing.coords import XY
+
 from spinn_machine import RoutingEntry
-from pacman.model.graphs.application import ApplicationVertex
+
 from pacman.exceptions import PacmanInvalidParameterException
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
+
 if TYPE_CHECKING:
     from pacman.model.graphs import AbstractVertex
 

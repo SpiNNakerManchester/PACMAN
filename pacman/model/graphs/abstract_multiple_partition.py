@@ -12,13 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Collection, Dict, Generic, Tuple, Type, TypeVar, Union
+
 from collections import defaultdict
+from typing import Collection, Dict, Generic, Tuple, Type, TypeVar, Union
+
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
+
 from pacman.exceptions import PacmanConfigurationException, PacmanValueError
 from pacman.model.graphs import (
-    AbstractVertex, AbstractEdge, AbstractEdgePartition)
+    AbstractEdge,
+    AbstractEdgePartition,
+    AbstractVertex,
+)
+
 #: :meta private:
 V = TypeVar("V", bound=AbstractVertex)
 #: :meta private:

@@ -14,11 +14,16 @@
 
 import functools
 from typing import List, Tuple, cast
+
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
+
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanElementAllocationException
 from pacman.model.routing_tables import (
-    MulticastRoutingTables, AbstractMulticastRoutingTable)
+    AbstractMulticastRoutingTable,
+    MulticastRoutingTables,
+)
+
 from .abstract_compressor import AbstractCompressor
 
 

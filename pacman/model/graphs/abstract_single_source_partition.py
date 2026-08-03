@@ -12,15 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from typing import (
-    Generic, Sequence, Tuple, Type, TypeVar, Union, TYPE_CHECKING)
+    TYPE_CHECKING,
+    Generic,
+    Sequence,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
+
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
+
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractEdgePartition
+
 if TYPE_CHECKING:
-    from .abstract_vertex import AbstractVertex  # @UnusedImport
     from .abstract_edge import AbstractEdge  # @UnusedImport
+    from .abstract_vertex import AbstractVertex  # @UnusedImport
 #: :meta private:
 V = TypeVar("V", bound='AbstractVertex')
 #: :meta private:

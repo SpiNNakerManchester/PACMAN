@@ -25,23 +25,30 @@ from spinn_machine.version import BIG_BOARD_TYPES, MANY_BOARD_TYPES, Spin1Gen
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.graphs.application import ApplicationEdge
+from pacman.model.graphs.application.abstract import (
+    AbstractOneAppOneMachineVertex,
+)
 from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.partitioner_splitters import SplitterFixedLegacy
+from pacman.model.partitioner_splitters import (
+    SplitterFixedLegacy,
+    SplitterOneAppOneMachine,
+)
 from pacman.model.placements import Placement, Placements
 from pacman.model.resources import ConstantSDRAM
-from pacman.operations.placer_algorithms import place_application_graph
-from pacman.operations.partition_algorithms import splitter_partitioner
-from pacman.operations.router_algorithms.application_router import (
-    route_application_graph)
-from pacman.operations.routing_info_allocator_algorithms import (
-    ZonedRoutingInfoAllocator)
-from pacman.operations.routing_table_generators import (
-    basic_routing_table_generator)
-from pacman_test_objects import SimpleTestVertex
-from pacman.model.graphs.application.abstract import (
-    AbstractOneAppOneMachineVertex)
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-from pacman.model.partitioner_splitters import SplitterOneAppOneMachine
+from pacman.operations.partition_algorithms import splitter_partitioner
+from pacman.operations.placer_algorithms import place_application_graph
+from pacman.operations.router_algorithms.application_router import (
+    route_application_graph,
+)
+from pacman.operations.routing_info_allocator_algorithms import (
+    ZonedRoutingInfoAllocator,
+)
+from pacman.operations.routing_table_generators import (
+    basic_routing_table_generator,
+)
+
+from pacman_test_objects import SimpleTestVertex
 
 
 class FixedKeyAppVertex(AbstractOneAppOneMachineVertex):

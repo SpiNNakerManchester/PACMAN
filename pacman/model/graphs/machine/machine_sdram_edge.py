@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Optional
-from pacman.model.graphs.machine import MachineEdge
-from pacman.model.graphs import AbstractSupportsSDRAMEdges
+
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs import AbstractSupportsSDRAMEdges
+from pacman.model.graphs.machine import MachineEdge
+
 from .machine_vertex import MachineVertex
 
 

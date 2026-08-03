@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
-from spinn_utilities.abstract_base import abstractmethod, AbstractBase
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import SDRAMMachineEdge
 

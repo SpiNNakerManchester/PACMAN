@@ -19,8 +19,9 @@ import unittest
 from spinn_utilities.configs.config_checker import ConfigChecker
 from spinn_utilities.configs.config_documentor import ConfigDocumentor
 
-from pacman.config_setup import unittest_setup
 import pacman
+from pacman.config_setup import unittest_setup
+
 import pacman_test_objects
 
 

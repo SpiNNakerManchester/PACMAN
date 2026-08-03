@@ -23,13 +23,15 @@ from spinn_machine.version import MANY_BOARD_TYPES
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application.abstract import (
-    AbstractOneAppOneMachineVertex)
+    AbstractOneAppOneMachineVertex,
+)
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.partitioner_splitters import SplitterOneAppOneMachine
 from pacman.model.resources import ConstantSDRAM
-from pacman_test_objects import NonLegacyApplicationVertex
-from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
+
+from pacman_test_objects import NonLegacyApplicationVertex
 
 
 class TestSplitterOneAppOneMachine(unittest.TestCase):

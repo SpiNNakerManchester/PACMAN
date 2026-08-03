@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from spinn_utilities.abstract_base import abstractmethod, AbstractBase
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from .machine_vertex import MachineVertex
 
 

@@ -16,9 +16,14 @@ import os
 from typing import Set
 
 from spinn_utilities.config_holder import (
-    add_default_cfg, clear_cfg_files, get_config_bool)
+    add_default_cfg,
+    clear_cfg_files,
+    get_config_bool,
+)
 from spinn_utilities.configs.camel_case_config_parser import optionxform
+
 from spinn_machine.config_setup import add_spinn_machine_cfg
+
 from pacman.data.pacman_data_writer import PacmanDataWriter
 
 BASE_CONFIG_FILE = "pacman.cfg"

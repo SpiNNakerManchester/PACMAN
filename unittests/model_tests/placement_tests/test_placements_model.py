@@ -16,10 +16,13 @@
 tests for placements
 """
 import unittest
+
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import (
-    PacmanNotPlacedError, PacmanProcessorAlreadyOccupiedError,
-    PacmanProcessorNotOccupiedError)
+    PacmanNotPlacedError,
+    PacmanProcessorAlreadyOccupiedError,
+    PacmanProcessorNotOccupiedError,
+)
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placement, Placements
 

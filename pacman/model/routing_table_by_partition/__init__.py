@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .multicast_routing_table_by_partition import (
-    MulticastRoutingTableByPartition)
+    MulticastRoutingTableByPartition,
+)
 
 __all__ = ["MulticastRoutingTableByPartition"]

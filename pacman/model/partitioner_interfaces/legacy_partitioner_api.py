@@ -12,10 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Optional, FrozenSet, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, FrozenSet, Optional
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from pacman.model.resources import AbstractSDRAM
+
 from pacman.model.graphs.common import Slice
+from pacman.model.resources import AbstractSDRAM
+
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex
 

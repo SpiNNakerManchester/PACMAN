@@ -20,10 +20,10 @@ internally connect those vertices up (if needed).
 """
 
 from .abstract_splitter_common import AbstractSplitterCommon
-from .splitter_one_app_one_machine import SplitterOneAppOneMachine
-from .splitter_fixed_legacy import SplitterFixedLegacy
-from .splitter_one_to_one_legacy import SplitterOneToOneLegacy
 from .splitter_external_device import SplitterExternalDevice
+from .splitter_fixed_legacy import SplitterFixedLegacy
+from .splitter_one_app_one_machine import SplitterOneAppOneMachine
+from .splitter_one_to_one_legacy import SplitterOneToOneLegacy
 
 __all__ = [
     'AbstractSplitterCommon',

@@ -13,8 +13,11 @@
 # limitations under the License.
 
 import unittest
+
 import spinn_utilities
+
 import spinn_machine
+
 import pacman
 from pacman.config_setup import unittest_setup
 

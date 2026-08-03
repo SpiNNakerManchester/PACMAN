@@ -12,17 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Optional, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, List, Optional
 
 from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs import AbstractVirtual
 from pacman.model.resources import ConstantSDRAM
+
 from .machine_vertex import MachineVertex
 
 if TYPE_CHECKING:
     from spinn_utilities.typing.coords import XY
+
     from spinn_machine.link_data_objects import SpinnakerLinkData
+
     from pacman.model.graphs.application import ApplicationVertex
     from pacman.model.graphs.common import Slice
     from pacman.model.routing_info import BaseKeyAndMask

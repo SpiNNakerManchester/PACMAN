@@ -13,9 +13,14 @@
 # limitations under the License.
 
 import unittest
+
 from pacman.exceptions import PacmanValueError
 from pacman.utilities.utility_calls import (
-    calc_shift, can_shift, first_one, last_one)
+    calc_shift,
+    can_shift,
+    first_one,
+    last_one,
+)
 
 
 class TestItilityCalls(unittest.TestCase):

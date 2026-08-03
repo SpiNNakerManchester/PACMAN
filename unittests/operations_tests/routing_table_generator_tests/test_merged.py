@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 import unittest
+from typing import Optional
 
 from parameterized import parameterized
 
@@ -29,17 +29,22 @@ from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman.model.placements import Placement, Placements
 from pacman.model.resources import ConstantSDRAM
-from pacman.operations.placer_algorithms import place_application_graph
+from pacman.model.routing_info import BaseKeyAndMask, RoutingInfo
 from pacman.operations.partition_algorithms import splitter_partitioner
+from pacman.operations.placer_algorithms import place_application_graph
 from pacman.operations.router_algorithms.application_router import (
-    route_application_graph)
-from pacman.model.routing_info import RoutingInfo
+    route_application_graph,
+)
 from pacman.operations.routing_info_allocator_algorithms import (
-    ZonedRoutingInfoAllocator)
-from pacman.operations.routing_table_generators.merged_routing_table_generator\
-    import (merged_routing_table_generator, _IteratorWithNext)
+    ZonedRoutingInfoAllocator,
+)
+from pacman.operations.routing_table_generators.merged_routing_table_generator import (
+    _IteratorWithNext,
+    merged_routing_table_generator,
+)
+
 from pacman_test_objects import SimpleTestVertex
-from pacman.model.routing_info import BaseKeyAndMask
+
 from .test_basic import FixedKeyAppVertex
 
 

@@ -12,16 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
-from .vertex_routing_info import VertexRoutingInfo
 from ..graphs.application import ApplicationVertex
+from .vertex_routing_info import VertexRoutingInfo
 
 if TYPE_CHECKING:
-    from .base_key_and_mask import BaseKeyAndMask
     from pacman.model.graphs.machine import MachineVertex
+
+    from .base_key_and_mask import BaseKeyAndMask
 
 # pylint: disable=abstract-method
 

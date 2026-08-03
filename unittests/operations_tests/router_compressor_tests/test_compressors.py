@@ -17,6 +17,7 @@ import unittest
 from parameterized import parameterized
 
 from spinn_utilities.config_holder import set_config
+
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from spinn_machine.version import MANY_BOARD_TYPES
 
@@ -24,13 +25,19 @@ from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables import (
-    UnCompressedMulticastRoutingTable, MulticastRoutingTables)
-from pacman.operations.router_compressors.routing_compression_checker import (
-    compare_tables)
+    MulticastRoutingTables,
+    UnCompressedMulticastRoutingTable,
+)
 from pacman.operations.router_compressors import (
-    pair_compressor, range_compressor)
-from pacman.operations.router_compressors.ordered_covering_router_compressor \
-    import ordered_covering_compressor
+    pair_compressor,
+    range_compressor,
+)
+from pacman.operations.router_compressors.ordered_covering_router_compressor import (
+    ordered_covering_compressor,
+)
+from pacman.operations.router_compressors.routing_compression_checker import (
+    compare_tables,
+)
 
 
 class TestCompressor(unittest.TestCase):

@@ -19,7 +19,9 @@ https://github.com/project-rig/rig/blob/master/rig/routing_table/remove_default_
 """
 
 from typing import List, Optional
+
 from spinn_machine import MulticastRoutingEntry
+
 from pacman.exceptions import MinimisationFailedError
 
 

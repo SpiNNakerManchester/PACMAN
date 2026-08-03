@@ -12,13 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Optional, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, List, Optional
+
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.require_subclass import require_subclass
+
 from pacman.model.graphs import AbstractVertex
+
 if TYPE_CHECKING:
     from spinn_utilities.typing.coords import XY
+
     from spinn_machine.link_data_objects import AbstractLinkData
+
     from pacman.model.routing_info import BaseKeyAndMask
 
 

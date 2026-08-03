@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
-from typing import Dict, Iterator, List, Optional, Tuple, Sequence, Set
+from typing import Dict, Iterator, List, Optional, Sequence, Set, Tuple
 
 from spinn_utilities.config_holder import get_config_bool, get_report_path
 from spinn_utilities.log import FormatAdapter
@@ -22,13 +23,17 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_machine import Chip
 
 from pacman.data import PacmanDataView
-from pacman.model.placements import Placements, Placement
-from pacman.model.graphs import AbstractVirtual
-from pacman.model.graphs.machine import MachineVertex
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 from pacman.exceptions import (
-    PacmanPlaceException, PacmanConfigurationException, PacmanTooBigToPlace)
+    PacmanConfigurationException,
+    PacmanPlaceException,
+    PacmanTooBigToPlace,
+)
+from pacman.model.graphs import AbstractVirtual
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.placements import Placement, Placements
+from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
+
 from .draw_placements import draw_placements as dp
 
 logger = FormatAdapter(logging.getLogger(__name__))

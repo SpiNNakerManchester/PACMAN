@@ -19,16 +19,18 @@ from spinn_utilities.overrides import overrides
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.exceptions import (
-    IrregularFixedMaskException, PacmanRouteInfoAllocationException)
-from pacman.operations.routing_info_allocator_algorithms.\
-    zoned_routing_info_allocator import ZonedRoutingInfoAllocator
+    IrregularFixedMaskException,
+    PacmanRouteInfoAllocationException,
+)
 from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
-from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
-from pacman.model.routing_info import (RoutingInfo, MachineVertexRoutingInfo)
+from pacman.model.resources import AbstractSDRAM
+from pacman.model.routing_info import MachineVertexRoutingInfo, RoutingInfo
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.operations.routing_info_allocator_algorithms.\
+    zoned_routing_info_allocator import ZonedRoutingInfoAllocator
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 

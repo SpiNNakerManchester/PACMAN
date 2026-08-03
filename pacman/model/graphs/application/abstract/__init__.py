@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_one_app_one_machine_vertex import AbstractOneAppOneMachineVertex
 from .abstract_2d_device_vertex import Abstract2DDeviceVertex
+from .abstract_one_app_one_machine_vertex import AbstractOneAppOneMachineVertex
 
 __all__ = ["AbstractOneAppOneMachineVertex", "Abstract2DDeviceVertex"]

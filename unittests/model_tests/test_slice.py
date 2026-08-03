@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import unittest
+
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.common import Slice
 

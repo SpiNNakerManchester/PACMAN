@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import unittest
+
 import numpy
+
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.common import MDSlice
 

@@ -15,6 +15,7 @@
 from typing import List, Optional, Tuple
 
 from spinn_utilities.typing.coords import XY
+
 from spinn_machine import Chip
 
 from pacman.data import PacmanDataView

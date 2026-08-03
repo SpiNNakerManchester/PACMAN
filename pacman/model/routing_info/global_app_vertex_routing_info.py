@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
+
 from spinn_utilities.overrides import overrides
+
 from .app_vertex_routing_info import AppVertexRoutingInfo
 
 logger = logging.getLogger(__name__)

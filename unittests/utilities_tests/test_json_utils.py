@@ -11,15 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import unittest
 import json
+import unittest
+
 from pacman.config_setup import unittest_setup
+from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placement
 from pacman.model.resources import (
-    ConstantSDRAM, IPtagResource, ReverseIPtagResource)
-from pacman.utilities.json_utils import (
-    placement_from_json, placement_to_json)
-from pacman.model.graphs.machine import SimpleMachineVertex
+    ConstantSDRAM,
+    IPtagResource,
+    ReverseIPtagResource,
+)
+from pacman.utilities.json_utils import placement_from_json, placement_to_json
 
 
 class TestJsonUtils(unittest.TestCase):

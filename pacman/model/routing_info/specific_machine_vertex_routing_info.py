@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+
 from .machine_vertex_routing_info import MachineVertexRoutingInfo
+
 if TYPE_CHECKING:
-    from pacman.model.routing_info import BaseKeyAndMask
     from pacman.model.graphs.machine import MachineVertex
+    from pacman.model.routing_info import BaseKeyAndMask
 
 
 class SpecificMachineVertexRoutingInfo(MachineVertexRoutingInfo):

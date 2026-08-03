@@ -12,17 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import defaultdict
-import math
 import logging
+import math
 import random
+from collections import defaultdict
 from typing import Dict, Optional
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.typing.coords import XY
+
 from pacman.data import PacmanDataView
 from pacman.model.graphs import AbstractVertex
 from pacman.model.placements import Placements
-from ._spinner_api import spinner_api, Colour
+
+from ._spinner_api import Colour, spinner_api
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

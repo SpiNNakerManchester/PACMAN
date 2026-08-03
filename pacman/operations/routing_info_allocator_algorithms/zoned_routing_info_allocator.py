@@ -16,22 +16,29 @@ import logging
 from typing import Dict, Iterable, List, Optional, Tuple
 
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ordered_set import OrderedSet
+from spinn_utilities.progress_bar import ProgressBar
 
-from pacman.model.routing_info import (
-    RoutingInfo, BaseKeyAndMask,
-    FixedAppVertexRoutingInfo, FixedMachineVertexRoutingInfo,
-    GlobalAppVertexRoutingInfo, GlobalMachineVertexRoutingInfo,
-    MachineVertexRoutingInfo,
-    SpecificAppVertexRoutingInfo, SpecificMachineVertexRoutingInfo)
+from pacman.exceptions import PacmanRouteInfoAllocationException
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
-from pacman.utilities.utility_calls import allocator_bits_needed, calc_shift
-from pacman.exceptions import PacmanRouteInfoAllocationException
-from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
+from pacman.model.routing_info import (
+    BaseKeyAndMask,
+    FixedAppVertexRoutingInfo,
+    FixedMachineVertexRoutingInfo,
+    GlobalAppVertexRoutingInfo,
+    GlobalMachineVertexRoutingInfo,
+    MachineVertexRoutingInfo,
+    RoutingInfo,
+    SpecificAppVertexRoutingInfo,
+    SpecificMachineVertexRoutingInfo,
+)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
-    get_app_partitions)
+    get_app_partitions,
+)
+from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
+from pacman.utilities.utility_calls import allocator_bits_needed, calc_shift
+
 _XAlloc = Iterable[Tuple[ApplicationVertex, str]]
 logger = FormatAdapter(logging.getLogger(__name__))
 

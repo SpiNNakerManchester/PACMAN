@@ -18,16 +18,22 @@ from typing_extensions import TypeAlias
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.graphs.application import (
-    ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex)
-from pacman.model.graphs.machine import (
-    MachineFPGAVertex, MachineSpiNNakerLinkVertex)
 from pacman.exceptions import (
-    PacmanConfigurationException, PacmanNotExistException)
-from pacman.model.graphs.application import FPGAConnection
-from pacman.utilities.utility_objs import ChipCounter
-from pacman.model.graphs.machine import MachineVertex
+    PacmanConfigurationException,
+    PacmanNotExistException,
+)
+from pacman.model.graphs.application import (
+    ApplicationFPGAVertex,
+    ApplicationSpiNNakerLinkVertex,
+    FPGAConnection,
+)
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import (
+    MachineFPGAVertex,
+    MachineSpiNNakerLinkVertex,
+    MachineVertex,
+)
+from pacman.utilities.utility_objs import ChipCounter
 
 from .abstract_splitter_common import AbstractSplitterCommon
 

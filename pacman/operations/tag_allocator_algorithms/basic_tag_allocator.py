@@ -13,16 +13,19 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Tuple, List, Dict, Union
+from typing import Dict, List, Tuple, Union
+
 from spinn_utilities.progress_bar import ProgressBar
+
 from spinn_machine import Chip, Machine
 from spinn_machine.tags import IPTag, ReverseIPTag
+
 from pacman.data import PacmanDataView
-from pacman.model.tags import Tags
-from pacman.model.placements import Placement
 from pacman.exceptions import PacmanNotFoundError
+from pacman.model.placements import Placement
 from pacman.model.resources.iptag_resource import IPtagResource
 from pacman.model.resources.reverse_iptag_resource import ReverseIPtagResource
+from pacman.model.tags import Tags
 
 # An arbitrary range of ports from which to allocate ports to Reverse IP Tags
 _BOARD_PORTS = range(17896, 18000)

@@ -12,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, List, Optional, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Iterable, List, Optional
 
 from spinn_utilities.overrides import overrides
 
 from spinn_machine.fpga_links import FPGALinks
 
 from pacman.model.graphs.common.slice import Slice
+
 from .application_virtual_vertex import ApplicationVirtualVertex
+
 if TYPE_CHECKING:
     from spinn_machine.link_data_objects import FPGALinkData
+
     from .fpga_connection import FPGAConnection
 
 

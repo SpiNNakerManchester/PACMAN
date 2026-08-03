@@ -12,11 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
 import platform
-
+from dataclasses import dataclass
 from typing import (
-    Any, Callable, ContextManager, Dict, List, NewType, Union, Tuple)
+    Any,
+    Callable,
+    ContextManager,
+    Dict,
+    List,
+    NewType,
+    Tuple,
+    Union,
+)
+
 from spinn_utilities.typing.coords import XY
 
 # Don't know or care what these next two types are; they're SpiNNer's
@@ -56,11 +64,12 @@ class Spinner:
         if platform.platform().lower().startswith("windows"):
             raise ImportError("SpiNNer not supported on Windows")
 
-        from spinner.scripts.contexts import (  # type: ignore
-            PNGContextManager)
-        from spinner.diagrams.machine_map import (  # type: ignore
-            get_machine_map_aspect_ratio, draw_machine_map)
         from spinner.board import create_torus  # type: ignore
+        from spinner.diagrams.machine_map import (  # type: ignore
+            draw_machine_map,
+            get_machine_map_aspect_ratio,
+        )
+        from spinner.scripts.contexts import PNGContextManager  # type: ignore
         return Spinner(PNGContextManager, get_machine_map_aspect_ratio,
                        draw_machine_map, create_torus)
 

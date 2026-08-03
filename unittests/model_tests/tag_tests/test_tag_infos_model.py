@@ -16,7 +16,9 @@
 TestTagsModel
 """
 import unittest
+
 from spinn_machine.tags import IPTag, ReverseIPTag
+
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs.machine import SimpleMachineVertex

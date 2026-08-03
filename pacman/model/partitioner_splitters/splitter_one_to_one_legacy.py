@@ -13,9 +13,11 @@
 # limitations under the License.
 
 import logging
-from typing import cast, List, Optional
-from spinn_utilities.overrides import overrides
+from typing import List, Optional, cast
+
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
+
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
@@ -23,6 +25,7 @@ from pacman.model.graphs.machine import MachineVertex
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.resources import AbstractSDRAM
 from pacman.utilities.utility_objs import ChipCounter
+
 from .abstract_splitter_common import AbstractSplitterCommon
 
 logger = FormatAdapter(logging.getLogger(__name__))

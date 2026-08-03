@@ -13,9 +13,9 @@
 # limitations under the License.
 
 
+import unittest
 from collections import defaultdict
 from typing import Dict, Set
-import unittest
 
 from parameterized import parameterized
 
@@ -29,10 +29,13 @@ from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanNotFoundError
-from pacman.model.placements import Placement, Placements
 from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.placements import Placement, Placements
 from pacman.model.resources import (
-    ConstantSDRAM, IPtagResource, ReverseIPtagResource)
+    ConstantSDRAM,
+    IPtagResource,
+    ReverseIPtagResource,
+)
 from pacman.operations.tag_allocator_algorithms import basic_tag_allocator
 
 

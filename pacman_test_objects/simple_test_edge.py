@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from typing import Optional
-from pacman.model.graphs.application import (
-    ApplicationEdge, ApplicationVertex)
+
+from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
 
 
 class SimpleTestEdge(ApplicationEdge):

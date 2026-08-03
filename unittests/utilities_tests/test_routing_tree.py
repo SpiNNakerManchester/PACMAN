@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import unittest
+
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree

@@ -12,13 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Optional
+
 from spinn_utilities.overrides import overrides
+
 from pacman.exceptions import (
-    PacmanConfigurationException,  PartitionMissingEdgesException,
-    PacmanValueError)
+    PacmanConfigurationException,
+    PacmanValueError,
+    PartitionMissingEdgesException,
+)
 from pacman.model.graphs import AbstractSingleSourcePartition
 from pacman.model.graphs.machine import (
-    AbstractSDRAMPartition, SDRAMMachineEdge, MachineVertex)
+    AbstractSDRAMPartition,
+    MachineVertex,
+    SDRAMMachineEdge,
+)
 
 
 class DestinationSegmentedSDRAMMachinePartition(

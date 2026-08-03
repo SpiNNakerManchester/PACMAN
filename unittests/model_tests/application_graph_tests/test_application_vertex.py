@@ -12,20 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import unittest
 from typing import Tuple
 
 import numpy
-import unittest
+
+from spinn_utilities.overrides import overrides
 
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import (
-    PacmanConfigurationException, PacmanInvalidParameterException)
-from pacman.model.graphs.common import Slice, ChipAndCore
-from pacman.model.graphs.machine import SimpleMachineVertex
+    PacmanConfigurationException,
+    PacmanInvalidParameterException,
+)
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.common import ChipAndCore, Slice
+from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
+
 from pacman_test_objects import SimpleTestVertex
-from spinn_utilities.overrides import overrides
 
 
 class MockSplitter(SplitterFixedLegacy):

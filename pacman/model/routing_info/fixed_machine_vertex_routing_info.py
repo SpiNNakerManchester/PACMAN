@@ -12,18 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Optional, Tuple, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Optional, Tuple
+
 from spinn_utilities.overrides import overrides
 
-from pacman.utilities.constants import BITS_IN_KEY
 from pacman.exceptions import IrregularFixedMaskException
+from pacman.utilities.constants import BITS_IN_KEY
 from pacman.utilities.utility_calls import can_shift, first_one, last_one
 
 from .machine_vertex_routing_info import MachineVertexRoutingInfo
 
 if TYPE_CHECKING:
-    from .base_key_and_mask import BaseKeyAndMask
     from pacman.model.graphs.machine import MachineVertex
+
+    from .base_key_and_mask import BaseKeyAndMask
 
 
 class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):

@@ -13,19 +13,28 @@
 # limitations under the License.
 
 import unittest
+
 from spinn_utilities.overrides import overrides
+
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import (
-    PacmanConfigurationException, PartitionMissingEdgesException,
-    PacmanValueError, SDRAMEdgeSizeException)
+    PacmanConfigurationException,
+    PacmanValueError,
+    PartitionMissingEdgesException,
+    SDRAMEdgeSizeException,
+)
 from pacman.model.graphs import (
-    AbstractMultiplePartition, AbstractSupportsSDRAMEdges)
+    AbstractMultiplePartition,
+    AbstractSupportsSDRAMEdges,
+)
 from pacman.model.graphs.machine import (
-     ConstantSDRAMMachinePartition,
-     DestinationSegmentedSDRAMMachinePartition,
-     MachineEdge,
-     SDRAMMachineEdge, SimpleMachineVertex,
-     SourceSegmentedSDRAMMachinePartition)
+    ConstantSDRAMMachinePartition,
+    DestinationSegmentedSDRAMMachinePartition,
+    MachineEdge,
+    SDRAMMachineEdge,
+    SimpleMachineVertex,
+    SourceSegmentedSDRAMMachinePartition,
+)
 from pacman.model.resources import ConstantSDRAM
 
 

@@ -17,15 +17,17 @@ import sys
 import unittest
 
 from spinn_utilities.config_holder import set_config
+
 from spinn_machine import virtual_machine
 from spinn_machine.version import Spin1Gen
+
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
-from pacman.model.routing_tables.multicast_routing_tables import (from_json)
+from pacman.model.routing_tables.multicast_routing_tables import from_json
+from pacman.operations.router_compressors import pair_compressor
 from pacman.operations.router_compressors.routing_compression_checker import (
-    compare_tables)
-from pacman.operations.router_compressors import (
-    pair_compressor)
+    compare_tables,
+)
 
 
 class TestUnorderedPairCompressor(unittest.TestCase):

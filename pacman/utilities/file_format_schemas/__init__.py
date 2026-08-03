@@ -16,8 +16,8 @@
 A simple bit of support code for validation.
 """
 
-import os
 import json
+import os
 from typing import Union
 
 import jsonschema

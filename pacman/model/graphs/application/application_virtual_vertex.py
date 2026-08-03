@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from spinn_utilities.abstract_base import abstractmethod
+
 from spinn_machine.link_data_objects import AbstractLinkData
+
 from .application_vertex import ApplicationVertex
 
 

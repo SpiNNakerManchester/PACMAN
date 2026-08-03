@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import unittest
+
 from parameterized import parameterized
 
 from spinn_utilities.config_holder import set_config
@@ -22,15 +23,20 @@ from spinn_machine.exceptions import SpinnMachineInvalidParameterException
 from spinn_machine.version import MANY_BOARD_TYPES
 
 from pacman.config_setup import unittest_setup
-from pacman.model.routing_tables import (
-    UnCompressedMulticastRoutingTable, MulticastRoutingTables)
-from pacman.model.routing_tables.multicast_routing_tables import (
-    to_json, from_json)
-from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartition)
 from pacman.exceptions import PacmanAlreadyExistsException
-from pacman.utilities import file_format_schemas
 from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.routing_table_by_partition import (
+    MulticastRoutingTableByPartition,
+)
+from pacman.model.routing_tables import (
+    MulticastRoutingTables,
+    UnCompressedMulticastRoutingTable,
+)
+from pacman.model.routing_tables.multicast_routing_tables import (
+    from_json,
+    to_json,
+)
+from pacman.utilities import file_format_schemas
 
 
 class TestRoutingTable(unittest.TestCase):

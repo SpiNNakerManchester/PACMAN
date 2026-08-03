@@ -12,25 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import deque, defaultdict
-from typing import (
-    Deque, Dict, Iterable, Iterator, List, Optional, Set, Tuple)
+from collections import defaultdict, deque
+from typing import Deque, Dict, Iterable, Iterator, List, Optional, Set, Tuple
+
 from typing_extensions import TypeAlias
+
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.typing.coords import XY
+
 from spinn_machine import Machine, RoutingEntry
+
 from pacman.data import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
-from pacman.model.graphs import AbstractVertex
-from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartition)
-from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
-    longest_dimension_first, get_app_partitions, vertex_xy,
-    vertex_xy_and_route)
-from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
+from pacman.model.graphs import AbstractEdgePartition, AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex, MulticastEdgePartition
-from pacman.model.graphs import AbstractEdgePartition
+from pacman.model.routing_table_by_partition import (
+    MulticastRoutingTableByPartition,
+)
+from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
+    get_app_partitions,
+    longest_dimension_first,
+    vertex_xy,
+    vertex_xy_and_route,
+)
+from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 
 _Node: TypeAlias = Tuple[int, XY]
 _OptInt: TypeAlias = Optional[int]

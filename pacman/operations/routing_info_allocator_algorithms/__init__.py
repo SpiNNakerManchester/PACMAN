@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .zoned_routing_info_allocator import (
-    ZonedRoutingInfoAllocator)
+from .zoned_routing_info_allocator import ZonedRoutingInfoAllocator
 
 __all__ = ['ZonedRoutingInfoAllocator']

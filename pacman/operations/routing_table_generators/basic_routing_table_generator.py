@@ -12,14 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Dict, Tuple
+
 from spinn_utilities.progress_bar import ProgressBar
+
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
+
 from pacman.data import PacmanDataView
-from pacman.model.routing_tables import (
-    UnCompressedMulticastRoutingTable, MulticastRoutingTables)
 from pacman.model.graphs import AbstractVertex
 from pacman.model.routing_info import RoutingInfo
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.model.routing_tables import (
+    MulticastRoutingTables,
+    UnCompressedMulticastRoutingTable,
+)
 
 
 def basic_routing_table_generator() -> MulticastRoutingTables:

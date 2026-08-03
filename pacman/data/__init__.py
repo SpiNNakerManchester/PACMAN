@@ -14,5 +14,4 @@
 
 from .pacman_data_view import PacmanDataView
 
-
 __all__ = ["PacmanDataView"]

@@ -21,12 +21,14 @@ import unittest
 from parameterized import parameterized
 
 from spinn_utilities.config_holder import set_config
+
 from spinn_machine.version import MANY_BOARD_TYPES
 
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from pacman.operations.partition_algorithms import splitter_partitioner
+
 from pacman_test_objects import SimpleTestVertex
 
 

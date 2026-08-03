@@ -12,30 +12,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
-from typing import (Iterable, List, Optional, Sequence, Tuple, Type, TypeVar,
-                    TYPE_CHECKING, Union)
+from typing import (
+    TYPE_CHECKING,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.typing.coords import XY
 
 from spinn_machine.data import MachineDataView
 
-from pacman.model.graphs.application import (
-    ApplicationEdge, ApplicationEdgePartition, ApplicationVertex)
-from pacman.model.graphs.machine import MachineEdge, MachineVertex
 from pacman.exceptions import PacmanNotPlacedError
-from pacman.model.graphs.application import ApplicationGraph
+from pacman.model.graphs.application import (
+    ApplicationEdge,
+    ApplicationEdgePartition,
+    ApplicationGraph,
+    ApplicationVertex,
+)
+from pacman.model.graphs.machine import MachineEdge, MachineVertex
 from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 
 if TYPE_CHECKING:
     from pacman.model.graphs import AbstractEdgePartition
     from pacman.model.placements import Placement, Placements
-    from pacman.model.tags import Tags
     from pacman.model.routing_info import RoutingInfo
-    from pacman.model.routing_tables import MulticastRoutingTables
     from pacman.model.routing_table_by_partition import (
-        MulticastRoutingTableByPartition)
+        MulticastRoutingTableByPartition,
+    )
+    from pacman.model.routing_tables import MulticastRoutingTables
+    from pacman.model.tags import Tags
 
     #: Type of a vertex. Can't be constrained for messy reasons.
     #: :meta private:

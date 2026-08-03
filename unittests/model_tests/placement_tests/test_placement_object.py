@@ -16,6 +16,7 @@
 tests for placement
 """
 import unittest
+
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanAlreadyPlacedError

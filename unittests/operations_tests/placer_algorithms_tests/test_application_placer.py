@@ -20,22 +20,27 @@ from parameterized import parameterized
 from spinn_utilities.config_holder import set_config
 from spinn_utilities.overrides import overrides
 
+from spinn_machine.version import BIG_BOARD_TYPES, MANY_BOARD_TYPES
 from spinn_machine.virtual_machine import virtual_machine_by_cores
-from spinn_machine.version import MANY_BOARD_TYPES, BIG_BOARD_TYPES
 
+from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
-from pacman.exceptions import (PacmanPlaceException, PacmanTooBigToPlace)
-from pacman.model.partitioner_splitters import (
-    SplitterFixedLegacy, AbstractSplitterCommon)
-from pacman.operations.placer_algorithms.application_placer import (
-    place_application_graph, ApplicationPlacer)
+from pacman.exceptions import PacmanPlaceException, PacmanTooBigToPlace
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex, SimpleMachineVertex
-from pacman.model.resources import ConstantSDRAM, AbstractSDRAM
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.config_setup import unittest_setup
+from pacman.model.partitioner_splitters import (
+    AbstractSplitterCommon,
+    SplitterFixedLegacy,
+)
 from pacman.model.placements.placements import Placements
+from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
+from pacman.operations.placer_algorithms.application_placer import (
+    ApplicationPlacer,
+    place_application_graph,
+)
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
+
 from pacman_test_objects import SimpleTestVertex
 
 

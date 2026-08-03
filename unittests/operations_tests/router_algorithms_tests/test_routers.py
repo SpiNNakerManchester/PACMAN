@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import defaultdict
 import math
-from typing import (
-    cast, Dict, Iterable, Optional, List, Sequence, Set, Tuple)
+from collections import defaultdict
+from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple, cast
 
 from parameterized import parameterized
 
@@ -28,36 +27,54 @@ from spinn_machine import Machine, RoutingEntry
 from spinn_machine.link_data_objects import AbstractLinkData
 from spinn_machine.version import BIG_BOARD_TYPES, MANY_BOARD_TYPES, Spin1Gen
 from spinn_machine.virtual_machine import (
-    virtual_machine_by_boards, virtual_machine_by_cores)
+    virtual_machine_by_boards,
+    virtual_machine_by_cores,
+)
 
+from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import (
-    ApplicationVertex, ApplicationEdge,
-    ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex, FPGAConnection)
+    ApplicationEdge,
+    ApplicationFPGAVertex,
+    ApplicationSpiNNakerLinkVertex,
+    ApplicationVertex,
+    FPGAConnection,
+)
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import (
-    MachineEdge, MachineVertex, MulticastEdgePartition)
+    MachineEdge,
+    MachineFPGAVertex,
+    MachineSpiNNakerLinkVertex,
+    MachineVertex,
+    MulticastEdgePartition,
+    SimpleMachineVertex,
+)
 from pacman.model.partitioner_splitters import (
-    SplitterExternalDevice, AbstractSplitterCommon)
-from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartition)
-from pacman.utilities.utility_objs import ChipCounter
-from pacman.operations.placer_algorithms.application_placer import (
-    place_application_graph)
-from pacman.operations.router_algorithms.application_router import (
-    route_application_graph, _path_without_errors)
-from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
-    longest_dimension_first, get_app_partitions, vertex_xy,
-    vertex_xy_and_route)
-from pacman.config_setup import unittest_setup
-from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.placements import Placements, Placement
+    AbstractSplitterCommon,
+    SplitterExternalDevice,
+)
+from pacman.model.placements import Placement, Placements
 from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
-from pacman.model.graphs.machine import (
-    MachineFPGAVertex, MachineSpiNNakerLinkVertex)
+from pacman.model.routing_table_by_partition import (
+    MulticastRoutingTableByPartition,
+)
+from pacman.operations.placer_algorithms.application_placer import (
+    place_application_graph,
+)
+from pacman.operations.router_algorithms.application_router import (
+    _path_without_errors,
+    route_application_graph,
+)
+from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
+    get_app_partitions,
+    longest_dimension_first,
+    vertex_xy,
+    vertex_xy_and_route,
+)
+from pacman.utilities.utility_objs import ChipCounter
 
 N_VERTICES = 10
 N_M_VERTICES = 50
