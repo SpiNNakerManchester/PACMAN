@@ -24,9 +24,8 @@ from spinn_machine.version import Spin1Gen
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables.multicast_routing_tables import from_json
-from pacman.operations.router_compressors.ordered_covering_router_compressor import (
-    ordered_covering_compressor,
-)
+from pacman.operations.router_compressors.\
+    ordered_covering_router_compressor import ordered_covering_compressor
 from pacman.operations.router_compressors.routing_compression_checker import (
     compare_tables,
 )

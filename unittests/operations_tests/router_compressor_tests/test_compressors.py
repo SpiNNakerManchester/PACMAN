@@ -32,9 +32,8 @@ from pacman.operations.router_compressors import (
     pair_compressor,
     range_compressor,
 )
-from pacman.operations.router_compressors.ordered_covering_router_compressor import (
-    ordered_covering_compressor,
-)
+from pacman.operations.router_compressors.\
+    ordered_covering_router_compressor import ordered_covering_compressor
 from pacman.operations.router_compressors.routing_compression_checker import (
     compare_tables,
 )

@@ -38,10 +38,11 @@ from pacman.operations.router_algorithms.application_router import (
 from pacman.operations.routing_info_allocator_algorithms import (
     ZonedRoutingInfoAllocator,
 )
-from pacman.operations.routing_table_generators.merged_routing_table_generator import (
-    _IteratorWithNext,
-    merged_routing_table_generator,
-)
+from pacman.operations.routing_table_generators. \
+    merged_routing_table_generator import (
+        _IteratorWithNext,
+        merged_routing_table_generator,
+    )
 
 from pacman_test_objects import SimpleTestVertex
 
