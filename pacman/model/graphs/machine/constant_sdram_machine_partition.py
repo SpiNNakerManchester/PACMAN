@@ -21,11 +21,9 @@ from pacman.exceptions import (
     SDRAMEdgeSizeException,
 )
 from pacman.model.graphs import AbstractSingleSourcePartition
-from pacman.model.graphs.machine import (
-    AbstractSDRAMPartition,
-    SDRAMMachineEdge,
-)
 
+from .abstract_sdram_partition import AbstractSDRAMPartition
+from .machine_sdram_edge import SDRAMMachineEdge
 from .machine_vertex import MachineVertex
 
 #: :meta private:

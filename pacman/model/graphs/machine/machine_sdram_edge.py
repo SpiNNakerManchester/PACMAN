@@ -15,8 +15,8 @@ from typing import Optional
 
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
-from pacman.model.graphs.machine import MachineEdge
 
+from .machine_edge import MachineEdge
 from .machine_vertex import MachineVertex
 
 

@@ -20,11 +20,10 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
 
 from pacman.exceptions import PacmanConfigurationException, PacmanValueError
-from pacman.model.graphs import (
-    AbstractEdge,
-    AbstractEdgePartition,
-    AbstractVertex,
-)
+
+from .abstract_edge import AbstractEdge
+from .abstract_edge_partition import AbstractEdgePartition
+from .abstract_vertex import AbstractVertex
 
 #: :meta private:
 V = TypeVar("V", bound=AbstractVertex)
