@@ -12,12 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from typing import (
-    Collection, Generic, Tuple, Type, TypeVar, Union, TYPE_CHECKING)
+    TYPE_CHECKING,
+    Collection,
+    Generic,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ordered_set import OrderedSet
+
 from pacman.exceptions import (
-    PacmanInvalidParameterException, PacmanAlreadyExistsException)
+    PacmanAlreadyExistsException,
+    PacmanInvalidParameterException,
+)
+
 if TYPE_CHECKING:
     from .abstract_edge import AbstractEdge  # @UnusedImport
     from .abstract_vertex import AbstractVertex

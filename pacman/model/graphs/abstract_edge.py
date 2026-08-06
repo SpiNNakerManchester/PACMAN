@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from typing import Generic, Optional, TypeVar
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from .abstract_vertex import AbstractVertex
 
 #: :meta private:

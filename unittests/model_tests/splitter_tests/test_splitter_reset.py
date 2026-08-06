@@ -13,10 +13,14 @@
 # limitations under the License.
 
 import unittest
+
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.model.partitioner_splitters import (
-    SplitterFixedLegacy, splitter_reset)
+    SplitterFixedLegacy,
+    splitter_reset,
+)
+
 from pacman_test_objects import SimpleTestVertex
 
 

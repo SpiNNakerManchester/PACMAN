@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Any
+
 from spinn_utilities.typing.coords import XY, XYP
+
 from spinn_machine import Chip
+
 from pacman.data.pacman_data_view import PacmanDataView
 from pacman.model.graphs.machine import MachineVertex
 

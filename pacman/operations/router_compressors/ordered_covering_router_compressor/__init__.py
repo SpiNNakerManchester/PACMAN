@@ -144,7 +144,10 @@ Implementation API
 ==================
 """
 from .ordered_covering import (
-    get_generality, ordered_covering, ordered_covering_compressor)
+    get_generality,
+    ordered_covering,
+    ordered_covering_compressor,
+)
 from .utils import intersect, remove_default_routes
 
 __all__ = (

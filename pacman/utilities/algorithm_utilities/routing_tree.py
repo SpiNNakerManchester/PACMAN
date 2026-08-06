@@ -24,11 +24,22 @@ Based on
 https://github.com/project-rig/rig/blob/master/rig/place_and_route/routing_tree.py
 """
 from __future__ import annotations
+
 from collections import deque
 from typing import (
-    Deque, Iterable, Iterator, List, Optional, Set, Tuple, Union,
-    TYPE_CHECKING)
+    TYPE_CHECKING,
+    Deque,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+)
+
 from spinn_utilities.typing.coords import XY
+
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex
 

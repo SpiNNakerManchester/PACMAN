@@ -12,13 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
 from typing import TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+
 from .app_vertex_routing_info import AppVertexRoutingInfo
+
 if TYPE_CHECKING:
-    from pacman.model.routing_info import BaseKeyAndMask
     from pacman.model.graphs.application import ApplicationVertex
+    from pacman.model.routing_info import BaseKeyAndMask
 
 logger = logging.getLogger(__name__)
 

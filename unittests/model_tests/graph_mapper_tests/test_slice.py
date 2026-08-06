@@ -16,6 +16,7 @@
 tests for slice
 """
 import unittest
+
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanValueError
 from pacman.model.graphs.common import Slice

@@ -14,8 +14,10 @@
 from typing import Any, Collection
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from spinn_machine import Chip
 from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
+
 from pacman.data.pacman_data_view import PacmanDataView
 
 

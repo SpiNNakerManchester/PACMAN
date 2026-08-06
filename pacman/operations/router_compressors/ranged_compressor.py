@@ -14,16 +14,22 @@
 
 import logging
 import sys
-from typing import cast, List
+from typing import List, cast
+
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
+
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
+
 from pacman.data import PacmanDataView
-from pacman.model.routing_tables import (
-    CompressedMulticastRoutingTable, MulticastRoutingTables,
-    AbstractMulticastRoutingTable, UnCompressedMulticastRoutingTable)
 from pacman.exceptions import MinimisationFailedError
+from pacman.model.routing_tables import (
+    AbstractMulticastRoutingTable,
+    CompressedMulticastRoutingTable,
+    MulticastRoutingTables,
+    UnCompressedMulticastRoutingTable,
+)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

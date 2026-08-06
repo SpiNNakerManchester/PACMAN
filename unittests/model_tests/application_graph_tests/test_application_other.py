@@ -13,12 +13,17 @@
 # limitations under the License.
 
 import unittest
+
 from spinn_utilities.config_holder import set_config
+
 from spinn_machine.exceptions import SpinnMachineException
 from spinn_machine.version import Spin1Gen, Spin2Gen
+
 from pacman.config_setup import unittest_setup
 from pacman.model.graphs.application import (
-    ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex)
+    ApplicationFPGAVertex,
+    ApplicationSpiNNakerLinkVertex,
+)
 
 
 class TestApplicationOther(unittest.TestCase):

@@ -13,10 +13,14 @@
 # limitations under the License.
 
 import unittest
+
 from pacman.config_setup import unittest_setup
-from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanInvalidParameterException)
+    PacmanAlreadyExistsException,
+    PacmanInvalidParameterException,
+)
+from pacman.model.graphs.application import ApplicationEdge, ApplicationGraph
+
 from pacman_test_objects import SimpleTestVertex
 
 

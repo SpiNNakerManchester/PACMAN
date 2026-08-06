@@ -15,14 +15,20 @@
 """
 test for the resources model
 """
-from enum import Enum
 import tempfile
 import unittest
+from enum import Enum
+
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import (
-    ConstantSDRAM, IPtagResource, MultiRegionSDRAM, ReverseIPtagResource,
-    SharedSDRAM, VariableSDRAM)
+    ConstantSDRAM,
+    IPtagResource,
+    MultiRegionSDRAM,
+    ReverseIPtagResource,
+    SharedSDRAM,
+    VariableSDRAM,
+)
 
 
 class MockEnum(Enum):

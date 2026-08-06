@@ -18,8 +18,11 @@ from typing import Collection, Dict, Iterable, Iterator, Tuple, Union
 from spinn_utilities.typing.coords import XY
 
 from pacman.exceptions import (
-    PacmanAlreadyPlacedError, PacmanNotPlacedError,
-    PacmanProcessorAlreadyOccupiedError, PacmanProcessorNotOccupiedError)
+    PacmanAlreadyPlacedError,
+    PacmanNotPlacedError,
+    PacmanProcessorAlreadyOccupiedError,
+    PacmanProcessorNotOccupiedError,
+)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
 from .placement import Placement

@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
+
 from spinn_utilities.overrides import overrides
-from pacman.utilities.utility_calls import can_shift
+
 from pacman.exceptions import IrregularFixedMaskException
+from pacman.utilities.utility_calls import can_shift
+
 from .app_vertex_routing_info import AppVertexRoutingInfo
 from .base_key_and_mask import BaseKeyAndMask
 

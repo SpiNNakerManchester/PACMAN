@@ -13,18 +13,28 @@
 # limitations under the License.
 
 import unittest
+
 from pacman.config_setup import unittest_setup
-from pacman.model.resources import ConstantSDRAM
 from pacman.exceptions import (
-    IrregularFixedMaskException, PacmanAlreadyExistsException,
-    PacmanConfigurationException, PacmanValueError)
-from pacman.model.routing_info import (
-    RoutingInfo, BaseKeyAndMask,
-    FixedAppVertexRoutingInfo, FixedMachineVertexRoutingInfo,
-    GlobalAppVertexRoutingInfo, GlobalMachineVertexRoutingInfo,
-    SpecificAppVertexRoutingInfo, SpecificMachineVertexRoutingInfo)
+    IrregularFixedMaskException,
+    PacmanAlreadyExistsException,
+    PacmanConfigurationException,
+    PacmanValueError,
+)
 from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.resources import ConstantSDRAM
+from pacman.model.routing_info import (
+    BaseKeyAndMask,
+    FixedAppVertexRoutingInfo,
+    FixedMachineVertexRoutingInfo,
+    GlobalAppVertexRoutingInfo,
+    GlobalMachineVertexRoutingInfo,
+    RoutingInfo,
+    SpecificAppVertexRoutingInfo,
+    SpecificMachineVertexRoutingInfo,
+)
 from pacman.utilities.constants import FULL_MASK
+
 from pacman_test_objects import SimpleTestVertex
 
 

@@ -22,7 +22,8 @@ from .machine_vertex_routing_info import MachineVertexRoutingInfo
 from .routing_info import RoutingInfo
 from .specific_app_vertex_routing_info import SpecificAppVertexRoutingInfo
 from .specific_machine_vertex_routing_info import (
-    SpecificMachineVertexRoutingInfo)
+    SpecificMachineVertexRoutingInfo,
+)
 from .vertex_routing_info import VertexRoutingInfo
 
 __all__ = ["AppVertexRoutingInfo", "BaseKeyAndMask",

@@ -12,20 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
 from typing import Optional
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
+
 from spinn_machine.data.machine_data_writer import MachineDataWriter
+
+from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.placements import Placements
 from pacman.model.routing_info import RoutingInfo
 from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartition)
+    MulticastRoutingTableByPartition,
+)
 from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.model.tags import Tags
-from pacman.exceptions import PacmanConfigurationException
+
 from .pacman_data_view import PacmanDataView, _PacmanDataModel
 
 logger = FormatAdapter(logging.getLogger(__name__))

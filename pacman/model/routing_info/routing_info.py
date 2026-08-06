@@ -12,17 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from collections import defaultdict
-from typing import (
-    Dict, Iterator, Optional, Iterable, Set, TYPE_CHECKING)
+from typing import TYPE_CHECKING, Dict, Iterable, Iterator, Optional, Set
 
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanRouteInfoAllocationException)
+    PacmanAlreadyExistsException,
+    PacmanRouteInfoAllocationException,
+)
 from pacman.utilities.constants import FULL_MASK
 
 if TYPE_CHECKING:
-    from .vertex_routing_info import VertexRoutingInfo
     from pacman.model.graphs import AbstractVertex
+
+    from .vertex_routing_info import VertexRoutingInfo
 
 
 class RoutingInfo(object):

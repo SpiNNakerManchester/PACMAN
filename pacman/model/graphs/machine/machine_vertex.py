@@ -12,23 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, Optional, final, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Iterable, Optional, final
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application.abstract import (
-    AbstractOneAppOneMachineVertex)
+    AbstractOneAppOneMachineVertex,
+)
 from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_calls import get_n_bits
 
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex
-    from pacman.model.resources import AbstractSDRAM
-    from pacman.model.resources import IPtagResource
-    from pacman.model.resources import ReverseIPtagResource
     from pacman.model.graphs.common import ChipAndCore
+    from pacman.model.resources import (
+        AbstractSDRAM,
+        IPtagResource,
+        ReverseIPtagResource,
+    )
 
 
 class MachineVertex(AbstractVertex, metaclass=AbstractBase):

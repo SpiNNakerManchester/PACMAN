@@ -12,17 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Optional
+
 import numpy
 
-from spinn_utilities.abstract_base import abstractmethod, AbstractBase
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractVertex
 from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.utility_calls import calc_shift, can_shift
 
-from .base_key_and_mask import BaseKeyAndMask
 from ..graphs.application import ApplicationVertex
+from .base_key_and_mask import BaseKeyAndMask
 
 NOT_SET = -1000
 

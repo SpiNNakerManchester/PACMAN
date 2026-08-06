@@ -14,10 +14,14 @@
 
 import math
 from typing import Optional
+
 from spinn_utilities.overrides import overrides
+
 from spinn_machine.link_data_objects import SpinnakerLinkData
 from spinn_machine.spinnaker_links import SpinnakerLinks
+
 from pacman.model.graphs.common.slice import Slice
+
 from .application_virtual_vertex import ApplicationVirtualVertex
 
 

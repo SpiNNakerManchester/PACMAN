@@ -12,23 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
 from typing import (
-    Collection, Generic, Optional, Tuple, TypeVar, Union, cast, TYPE_CHECKING)
+    TYPE_CHECKING,
+    Collection,
+    Generic,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 
 import numpy
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.ordered_set import OrderedSet
 
 from pacman.exceptions import (
-    PacmanConfigurationException, PacmanInvalidParameterException)
+    PacmanConfigurationException,
+    PacmanInvalidParameterException,
+)
 from pacman.model.graphs import AbstractVertex
+
 if TYPE_CHECKING:
-    from pacman.model.partitioner_splitters import AbstractSplitterCommon
     from pacman.model.graphs.machine import MachineVertex
+    from pacman.model.partitioner_splitters import AbstractSplitterCommon
     from pacman.model.routing_info import BaseKeyAndMask
+
     from .application_edge import ApplicationEdge
     from .application_edge_partition import ApplicationEdgePartition
 #: :meta private:

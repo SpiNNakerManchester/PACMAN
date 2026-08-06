@@ -14,7 +14,9 @@
 
 import logging
 from typing import Iterable
+
 from spinn_utilities.log import FormatAdapter
+
 from spinn_machine import MulticastRoutingEntry
 
 logger = FormatAdapter(logging.getLogger(__name__))

@@ -14,28 +14,34 @@
 """
 Collection of functions which together validate routes.
 """
-from collections import defaultdict
 import logging
-from typing import Dict, NamedTuple, Iterable, List, Set
+from collections import defaultdict
+from typing import Dict, Iterable, List, NamedTuple, Set
+
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.log import FormatAdapter
+
 from spinn_machine import Chip, MulticastRoutingEntry
 
 from pacman.data import PacmanDataView
 from pacman.exceptions import (
-    PacmanConfigurationException, PacmanRoutingException)
-from pacman.model.graphs.application import ApplicationVertex
+    PacmanConfigurationException,
+    PacmanRoutingException,
+)
 from pacman.model.graphs import AbstractVirtual
-from pacman.utilities.constants import FULL_MASK
-from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
-    get_app_partitions)
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.placements import Placement
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.routing_tables import (
-    AbstractMulticastRoutingTable, MulticastRoutingTables)
-
+    AbstractMulticastRoutingTable,
+    MulticastRoutingTables,
+)
+from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
+    get_app_partitions,
+)
+from pacman.utilities.constants import FULL_MASK
 
 logger = FormatAdapter(logging.getLogger(__name__))
 range_masks = {FULL_MASK - ((2 ** i) - 1) for i in range(1, 33)}

@@ -11,19 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import (
-    Dict, Iterable, List, Optional, Tuple, TypeVar, Generic)
+from typing import Dict, Generic, Iterable, List, Optional, Tuple, TypeVar
+
 from spinn_utilities.progress_bar import ProgressBar
+
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
+
 from pacman.data import PacmanDataView
-from pacman.model.routing_tables import (
-    UnCompressedMulticastRoutingTable, MulticastRoutingTables)
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.routing_info import (
-    RoutingInfo, AppVertexRoutingInfo, MachineVertexRoutingInfo)
 from pacman.model.graphs import AbstractVertex
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.model.routing_info import (
+    AppVertexRoutingInfo,
+    MachineVertexRoutingInfo,
+    RoutingInfo,
+)
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.model.routing_tables import (
+    MulticastRoutingTables,
+    UnCompressedMulticastRoutingTable,
+)
 
 #: :meta private:
 E = TypeVar("E")

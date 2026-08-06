@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from spinn_utilities.overrides import overrides
 
 from .machine_vertex_routing_info import MachineVertexRoutingInfo

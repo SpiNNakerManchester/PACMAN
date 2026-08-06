@@ -12,10 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import (
-    Collection, Dict, FrozenSet, Iterable, List, Mapping, Optional, Set, Tuple,
-    Union, cast)
 
+from typing import (
+    Collection,
+    Dict,
+    FrozenSet,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+    cast,
+)
 
 from typing_extensions import TypeAlias
 
@@ -24,12 +34,14 @@ from spinn_utilities.timer import Timer
 
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
-from pacman.exceptions import MinimisationFailedError
-from pacman.utilities.constants import FULL_MASK
-from pacman.model.routing_tables import UnCompressedMulticastRoutingTable
-from pacman.operations.router_compressors import AbstractCompressor
-from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.data.pacman_data_view import PacmanDataView
+from pacman.exceptions import MinimisationFailedError
+from pacman.model.routing_tables import (
+    MulticastRoutingTables,
+    UnCompressedMulticastRoutingTable,
+)
+from pacman.operations.router_compressors import AbstractCompressor
+from pacman.utilities.constants import FULL_MASK
 
 from .utils import intersect, remove_default_routes
 

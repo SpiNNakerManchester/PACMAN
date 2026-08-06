@@ -13,21 +13,20 @@
 # limitations under the License.
 
 import logging
-from typing import cast, Generic, List, Optional
+from typing import Generic, List, Optional, cast
 
-from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
 
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
-from pacman.utilities.algorithm_utilities.partition_algorithm_utilities import\
-    get_multidimensional_slices
-from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
+from pacman.utilities.algorithm_utilities. \
+    partition_algorithm_utilities import get_multidimensional_slices
 from pacman.utilities.utility_objs import ChipCounter
 
 from .abstract_splitter_common import AbstractSplitterCommon, V
-
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

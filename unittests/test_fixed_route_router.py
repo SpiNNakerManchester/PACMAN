@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 from typing import Dict, Set, Tuple
+
+import pytest
 from parameterized import parameterized
 
 from spinn_utilities.config_holder import set_config
@@ -23,10 +24,10 @@ from spinn_machine.version import BIG_BOARD_TYPES, Spin1Gen, Spin2Gen
 
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
-from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.placements import Placements, Placement
-from pacman.operations.fixed_route_router import fixed_route_router
 from pacman.exceptions import PacmanRoutingException
+from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.placements import Placement, Placements
+from pacman.operations.fixed_route_router import fixed_route_router
 
 
 def _get_destinations(

@@ -12,12 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from collections import defaultdict
 from typing import (
-    Dict, Iterable, Iterator, List, Optional, Set, Tuple, TYPE_CHECKING)
+    TYPE_CHECKING,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+)
+
 from spinn_machine.tags import IPTag, ReverseIPTag
+
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.utilities import utility_calls
+
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex
 

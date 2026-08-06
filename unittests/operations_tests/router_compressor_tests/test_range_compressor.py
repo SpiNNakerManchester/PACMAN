@@ -15,17 +15,24 @@
 import os
 import sys
 import unittest
+
 from spinn_utilities.config_holder import set_config
+
 from spinn_machine.version import Spin1Gen
+
 from pacman.config_setup import unittest_setup
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.model.routing_tables.uncompressed_multicast_routing_table import (
-    from_csv)
+    from_csv,
+)
 from pacman.operations.router_compressors import (
-    RangeCompressor, range_compressor)
+    RangeCompressor,
+    range_compressor,
+)
 from pacman.operations.router_compressors.routing_compression_checker import (
-    compare_tables)
+    compare_tables,
+)
 
 
 class TestRangeCompressor(unittest.TestCase):

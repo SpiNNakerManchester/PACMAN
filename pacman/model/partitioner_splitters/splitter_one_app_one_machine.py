@@ -14,15 +14,20 @@
 
 import logging
 from typing import Generic, List, TypeVar
-from spinn_utilities.overrides import overrides
+
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
+
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application.abstract import (
-    AbstractOneAppOneMachineVertex)
-from pacman.utilities.utility_objs import ChipCounter
-from pacman.model.graphs.machine import MachineVertex
+    AbstractOneAppOneMachineVertex,
+)
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
+from pacman.utilities.utility_objs import ChipCounter
+
 from .abstract_splitter_common import AbstractSplitterCommon
+
 #: :meta private:
 MV = TypeVar("MV", bound=MachineVertex)
 #: :meta private:

@@ -17,14 +17,15 @@ import unittest
 from parameterized import parameterized
 
 from spinn_utilities.config_holder import set_config
+
 from spinn_machine.version import MANY_BOARD_TYPES
 
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterOneToOneLegacy
-from pacman_test_objects import (
-    NonLegacyApplicationVertex, SimpleTestVertex)
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
+
+from pacman_test_objects import NonLegacyApplicationVertex, SimpleTestVertex
 
 
 class TestSplitterFixedLegacy(unittest.TestCase):

@@ -13,13 +13,12 @@
 # limitations under the License.
 
 from .abstract_edge import AbstractEdge
-from .abstract_vertex import AbstractVertex
-from .abstract_virtual import AbstractVirtual
 from .abstract_edge_partition import AbstractEdgePartition
 from .abstract_multiple_partition import AbstractMultiplePartition
 from .abstract_single_source_partition import AbstractSingleSourcePartition
 from .abstract_supports_sdram_edges import AbstractSupportsSDRAMEdges
-
+from .abstract_vertex import AbstractVertex
+from .abstract_virtual import AbstractVirtual
 
 __all__ = [
     "AbstractEdge", "AbstractEdgePartition",

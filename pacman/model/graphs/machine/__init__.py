@@ -12,19 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .abstract_sdram_partition import AbstractSDRAMPartition
+from .constant_sdram_machine_partition import ConstantSDRAMMachinePartition
+from .destination_segmented_sdram_machine_partition import (
+    DestinationSegmentedSDRAMMachinePartition,
+)
 from .machine_edge import MachineEdge
 from .machine_fpga_vertex import MachineFPGAVertex
 from .machine_sdram_edge import SDRAMMachineEdge
 from .machine_spinnaker_link_vertex import MachineSpiNNakerLinkVertex
 from .machine_vertex import MachineVertex
-from .simple_machine_vertex import SimpleMachineVertex
-from .abstract_sdram_partition import AbstractSDRAMPartition
-from .constant_sdram_machine_partition import ConstantSDRAMMachinePartition
-from .destination_segmented_sdram_machine_partition import (
-    DestinationSegmentedSDRAMMachinePartition)
 from .multicast_edge_partition import MulticastEdgePartition
+from .simple_machine_vertex import SimpleMachineVertex
 from .source_segmented_sdram_machine_partition import (
-    SourceSegmentedSDRAMMachinePartition)
+    SourceSegmentedSDRAMMachinePartition,
+)
 
 __all__ = [
     "AbstractSDRAMPartition", "ConstantSDRAMMachinePartition",

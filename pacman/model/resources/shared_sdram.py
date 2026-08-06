@@ -18,7 +18,9 @@ from typing import Any, Dict, Optional, TextIO, Union
 import numpy
 
 from spinn_utilities.overrides import overrides
+
 from pacman.exceptions import PacmanConfigurationException
+
 from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
 from .variable_sdram import VariableSDRAM

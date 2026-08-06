@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Generic, Optional, TypeVar, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Generic, Optional, TypeVar
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import ApplicationVertex
+
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex  # @UnusedImport
 #: :meta private:

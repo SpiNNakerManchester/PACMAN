@@ -16,12 +16,14 @@ from typing import Generic, Optional, Type, TypeVar, cast
 from spinn_utilities.overrides import overrides
 
 from pacman.exceptions import (
-    PacmanConfigurationException, PartitionMissingEdgesException,
-    SDRAMEdgeSizeException)
-from pacman.model.graphs.machine import AbstractSDRAMPartition
+    PacmanConfigurationException,
+    PartitionMissingEdgesException,
+    SDRAMEdgeSizeException,
+)
 from pacman.model.graphs import AbstractSingleSourcePartition
-from pacman.model.graphs.machine import SDRAMMachineEdge
 
+from .abstract_sdram_partition import AbstractSDRAMPartition
+from .machine_sdram_edge import SDRAMMachineEdge
 from .machine_vertex import MachineVertex
 
 #: :meta private:

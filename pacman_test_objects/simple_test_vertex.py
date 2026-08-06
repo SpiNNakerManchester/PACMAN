@@ -18,11 +18,12 @@ from typing import Optional
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
-    LegacyPartitionerAPI)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
+    LegacyPartitionerAPI,
+)
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 

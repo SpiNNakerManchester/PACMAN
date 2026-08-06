@@ -15,17 +15,16 @@
 Miscellaneous minor functions for converting between JSON and Python objects.
 """
 
-import json
 import gzip
-from typing import cast, Iterable, List, Union
+import json
+from typing import Iterable, List, Union, cast
 
 from spinn_utilities.typing.json import JsonArray, JsonObject
 
 from pacman.data import PacmanDataView
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements.placement import Placement
-from pacman.model.resources import (
-    IPtagResource, ReverseIPtagResource)
+from pacman.model.resources import IPtagResource, ReverseIPtagResource
 from pacman.model.routing_info import BaseKeyAndMask
 
 

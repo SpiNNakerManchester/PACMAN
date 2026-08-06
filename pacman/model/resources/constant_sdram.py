@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from typing import Any, Optional, TextIO
+
 from spinn_utilities.overrides import overrides
+
 from .abstract_sdram import AbstractSDRAM
 
 

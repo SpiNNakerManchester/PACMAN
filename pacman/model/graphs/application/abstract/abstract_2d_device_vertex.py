@@ -13,15 +13,17 @@
 # limitations under the License.
 import math
 from typing import Tuple
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
 from spinn_utilities.typing.coords import XY
+
 from pacman.exceptions import PacmanConfigurationException
-from pacman.utilities.utility_calls import get_n_bits, is_power_of_2
-from pacman.utilities.constants import BITS_IN_KEY
-from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import MDSlice
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.utilities.constants import BITS_IN_KEY
+from pacman.utilities.utility_calls import get_n_bits, is_power_of_2
 
 
 class Abstract2DDeviceVertex(object, metaclass=AbstractBase):

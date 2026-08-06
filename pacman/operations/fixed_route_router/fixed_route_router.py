@@ -13,12 +13,17 @@
 # limitations under the License.
 
 from typing import Dict, List, Tuple, Type
+
 from spinn_utilities.progress_bar import ProgressBar
+
 from spinn_machine import Chip, RoutingEntry
+
 from pacman.data import PacmanDataView
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanConfigurationException,
-    PacmanRoutingException)
+    PacmanAlreadyExistsException,
+    PacmanConfigurationException,
+    PacmanRoutingException,
+)
 
 
 def fixed_route_router(

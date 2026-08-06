@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from collections import defaultdict
 from typing import Dict, Iterable, Optional, Sequence, cast
 
 from spinn_utilities.ordered_set import OrderedSet
+
 from pacman.exceptions import (
-    PacmanAlreadyExistsException, PacmanInvalidParameterException)
+    PacmanAlreadyExistsException,
+    PacmanInvalidParameterException,
+)
 
 from .application_edge import ApplicationEdge
 from .application_edge_partition import ApplicationEdgePartition

@@ -13,23 +13,32 @@
 # limitations under the License.
 
 import unittest
+
 from spinn_utilities.exceptions import (
-    DataNotYetAvialable, SimulatorRunningException, SimulatorShutdownException)
+    DataNotYetAvialable,
+    SimulatorRunningException,
+    SimulatorShutdownException,
+)
+
 from pacman.config_setup import unittest_setup
 from pacman.data import PacmanDataView
 from pacman.data.pacman_data_writer import PacmanDataWriter
 from pacman.exceptions import (
-    PacmanConfigurationException, PacmanNotPlacedError)
-from pacman.model.graphs.common import Slice
+    PacmanConfigurationException,
+    PacmanNotPlacedError,
+)
 from pacman.model.graphs.application import ApplicationEdge
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.placements import Placement, Placements
 from pacman.model.resources import ConstantSDRAM, VariableSDRAM
 from pacman.model.routing_info import RoutingInfo
 from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartition)
+    MulticastRoutingTableByPartition,
+)
 from pacman.model.routing_tables import MulticastRoutingTables
 from pacman.model.tags import Tags
+
 from pacman_test_objects import SimpleTestVertex
 
 

@@ -14,8 +14,11 @@
 
 import logging
 from typing import Dict, List, Optional, TextIO
+
 from spinn_utilities.log import FormatAdapter
+
 from spinn_machine import MulticastRoutingEntry
+
 from pacman.exceptions import PacmanRoutingException
 from pacman.model.routing_tables import AbstractMulticastRoutingTable
 from pacman.utilities.algorithm_utilities.routes_format import format_route

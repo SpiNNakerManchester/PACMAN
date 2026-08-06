@@ -16,11 +16,13 @@ from typing import Iterable, Optional
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.resources import AbstractSDRAM
-from pacman.model.resources import IPtagResource
-from pacman.model.resources import ReverseIPtagResource
+from pacman.model.graphs.common import Slice
+from pacman.model.resources import (
+    AbstractSDRAM,
+    IPtagResource,
+    ReverseIPtagResource,
+)
 
 from .machine_vertex import MachineVertex
 

@@ -13,11 +13,12 @@
 # limitations under the License.
 
 import unittest
+
 from pacman.config_setup import unittest_setup
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
-from pacman_test_objects import (
-    NonLegacyApplicationVertex, SimpleTestVertex)
+
+from pacman_test_objects import NonLegacyApplicationVertex, SimpleTestVertex
 
 
 class TestSplitterFixedLegacy(unittest.TestCase):

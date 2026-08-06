@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Optional
+
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import ChipAndCore
 
