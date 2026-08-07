@@ -62,7 +62,7 @@ def draw_placements(
     vertex_colours: Dict[Optional[AbstractVertex], Colour] = defaultdict(
         _next_colour)
     vertex_colours[None] = unused
-    board_colours: Dict[XY, Colour] = dict()
+    board_colours: Dict[XY, Colour] = {}
     machine = PacmanDataView.get_machine()
     for xy in machine.chip_coordinates:
         if (placements.n_placements_on_chip(xy) ==

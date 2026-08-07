@@ -114,7 +114,7 @@ def __create_routing_table(
         routing_info: RoutingInfo) -> UnCompressedMulticastRoutingTable:
     table = UnCompressedMulticastRoutingTable(x, y)
     sources_by_key_mask: Dict[BaseKeyAndMask,
-                              Tuple[AbstractVertex, str]] = dict()
+                              Tuple[AbstractVertex, str]] = {}
     iterator = _IteratorWithNext(partitions_in_table.items())
     while iterator.has_next:
         (vertex, part_id), entry = iterator.pop()

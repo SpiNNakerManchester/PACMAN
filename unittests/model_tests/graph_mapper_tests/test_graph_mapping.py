@@ -36,7 +36,7 @@ class TestGraphMapping(unittest.TestCase):
         """
         test getting the vertex from a graph mapper via the vertex
         """
-        vertices = list()
+        vertices = []
         vert = SimpleTestVertex(10, "Some testing vertex")
         vertices.append(SimpleMachineVertex(None, ""))
         vertices.append(SimpleMachineVertex(None, ""))

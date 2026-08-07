@@ -58,8 +58,8 @@ class SplitterExternalDevice(AbstractSplitterCommon):
 
     def __init__(self) -> None:
         super().__init__()
-        self.__incoming_vertices: List[MachineVertex] = list()
-        self.__incoming_slices: List[Slice] = list()
+        self.__incoming_vertices: List[MachineVertex] = []
+        self.__incoming_slices: List[Slice] = []
         self.__outgoing_vertex: Optional[MachineVertex] = None
         self.__outgoing_slice: Optional[Slice] = None
 
@@ -67,8 +67,8 @@ class SplitterExternalDevice(AbstractSplitterCommon):
     def set_governed_app_vertex(self, app_vertex: _Allowed) -> None:
         super().set_governed_app_vertex(app_vertex)
 
-        self.__incoming_vertices = list()
-        self.__incoming_slices = list()
+        self.__incoming_vertices = []
+        self.__incoming_slices = []
         self.__outgoing_vertex = None
         self.__outgoing_slice = None
 

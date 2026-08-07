@@ -53,10 +53,10 @@ class Tags(object):
 
     def __init__(self) -> None:
         # Mapping of (board address, tag) to IPTag
-        self._ip_tags: Dict[Tuple[str, int], IPTag] = dict()
+        self._ip_tags: Dict[Tuple[str, int], IPTag] = {}
 
         # Mapping of (board address, tag) to ReverseIPTag
-        self._reverse_ip_tags: Dict[Tuple[str, int], ReverseIPTag] = dict()
+        self._reverse_ip_tags: Dict[Tuple[str, int], ReverseIPTag] = {}
 
         # Mapping of vertex to list of IPTag
         self._ip_tags_by_vertex: Dict[

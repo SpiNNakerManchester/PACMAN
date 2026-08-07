@@ -66,7 +66,7 @@ class TestPlacement(unittest.TestCase):
         check that you cant put a vertex in multiple placements
         """
         subv = SimpleMachineVertex(None, "")
-        pl = list()
+        pl = []
         for i in range(4):
             pl.append(Placement(subv, 0, 0, i))
         with self.assertRaises(PacmanAlreadyPlacedError):

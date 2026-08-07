@@ -753,7 +753,7 @@ def _get_covered_keys_and_masks(
     """
     # For every entry in the table below the insertion index see which keys
     # and masks would overlap with the key and mask of the merged entry.
-    covered: List[_KeyMask] = list()
+    covered: List[_KeyMask] = []
     for entry in merge.routing_table[merge.insertion_index:]:
         km = (entry.key, entry.mask)
         for key_mask in aliases.get(km, {km}):

@@ -51,7 +51,7 @@ class Placements(object):
             If two placements are made to the same processor.
         """
         self._placements: Dict[XY, Dict[int, Placement]] = defaultdict(dict)
-        self._machine_vertices: Dict[MachineVertex, Placement] = dict()
+        self._machine_vertices: Dict[MachineVertex, Placement] = {}
         if placements:
             self.add_placements(placements)
 

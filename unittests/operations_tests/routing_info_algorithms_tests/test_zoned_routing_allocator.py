@@ -134,14 +134,14 @@ def create_graphs1(with_fixed: bool, shiftable: bool = True) -> None:
     out_app_vertex = MockAppVertex(splitter=MockSplitter())
     PacmanDataView.add_vertex(out_app_vertex)
     # Create 5 application vertices (3 bits)
-    app_vertices = list()
+    app_vertices = []
     for app_index in range(5):
         fixed_keys_by_partition: Optional[Dict[str, BaseKeyAndMask]] = None
         fixed_machine_keys_by_partition: \
             Optional[Dict[Tuple[MachineVertex, str], BaseKeyAndMask]] = None
         if with_fixed:
-            fixed_keys_by_partition = dict()
-            fixed_machine_keys_by_partition = dict()
+            fixed_keys_by_partition = {}
+            fixed_machine_keys_by_partition = {}
             if app_index == 2:
                 fixed_keys_by_partition["Part7"] = BaseKeyAndMask(
                     0xFE000000, 0xFFFF0000)
@@ -563,7 +563,7 @@ def test_big_fixed_low() -> None:
 
 
 def create_many_machine_mask() -> None:
-    fixed_machine_keys_by_partition: Any = dict()
+    fixed_machine_keys_by_partition: Any = {}
     fixed_app_vertex = MockAppVertex(
         splitter=MockSplitter(), fixed_key=BaseKeyAndMask(0, 0xffffff00),
         fixed_machine_keys_by_partition=fixed_machine_keys_by_partition)

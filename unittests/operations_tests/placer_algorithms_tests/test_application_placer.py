@@ -51,7 +51,7 @@ class MockSplitter(AbstractSplitterCommon):
         self.__n_groups = n_groups
         self.__n_machine_vertices = n_machine_vertices
         self.__same_chip_groups: List[
-            Tuple[Sequence[MachineVertex], AbstractSDRAM]] = list()
+            Tuple[Sequence[MachineVertex], AbstractSDRAM]] = []
         self.__sdram = sdram
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)

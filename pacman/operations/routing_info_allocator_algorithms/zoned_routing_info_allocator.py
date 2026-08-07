@@ -131,9 +131,9 @@ class ZonedRoutingInfoAllocator(object):
         self.__vertex_partitions: OrderedSet[
             Tuple[ApplicationVertex, str]] = OrderedSet()
         self.__atom_bits_per_app_part: Dict[
-            Tuple[ApplicationVertex, str], int] = dict()
+            Tuple[ApplicationVertex, str], int] = {}
         self.__ap_keys_blocked_by_fixed: \
-            Dict[int, Tuple[ApplicationVertex, str]] = dict()
+            Dict[int, Tuple[ApplicationVertex, str]] = {}
 
         # Start at with values for an empty graph then as needed
         self.__min_bits_machine_and_atoms = 0

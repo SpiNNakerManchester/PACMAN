@@ -42,7 +42,7 @@ class MulticastRoutingTableByPartition(object):
 
     def __init__(self) -> None:
         self._router_to_entries_map: Dict[XY, Dict[
-            Tuple[AbstractVertex, str], RoutingEntry]] = dict()
+            Tuple[AbstractVertex, str], RoutingEntry]] = {}
 
     def add_path_entry(
             self, entry: RoutingEntry,
@@ -61,7 +61,7 @@ class MulticastRoutingTableByPartition(object):
         key = (router_x, router_y)
         entries = self._router_to_entries_map.get(key)
         if entries is None:
-            entries = dict()
+            entries = {}
             self._router_to_entries_map[key] = entries
 
         if isinstance(source_vertex, ApplicationVertex):

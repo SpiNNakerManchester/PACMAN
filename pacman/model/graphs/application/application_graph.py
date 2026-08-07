@@ -49,7 +49,7 @@ class ApplicationGraph(object):
             OrderedSet[ApplicationEdgePartition]] = defaultdict(OrderedSet)
         self._n_outgoing_edge_partitions = 0
         self._unlabelled_vertex_count = 0
-        self._vertex_by_label: Dict[str, ApplicationVertex] = dict()
+        self._vertex_by_label: Dict[str, ApplicationVertex] = {}
 
     def add_vertex(self, vertex: ApplicationVertex) -> None:
         """

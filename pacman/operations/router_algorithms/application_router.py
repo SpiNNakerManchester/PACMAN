@@ -52,7 +52,7 @@ class _Targets(object):
     def __init__(self) -> None:
         self.__targets_by_source: Dict[
             AbstractVertex, Tuple[List[int], List[int]]] = defaultdict(
-                lambda: (list(), list()))
+                lambda: ([], []))
 
     def ensure_source(self, source_vertex: AbstractVertex) -> None:
         """
@@ -61,7 +61,7 @@ class _Targets(object):
         :param source_vertex: The vertex to ensure exists
         """
         if source_vertex not in self.__targets_by_source:
-            self.__targets_by_source[source_vertex] = (list(), list())
+            self.__targets_by_source[source_vertex] = ([], [])
 
     def add_sources_for_target(
             self, core: _OptInt, link: _OptInt,
@@ -196,7 +196,7 @@ def route_application_graph() -> MulticastRoutingTableByPartition:
 
         # Keep track of which chips (xys) we have visited with routes for this
         # partition to ensure no looping
-        routes: Dict[XY, RoutingTree] = dict()
+        routes: Dict[XY, RoutingTree] = {}
 
         # Keep track of cores or links to target on specific chips (xys)
         targets: Dict[XY, _Targets] = defaultdict(_Targets)
@@ -511,7 +511,7 @@ def _make_source_to_source_routes(
     :param targets: The target end-points of the routes
     """
     for xy in source_mappings:
-        source_routes: Dict[XY, RoutingTree] = dict()
+        source_routes: Dict[XY, RoutingTree] = {}
         _route_to_xys(
             xy, all_source_xys.union(self_xys), machine, source_routes,
             source_edge_xys.union(self_xys),
@@ -541,14 +541,14 @@ def _make_source_to_source_edge_routes(
     :param routing_tables: The tables to write
     """
     for xy in source_mappings:
-        source_routes: Dict[XY, RoutingTree] = dict()
+        source_routes: Dict[XY, RoutingTree] = {}
         _route_to_xys(
             xy, all_source_xys, machine, source_routes,
             source_edge_xys, "Sources to source")
         for vertex, processor, link in source_mappings[xy]:
             _convert_a_route(
                 routing_tables, vertex, partition.identifier,
-                processor, link, source_routes[xy], dict())
+                processor, link, source_routes[xy], {})
 
 
 def _find_target_xy(
@@ -611,7 +611,7 @@ def _route_to_xys(
         label: str) -> None:
     # Keep a queue of xy to visit, list of (parent xy, link from parent)
     xys_to_explore: Deque[Tuple[XY, List[Tuple[XY, int]]]] = deque(
-        [(first_xy, list())])
+        [(first_xy, [])])
     visited = set()
     targets_to_visit = set(targets)
     while xys_to_explore:
@@ -625,7 +625,7 @@ def _route_to_xys(
         # If we have reached a xy that has already been routed to,
         # cut the path off here
         if xy in routes:
-            path = list()
+            path = []
 
         # If we have reached a target, add the path to the routes
         elif xy in targets:
@@ -638,7 +638,7 @@ def _route_to_xys(
                 last_route = routes[parent]
 
             # The path can be reset from here as we have already routed here
-            path = list()
+            path = []
 
         for link in range(6):
             x, y = xy
@@ -751,7 +751,7 @@ def _path_without_errors(
         machine: Machine) -> List[_Node]:
     c_xy = source_xy
     pos = 0
-    new_nodes = list()
+    new_nodes = []
     while pos < len(nodes):
         # While the route is working, move forwards and copy
         while (pos < len(nodes) and _is_ok(c_xy, nodes[pos], machine)):
@@ -805,7 +805,7 @@ def _xy(node: _Node) -> XY:
 def _find_path(
         source_xy: XY, target_xy: XY, machine: Machine) -> List[_Node]:
     xys_to_explore: Deque[Tuple[XY, List[_Node]]] = deque(
-        [(source_xy, list())])
+        [(source_xy, [])])
     visited = set()
     while xys_to_explore:
         xy, path = xys_to_explore.popleft()
@@ -859,8 +859,8 @@ def _convert_a_route(
         incoming_processor, incoming_link, route = to_process.pop()
         x, y = route.chip
 
-        processor_ids: List[int] = list()
-        link_ids: List[int] = list()
+        processor_ids: List[int] = []
+        link_ids: List[int] = []
         next_incoming_link: _OptInt = None
         for (link, next_hop) in route.children:
             if link is not None:
