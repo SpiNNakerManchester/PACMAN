@@ -48,18 +48,18 @@ class TestPlacements(unittest.TestCase):
         checks that creating an empty placements object is valid
         """
         pls = Placements()
-        self.assertEqual(pls._placements, dict())
-        self.assertEqual(pls._machine_vertices, dict())
+        self.assertEqual(pls._placements, {})
+        self.assertEqual(pls._machine_vertices, {})
 
     def test_get_placement_of_vertex(self) -> None:
         """
         checks the placements get placement method
         """
-        subv = list()
+        subv = []
         for i in range(5):
             subv.append(SimpleMachineVertex(None, ""))
 
-        pl = list()
+        pl = []
         for i in range(4):
             pl.append(Placement(subv[i], 0, 0, i))
 
@@ -72,11 +72,11 @@ class TestPlacements(unittest.TestCase):
         checks that from a placements object, you can get to the correct
         vertex using the get_vertex_on_processor() method
         """
-        subv = list()
+        subv = []
         for i in range(5):
             subv.append(SimpleMachineVertex(None, ""))
 
-        pl = list()
+        pl = []
         for i in range(4):
             pl.append(Placement(subv[i], 0, 0, i))
 
@@ -91,11 +91,11 @@ class TestPlacements(unittest.TestCase):
         """
         tests the placements iterator functionality.
         """
-        subv = list()
+        subv = []
         for i in range(5):
             subv.append(SimpleMachineVertex(None, ""))
 
-        pl = list()
+        pl = []
         for i in range(4):
             pl.append(Placement(subv[i], 0, 0, i))
 

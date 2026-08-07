@@ -127,19 +127,19 @@ class ApplicationPlacer(object):
 
         self.__full_chips: Set[Chip] = set()
         self.__prepared_chips: Set[Chip] = set()
-        self.__restored_chips: List[Chip] = list()
-        self.__starts_tried: List[Chip] = list()
+        self.__restored_chips: List[Chip] = []
+        self.__starts_tried: List[Chip] = []
 
         self.__current_chip: Optional[Chip] = None
-        self.__current_cores_free: List[int] = list()
+        self.__current_cores_free: List[int] = []
         self.__current_sdram_used: AbstractSDRAM = ConstantSDRAM(0)
         self.__app_vertex_label: Optional[str] = None
 
         # Set some value so no Optional needed
         self.__ethernet_x = -1
         self.__ethernet_y = -1
-        self.__same_board_chips: Dict[Chip, Chip] = dict()
-        self.__other_board_chips:  Dict[Chip, Chip] = dict()
+        self.__same_board_chips: Dict[Chip, Chip] = {}
+        self.__other_board_chips:  Dict[Chip, Chip] = {}
 
     def do_placements(self, system_placements: Placements) -> Placements:
         """
@@ -233,7 +233,7 @@ class ApplicationPlacer(object):
         self.__prepared_chips.clear()
         self.__current_chip = None
 
-        placements_to_make: List = list()
+        placements_to_make: List = []
 
         # Go through the groups
         for vertices, sdram in same_chip_groups:
@@ -280,7 +280,7 @@ class ApplicationPlacer(object):
 
     def _place_error(self, system_placements: Placements,
                      exception: Exception) -> PacmanPlaceException:
-        unplaceable = list()
+        unplaceable = []
         vertex_count = 0
         n_vertices = 0
         for app_vertex in PacmanDataView.iterate_vertices():

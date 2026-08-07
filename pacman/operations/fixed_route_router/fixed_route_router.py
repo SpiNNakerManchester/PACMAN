@@ -59,7 +59,7 @@ class _FixedRouteRouter(object):
         self._machine = PacmanDataView.get_machine()
         self._destination_class = destination_class
         self._fixed_route_tables: Dict[Tuple[int, int], RoutingEntry] = \
-            dict()
+            {}
 
     def build_fixed_routes(self) -> Dict[Tuple[int, int], RoutingEntry]:
         """

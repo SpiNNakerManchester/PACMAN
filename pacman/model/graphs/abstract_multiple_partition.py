@@ -51,7 +51,7 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
         """
         super().__init__(
             identifier=identifier, allowed_edge_types=allowed_edge_types)
-        self._pre_vertices: Dict[V, OrderedSet[E]] = dict()
+        self._pre_vertices: Dict[V, OrderedSet[E]] = {}
         self._destinations: Dict[V, OrderedSet[E]] = defaultdict(OrderedSet)
 
         # hard code dict of lists so that only these are acceptable.

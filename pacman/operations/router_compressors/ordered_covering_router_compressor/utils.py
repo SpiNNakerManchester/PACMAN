@@ -92,7 +92,7 @@ def remove_default_routes(
         # Optimised case: no alias check so just remove default-routed entries
         new_table = [entry for entry in table if not entry.defaultable]
     else:
-        new_table = list()
+        new_table = []
         for i, entry in enumerate(table):
             if not entry.defaultable:
                 # If the entry cannot be removed then add it to the table

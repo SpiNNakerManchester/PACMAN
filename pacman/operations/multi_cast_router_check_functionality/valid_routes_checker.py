@@ -164,7 +164,7 @@ def _search_route(
 
     located_destinations: Set[PlacementTuple] = set()
 
-    failed_to_cover_all_keys_routers: List[_Failure] = list()
+    failed_to_cover_all_keys_routers: List[_Failure] = []
 
     _start_trace_via_routing_tables(
         source_placement, key_and_mask, located_destinations, routing_tables,
@@ -172,7 +172,7 @@ def _search_route(
 
     # start removing from located_destinations and check if destinations not
     #  reached
-    failed_to_reach_destinations = list()
+    failed_to_reach_destinations = []
     for dest in dest_placements:
         if dest in located_destinations:
             located_destinations.remove(dest)
@@ -268,7 +268,7 @@ def _check_all_keys_hit_entry(
     :param base_key: the base key of the partition
     :return: the list of keys which this entry doesn't cover which it should
     """
-    bad_entries = list()
+    bad_entries = []
     for atom_id in range(0, n_atoms):
         key = base_key + atom_id
         if entry.mask & key != entry.key:

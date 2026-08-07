@@ -64,7 +64,7 @@ def get_multidimensional_slices(
         total_n_atoms *= n_atom
 
     # Run over all the vertices and create slices for them
-    slices: List[Slice] = list()
+    slices: List[Slice] = []
     hi_atom = -1
     for v in range(n_vertices):
         # Work out where in each of the dimensions this vertex starts by
@@ -109,7 +109,7 @@ def get_single_dimension_slices(app_vertex: ApplicationVertex) -> List[Slice]:
     n_vertices = math.ceil(app_vertex.n_atoms / total_on_core)
 
     # Run over all the vertices and create slices for them
-    slices = list()
+    slices = []
     hi_atom = -1
     for _ in range(n_vertices):
         # Make a slice

@@ -56,7 +56,7 @@ def __create_routing_table(
         routing_infos: RoutingInfo) -> UnCompressedMulticastRoutingTable:
     table = UnCompressedMulticastRoutingTable(x, y)
     sources_by_key_mask: Dict[BaseKeyAndMask,
-                              Tuple[AbstractVertex, str]] = dict()
+                              Tuple[AbstractVertex, str]] = {}
     for source_vertex, partition_id in partitions_in_table:
         r_info = routing_infos.get_info_from(
             source_vertex, partition_id)

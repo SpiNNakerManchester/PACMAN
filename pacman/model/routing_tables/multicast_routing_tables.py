@@ -52,7 +52,7 @@ class MulticastRoutingTables(object):
             If any two routing tables are for the same chip
         """
         self._routing_tables_by_chip: Dict[
-            XY, AbstractMulticastRoutingTable] = dict()
+            XY, AbstractMulticastRoutingTable] = {}
 
         for routing_table in routing_tables:
             self.add_routing_table(routing_table)

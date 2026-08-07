@@ -53,7 +53,7 @@ def key_mask_to_json(key_mask: BaseKeyAndMask) -> JsonObject:
     :returns: key and mask in json format
     """
     try:
-        json_object: JsonObject = dict()
+        json_object: JsonObject = {}
         json_object["key"] = key_mask.key
         json_object["mask"] = key_mask.mask
     except Exception as ex:  # pylint: disable=broad-except
@@ -68,7 +68,7 @@ def iptag_resource_to_json(iptag: IPtagResource) -> JsonObject:
     :param iptag:
     :returns: iptag in json forMAT
     """
-    json_dict: JsonObject = dict()
+    json_dict: JsonObject = {}
     try:
         json_dict["ip_address"] = iptag.ip_address
         if iptag.port is not None:
@@ -129,7 +129,7 @@ def reverse_iptag_to_json(iptag: ReverseIPtagResource) -> JsonObject:
     :param iptag:
     :returns: json description of the reverse iptags
     """
-    json_dict: JsonObject = dict()
+    json_dict: JsonObject = {}
     try:
         if iptag.port is not None:
             json_dict["port"] = iptag.port
@@ -189,7 +189,7 @@ def placement_to_json(placement: Placement) -> JsonObject:
     :param placement:
     :returns: json object describing the placement
     """
-    json_dict: JsonObject = dict()
+    json_dict: JsonObject = {}
     try:
         json_dict["vertex_label"] = placement.vertex.label
         json_dict["x"] = placement.x
