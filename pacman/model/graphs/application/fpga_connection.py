@@ -18,10 +18,10 @@ from typing import NamedTuple, Optional
 from spinn_utilities.typing.coords import XY
 
 #: The range of FPGA ids
-FPGA_IDS = range(0, 3)
+FPGA_IDS = range(3)
 
 #: The range of FPGA link ids
-FPGA_LINK_IDS = range(0, 16)
+FPGA_LINK_IDS = range(16)
 
 
 class FPGAConnection(NamedTuple):
