@@ -36,16 +36,15 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     """
 
     __slots__ = (
-        # The coordinates of the chip for which this is the routing table
-        "_x", "_y",
-
         # dict of multicast routing entries.
         # (key, mask) -> multicast_routing_entry
         "_entries_by_key_mask",
-
         # counter of how many entries in their multicast routing table are
         # defaultable
-        "_number_of_defaulted_routing_entries")
+        "_number_of_defaulted_routing_entries",
+        # The coordinates of the chip for which this is the routing table
+        "_x", "_y",
+    )
 
     def __init__(
             self, x: int, y: int,

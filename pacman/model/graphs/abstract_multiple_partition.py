@@ -36,10 +36,11 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
     An edge partition that has multiple source vertices.
     """
     __slots__ = (
+        # the destinations of this outgoing partition.
+        "_destinations",
         # the vertices which send through this partition.
         "_pre_vertices",
-        # the destinations of this outgoing partition.
-        "_destinations")
+    )
 
     def __init__(
             self, pre_vertices: Collection[V], identifier: str,

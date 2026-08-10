@@ -27,10 +27,11 @@ class SDRAMMachineEdge(MachineEdge):
     """
 
     __slots__ = (
+        # The sdram base address for this edge
+        "_sdram_base_address",
         # The sdram size of this edge.
         "_sdram_size",
-        # The sdram base address for this edge
-        "_sdram_base_address")
+    )
 
     def __init__(
             self, pre_vertex: MachineVertex, post_vertex: MachineVertex,

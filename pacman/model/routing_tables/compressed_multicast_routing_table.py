@@ -28,15 +28,14 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
     """
 
     __slots__ = (
-        # The coordinates of the chip for which this is the routing table
-        "_x", "_y",
-
         # An iterable of routing entries to add to the table
         "_multicast_routing_entries",
-
         # counter of how many entries in their multicast routing table are
         # defaultable
-        "_number_of_defaulted_routing_entries")
+        "_number_of_defaulted_routing_entries",
+        # The coordinates of the chip for which this is the routing table
+        "_x", "_y",
+    )
 
     def __init__(
             self, x: int, y: int,

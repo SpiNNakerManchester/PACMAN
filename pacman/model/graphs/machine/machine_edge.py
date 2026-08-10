@@ -32,12 +32,13 @@ class MachineEdge(AbstractEdge[_MV]):
     """
 
     __slots__ = (
-        # The vertex at the start of the edge
-        "_pre_vertex",
+        # The label of the edge
+        "_label",
         # The vertex at the end of the edge
         "_post_vertex",
-        # The label of the edge
-        "_label")
+        # The vertex at the start of the edge
+        "_pre_vertex",
+    )
 
     def __init__(self, pre_vertex: MachineVertex, post_vertex: MachineVertex,
                  label: Optional[str] = None):

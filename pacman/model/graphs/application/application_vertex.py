@@ -59,9 +59,6 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         # List of machine vertices associated with this app vertex
         "_machine_vertices",
 
-        # The splitter object associated with this app vertex
-        "_splitter",
-
         # The maximum number of atoms for each dimension for each core.
         # For example, a 2D vertex might have a shape of 640 by 480 with
         # rectangles on each core or 32 by 16.
@@ -69,7 +66,11 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         # the vertex has multiple dimensions, one or more of the dimensions
         # might have fewer atoms on the last core (e.g. the rectangle on the
         # last core of a 2D vertex might be smaller).
-        "_max_atoms_per_dimension_per_core")
+        "_max_atoms_per_dimension_per_core",
+
+        # The splitter object associated with this app vertex
+        "_splitter",
+    )
 
     def __init__(
             self, label: Optional[str] = None,

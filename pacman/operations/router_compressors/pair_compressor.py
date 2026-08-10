@@ -157,8 +157,6 @@ class _PairCompressor(AbstractCompressor):
         "_all_entries",
         # flag to use slower quick sort as it is implemented in c/ on cores
         "_c_sort",
-        # The next index to write a merged/unmergeable entry to
-        "_write_index",
         # Inclusive index of last entry in the array (length in python)
         "_max_index",
         # Exclusive pointer to the end of the entries for previous buckets
@@ -170,10 +168,13 @@ class _PairCompressor(AbstractCompressor):
         # to keep c and python code as similar as possible
         # List of the routes to match with the frequencies
         "_routes",
+        # Number of unique routes found so far
+        "_routes_count",
         # List of the frequencies. Match index for index with routes
         "_routes_frequency",
-        # Number of unique routes found so far
-        "_routes_count")
+        # The next index to write a merged/unmergeable entry to
+        "_write_index",
+    )
 
     def __init__(self, ordered: bool = True, accept_overflow: bool = False,
                  c_sort: bool = False):

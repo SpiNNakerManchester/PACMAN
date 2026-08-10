@@ -21,12 +21,13 @@ class ChipAndCore(object):
     """
 
     __slots__ = (
+        # The processor ID on chip (x,y) that this vertex is placed on within
+        # the SpiNNaker machine; may be None
+        "_p",
         # the chip coordinates in the SpiNNaker machine to which the machine
         # vertex is placed
         "_x", "_y",
-        # The processor ID on chip (x,y) that this vertex is placed on within
-        # the SpiNNaker machine; may be None
-        "_p")
+    )
 
     def __init__(self, x: int, y: int, p: Optional[int] = None):
         """

@@ -97,33 +97,33 @@ class ZonedRoutingInfoAllocator(object):
     """
 
     __slots__ = (
-        # A list of vertices and partitions to allocate
-        "__vertex_partitions",
+        # Set of app_part indexes used by fixed
+        "__ap_keys_blocked_by_fixed",
         # For each App vertex / Partition name zone keep track of the number of
         # bites required for the mask for each machine vertex
         "__atom_bits_per_app_part",
-        # Minimum size needed for the combined machine and atoms zone
-        # This is the maximum needed to represent the keys and masks
-        # for a single app vertex / partition ID
-        "__min_bits_machine_and_atoms",
-        # Maximum number of bits to represent the machines for any vertex
-        "__max_bits_machine",
-        # Maximum number of bits to represent the atoms for any vertex
-        "__max_bits_atoms",
-        # Needed size of the App vertex / Partition name zone
-        "__size_app_part_bits",
-        # Set of app_part indexes used by fixed
-        "__ap_keys_blocked_by_fixed",
-        # The size of the App vertex / Partition name zone
-        "__target_app_bits",
-        # Size of the machine part for vertex that fit the normal case
-        "__target_machine_bits",
-        # Size of the atoms part for vertex that fit the normal case
-        "__target_atom_bits",
         # Default Application mask
         "__global_app_mask",
         # Default Machine mask
         "__global_machine_mask",
+        # Maximum number of bits to represent the machines for any vertex
+        "__max_bits_atoms",
+        # Minimum size needed for the combined machine and atoms zone
+        # This is the maximum needed to represent the keys and masks
+        # for a single app vertex / partition ID
+        "__max_bits_machine",
+        # Maximum number of bits to represent the atoms for any vertex
+        "__min_bits_machine_and_atoms",
+        # Needed size of the App vertex / Partition name zone
+        "__size_app_part_bits",
+        # The size of the App vertex / Partition name zone
+        "__target_app_bits",
+        # Size of the atoms part for vertex that fit the normal case
+        "__target_atom_bits",
+        # Size of the machine part for vertex that fit the normal case
+        "__target_machine_bits",
+        # A list of vertices and partitions to allocate
+        "__vertex_partitions",
     )
 
     def __init__(self) -> None:

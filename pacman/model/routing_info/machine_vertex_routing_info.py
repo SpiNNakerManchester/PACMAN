@@ -35,13 +35,14 @@ class MachineVertexRoutingInfo(VertexRoutingInfo):
     """
 
     __slots__ = (
-        # The machine vertex that the keys are allocated to
-        "__machine_vertex",
+        # application Mask for this routing info
+        "__app_mask",
         # The index of the machine vertex within the range of the application
         # vertex
         "__index",
-        # application Mask for this routing info
-        "__app_mask")
+        # The machine vertex that the keys are allocated to
+        "__machine_vertex",
+    )
 
     def __init__(self, key_and_mask: BaseKeyAndMask, partition_id: str,
                  machine_vertex: MachineVertex, index: int, app_mask: int):

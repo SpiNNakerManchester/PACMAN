@@ -78,12 +78,12 @@ class _PacmanDataModel(object):
 
     __slots__ = (
         # Data values cached
+        "_all_monitor_vertices",
+        "_ethernet_monitor_vertices",
         "_graph",
         "_placements",
         "_plan_n_timesteps",
         "_precompressed",
-        "_all_monitor_vertices",
-        "_ethernet_monitor_vertices",
         "_routing_infos",
         "_routing_table_by_partition",
         "_tags",

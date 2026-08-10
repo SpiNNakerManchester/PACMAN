@@ -60,33 +60,12 @@ class ApplicationPlacer(object):
 
     """
     __slots__ = (
-        # Values from PacmanDataView cached for speed
-        # PacmanDataView.get_machine()
-        "__machine",
-        # PacmanDataView.get_plan_n_timestep()
-        "__plan_n_timesteps",
-        # Sdram available on perfect none Ethernet Chip after Monitors placed
-        "__max_sdram",
-        # Maximum sdram that should be used for a Chip to not be full
-        "__cap_sdram",
-        # N Cores free on perfect none Ethernet Chip after Monitors placed
-        "__max_cores",
-
-        # Pointer to the placements including all previous Application Vertices
-        "__placements",
-        # A Function to yield the Chips in a consistent order
-        "__chips",
-        # Chips that have been fully placed by previous Application Vertices
-        "__full_chips",
-        # Chips that have already been used by this ApplicationVertex
-        "__prepared_chips",
-        # Start Chips from previous ApplicationVertices not yet marked as full
-        "__restored_chips",
-        # Start Chips tried for this ApplicationVertex
-        "__starts_tried",
         # Label of the current ApplicationVertex for (error) reporting
         "__app_vertex_label",
-
+        # Maximum sdram that should be used for a Chip to not be full
+        "__cap_sdram",
+        # A Function to yield the Chips in a consistent order
+        "__chips",
         # Data for the last Chip offered to place on
         # May be full after current group placed
         "__current_chip",
@@ -94,15 +73,34 @@ class ApplicationPlacer(object):
         "__current_cores_free",
         # Used sdram after the current group is placed
         "__current_sdram_used",
-
         # Data about the neighbouring Chips to ones used
         # Current board being placed on
         "__ethernet_x",
         "__ethernet_y",
+        # Chips that have been fully placed by previous Application Vertices
+        "__full_chips",
+        # Values from PacmanDataView cached for speed
+        # PacmanDataView.get_machine()
+        "__machine",
+        # N Cores free on perfect none Ethernet Chip after Monitors placed
+        "__max_cores",
+        # Sdram available on perfect none Ethernet Chip after Monitors placed
+        "__max_sdram",
+        # List of available neighbours not on the current board
+        "__other_board_chips",
+        # Pointer to the placements including all previous Application Vertices
+        "__placements",
+        # PacmanDataView.get_plan_n_timestep()
+        "__plan_n_timesteps",
+        # Chips that have already been used by this ApplicationVertex
+        "__prepared_chips",
+        # Start Chips from previous ApplicationVertices not yet marked as full
+        "__restored_chips",
         # List of available neighbours on the current board
         "__same_board_chips",
-        # List of available neighbours not on the current board
-        "__other_board_chips")
+        # Start Chips tried for this ApplicationVertex
+        "__starts_tried",
+    )
 
     def __init__(self, placements: Placements):
         """
