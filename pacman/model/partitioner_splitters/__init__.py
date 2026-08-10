@@ -27,5 +27,8 @@ from .splitter_one_to_one_legacy import SplitterOneToOneLegacy
 
 __all__ = [
     'AbstractSplitterCommon',
-    'SplitterOneAppOneMachine', 'SplitterOneToOneLegacy',
-    'SplitterFixedLegacy', 'SplitterExternalDevice']
+    'SplitterExternalDevice',
+    'SplitterFixedLegacy',
+    'SplitterOneAppOneMachine',
+    'SplitterOneToOneLegacy',
+]

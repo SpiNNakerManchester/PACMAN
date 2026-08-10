@@ -15,4 +15,4 @@
 from .abstract_2d_device_vertex import Abstract2DDeviceVertex
 from .abstract_one_app_one_machine_vertex import AbstractOneAppOneMachineVertex
 
-__all__ = ["AbstractOneAppOneMachineVertex", "Abstract2DDeviceVertex"]
+__all__ = ["Abstract2DDeviceVertex", "AbstractOneAppOneMachineVertex"]

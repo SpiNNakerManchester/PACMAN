@@ -28,9 +28,15 @@ from .application_spinnaker_link_vertex import ApplicationSpiNNakerLinkVertex
 from .application_virtual_vertex import ApplicationVirtualVertex
 from .fpga_connection import FPGAConnection
 
-__all__ = ["ApplicationEdge", "ApplicationEdgePartition",
-           "ApplicationFPGAVertex", "ApplicationGraph",
-           "ApplicationSpiNNakerLinkVertex", "ApplicationVertex",
-           "FPGAConnection", "Application2DFPGAVertex",
-           "Application2DSpiNNakerLinkVertex",
-           "ApplicationVirtualVertex"]
+__all__ = [
+    "Application2DFPGAVertex",
+    "Application2DSpiNNakerLinkVertex",
+    "ApplicationEdge",
+    "ApplicationEdgePartition",
+    "ApplicationFPGAVertex",
+    "ApplicationGraph",
+    "ApplicationSpiNNakerLinkVertex",
+    "ApplicationVertex",
+    "ApplicationVirtualVertex",
+    "FPGAConnection",
+]
