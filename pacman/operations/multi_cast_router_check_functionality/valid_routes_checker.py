@@ -269,7 +269,7 @@ def _check_all_keys_hit_entry(
     :return: the list of keys which this entry doesn't cover which it should
     """
     bad_entries = []
-    for atom_id in range(0, n_atoms):
+    for atom_id in range(n_atoms):
         key = base_key + atom_id
         if entry.mask & key != entry.key:
             bad_entries.append(key)
