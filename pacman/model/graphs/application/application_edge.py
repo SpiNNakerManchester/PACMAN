@@ -29,12 +29,13 @@ class ApplicationEdge(AbstractEdge['ApplicationVertex']):
     """
 
     __slots__ = (
-        # The edge at the start of the vertex
-        "_pre_vertex",
+        # The label
+        "_label",
         # The edge at the end of the vertex
         "_post_vertex",
-        # The label
-        "_label")
+        # The edge at the start of the vertex
+        "_pre_vertex",
+    )
 
     def __init__(self, pre_vertex: ApplicationVertex,
                  post_vertex: ApplicationVertex, label: Optional[str] = None):

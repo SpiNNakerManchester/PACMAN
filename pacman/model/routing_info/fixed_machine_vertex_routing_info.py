@@ -39,9 +39,9 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
     """
 
     __slots__ = (
+        "__app_key",
         # Records this has app keys overlap
         "__app_key_overlap",
-        "__app_key",
         "__global_app_mask",
         "__global_machine_mask"
     )

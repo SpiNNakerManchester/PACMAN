@@ -27,15 +27,15 @@ class Placement(object):
     """
 
     __slots__ = (
+        # The processor ID on chip (x,y) that this vertex is placed on within
+        # the SpiNNaker machine
+        "_p",
         # the machine vertex that is placed on the core represented
         "_vertex",
-
         # the chip coordinates in the SpiNNaker machine to which the machine
         # vertex is placed
         "_x", "_y",
-        # The processor ID on chip (x,y) that this vertex is placed on within
-        # the SpiNNaker machine
-        "_p")
+    )
 
     def __init__(self, vertex: MachineVertex, x: int, y: int, p: int):
         """

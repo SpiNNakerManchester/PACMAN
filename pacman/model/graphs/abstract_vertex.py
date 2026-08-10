@@ -25,10 +25,11 @@ class AbstractVertex(object):
     __slots__ = (
         # Indicates if the Vertex has been added to a graph
         "_added_to_graph",
+        # the x, y (and p) this vertex MUST be placed on
+        "_fixed_location",
         # Label for the vertex. Changeable until added to graph
         "_label",
-        # the x, y (and p) this vertex MUST be placed on
-        "_fixed_location")
+    )
 
     def __init__(self, label: Optional[str] = None):
         """

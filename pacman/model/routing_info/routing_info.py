@@ -33,14 +33,23 @@ class RoutingInfo(object):
     An association of machine vertices to a non-overlapping set of keys
     and masks.
     """
-    __slots__ = ("_info", "_is_machine_shiftable",
-                 "_global_app_mask", "_global_machine_mask",
-                 "_has_fixed_keys", "_has_app_keys_overlap",
-                 "_has_global_app_masks", "_has_global_machine_masks",
-                 "_max_bits_machine", "_max_bits_atoms",
-                 "_min_bits_machine_and_atoms", "_size_app_part_bits",
-                 "_target_app_bits", "_target_machine_bits",
-                 "_target_atom_bits")
+    __slots__ = (
+        "_global_app_mask",
+        "_global_machine_mask",
+        "_has_app_keys_overlap",
+        "_has_fixed_keys",
+        "_has_global_app_masks",
+        "_has_global_machine_masks",
+        "_info",
+        "_is_machine_shiftable",
+        "_max_bits_atoms",
+        "_max_bits_machine",
+        "_min_bits_machine_and_atoms",
+        "_size_app_part_bits",
+        "_target_app_bits",
+        "_target_atom_bits",
+        "_target_machine_bits",
+    )
 
     def __init__(self) -> None:
         # Partition information indexed by edge pre-vertex and partition ID

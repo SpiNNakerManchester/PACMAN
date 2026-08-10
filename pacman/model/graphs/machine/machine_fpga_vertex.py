@@ -38,13 +38,14 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
     """
 
     __slots__ = (
+        "_board_address",
         "_fpga_id",
         "_fpga_link_id",
-        "_board_address",
-        "_linked_chip_coordinates",
-        "_outgoing_keys_and_masks",
         "_incoming",
-        "_outgoing")
+        "_linked_chip_coordinates",
+        "_outgoing",
+        "_outgoing_keys_and_masks",
+    )
 
     def __init__(
             self, fpga_id: int, fpga_link_id: int,

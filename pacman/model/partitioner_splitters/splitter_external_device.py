@@ -47,14 +47,14 @@ class SplitterExternalDevice(AbstractSplitterCommon):
     """
 
     __slots__ = (
-        # Machine vertices that will send packets into the network
-        "__incoming_vertices",
-        # Machine vertices that will receive packets from the network
-        "__outgoing_vertex",
         # Slices of incoming vertices (not exactly but hopefully close enough)
         "__incoming_slices",
+        # Machine vertices that will send packets into the network
+        "__incoming_vertices",
         # Slice of outgoing vertex (which really doesn't matter here)
-        "__outgoing_slice")
+        "__outgoing_slice",
+        # Machine vertices that will receive packets from the network
+        "__outgoing_vertex")
 
     def __init__(self) -> None:
         super().__init__()

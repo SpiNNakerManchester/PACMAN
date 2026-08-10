@@ -41,8 +41,9 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon[ApplicationVertex]):
 
     __slots__ = [
         "_machine_vertex",
+        "_sdram",
         "_vertex_slice",
-        "_sdram"]
+    ]
 
     def __init__(self) -> None:
         super().__init__()

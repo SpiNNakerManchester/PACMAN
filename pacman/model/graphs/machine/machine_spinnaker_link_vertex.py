@@ -38,12 +38,13 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractVirtual):
     """
 
     __slots__ = (
-        "_spinnaker_link_id",
         "_board_address",
-        "_linked_chip_coordinates",
-        "_outgoing_keys_and_masks",
         "_incoming",
-        "_outgoing")
+        "_linked_chip_coordinates",
+        "_outgoing",
+        "_outgoing_keys_and_masks",
+        "_spinnaker_link_id",
+    )
 
     def __init__(
             self, spinnaker_link_id: int, board_address: Optional[str] = None,

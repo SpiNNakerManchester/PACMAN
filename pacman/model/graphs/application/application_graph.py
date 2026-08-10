@@ -34,14 +34,15 @@ class ApplicationGraph(object):
     """
 
     __slots__ = (
-        # The sets of edge partitions by pre-vertex
-        "_outgoing_edge_partitions_by_pre_vertex",
         # The total number of outgoing edge partitions
         "_n_outgoing_edge_partitions",
+        # The sets of edge partitions by pre-vertex
+        "_outgoing_edge_partitions_by_pre_vertex",
         # count of vertex which had a None or already used label
         "_unlabelled_vertex_count",
         # map between labels and vertex
-        "_vertex_by_label")
+        "_vertex_by_label",
+    )
 
     def __init__(self) -> None:
         self._outgoing_edge_partitions_by_pre_vertex: Dict[

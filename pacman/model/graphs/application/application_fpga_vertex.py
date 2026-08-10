@@ -35,10 +35,11 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
     """
 
     __slots__ = (
-        "_n_atoms",
         "_incoming_fpga_connections",
+        "_n_atoms",
+        "_n_machine_vertices_per_link",
         "_outgoing_fpga_connection",
-        "_n_machine_vertices_per_link")
+    )
 
     def __init__(
             self, n_atoms: int,

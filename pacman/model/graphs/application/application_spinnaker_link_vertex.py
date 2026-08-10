@@ -31,12 +31,13 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
     """
 
     __slots__ = (
-        "_n_atoms",
-        "_spinnaker_link_id",
         "_board_address",
-        "_n_machine_vertices",
         "_incoming",
-        "_outgoing")
+        "_n_atoms",
+        "_n_machine_vertices",
+        "_outgoing",
+        "_spinnaker_link_id",
+    )
 
     def __init__(
             self, n_atoms: int, spinnaker_link_id: int,

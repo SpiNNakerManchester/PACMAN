@@ -25,20 +25,20 @@ class ChipCounter(object):
     """
 
     __slots__ = (
-        # How many cores there are to be used on a chip
-        "__n_cores_per_chip",
-
-        # How much SDRAM there is to be used on a chip
-        "__sdram_per_chip",
-
         # The number of cores free on the "current" chip
         "__cores_free",
+
+        # The number of chips used, including the current one
+        "__n_chips",
+
+        # How many cores there are to be used on a chip
+        "__n_cores_per_chip",
 
         # The SDRAM free on the "current" chip
         "__sdram_free",
 
-        # The number of chips used, including the current one
-        "__n_chips")
+        # How much SDRAM there is to be used on a chip
+        "__sdram_per_chip")
 
     def __init__(self) -> None:
         version = PacmanDataView.get_machine_version()

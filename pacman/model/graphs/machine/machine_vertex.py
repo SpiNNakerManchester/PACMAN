@@ -41,7 +41,10 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     """
 
     __slots__ = (
-        "_app_vertex", "_index", "__vertex_slice")
+        "__vertex_slice",
+        "_app_vertex",
+        "_index",
+    )
     _DEFAULT_SLICE = Slice(0, 0)
 
     def __init__(self, label: Optional[str] = None,

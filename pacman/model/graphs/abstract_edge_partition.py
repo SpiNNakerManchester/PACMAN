@@ -46,12 +46,13 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
     """
 
     __slots__ = (
-        # The partition identifier
-        "_identifier",
+        # The type of edges to accept
+        "_allowed_edge_types",
         # The edges in the partition
         "_edges",
-        # The type of edges to accept
-        "_allowed_edge_types")
+        # The partition identifier
+        "_identifier",
+    )
 
     def __init__(self, identifier: str,
                  allowed_edge_types: Union[Type[E], Tuple[Type[E], ...]]):
