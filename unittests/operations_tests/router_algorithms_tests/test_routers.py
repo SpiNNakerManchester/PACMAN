@@ -14,7 +14,7 @@
 
 import math
 from collections import defaultdict
-from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple, cast
+from typing import Iterable, Optional, Sequence, cast
 
 from parameterized import parameterized
 
@@ -134,12 +134,12 @@ class MockMultiInputSplitter(AbstractSplitterCommon):
         self.__n_outgoing_machine_vertices = n_outgoing_machine_vertices
         self.__n_groups = n_groups
         self.__internal_multicast = internal_multicast
-        self.__same_chip_groups: List[Tuple[
+        self.__same_chip_groups: list[tuple[
             Sequence[MachineVertex], AbstractSDRAM]] = []
-        self.__incoming_machine_vertices: List[List[MachineVertex]] = [
+        self.__incoming_machine_vertices: list[list[MachineVertex]] = [
             [] for _ in range(n_incoming_machine_vertices)]
-        self.__outgoing_machine_vertices: List[MachineVertex] = []
-        self.__internal_multicast_partitions: List[
+        self.__outgoing_machine_vertices: list[MachineVertex] = []
+        self.__internal_multicast_partitions: list[
             MulticastEdgePartition] = []
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
@@ -194,7 +194,7 @@ class MockMultiInputSplitter(AbstractSplitterCommon):
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
-            partition_id: str) -> Sequence[Tuple[
+            partition_id: str) -> Sequence[tuple[
                 MachineVertex, Sequence[AbstractVertex]]]:
         sources = source_vertex.splitter.get_out_going_vertices(partition_id)
         n_sources = len(sources)
@@ -227,7 +227,7 @@ class MockMultiInputSplitter(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.get_same_chip_groups)
     def get_same_chip_groups(self) -> Sequence[
-            Tuple[Sequence[MachineVertex], AbstractSDRAM]]:
+            tuple[Sequence[MachineVertex], AbstractSDRAM]]:
         return self.__same_chip_groups
 
 
@@ -277,7 +277,7 @@ class MockOneToOneSplitter(AbstractSplitterCommon):
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
-            partition_id: str) -> Sequence[Tuple[
+            partition_id: str) -> Sequence[tuple[
                 MachineVertex, Sequence[AbstractVertex]]]:
         return [
             (target, [source])
@@ -291,7 +291,7 @@ class MockNearestEthernetSplitter(AbstractSplitterCommon):
     def __init__(self) -> None:
         super().__init__()
         self.__placements = Placements()
-        self.__m_vertex_by_ethernet: Dict[Tuple[int, int], MachineVertex]
+        self.__m_vertex_by_ethernet: dict[tuple[int, int], MachineVertex]
         self.__m_vertex_by_ethernet = {}
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
@@ -336,7 +336,7 @@ class MockNearestEthernetSplitter(AbstractSplitterCommon):
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
-            partition_id: str) -> Sequence[Tuple[
+            partition_id: str) -> Sequence[tuple[
                 MachineVertex, Sequence[AbstractVertex]]]:
 
         m_vertex = next(iter(source_vertex.splitter.get_out_going_vertices(
@@ -357,9 +357,9 @@ class MockInputOutputSplitter(AbstractSplitterCommon):
         super().__init__()
         self.__n_incoming: int = n_incoming
         self.__n_outgoing: int = n_outgoing
-        self.__incoming_machine_vertices: List[MachineVertex] = []
-        self.__outgoing_machine_vertices: List[MachineVertex] = []
-        self.__internal_multicast_partitions: List[
+        self.__incoming_machine_vertices: list[MachineVertex] = []
+        self.__outgoing_machine_vertices: list[MachineVertex] = []
+        self.__internal_multicast_partitions: list[
             MulticastEdgePartition] = []
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
@@ -505,11 +505,11 @@ def _get_entry(
 
 def _find_targets(
         routing_tables: MulticastRoutingTableByPartition,
-        expected_virtual: Set[Tuple[int, int, int]],
-        source_vertex: MachineVertex, partition_id: str) -> Set[
-            Tuple[XY, Optional[int], Optional[int]]]:
-    found_targets: Set[Tuple[XY, Optional[int], Optional[int]]] = set()
-    to_follow: List[Tuple[int, int, Optional[RoutingEntry]]] = []
+        expected_virtual: set[tuple[int, int, int]],
+        source_vertex: MachineVertex, partition_id: str) -> set[
+            tuple[XY, Optional[int], Optional[int]]]:
+    found_targets: set[tuple[XY, Optional[int], Optional[int]]] = set()
+    to_follow: list[tuple[int, int, Optional[RoutingEntry]]] = []
     x, y = vertex_xy(source_vertex)
     first_entry = _get_entry(
         routing_tables, x, y, source_vertex, partition_id, True)
@@ -548,7 +548,7 @@ def _find_targets(
     return found_targets
 
 
-def _add_virtual(expected_virtual: Set[Tuple[int, int, int]],
+def _add_virtual(expected_virtual: set[tuple[int, int, int]],
                  vertex: MachineVertex) -> None:
     link_data: Optional[AbstractLinkData] = None
     if isinstance(vertex, MachineFPGAVertex):
@@ -569,7 +569,7 @@ def _check_edges(routing_tables: MulticastRoutingTableByPartition) -> None:
 
         # Find the required targets
         required_targets = defaultdict(set)
-        expected_virtual: Set[Tuple[int, int, int]] = set()
+        expected_virtual: set[tuple[int, int, int]] = set()
         for edge in part.edges:
             post = edge.post_vertex
             targets = post.splitter.get_source_specific_in_coming_vertices(
@@ -740,7 +740,7 @@ def test_multi_down_chips_and_links(_: str, ver_num: str) -> None:
     routing_tables = _route_and_time()
 
     # Pick a few of the chips and links used and take them out
-    chosen_entries: List[Tuple[int, int, RoutingEntry]] = []
+    chosen_entries: list[tuple[int, int, RoutingEntry]] = []
     count = 2
     for x, y in routing_tables.get_routers():
         if len(chosen_entries) >= 10:
@@ -950,7 +950,7 @@ def test_with_ethernet_system_placements(_: str, ver_num: str) -> None:
     _check_edges(routing_tables)
 
 
-def _check_path(source: XY, nodes_fixed: List[Tuple[int, XY]],
+def _check_path(source: XY, nodes_fixed: list[tuple[int, XY]],
                 machine: Machine, target: XY) -> None:
     c_x, c_y = source
     seen = set()

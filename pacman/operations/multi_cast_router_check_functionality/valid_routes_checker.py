@@ -16,7 +16,7 @@ Collection of functions which together validate routes.
 """
 import logging
 from collections import defaultdict
-from typing import Dict, Iterable, List, NamedTuple, Set
+from typing import Iterable, NamedTuple
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
@@ -62,7 +62,7 @@ class PlacementTuple(NamedTuple):
 class _Failure(NamedTuple):
     router_x: int
     router_y: int
-    keys: List[int]
+    keys: list[int]
     source_mask: int
 
 
@@ -86,7 +86,7 @@ def validate_routes(routing_tables: MulticastRoutingTables) -> None:
         source = partition.pre_vertex
 
         # Destination cores by source machine vertices
-        destinations: Dict[MachineVertex, OrderedSet[PlacementTuple]] = \
+        destinations: dict[MachineVertex, OrderedSet[PlacementTuple]] = \
             defaultdict(OrderedSet)
 
         for edge in partition.edges:
@@ -162,9 +162,9 @@ def _search_route(
         for dest in dest_placements:
             logger.debug("[{}:{}:{}]", dest.x, dest.y, dest.p)
 
-    located_destinations: Set[PlacementTuple] = set()
+    located_destinations: set[PlacementTuple] = set()
 
-    failed_to_cover_all_keys_routers: List[_Failure] = []
+    failed_to_cover_all_keys_routers: list[_Failure] = []
 
     _start_trace_via_routing_tables(
         source_placement, key_and_mask, located_destinations, routing_tables,
@@ -224,9 +224,9 @@ def _search_route(
 
 def _start_trace_via_routing_tables(
         source_placement: Placement, key_and_mask: BaseKeyAndMask,
-        reached_placements: Set[PlacementTuple],
+        reached_placements: set[PlacementTuple],
         routing_tables: MulticastRoutingTables, n_atoms: int,
-        failed_to_cover_all_keys_routers: List[_Failure]) -> None:
+        failed_to_cover_all_keys_routers: list[_Failure]) -> None:
     """
     Start the trace, by using the source placement's router and tracing
     from the route.
@@ -245,7 +245,7 @@ def _start_trace_via_routing_tables(
         source_placement.x, source_placement.y)
     if current_router_table is None:
         return
-    visited_routers: Set[Chip] = set()
+    visited_routers: set[Chip] = set()
     visited_routers.add(current_router_table.chip)
 
     # get src router
@@ -261,7 +261,7 @@ def _start_trace_via_routing_tables(
 
 def _check_all_keys_hit_entry(
         entry: MulticastRoutingEntry, n_atoms: int,
-        base_key: int) -> List[int]:
+        base_key: int) -> list[int]:
     """
     :param entry: routing entry discovered
     :param n_atoms: the number of atoms this partition covers
@@ -281,9 +281,9 @@ def _recursive_trace_to_destinations(
         entry: MulticastRoutingEntry,
         current_router: AbstractMulticastRoutingTable,
         chip_x: int, chip_y: int, key_and_mask: BaseKeyAndMask,
-        visited_routers: Set[Chip], reached_placements: Set[PlacementTuple],
+        visited_routers: set[Chip], reached_placements: set[PlacementTuple],
         routing_tables: MulticastRoutingTables, n_atoms: int,
-        failed_to_cover_all_keys_routers: List[_Failure]) -> None:
+        failed_to_cover_all_keys_routers: list[_Failure]) -> None:
     """
     Recursively search though routing tables until no more entries are
     registered with this key.
@@ -353,7 +353,7 @@ def _recursive_trace_to_destinations(
         _is_dest(processor_values, current_router, reached_placements)
 
 
-def _check_visited_routers(chip: Chip, visited_routers: Set[Chip]) -> None:
+def _check_visited_routers(chip: Chip, visited_routers: set[Chip]) -> None:
     """
     Check if the trace has visited this router already.
 
@@ -371,7 +371,7 @@ def _check_visited_routers(chip: Chip, visited_routers: Set[Chip]) -> None:
 
 def _is_dest(processor_ids: Iterable[int],
              current_router: AbstractMulticastRoutingTable,
-             reached_placements: Set[PlacementTuple]) -> None:
+             reached_placements: set[PlacementTuple]) -> None:
     """
     Collect processors to be removed.
 

@@ -21,7 +21,7 @@ from pacman.data.pacman_data_view import PacmanDataView
 from pacman.model.graphs.machine import MachineVertex
 
 
-class Placement(object):
+class Placement:
     """
     The placement of a vertex on to a machine chip and core.
     """

@@ -17,8 +17,6 @@ from typing import (
     TYPE_CHECKING,
     Collection,
     Generic,
-    Tuple,
-    Type,
     TypeVar,
     Union,
 )
@@ -55,7 +53,7 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
     )
 
     def __init__(self, identifier: str,
-                 allowed_edge_types: Union[Type[E], Tuple[Type[E], ...]]):
+                 allowed_edge_types: Union[type[E], tuple[type[E], ...]]):
         """
         :param identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed

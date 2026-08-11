@@ -28,13 +28,9 @@ from __future__ import annotations
 from collections import deque
 from typing import (
     TYPE_CHECKING,
-    Deque,
     Iterable,
     Iterator,
-    List,
     Optional,
-    Set,
-    Tuple,
     Union,
 )
 
@@ -44,7 +40,7 @@ if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex
 
 
-class RoutingTree(object):
+class RoutingTree:
     """
     Explicitly defines a multicast route through a SpiNNaker machine.
 
@@ -67,8 +63,8 @@ class RoutingTree(object):
             The chip the route is currently passing through.
         """
         self._chip_x, self._chip_y = chip
-        self._children: List[
-            Tuple[int, Union[RoutingTree, MachineVertex]]] = []
+        self._children: list[
+            tuple[int, Union[RoutingTree, MachineVertex]]] = []
         self._label = label
 
     @property
@@ -87,7 +83,7 @@ class RoutingTree(object):
 
     @property
     def children(self) -> Iterable[
-            Tuple[int, Union[RoutingTree, MachineVertex]]]:
+            tuple[int, Union[RoutingTree, MachineVertex]]]:
         """
         A :py:class:`iterable` of the next steps in the route represented by a
         (route, object) tuple.
@@ -114,7 +110,7 @@ class RoutingTree(object):
         yield from self._children
 
     def append_child(
-            self, child: Tuple[int, Union[RoutingTree, MachineVertex]]
+            self, child: tuple[int, Union[RoutingTree, MachineVertex]]
             ) -> None:
         """
         Adds the child to the tree
@@ -124,7 +120,7 @@ class RoutingTree(object):
         self._children.append(child)
 
     def remove_child(
-            self, child: Tuple[int, Union[RoutingTree, MachineVertex]]
+            self, child: tuple[int, Union[RoutingTree, MachineVertex]]
             ) -> None:
         """
         Removes a child which must have been in the tree
@@ -165,7 +161,7 @@ class RoutingTree(object):
         return f"<RoutingTree at {self.chip} with {len(self._children)}" \
                f" {'child' if len(self._children) == 1 else 'children'}>"
 
-    def traverse(self) -> Iterable[Tuple[Optional[int], XY, Set[int]]]:
+    def traverse(self) -> Iterable[tuple[Optional[int], XY, set[int]]]:
         """
         Traverse the tree yielding the direction taken to a node, the
         coordinates of that node and the directions leading from the Node.
@@ -179,14 +175,14 @@ class RoutingTree(object):
         # A queue of (direction, node) to visit. The direction is the Links
         # entry which describes the direction in which we last moved to reach
         # the node (or None for the root).
-        to_visit: Deque[
-            Tuple[Optional[int], RoutingTree]] = deque(((None, self), ))
+        to_visit: deque[
+            tuple[Optional[int], RoutingTree]] = deque(((None, self), ))
         while to_visit:
             direction, node = to_visit.popleft()
 
             # Determine the set of directions we must travel to reach the
             # children
-            out_directions: Set[int] = set()
+            out_directions: set[int] = set()
             # pylint:disable=protected-access
             for child_direction, child in node._children:
                 # Note that if the direction is unspecified, we simply

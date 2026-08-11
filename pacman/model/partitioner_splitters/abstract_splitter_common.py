@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Generic, Iterable, Optional, Sequence, Tuple, TypeVar
+from typing import Generic, Iterable, Optional, Sequence, TypeVar
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -150,7 +150,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
 
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
-            partition_id: str) -> Sequence[Tuple[
+            partition_id: str) -> Sequence[tuple[
                 MachineVertex, Sequence[AbstractVertex]]]:
         """
         Get machine post-vertices for a given source.
@@ -194,7 +194,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         raise NotImplementedError
 
     def get_same_chip_groups(self) -> Sequence[
-            Tuple[Sequence[MachineVertex], AbstractSDRAM]]:
+            tuple[Sequence[MachineVertex], AbstractSDRAM]]:
         """
         Get a list of lists of vertices and SDRAM which must be
         allocated on the same chip.

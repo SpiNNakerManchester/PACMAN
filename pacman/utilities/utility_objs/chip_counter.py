@@ -16,7 +16,7 @@ from pacman.data import PacmanDataView
 from pacman.model.resources.abstract_sdram import AbstractSDRAM
 
 
-class ChipCounter(object):
+class ChipCounter:
     """
     A counter of how many chips are needed to hold machine vertices.
     This does not look at the fixed_locations of the vertices at all.

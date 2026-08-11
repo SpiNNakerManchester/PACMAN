@@ -15,14 +15,9 @@ from __future__ import annotations
 
 from typing import (
     Collection,
-    Dict,
-    FrozenSet,
     Iterable,
-    List,
     Mapping,
     Optional,
-    Set,
-    Tuple,
     Union,
     cast,
 )
@@ -46,11 +41,11 @@ from pacman.utilities.constants import FULL_MASK
 from .utils import intersect, remove_default_routes
 
 #: A key,mask pair
-_KeyMask: TypeAlias = Tuple[int, int]
+_KeyMask: TypeAlias = tuple[int, int]
 #: A mapping from a key,mask pair to the things it aliases
-_Aliases: TypeAlias = Dict[_KeyMask, FrozenSet[_KeyMask]]
+_Aliases: TypeAlias = dict[_KeyMask, frozenset[_KeyMask]]
 #: A read-only mapping from a key,mask pair to the things it aliases
-_ROAliases: TypeAlias = Mapping[_KeyMask, FrozenSet[_KeyMask]]
+_ROAliases: TypeAlias = Mapping[_KeyMask, frozenset[_KeyMask]]
 #: Sequence of all bit positions in a 32-bit word
 _all_bits = tuple(1 << i for i in range(32))
 # pylint: disable=wrong-spelling-in-comment
@@ -77,7 +72,7 @@ class _OrderedCoveringCompressor(AbstractCompressor):
 
     def compress_table(
             self, router_table: UnCompressedMulticastRoutingTable
-            ) -> List[MulticastRoutingEntry]:
+            ) -> list[MulticastRoutingEntry]:
         """
         Reduce the size of a routing table by merging together entries where
         possible and by removing any remaining default routes.
@@ -111,7 +106,7 @@ def ordered_covering(
         target_length: Optional[int],
         aliases: _Aliases, *, no_raise: bool = False,
         time_to_run_for: Optional[float] = None
-        ) -> Tuple[List[MulticastRoutingEntry], _Aliases]:
+        ) -> tuple[list[MulticastRoutingEntry], _Aliases]:
     """
     Reduce the size of a routing table by merging together entries where
     possible.
@@ -231,7 +226,7 @@ def _get_entry_generality(entry: Union[MulticastRoutingEntry, _Merge]) -> int:
 
 
 def _get_best_merge(
-        routing_table: List[MulticastRoutingEntry],
+        routing_table: list[MulticastRoutingEntry],
         aliases: _ROAliases) -> '_Merge':
     """
     Inspect all possible merges for the routing table and return the merge
@@ -273,7 +268,7 @@ def _get_best_merge(
     return best_merge
 
 
-def _get_all_merges(routing_table: List[MulticastRoutingEntry]
+def _get_all_merges(routing_table: list[MulticastRoutingEntry]
                     ) -> Iterable['_Merge']:
     """
     Get possible sets of entries to merge.
@@ -281,7 +276,7 @@ def _get_all_merges(routing_table: List[MulticastRoutingEntry]
     :param routing_table: Routing entries to be merged.
     """
     # Memorise entries that have been considered as part of a merge
-    considered_entries: Set[int] = set()
+    considered_entries: set[int] = set()
 
     for i, entry in enumerate(routing_table):
         # If we've already considered this entry then skip
@@ -303,7 +298,7 @@ def _get_all_merges(routing_table: List[MulticastRoutingEntry]
             yield _Merge(routing_table, merge)
 
 
-class _Merge(object):
+class _Merge:
     """
     Represents a potential merge of routing table entries.
     """
@@ -327,7 +322,7 @@ class _Merge(object):
         # Whether this merge is defaultable
         "defaultable"]
 
-    def __init__(self, routing_table: List[MulticastRoutingEntry],
+    def __init__(self, routing_table: list[MulticastRoutingEntry],
                  entries: Collection[int] = frozenset()):
         """
         :param routing_table:
@@ -351,8 +346,8 @@ class _Merge(object):
 
         # Compute the goodness of the merge
         self.goodness: int = len(entries) - 1
-        self.routing_table: List[MulticastRoutingEntry] = routing_table
-        self.entries: FrozenSet[int] = frozenset(entries)
+        self.routing_table: list[MulticastRoutingEntry] = routing_table
+        self.entries: frozenset[int] = frozenset(entries)
 
         # Compute the new mask, key and generality
         any_zeros = ~all_ones
@@ -395,7 +390,7 @@ class _Merge(object):
 
         return pos
 
-    def apply(self, aliases: _Aliases) -> List[MulticastRoutingEntry]:
+    def apply(self, aliases: _Aliases) -> list[MulticastRoutingEntry]:
         """
         Apply the merge to the routing table it is defined against and get a
         new routing table.
@@ -412,7 +407,7 @@ class _Merge(object):
         """
         # Create a new routing table of the correct size
         new_size = len(self.routing_table) - len(self.entries) + 1
-        new_table: List[Optional[MulticastRoutingEntry]] = [
+        new_table: list[Optional[MulticastRoutingEntry]] = [
             None for _ in range(new_size)]
 
         # Get the new entry
@@ -422,7 +417,7 @@ class _Merge(object):
             defaultable=self.defaultable)
         new_entry = MulticastRoutingEntry(
             key=self.key, mask=self.mask, routing_entry=routing_entry)
-        our_aliases: Set[_KeyMask] = set()
+        our_aliases: set[_KeyMask] = set()
 
         # Iterate through the old table copying entries across
         insert = 0
@@ -452,7 +447,7 @@ class _Merge(object):
             new_table[insert] = new_entry
 
         # All entries in new_table are now not None; cast is safe
-        return cast(List[MulticastRoutingEntry], new_table)
+        return cast(list[MulticastRoutingEntry], new_table)
 
 
 def _refine_merge(
@@ -491,7 +486,7 @@ def _refine_merge(
     return merge
 
 
-def _refine_upcheck(merge: _Merge, min_goodness: int) -> Tuple[_Merge, bool]:
+def _refine_upcheck(merge: _Merge, min_goodness: int) -> tuple[_Merge, bool]:
     """
     Remove from the merge any entries which would be covered by entries
     between their current position and the merge insertion position.
@@ -668,7 +663,7 @@ def _refine_downcheck(
         # keep track of the entries which have the fewest bits that we could
         # set.
         most_stringent = 33  # Not at all stringent
-        bits_and_vals: Set[Tuple[int, int]] = set()
+        bits_and_vals: set[tuple[int, int]] = set()
         for key, mask in covered:
             # Get the bit positions where there ISN'T an X in the covered entry
             # but there IS an X in the merged entry.
@@ -705,9 +700,9 @@ def _refine_downcheck(
         # Get the smallest number of entries to remove to modify the
         # resultant key-mask to avoid covering a lower entry. Prefer to
         # modify more significant bits of the key mask.
-        remove: Set[int] = set()  # Entries to remove
+        remove: set[int] = set()  # Entries to remove
         for bit, val in sorted(bits_and_vals, reverse=True):
-            working_remove: Set[int] = set()  # Holder for working remove set
+            working_remove: set[int] = set()  # Holder for working remove set
 
             for i in merge.entries:
                 entry = merge.routing_table[i]
@@ -738,7 +733,7 @@ def _refine_downcheck(
 
 
 def _get_covered_keys_and_masks(
-        merge: _Merge, aliases: _ROAliases) -> List[_KeyMask]:
+        merge: _Merge, aliases: _ROAliases) -> list[_KeyMask]:
     """
     Get keys and masks which would be covered by the entry resulting from
     the merge.
@@ -753,7 +748,7 @@ def _get_covered_keys_and_masks(
     """
     # For every entry in the table below the insertion index see which keys
     # and masks would overlap with the key and mask of the merged entry.
-    covered: List[_KeyMask] = []
+    covered: list[_KeyMask] = []
     for entry in merge.routing_table[merge.insertion_index:]:
         km = (entry.key, entry.mask)
         for key_mask in aliases.get(km, {km}):

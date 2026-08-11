@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
-from typing import Tuple
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
@@ -26,7 +25,7 @@ from pacman.utilities.constants import BITS_IN_KEY
 from pacman.utilities.utility_calls import get_n_bits, is_power_of_2
 
 
-class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
+class Abstract2DDeviceVertex(metaclass=AbstractBase):
     """
     A helper for 2D input devices.
 
@@ -76,7 +75,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
     @property
     @abstractmethod
     @overrides(ApplicationVertex.atoms_shape)
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         """
         The "shape" of the atoms in the vertex i.e. how the atoms are split
         between the dimensions of the vertex.  By default everything is

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import List, Optional, cast
+from typing import Optional, cast
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -72,28 +72,28 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon[ApplicationVertex]):
         chip_counter.add_core(self._sdram)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
-    def get_out_going_slices(self) -> List[Slice]:
+    def get_out_going_slices(self) -> list[Slice]:
         assert self._vertex_slice is not None
         return [self._vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
-    def get_in_coming_slices(self) -> List[Slice]:
+    def get_in_coming_slices(self) -> list[Slice]:
         assert self._vertex_slice is not None
         return [self._vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, partition_id: str) -> List[MachineVertex]:
+    def get_out_going_vertices(self, partition_id: str) -> list[MachineVertex]:
         assert self._machine_vertex is not None
         return [self._machine_vertex]
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, partition_id: str) -> List[MachineVertex]:
+    def get_in_coming_vertices(self, partition_id: str) -> list[MachineVertex]:
         assert self._machine_vertex is not None
         return [self._machine_vertex]
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(
-            self, variable_to_record: str) -> List[MachineVertex]:
+            self, variable_to_record: str) -> list[MachineVertex]:
         assert self._machine_vertex is not None
         return [self._machine_vertex]
 

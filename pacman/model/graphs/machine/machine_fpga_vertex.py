@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -54,7 +54,7 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
             label: Optional[str] = None,
             app_vertex: Optional[ApplicationVertex] = None,
             vertex_slice: Optional[Slice] = None,
-            outgoing_keys_and_masks: Optional[List[BaseKeyAndMask]] = None,
+            outgoing_keys_and_masks: Optional[list[BaseKeyAndMask]] = None,
             incoming: bool = True, outgoing: bool = False):
         """
         :param fpga_id: Field Programmable Gate Arrays id
@@ -114,7 +114,7 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
         return self._linked_chip_coordinates
 
     @overrides(AbstractVirtual.outgoing_keys_and_masks)
-    def outgoing_keys_and_masks(self) -> Optional[List[BaseKeyAndMask]]:
+    def outgoing_keys_and_masks(self) -> Optional[list[BaseKeyAndMask]]:
         return self._outgoing_keys_and_masks
 
     @property

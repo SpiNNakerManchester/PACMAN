@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Dict, Iterable, Optional, Sequence, cast
+from typing import Iterable, Optional, Sequence, cast
 
 from spinn_utilities.ordered_set import OrderedSet
 
@@ -28,7 +28,7 @@ from .application_edge_partition import ApplicationEdgePartition
 from .application_vertex import ApplicationVertex
 
 
-class ApplicationGraph(object):
+class ApplicationGraph:
     """
     An application-level abstraction of a graph.
     """
@@ -45,12 +45,12 @@ class ApplicationGraph(object):
     )
 
     def __init__(self) -> None:
-        self._outgoing_edge_partitions_by_pre_vertex: Dict[
+        self._outgoing_edge_partitions_by_pre_vertex: dict[
             ApplicationVertex,
             OrderedSet[ApplicationEdgePartition]] = defaultdict(OrderedSet)
         self._n_outgoing_edge_partitions = 0
         self._unlabelled_vertex_count = 0
-        self._vertex_by_label: Dict[str, ApplicationVertex] = {}
+        self._vertex_by_label: dict[str, ApplicationVertex] = {}
 
     def add_vertex(self, vertex: ApplicationVertex) -> None:
         """

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Collection, Iterable, List
+from typing import Any, Collection, Iterable
 
 from spinn_utilities.overrides import overrides
 
@@ -53,7 +53,7 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         self._x = x
         self._y = y
         self._number_of_defaulted_routing_entries = 0
-        self._multicast_routing_entries: List[MulticastRoutingEntry] = []
+        self._multicast_routing_entries: list[MulticastRoutingEntry] = []
 
         for multicast_routing_entry in multicast_routing_entries:
             self.add_multicast_routing_entry(multicast_routing_entry)

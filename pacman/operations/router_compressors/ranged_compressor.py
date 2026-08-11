@@ -14,7 +14,7 @@
 
 import logging
 import sys
-from typing import List, cast
+from typing import cast
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
@@ -66,7 +66,7 @@ def range_compressor(accept_overflow: bool = True) -> MulticastRoutingTables:
     return compressed_tables
 
 
-class RangeCompressor(object):
+class RangeCompressor:
     """
     A compressor based on ranges.
     Use via :py:func:`range_compressor`.
@@ -79,7 +79,7 @@ class RangeCompressor(object):
 
     def __init__(self) -> None:
         # temp values to avoid Optional
-        self._entries: List[MulticastRoutingEntry] = []
+        self._entries: list[MulticastRoutingEntry] = []
         self._compressed = CompressedMulticastRoutingTable(0, 0)
 
     def compress_table(

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from typing import Iterable, List, Optional, Sequence, Tuple
+from typing import Iterable, Optional, Sequence
 
 from parameterized import parameterized
 
@@ -50,8 +50,8 @@ class MockSplitter(AbstractSplitterCommon):
         super().__init__()
         self.__n_groups = n_groups
         self.__n_machine_vertices = n_machine_vertices
-        self.__same_chip_groups: List[
-            Tuple[Sequence[MachineVertex], AbstractSDRAM]] = []
+        self.__same_chip_groups: list[
+            tuple[Sequence[MachineVertex], AbstractSDRAM]] = []
         self.__sdram = sdram
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
@@ -98,7 +98,7 @@ class MockSplitter(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.get_same_chip_groups)
     def get_same_chip_groups(self) -> Sequence[
-            Tuple[Sequence[MachineVertex], AbstractSDRAM]]:
+            tuple[Sequence[MachineVertex], AbstractSDRAM]]:
         return self.__same_chip_groups
 
 

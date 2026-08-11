@@ -19,7 +19,6 @@ from typing import (
     Collection,
     Generic,
     Optional,
-    Tuple,
     TypeVar,
     Union,
     cast,
@@ -74,7 +73,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
 
     def __init__(
             self, label: Optional[str] = None,
-            max_atoms_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
+            max_atoms_per_core: Optional[Union[int, tuple[int, ...]]] = None,
             splitter: Optional[AbstractSplitterCommon] = None):
         """
         :param label: The optional name of the vertex.
@@ -94,7 +93,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             # Use setter as there is extra work to do
             self.splitter = splitter
         # Keep the name for simplicity but move to new internal representation
-        self._max_atoms_per_dimension_per_core: Optional[Tuple[int, ...]]
+        self._max_atoms_per_dimension_per_core: Optional[tuple[int, ...]]
         self._set_max_atoms_per_dimension_per_core(max_atoms_per_core)
 
     def __str__(self) -> str:
@@ -152,7 +151,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         self._machine_vertices.add(machine_vertex)
 
     @property
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         """
         The "shape" of the atoms in the vertex i.e. how the atoms are split
         between the dimensions of the vertex.  By default everything is
@@ -236,7 +235,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         self.__check_atoms_per_core()
         return int(numpy.prod(self._max_atoms_per_dimension_per_core))
 
-    def get_max_atoms_per_dimension_per_core(self) -> Tuple[int, ...]:
+    def get_max_atoms_per_dimension_per_core(self) -> tuple[int, ...]:
         """
         Gets the maximum number of atoms per dimension per core.
 
@@ -251,7 +250,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         return self._max_atoms_per_dimension_per_core
 
     def _set_max_atoms_per_dimension_per_core(
-            self, new_value: Optional[Union[int, Tuple[int, ...]]]) -> None:
+            self, new_value: Optional[Union[int, tuple[int, ...]]]) -> None:
         """
         Set the maximum number of atoms per dimension per core.
 
@@ -270,12 +269,12 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             max_atoms_int: int = int(cast(int, new_value))
             self._max_atoms_per_dimension_per_core = (max_atoms_int, )
         else:
-            max_atoms_tuple: Tuple[int, ...] = cast(
-                Tuple[int, ...],  new_value)
+            max_atoms_tuple: tuple[int, ...] = cast(
+                tuple[int, ...],  new_value)
             self._max_atoms_per_dimension_per_core = max_atoms_tuple
 
     def set_max_atoms_per_dimension_per_core(
-            self, new_value: Union[int, Tuple[int, ...]]) -> None:
+            self, new_value: Union[int, tuple[int, ...]]) -> None:
         """
         Set the maximum number of atoms per dimension per core.
 

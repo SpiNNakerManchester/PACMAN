@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import Any, Tuple, Union
+from typing import Any, Union
 
 import numpy
 from numpy.typing import NDArray
@@ -33,8 +33,8 @@ class MDSlice(Slice):
     __slots__ = ("_atoms_shape", "_shape", "_start")
 
     def __init__(
-            self, lo_atom: int, hi_atom: int, shape: Tuple[int, ...],
-            start: Tuple[int, ...], atoms_shape: Tuple[int, ...]):
+            self, lo_atom: int, hi_atom: int, shape: tuple[int, ...],
+            start: tuple[int, ...], atoms_shape: tuple[int, ...]):
         """
         :param lo_atom: Index of the lowest atom to represent.
         :param hi_atom: Index of the highest atom to represent.
@@ -68,12 +68,12 @@ class MDSlice(Slice):
 
     @property
     @overrides(Slice.shape)
-    def shape(self) -> Tuple[int, ...]:
+    def shape(self) -> tuple[int, ...]:
         return self._shape
 
     @property
     @overrides(Slice.start)
-    def start(self) -> Tuple[int, ...]:
+    def start(self) -> tuple[int, ...]:
         return self._start
 
     @overrides(Slice.as_slice)
@@ -97,12 +97,12 @@ class MDSlice(Slice):
 
     @property
     @overrides(Slice.dimension)
-    def dimension(self) -> Tuple[slice, ...]:
+    def dimension(self) -> tuple[slice, ...]:
         return tuple(self.get_slice(n) for n in range(len(self.shape)))
 
     @property
     @overrides(Slice.end)
-    def end(self) -> Tuple[int, ...]:
+    def end(self) -> tuple[int, ...]:
         return tuple((numpy.array(self.start) + numpy.array(self.shape)) - 1)
 
     @overrides(Slice.get_ids_as_slice_or_list)

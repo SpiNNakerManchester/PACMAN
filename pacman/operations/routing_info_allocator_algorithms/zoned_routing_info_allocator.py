@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Iterable, Optional
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
@@ -39,11 +39,11 @@ from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
 from pacman.utilities.constants import BITS_IN_KEY, FULL_MASK
 from pacman.utilities.utility_calls import allocator_bits_needed, calc_shift
 
-_XAlloc = Iterable[Tuple[ApplicationVertex, str]]
+_XAlloc = Iterable[tuple[ApplicationVertex, str]]
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class ZonedRoutingInfoAllocator(object):
+class ZonedRoutingInfoAllocator:
     """
     A routing key allocator that uses fixed zones that are the same for
     all vertices.  This will hopefully make the keys more compressible.
@@ -129,11 +129,11 @@ class ZonedRoutingInfoAllocator(object):
     def __init__(self) -> None:
         # Storage objects to be filled
         self.__vertex_partitions: OrderedSet[
-            Tuple[ApplicationVertex, str]] = OrderedSet()
-        self.__atom_bits_per_app_part: Dict[
-            Tuple[ApplicationVertex, str], int] = {}
+            tuple[ApplicationVertex, str]] = OrderedSet()
+        self.__atom_bits_per_app_part: dict[
+            tuple[ApplicationVertex, str], int] = {}
         self.__ap_keys_blocked_by_fixed: \
-            Dict[int, Tuple[ApplicationVertex, str]] = {}
+            dict[int, tuple[ApplicationVertex, str]] = {}
 
         # Start at with values for an empty graph then as needed
         self.__min_bits_machine_and_atoms = 0
@@ -198,7 +198,7 @@ class ZonedRoutingInfoAllocator(object):
 
     def __allocate_many_fixed(
             self, pre: ApplicationVertex, part_id: str,
-            app_key_and_mask: BaseKeyAndMask, outgoing: List[MachineVertex],
+            app_key_and_mask: BaseKeyAndMask, outgoing: list[MachineVertex],
             routing_info: RoutingInfo) -> None:
         max_atom_bits = 0
         machine_mask: Optional[int] = None
@@ -301,7 +301,7 @@ class ZonedRoutingInfoAllocator(object):
                 f"for machine and atom bits")
 
     def __find_target_app_bits(
-            self, routing_info: RoutingInfo) -> Tuple[int, Optional[int]]:
+            self, routing_info: RoutingInfo) -> tuple[int, Optional[int]]:
         max_app = BITS_IN_KEY - self.__min_bits_machine_and_atoms
         min_app = self.__size_app_part_bits
         best_app = (BITS_IN_KEY -

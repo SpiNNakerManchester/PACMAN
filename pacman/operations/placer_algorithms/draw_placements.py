@@ -16,7 +16,7 @@ import logging
 import math
 import random
 from collections import defaultdict
-from typing import Dict, Optional
+from typing import Optional
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.typing.coords import XY
@@ -59,10 +59,10 @@ def draw_placements(
         return
     # Colour the boards by placements
     unused: Colour = (0.5, 0.5, 0.5, 1.0)
-    vertex_colours: Dict[Optional[AbstractVertex], Colour] = defaultdict(
+    vertex_colours: dict[Optional[AbstractVertex], Colour] = defaultdict(
         _next_colour)
     vertex_colours[None] = unused
-    board_colours: Dict[XY, Colour] = {}
+    board_colours: dict[XY, Colour] = {}
     machine = PacmanDataView.get_machine()
     for xy in machine.chip_coordinates:
         if (placements.n_placements_on_chip(xy) ==

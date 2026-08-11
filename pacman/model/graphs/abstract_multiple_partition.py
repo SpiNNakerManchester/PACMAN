@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Collection, Dict, Generic, Tuple, Type, TypeVar, Union
+from typing import Collection, Generic, TypeVar, Union
 
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
@@ -44,7 +44,7 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
 
     def __init__(
             self, pre_vertices: Collection[V], identifier: str,
-            allowed_edge_types: Union[Type[E], Tuple[Type[E], ...]]):
+            allowed_edge_types: Union[type[E], tuple[type[E], ...]]):
         """
         :param pre_vertices: The vertices which send through this partition
         :param identifier: The identifier of the partition
@@ -52,8 +52,8 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
         """
         super().__init__(
             identifier=identifier, allowed_edge_types=allowed_edge_types)
-        self._pre_vertices: Dict[V, OrderedSet[E]] = {}
-        self._destinations: Dict[V, OrderedSet[E]] = defaultdict(OrderedSet)
+        self._pre_vertices: dict[V, OrderedSet[E]] = {}
+        self._destinations: dict[V, OrderedSet[E]] = defaultdict(OrderedSet)
 
         # hard code dict of lists so that only these are acceptable.
         for pre_vertex in pre_vertices:

@@ -18,7 +18,7 @@ and
 https://github.com/project-rig/rig/blob/master/rig/routing_table/remove_default_routes.py
 """
 
-from typing import List, Optional
+from typing import Optional
 
 from spinn_machine import MulticastRoutingEntry
 
@@ -52,8 +52,8 @@ def intersect(key_a: int, mask_a: int, key_b: int, mask_b: int) -> bool:
 
 
 def remove_default_routes(
-        table: List[MulticastRoutingEntry], target_length: Optional[int],
-        check_for_aliases: bool = True) -> List[MulticastRoutingEntry]:
+        table: list[MulticastRoutingEntry], target_length: Optional[int],
+        check_for_aliases: bool = True) -> list[MulticastRoutingEntry]:
     """
     Remove from the routing table any entries which could be replaced by
     default routing.

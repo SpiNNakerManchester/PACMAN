@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Dict, List, Tuple, Union
+from typing import Union
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -46,11 +46,11 @@ def basic_tag_allocator() -> Tags:
     :return: tag allocation holder
     """
     # Keep track of which tags are free by Ethernet chip
-    tags_available: Dict[Chip, List[int]] = defaultdict(
+    tags_available: dict[Chip, list[int]] = defaultdict(
         lambda: list(_CHIP_TAGS))
 
     # Keep track of which ports are free by Ethernet chip
-    ports_available: Dict[Chip, List[int]] = defaultdict(
+    ports_available: dict[Chip, list[int]] = defaultdict(
         lambda: list(_BOARD_PORTS))
 
     # Go through placements and find tags
@@ -83,8 +83,8 @@ def basic_tag_allocator() -> Tags:
 
 def __get_chip_and_tag(
         iptag: Union[IPtagResource, ReverseIPtagResource], eth_chip: Chip,
-        machine: Machine, tags_available: Dict[Chip, List[int]]
-        ) -> Tuple[Chip, int]:
+        machine: Machine, tags_available: dict[Chip, list[int]]
+        ) -> tuple[Chip, int]:
     tags_on_chip = tags_available[eth_chip]
     tag = iptag.tag
     if tag is not None:
@@ -100,7 +100,7 @@ def __get_chip_and_tag(
         return __find_free_tag(machine, tags_available)
 
 
-def __find_tag_chip(machine: Machine, tags_available: Dict[Chip, List[int]],
+def __find_tag_chip(machine: Machine, tags_available: dict[Chip, list[int]],
                     tag: int) -> Chip:
     for eth_chip in machine.ethernet_connected_chips:
         tags_on_chip = tags_available[eth_chip]
@@ -112,7 +112,7 @@ def __find_tag_chip(machine: Machine, tags_available: Dict[Chip, List[int]],
 
 def __find_free_tag(
         machine: Machine,
-        tags_available: Dict[Chip, List[int]]) -> Tuple[Chip, int]:
+        tags_available: dict[Chip, list[int]]) -> tuple[Chip, int]:
     for eth_chip in machine.ethernet_connected_chips:
         tags_on_chip = tags_available[eth_chip]
         if tags_on_chip:
@@ -144,7 +144,7 @@ def __create_reverse_tag(
 
 def __get_port(
         reverse_ip_tag: ReverseIPtagResource, eth_chip: Chip,
-        ports_available: Dict[Chip, List[int]]) -> int:
+        ports_available: dict[Chip, list[int]]) -> int:
     if reverse_ip_tag.port is not None:
         return reverse_ip_tag.port
     return ports_available[eth_chip].pop()

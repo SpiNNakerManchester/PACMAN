@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import functools
-from typing import List, Tuple, cast
+from typing import cast
 
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
@@ -186,14 +186,14 @@ class _PairCompressor(AbstractCompressor):
             Flag to use slower quick sort as it is implemented in c/ on cores
         """
         super().__init__(ordered, accept_overflow)
-        self._all_entries: List[MulticastRoutingEntry] = []
+        self._all_entries: list[MulticastRoutingEntry] = []
         self._c_sort = c_sort
         self._write_index = 0
         self._max_index = 0
         self._previous_index = 0
         self._remaining_index = 0
-        self._routes: List[int] = []
-        self._routes_frequency: List[int] = []
+        self._routes: list[int] = []
+        self._routes_frequency: list[int] = []
         self._routes_count = 0
 
     def _compare_entries(
@@ -240,7 +240,7 @@ class _PairCompressor(AbstractCompressor):
         raise PacmanElementAllocationException("Sorting error")
 
     def _three_way_partition_table(
-            self, low: int, high: int) -> Tuple[int, int]:
+            self, low: int, high: int) -> tuple[int, int]:
         """
         Partitions the entries between low and high into three parts
 
@@ -294,7 +294,7 @@ class _PairCompressor(AbstractCompressor):
         self._routes[index_b] = temp
 
     def _three_way_partition_routes(
-            self, low: int, high: int) -> Tuple[int, int]:
+            self, low: int, high: int) -> tuple[int, int]:
         """
         Partitions the routes and frequencies into three parts.
 
@@ -406,7 +406,7 @@ class _PairCompressor(AbstractCompressor):
 
     def compress_table(
             self, router_table: AbstractMulticastRoutingTable
-            ) -> List[MulticastRoutingEntry]:
+            ) -> list[MulticastRoutingEntry]:
         """
         Compresses all the entries for a single table.
 
@@ -442,7 +442,7 @@ class _PairCompressor(AbstractCompressor):
         else:
             # Use built-in sorting; much simpler
             self._routes_frequency, self._routes = cast(
-                Tuple[List[int], List[int]],
+                tuple[list[int], list[int]],
                 zip(*sorted(
                     zip(self._routes_frequency, self._routes),
                     key=lambda x: -x[0])))
@@ -494,7 +494,7 @@ class _PairCompressor(AbstractCompressor):
         return (key_a & mask_b) == (key_b & mask_a)
 
     def merge(self, entry1: MulticastRoutingEntry,
-              entry2: MulticastRoutingEntry) -> Tuple[int, int, bool]:
+              entry2: MulticastRoutingEntry) -> tuple[int, int, bool]:
         """
         Merges two entries/triples into one that covers both.
 

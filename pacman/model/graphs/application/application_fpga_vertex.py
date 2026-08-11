@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, List, Optional
+from typing import TYPE_CHECKING, Iterable, Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -43,7 +43,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     def __init__(
             self, n_atoms: int,
-            incoming_fpga_connections: Optional[List[FPGAConnection]] = None,
+            incoming_fpga_connections: Optional[list[FPGAConnection]] = None,
             outgoing_fpga_connection: Optional[FPGAConnection] = None,
             label: Optional[str] = None,
             n_machine_vertices_per_link: int = 1):

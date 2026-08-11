@@ -17,7 +17,7 @@ Miscellaneous minor functions for converting between JSON and Python objects.
 
 import gzip
 import json
-from typing import Iterable, List, Union, cast
+from typing import Iterable, Union, cast
 
 from spinn_utilities.typing.json import JsonArray, JsonObject
 
@@ -109,7 +109,7 @@ def iptag_resources_to_json(iptags: Iterable[IPtagResource]) -> JsonArray:
 
 
 def iptag_resources_from_json(
-        json_list: List[JsonObject]) -> List[IPtagResource]:
+        json_list: list[JsonObject]) -> list[IPtagResource]:
     """
     Creates a list of iptags from json.
 
@@ -169,7 +169,7 @@ def reverse_iptags_to_json(
 
 
 def reverse_iptags_from_json(
-        json_list: List[JsonObject]) -> List[ReverseIPtagResource]:
+        json_list: list[JsonObject]) -> list[ReverseIPtagResource]:
     """
     Creates a list of ReverseIPtagResource from json
 

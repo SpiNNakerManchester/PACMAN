@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional, Tuple
+from typing import Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -37,7 +37,7 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
 
     def __init__(
             self, width: int, height: int, sub_width: int, sub_height: int,
-            incoming_fpga_connections: Optional[List[FPGAConnection]] = None,
+            incoming_fpga_connections: Optional[list[FPGAConnection]] = None,
             outgoing_fpga_connection: Optional[FPGAConnection] = None,
             label: Optional[str] = None):
         """
@@ -90,7 +90,7 @@ class Application2DFPGAVertex(ApplicationFPGAVertex, Abstract2DDeviceVertex):
 
     @property
     @overrides(ApplicationFPGAVertex.atoms_shape)
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         return (self.__width, self.__height)
 
     @overrides(ApplicationFPGAVertex.get_incoming_slice_for_link)

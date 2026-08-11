@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Set, Tuple
 
 import pytest
 from parameterized import parameterized
@@ -32,11 +31,11 @@ from pacman.operations.fixed_route_router import fixed_route_router
 
 def _get_destinations(
         machine: Machine,
-        fixed_route_tables: Dict[Tuple[int, int], RoutingEntry],
-        source_x: int, source_y: int) -> Set[Tuple[int, int, int]]:
+        fixed_route_tables: dict[tuple[int, int], RoutingEntry],
+        source_x: int, source_y: int) -> set[tuple[int, int, int]]:
     to_search = list([(source_x, source_y)])
     visited = set()
-    destinations: Set[Tuple[int, int, int]] = set()
+    destinations: set[tuple[int, int, int]] = set()
     while to_search:
         x, y = to_search.pop()
         assert (x, y) not in visited

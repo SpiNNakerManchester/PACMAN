@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict, Iterable, Optional, Sequence, Tuple
+from typing import Any, Iterable, Optional, Sequence
 
 from spinn_utilities.overrides import overrides
 
@@ -72,10 +72,10 @@ class MockAppVertex(ApplicationVertex):
 
     def __init__(self, splitter: Optional[AbstractSplitterCommon] = None,
                  fixed_keys_by_partition: Optional[
-                     Dict[str, BaseKeyAndMask]] = None,
+                     dict[str, BaseKeyAndMask]] = None,
                  fixed_key: Optional[BaseKeyAndMask] = None,
                  fixed_machine_keys_by_partition:  Optional[
-                     Dict[Tuple[MachineVertex, str], BaseKeyAndMask]] = None):
+                     dict[tuple[MachineVertex, str], BaseKeyAndMask]] = None):
         super(MockAppVertex, self).__init__(splitter=splitter)
         self.__fixed_keys_by_partition = fixed_keys_by_partition
         self.__fixed_key = fixed_key
@@ -112,7 +112,7 @@ class TestMacVertex(MachineVertex):
             self, label: Optional[str] = None,
             app_vertex: Optional[ApplicationVertex] = None,
             vertex_slice: Optional[Slice] = None,
-            n_keys_required: Optional[Dict[str, int]] = None):
+            n_keys_required: Optional[dict[str, int]] = None):
         super(TestMacVertex, self).__init__(
             label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__n_keys_required = n_keys_required
@@ -136,9 +136,9 @@ def create_graphs1(with_fixed: bool, shiftable: bool = True) -> None:
     # Create 5 application vertices (3 bits)
     app_vertices = []
     for app_index in range(5):
-        fixed_keys_by_partition: Optional[Dict[str, BaseKeyAndMask]] = None
+        fixed_keys_by_partition: Optional[dict[str, BaseKeyAndMask]] = None
         fixed_machine_keys_by_partition: \
-            Optional[Dict[Tuple[MachineVertex, str], BaseKeyAndMask]] = None
+            Optional[dict[tuple[MachineVertex, str], BaseKeyAndMask]] = None
         if with_fixed:
             fixed_keys_by_partition = {}
             fixed_machine_keys_by_partition = {}
@@ -207,7 +207,7 @@ def create_graphs1(with_fixed: bool, shiftable: bool = True) -> None:
 
 
 def create_graphs_only_fixed(
-        fixed_keys_by_partition: Dict[str, BaseKeyAndMask]) -> None:
+        fixed_keys_by_partition: dict[str, BaseKeyAndMask]) -> None:
     # An output vertex to aim things at (to make keys required)
     out_app_vertex = MockAppVertex(splitter=MockSplitter())
     PacmanDataView.add_vertex(out_app_vertex)

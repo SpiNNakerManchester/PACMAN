@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional, Tuple
+from typing import Optional
 
 from spinn_utilities.typing.coords import XY
 
@@ -24,7 +24,7 @@ from pacman.model.graphs.application import ApplicationEdgePartition
 from pacman.model.graphs.machine import MachineVertex
 
 
-def get_app_partitions() -> List[ApplicationEdgePartition]:
+def get_app_partitions() -> list[ApplicationEdgePartition]:
     """
     Find all application partitions.
 
@@ -60,7 +60,7 @@ def get_app_partitions() -> List[ApplicationEdgePartition]:
 
 
 def longest_dimension_first(
-        vector: Tuple[int, int, int], start: XY) -> List[Tuple[int, XY]]:
+        vector: tuple[int, int, int], start: XY) -> list[tuple[int, XY]]:
     """
     List the (x, y) steps on a longest-dimension first route.
 
@@ -78,7 +78,7 @@ def longest_dimension_first(
         start)
 
 
-def vector_to_nodes(dm_vector: List[XY], start: XY) -> List[Tuple[int, XY]]:
+def vector_to_nodes(dm_vector: list[XY], start: XY) -> list[tuple[int, XY]]:
     """
     Convert a vector to a set of nodes.
 
@@ -158,8 +158,8 @@ def vertex_chip(vertex: MachineVertex) -> Chip:
     return machine[link_data.connected_chip_x, link_data.connected_chip_y]
 
 
-def vertex_xy_and_route(vertex: MachineVertex) -> Tuple[
-        XY, Tuple[MachineVertex, Optional[int], Optional[int]]]:
+def vertex_xy_and_route(vertex: MachineVertex) -> tuple[
+        XY, tuple[MachineVertex, Optional[int], Optional[int]]]:
     """
     Get the non-virtual chip coordinates, the vertex, and processor or
     link to follow to get to the vertex.

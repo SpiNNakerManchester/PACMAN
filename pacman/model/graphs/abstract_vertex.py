@@ -17,7 +17,7 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import ChipAndCore
 
 
-class AbstractVertex(object):
+class AbstractVertex:
     """
     A vertex in a graph.
     """
