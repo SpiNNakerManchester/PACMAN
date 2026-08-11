@@ -198,8 +198,8 @@ class MockMultiInputSplitter(AbstractSplitterCommon):
                 MachineVertex, Sequence[AbstractVertex]]]:
         sources = source_vertex.splitter.get_out_going_vertices(partition_id)
         n_sources = len(sources)
-        sources_per_incoming = int(math.ceil(
-            n_sources / self.__n_incoming_machine_vertices))
+        sources_per_incoming = math.ceil(
+            n_sources / self.__n_incoming_machine_vertices)
         result = []
         for i in range(self.__n_incoming_machine_vertices):
             start = sources_per_incoming * i

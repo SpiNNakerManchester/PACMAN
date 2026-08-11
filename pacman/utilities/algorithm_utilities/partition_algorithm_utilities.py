@@ -58,7 +58,7 @@ def get_multidimensional_slices(
     total_n_atoms = 1
     for d, n_atom in enumerate(n_atoms):
         dim_numerator[d] = n_vertices
-        n_this_dim = int(math.ceil(n_atom / atoms_per_core[d]))
+        n_this_dim = math.ceil(n_atom / atoms_per_core[d])
         n_vertices *= n_this_dim
         total_atoms_per_core *= atoms_per_core[d]
         total_n_atoms *= n_atom

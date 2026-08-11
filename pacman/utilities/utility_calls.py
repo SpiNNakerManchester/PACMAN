@@ -113,7 +113,7 @@ def get_n_bits(n_values: int) -> int:
         return 0
     if n_values == 1:
         return 1
-    return int(math.ceil(math.log2(n_values)))
+    return math.ceil(math.log2(n_values))
 
 
 def allocator_bits_needed(size: int) -> int:
@@ -125,7 +125,7 @@ def allocator_bits_needed(size: int) -> int:
     """
     if size == 0:
         return 0
-    return int(math.ceil(math.log2(size)))
+    return math.ceil(math.log2(size))
 
 
 def get_keys(

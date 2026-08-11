@@ -98,8 +98,8 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
             The index of the connection, for when n_machine_vertices > 1
         :returns: The slice to be given to the connection.
         """
-        atoms_per_slice = int(math.ceil(
-            self._n_atoms / self._n_machine_vertices))
+        atoms_per_slice = math.ceil(
+            self._n_atoms / self._n_machine_vertices)
         low_atom = atoms_per_slice * index
         hi_atom = (atoms_per_slice * (index + 1)) - 1
         hi_atom = min((hi_atom, self.n_atoms - 1))
@@ -138,4 +138,4 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
 
     @overrides(ApplicationVirtualVertex.get_max_atoms_per_core)
     def get_max_atoms_per_core(self) -> int:
-        return int(math.ceil(self._n_atoms / self._n_machine_vertices))
+        return math.ceil(self._n_atoms / self._n_machine_vertices)
