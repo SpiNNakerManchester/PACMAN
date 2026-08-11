@@ -184,7 +184,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         if isinstance(n_atoms, int):
             return n_atoms
         # Allow a float which has a near int value
-        temp = int(round(n_atoms))
+        temp = round(n_atoms)
         if abs(temp - n_atoms) < 0.001:
             if temp != n_atoms:
                 logger.warning(

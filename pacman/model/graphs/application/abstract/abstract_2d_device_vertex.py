@@ -109,8 +109,8 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         The number of sub-rectangles the device is made up of.
         """
-        return (int(math.ceil(self.width / self.sub_width)) *
-                int(math.ceil(self.height / self.sub_height)))
+        return (math.ceil(self.width / self.sub_width) *
+                math.ceil(self.height / self.sub_height))
 
     def _sub_square_from_index(self, index: int) -> XY:
         """
@@ -118,8 +118,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
 
         :param index: The index of the sub square
         """
-        n_squares_per_row = int(math.ceil(
-            self.width / self.sub_width))
+        n_squares_per_row = math.ceil(self.width / self.sub_width)
         x_index = index % n_squares_per_row
         y_index = index // n_squares_per_row
 
@@ -188,7 +187,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         The number of bits to use for the X coordinate of a sub-rectangle.
         """
-        n_per_row = int(math.ceil(self.width / self.sub_width))
+        n_per_row = math.ceil(self.width / self.sub_width)
         return get_n_bits(n_per_row)
 
     @property
@@ -196,7 +195,7 @@ class Abstract2DDeviceVertex(object, metaclass=AbstractBase):
         """
         The number of bits to use for the Y coordinate of a sub-rectangle.
         """
-        n_per_col = int(math.ceil(self.height / self.sub_height))
+        n_per_col = math.ceil(self.height / self.sub_height)
         return get_n_bits(n_per_col)
 
     @property

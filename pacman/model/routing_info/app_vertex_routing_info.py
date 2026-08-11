@@ -109,7 +109,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         # Works because -v == not v + 1
         if i > 0:
             return i & -i
-        return 2 ** int(math.ceil(math.log2(n_entries)))
+        return 2 ** math.ceil(math.log2(n_entries))
 
     @property
     @overrides(VertexRoutingInfo.vertex)
