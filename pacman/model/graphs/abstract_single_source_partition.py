@@ -17,8 +17,6 @@ from typing import (
     TYPE_CHECKING,
     Generic,
     Sequence,
-    Tuple,
-    Type,
     TypeVar,
     Union,
 )
@@ -49,7 +47,7 @@ class AbstractSingleSourcePartition(
 
     def __init__(
             self, pre_vertex: V, identifier: str,
-            allowed_edge_types: Union[Type[E], Tuple[Type[E], ...]]):
+            allowed_edge_types: Union[type[E], tuple[type[E], ...]]):
         """
 
         :param pre_vertex: The vertex at the start of all the edges

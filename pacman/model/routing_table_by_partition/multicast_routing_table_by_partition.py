@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, Iterator, Optional, Tuple
+from typing import TYPE_CHECKING, Iterator, Optional
 
 from spinn_utilities.typing.coords import XY
 
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-class MulticastRoutingTableByPartition(object):
+class MulticastRoutingTableByPartition:
     """
     A set of multicast routing path objects.
     """
@@ -41,8 +41,8 @@ class MulticastRoutingTableByPartition(object):
         "_router_to_entries_map", )
 
     def __init__(self) -> None:
-        self._router_to_entries_map: Dict[XY, Dict[
-            Tuple[AbstractVertex, str], RoutingEntry]] = {}
+        self._router_to_entries_map: dict[XY, dict[
+            tuple[AbstractVertex, str], RoutingEntry]] = {}
 
     def add_path_entry(
             self, entry: RoutingEntry,
@@ -104,7 +104,7 @@ class MulticastRoutingTableByPartition(object):
         return len(self._router_to_entries_map)
 
     def get_entries_for_router(self, router_x: int, router_y: int) -> Optional[
-            Dict[Tuple[AbstractVertex, str], RoutingEntry]]:
+            dict[tuple[AbstractVertex, str], RoutingEntry]]:
         """
         Get the set of multicast path entries assigned to this router.
 

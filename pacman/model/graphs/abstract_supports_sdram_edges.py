@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
 # Can't use this decorator: circular import problem
 # @require_subclass(MachineVertex)
-class AbstractSupportsSDRAMEdges(object, metaclass=AbstractBase):
+class AbstractSupportsSDRAMEdges(metaclass=AbstractBase):
     """
     Marks a machine vertex that can have SDRAM edges attached to it.
     """

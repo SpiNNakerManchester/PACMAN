@@ -18,10 +18,7 @@ from typing import (
     Any,
     Callable,
     ContextManager,
-    Dict,
-    List,
     NewType,
-    Tuple,
     Union,
 )
 
@@ -31,7 +28,7 @@ from spinn_utilities.typing.coords import XY
 _Boards = NewType("_Boards", list)
 _Context = NewType("_Context", int)
 #: The type of colours. RGBA
-Colour = Tuple[float, float, float, float]
+Colour = tuple[float, float, float, float]
 
 
 @dataclass
@@ -44,8 +41,8 @@ class Spinner:
         _Context]]
     aspect_ratio: Callable[[int, int], float]
     draw: Callable[
-        [_Context, int, int, int, int, _Boards, Dict[Any, Any],
-         Dict[XY, Colour], List[XY]], None]
+        [_Context, int, int, int, int, _Boards, dict[Any, Any],
+         dict[XY, Colour], list[XY]], None]
     create_torus: Callable[[int, int], _Boards]
 
     @staticmethod

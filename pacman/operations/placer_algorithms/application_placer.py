@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, Iterator, List, Optional, Sequence, Set, Tuple
+from typing import Iterator, Optional, Sequence
 
 from spinn_utilities.config_holder import get_config_bool, get_report_path
 from spinn_utilities.log import FormatAdapter
@@ -54,7 +54,7 @@ def place_application_graph(system_placements: Placements) -> Placements:
     return placer.do_placements(system_placements)
 
 
-class ApplicationPlacer(object):
+class ApplicationPlacer:
     """
     Places the Vertices keeping ones for an ApplicationVertex together.
 
@@ -123,21 +123,21 @@ class ApplicationPlacer(object):
         self.__placements = placements
         self.__chips = self._chip_order()
 
-        self.__full_chips: Set[Chip] = set()
-        self.__prepared_chips: Set[Chip] = set()
-        self.__restored_chips: List[Chip] = []
-        self.__starts_tried: List[Chip] = []
+        self.__full_chips: set[Chip] = set()
+        self.__prepared_chips: set[Chip] = set()
+        self.__restored_chips: list[Chip] = []
+        self.__starts_tried: list[Chip] = []
 
         self.__current_chip: Optional[Chip] = None
-        self.__current_cores_free: List[int] = []
+        self.__current_cores_free: list[int] = []
         self.__current_sdram_used: AbstractSDRAM = ConstantSDRAM(0)
         self.__app_vertex_label: Optional[str] = None
 
         # Set some value so no Optional needed
         self.__ethernet_x = -1
         self.__ethernet_y = -1
-        self.__same_board_chips: Dict[Chip, Chip] = {}
-        self.__other_board_chips:  Dict[Chip, Chip] = {}
+        self.__same_board_chips: dict[Chip, Chip] = {}
+        self.__other_board_chips:  dict[Chip, Chip] = {}
 
     def do_placements(self, system_placements: Placements) -> Placements:
         """
@@ -206,8 +206,8 @@ class ApplicationPlacer(object):
         self.__placements.add_placements(placements_to_make)
 
     def _prepare_placements(self, same_chip_groups:  Sequence[
-            Tuple[Sequence[MachineVertex], AbstractSDRAM]]
-            ) -> Optional[List[Placement]]:
+            tuple[Sequence[MachineVertex], AbstractSDRAM]]
+            ) -> Optional[list[Placement]]:
         """
         Try to make the placements for this ApplicationVertex.
 
@@ -231,7 +231,7 @@ class ApplicationPlacer(object):
         self.__prepared_chips.clear()
         self.__current_chip = None
 
-        placements_to_make: List = []
+        placements_to_make: list = []
 
         # Go through the groups
         for vertices, sdram in same_chip_groups:
@@ -254,7 +254,7 @@ class ApplicationPlacer(object):
         return placements_to_make
 
     def _filter_vertices(
-            self, vertices: Sequence[MachineVertex]) -> List[MachineVertex]:
+            self, vertices: Sequence[MachineVertex]) -> list[MachineVertex]:
         """
         Removes an already placed or virtual vertices.
 

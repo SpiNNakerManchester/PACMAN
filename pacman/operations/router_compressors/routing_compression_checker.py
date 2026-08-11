@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Dict, List, Optional, TextIO
+from typing import Optional, TextIO
 
 from spinn_utilities.log import FormatAdapter
 
@@ -59,7 +59,7 @@ def codify(route: MulticastRoutingEntry, length: int = 32) -> str:
 
 
 def codify_table(
-        table: AbstractMulticastRoutingTable, length: int = 32) -> Dict[
+        table: AbstractMulticastRoutingTable, length: int = 32) -> dict[
             str, MulticastRoutingEntry]:
     """
     Apply :py:func:`codify` to all entries in a table.
@@ -89,7 +89,7 @@ def _covers(o_code: str, c_code: str) -> bool:
     return True
 
 
-def _calc_remainders(o_code: str, c_code: str) -> List[str]:
+def _calc_remainders(o_code: str, c_code: str) -> list[str]:
     """
     :param o_code: Codified original route
     :param c_code: Codified compressed route
@@ -110,7 +110,7 @@ def _calc_remainders(o_code: str, c_code: str) -> List[str]:
 
 def compare_route(
         o_route: MulticastRoutingEntry,
-        compressed_dict: Dict[str, MulticastRoutingEntry],
+        compressed_dict: dict[str, MulticastRoutingEntry],
         o_code: Optional[str] = None, start: int = 0,
         f: Optional[TextIO] = None) -> None:
     """

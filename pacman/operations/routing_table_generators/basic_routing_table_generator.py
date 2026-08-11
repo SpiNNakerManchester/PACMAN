@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Dict, Tuple
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -51,12 +50,12 @@ def basic_routing_table_generator() -> MulticastRoutingTables:
 
 
 def __create_routing_table(
-        x: int, y: int, partitions_in_table: Dict[
-            Tuple[AbstractVertex, str], RoutingEntry],
+        x: int, y: int, partitions_in_table: dict[
+            tuple[AbstractVertex, str], RoutingEntry],
         routing_infos: RoutingInfo) -> UnCompressedMulticastRoutingTable:
     table = UnCompressedMulticastRoutingTable(x, y)
-    sources_by_key_mask: Dict[BaseKeyAndMask,
-                              Tuple[AbstractVertex, str]] = {}
+    sources_by_key_mask: dict[BaseKeyAndMask,
+                              tuple[AbstractVertex, str]] = {}
     for source_vertex, partition_id in partitions_in_table:
         r_info = routing_infos.get_info_from(
             source_vertex, partition_id)

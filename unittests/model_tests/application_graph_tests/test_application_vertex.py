@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import unittest
-from typing import Tuple
 
 import numpy
 
@@ -42,8 +41,8 @@ class MockSplitter(SplitterFixedLegacy):
 
 class SimpleMDVertex(ApplicationVertex):
 
-    def __init__(self, max_atoms_per_core: Tuple[int, ...],
-                 atoms_shape: Tuple[int, ...]):
+    def __init__(self, max_atoms_per_core: tuple[int, ...],
+                 atoms_shape: tuple[int, ...]):
         super(SimpleMDVertex, self).__init__(
             max_atoms_per_core=max_atoms_per_core)
         self.__atoms_shape = atoms_shape
@@ -55,7 +54,7 @@ class SimpleMDVertex(ApplicationVertex):
 
     @property
     @overrides(ApplicationVertex.atoms_shape)
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         return self.__atoms_shape
 
 

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-from typing import Set
 
 from spinn_utilities.config_holder import (
     add_default_cfg,
@@ -50,7 +49,7 @@ def add_pacman_cfg() -> None:
     add_default_cfg(os.path.join(os.path.dirname(__file__), BASE_CONFIG_FILE))
 
 
-def packman_cfg_paths_skipped() -> Set[str]:
+def packman_cfg_paths_skipped() -> set[str]:
     """
     Set of cfg path that may not be found based on other cfg settings
 

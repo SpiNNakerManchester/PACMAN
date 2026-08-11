@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import logging
 import math
-from typing import TYPE_CHECKING, Iterable, List, Tuple
+from typing import TYPE_CHECKING, Iterable
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -61,7 +61,7 @@ class AppVertexRoutingInfo(VertexRoutingInfo):
         self.__machine_mask = machine_mask
         self.__max_machine_index = max_machine_index
 
-    def merge_machine_entries(self, entries: List[Tuple[
+    def merge_machine_entries(self, entries: list[tuple[
             RoutingEntry,
             MachineVertexRoutingInfo]]) -> Iterable[MulticastRoutingEntry]:
         """

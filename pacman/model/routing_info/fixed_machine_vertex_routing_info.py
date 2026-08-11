@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import TYPE_CHECKING, Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -95,7 +95,7 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
     def has_fixed_keys(self) -> bool:
         return True
 
-    def get_atom_bits_needed_range(self) -> Tuple[int, int]:
+    def get_atom_bits_needed_range(self) -> tuple[int, int]:
         """
         The range of atom bit values that this info can support.
 

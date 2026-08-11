@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from typing_extensions import TypeAlias
 
@@ -58,8 +58,8 @@ class SplitterExternalDevice(AbstractSplitterCommon):
 
     def __init__(self) -> None:
         super().__init__()
-        self.__incoming_vertices: List[MachineVertex] = []
-        self.__incoming_slices: List[Slice] = []
+        self.__incoming_vertices: list[MachineVertex] = []
+        self.__incoming_slices: list[Slice] = []
         self.__outgoing_vertex: Optional[MachineVertex] = None
         self.__outgoing_slice: Optional[Slice] = None
 
@@ -139,17 +139,17 @@ class SplitterExternalDevice(AbstractSplitterCommon):
             app_vertex.remember_machine_vertex(self.__outgoing_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
-    def get_in_coming_slices(self) -> List[Slice]:
+    def get_in_coming_slices(self) -> list[Slice]:
         if self.__outgoing_slice is None:
             return []
         return [self.__outgoing_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
-    def get_out_going_slices(self) -> List[Slice]:
+    def get_out_going_slices(self) -> list[Slice]:
         return self.__incoming_slices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, partition_id: str) -> List[MachineVertex]:
+    def get_in_coming_vertices(self, partition_id: str) -> list[MachineVertex]:
         # Note, the incoming vertex is how to get packets into this device,
         # so we want to direct it at the outgoing vertex!
         if self.__outgoing_vertex is None:
@@ -159,7 +159,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         return [self.__outgoing_vertex]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, partition_id: str) -> List[MachineVertex]:
+    def get_out_going_vertices(self, partition_id: str) -> list[MachineVertex]:
         # Note, the outgoing vertex is how to get packets out of this device,
         # so we want to direct it at the incoming vertices!
         if not self.__incoming_vertices:
@@ -170,7 +170,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(
-            self, variable_to_record: str) -> List[MachineVertex]:
+            self, variable_to_record: str) -> list[MachineVertex]:
         return []
 
     @overrides(AbstractSplitterCommon.reset_called)

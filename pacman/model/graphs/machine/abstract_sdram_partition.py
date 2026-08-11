@@ -16,7 +16,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from .machine_vertex import MachineVertex
 
 
-class AbstractSDRAMPartition(object, metaclass=AbstractBase):
+class AbstractSDRAMPartition(metaclass=AbstractBase):
     """
     An edge partition that contains SDRAM edges.
     """

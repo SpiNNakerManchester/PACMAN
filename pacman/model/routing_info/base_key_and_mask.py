@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
 import numpy
 
 from pacman.exceptions import PacmanConfigurationException
 
 
-class BaseKeyAndMask(object):
+class BaseKeyAndMask:
     """
     A Key and Mask to be used for routing.
     """
@@ -100,7 +100,7 @@ class BaseKeyAndMask(object):
 
     def get_keys(
             self, key_array: Optional[numpy.ndarray] = None, offset: int = 0,
-            n_keys: Optional[int] = None) -> Tuple[numpy.ndarray, int]:
+            n_keys: Optional[int] = None) -> tuple[numpy.ndarray, int]:
         """
         Get the ordered list of keys that the combination allows.
 

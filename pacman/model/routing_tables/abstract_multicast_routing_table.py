@@ -21,7 +21,7 @@ from spinn_machine.multicast_routing_entry import MulticastRoutingEntry
 from pacman.data.pacman_data_view import PacmanDataView
 
 
-class AbstractMulticastRoutingTable(object, metaclass=AbstractBase):
+class AbstractMulticastRoutingTable(metaclass=AbstractBase):
     """
     A multicast routing table. May be compressed or uncompressed.
     """

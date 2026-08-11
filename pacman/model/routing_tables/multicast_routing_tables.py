@@ -14,7 +14,7 @@
 
 import gzip
 import json
-from typing import Collection, Dict, Iterable, Iterator, Optional, Union, cast
+from typing import Collection, Iterable, Iterator, Optional, Union, cast
 
 from spinn_utilities.typing.coords import XY
 from spinn_utilities.typing.json import JsonObjectArray
@@ -29,7 +29,7 @@ from .uncompressed_multicast_routing_table import (
 )
 
 
-class MulticastRoutingTables(object):
+class MulticastRoutingTables:
     """
     Represents the multicast routing tables for a number of chips.
 
@@ -51,7 +51,7 @@ class MulticastRoutingTables(object):
         :raise PacmanAlreadyExistsException:
             If any two routing tables are for the same chip
         """
-        self._routing_tables_by_chip: Dict[
+        self._routing_tables_by_chip: dict[
             XY, AbstractMulticastRoutingTable] = {}
 
         for routing_table in routing_tables:

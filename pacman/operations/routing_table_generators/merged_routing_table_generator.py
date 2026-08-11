@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Dict, Generic, Iterable, List, Optional, Tuple, TypeVar
+from typing import Generic, Iterable, Optional, TypeVar
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -109,12 +109,12 @@ def merged_routing_table_generator() -> MulticastRoutingTables:
 
 def __create_routing_table(
         x: int, y: int,
-        partitions_in_table: Dict[Tuple[AbstractVertex, str],
+        partitions_in_table: dict[tuple[AbstractVertex, str],
                                   RoutingEntry],
         routing_info: RoutingInfo) -> UnCompressedMulticastRoutingTable:
     table = UnCompressedMulticastRoutingTable(x, y)
-    sources_by_key_mask: Dict[BaseKeyAndMask,
-                              Tuple[AbstractVertex, str]] = {}
+    sources_by_key_mask: dict[BaseKeyAndMask,
+                              tuple[AbstractVertex, str]] = {}
     iterator = _IteratorWithNext(partitions_in_table.items())
     while iterator.has_next:
         (vertex, part_id), entry = iterator.pop()
@@ -153,7 +153,7 @@ def __create_routing_table(
         assert isinstance(app_r_info, AppVertexRoutingInfo)
 
         # Get the entries to merge
-        entries: List[Tuple[
+        entries: list[tuple[
             RoutingEntry, MachineVertexRoutingInfo]] = [(entry, r_info)]
         while __match(iterator, vertex, part_id, r_info, entry, routing_info,
                       app_r_info):
@@ -174,7 +174,7 @@ def __create_routing_table(
 
 def __match(
         iterator: _IteratorWithNext[
-            Tuple[Tuple[AbstractVertex, str], RoutingEntry]],
+            tuple[tuple[AbstractVertex, str], RoutingEntry]],
         vertex: MachineVertex,
         part_id: str, r_info: MachineVertexRoutingInfo, entry:  RoutingEntry,
         routing_info:  RoutingInfo,
@@ -219,7 +219,7 @@ def __mask_has_holes(mask: int) -> bool:
 
 def __merged_keys_and_masks(
         app_r_info: AppVertexRoutingInfo,
-        entries: List[Tuple[RoutingEntry, MachineVertexRoutingInfo]]
+        entries: list[tuple[RoutingEntry, MachineVertexRoutingInfo]]
         ) -> Iterable[MulticastRoutingEntry]:
     if not entries:
         return

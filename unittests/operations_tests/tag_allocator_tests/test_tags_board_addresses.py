@@ -15,7 +15,6 @@
 
 import unittest
 from collections import defaultdict
-from typing import Dict, Set
 
 from parameterized import parameterized
 
@@ -115,7 +114,7 @@ class TestTagsBoardAddresses(unittest.TestCase):
         writer.set_plan_n_timesteps(1000)
         tags = basic_tag_allocator()
 
-        tags_by_board: Dict[str, Set] = defaultdict(set)
+        tags_by_board: dict[str, set] = defaultdict(set)
         for vertices in (eth_vertices, eth2_vertices):
             for vertex in vertices:
                 iptags = tags.get_ip_tags_for_vertex(vertex)

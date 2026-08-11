@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple
+from typing import Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -92,7 +92,7 @@ class Application2DSpiNNakerLinkVertex(
 
     @property
     @overrides(ApplicationSpiNNakerLinkVertex.atoms_shape)
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         return (self.__width, self.__height)
 
     @overrides(ApplicationSpiNNakerLinkVertex.get_incoming_slice)

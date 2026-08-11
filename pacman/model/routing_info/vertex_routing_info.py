@@ -28,7 +28,7 @@ from .base_key_and_mask import BaseKeyAndMask
 NOT_SET = -1000
 
 
-class VertexRoutingInfo(object, metaclass=AbstractBase):
+class VertexRoutingInfo(metaclass=AbstractBase):
     """
     Associates a partition identifier to its routing information
     (keys and masks).

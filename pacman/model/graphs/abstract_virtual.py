@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.require_subclass import require_subclass
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
 
 @require_subclass(AbstractVertex)
-class AbstractVirtual(object):
+class AbstractVirtual:
     """
     A vertex which exists outside of the machine,
     allowing a graph to formally participate in I/O.
@@ -61,7 +61,7 @@ class AbstractVirtual(object):
         raise NotImplementedError
 
     @abstractmethod
-    def outgoing_keys_and_masks(self) -> Optional[List[BaseKeyAndMask]]:
+    def outgoing_keys_and_masks(self) -> Optional[list[BaseKeyAndMask]]:
         """
         Get the keys sent by the device or `None` if there aren't any
         explicitly defined.

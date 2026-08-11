@@ -14,7 +14,7 @@
 from typing import Any, Optional
 
 
-class ReverseIPtagResource(object):
+class ReverseIPtagResource:
     """
     Represents the ability to talk to a SpiNNaker machine by sending UDP
     packets to it during execution.

@@ -17,11 +17,8 @@ import logging
 from typing import (
     TYPE_CHECKING,
     Iterable,
-    List,
     Optional,
     Sequence,
-    Tuple,
-    Type,
     TypeVar,
     Union,
 )
@@ -59,7 +56,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access
 
 
-class _PacmanDataModel(object):
+class _PacmanDataModel:
     """
     Singleton data model.
 
@@ -114,8 +111,8 @@ class _PacmanDataModel(object):
             self._graph.reset()
         self._placements: Optional[Placements] = None
         self._precompressed: Optional[MulticastRoutingTables] = None
-        self._all_monitor_vertices: List[MachineVertex] = []
-        self._ethernet_monitor_vertices: List[MachineVertex] = []
+        self._all_monitor_vertices: list[MachineVertex] = []
+        self._ethernet_monitor_vertices: list[MachineVertex] = []
         self._uncompressed: Optional[MulticastRoutingTables] = None
         self._routing_infos: Optional[RoutingInfo] = None
         self._routing_table_by_partition: Optional[
@@ -271,7 +268,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def get_vertices_by_type(
-            cls, vertex_type: Type[VTX]) -> Iterable[VTX]:
+            cls, vertex_type: type[VTX]) -> Iterable[VTX]:
         """
         The application vertices in the graph of the specific type.
 
@@ -410,7 +407,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def iterate_placements_by_vertex_type(
             cls, vertex_type: Union[
-                type, Tuple[type, ...]]) -> Iterable[Placement]:
+                type, tuple[type, ...]]) -> Iterable[Placement]:
         """
         :param vertex_type: Class of vertex to find
         :returns: Iterator over placements on any chip with this vertex_type.
@@ -437,7 +434,7 @@ class PacmanDataView(MachineDataView):
     @classmethod
     def iterate_placements_by_xy_and_type(
             cls, xy: XY, vertex_type: Union[
-                type, Tuple[type, ...]]) -> Iterable[Placement]:
+                type, tuple[type, ...]]) -> Iterable[Placement]:
         """
         :param xy: x and y coordinates to find placements for.
         :param vertex_type: Class of vertex to find

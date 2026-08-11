@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import math
 from enum import Enum
-from typing import Any, Dict, Optional, TextIO, Union
+from typing import Any, Optional, TextIO, Union
 
 import numpy
 from typing_extensions import TypeAlias
@@ -54,7 +54,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
         "_total")
 
     def __init__(self) -> None:
-        self.__regions: Dict[_RegionKey, AbstractSDRAM] = {}
+        self.__regions: dict[_RegionKey, AbstractSDRAM] = {}
         self._total: AbstractSDRAM = ConstantSDRAM(0)
 
     @property

@@ -14,7 +14,7 @@
 from typing import Any, Optional
 
 
-class IPtagResource(object):
+class IPtagResource:
     """
     Represents the ability to have a SpiNNaker machine send messages to
     you during execution.

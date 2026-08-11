@@ -18,7 +18,7 @@ based on https://github.com/project-rig/
 
 import logging
 from abc import abstractmethod
-from typing import List, cast
+from typing import cast
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
@@ -37,7 +37,7 @@ from pacman.model.routing_tables import (
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class AbstractCompressor(object):
+class AbstractCompressor:
     """
     Basic model of a router table compressor.
 
@@ -78,7 +78,7 @@ class AbstractCompressor(object):
 
     @abstractmethod
     def compress_table(
-            self, router_table: UnCompressedMulticastRoutingTable) -> List[
+            self, router_table: UnCompressedMulticastRoutingTable) -> list[
                 MulticastRoutingEntry]:
         """
         :param router_table:

@@ -15,7 +15,7 @@
 import csv
 import gzip
 import logging
-from typing import Any, Collection, Dict, Iterable
+from typing import Any, Collection, Iterable
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -62,7 +62,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         self._x = x
         self._y = y
         self._number_of_defaulted_routing_entries = 0
-        self._entries_by_key_mask: Dict = {}
+        self._entries_by_key_mask: dict = {}
 
         for multicast_routing_entry in multicast_routing_entries:
             self.add_multicast_routing_entry(multicast_routing_entry)

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Generic, List, Optional, cast
+from typing import Generic, Optional, cast
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -44,7 +44,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
 
     def __init__(self) -> None:
         super().__init__()
-        self.__slices: Optional[List[Slice]] = None
+        self.__slices: Optional[list[Slice]] = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex: V) -> None:
@@ -54,28 +54,28 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
         super().set_governed_app_vertex(app_vertex)
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, partition_id: str) -> List[MachineVertex]:
+    def get_out_going_vertices(self, partition_id: str) -> list[MachineVertex]:
         return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, partition_id: str) -> List[MachineVertex]:
+    def get_in_coming_vertices(self, partition_id: str) -> list[MachineVertex]:
         return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(
-            self, variable_to_record: str) -> List[MachineVertex]:
+            self, variable_to_record: str) -> list[MachineVertex]:
         return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
-    def get_out_going_slices(self) -> List[Slice]:
+    def get_out_going_slices(self) -> list[Slice]:
         return self.__fixed_slices
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
-    def get_in_coming_slices(self) -> List[Slice]:
+    def get_in_coming_slices(self) -> list[Slice]:
         return self.__fixed_slices
 
     @property
-    def __fixed_slices(self) -> List[Slice]:
+    def __fixed_slices(self) -> list[Slice]:
         if self.__slices is None:
             self.__slices = get_multidimensional_slices(
                 self.governed_app_vertex)

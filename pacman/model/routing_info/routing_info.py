@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import TYPE_CHECKING, Dict, Iterable, Iterator, Optional, Set
+from typing import TYPE_CHECKING, Iterable, Iterator, Optional
 
 from pacman.exceptions import (
     PacmanAlreadyExistsException,
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from .vertex_routing_info import VertexRoutingInfo
 
 
-class RoutingInfo(object):
+class RoutingInfo:
     """
     An association of machine vertices to a non-overlapping set of keys
     and masks.
@@ -54,8 +54,8 @@ class RoutingInfo(object):
     def __init__(self) -> None:
         # Partition information indexed by edge pre-vertex and partition ID
         # name
-        self._info: Dict[AbstractVertex,
-                         Dict[str, VertexRoutingInfo]] = defaultdict(dict)
+        self._info: dict[AbstractVertex,
+                         dict[str, VertexRoutingInfo]] = defaultdict(dict)
         self._global_app_mask: Optional[int] = None
         self._global_machine_mask: Optional[int] = None
         # Temp values to avoid Optionals
@@ -146,7 +146,7 @@ class RoutingInfo(object):
 
     def check_info_from(
             self, vertex: AbstractVertex,
-            allowed_partition_ids: Set[str]) -> None:
+            allowed_partition_ids: set[str]) -> None:
         """
         Check that the partition ids for a vertex are in the allowed set.
 

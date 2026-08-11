@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, List, Tuple, Type
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -27,7 +26,7 @@ from pacman.exceptions import (
 
 
 def fixed_route_router(
-        destination_class: Type) -> Dict[Tuple[int, int], RoutingEntry]:
+        destination_class: type) -> dict[tuple[int, int], RoutingEntry]:
     """
     Runs the fixed route generator for all boards on machine.
 
@@ -41,7 +40,7 @@ def fixed_route_router(
     return router.build_fixed_routes()
 
 
-class _FixedRouteRouter(object):
+class _FixedRouteRouter:
     """
     Computes the fixed routes used to direct data out traffic to the
     board-local gatherer processors.
@@ -51,17 +50,17 @@ class _FixedRouteRouter(object):
         "_destination_class", "_fixed_route_tables",
         "_machine")
 
-    def __init__(self, destination_class: Type):
+    def __init__(self, destination_class: type):
         """
 
         :param destination_class: the destination class to route packets to
         """
         self._machine = PacmanDataView.get_machine()
         self._destination_class = destination_class
-        self._fixed_route_tables: Dict[Tuple[int, int], RoutingEntry] = \
+        self._fixed_route_tables: dict[tuple[int, int], RoutingEntry] = \
             {}
 
-    def build_fixed_routes(self) -> Dict[Tuple[int, int], RoutingEntry]:
+    def build_fixed_routes(self) -> dict[tuple[int, int], RoutingEntry]:
         """
         Runs the fixed route generator for all boards on machine.
 
@@ -125,9 +124,9 @@ class _FixedRouteRouter(object):
         # build entry and add to tables
         self.__add_fixed_route_entry((eth_x, eth_y), [], [processor_id])
 
-    def __add_fixed_route_entry(self, key: Tuple[int, int],
-                                link_ids: List[int],
-                                processor_ids: List[int]) -> None:
+    def __add_fixed_route_entry(self, key: tuple[int, int],
+                                link_ids: list[int],
+                                processor_ids: list[int]) -> None:
         """
         :raises PacmanAlreadyExistsException:
         """

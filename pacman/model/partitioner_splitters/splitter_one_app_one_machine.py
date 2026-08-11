@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Generic, List, TypeVar
+from typing import Generic, TypeVar
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -56,24 +56,24 @@ class SplitterOneAppOneMachine(AbstractSplitterCommon[AV], Generic[AV, MV]):
             self.governed_app_vertex.machine_vertex.sdram_required)
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
-    def get_out_going_slices(self) -> List[Slice]:
+    def get_out_going_slices(self) -> list[Slice]:
         return [self.governed_app_vertex.machine_vertex.vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
-    def get_in_coming_slices(self) -> List[Slice]:
+    def get_in_coming_slices(self) -> list[Slice]:
         return [self.governed_app_vertex.machine_vertex.vertex_slice]
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, partition_id: str) -> List[MV]:
+    def get_out_going_vertices(self, partition_id: str) -> list[MV]:
         return [self.governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, partition_id: str) -> List[MV]:
+    def get_in_coming_vertices(self, partition_id: str) -> list[MV]:
         return [self.governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(
-            self, variable_to_record: str) -> List[MV]:
+            self, variable_to_record: str) -> list[MV]:
         return [self.governed_app_vertex.machine_vertex]
 
     @overrides(AbstractSplitterCommon.reset_called)

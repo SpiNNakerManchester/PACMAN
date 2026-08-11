@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, FrozenSet, Optional
+from typing import TYPE_CHECKING, Optional
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 # Can't use this decorator: circular import problem
 # @require_subclass(ApplicationVertex)
-class LegacyPartitionerAPI(object, metaclass=AbstractBase):
+class LegacyPartitionerAPI(metaclass=AbstractBase):
     """
     API used by the vertices which don't have their own splitters but use
     what master did before the self partitioning stuff came to be.
@@ -64,7 +64,7 @@ class LegacyPartitionerAPI(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @staticmethod
-    def abstract_methods() -> FrozenSet[str]:
+    def abstract_methods() -> frozenset[str]:
         """
         :returns: The abstract methods and properties defined in this class.
         """

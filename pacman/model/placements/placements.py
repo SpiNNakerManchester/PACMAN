@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Collection, Dict, Iterable, Iterator, Tuple, Union
+from typing import Collection, Iterable, Iterator, Union
 
 from spinn_utilities.typing.coords import XY
 
@@ -28,7 +28,7 @@ from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from .placement import Placement
 
 
-class Placements(object):
+class Placements:
     """
     The placements of vertices on the chips of the machine.
     """
@@ -50,8 +50,8 @@ class Placements(object):
         :raise PacmanProcessorAlreadyOccupiedError:
             If two placements are made to the same processor.
         """
-        self._placements: Dict[XY, Dict[int, Placement]] = defaultdict(dict)
-        self._machine_vertices: Dict[MachineVertex, Placement] = {}
+        self._placements: dict[XY, dict[int, Placement]] = defaultdict(dict)
+        self._machine_vertices: dict[MachineVertex, Placement] = {}
         if placements:
             self.add_placements(placements)
 
@@ -148,7 +148,7 @@ class Placements(object):
 
     def iterate_placements_by_xy_and_type(
             self, xy: XY, vertex_type: Union[
-                type, Tuple[type, ...]]) -> Iterable[Placement]:
+                type, tuple[type, ...]]) -> Iterable[Placement]:
         """
         :param xy: x and y coordinate to find placements for.
         :param vertex_type: Class of vertex to find
@@ -160,7 +160,7 @@ class Placements(object):
 
     def iterate_placements_by_vertex_type(
             self, vertex_type: Union[
-                type, Tuple[type, ...]]) -> Iterable[Placement]:
+                type, tuple[type, ...]]) -> Iterable[Placement]:
         """
         :param vertex_type: Class of vertex to find
         :returns: Placements on any chip with this vertex_type.

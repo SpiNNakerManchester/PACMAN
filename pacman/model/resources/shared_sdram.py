@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import Any, Dict, Optional, TextIO, Union
+from typing import Any, Optional, TextIO, Union
 
 import numpy
 
@@ -44,7 +44,7 @@ class SharedSDRAM(AbstractSDRAM):
         "_shared"
         )
 
-    def __init__(self, shared: Dict[str, AbstractSDRAM],
+    def __init__(self, shared: dict[str, AbstractSDRAM],
                  per_core: Optional[AbstractSDRAM] = None) -> None:
         """
         Creates an SDRAM of both per_core and shared requirements.

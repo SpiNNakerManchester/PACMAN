@@ -14,7 +14,7 @@
 from typing import Any, Optional
 
 
-class ChipAndCore(object):
+class ChipAndCore:
     """
     A constraint to place a vertex on a specific chip and, optionally, a
     specific core on that chip.

@@ -18,7 +18,7 @@ from typing import Any, Optional, TextIO
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-class AbstractSDRAM(object, metaclass=AbstractBase):
+class AbstractSDRAM(metaclass=AbstractBase):
     """
     Represents an amount of SDRAM used on a chip in the machine.
     """

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import Any, Tuple, Union
+from typing import Any, Union
 
 import numpy
 from numpy.typing import NDArray
@@ -21,7 +21,7 @@ from numpy.typing import NDArray
 from pacman.exceptions import PacmanTypeError, PacmanValueError
 
 
-class Slice(object):
+class Slice:
     """
     Represents a simple single-dimensional slice of a vertex.
 
@@ -79,7 +79,7 @@ class Slice(object):
         return self._n_atoms
 
     @property
-    def shape(self) -> Tuple[int, ...]:
+    def shape(self) -> tuple[int, ...]:
         """
         The shape of the atoms over multiple dimensions.
         By default the shape will be 1-dimensional.
@@ -87,7 +87,7 @@ class Slice(object):
         return (self._n_atoms, )
 
     @property
-    def start(self) -> Tuple[int, ...]:
+    def start(self) -> tuple[int, ...]:
         """
         The start coordinates of the slice.
         By default this will be `lo_atom` in 1 dimension.
@@ -121,7 +121,7 @@ class Slice(object):
         raise IndexError(f"{n} is invalid for a 1 dimension Slice ")
 
     @property
-    def dimension(self) -> Tuple[slice, ...]:
+    def dimension(self) -> tuple[slice, ...]:
         """
         Get directions or edges as slices for every dimension
 
@@ -132,7 +132,7 @@ class Slice(object):
         return (slice(self._lo_atom, self._lo_atom + self._n_atoms), )
 
     @property
-    def end(self) -> Tuple[int, ...]:
+    def end(self) -> tuple[int, ...]:
         """
         The end positions of the slice in each dimension
         """
