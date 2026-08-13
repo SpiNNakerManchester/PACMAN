@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -32,7 +32,7 @@ class AbstractEdge(Generic[V], metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def label(self) -> Optional[str]:
+    def label(self) -> str | None:
         """
         The label of the edge.
         """

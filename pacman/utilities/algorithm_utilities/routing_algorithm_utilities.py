@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from spinn_utilities.typing.coords import XY
 
@@ -159,7 +158,7 @@ def vertex_chip(vertex: MachineVertex) -> Chip:
 
 
 def vertex_xy_and_route(vertex: MachineVertex) -> tuple[
-        XY, tuple[MachineVertex, Optional[int], Optional[int]]]:
+        XY, tuple[MachineVertex, int | None, int | None]]:
     """
     Get the non-virtual chip coordinates, the vertex, and processor or
     link to follow to get to the vertex.

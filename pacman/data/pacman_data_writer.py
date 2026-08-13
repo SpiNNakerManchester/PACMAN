@@ -14,7 +14,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -131,7 +130,7 @@ class PacmanDataWriter(MachineDataWriter, PacmanDataView):
                 "router_tables should be a MulticastRoutingTables")
         self.__pacman_data._precompressed = router_tables
 
-    def set_plan_n_timesteps(self, plan_n_timesteps: Optional[int]) -> None:
+    def set_plan_n_timesteps(self, plan_n_timesteps: int | None) -> None:
         """
         Sets the `plan_n_timestep`. Use `None` for run forever.
 

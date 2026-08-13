@@ -14,7 +14,7 @@
 
 import gzip
 import json
-from typing import Collection, Iterable, Iterator, Optional, Union, cast
+from typing import Collection, Iterable, Iterator, cast
 
 from spinn_utilities.typing.coords import XY
 from spinn_utilities.typing.json import JsonObjectArray
@@ -113,7 +113,7 @@ class MulticastRoutingTables:
             return 0
 
     def get_routing_table_for_chip(
-            self, x: int, y: int) -> Optional[AbstractMulticastRoutingTable]:
+            self, x: int, y: int) -> AbstractMulticastRoutingTable | None:
         """
         Get a routing table for a particular chip.
 
@@ -158,7 +158,7 @@ def to_json(router_table: MulticastRoutingTables) -> JsonObjectArray:
         for routing_table in router_table]
 
 
-def from_json(j_router: Union[str, JsonObjectArray]) -> MulticastRoutingTables:
+def from_json(j_router: str | JsonObjectArray) -> MulticastRoutingTables:
     """
     Creates Routing Tables based on json
 

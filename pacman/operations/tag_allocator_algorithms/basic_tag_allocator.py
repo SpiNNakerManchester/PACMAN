@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Union
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -82,7 +81,7 @@ def basic_tag_allocator() -> Tags:
 
 
 def __get_chip_and_tag(
-        iptag: Union[IPtagResource, ReverseIPtagResource], eth_chip: Chip,
+        iptag: IPtagResource | ReverseIPtagResource, eth_chip: Chip,
         machine: Machine, tags_available: dict[Chip, list[int]]
         ) -> tuple[Chip, int]:
     tags_on_chip = tags_available[eth_chip]

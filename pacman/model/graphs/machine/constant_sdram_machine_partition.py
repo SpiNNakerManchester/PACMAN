@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Generic, Optional, TypeVar, cast
+from typing import Generic, TypeVar, cast
 
 from spinn_utilities.overrides import overrides
 
@@ -54,8 +54,8 @@ class ConstantSDRAMMachinePartition(
         super().__init__(
             pre_vertex, identifier,
             allowed_edge_types=cast(type[E], SDRAMMachineEdge))
-        self._sdram_size: Optional[int] = None
-        self._sdram_base_address: Optional[int] = None
+        self._sdram_size: int | None = None
+        self._sdram_base_address: int | None = None
 
     @overrides(AbstractSingleSourcePartition.add_edge)
     def add_edge(self, edge: E) -> None:

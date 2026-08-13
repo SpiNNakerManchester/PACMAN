@@ -19,7 +19,6 @@ from typing import (
     Callable,
     ContextManager,
     NewType,
-    Union,
 )
 
 from spinn_utilities.typing.coords import XY
@@ -72,7 +71,7 @@ class Spinner:
 
 
 #: Either we get the API to SpiNNer, or we have an error
-spinner_api: Union[Spinner, ImportError]
+spinner_api: Spinner | ImportError
 
 try:
     spinner_api = Spinner.import_api()

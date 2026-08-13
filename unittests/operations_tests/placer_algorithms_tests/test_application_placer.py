@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from typing import Iterable, Optional, Sequence
+from typing import Iterable, Sequence
 
 from parameterized import parameterized
 
@@ -56,7 +56,7 @@ class MockSplitter(AbstractSplitterCommon):
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(
-            self, chip_counter: Optional[ChipCounter]) -> None:
+            self, chip_counter: ChipCounter | None) -> None:
         for _ in range(self.__n_groups):
             m_vertices = [
                 SimpleMachineVertex(

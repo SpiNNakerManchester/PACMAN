@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Generic, Iterable, Optional, TypeVar
+from typing import Generic, Iterable, TypeVar
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -47,13 +47,13 @@ class _IteratorWithNext(Generic[E]):
         """
         self.__iterator = iter(iterable)
         try:
-            self.__next: Optional[E] = next(self.__iterator)
+            self.__next: E | None = next(self.__iterator)
             self.__has_next = True
         except StopIteration:
             self.__next = None
             self.__has_next = False
 
-    def peek(self) -> Optional[E]:
+    def peek(self) -> E | None:
         """
         :returns: The Element if any that would be returned by a pop call
         """

@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import TYPE_CHECKING, Iterable, Iterator, Optional
+from typing import TYPE_CHECKING, Iterable, Iterator
 
 from pacman.exceptions import (
     PacmanAlreadyExistsException,
@@ -56,8 +56,8 @@ class RoutingInfo:
         # name
         self._info: dict[AbstractVertex,
                          dict[str, VertexRoutingInfo]] = defaultdict(dict)
-        self._global_app_mask: Optional[int] = None
-        self._global_machine_mask: Optional[int] = None
+        self._global_app_mask: int | None = None
+        self._global_machine_mask: int | None = None
         # Temp values to avoid Optionals
         self._min_bits_machine_and_atoms = -1000
         self._max_bits_machine = -1000
@@ -163,7 +163,7 @@ class RoutingInfo:
                     f"Vertex {vertex} has unknown partition ID {partition_id}")
 
     def get_single_info_from(
-            self, vertex: AbstractVertex) -> Optional[VertexRoutingInfo]:
+            self, vertex: AbstractVertex) -> VertexRoutingInfo | None:
         """
         Get routing information for a given vertex.  Fails if the vertex has
         more than one outgoing partition.
@@ -181,7 +181,7 @@ class RoutingInfo:
         return next(iter(info.values()))
 
     def get_single_key_from(
-            self, vertex: AbstractVertex) -> Optional[int]:
+            self, vertex: AbstractVertex) -> int | None:
         """
         Get the first key for the partition starting at a vertex.  Fails if
         the vertex has more than one outgoing partition.

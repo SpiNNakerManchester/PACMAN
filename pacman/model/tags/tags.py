@@ -18,7 +18,6 @@ from typing import (
     TYPE_CHECKING,
     Iterable,
     Iterator,
-    Optional,
 )
 
 from spinn_machine.tags import IPTag, ReverseIPTag
@@ -172,8 +171,8 @@ class Tags:
         """
         return iter(self._reverse_ip_tags.values())
 
-    def get_ip_tags_for_vertex(self, vertex: MachineVertex) -> Optional[
-            list[IPTag]]:
+    def get_ip_tags_for_vertex(
+            self, vertex: MachineVertex) -> list[IPTag] | None:
         """
         Get the IP Tags assigned to a given machine vertex.
 
@@ -183,7 +182,7 @@ class Tags:
         return self._ip_tags_by_vertex.get(vertex)
 
     def get_reverse_ip_tags_for_vertex(
-            self, vertex: MachineVertex) -> Optional[list[ReverseIPTag]]:
+            self, vertex: MachineVertex) -> list[ReverseIPTag] | None:
         """
         Get the Reverse IP Tags assigned to a given machine vertex.
 

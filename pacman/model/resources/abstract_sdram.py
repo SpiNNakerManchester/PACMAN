@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import Any, Optional, TextIO
+from typing import Any, TextIO
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -25,7 +25,7 @@ class AbstractSDRAM(metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def get_total_sdram(self, n_timesteps: Optional[int]) -> int:
+    def get_total_sdram(self, n_timesteps: int | None) -> int:
         """
         The total SDRAM.
 
@@ -68,8 +68,8 @@ class AbstractSDRAM(metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def report(self, timesteps: Optional[int], indent: str = "",
-               preamble: str = "", target: Optional[TextIO] = None) -> None:
+    def report(self, timesteps: int | None, indent: str = "",
+               preamble: str = "", target: TextIO | None = None) -> None:
         """
         Writes a description of this SDRAM to the target.
 

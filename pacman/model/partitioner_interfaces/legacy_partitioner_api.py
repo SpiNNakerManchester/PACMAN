@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -50,7 +50,7 @@ class LegacyPartitionerAPI(metaclass=AbstractBase):
     @abstractmethod
     def create_machine_vertex(
             self, vertex_slice: Slice, sdram: AbstractSDRAM,
-            label: Optional[str] = None) -> MachineVertex:
+            label: str | None = None) -> MachineVertex:
         """
         Create a machine vertex from this application vertex.
 

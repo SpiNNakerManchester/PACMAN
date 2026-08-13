@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union
 
 from typing_extensions import TypeAlias
 
@@ -37,8 +36,7 @@ from pacman.utilities.utility_objs import ChipCounter
 
 from .abstract_splitter_common import AbstractSplitterCommon
 
-_Allowed: TypeAlias = Union[
-    ApplicationFPGAVertex, ApplicationSpiNNakerLinkVertex]
+_Allowed: TypeAlias = ApplicationFPGAVertex | ApplicationSpiNNakerLinkVertex
 
 
 class SplitterExternalDevice(AbstractSplitterCommon):
@@ -60,8 +58,8 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         super().__init__()
         self.__incoming_vertices: list[MachineVertex] = []
         self.__incoming_slices: list[Slice] = []
-        self.__outgoing_vertex: Optional[MachineVertex] = None
-        self.__outgoing_slice: Optional[Slice] = None
+        self.__outgoing_vertex: MachineVertex | None = None
+        self.__outgoing_slice: Slice | None = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex: _Allowed) -> None:
@@ -73,7 +71,7 @@ class SplitterExternalDevice(AbstractSplitterCommon):
         self.__outgoing_slice = None
 
         if isinstance(app_vertex, ApplicationFPGAVertex):
-            fpga: Optional[FPGAConnection]
+            fpga: FPGAConnection | None
             # This can have multiple FPGA connections per board
             for i in range(app_vertex.n_machine_vertices_per_link):
                 for fpga in app_vertex.incoming_fpga_connections:

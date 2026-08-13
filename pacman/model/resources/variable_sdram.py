@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import Any, Optional, TextIO, Union
+from typing import Any, TextIO
 
 import numpy
 
@@ -25,7 +25,7 @@ from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
 
 
-def _ceil(value: Union[int, float, numpy.integer, numpy.floating]) -> int:
+def _ceil(value: int | float | numpy.integer | numpy.floating) -> int:
     return math.ceil(value)
 
 
@@ -54,7 +54,7 @@ class VariableSDRAM(AbstractSDRAM):
         self._per_timestep_sdram = float(per_timestep_sdram)
 
     @overrides(AbstractSDRAM.get_total_sdram)
-    def get_total_sdram(self, n_timesteps: Optional[int]) -> int:
+    def get_total_sdram(self, n_timesteps: int | None) -> int:
         if n_timesteps is not None:
             return _ceil(
                 self._fixed_sdram + self._per_timestep_sdram * n_timesteps)
@@ -100,8 +100,8 @@ class VariableSDRAM(AbstractSDRAM):
             return other + self
 
     @overrides(AbstractSDRAM.report)
-    def report(self, timesteps: Optional[int], indent: str = "",
-               preamble: str = "", target: Optional[TextIO] = None) -> None:
+    def report(self, timesteps: int | None, indent: str = "",
+               preamble: str = "", target: TextIO | None = None) -> None:
         print(indent, preamble,
               f"Fixed {self._fixed_sdram} bytes "
               f"Per_timestep {self._per_timestep_sdram} bytes "

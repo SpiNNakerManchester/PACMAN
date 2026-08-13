@@ -17,10 +17,8 @@ import logging
 from typing import (
     TYPE_CHECKING,
     Iterable,
-    Optional,
     Sequence,
     TypeVar,
-    Union,
 )
 
 from spinn_utilities.log import FormatAdapter
@@ -71,7 +69,7 @@ class _PacmanDataModel:
     What data is held where and how can change without notice.
     """
 
-    __singleton: Optional[_PacmanDataModel] = None
+    __singleton: _PacmanDataModel | None = None
 
     __slots__ = (
         # Data values cached
@@ -100,7 +98,7 @@ class _PacmanDataModel:
         """
         self._graph = ApplicationGraph()
         # set at the start of every run
-        self._plan_n_timesteps: Optional[int] = None
+        self._plan_n_timesteps: int | None = None
         self._hard_reset()
 
     def _hard_reset(self) -> None:
@@ -109,15 +107,15 @@ class _PacmanDataModel:
         """
         if self._graph:
             self._graph.reset()
-        self._placements: Optional[Placements] = None
-        self._precompressed: Optional[MulticastRoutingTables] = None
+        self._placements: Placements | None = None
+        self._precompressed: MulticastRoutingTables | None = None
         self._all_monitor_vertices: list[MachineVertex] = []
         self._ethernet_monitor_vertices: list[MachineVertex] = []
-        self._uncompressed: Optional[MulticastRoutingTables] = None
-        self._routing_infos: Optional[RoutingInfo] = None
-        self._routing_table_by_partition: Optional[
-            MulticastRoutingTableByPartition] = None
-        self._tags: Optional[Tags] = None
+        self._uncompressed: MulticastRoutingTables | None = None
+        self._routing_infos: RoutingInfo | None = None
+        self._routing_table_by_partition: (MulticastRoutingTableByPartition |
+                                           None) = None
+        self._tags: Tags | None = None
         self._soft_reset()
 
     def _soft_reset(self) -> None:
@@ -406,8 +404,7 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def iterate_placements_by_vertex_type(
-            cls, vertex_type: Union[
-                type, tuple[type, ...]]) -> Iterable[Placement]:
+            cls, vertex_type: type | tuple[type, ...]) -> Iterable[Placement]:
         """
         :param vertex_type: Class of vertex to find
         :returns: Iterator over placements on any chip with this vertex_type.
@@ -433,8 +430,8 @@ class PacmanDataView(MachineDataView):
 
     @classmethod
     def iterate_placements_by_xy_and_type(
-            cls, xy: XY, vertex_type: Union[
-                type, tuple[type, ...]]) -> Iterable[Placement]:
+            cls, xy: XY,
+            vertex_type: type | tuple[type, ...]) -> Iterable[Placement]:
         """
         :param xy: x and y coordinates to find placements for.
         :param vertex_type: Class of vertex to find
@@ -559,7 +556,7 @@ class PacmanDataView(MachineDataView):
         return cls.__pacman_data._precompressed
 
     @classmethod
-    def get_plan_n_timestep(cls) -> Optional[int]:
+    def get_plan_n_timestep(cls) -> int | None:
         """
         The number of timesteps to plan for in an auto-pause-resume cycle.
 

@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Collection, Generic, TypeVar, Union
+from typing import Collection, Generic, TypeVar
 
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides
@@ -44,7 +44,7 @@ class AbstractMultiplePartition(AbstractEdgePartition[E], Generic[V, E]):
 
     def __init__(
             self, pre_vertices: Collection[V], identifier: str,
-            allowed_edge_types: Union[type[E], tuple[type[E], ...]]):
+            allowed_edge_types: type[E] | tuple[type[E], ...]):
         """
         :param pre_vertices: The vertices which send through this partition
         :param identifier: The identifier of the partition

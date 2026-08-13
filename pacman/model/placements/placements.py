@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Collection, Iterable, Iterator, Union
+from typing import Collection, Iterable, Iterator
 
 from spinn_utilities.typing.coords import XY
 
@@ -147,8 +147,8 @@ class Placements:
         return self._placements[xy].values()
 
     def iterate_placements_by_xy_and_type(
-            self, xy: XY, vertex_type: Union[
-                type, tuple[type, ...]]) -> Iterable[Placement]:
+            self, xy: XY,
+            vertex_type: type | tuple[type, ...]) -> Iterable[Placement]:
         """
         :param xy: x and y coordinate to find placements for.
         :param vertex_type: Class of vertex to find
@@ -159,8 +159,7 @@ class Placements:
                 yield placement
 
     def iterate_placements_by_vertex_type(
-            self, vertex_type: Union[
-                type, tuple[type, ...]]) -> Iterable[Placement]:
+            self, vertex_type: type | tuple[type, ...]) -> Iterable[Placement]:
         """
         :param vertex_type: Class of vertex to find
         :returns: Placements on any chip with this vertex_type.

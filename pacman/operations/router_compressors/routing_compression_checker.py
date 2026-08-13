@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Optional, TextIO
+from typing import TextIO
 
 from spinn_utilities.log import FormatAdapter
 
@@ -111,8 +111,8 @@ def _calc_remainders(o_code: str, c_code: str) -> list[str]:
 def compare_route(
         o_route: MulticastRoutingEntry,
         compressed_dict: dict[str, MulticastRoutingEntry],
-        o_code: Optional[str] = None, start: int = 0,
-        f: Optional[TextIO] = None) -> None:
+        o_code: str | None = None, start: int = 0,
+        f: TextIO | None = None) -> None:
     """
     Compare that the compressed route is correct.
 

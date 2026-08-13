@@ -14,7 +14,7 @@
 
 import math
 from collections import defaultdict
-from typing import Iterable, Optional, Sequence, cast
+from typing import Iterable, Sequence, cast
 
 from parameterized import parameterized
 
@@ -482,7 +482,7 @@ def _make_input_output_vertices(
 def _get_entry(
         routing_tables: MulticastRoutingTableByPartition, x: int, y: int,
         source_vertex: MachineVertex, partition_id: str,
-        allow_none: bool) -> Optional[RoutingEntry]:
+        allow_none: bool) -> RoutingEntry | None:
     app_vertex = source_vertex.app_vertex
     app_entry = routing_tables.get_entry_on_coords_for_edge(
         app_vertex, partition_id, x, y)
@@ -507,9 +507,9 @@ def _find_targets(
         routing_tables: MulticastRoutingTableByPartition,
         expected_virtual: set[tuple[int, int, int]],
         source_vertex: MachineVertex, partition_id: str) -> set[
-            tuple[XY, Optional[int], Optional[int]]]:
-    found_targets: set[tuple[XY, Optional[int], Optional[int]]] = set()
-    to_follow: list[tuple[int, int, Optional[RoutingEntry]]] = []
+            tuple[XY, int | None, int | None]]:
+    found_targets: set[tuple[XY, int | None, int | None]] = set()
+    to_follow: list[tuple[int, int, RoutingEntry | None]] = []
     x, y = vertex_xy(source_vertex)
     first_entry = _get_entry(
         routing_tables, x, y, source_vertex, partition_id, True)
@@ -550,7 +550,7 @@ def _find_targets(
 
 def _add_virtual(expected_virtual: set[tuple[int, int, int]],
                  vertex: MachineVertex) -> None:
-    link_data: Optional[AbstractLinkData] = None
+    link_data: AbstractLinkData | None = None
     if isinstance(vertex, MachineFPGAVertex):
         link_data = PacmanDataView.get_fpga_links().get_fpga_link_with_id(
             vertex.fpga_id, vertex.fpga_link_id, vertex.board_address)

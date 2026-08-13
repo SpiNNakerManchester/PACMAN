@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Generic, Iterable, Optional, Sequence, TypeVar
+from typing import Generic, Iterable, Sequence, TypeVar
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -42,7 +42,7 @@ class AbstractSplitterCommon(Generic[V], metaclass=AbstractBase):
         "__governed_app_vertex", )
 
     def __init__(self) -> None:
-        self.__governed_app_vertex: Optional[V] = None
+        self.__governed_app_vertex: V | None = None
 
     def __str__(self) -> str:
         try:

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
@@ -61,8 +61,8 @@ class FixedMachineVertexRoutingInfo(MachineVertexRoutingInfo):
                          app_key_and_mask.mask)
         self.__app_key_overlap = False
         self.__app_key = app_key_and_mask.key
-        self.__global_app_mask: Optional[int] = None
-        self.__global_machine_mask: Optional[int] = None
+        self.__global_app_mask: int | None = None
+        self.__global_machine_mask: int | None = None
 
         if not can_shift(app_key_and_mask.mask):
             raise IrregularFixedMaskException(

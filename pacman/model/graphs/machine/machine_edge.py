@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
@@ -41,7 +41,7 @@ class MachineEdge(AbstractEdge[_MV]):
     )
 
     def __init__(self, pre_vertex: MachineVertex, post_vertex: MachineVertex,
-                 label: Optional[str] = None):
+                 label: str | None = None):
         """
         :param pre_vertex: The vertex at the start of the edge.
         :param post_vertex: The vertex at the end of the edge.
@@ -53,7 +53,7 @@ class MachineEdge(AbstractEdge[_MV]):
 
     @property
     @overrides(AbstractEdge.label)
-    def label(self) -> Optional[str]:
+    def label(self) -> str | None:
         return self._label
 
     @property

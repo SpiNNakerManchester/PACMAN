@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Optional
+from typing import Any
 
 import numpy
 
@@ -99,8 +99,8 @@ class BaseKeyAndMask:
         return 2 ** len(zeros)
 
     def get_keys(
-            self, key_array: Optional[numpy.ndarray] = None, offset: int = 0,
-            n_keys: Optional[int] = None) -> tuple[numpy.ndarray, int]:
+            self, key_array: numpy.ndarray | None = None, offset: int = 0,
+            n_keys: int | None = None) -> tuple[numpy.ndarray, int]:
         """
         Get the ordered list of keys that the combination allows.
 

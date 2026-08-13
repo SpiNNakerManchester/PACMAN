@@ -18,7 +18,6 @@ from typing import (
     Generic,
     Sequence,
     TypeVar,
-    Union,
 )
 
 from spinn_utilities.abstract_base import AbstractBase
@@ -47,7 +46,7 @@ class AbstractSingleSourcePartition(
 
     def __init__(
             self, pre_vertex: V, identifier: str,
-            allowed_edge_types: Union[type[E], tuple[type[E], ...]]):
+            allowed_edge_types: type[E] | tuple[type[E], ...]):
         """
 
         :param pre_vertex: The vertex at the start of all the edges

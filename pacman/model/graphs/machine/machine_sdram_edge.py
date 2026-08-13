@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
 
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
@@ -46,7 +45,7 @@ class SDRAMMachineEdge(MachineEdge):
                 f"Pre-vertex {pre_vertex} doesn't support SDRAM edges")
         super().__init__(pre_vertex, post_vertex, label=label)
         self._sdram_size = pre_vertex.sdram_requirement(self)
-        self._sdram_base_address: Optional[int] = None
+        self._sdram_base_address: int | None = None
 
     @property
     def sdram_size(self) -> int:
@@ -56,7 +55,7 @@ class SDRAMMachineEdge(MachineEdge):
         return self._sdram_size
 
     @property
-    def sdram_base_address(self) -> Optional[int]:
+    def sdram_base_address(self) -> int | None:
         """
         The start address of the sdram if set
         """

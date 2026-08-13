@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 from spinn_utilities.typing.coords import XY
 
@@ -37,8 +37,8 @@ class FPGAConnection(NamedTuple):
 
     #: The IP address of the board with the FPGA, or None for the default board
     #: or if using chip_coords
-    board_address: Optional[str]
+    board_address: str | None
 
     #: The coordinates of the chip connected to the FPGA, or None for the
     #: default board or if using board_address
-    chip_coords: Optional[XY]
+    chip_coords: XY | None

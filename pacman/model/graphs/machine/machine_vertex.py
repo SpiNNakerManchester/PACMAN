@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, Optional, final
+from typing import TYPE_CHECKING, Iterable, final
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
@@ -47,9 +47,9 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
     )
     _DEFAULT_SLICE = Slice(0, 0)
 
-    def __init__(self, label: Optional[str] = None,
-                 app_vertex: Optional[ApplicationVertex] = None,
-                 vertex_slice: Optional[Slice] = None):
+    def __init__(self, label: str | None = None,
+                 app_vertex: ApplicationVertex | None = None,
+                 vertex_slice: Slice | None = None):
         """
         :param label: The optional name of the vertex
         :param app_vertex:
@@ -69,7 +69,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
             app_vertex = AbstractOneAppOneMachineVertex(self, self.label)
         self._added_to_graph = False
         self._app_vertex = app_vertex
-        self._index: Optional[int] = None
+        self._index: int | None = None
         if vertex_slice is not None:
             self.__vertex_slice = vertex_slice
         else:
@@ -155,7 +155,7 @@ class MachineVertex(AbstractVertex, metaclass=AbstractBase):
         return []
 
     @overrides(AbstractVertex.get_fixed_location)
-    def get_fixed_location(self) -> Optional[ChipAndCore]:
+    def get_fixed_location(self) -> ChipAndCore | None:
         """
         .. note::
             If the Machine vertex has no `fixed_location`

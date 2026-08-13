@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import Any, Union
+from typing import Any
 
 import numpy
 from numpy.typing import NDArray
@@ -138,7 +138,7 @@ class Slice:
         """
         return (self._lo_atom + self._n_atoms, )
 
-    def get_ids_as_slice_or_list(self) -> Union[slice, numpy.ndarray]:
+    def get_ids_as_slice_or_list(self) -> slice | numpy.ndarray:
         """
         Returns the IDs as a built-in slice if possible,
         otherwise as a list of IDs.

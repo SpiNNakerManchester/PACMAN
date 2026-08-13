@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
@@ -58,8 +58,8 @@ class FixedAppVertexRoutingInfo(AppVertexRoutingInfo):
         super().__init__(key_and_mask, partition_id, app_vertex,
                          max_machine_index, machine_mask)
         self.__app_key_overlap = False
-        self.__global_app_mask: Optional[int] = None
-        self.__global_machine_mask: Optional[int] = None
+        self.__global_app_mask: int | None = None
+        self.__global_machine_mask: int | None = None
 
         if not can_shift(key_and_mask.mask):
             raise IrregularFixedMaskException(
