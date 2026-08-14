@@ -18,9 +18,7 @@ from typing import (
     TYPE_CHECKING,
     Collection,
     Generic,
-    Optional,
     TypeVar,
-    Union,
     cast,
 )
 
@@ -72,9 +70,9 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
     )
 
     def __init__(
-            self, label: Optional[str] = None,
-            max_atoms_per_core: Optional[Union[int, tuple[int, ...]]] = None,
-            splitter: Optional[AbstractSplitterCommon] = None):
+            self, label: str | None = None,
+            max_atoms_per_core: int | tuple[int, ...] | None = None,
+            splitter: AbstractSplitterCommon | None = None):
         """
         :param label: The optional name of the vertex.
         :param max_atoms_per_core: The max number of atoms that can be
@@ -86,14 +84,14 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             Leave as `None` to delegate the choice of splitter to the selector.
         """
         # Need to set to None temporarily as add_constraint checks splitter
-        self._splitter: Optional[AbstractSplitterCommon] = None
+        self._splitter: AbstractSplitterCommon | None = None
         super().__init__(label)
         self._machine_vertices: OrderedSet[MV] = OrderedSet()
         if splitter:
             # Use setter as there is extra work to do
             self.splitter = splitter
         # Keep the name for simplicity but move to new internal representation
-        self._max_atoms_per_dimension_per_core: Optional[tuple[int, ...]]
+        self._max_atoms_per_dimension_per_core: tuple[int, ...] | None
         self._set_max_atoms_per_dimension_per_core(max_atoms_per_core)
 
     def __str__(self) -> str:
@@ -169,7 +167,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         raise NotImplementedError
 
     def round_n_atoms(
-            self, n_atoms: Union[int, float], label: str = "n_atoms") -> int:
+            self, n_atoms: int | float, label: str = "n_atoms") -> int:
         """
         Utility function to allow superclasses to make sure `n_atoms` is an
         integer.
@@ -250,7 +248,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         return self._max_atoms_per_dimension_per_core
 
     def _set_max_atoms_per_dimension_per_core(
-            self, new_value: Optional[Union[int, tuple[int, ...]]]) -> None:
+            self, new_value: int | tuple[int, ...] | None) -> None:
         """
         Set the maximum number of atoms per dimension per core.
 
@@ -274,7 +272,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
             self._max_atoms_per_dimension_per_core = max_atoms_tuple
 
     def set_max_atoms_per_dimension_per_core(
-            self, new_value: Union[int, tuple[int, ...]]) -> None:
+            self, new_value: int | tuple[int, ...]) -> None:
         """
         Set the maximum number of atoms per dimension per core.
 
@@ -305,7 +303,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
 
     def get_machine_fixed_key_and_mask(
             self, machine_vertex: MachineVertex,
-            partition_id: str) -> Optional[BaseKeyAndMask]:
+            partition_id: str) -> BaseKeyAndMask | None:
         """
         Get a fixed key and mask for the given machine vertex and partition
         identifier, or `None` if not fixed (the default).
@@ -327,7 +325,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         return None
 
     def get_fixed_key_and_mask(
-            self, partition_id: str) -> Optional[BaseKeyAndMask]:
+            self, partition_id: str) -> BaseKeyAndMask | None:
         """
         Get a fixed key and mask for the application vertex or `None` if not
         fixed (the default).  See :py:meth:`get_machine_fixed_key_and_mask` for
@@ -351,7 +349,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         """
 
     def get_key_ordered_indices(
-            self, indices: Optional[numpy.ndarray] = None) -> numpy.ndarray:
+            self, indices: numpy.ndarray | None = None) -> numpy.ndarray:
         """
         Get indices of the vertex in the order that atoms appear when the
         vertex is split into cores as determined by max_atoms_per_core.  When

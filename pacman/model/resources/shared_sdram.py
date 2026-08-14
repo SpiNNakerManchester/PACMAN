@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import Any, Optional, TextIO, Union
+from typing import Any, TextIO
 
 import numpy
 
@@ -26,7 +26,7 @@ from .constant_sdram import ConstantSDRAM
 from .variable_sdram import VariableSDRAM
 
 
-def _ceil(value: Union[int, float, numpy.integer, numpy.floating]) -> int:
+def _ceil(value: int | float | numpy.integer | numpy.floating) -> int:
     return math.ceil(value)
 
 
@@ -45,7 +45,7 @@ class SharedSDRAM(AbstractSDRAM):
         )
 
     def __init__(self, shared: dict[str, AbstractSDRAM],
-                 per_core: Optional[AbstractSDRAM] = None) -> None:
+                 per_core: AbstractSDRAM | None = None) -> None:
         """
         Creates an SDRAM of both per_core and shared requirements.
 
@@ -67,7 +67,7 @@ class SharedSDRAM(AbstractSDRAM):
             self._per_core = per_core
 
     @overrides(AbstractSDRAM.get_total_sdram)
-    def get_total_sdram(self, n_timesteps: Optional[int]) -> int:
+    def get_total_sdram(self, n_timesteps: int | None) -> int:
         running = self._per_core.get_total_sdram(n_timesteps)
         for sdram in self._shared.values():
             running += sdram.get_total_sdram(n_timesteps)
@@ -116,8 +116,8 @@ class SharedSDRAM(AbstractSDRAM):
             return other + self
 
     @overrides(AbstractSDRAM.report)
-    def report(self, timesteps: Optional[int], indent: str = "",
-               preamble: str = "", target: Optional[TextIO] = None) -> None:
+    def report(self, timesteps: int | None, indent: str = "",
+               preamble: str = "", target: TextIO | None = None) -> None:
         self._per_core.report(timesteps, indent, preamble, target)
         for key, sdram in self._shared.items():
             sdram.report(timesteps, indent+"    ", key+":", target)

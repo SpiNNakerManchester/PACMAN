@@ -14,7 +14,6 @@
 
 """ test vertex used in many unit tests
 """
-from typing import Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -36,8 +35,8 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
 
     def __init__(self, n_atoms: int, label: str = "testVertex",
                  max_atoms_per_core: int = 256,
-                 fixed_sdram_value: Optional[int] = None,
-                 splitter: Optional[AbstractSplitterCommon] = None):
+                 fixed_sdram_value: int | None = None,
+                 splitter: AbstractSplitterCommon | None = None):
         super().__init__(
             label=label, max_atoms_per_core=max_atoms_per_core,
             splitter=splitter)
@@ -61,7 +60,7 @@ class SimpleTestVertex(ApplicationVertex, LegacyPartitionerAPI):
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice: Slice, sdram: AbstractSDRAM,
-            label: Optional[str] = None) -> SimpleMachineVertex:
+            label: str | None = None) -> SimpleMachineVertex:
         return SimpleMachineVertex(sdram, label, self, vertex_slice)
 
     @property

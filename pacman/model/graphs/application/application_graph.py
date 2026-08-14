@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Iterable, Optional, Sequence, cast
+from typing import Iterable, Sequence, cast
 
 from spinn_utilities.ordered_set import OrderedSet
 
@@ -203,9 +203,8 @@ class ApplicationGraph:
         return self._outgoing_edge_partitions_by_pre_vertex[vertex]
 
     def get_outgoing_edge_partition_starting_at_vertex(
-            self, vertex: ApplicationVertex,
-            outgoing_edge_partition_name: str) -> Optional[
-                ApplicationEdgePartition]:
+            self, vertex: ApplicationVertex, outgoing_edge_partition_name: str
+            ) -> ApplicationEdgePartition | None:
         """
         Get the given outgoing edge partition that starts at the
         given vertex, or `None` if no such edge partition exists.

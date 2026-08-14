@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
@@ -49,12 +49,12 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
 
     def __init__(
             self, fpga_id: int, fpga_link_id: int,
-            board_address: Optional[str] = None,
-            linked_chip_coordinates: Optional[XY] = None,
-            label: Optional[str] = None,
-            app_vertex: Optional[ApplicationVertex] = None,
-            vertex_slice: Optional[Slice] = None,
-            outgoing_keys_and_masks: Optional[list[BaseKeyAndMask]] = None,
+            board_address: str | None = None,
+            linked_chip_coordinates: XY | None = None,
+            label: str | None = None,
+            app_vertex: ApplicationVertex | None = None,
+            vertex_slice: Slice | None = None,
+            outgoing_keys_and_masks: list[BaseKeyAndMask] | None = None,
             incoming: bool = True, outgoing: bool = False):
         """
         :param fpga_id: Field Programmable Gate Arrays id
@@ -105,16 +105,16 @@ class MachineFPGAVertex(MachineVertex, AbstractVirtual):
 
     @property
     @overrides(AbstractVirtual.board_address)
-    def board_address(self) -> Optional[str]:
+    def board_address(self) -> str | None:
         return self._board_address
 
     @property
     @overrides(AbstractVirtual.linked_chip_coordinates)
-    def linked_chip_coordinates(self) -> Optional[XY]:
+    def linked_chip_coordinates(self) -> XY | None:
         return self._linked_chip_coordinates
 
     @overrides(AbstractVirtual.outgoing_keys_and_masks)
-    def outgoing_keys_and_masks(self) -> Optional[list[BaseKeyAndMask]]:
+    def outgoing_keys_and_masks(self) -> list[BaseKeyAndMask] | None:
         return self._outgoing_keys_and_masks
 
     @property

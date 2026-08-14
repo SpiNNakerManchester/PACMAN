@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import unittest
-from typing import Optional
 
 from parameterized import parameterized
 
@@ -100,7 +99,7 @@ class TestMerged(unittest.TestCase):
         writer.add_edge(ApplicationEdge(v1, v1), "foo")
 
     def make_infos(self, writer: PacmanDataWriter,
-                   system_placements: Optional[Placements] = None) -> None:
+                   system_placements: Placements | None = None) -> None:
         if system_placements is None:
             system_placements = Placements()
         splitter_partitioner()

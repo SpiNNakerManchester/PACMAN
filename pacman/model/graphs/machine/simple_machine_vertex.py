@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Optional
+from typing import Iterable
 
 from spinn_utilities.overrides import overrides
 
@@ -38,11 +38,11 @@ class SimpleMachineVertex(MachineVertex):
     __slots__ = ("_iptags", "_reverse_iptags", "_sdram")
 
     def __init__(
-            self, sdram: Optional[AbstractSDRAM], label: Optional[str] = None,
-            app_vertex: Optional[ApplicationVertex] = None,
-            vertex_slice: Optional[Slice] = None,
-            iptags: Optional[Iterable[IPtagResource]] = None,
-            reverse_iptags: Optional[Iterable[ReverseIPtagResource]] = None):
+            self, sdram: AbstractSDRAM | None, label: str | None = None,
+            app_vertex: ApplicationVertex | None = None,
+            vertex_slice: Slice | None = None,
+            iptags: Iterable[IPtagResource] | None = None,
+            reverse_iptags: Iterable[ReverseIPtagResource] | None = None):
         """
 
         :param sdram: The SDRAM space required by the vertex.

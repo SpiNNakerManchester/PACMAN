@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Optional
+from typing import Any
 
 
 class ChipAndCore:
@@ -29,7 +29,7 @@ class ChipAndCore:
         "_x", "_y",
     )
 
-    def __init__(self, x: int, y: int, p: Optional[int] = None):
+    def __init__(self, x: int, y: int, p: int | None = None):
         """
         :param x: the x-coordinate of the chip
         :param y: the y-coordinate of the chip
@@ -54,7 +54,7 @@ class ChipAndCore:
         return self._y
 
     @property
-    def p(self) -> Optional[int]:
+    def p(self) -> int | None:
         """
         The processor on the chip, or `None` if that is not constrained.
         """

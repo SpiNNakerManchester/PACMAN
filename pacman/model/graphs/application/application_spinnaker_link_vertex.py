@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import math
-from typing import Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -41,7 +40,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
 
     def __init__(
             self, n_atoms: int, spinnaker_link_id: int,
-            board_address: Optional[str] = None, label: Optional[str] = None,
+            board_address: str | None = None, label: str | None = None,
             n_machine_vertices: int = 1,
             incoming: bool = True, outgoing: bool = True):
         """
@@ -78,7 +77,7 @@ class ApplicationSpiNNakerLinkVertex(ApplicationVirtualVertex):
         return self._spinnaker_link_id
 
     @property
-    def board_address(self) -> Optional[str]:
+    def board_address(self) -> str | None:
         """
         The board to which this device is connected, or `None` for the
         default board.

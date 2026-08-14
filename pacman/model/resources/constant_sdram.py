@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Optional, TextIO
+from typing import Any, TextIO
 
 from spinn_utilities.overrides import overrides
 
@@ -37,7 +37,7 @@ class ConstantSDRAM(AbstractSDRAM):
         self._sdram = int(sdram)
 
     @overrides(AbstractSDRAM.get_total_sdram)
-    def get_total_sdram(self, n_timesteps: Optional[int]) -> int:
+    def get_total_sdram(self, n_timesteps: int | None) -> int:
         return self._sdram
 
     @property
@@ -64,8 +64,8 @@ class ConstantSDRAM(AbstractSDRAM):
             return other.__add__(self)
 
     @overrides(AbstractSDRAM.report)
-    def report(self, timesteps: Optional[int], indent: str = "",
-               preamble: str = "", target: Optional[TextIO] = None) -> None:
+    def report(self, timesteps: int | None, indent: str = "",
+               preamble: str = "", target: TextIO | None = None) -> None:
         print(indent, preamble, f"Constant {self._sdram} bytes", file=target)
 
     @property

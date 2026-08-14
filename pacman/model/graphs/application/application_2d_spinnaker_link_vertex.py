@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -38,8 +37,8 @@ class Application2DSpiNNakerLinkVertex(
 
     def __init__(
             self, width: int, height: int, sub_width: int, sub_height: int,
-            spinnaker_link_id: int, board_address: Optional[str] = None,
-            label: Optional[str] = None,
+            spinnaker_link_id: int, board_address: str | None = None,
+            label: str | None = None,
             incoming: bool = True, outgoing: bool = False):
         """
         :param width: The width of the vertex in atoms

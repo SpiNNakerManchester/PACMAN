@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, Optional
+from typing import TYPE_CHECKING, Iterable
 
 from spinn_utilities.overrides import overrides
 
@@ -43,9 +43,9 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
 
     def __init__(
             self, n_atoms: int,
-            incoming_fpga_connections: Optional[list[FPGAConnection]] = None,
-            outgoing_fpga_connection: Optional[FPGAConnection] = None,
-            label: Optional[str] = None,
+            incoming_fpga_connections: list[FPGAConnection] | None = None,
+            outgoing_fpga_connection: FPGAConnection | None = None,
+            label: str | None = None,
             n_machine_vertices_per_link: int = 1):
         """
         :param n_atoms: The number of atoms in the vertex
@@ -116,7 +116,7 @@ class ApplicationFPGAVertex(ApplicationVirtualVertex):
             yield from self._incoming_fpga_connections
 
     @property
-    def outgoing_fpga_connection(self) -> Optional[FPGAConnection]:
+    def outgoing_fpga_connection(self) -> FPGAConnection | None:
         """
         The connection to one FPGA via one link to which packets are sent
         to this device.

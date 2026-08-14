@@ -17,8 +17,6 @@ from typing import (
     Collection,
     Iterable,
     Mapping,
-    Optional,
-    Union,
     cast,
 )
 
@@ -88,7 +86,7 @@ class _OrderedCoveringCompressor(AbstractCompressor):
         if get_config_bool(
                 "Mapping", "router_table_compress_as_far_as_possible"):
             # Compress as much as possible
-            target_length: Optional[int] = None
+            target_length: int | None = None
         else:
             chip = PacmanDataView.get_chip_at(router_table.x, router_table.y)
             target_length = chip.router.n_available_multicast_entries
@@ -103,9 +101,9 @@ class _OrderedCoveringCompressor(AbstractCompressor):
 
 def ordered_covering(
         routing_table: Iterable[MulticastRoutingEntry],
-        target_length: Optional[int],
+        target_length: int | None,
         aliases: _Aliases, *, no_raise: bool = False,
-        time_to_run_for: Optional[float] = None
+        time_to_run_for: float | None = None
         ) -> tuple[list[MulticastRoutingEntry], _Aliases]:
     """
     Reduce the size of a routing table by merging together entries where
@@ -218,7 +216,7 @@ def get_generality(key: int, mask: int) -> int:
     return bin(xs).count("1")
 
 
-def _get_entry_generality(entry: Union[MulticastRoutingEntry, _Merge]) -> int:
+def _get_entry_generality(entry: MulticastRoutingEntry | _Merge) -> int:
     """
     Actually useful-in-this-file form of get_generality.
     """
@@ -407,7 +405,7 @@ class _Merge:
         """
         # Create a new routing table of the correct size
         new_size = len(self.routing_table) - len(self.entries) + 1
-        new_table: list[Optional[MulticastRoutingEntry]] = [
+        new_table: list[MulticastRoutingEntry | None] = [
             None for _ in range(new_size)]
 
         # Get the new entry

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.require_subclass import require_subclass
@@ -43,7 +43,7 @@ class AbstractVirtual:
 
     @property
     @abstractmethod
-    def board_address(self) -> Optional[str]:
+    def board_address(self) -> str | None:
         """
         The IP address of the board to which the device is connected,
         or ``None`` for the boot board, or when using linked chip
@@ -53,7 +53,7 @@ class AbstractVirtual:
 
     @property
     @abstractmethod
-    def linked_chip_coordinates(self) -> Optional[XY]:
+    def linked_chip_coordinates(self) -> XY | None:
         """
         The coordinates of the chip to which the device is connected,
         or ``None`` for the boot board, or when using a board address.
@@ -61,7 +61,7 @@ class AbstractVirtual:
         raise NotImplementedError
 
     @abstractmethod
-    def outgoing_keys_and_masks(self) -> Optional[list[BaseKeyAndMask]]:
+    def outgoing_keys_and_masks(self) -> list[BaseKeyAndMask] | None:
         """
         Get the keys sent by the device or `None` if there aren't any
         explicitly defined.

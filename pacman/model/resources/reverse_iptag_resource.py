@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Optional
+from typing import Any
 
 
 class ReverseIPtagResource:
@@ -30,8 +30,8 @@ class ReverseIPtagResource:
         # A fixed tag ID to assign, or None if any tag is OK
         "_tag")
 
-    def __init__(self, port: Optional[int] = None, sdp_port: int = 1,
-                 tag: Optional[int] = None):
+    def __init__(self, port: int | None = None, sdp_port: int = 1,
+                 tag: int | None = None):
         """
         :param port: The UDP port to listen to on the board for this tag
             or `None` for a default
@@ -45,7 +45,7 @@ class ReverseIPtagResource:
         self._tag = tag
 
     @property
-    def port(self) -> Optional[int]:
+    def port(self) -> int | None:
         """
         The port of the tag.
         """
@@ -60,7 +60,7 @@ class ReverseIPtagResource:
         return self._sdp_port
 
     @property
-    def tag(self) -> Optional[int]:
+    def tag(self) -> int | None:
         """
         The tag required, or `None` if any tag is OK.
         """

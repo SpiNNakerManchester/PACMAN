@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Iterator, Optional, Sequence
+from typing import Iterator, Sequence
 
 from spinn_utilities.config_holder import get_config_bool, get_report_path
 from spinn_utilities.log import FormatAdapter
@@ -128,10 +128,10 @@ class ApplicationPlacer:
         self.__restored_chips: list[Chip] = []
         self.__starts_tried: list[Chip] = []
 
-        self.__current_chip: Optional[Chip] = None
+        self.__current_chip: Chip | None = None
         self.__current_cores_free: list[int] = []
         self.__current_sdram_used: AbstractSDRAM = ConstantSDRAM(0)
-        self.__app_vertex_label: Optional[str] = None
+        self.__app_vertex_label: str | None = None
 
         # Set some value so no Optional needed
         self.__ethernet_x = -1
@@ -207,7 +207,7 @@ class ApplicationPlacer:
 
     def _prepare_placements(self, same_chip_groups:  Sequence[
             tuple[Sequence[MachineVertex], AbstractSDRAM]]
-            ) -> Optional[list[Placement]]:
+            ) -> list[Placement] | None:
         """
         Try to make the placements for this ApplicationVertex.
 
@@ -600,7 +600,7 @@ class ApplicationPlacer:
                 f"{PacmanDataView.get_chips_boards_required_str()}")
 
     def _get_next_neighbour(
-            self, n_cores: int, sdram: AbstractSDRAM) -> Optional[Chip]:
+            self, n_cores: int, sdram: AbstractSDRAM) -> Chip | None:
         """
         Gets the next neighbour Chip
 
@@ -623,7 +623,7 @@ class ApplicationPlacer:
                 return chip
 
     def _get_next_chip_with_space(
-            self, n_cores: int, sdram: AbstractSDRAM) -> Optional[Chip]:
+            self, n_cores: int, sdram: AbstractSDRAM) -> Chip | None:
         """
         Gets the next Chip with space
 
@@ -664,7 +664,7 @@ class ApplicationPlacer:
                 else:
                     self.__other_board_chips[target] = target
 
-    def _pop_neighbour(self) -> Optional[Chip]:
+    def _pop_neighbour(self) -> Chip | None:
         """
         Pops the next neighbour Chip with preference to ones on current board
 

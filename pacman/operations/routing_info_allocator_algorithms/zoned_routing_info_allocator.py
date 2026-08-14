@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Iterable, Optional
+from typing import Iterable
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
@@ -201,7 +201,7 @@ class ZonedRoutingInfoAllocator:
             app_key_and_mask: BaseKeyAndMask, outgoing: list[MachineVertex],
             routing_info: RoutingInfo) -> None:
         max_atom_bits = 0
-        machine_mask: Optional[int] = None
+        machine_mask: int | None = None
         for m_vertex in outgoing:
             key_and_mask = pre.get_machine_fixed_key_and_mask(
                 m_vertex, part_id)
@@ -301,7 +301,7 @@ class ZonedRoutingInfoAllocator:
                 f"for machine and atom bits")
 
     def __find_target_app_bits(
-            self, routing_info: RoutingInfo) -> tuple[int, Optional[int]]:
+            self, routing_info: RoutingInfo) -> tuple[int, int | None]:
         max_app = BITS_IN_KEY - self.__min_bits_machine_and_atoms
         min_app = self.__size_app_part_bits
         best_app = (BITS_IN_KEY -

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
@@ -38,7 +38,7 @@ class ApplicationEdge(AbstractEdge['ApplicationVertex']):
     )
 
     def __init__(self, pre_vertex: ApplicationVertex,
-                 post_vertex: ApplicationVertex, label: Optional[str] = None):
+                 post_vertex: ApplicationVertex, label: str | None = None):
         """
         :param pre_vertex:
             The application vertex at the start of the edge.
@@ -52,7 +52,7 @@ class ApplicationEdge(AbstractEdge['ApplicationVertex']):
 
     @property
     @overrides(AbstractEdge.label)
-    def label(self) -> Optional[str]:
+    def label(self) -> str | None:
         return self._label
 
     @property

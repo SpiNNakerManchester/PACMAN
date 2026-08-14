@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Generic, Optional, cast
+from typing import Generic, cast
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -44,7 +44,7 @@ class SplitterFixedLegacy(AbstractSplitterCommon[V], Generic[V]):
 
     def __init__(self) -> None:
         super().__init__()
-        self.__slices: Optional[list[Slice]] = None
+        self.__slices: list[Slice] | None = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex: V) -> None:

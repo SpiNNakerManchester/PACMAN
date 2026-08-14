@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import unittest
-from typing import Optional, cast
+from typing import cast
 
 from parameterized import parameterized
 from typing_extensions import Self
@@ -54,8 +54,8 @@ from pacman_test_objects import SimpleTestVertex
 class FixedKeyAppVertex(AbstractOneAppOneMachineVertex):
 
     def __init__(
-            self, fixed_key_and_mask: Optional[BaseKeyAndMask],
-            label: Optional[str] = None,
+            self, fixed_key_and_mask: BaseKeyAndMask | None,
+            label: str | None = None,
             n_atoms: int = 1):
         machine_vertex = SimpleMachineVertex(
             ConstantSDRAM(1000), app_vertex=self)
@@ -66,7 +66,7 @@ class FixedKeyAppVertex(AbstractOneAppOneMachineVertex):
         self._splitter.set_governed_app_vertex(cast(Self, self))
 
     def get_fixed_key_and_mask(
-            self, partition_id: str) -> Optional[BaseKeyAndMask]:
+            self, partition_id: str) -> BaseKeyAndMask | None:
         return self.__fixed_key_and_mask
 
 
@@ -95,7 +95,7 @@ class TestBasic(unittest.TestCase):
         writer.add_edge(ApplicationEdge(v1, v1), "foo")
 
     def make_infos(self, writer: PacmanDataWriter,
-                   system_placements: Optional[Placements] = None) -> None:
+                   system_placements: Placements | None = None) -> None:
         if system_placements is None:
             system_placements = Placements()
         splitter_partitioner()

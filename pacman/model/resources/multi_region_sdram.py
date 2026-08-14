@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import math
 from enum import Enum
-from typing import Any, Optional, TextIO, Union
+from typing import Any, TextIO
 
 import numpy
 from typing_extensions import TypeAlias
@@ -26,8 +26,8 @@ from .abstract_sdram import AbstractSDRAM
 from .constant_sdram import ConstantSDRAM
 from .variable_sdram import VariableSDRAM
 
-_RegionKey: TypeAlias = Union[int, str, Enum]
-_Value: TypeAlias = Union[int, float, numpy.integer, numpy.floating]
+_RegionKey: TypeAlias = int | str | Enum
+_Value: TypeAlias = int | float | numpy.integer | numpy.floating
 
 
 def _ceil(value: _Value) -> int:
@@ -124,14 +124,14 @@ class MultiRegionSDRAM(AbstractSDRAM):
                 self.__regions[region] = other.regions[region]
 
     @overrides(AbstractSDRAM.report)
-    def report(self, timesteps: Optional[int], indent: str = "",
-               preamble: str = "", target: Optional[TextIO] = None) -> None:
+    def report(self, timesteps: int | None, indent: str = "",
+               preamble: str = "", target: TextIO | None = None) -> None:
         self._total.report(timesteps, indent, preamble, target)
         for region in self.__regions:
             self.__regions[region].report(
                 timesteps, indent+"    ", str(region)+":", target)
 
-    def get_total_sdram(self, n_timesteps: Optional[int]) -> int:
+    def get_total_sdram(self, n_timesteps: int | None) -> int:
         """
         The total SDRAM.
 

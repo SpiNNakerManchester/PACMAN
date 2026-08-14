@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
 
 import numpy
 
@@ -48,7 +47,7 @@ class VertexRoutingInfo(metaclass=AbstractBase):
         self.__key_and_mask = key_and_mask
         self.__partition_id = partition_id
 
-    def get_keys(self, n_keys: Optional[int] = None) -> numpy.ndarray:
+    def get_keys(self, n_keys: int | None = None) -> numpy.ndarray:
         """
         Get the ordered list of individual keys allocated to the edge.
 

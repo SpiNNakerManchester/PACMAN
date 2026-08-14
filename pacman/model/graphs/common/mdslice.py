@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import Any, Union
+from typing import Any
 
 import numpy
 from numpy.typing import NDArray
@@ -136,7 +136,7 @@ class MDSlice(Slice):
 
     @classmethod
     @overrides(Slice.from_string, extend_doc=False)
-    def from_string(cls, as_str: str) -> Union[MDSlice, Slice]:
+    def from_string(cls, as_str: str) -> MDSlice | Slice:
         """
         Convert the string form of a :py:class:`MDSlice` into an object
         instance.

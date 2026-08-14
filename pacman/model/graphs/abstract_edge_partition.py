@@ -18,7 +18,6 @@ from typing import (
     Collection,
     Generic,
     TypeVar,
-    Union,
 )
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -53,7 +52,7 @@ class AbstractEdgePartition(Generic[E], metaclass=AbstractBase):
     )
 
     def __init__(self, identifier: str,
-                 allowed_edge_types: Union[type[E], tuple[type[E], ...]]):
+                 allowed_edge_types: type[E] | tuple[type[E], ...]):
         """
         :param identifier: The identifier of the partition
         :param allowed_edge_types: The types of edges allowed

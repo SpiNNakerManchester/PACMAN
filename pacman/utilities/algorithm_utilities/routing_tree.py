@@ -30,8 +30,6 @@ from typing import (
     TYPE_CHECKING,
     Iterable,
     Iterator,
-    Optional,
-    Union,
 )
 
 from spinn_utilities.typing.coords import XY
@@ -57,18 +55,18 @@ class RoutingTree:
     #   than a tuple saves 56 bytes per instance.
     __slots__ = ("_children", "_chip_x", "_chip_y", "_label")
 
-    def __init__(self, chip: XY, label: Optional[str] = None):
+    def __init__(self, chip: XY, label: str | None = None):
         """
         :param chip:
             The chip the route is currently passing through.
         """
         self._chip_x, self._chip_y = chip
         self._children: list[
-            tuple[int, Union[RoutingTree, MachineVertex]]] = []
+            tuple[int, RoutingTree | MachineVertex]] = []
         self._label = label
 
     @property
-    def label(self) -> Optional[str]:
+    def label(self) -> str | None:
         """
         The label value provided to the init (if applicable).
         """
@@ -83,7 +81,7 @@ class RoutingTree:
 
     @property
     def children(self) -> Iterable[
-            tuple[int, Union[RoutingTree, MachineVertex]]]:
+            tuple[int, RoutingTree | MachineVertex]]:
         """
         A :py:class:`iterable` of the next steps in the route represented by a
         (route, object) tuple.
@@ -110,7 +108,7 @@ class RoutingTree:
         yield from self._children
 
     def append_child(
-            self, child: tuple[int, Union[RoutingTree, MachineVertex]]
+            self, child: tuple[int, RoutingTree | MachineVertex]
             ) -> None:
         """
         Adds the child to the tree
@@ -120,7 +118,7 @@ class RoutingTree:
         self._children.append(child)
 
     def remove_child(
-            self, child: tuple[int, Union[RoutingTree, MachineVertex]]
+            self, child: tuple[int, RoutingTree | MachineVertex]
             ) -> None:
         """
         Removes a child which must have been in the tree
@@ -134,7 +132,7 @@ class RoutingTree:
         """
         return not self._children
 
-    def __iter__(self) -> Iterator[Union[RoutingTree, MachineVertex]]:
+    def __iter__(self) -> Iterator[RoutingTree | MachineVertex]:
         """
         Iterate over this node and then all its children, recursively and in
         no specific order. This iterator iterates over the child *objects*
@@ -161,7 +159,7 @@ class RoutingTree:
         return f"<RoutingTree at {self.chip} with {len(self._children)}" \
                f" {'child' if len(self._children) == 1 else 'children'}>"
 
-    def traverse(self) -> Iterable[tuple[Optional[int], XY, set[int]]]:
+    def traverse(self) -> Iterable[tuple[int | None, XY, set[int]]]:
         """
         Traverse the tree yielding the direction taken to a node, the
         coordinates of that node and the directions leading from the Node.
@@ -176,7 +174,7 @@ class RoutingTree:
         # entry which describes the direction in which we last moved to reach
         # the node (or None for the root).
         to_visit: deque[
-            tuple[Optional[int], RoutingTree]] = deque(((None, self), ))
+            tuple[int | None, RoutingTree]] = deque(((None, self), ))
         while to_visit:
             direction, node = to_visit.popleft()
 

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict, deque
-from typing import Iterable, Iterator, Optional
+from typing import Iterable, Iterator
 
 from typing_extensions import TypeAlias
 
@@ -39,7 +39,7 @@ from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
 from pacman.utilities.algorithm_utilities.routing_tree import RoutingTree
 
 _Node: TypeAlias = tuple[int, XY]
-_OptInt: TypeAlias = Optional[int]
+_OptInt: TypeAlias = int | None
 _MappedSrc: TypeAlias = tuple[AbstractVertex, _OptInt, _OptInt]
 
 
@@ -554,7 +554,7 @@ def _make_source_to_source_edge_routes(
 def _find_target_xy(
         target_xys: set[XY], routes: dict[XY, RoutingTree],
         source_mappings: dict[XY, list[_MappedSrc]]) -> tuple[
-            XY, Optional[set[XY]]]:
+            XY, set[XY] | None]:
     """
     Find a target chip to use from the set of target chips.
 

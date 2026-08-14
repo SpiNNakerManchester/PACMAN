@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Iterator, Optional
+from typing import TYPE_CHECKING, Iterator
 
 from spinn_utilities.typing.coords import XY
 
@@ -103,8 +103,8 @@ class MulticastRoutingTableByPartition:
         """
         return len(self._router_to_entries_map)
 
-    def get_entries_for_router(self, router_x: int, router_y: int) -> Optional[
-            dict[tuple[AbstractVertex, str], RoutingEntry]]:
+    def get_entries_for_router(self, router_x: int, router_y: int) -> dict[
+            tuple[AbstractVertex, str], RoutingEntry] | None:
         """
         Get the set of multicast path entries assigned to this router.
 
@@ -117,7 +117,7 @@ class MulticastRoutingTableByPartition:
 
     def get_entry_on_coords_for_edge(
             self, source_vertex: AbstractVertex, partition_id: str,
-            router_x: int, router_y: int) -> Optional[RoutingEntry]:
+            router_x: int, router_y: int) -> RoutingEntry | None:
         """
         :param source_vertex:
         :param partition_id:

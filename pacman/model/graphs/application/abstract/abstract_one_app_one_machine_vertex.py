@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from spinn_utilities.overrides import overrides
 
@@ -33,7 +33,7 @@ class AbstractOneAppOneMachineVertex(ApplicationVertex, Generic[V]):
         # A pointer to the machine vertex set at init time
         "_machine_vertex", )
 
-    def __init__(self, machine_vertex: V, label: Optional[str],
+    def __init__(self, machine_vertex: V, label: str | None,
                  n_atoms: int = 1):
         """
         :param machine_vertex: The fixed machine vertex.

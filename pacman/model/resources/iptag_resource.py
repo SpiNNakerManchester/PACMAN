@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Optional
+from typing import Any
 
 
 class IPtagResource:
@@ -37,7 +37,7 @@ class IPtagResource:
 
     def __init__(
             self, ip_address: str, port: int,
-            strip_sdp: bool, tag: Optional[int] = None,
+            strip_sdp: bool, tag: int | None = None,
             traffic_identifier: str = "DEFAULT"):
         """
         :param ip_address:
@@ -85,7 +85,7 @@ class IPtagResource:
         return self._strip_sdp
 
     @property
-    def tag(self) -> Optional[int]:
+    def tag(self) -> int | None:
         """
         The tag required, or `None` if any tag is OK.
         """

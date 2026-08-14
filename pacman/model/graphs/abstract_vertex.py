@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
 
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import ChipAndCore
@@ -31,16 +30,16 @@ class AbstractVertex:
         "_label",
     )
 
-    def __init__(self, label: Optional[str] = None):
+    def __init__(self, label: str | None = None):
         """
         :param label: The optional name of the vertex
         """
         self._label = label
         self._added_to_graph = False
-        self._fixed_location: Optional[ChipAndCore] = None
+        self._fixed_location: ChipAndCore | None = None
 
     @property
-    def label(self) -> Optional[str]:
+    def label(self) -> str | None:
         """
         The current label to the vertex.
 
@@ -77,7 +76,7 @@ class AbstractVertex:
         """
         return self._added_to_graph
 
-    def get_fixed_location(self) -> Optional[ChipAndCore]:
+    def get_fixed_location(self) -> ChipAndCore | None:
         """
         The x, y and possibly p the vertex *must* be placed on.
 
@@ -91,7 +90,7 @@ class AbstractVertex:
         return self._fixed_location
 
     def set_fixed_location(
-            self, x: int, y: int, p: Optional[int] = None) -> None:
+            self, x: int, y: int, p: int | None = None) -> None:
         """
         Set the location where the vertex must be placed.
 

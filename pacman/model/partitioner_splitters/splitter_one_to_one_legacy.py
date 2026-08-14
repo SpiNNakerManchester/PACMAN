@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Optional, cast
+from typing import cast
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -47,9 +47,9 @@ class SplitterOneToOneLegacy(AbstractSplitterCommon[ApplicationVertex]):
 
     def __init__(self) -> None:
         super().__init__()
-        self._machine_vertex: Optional[MachineVertex] = None
-        self._vertex_slice: Optional[Slice] = None
-        self._sdram: Optional[AbstractSDRAM] = None
+        self._machine_vertex: MachineVertex | None = None
+        self._vertex_slice: Slice | None = None
+        self._sdram: AbstractSDRAM | None = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex: ApplicationVertex) -> None:

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
 
@@ -23,5 +22,5 @@ class SimpleTestEdge(ApplicationEdge):
     """
 
     def __init__(self, pre_vertex: ApplicationVertex,
-                 post_vertex: ApplicationVertex, label: Optional[str] = None):
+                 post_vertex: ApplicationVertex, label: str | None = None):
         super().__init__(pre_vertex, post_vertex, label=label)

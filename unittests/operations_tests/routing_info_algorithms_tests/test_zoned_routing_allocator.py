@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Iterable, Optional, Sequence
+from typing import Any, Iterable, Sequence
 
 from spinn_utilities.overrides import overrides
 
@@ -70,12 +70,12 @@ class MockSplitter(AbstractSplitterCommon):
 
 class MockAppVertex(ApplicationVertex):
 
-    def __init__(self, splitter: Optional[AbstractSplitterCommon] = None,
-                 fixed_keys_by_partition: Optional[
-                     dict[str, BaseKeyAndMask]] = None,
-                 fixed_key: Optional[BaseKeyAndMask] = None,
-                 fixed_machine_keys_by_partition:  Optional[
-                     dict[tuple[MachineVertex, str], BaseKeyAndMask]] = None):
+    def __init__(self, splitter: AbstractSplitterCommon | None = None,
+                 fixed_keys_by_partition: dict[
+                    str, BaseKeyAndMask] | None = None,
+                 fixed_key: BaseKeyAndMask | None = None,
+                 fixed_machine_keys_by_partition:  dict[
+                    tuple[MachineVertex, str], BaseKeyAndMask] | None = None):
         super(MockAppVertex, self).__init__(splitter=splitter)
         self.__fixed_keys_by_partition = fixed_keys_by_partition
         self.__fixed_key = fixed_key
@@ -89,7 +89,7 @@ class MockAppVertex(ApplicationVertex):
 
     @overrides(ApplicationVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(
-            self, partition_id: str) -> Optional[BaseKeyAndMask]:
+            self, partition_id: str) -> BaseKeyAndMask | None:
         if self.__fixed_key is not None:
             return self.__fixed_key
         if self.__fixed_keys_by_partition is None:
@@ -99,7 +99,7 @@ class MockAppVertex(ApplicationVertex):
     @overrides(ApplicationVertex.get_machine_fixed_key_and_mask)
     def get_machine_fixed_key_and_mask(
             self, machine_vertex: MachineVertex,
-            partition_id: str) -> Optional[BaseKeyAndMask]:
+            partition_id: str) -> BaseKeyAndMask | None:
         if self.__fixed_machine_keys_by_partition is None:
             return None
         return self.__fixed_machine_keys_by_partition.get(
@@ -109,10 +109,10 @@ class MockAppVertex(ApplicationVertex):
 class TestMacVertex(MachineVertex):
 
     def __init__(
-            self, label: Optional[str] = None,
-            app_vertex: Optional[ApplicationVertex] = None,
-            vertex_slice: Optional[Slice] = None,
-            n_keys_required: Optional[dict[str, int]] = None):
+            self, label: str | None = None,
+            app_vertex: ApplicationVertex | None = None,
+            vertex_slice: Slice | None = None,
+            n_keys_required: dict[str, int] | None = None):
         super(TestMacVertex, self).__init__(
             label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__n_keys_required = n_keys_required
@@ -136,9 +136,9 @@ def create_graphs1(with_fixed: bool, shiftable: bool = True) -> None:
     # Create 5 application vertices (3 bits)
     app_vertices = []
     for app_index in range(5):
-        fixed_keys_by_partition: Optional[dict[str, BaseKeyAndMask]] = None
+        fixed_keys_by_partition: dict[str, BaseKeyAndMask] | None = None
         fixed_machine_keys_by_partition: \
-            Optional[dict[tuple[MachineVertex, str], BaseKeyAndMask]] = None
+            dict[tuple[MachineVertex, str], BaseKeyAndMask] | None = None
         if with_fixed:
             fixed_keys_by_partition = {}
             fixed_machine_keys_by_partition = {}
@@ -465,7 +465,7 @@ def test_allocator_not_shiftable() -> None:
     assert not routing_info.is_machine_shiftable
 
 
-def create_big(fixed_mask: Optional[int]) -> None:
+def create_big(fixed_mask: int | None) -> None:
     # This test shows how easy it is to trip up the allocator with a retina
     # Create a single "big" vertex
     if fixed_mask is None:

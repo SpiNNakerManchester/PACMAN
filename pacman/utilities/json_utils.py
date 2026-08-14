@@ -17,7 +17,7 @@ Miscellaneous minor functions for converting between JSON and Python objects.
 
 import gzip
 import json
-from typing import Iterable, Union, cast
+from typing import Iterable, cast
 
 from spinn_utilities.typing.json import JsonArray, JsonObject
 
@@ -28,7 +28,7 @@ from pacman.model.resources import IPtagResource, ReverseIPtagResource
 from pacman.model.routing_info import BaseKeyAndMask
 
 
-def json_to_object(json_object: Union[str, JsonObject]) -> JsonObject:
+def json_to_object(json_object: str | JsonObject) -> JsonObject:
     """
     Makes sure this is a JSON object reading in a file if required
 
