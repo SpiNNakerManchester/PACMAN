@@ -14,10 +14,10 @@
 
 import platform
 from collections.abc import Callable
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from typing import (
     Any,
-    ContextManager,
     NewType,
 )
 
@@ -36,8 +36,8 @@ class Spinner:
     Typed version of the API from SpiNNer that we actually use.
     """
     #: Open a drawing surface as a context
-    png_context_manager: Callable[[str, int, int], ContextManager[
-        _Context]]
+    png_context_manager: Callable[[str, int, int],
+                                  AbstractContextManager[_Context]]
     aspect_ratio: Callable[[int, int], float]
     draw: Callable[
         [_Context, int, int, int, int, _Boards, dict[Any, Any],
