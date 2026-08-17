@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from typing import Iterable, Sequence
+from collections.abc import Iterable, Sequence
 
 from parameterized import parameterized
 

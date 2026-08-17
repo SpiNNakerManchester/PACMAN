@@ -15,10 +15,9 @@ from __future__ import annotations
 
 import math
 from enum import Enum
-from typing import Any, TextIO
+from typing import Any, TextIO, TypeAlias
 
 import numpy
-from typing_extensions import TypeAlias
 
 from spinn_utilities.overrides import overrides
 

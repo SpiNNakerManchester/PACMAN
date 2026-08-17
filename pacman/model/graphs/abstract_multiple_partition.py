@@ -14,7 +14,8 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Collection, Generic, TypeVar
+from collections.abc import Collection
+from typing import Generic, TypeVar
 
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.overrides import overrides

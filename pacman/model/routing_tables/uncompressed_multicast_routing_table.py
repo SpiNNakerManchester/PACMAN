@@ -15,7 +15,8 @@
 import csv
 import gzip
 import logging
-from typing import Any, Collection, Iterable
+from collections.abc import Collection, Iterable
+from typing import Any
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides

@@ -13,9 +13,8 @@
 # limitations under the License.
 
 from collections import defaultdict, deque
-from typing import Iterable, Iterator
-
-from typing_extensions import TypeAlias
+from collections.abc import Iterable, Iterator
+from typing import TypeAlias
 
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.typing.coords import XY

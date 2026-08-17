@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Collection, Iterable, Iterator
+from collections.abc import Collection, Iterable, Iterator
 
 from spinn_utilities.typing.coords import XY
 

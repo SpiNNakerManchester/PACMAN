@@ -17,7 +17,8 @@ Miscellaneous minor functions for converting between JSON and Python objects.
 
 import gzip
 import json
-from typing import Iterable, cast
+from collections.abc import Iterable
+from typing import cast
 
 from spinn_utilities.typing.json import JsonArray, JsonObject
 

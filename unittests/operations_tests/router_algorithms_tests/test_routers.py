@@ -14,7 +14,8 @@
 
 import math
 from collections import defaultdict
-from typing import Iterable, Sequence, cast
+from collections.abc import Iterable, Sequence
+from typing import cast
 
 from parameterized import parameterized
 

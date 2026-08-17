@@ -14,9 +14,9 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Collection
 from typing import (
     TYPE_CHECKING,
-    Collection,
     Generic,
     TypeVar,
     cast,

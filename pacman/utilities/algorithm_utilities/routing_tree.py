@@ -26,10 +26,9 @@ https://github.com/project-rig/rig/blob/master/rig/place_and_route/routing_tree.
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Iterable, Iterator
 from typing import (
     TYPE_CHECKING,
-    Iterable,
-    Iterator,
 )
 
 from spinn_utilities.typing.coords import XY

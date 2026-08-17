@@ -13,9 +13,9 @@
 # limitations under the License.
 from __future__ import annotations
 
+from collections.abc import Collection
 from typing import (
     TYPE_CHECKING,
-    Collection,
     Generic,
     TypeVar,
 )

@@ -14,7 +14,8 @@
 
 import gzip
 import json
-from typing import Collection, Iterable, Iterator, cast
+from collections.abc import Collection, Iterable, Iterator
+from typing import cast
 
 from spinn_utilities.typing.coords import XY
 from spinn_utilities.typing.json import JsonObjectArray
