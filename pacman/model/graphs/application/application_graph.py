@@ -14,7 +14,8 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Iterable, Sequence, cast
+from collections.abc import Iterable, Sequence
+from typing import cast
 
 from spinn_utilities.ordered_set import OrderedSet
 

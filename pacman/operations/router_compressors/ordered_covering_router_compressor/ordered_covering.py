@@ -13,14 +13,11 @@
 # limitations under the License.
 from __future__ import annotations
 
+from collections.abc import Collection, Iterable, Mapping
 from typing import (
-    Collection,
-    Iterable,
-    Mapping,
+    TypeAlias,
     cast,
 )
-
-from typing_extensions import TypeAlias
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.timer import Timer

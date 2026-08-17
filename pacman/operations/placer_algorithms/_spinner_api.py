@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import platform
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import (
     Any,
-    Callable,
     ContextManager,
     NewType,
 )

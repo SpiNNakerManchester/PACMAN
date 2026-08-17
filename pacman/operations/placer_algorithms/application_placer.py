@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Iterator, Sequence
+from collections.abc import Iterator, Sequence
 
 from spinn_utilities.config_holder import get_config_bool, get_report_path
 from spinn_utilities.log import FormatAdapter

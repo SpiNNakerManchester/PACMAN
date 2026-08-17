@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from typing_extensions import TypeAlias
+from typing import TypeAlias
 
 from spinn_utilities.overrides import overrides
 

@@ -16,7 +16,8 @@ Collection of functions which together validate routes.
 """
 import logging
 from collections import defaultdict
-from typing import Iterable, NamedTuple
+from collections.abc import Iterable
+from typing import NamedTuple
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
