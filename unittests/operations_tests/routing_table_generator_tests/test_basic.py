@@ -13,9 +13,10 @@
 # limitations under the License.
 
 import unittest
-from typing import Self, cast
+from typing import cast
 
 from parameterized import parameterized
+from typing_extensions import Self
 
 from spinn_utilities.config_holder import set_config
 
