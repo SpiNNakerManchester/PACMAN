@@ -56,9 +56,9 @@ class TestTagsBoardAddresses(unittest.TestCase):
                 sdram=ConstantSDRAM(0),
                 iptags=[IPtagResource(
                     "127.0.0.1", port=123, strip_sdp=True)],
-                label="Vertex {}".format(i))
+                label=f"Vertex {i}")
             for i in range(len(eth_chips))]
-        print("Created {} vertices".format(len(vertices)))
+        print(f"Created {len(vertices)} vertices")
         placements = Placements(
             Placement(vertex, chip.x, chip.y, 1)
             for vertex, chip in zip(vertices, eth_chips))
@@ -95,14 +95,14 @@ class TestTagsBoardAddresses(unittest.TestCase):
                 sdram=ConstantSDRAM(0),
                 iptags=[IPtagResource(
                     "127.0.0.1", port=tag, strip_sdp=True)],
-                label="Ethernet Vertex {}".format(proc))
+                label=f"Ethernet Vertex {proc}")
             for tag in eth_chip.tag_ids]
         eth2_vertices = [
             SimpleMachineVertex(
                 sdram=ConstantSDRAM(0),
                 iptags=[IPtagResource(
                     "127.0.0.1", port=10000 + tag, strip_sdp=True)],
-                label="Ethernet 2 Vertex {}".format(proc))
+                label=f"Ethernet 2 Vertex {proc}")
             for tag in range(n_extra_vertices)]
         placements = Placements(
             Placement(vertex, eth_chip.x, eth_chip.y, proc)
