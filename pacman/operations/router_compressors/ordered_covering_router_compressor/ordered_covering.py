@@ -298,7 +298,7 @@ class _Merge:
     Represents a potential merge of routing table entries.
     """
 
-    _slots__ = [
+    __slots__ = [
         # Reference to the routing table against which the merge is defined.
         "routing_table",
         # Indices of entries in the routing table which are included in this
