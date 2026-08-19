@@ -300,7 +300,7 @@ class _Merge:
 
     __slots__ = [
         # Whether this merge is defaultable
-        "defaultable"
+        "defaultable",
         # Indices of entries in the routing table which are included in this
         # merge.
         "entries",
