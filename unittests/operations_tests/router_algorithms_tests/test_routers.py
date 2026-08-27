@@ -422,7 +422,7 @@ class MockInputOutputSplitter(AbstractSplitterCommon):
 
 class MockAppVertex(ApplicationVertex):
     def __init__(self, n_atoms: int, label: str):
-        super(MockAppVertex, self).__init__(label)
+        super().__init__(label)
         self.__n_atoms = n_atoms
 
     @property
