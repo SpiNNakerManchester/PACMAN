@@ -164,7 +164,7 @@ class TestRoutingTable(unittest.TestCase):
     def test_add_routing_table_for_duplicate_chip(self) -> None:
         key_combo = 0xff35
         mask = 0xffff
-        proc_ids = list( range(18))
+        proc_ids = list(range(18))
         link_ids = list(range(6))
         multicast_entries1 = MulticastRoutingEntry(
             key_combo, mask, RoutingEntry(
