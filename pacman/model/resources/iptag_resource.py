@@ -97,9 +97,8 @@ class IPtagResource:
             f"traffic_identifier={self._traffic_identifier})")
 
     def __eq__(self, other: object) -> bool:
-        """
-        For unit tests *only* so __hash__ and __eq__ pairing not done!
-        """
+        if not isinstance(other, IPtagResource):
+            return False
         return (self._ip_address == other._ip_address and
                 self._port == other._port and
                 self._strip_sdp == other._strip_sdp and
