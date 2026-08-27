@@ -13,8 +13,6 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import Any
-
 import numpy
 from numpy.typing import NDArray
 
@@ -123,7 +121,7 @@ class MDSlice(Slice):
             value += f"({a_slice.start}:{a_slice.stop})"
         return f"{self.lo_atom}{self._atoms_shape}{value}"
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, MDSlice):
             return False
         if not super().__eq__(other):

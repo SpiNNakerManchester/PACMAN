@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from collections.abc import Collection, Iterable
-from typing import Any
 
 from spinn_utilities.overrides import overrides
 
@@ -94,7 +93,7 @@ class CompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         return self._number_of_defaulted_routing_entries
 
     @overrides(AbstractMulticastRoutingTable.__eq__)
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, CompressedMulticastRoutingTable):
             return False
         if self._x != other.x and self._y != other.y:

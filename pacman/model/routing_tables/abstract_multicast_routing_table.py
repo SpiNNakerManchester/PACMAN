@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from collections.abc import Collection
-from typing import Any
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -93,11 +92,11 @@ class AbstractMulticastRoutingTable(metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """equals method"""
         raise NotImplementedError
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
     @abstractmethod

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import Any, TextIO
+from typing import TextIO
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -64,7 +64,7 @@ class AbstractSDRAM(metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         raise NotImplementedError
 
     @abstractmethod

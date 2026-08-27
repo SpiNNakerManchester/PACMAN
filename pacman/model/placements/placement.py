@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any
 
 from spinn_utilities.typing.coords import XY, XYP
 
@@ -100,7 +99,7 @@ class Placement:
         """
         return PacmanDataView.get_chip_at(self._x, self._y)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Placement):
             return False
         return (self._x == other.x and self._y == other.y and
@@ -109,7 +108,7 @@ class Placement:
     def __hash__(self) -> int:
         return hash((self._x, self._y, self._p, self._vertex))
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
     def __repr__(self) -> str:

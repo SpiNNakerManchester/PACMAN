@@ -13,8 +13,6 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import Any
-
 import numpy
 from numpy.typing import NDArray
 
@@ -159,7 +157,7 @@ class Slice:
     def __str__(self) -> str:
         return (f"({self.lo_atom}:{self.hi_atom})")
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Slice):
             return False
         if self._lo_atom != other.lo_atom:

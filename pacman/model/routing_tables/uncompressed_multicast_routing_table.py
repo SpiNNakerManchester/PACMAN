@@ -16,7 +16,6 @@ import csv
 import gzip
 import logging
 from collections.abc import Collection, Iterable
-from typing import Any
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -117,7 +116,7 @@ class UnCompressedMulticastRoutingTable(AbstractMulticastRoutingTable):
         return self._number_of_defaulted_routing_entries
 
     @overrides(AbstractMulticastRoutingTable.__eq__)
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, UnCompressedMulticastRoutingTable):
             return False
         if self._x != other.x and self._y != other.y:

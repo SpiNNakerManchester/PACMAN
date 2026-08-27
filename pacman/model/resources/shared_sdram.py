@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import Any, TextIO
+from typing import TextIO
 
 import numpy
 
@@ -90,7 +90,7 @@ class SharedSDRAM(AbstractSDRAM):
         return running
 
     @overrides(AbstractSDRAM.__eq__)
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, SharedSDRAM):
             return False
         if self._per_core != other._per_core:

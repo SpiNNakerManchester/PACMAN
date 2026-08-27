@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import math
 from enum import Enum
-from typing import Any, TextIO, TypeAlias
+from typing import TextIO, TypeAlias
 
 import numpy
 
@@ -139,7 +139,7 @@ class MultiRegionSDRAM(AbstractSDRAM):
         """
         return self._total.get_total_sdram(n_timesteps)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, MultiRegionSDRAM):
             return self._total == other._total
         return self._total == other
