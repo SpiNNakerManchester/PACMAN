@@ -66,12 +66,8 @@ class TestRoutingTable(unittest.TestCase):
         """
         key_combo = 0xff000
         mask = 0xff000
-        proc_ids = []
-        link_ids = []
-        for i in range(18):
-            proc_ids.append(i)
-        for i in range(6):
-            link_ids.append(i)
+        proc_ids = list(range(18))
+        link_ids = list(range(6))
         multicast_entries = []
         for i in range(5):
             multicast_entries.append(MulticastRoutingEntry(
@@ -98,12 +94,8 @@ class TestRoutingTable(unittest.TestCase):
         """
         key_combo = 0xff35
         mask = 0xff35
-        proc_ids = []
-        link_ids = []
-        for i in range(18):
-            proc_ids.append(i)
-        for i in range(6):
-            link_ids.append(i)
+        proc_ids = list(range(18))
+        link_ids = list(range(6))
         multicast_entries = []
         for i in range(5):
             multicast_entries.append(MulticastRoutingEntry(
@@ -120,12 +112,8 @@ class TestRoutingTable(unittest.TestCase):
 
         key_combo = 0xff35
         mask = 0xffff
-        proc_ids = []
-        link_ids = []
-        for i in range(18):
-            proc_ids.append(i)
-        for i in range(6):
-            link_ids.append(i)
+        proc_ids = list(range(18))
+        link_ids = list(range(6))
         multicast_entries = []
         for i in range(5):
             multicast_entries.append(MulticastRoutingEntry(
@@ -137,12 +125,8 @@ class TestRoutingTable(unittest.TestCase):
     def test_new_multicast_routing_tables(self) -> None:
         key_combo = 0xff35
         mask = 0xffff
-        proc_ids = []
-        link_ids = []
-        for i in range(18):
-            proc_ids.append(i)
-        for i in range(6):
-            link_ids.append(i)
+        proc_ids = list(range(18))
+        link_ids = list(range(6))
         multicast_entries1 = MulticastRoutingEntry(
             key_combo, mask, RoutingEntry(
                 processor_ids=proc_ids, link_ids=link_ids))
@@ -180,12 +164,8 @@ class TestRoutingTable(unittest.TestCase):
     def test_add_routing_table_for_duplicate_chip(self) -> None:
         key_combo = 0xff35
         mask = 0xffff
-        proc_ids = []
-        link_ids = []
-        for i in range(18):
-            proc_ids.append(i)
-        for i in range(6):
-            link_ids.append(i)
+        proc_ids = list(range(18))
+        link_ids = list(range(6))
         multicast_entries1 = MulticastRoutingEntry(
             key_combo, mask, RoutingEntry(
                 processor_ids=proc_ids, link_ids=link_ids))
