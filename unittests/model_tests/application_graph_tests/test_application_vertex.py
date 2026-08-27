@@ -43,8 +43,7 @@ class SimpleMDVertex(ApplicationVertex):
 
     def __init__(self, max_atoms_per_core: tuple[int, ...],
                  atoms_shape: tuple[int, ...]):
-        super(SimpleMDVertex, self).__init__(
-            max_atoms_per_core=max_atoms_per_core)
+        super().__init__(max_atoms_per_core=max_atoms_per_core)
         self.__atoms_shape = atoms_shape
 
     @property

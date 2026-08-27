@@ -77,7 +77,7 @@ class MockAppVertex(ApplicationVertex):
                  fixed_key: BaseKeyAndMask | None = None,
                  fixed_machine_keys_by_partition:  dict[
                     tuple[MachineVertex, str], BaseKeyAndMask] | None = None):
-        super(MockAppVertex, self).__init__(splitter=splitter)
+        super().__init__(splitter=splitter)
         self.__fixed_keys_by_partition = fixed_keys_by_partition
         self.__fixed_key = fixed_key
         self.__fixed_machine_keys_by_partition = \
@@ -114,7 +114,7 @@ class TestMacVertex(MachineVertex):
             app_vertex: ApplicationVertex | None = None,
             vertex_slice: Slice | None = None,
             n_keys_required: dict[str, int] | None = None):
-        super(TestMacVertex, self).__init__(
+        super().__init__(
             label=label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__n_keys_required = n_keys_required
 
