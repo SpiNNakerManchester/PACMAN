@@ -57,7 +57,7 @@ def key_mask_to_json(key_mask: BaseKeyAndMask) -> JsonObject:
         json_object: JsonObject = {}
         json_object["key"] = key_mask.key
         json_object["mask"] = key_mask.mask
-    except Exception as ex:  # pylint: disable=broad-except
+    except Exception as ex:  # NOQA
         json_object["exception"] = str(ex)
     return json_object
 
@@ -78,7 +78,7 @@ def iptag_resource_to_json(iptag: IPtagResource) -> JsonObject:
         if iptag.tag is not None:
             json_dict["tag"] = iptag.tag
         json_dict["traffic_identifier"] = iptag.traffic_identifier
-    except Exception as ex:  # pylint: disable=broad-except
+    except Exception as ex:  # NOQA
         json_dict["exception"] = str(ex)
     return json_dict
 
@@ -137,7 +137,7 @@ def reverse_iptag_to_json(iptag: ReverseIPtagResource) -> JsonObject:
         json_dict["sdp_port"] = iptag.sdp_port
         if iptag.tag is not None:
             json_dict["tag"] = iptag.tag
-    except Exception as ex:  # pylint: disable=broad-except
+    except Exception as ex:  # NOQA
         json_dict["exception"] = str(ex)
     return json_dict
 
@@ -196,7 +196,7 @@ def placement_to_json(placement: Placement) -> JsonObject:
         json_dict["x"] = placement.x
         json_dict["y"] = placement.y
         json_dict["p"] = placement.p
-    except Exception as ex:  # pylint: disable=broad-except
+    except Exception as ex:  # NOQA
         json_dict["exception"] = str(ex)
     return json_dict
 
