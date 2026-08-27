@@ -222,7 +222,7 @@ def _get_entry_generality(entry: MulticastRoutingEntry | _Merge) -> int:
 
 def _get_best_merge(
         routing_table: list[MulticastRoutingEntry],
-        aliases: _ROAliases) -> '_Merge':
+        aliases: _ROAliases) -> _Merge:
     """
     Inspect all possible merges for the routing table and return the merge
     which would combine the greatest number of entries.
@@ -264,7 +264,7 @@ def _get_best_merge(
 
 
 def _get_all_merges(routing_table: list[MulticastRoutingEntry]
-                    ) -> Iterable['_Merge']:
+                    ) -> Iterable[_Merge]:
     """
     Get possible sets of entries to merge.
 
