@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, TextIO
+from typing import TextIO
 
 from spinn_utilities.overrides import overrides
 
@@ -50,7 +50,7 @@ class ConstantSDRAM(AbstractSDRAM):
     def per_timestep(self) -> float:
         return 0
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, ConstantSDRAM):
             return False
         return other.fixed == self.fixed

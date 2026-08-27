@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any
 
 
 class ReverseIPtagResource:
@@ -70,7 +69,7 @@ class ReverseIPtagResource:
         return (f"ReverseIPTagResource(port={self._port}, "
                 f"sdp_port={self._sdp_port}, tag={self._tag})")
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, ReverseIPtagResource):
             return False
         return (self._port == other._port and
@@ -80,5 +79,5 @@ class ReverseIPtagResource:
     def __hash__(self) -> int:
         return hash((self._port, self._sdp_port, self._tag))
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)

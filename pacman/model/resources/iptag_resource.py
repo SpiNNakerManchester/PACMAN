@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any
 
 
 class IPtagResource:
@@ -97,10 +96,9 @@ class IPtagResource:
             f"strip_sdp={self._strip_sdp}, tag={self._tag}, "
             f"traffic_identifier={self._traffic_identifier})")
 
-    def __eq__(self, other: Any) -> bool:
-        """
-        For unit tests *only* so __hash__ and __eq__ pairing not done!
-        """
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, IPtagResource):
+            return False
         return (self._ip_address == other._ip_address and
                 self._port == other._port and
                 self._strip_sdp == other._strip_sdp and
@@ -112,5 +110,5 @@ class IPtagResource:
             self._ip_address, self._port, self._strip_sdp, self._tag,
             self._traffic_identifier))
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)

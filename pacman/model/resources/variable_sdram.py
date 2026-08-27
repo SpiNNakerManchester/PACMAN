@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import Any, TextIO
+from typing import TextIO
 
 import numpy
 
@@ -73,7 +73,7 @@ class VariableSDRAM(AbstractSDRAM):
     def per_timestep(self) -> float:
         return self._per_timestep_sdram
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, VariableSDRAM):
             if other.fixed != self.fixed:
                 return False
