@@ -167,15 +167,15 @@ class TestRoutingInfo(unittest.TestCase):
 
         # global masks set later so these fail until set
         with self.assertRaises(IrregularFixedMaskException):
-            info.global_app_mask
+            _ = info.global_app_mask
         with self.assertRaises(IrregularFixedMaskException):
-            info.has_global_app_masks
+            _ = info.has_global_app_masks
         with self.assertRaises(IrregularFixedMaskException):
-            info.global_machine_mask
+            _ = info.global_machine_mask
         with self.assertRaises(IrregularFixedMaskException):
-            info.has_global_machine_masks
+            _ = info.has_global_machine_masks
         with self.assertRaises(IrregularFixedMaskException):
-            info.global_app_shift
+            _ = info.global_app_shift
 
         # Regular stiff works right away
         self.assertEqual(info.key_and_mask, bkm1)
@@ -214,7 +214,7 @@ class TestRoutingInfo(unittest.TestCase):
         self.assertFalse(info.has_global_app_masks)
         self.assertFalse(info.is_machine_shiftable)
         with self.assertRaises(PacmanValueError):
-            info.machine_shift
+            _ = info.machine_shift
         # based on global
         self.assertEqual(info.machine_index_mask, 0x0003b000)
         self.assertEqual(hex(info.atom_mask), hex(0x000c4FfF))
@@ -304,15 +304,15 @@ class TestRoutingInfo(unittest.TestCase):
 
         # global masks set later so these fail until set
         with self.assertRaises(IrregularFixedMaskException):
-            info.global_app_mask
+            _ = info.global_app_mask
         with self.assertRaises(IrregularFixedMaskException):
-            info.has_global_app_masks
+            _ = info.has_global_app_masks
         with self.assertRaises(IrregularFixedMaskException):
-            info.global_machine_mask
+            _ = info.global_machine_mask
         with self.assertRaises(IrregularFixedMaskException):
-            info.has_global_machine_masks
+            _ = info.has_global_machine_masks
         with self.assertRaises(IrregularFixedMaskException):
-            info.global_app_shift
+            _ = info.global_app_shift
 
         # Regular stiff works right away
         self.assertEqual(info.mask, specific_app)
