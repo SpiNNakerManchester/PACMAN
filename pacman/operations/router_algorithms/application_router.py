@@ -933,7 +933,7 @@ def _add_routing_entry(
     except Exception as e:
         print(f"Error adding route: {e}")
         _print_path(first_route)
-        raise e
+        raise
 
 
 def _print_path(first_route: RoutingTree) -> None:
