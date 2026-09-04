@@ -15,6 +15,7 @@
 import unittest
 
 from pacman.config_setup import unittest_setup
+from pacman.exceptions import PacmanTypeError
 from pacman.model.graphs.common import Slice
 
 
@@ -49,7 +50,7 @@ class TestSlice(unittest.TestCase):
 
     def test_check_lo_atom_int(self) -> None:
         # Check for value sanity
-        with self.assertRaises(Exception):
+        with self.assertRaises(PacmanTypeError):
             # Check for int atom
             Slice("1", 10)  # type: ignore[arg-type]
 
@@ -60,7 +61,7 @@ class TestSlice(unittest.TestCase):
 
     def test_check_hi_atom_int(self) -> None:
         # Check for value sanity
-        with self.assertRaises(Exception):
+        with self.assertRaises(PacmanTypeError):
             # Check for int atom
             Slice(1, "10")   # type: ignore[arg-type]
 

@@ -153,7 +153,7 @@ class TestPartition(unittest.TestCase):
         self.assertEqual(0, part.total_sdram_requirements())
         with self.assertRaises(PartitionMissingEdgesException):
             part.sdram_base_address = 10
-        with self.assertRaises(Exception):
+        with self.assertRaises(KeyError):
             part.get_sdram_size_of_region_for(v1)
         self.assertFalse(part.is_sdram_base_address_defined(v1))
         v3 = MockSupportsSDRAMEdges(ConstantSDRAM(12))
@@ -196,5 +196,5 @@ class TestPartition(unittest.TestCase):
         with self.assertRaises(PacmanConfigurationException):
             AbstractMultiplePartition([v1, v1], "foo", (MachineEdge))
         part = AbstractMultiplePartition([v1, v2], "foo", (MachineEdge))
-        with self.assertRaises(Exception):
+        with self.assertRaises(PacmanValueError):
             part.add_edge(SDRAMMachineEdge(v3, v1, "foo"))
