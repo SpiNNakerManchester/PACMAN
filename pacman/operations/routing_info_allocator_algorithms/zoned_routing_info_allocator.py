@@ -306,8 +306,7 @@ class ZonedRoutingInfoAllocator:
         min_app = self.__size_app_part_bits
         best_app = (BITS_IN_KEY -
                     self.__max_bits_machine - self.__max_bits_atoms)
-        if best_app < min_app:
-            best_app = min_app
+        best_app = max(best_app, min_app)
 
         # no fixed so easiest
         if len(routing_info) == 0:
