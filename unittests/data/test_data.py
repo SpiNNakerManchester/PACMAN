@@ -92,7 +92,7 @@ class TestSimulatorData(unittest.TestCase):
 
         self.assertTrue(PacmanDataView.get_n_vertices() > 0)
         self.assertSetEqual(
-            set([app1, app2, app3]),
+            {app1, app2, app3},
             set(PacmanDataView.iterate_vertices()))
         self.assertEqual(
             [app2, app3],

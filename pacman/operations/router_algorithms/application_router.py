@@ -299,7 +299,7 @@ def _route_source_to_target(
     target_xys: set[XY]
     # If there is just one real target, use that directly
     if len(real_target_xys) == 1:
-        target_xys = set([xy])
+        target_xys = {xy}
         target_xy = xy
         overlaps = None
     else:
@@ -820,7 +820,7 @@ def _find_path(
             x, y = xy
             if machine.is_link_at(x, y, link):
                 next_xy: XY = machine.xy_over_link(x, y, link)
-                if _is_open_chip(next_xy, set((next_xy,)), visited, machine):
+                if _is_open_chip(next_xy, {next_xy}, visited, machine):
                     new_path = list(path)
                     new_path.append((link, next_xy))
                     xys_to_explore.append((next_xy, new_path))
