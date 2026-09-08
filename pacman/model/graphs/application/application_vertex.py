@@ -167,7 +167,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
         raise NotImplementedError
 
     def round_n_atoms(
-            self, n_atoms: int | float, label: str = "n_atoms") -> int:
+            self, n_atoms: float, label: str = "n_atoms") -> int:
         """
         Utility function to allow superclasses to make sure `n_atoms` is an
         integer.
