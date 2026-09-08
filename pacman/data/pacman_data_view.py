@@ -83,7 +83,7 @@ class _PacmanDataModel:
         "_tags",
         "_uncompressed")
 
-    def __new__(cls) -> _PacmanDataModel:
+    def __new__(cls) -> _PacmanDataModel:  # NOQA: PYI034
         if cls.__singleton is not None:
             return cls.__singleton
         obj = object.__new__(cls)
