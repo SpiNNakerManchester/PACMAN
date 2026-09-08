@@ -26,7 +26,7 @@ from .constant_sdram import ConstantSDRAM
 from .variable_sdram import VariableSDRAM
 
 
-def _ceil(value: int | float | numpy.integer | numpy.floating) -> int:
+def _ceil(value: float | numpy.integer | numpy.floating) -> int:
     return math.ceil(value)
 
 
