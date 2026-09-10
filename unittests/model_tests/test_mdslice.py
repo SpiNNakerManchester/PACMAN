@@ -84,8 +84,8 @@ class TestSlice(unittest.TestCase):
         s = MDSlice(22, 89, (2, 3, 2), (4, 3, 0), (6, 9, 4))
         # Going over the raster IDs should result in a line over the core
         self.assertListEqual(list(range(2 * 3 * 2)),
-                             list((s.get_relative_indices(
-                                 s.get_raster_ids()))))
+                             list(s.get_relative_indices(
+                                 s.get_raster_ids())))
 
     def test_get_raster_indices(self) -> None:
         s = MDSlice(22, 89, (2, 3, 2), (4, 3, 0), (6, 9, 4))
