@@ -55,7 +55,7 @@ def codify(route: MulticastRoutingEntry, length: int = 32) -> str:
     # Check each bit in the mask; use bit from key if so, else WILDCARD
     return "".join(
         str(int(key & bit != 0) if (mask & bit) else WILDCARD)
-        for bit in map(lambda i: 1 << i, reversed(range(length))))
+        for bit in [1 << i for i in reversed(range(length))])
 
 
 def codify_table(

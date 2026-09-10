@@ -93,8 +93,8 @@ class MulticastRoutingTables:
         :returns: The number of entries in the largest table.
         """
         if self._routing_tables_by_chip:
-            return max(map((lambda x: x.number_of_entries),
-                           self._routing_tables_by_chip.values()))
+            return max([x.number_of_entries
+                        for x in self._routing_tables_by_chip.values()])
         else:
             return 0
 
@@ -108,8 +108,8 @@ class MulticastRoutingTables:
         :returns: total number of multicast routing entries
         """
         if self._routing_tables_by_chip:
-            return sum(map((lambda x: x.number_of_entries),
-                           self._routing_tables_by_chip.values()))
+            return sum([x.number_of_entries
+                        for x in self._routing_tables_by_chip.values()])
         else:
             return 0
 
