@@ -369,13 +369,12 @@ class ZonedRoutingInfoAllocator:
         self.__target_app_bits, atom_bits = (
             self.__find_target_app_bits(routing_info))
 
+        # fixed does not leave room for largest machine index
         if atom_bits is not None:
-            # fixed is smaller than needed by other vertices
-            if atom_bits < self.__max_bits_atoms:
-                atom_bits = None
-            # fixed does not leave room for largest machine index
-            elif (self.__target_app_bits + self.__max_bits_machine +
-                  atom_bits > BITS_IN_KEY):
+            if ((atom_bits < self.__max_bits_atoms) or
+                # fixed is smaller than needed by other vertices
+                (self.__target_app_bits + self.__max_bits_machine + atom_bits
+                 > BITS_IN_KEY)):
                 atom_bits = None
 
         if atom_bits is not None:
