@@ -105,9 +105,9 @@ def test_all_working(width: int, height: int,  version: int,
         set_config("Machine", "down_links", down_str)
     down_chips = None
     if with_down_chips:
-        down_chips = set(
+        down_chips = {
             (ethernet_chip.x + 1, ethernet_chip.y + 1)
-            for ethernet_chip in temp_machine.ethernet_connected_chips)
+            for ethernet_chip in temp_machine.ethernet_connected_chips}
         down_str = ":".join([f"{x},{y}" for x, y in down_chips])
         set_config("Machine", "down_chips", down_str)
     _check_setup(width, height)
