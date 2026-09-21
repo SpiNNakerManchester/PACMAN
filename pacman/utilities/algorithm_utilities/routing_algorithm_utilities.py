@@ -45,7 +45,7 @@ def get_app_partitions() -> list[ApplicationEdgePartition]:
     # Find all partitions that need to be dealt with
     # Make a copy which we can edit
     partitions = list(PacmanDataView.iterate_partitions())
-    sources = set((p.pre_vertex, p.identifier) for p in partitions)
+    sources = {(p.pre_vertex, p.identifier) for p in partitions}
 
     # Convert internal partitions to self-connected partitions
     for v in PacmanDataView.iterate_vertices():
