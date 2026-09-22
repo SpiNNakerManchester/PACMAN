@@ -477,8 +477,8 @@ def _make_source_to_target_routes(
         # Make sure that we add the machine sources on the source edge chip
         if source_edge_xy not in targets:
             edge_targets = _Targets()
-            for source_xy in source_mappings:
-                for vertex, _p, _l in source_mappings[source_xy]:
+            for source_mapping in source_mappings.values():
+                for vertex, _p, _l in source_mapping:
                     edge_targets.ensure_source(vertex)
             targets[source_edge_xy] = edge_targets
 
@@ -509,13 +509,14 @@ def _make_source_to_source_routes(
     :param routing_tables: The tables to write
     :param targets: The target end-points of the routes
     """
-    for xy in source_mappings:
+    for xy, source_mapping in source_mappings.items():
         source_routes: dict[XY, RoutingTree] = {}
         _route_to_xys(
             xy, all_source_xys.union(self_xys), machine, source_routes,
             source_edge_xys.union(self_xys),
             "Sources to Source (self)")
-        for vertex, processor, link in source_mappings[xy]:
+
+        for vertex, processor, link in source_mapping:
             _convert_a_route(
                 routing_tables, vertex, partition.identifier,
                 processor, link, source_routes[xy], targets=targets,
@@ -539,12 +540,12 @@ def _make_source_to_source_edge_routes(
     :param partition: The partition to route
     :param routing_tables: The tables to write
     """
-    for xy in source_mappings:
+    for xy, source_mapping in source_mappings.items():
         source_routes: dict[XY, RoutingTree] = {}
         _route_to_xys(
             xy, all_source_xys, machine, source_routes,
             source_edge_xys, "Sources to source")
-        for vertex, processor, link in source_mappings[xy]:
+        for vertex, processor, link in source_mapping:
             _convert_a_route(
                 routing_tables, vertex, partition.identifier,
                 processor, link, source_routes[xy], {})
