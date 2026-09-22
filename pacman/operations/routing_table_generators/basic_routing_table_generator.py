@@ -56,10 +56,9 @@ def __create_routing_table(
     table = UnCompressedMulticastRoutingTable(x, y)
     sources_by_key_mask: dict[BaseKeyAndMask,
                               tuple[AbstractVertex, str]] = {}
-    for source_vertex, partition_id in partitions_in_table:
+    for (source_vertex, partition_id), entry in partitions_in_table.items():
         r_info = routing_infos.get_info_from(
             source_vertex, partition_id)
-        entry = partitions_in_table[source_vertex, partition_id]
         if r_info.key_and_mask in sources_by_key_mask:
             if (sources_by_key_mask[r_info.key_and_mask]
                     != (source_vertex, partition_id)):
