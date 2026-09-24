@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     from .application_edge_partition import ApplicationEdgePartition
 #: :meta private:
 MV = TypeVar("MV", bound='MachineVertex')
-logger = FormatAdapter(logging.getLogger(__file__))
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
