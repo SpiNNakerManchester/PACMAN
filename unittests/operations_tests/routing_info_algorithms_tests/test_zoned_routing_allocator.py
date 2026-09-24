@@ -597,6 +597,6 @@ def test_many_machine_mask() -> None:
     create_many_machine_mask()
     try:
         ZonedRoutingInfoAllocator().allocate()
-        raise Exception("PacmanRouteInfoAllocationExceptio not raise")
+        raise AssertionError("PacmanRouteInfoAllocationException not raise")
     except PacmanRouteInfoAllocationException:
         pass
