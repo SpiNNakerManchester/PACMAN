@@ -86,11 +86,7 @@ def is_single(iterable: Iterable[Any]) -> bool:
         return False
 
     # Test if there is a second item, if not return True
-    if next(iterator, None) is None:
-        return True
-
-    # Otherwise return False
-    return False
+    return next(iterator, None) is None
 
 
 def md5(string: str) -> str:
