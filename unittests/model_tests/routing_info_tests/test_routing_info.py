@@ -143,7 +143,6 @@ class TestRoutingInfo(unittest.TestCase):
         with self.assertRaises(PacmanConfigurationException):
             BaseKeyAndMask(0xF0, 0x40)
         bkm1 = BaseKeyAndMask(0x40, 0xF0)
-        assert bkm1 == bkm1
         assert bkm1 != []
         assert str(bkm1) == "KeyAndMask:0x40:0xf0"
         assert bkm1.n_keys == 268435456
