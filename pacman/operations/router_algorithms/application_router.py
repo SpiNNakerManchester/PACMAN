@@ -616,8 +616,8 @@ def _route_to_xys(
     targets_to_visit = set(targets)
     while xys_to_explore:
         xy, path = xys_to_explore.popleft()
-        if xy in targets_to_visit:
-            targets_to_visit.remove(xy)
+        # remove xy if it exists
+        targets_to_visit.dicard(xy)
         if xy in visited:
             continue
         visited.add(xy)
