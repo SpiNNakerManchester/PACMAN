@@ -203,8 +203,7 @@ class RoutingInfo:
         :return: a iterator of routing information
         """
         for vertex_info in self._info.values():
-            for info in vertex_info.values():
-                yield info
+            yield from vertex_info.values()
 
     def __len__(self) -> int:
         return sum(len(v) for v in self._info.values())
