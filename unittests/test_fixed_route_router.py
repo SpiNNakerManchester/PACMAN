@@ -33,7 +33,7 @@ def _get_destinations(
         machine: Machine,
         fixed_route_tables: dict[tuple[int, int], RoutingEntry],
         source_x: int, source_y: int) -> set[tuple[int, int, int]]:
-    to_search = list([(source_x, source_y)])
+    to_search = [(source_x, source_y)]
     visited = set()
     destinations: set[tuple[int, int, int]] = set()
     while to_search:
