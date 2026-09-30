@@ -210,7 +210,7 @@ def get_generality(key: int, mask: int) -> int:
     xs = (~key) & (~mask) & 0xffffffff
     # See https://stackoverflow.com/a/9831671/301832
     # Can't use int.bit_count() until Python 10
-    return bin(xs).count("1")
+    return (xs).bit_count()
 
 
 def _get_entry_generality(entry: MulticastRoutingEntry | _Merge) -> int:

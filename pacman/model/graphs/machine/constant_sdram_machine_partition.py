@@ -33,8 +33,8 @@ E = TypeVar("E", bound=SDRAMMachineEdge)
 
 
 class ConstantSDRAMMachinePartition(
-        AbstractSingleSourcePartition[V, E], Generic[V, E],
-        AbstractSDRAMPartition):
+        AbstractSingleSourcePartition[V, E], AbstractSDRAMPartition,
+        Generic[V, E]):
     """
     An SDRAM partition that uses a fixed amount of memory. The edges in
     the partition must agree on how much memory is required.
