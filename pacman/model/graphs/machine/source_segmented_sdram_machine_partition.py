@@ -21,11 +21,11 @@ from pacman.exceptions import (
     PartitionMissingEdgesException,
 )
 from pacman.model.graphs import AbstractMultiplePartition
-from pacman.model.graphs.machine import (
+from pacman.model.graphs.machine.abstract_sdram_partition import (
     AbstractSDRAMPartition,
-    MachineVertex,
-    SDRAMMachineEdge,
 )
+from pacman.model.graphs.machine.machine_sdram_edge import SDRAMMachineEdge
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
 
 class SourceSegmentedSDRAMMachinePartition(

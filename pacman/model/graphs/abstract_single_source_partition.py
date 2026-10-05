@@ -24,7 +24,7 @@ from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs import AbstractEdgePartition
+from pacman.model.graphs.abstract_edge_partition import AbstractEdgePartition
 
 if TYPE_CHECKING:
     from .abstract_edge import AbstractEdge  # @UnusedImport
