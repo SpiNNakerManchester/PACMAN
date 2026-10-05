@@ -18,10 +18,12 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs import AbstractVertex
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex,
+)
 from pacman.utilities.constants import FULL_MASK
 from pacman.utilities.utility_calls import calc_shift, can_shift
 
-from ..graphs.application import ApplicationVertex
 from .base_key_and_mask import BaseKeyAndMask
 
 NOT_SET = -1000
