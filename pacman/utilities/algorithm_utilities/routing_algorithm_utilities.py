@@ -20,7 +20,8 @@ from spinn_machine import Chip
 from pacman.data.pacman_data_view import PacmanDataView
 from pacman.model.graphs.abstract_virtual import AbstractVirtual
 from pacman.model.graphs.application.application_edge_partition import (
-    ApplicationEdgePartition)
+    ApplicationEdgePartition,
+)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
 

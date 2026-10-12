@@ -18,13 +18,17 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.abstract_vertex import AbstractVertex
-from pacman.model.graphs.application.application_vertex import ApplicationVertex
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex,
+)
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.machine.abstract_sdram_partition import (
-    AbstractSDRAMPartition)
+    AbstractSDRAMPartition,
+)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.graphs.machine.multicast_edge_partition import (
-    MulticastEdgePartition)
+    MulticastEdgePartition,
+)
 from pacman.model.resources.abstract_sdram import AbstractSDRAM
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 

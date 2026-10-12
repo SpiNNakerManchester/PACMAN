@@ -18,12 +18,14 @@ from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
 from pacman.data.pacman_data_view import PacmanDataView
 from pacman.model.graphs.abstract_vertex import AbstractVertex
-from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-from pacman.model.routing_tables.uncompressed_multicast_routing_table import (
-    UnCompressedMulticastRoutingTable)
+from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_tables.multicast_routing_tables import (
-    MulticastRoutingTables)
+    MulticastRoutingTables,
+)
+from pacman.model.routing_tables.uncompressed_multicast_routing_table import (
+    UnCompressedMulticastRoutingTable,
+)
 
 
 def basic_routing_table_generator() -> MulticastRoutingTables:

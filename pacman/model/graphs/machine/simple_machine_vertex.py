@@ -17,12 +17,12 @@ from collections.abc import Iterable
 from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
+    ApplicationVertex,
+)
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.resources.abstract_sdram import AbstractSDRAM
 from pacman.model.resources.iptag_resource import IPtagResource
-from pacman.model.resources.reverse_iptag_resource import (
-    ReverseIPtagResource)
+from pacman.model.resources.reverse_iptag_resource import ReverseIPtagResource
 
 from .machine_vertex import MachineVertex
 

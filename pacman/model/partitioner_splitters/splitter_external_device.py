@@ -21,15 +21,17 @@ from pacman.exceptions import (
     PacmanConfigurationException,
     PacmanNotExistException,
 )
-from pacman.model.graphs.application.application_fpga_vertex import (
-    ApplicationFPGAVertex)
 from pacman.model.graphs.application. \
     application_spinnaker_link_vertex import ApplicationSpiNNakerLinkVertex
+from pacman.model.graphs.application.application_fpga_vertex import (
+    ApplicationFPGAVertex,
+)
 from pacman.model.graphs.application.fpga_connection import FPGAConnection
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.machine.machine_fpga_vertex import MachineFPGAVertex
 from pacman.model.graphs.machine.machine_spinnaker_link_vertex import (
-    MachineSpiNNakerLinkVertex)
+    MachineSpiNNakerLinkVertex,
+)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 

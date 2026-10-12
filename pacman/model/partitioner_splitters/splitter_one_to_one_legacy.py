@@ -20,11 +20,13 @@ from spinn_utilities.overrides import overrides
 
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
+    ApplicationVertex,
+)
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
-    LegacyPartitionerAPI)
+    LegacyPartitionerAPI,
+)
 from pacman.model.resources.abstract_sdram import AbstractSDRAM
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 

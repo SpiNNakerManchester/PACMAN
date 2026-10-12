@@ -20,18 +20,24 @@ from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
 from pacman.data.pacman_data_view import PacmanDataView
 from pacman.model.graphs.abstract_vertex import AbstractVertex
-from pacman.model.graphs.application.application_vertex import ApplicationVertex
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex,
+)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.routing_info.app_vertex_routing_info import (
-    AppVertexRoutingInfo)
-from pacman.model.routing_info.machine_vertex_routing_info import (
-    MachineVertexRoutingInfo)
-from pacman.model.routing_info.routing_info import RoutingInfo
+    AppVertexRoutingInfo,
+)
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.model.routing_info.machine_vertex_routing_info import (
+    MachineVertexRoutingInfo,
+)
+from pacman.model.routing_info.routing_info import RoutingInfo
 from pacman.model.routing_tables.multicast_routing_tables import (
-    MulticastRoutingTables)
+    MulticastRoutingTables,
+)
 from pacman.model.routing_tables.uncompressed_multicast_routing_table import (
-    UnCompressedMulticastRoutingTable)
+    UnCompressedMulticastRoutingTable,
+)
 
 #: :meta private:
 E = TypeVar("E")

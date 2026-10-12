@@ -19,7 +19,8 @@ from spinn_utilities.typing.coords import XY
 
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
+    ApplicationVertex,
+)
 from pacman.model.graphs.common.mdslice import MDSlice
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.utilities.constants import BITS_IN_KEY

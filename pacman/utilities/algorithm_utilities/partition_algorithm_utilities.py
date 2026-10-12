@@ -19,7 +19,8 @@ import math
 
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
+    ApplicationVertex,
+)
 from pacman.model.graphs.common.mdslice import MDSlice
 from pacman.model.graphs.common.slice import Slice
 

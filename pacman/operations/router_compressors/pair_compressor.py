@@ -20,9 +20,11 @@ from spinn_machine import MulticastRoutingEntry, RoutingEntry
 from pacman.data.pacman_data_view import PacmanDataView
 from pacman.exceptions import PacmanElementAllocationException
 from pacman.model.routing_tables.abstract_multicast_routing_table import (
-    AbstractMulticastRoutingTable)
+    AbstractMulticastRoutingTable,
+)
 from pacman.model.routing_tables.multicast_routing_tables import (
-    MulticastRoutingTables)
+    MulticastRoutingTables,
+)
 
 from .abstract_compressor import AbstractCompressor
 

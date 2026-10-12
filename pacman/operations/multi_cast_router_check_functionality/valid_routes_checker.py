@@ -32,14 +32,17 @@ from pacman.exceptions import (
 )
 from pacman.model.graphs.abstract_virtual import AbstractVirtual
 from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
+    ApplicationVertex,
+)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.model.routing_tables.abstract_multicast_routing_table import (
-    AbstractMulticastRoutingTable)
+    AbstractMulticastRoutingTable,
+)
 from pacman.model.routing_tables.multicast_routing_tables import (
-    MulticastRoutingTables)
+    MulticastRoutingTables,
+)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     get_app_partitions,
 )

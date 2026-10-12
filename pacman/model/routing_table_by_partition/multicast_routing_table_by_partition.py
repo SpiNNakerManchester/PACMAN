@@ -23,7 +23,8 @@ from spinn_machine import RoutingEntry
 
 from pacman.exceptions import PacmanInvalidParameterException
 from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
+    ApplicationVertex,
+)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
 if TYPE_CHECKING:

@@ -24,7 +24,8 @@ from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
 from pacman.exceptions import PacmanAlreadyExistsException
 from pacman.model.routing_tables.abstract_multicast_routing_table import (
-    AbstractMulticastRoutingTable)
+    AbstractMulticastRoutingTable,
+)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

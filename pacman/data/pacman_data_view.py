@@ -28,10 +28,12 @@ from spinn_machine.data import MachineDataView
 from pacman.exceptions import PacmanNotPlacedError
 from pacman.model.graphs.application.application_edge import ApplicationEdge
 from pacman.model.graphs.application.application_edge_partition import (
-    ApplicationEdgePartition)
+    ApplicationEdgePartition,
+)
 from pacman.model.graphs.application.application_graph import ApplicationGraph
 from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
+    ApplicationVertex,
+)
 from pacman.model.graphs.machine.machine_edge import MachineEdge
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.resources.abstract_sdram import AbstractSDRAM

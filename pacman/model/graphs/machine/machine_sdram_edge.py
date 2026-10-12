@@ -14,7 +14,8 @@
 
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.abstract_supports_sdram_edges import (
-    AbstractSupportsSDRAMEdges)
+    AbstractSupportsSDRAMEdges,
+)
 
 from .machine_edge import MachineEdge
 from .machine_vertex import MachineVertex

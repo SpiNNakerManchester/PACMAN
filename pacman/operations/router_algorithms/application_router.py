@@ -26,13 +26,16 @@ from pacman.exceptions import PacmanRoutingException
 from pacman.model.graphs.abstract_edge_partition import AbstractEdgePartition
 from pacman.model.graphs.abstract_vertex import AbstractVertex
 from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
+    ApplicationVertex,
+)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.graphs.machine.multicast_edge_partition import (
-    MulticastEdgePartition)
+    MulticastEdgePartition,
+)
 from pacman.model.routing_table_by_partition. \
     multicast_routing_table_by_partition import (
-    MulticastRoutingTableByPartition)
+        MulticastRoutingTableByPartition,
+    )
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     get_app_partitions,
     longest_dimension_first,

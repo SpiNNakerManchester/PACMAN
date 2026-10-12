@@ -22,7 +22,8 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
-    LegacyPartitionerAPI)
+    LegacyPartitionerAPI,
+)
 from pacman.utilities.algorithm_utilities. \
     partition_algorithm_utilities import get_multidimensional_slices
 from pacman.utilities.utility_objs.chip_counter import ChipCounter

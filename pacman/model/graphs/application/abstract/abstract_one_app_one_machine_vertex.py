@@ -18,7 +18,8 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
+    ApplicationVertex,
+)
 
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex  # @UnusedImport

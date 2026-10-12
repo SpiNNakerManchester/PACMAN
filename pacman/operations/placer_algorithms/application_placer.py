@@ -30,7 +30,8 @@ from pacman.exceptions import (
 )
 from pacman.model.graphs.abstract_virtual import AbstractVirtual
 from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
+    ApplicationVertex,
+)
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
