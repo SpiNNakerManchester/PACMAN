@@ -19,12 +19,11 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.application.abstract import (
-    AbstractOneAppOneMachineVertex,
-)
-from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineVertex
-from pacman.utilities.utility_objs import ChipCounter
+from pacman.model.graphs.application.abstract. \
+    abstract_one_app_one_machine_vertex import AbstractOneAppOneMachineVertex
+from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 from .abstract_splitter_common import AbstractSplitterCommon
 

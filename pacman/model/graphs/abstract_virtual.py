@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.require_subclass import require_subclass
 
-from pacman.model.graphs import AbstractVertex
+from pacman.model.graphs.abstract_vertex import AbstractVertex
 
 if TYPE_CHECKING:
     from spinn_utilities.typing.coords import XY

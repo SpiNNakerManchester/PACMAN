@@ -17,10 +17,11 @@ from spinn_utilities.typing.coords import XY
 
 from spinn_machine import Chip
 
-from pacman.data import PacmanDataView
-from pacman.model.graphs import AbstractVirtual
-from pacman.model.graphs.application import ApplicationEdgePartition
-from pacman.model.graphs.machine import MachineVertex
+from pacman.data.pacman_data_view import PacmanDataView
+from pacman.model.graphs.abstract_virtual import AbstractVirtual
+from pacman.model.graphs.application.application_edge_partition import (
+    ApplicationEdgePartition)
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
 
 def get_app_partitions() -> list[ApplicationEdgePartition]:

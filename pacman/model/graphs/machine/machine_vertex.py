@@ -19,11 +19,10 @@ from typing import TYPE_CHECKING, final
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
 
-from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.application.abstract import (
-    AbstractOneAppOneMachineVertex,
-)
-from pacman.model.graphs.common import Slice
+from pacman.model.graphs.abstract_vertex import AbstractVertex
+from pacman.model.graphs.application.abstract. \
+    abstract_one_app_one_machine_vertex import AbstractOneAppOneMachineVertex
+from pacman.model.graphs.common.slice import Slice
 from pacman.utilities.utility_calls import get_n_bits
 
 if TYPE_CHECKING:

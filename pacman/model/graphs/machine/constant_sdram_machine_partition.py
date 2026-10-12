@@ -20,7 +20,8 @@ from pacman.exceptions import (
     PartitionMissingEdgesException,
     SDRAMEdgeSizeException,
 )
-from pacman.model.graphs import AbstractSingleSourcePartition
+from pacman.model.graphs.abstract_single_source_partition import (
+    AbstractSingleSourcePartition)
 
 from .abstract_sdram_partition import AbstractSDRAMPartition
 from .machine_sdram_edge import SDRAMMachineEdge

@@ -26,11 +26,12 @@ from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
 from pacman.data.pacman_data_view import PacmanDataView
 from pacman.exceptions import MinimisationFailedError
-from pacman.model.routing_tables import (
-    MulticastRoutingTables,
-    UnCompressedMulticastRoutingTable,
-)
-from pacman.operations.router_compressors import AbstractCompressor
+from pacman.model.routing_tables.multicast_routing_tables import (
+    MulticastRoutingTables)
+from pacman.model.routing_tables.uncompressed_multicast_routing_table import (
+    UnCompressedMulticastRoutingTable)
+from pacman.operations.router_compressors.abstract_compressor import (
+    AbstractCompressor)
 from pacman.utilities.constants import FULL_MASK
 
 from .utils import intersect, remove_default_routes

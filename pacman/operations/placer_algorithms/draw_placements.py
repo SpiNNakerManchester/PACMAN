@@ -20,9 +20,9 @@ from collections import defaultdict
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.typing.coords import XY
 
-from pacman.data import PacmanDataView
-from pacman.model.graphs import AbstractVertex
-from pacman.model.placements import Placements
+from pacman.data.pacman_data_view import PacmanDataView
+from pacman.model.graphs.abstract_vertex import AbstractVertex
+from pacman.model.placements.placements import Placements
 
 from ._spinner_api import Colour, spinner_api
 

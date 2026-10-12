@@ -22,14 +22,16 @@ from spinn_utilities.progress_bar import ProgressBar
 
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
-from pacman.data import PacmanDataView
+from pacman.data.pacman_data_view import PacmanDataView
 from pacman.exceptions import MinimisationFailedError
-from pacman.model.routing_tables import (
-    AbstractMulticastRoutingTable,
-    CompressedMulticastRoutingTable,
-    MulticastRoutingTables,
-    UnCompressedMulticastRoutingTable,
-)
+from pacman.model.routing_tables.abstract_multicast_routing_table import (
+    AbstractMulticastRoutingTable)
+from pacman.model.routing_tables.compressed_multicast_routing_table import (
+    CompressedMulticastRoutingTable)
+from pacman.model.routing_tables.multicast_routing_tables import (
+    MulticastRoutingTables)
+from pacman.model.routing_tables.uncompressed_multicast_routing_table import (
+    UnCompressedMulticastRoutingTable)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

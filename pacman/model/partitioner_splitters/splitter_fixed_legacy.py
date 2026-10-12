@@ -19,12 +19,13 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineVertex
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
+from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.model.partitioner_interfaces.legacy_partitioner_api import (
+    LegacyPartitionerAPI)
 from pacman.utilities.algorithm_utilities. \
     partition_algorithm_utilities import get_multidimensional_slices
-from pacman.utilities.utility_objs import ChipCounter
+from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 from .abstract_splitter_common import AbstractSplitterCommon, V
 

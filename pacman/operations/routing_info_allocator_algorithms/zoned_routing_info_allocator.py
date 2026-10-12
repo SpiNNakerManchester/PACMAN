@@ -20,19 +20,24 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_utilities.progress_bar import ProgressBar
 
 from pacman.exceptions import PacmanRouteInfoAllocationException
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
-from pacman.model.routing_info import (
-    BaseKeyAndMask,
-    FixedAppVertexRoutingInfo,
-    FixedMachineVertexRoutingInfo,
-    GlobalAppVertexRoutingInfo,
-    GlobalMachineVertexRoutingInfo,
-    MachineVertexRoutingInfo,
-    RoutingInfo,
-    SpecificAppVertexRoutingInfo,
-    SpecificMachineVertexRoutingInfo,
-)
+from pacman.model.graphs.application.application_vertex import ApplicationVertex
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.model.routing_info.fixed_app_vertex_routing_info import (
+    FixedAppVertexRoutingInfo)
+from pacman.model.routing_info.fixed_machine_vertex_routing_info import (
+    FixedMachineVertexRoutingInfo)
+from pacman.model.routing_info.global_app_vertex_routing_info import (
+    GlobalAppVertexRoutingInfo)
+from pacman.model.routing_info.global_machine_vertex_routing_info import (
+    GlobalMachineVertexRoutingInfo)
+from pacman.model.routing_info.machine_vertex_routing_info import (
+    MachineVertexRoutingInfo)
+from pacman.model.routing_info.routing_info import RoutingInfo
+from pacman.model.routing_info.specific_app_vertex_routing_info import (
+    SpecificAppVertexRoutingInfo)
+from pacman.model.routing_info.specific_machine_vertex_routing_info import (
+    SpecificMachineVertexRoutingInfo)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     get_app_partitions,
 )

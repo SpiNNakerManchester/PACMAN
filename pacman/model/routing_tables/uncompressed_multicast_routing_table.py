@@ -23,7 +23,8 @@ from spinn_utilities.overrides import overrides
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
 from pacman.exceptions import PacmanAlreadyExistsException
-from pacman.model.routing_tables import AbstractMulticastRoutingTable
+from pacman.model.routing_tables.abstract_multicast_routing_table import (
+    AbstractMulticastRoutingTable)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

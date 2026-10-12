@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pacman.model.graphs import AbstractSingleSourcePartition
+from pacman.model.graphs.abstract_single_source_partition import (
+    AbstractSingleSourcePartition)
 
 from .machine_edge import MachineEdge
 from .machine_vertex import MachineVertex

@@ -17,8 +17,8 @@ from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.graphs import AbstractVirtual
-from pacman.model.resources import ConstantSDRAM
+from pacman.model.graphs.abstract_virtual import AbstractVirtual
+from pacman.model.resources.constant_sdram import ConstantSDRAM
 
 from .machine_vertex import MachineVertex
 
@@ -121,7 +121,7 @@ class MachineSpiNNakerLinkVertex(MachineVertex, AbstractVirtual):
     def get_link_data(self) -> SpinnakerLinkData:
         # delayed import due to circular dependencies
         # pylint: disable=import-outside-toplevel
-        from pacman.data import PacmanDataView
+        from pacman.data.pacman_data_view import PacmanDataView
         spinnaker_links = PacmanDataView.get_spinnaker_links()
         return spinnaker_links.get_spinnaker_link_with_id(
             self._spinnaker_link_id, self._board_address,

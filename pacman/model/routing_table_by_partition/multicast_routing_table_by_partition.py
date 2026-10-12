@@ -22,8 +22,9 @@ from spinn_utilities.typing.coords import XY
 from spinn_machine import RoutingEntry
 
 from pacman.exceptions import PacmanInvalidParameterException
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex)
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
 if TYPE_CHECKING:
     from pacman.model.graphs import AbstractVertex

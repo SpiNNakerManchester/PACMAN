@@ -15,8 +15,9 @@
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.graphs.application.abstract import Abstract2DDeviceVertex
-from pacman.model.graphs.common import Slice
+from pacman.model.graphs.application.abstract.abstract_2d_device_vertex import (
+    Abstract2DDeviceVertex)
+from pacman.model.graphs.common.slice import Slice
 
 from .application_fpga_vertex import ApplicationFPGAVertex
 from .fpga_connection import FPGAConnection

@@ -17,7 +17,8 @@ from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.graphs import AbstractSingleSourcePartition
+from pacman.model.graphs.abstract_single_source_partition import (
+    AbstractSingleSourcePartition)
 
 from .application_edge import ApplicationEdge
 

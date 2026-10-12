@@ -21,14 +21,18 @@ from spinn_utilities.typing.coords import XY
 
 from spinn_machine import Machine, RoutingEntry
 
-from pacman.data import PacmanDataView
+from pacman.data.pacman_data_view import PacmanDataView
 from pacman.exceptions import PacmanRoutingException
-from pacman.model.graphs import AbstractEdgePartition, AbstractVertex
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex, MulticastEdgePartition
-from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartition,
-)
+from pacman.model.graphs.abstract_edge_partition import AbstractEdgePartition
+from pacman.model.graphs.abstract_vertex import AbstractVertex
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex)
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.model.graphs.machine.multicast_edge_partition import (
+    MulticastEdgePartition)
+from pacman.model.routing_table_by_partition. \
+    multicast_routing_table_by_partition import (
+    MulticastRoutingTableByPartition)
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (
     get_app_partitions,
     longest_dimension_first,
