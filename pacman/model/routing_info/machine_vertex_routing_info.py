@@ -17,7 +17,10 @@ from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
-from ..graphs.application import ApplicationVertex
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex,
+)
+
 from .vertex_routing_info import VertexRoutingInfo
 
 if TYPE_CHECKING:

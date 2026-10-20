@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.common import ChipAndCore
+from pacman.model.graphs.common.chip_and_core import ChipAndCore
 
 
 class AbstractVertex:

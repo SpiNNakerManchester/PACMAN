@@ -17,10 +17,12 @@ from typing import cast
 
 from spinn_machine import MulticastRoutingEntry, RoutingEntry
 
-from pacman.data import PacmanDataView
+from pacman.data.pacman_data_view import PacmanDataView
 from pacman.exceptions import PacmanElementAllocationException
-from pacman.model.routing_tables import (
+from pacman.model.routing_tables.abstract_multicast_routing_table import (
     AbstractMulticastRoutingTable,
+)
+from pacman.model.routing_tables.multicast_routing_tables import (
     MulticastRoutingTables,
 )
 

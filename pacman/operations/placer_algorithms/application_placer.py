@@ -22,17 +22,21 @@ from spinn_utilities.progress_bar import ProgressBar
 
 from spinn_machine import Chip
 
-from pacman.data import PacmanDataView
+from pacman.data.pacman_data_view import PacmanDataView
 from pacman.exceptions import (
     PacmanConfigurationException,
     PacmanPlaceException,
     PacmanTooBigToPlace,
 )
-from pacman.model.graphs import AbstractVirtual
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
-from pacman.model.placements import Placement, Placements
-from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
+from pacman.model.graphs.abstract_virtual import AbstractVirtual
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex,
+)
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.model.placements.placement import Placement
+from pacman.model.placements.placements import Placements
+from pacman.model.resources.abstract_sdram import AbstractSDRAM
+from pacman.model.resources.constant_sdram import ConstantSDRAM
 
 from .draw_placements import draw_placements as dp
 

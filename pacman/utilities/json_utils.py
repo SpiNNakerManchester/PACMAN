@@ -22,11 +22,14 @@ from typing import cast
 
 from spinn_utilities.typing.json import JsonArray, JsonObject
 
-from pacman.data import PacmanDataView
-from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.data.pacman_data_view import PacmanDataView
+from pacman.model.graphs.machine.simple_machine_vertex import (
+    SimpleMachineVertex,
+)
 from pacman.model.placements.placement import Placement
-from pacman.model.resources import IPtagResource, ReverseIPtagResource
-from pacman.model.routing_info import BaseKeyAndMask
+from pacman.model.resources.iptag_resource import IPtagResource
+from pacman.model.resources.reverse_iptag_resource import ReverseIPtagResource
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 
 
 def json_to_object(json_object: str | JsonObject) -> JsonObject:

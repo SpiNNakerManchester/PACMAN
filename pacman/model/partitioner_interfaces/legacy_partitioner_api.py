@@ -17,8 +17,8 @@ from typing import TYPE_CHECKING
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
-from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
+from pacman.model.graphs.common.slice import Slice
+from pacman.model.resources.abstract_sdram import AbstractSDRAM
 
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex
