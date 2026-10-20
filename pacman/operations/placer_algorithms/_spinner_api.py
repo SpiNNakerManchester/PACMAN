@@ -17,7 +17,6 @@ from collections.abc import Callable
 from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from typing import (
-    Any,
     NewType,
 )
 
@@ -40,7 +39,7 @@ class Spinner:
                                   AbstractContextManager[_Context]]
     aspect_ratio: Callable[[int, int], float]
     draw: Callable[
-        [_Context, int, int, int, int, _Boards, dict[Any, Any],
+        [_Context, int, int, int, int, _Boards, dict[object, object],
          dict[XY, Colour], list[XY]], None]
     create_torus: Callable[[int, int], _Boards]
 
