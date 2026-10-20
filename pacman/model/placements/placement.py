@@ -17,7 +17,7 @@ from spinn_utilities.typing.coords import XY, XYP
 from spinn_machine import Chip
 
 from pacman.data.pacman_data_view import PacmanDataView
-from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
 
 class Placement:

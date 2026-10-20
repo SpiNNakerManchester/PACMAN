@@ -32,7 +32,7 @@ from pacman.exceptions import (
     PacmanConfigurationException,
     PacmanInvalidParameterException,
 )
-from pacman.model.graphs import AbstractVertex
+from pacman.model.graphs.abstract_vertex import AbstractVertex
 
 if TYPE_CHECKING:
     from pacman.model.graphs.machine import MachineVertex
@@ -289,7 +289,7 @@ class ApplicationVertex(AbstractVertex, Generic[MV], metaclass=AbstractBase):
 
         # delayed import due to circular dependencies
         # pylint: disable=import-outside-toplevel
-        from pacman.data import PacmanDataView
+        from pacman.data.pacman_data_view import PacmanDataView
         PacmanDataView.set_requires_mapping()
 
     def reset(self) -> None:

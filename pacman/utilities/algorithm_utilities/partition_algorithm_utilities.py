@@ -18,8 +18,11 @@ A collection of methods which support partitioning algorithms.
 import math
 
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.common import MDSlice, Slice
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex,
+)
+from pacman.model.graphs.common.mdslice import MDSlice
+from pacman.model.graphs.common.slice import Slice
 
 
 def get_multidimensional_slices(

@@ -21,15 +21,21 @@ from spinn_utilities.overrides import overrides
 from spinn_machine.data.machine_data_writer import MachineDataWriter
 
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
-from pacman.model.placements import Placements
-from pacman.model.routing_info import RoutingInfo
-from pacman.model.routing_table_by_partition import (
-    MulticastRoutingTableByPartition,
+from pacman.model.graphs.application.application_edge import ApplicationEdge
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex,
 )
-from pacman.model.routing_tables import MulticastRoutingTables
-from pacman.model.tags import Tags
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.model.placements.placements import Placements
+from pacman.model.routing_info.routing_info import RoutingInfo
+from pacman.model.routing_table_by_partition. \
+    multicast_routing_table_by_partition import (
+        MulticastRoutingTableByPartition,
+    )
+from pacman.model.routing_tables.multicast_routing_tables import (
+    MulticastRoutingTables,
+)
+from pacman.model.tags.tags import Tags
 
 from .pacman_data_view import PacmanDataView, _PacmanDataModel
 

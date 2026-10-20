@@ -17,16 +17,20 @@ from typing import Generic, TypeVar
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import (
+from pacman.model.graphs.abstract_vertex import AbstractVertex
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex,
+)
+from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.machine.abstract_sdram_partition import (
     AbstractSDRAMPartition,
-    MachineVertex,
+)
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.model.graphs.machine.multicast_edge_partition import (
     MulticastEdgePartition,
 )
-from pacman.model.resources import AbstractSDRAM
-from pacman.utilities.utility_objs import ChipCounter
+from pacman.model.resources.abstract_sdram import AbstractSDRAM
+from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 #: The type of vertex that we split.
 #: :meta private:

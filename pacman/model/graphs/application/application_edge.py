@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.graphs import AbstractEdge
+from pacman.model.graphs.abstract_edge import AbstractEdge
 
 if TYPE_CHECKING:
     from pacman.model.graphs.application import ApplicationVertex

@@ -25,18 +25,22 @@ from spinn_utilities.progress_bar import ProgressBar
 
 from spinn_machine import Chip, MulticastRoutingEntry
 
-from pacman.data import PacmanDataView
+from pacman.data.pacman_data_view import PacmanDataView
 from pacman.exceptions import (
     PacmanConfigurationException,
     PacmanRoutingException,
 )
-from pacman.model.graphs import AbstractVirtual
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
-from pacman.model.placements import Placement
-from pacman.model.routing_info import BaseKeyAndMask
-from pacman.model.routing_tables import (
+from pacman.model.graphs.abstract_virtual import AbstractVirtual
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex,
+)
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.model.placements.placement import Placement
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.model.routing_tables.abstract_multicast_routing_table import (
     AbstractMulticastRoutingTable,
+)
+from pacman.model.routing_tables.multicast_routing_tables import (
     MulticastRoutingTables,
 )
 from pacman.utilities.algorithm_utilities.routing_algorithm_utilities import (

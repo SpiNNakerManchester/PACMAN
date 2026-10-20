@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex,
-)
 
 from .application_2d_fpga_vertex import Application2DFPGAVertex
 from .application_2d_spinnaker_link_vertex import (
@@ -25,6 +22,7 @@ from .application_edge_partition import ApplicationEdgePartition
 from .application_fpga_vertex import ApplicationFPGAVertex
 from .application_graph import ApplicationGraph
 from .application_spinnaker_link_vertex import ApplicationSpiNNakerLinkVertex
+from .application_vertex import ApplicationVertex
 from .application_virtual_vertex import ApplicationVirtualVertex
 from .fpga_connection import FPGAConnection
 

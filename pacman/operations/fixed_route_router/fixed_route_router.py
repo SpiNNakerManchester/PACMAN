@@ -17,7 +17,7 @@ from spinn_utilities.progress_bar import ProgressBar
 
 from spinn_machine import Chip, RoutingEntry
 
-from pacman.data import PacmanDataView
+from pacman.data.pacman_data_view import PacmanDataView
 from pacman.exceptions import (
     PacmanAlreadyExistsException,
     PacmanConfigurationException,

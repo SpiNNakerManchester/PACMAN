@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pacman.data import PacmanDataView
+from pacman.data.pacman_data_view import PacmanDataView
 
 
 def splitter_reset() -> None:

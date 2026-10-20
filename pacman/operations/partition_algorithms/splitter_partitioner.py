@@ -14,7 +14,7 @@
 
 from spinn_utilities.progress_bar import ProgressBar
 
-from pacman.data import PacmanDataView
+from pacman.data.pacman_data_view import PacmanDataView
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 
