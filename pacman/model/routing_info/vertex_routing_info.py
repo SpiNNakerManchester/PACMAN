@@ -17,7 +17,6 @@ import numpy
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 from pacman.exceptions import PacmanConfigurationException
-
 from pacman.model.graphs.abstract_virtual import AbstractVertex
 from pacman.model.graphs.application.application_vertex import (
     ApplicationVertex,
