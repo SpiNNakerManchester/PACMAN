@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
-
 
 class PacmanException(Exception):
     """
@@ -26,7 +24,7 @@ class PacmanInvalidParameterException(PacmanException):
     A parameter has an invalid value.
     """
 
-    def __init__(self, parameter: str, value: Any, problem: str):
+    def __init__(self, parameter: str, value: object, problem: str):
         """
         :param parameter: The name of the parameter
         :param value: The value of the parameter
@@ -42,7 +40,7 @@ class PacmanAlreadyExistsException(PacmanException):
     Something already exists and that adding another would be a conflict.
     """
 
-    def __init__(self, item_type: str, item_id: Any):
+    def __init__(self, item_type: str, item_id: object):
         """
         :param item_type: The type of the item that already exists
         :param item_id: The ID of the item which is in conflict

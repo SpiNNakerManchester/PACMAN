@@ -15,7 +15,6 @@
 import hashlib
 import math
 from collections.abc import Iterable
-from typing import Any
 
 import numpy
 
@@ -65,7 +64,7 @@ def compress_bits_from_bit_array(
     return compress_from_bit_array(expanded_value)
 
 
-def is_equal_or_none(a: Any, b: Any) -> bool:
+def is_equal_or_none(a: object, b: object) -> bool:
     """
     If a and b are both not `None`, return True if and only if they are equal,
     otherwise return True.
@@ -75,7 +74,7 @@ def is_equal_or_none(a: Any, b: Any) -> bool:
     return (a is None or b is None or a == b)
 
 
-def is_single(iterable: Iterable[Any]) -> bool:
+def is_single(iterable: Iterable[object]) -> bool:
     """
     :returns: True if there is exactly one item in the iterable.
     """
